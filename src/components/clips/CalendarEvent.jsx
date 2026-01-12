@@ -4,7 +4,7 @@ import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import EditClipModal from "./EditClipModal";
+import EditClipModal from "./EditClipModal.jsx";
 
 const platformIcons = {
   youtube: Youtube,

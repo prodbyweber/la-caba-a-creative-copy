@@ -23,7 +23,7 @@ import {
   parseISO
 } from "date-fns";
 import { es } from "date-fns/locale";
-import CalendarEvent from "./CalendarEvent";
+import CalendarEvent from "./CalendarEvent.jsx";
 
 export default function ClipsCalendar({ filters }) {
   const [currentDate, setCurrentDate] = useState(new Date());

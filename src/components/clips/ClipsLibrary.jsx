@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import ClipCard from "./ClipCard";
+import ClipCard from "./ClipCard.jsx";
 import { LayoutGrid, List, Loader } from "lucide-react";
 
 export default function ClipsLibrary({ filters }) {

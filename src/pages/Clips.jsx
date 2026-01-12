@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
-import ClipsLibrary from "@/components/clips/ClipsLibrary";
-import ClipsCalendar from "@/components/clips/ClipsCalendar";
-import ClipsHeader from "@/components/clips/ClipsHeader";
+import ClipsLibrary from "@/components/clips/ClipsLibrary.jsx";
+import ClipsCalendar from "@/components/clips/ClipsCalendar.jsx";
+import ClipsHeader from "@/components/clips/ClipsHeader.jsx";
 import { LayoutGrid, Calendar } from "lucide-react";
 
 export default function Clips() {

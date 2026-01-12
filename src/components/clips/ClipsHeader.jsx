@@ -10,8 +10,8 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import UploadClipModal from "./UploadClipModal";
-import ClipsFilters from "./ClipsFilters";
+import UploadClipModal from "./UploadClipModal.jsx";
+import ClipsFilters from "./ClipsFilters.jsx";
 
 export default function ClipsHeader({ filters, setFilters, activeTab }) {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);

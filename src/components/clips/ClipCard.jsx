@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import EditClipModal from "./EditClipModal";
+import EditClipModal from "./EditClipModal.jsx";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 
