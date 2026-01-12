@@ -5,7 +5,7 @@ import { Play, Music2, Users, Eye, TrendingUp, TrendingDown } from "lucide-react
 const metrics = [
   {
     icon: Eye,
-    label: "Total Views",
+    label: "Vistas Totales",
     value: "1.24M",
     change: "+12.5%",
     trend: "up",
@@ -13,7 +13,7 @@ const metrics = [
   },
   {
     icon: Music2,
-    label: "Streams",
+    label: "Reproducciones",
     value: "847K",
     change: "+8.2%",
     trend: "up",
@@ -21,7 +21,7 @@ const metrics = [
   },
   {
     icon: Play,
-    label: "Active Clips",
+    label: "Clips Activos",
     value: "234",
     change: "+23",
     trend: "up",
@@ -29,7 +29,7 @@ const metrics = [
   },
   {
     icon: Users,
-    label: "New Followers",
+    label: "Nuevos Seguidores",
     value: "2.4K",
     change: "-2.1%",
     trend: "down",

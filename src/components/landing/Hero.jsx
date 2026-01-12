@@ -32,20 +32,20 @@ export default function Hero() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8"
           >
             <Sparkles className="w-4 h-4 text-emerald-400" />
-            <span className="text-sm text-gray-300">The Creative Operating System</span>
+            <span className="text-sm text-gray-300">El Sistema Operativo Creativo</span>
           </motion.div>
 
           {/* Main Headline */}
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
-            <span className="block text-white">Not a studio.</span>
+            <span className="block text-white">No es un estudio.</span>
             <span className="block bg-gradient-to-r from-emerald-400 via-purple-400 to-orange-400 bg-clip-text text-transparent">
-              A system for artists.
+              Es un sistema para artistas.
             </span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-            Music production, digitalization, content and monetization — all in one place.
+            Producción musical, digitalización, contenido y monetización — todo en un solo lugar.
           </p>
 
           {/* CTAs */}
@@ -56,7 +56,7 @@ export default function Hero() {
                 whileTap={{ scale: 0.98 }}
                 className="group px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 font-medium text-lg flex items-center gap-3 shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all duration-300"
               >
-                Join the Creative System
+                Únete al Sistema Creativo
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </motion.button>
             </Link>
@@ -67,7 +67,7 @@ export default function Hero() {
               className="group px-8 py-4 rounded-full bg-white/5 border border-white/10 font-medium text-lg flex items-center gap-3 hover:bg-white/10 transition-all duration-300"
             >
               <Play className="w-5 h-5 text-purple-400" />
-              See how it works
+              Ver cómo funciona
             </motion.button>
           </div>
         </motion.div>
@@ -80,9 +80,9 @@ export default function Hero() {
           className="mt-24 grid grid-cols-3 gap-8 max-w-3xl mx-auto"
         >
           {[
-            { value: "500+", label: "Artists" },
-            { value: "2.5M", label: "Streams" },
-            { value: "$120K", label: "Revenue Generated" },
+            { value: "500+", label: "Artistas" },
+            { value: "2.5M", label: "Reproducciones" },
+            { value: "$120K", label: "Ingresos Generados" },
           ].map((stat, i) => (
             <div key={i} className="text-center">
               <div className="text-3xl sm:text-4xl font-bold text-white mb-1">{stat.value}</div>

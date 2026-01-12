@@ -6,24 +6,24 @@ const steps = [
   {
     icon: Music,
     number: "01",
-    title: "Create Music",
-    description: "Record, produce, and perfect your sound with our world-class facilities and expert guidance.",
+    title: "Crea Música",
+    description: "Graba, produce y perfecciona tu sonido con nuestras instalaciones de clase mundial y orientación experta.",
     color: "emerald",
     gradient: "from-emerald-500 to-emerald-600"
   },
   {
     icon: Upload,
     number: "02",
-    title: "Distribute Content",
-    description: "Push your music and clips across all major platforms with one click. Automated, optimized, tracked.",
+    title: "Distribuye Contenido",
+    description: "Envía tu música y clips a todas las plataformas principales con un clic. Automatizado, optimizado, rastreado.",
     color: "purple",
     gradient: "from-purple-500 to-purple-600"
   },
   {
     icon: BarChart3,
     number: "03",
-    title: "Track & Monetize",
-    description: "Watch your growth in real-time. Understand what works. Maximize your revenue streams.",
+    title: "Rastrea y Monetiza",
+    description: "Observa tu crecimiento en tiempo real. Entiende qué funciona. Maximiza tus flujos de ingresos.",
     color: "orange",
     gradient: "from-orange-500 to-orange-600"
   }
@@ -42,13 +42,13 @@ export default function HowItWorks() {
           className="text-center mb-20"
         >
           <span className="text-emerald-400 text-sm font-medium tracking-wider uppercase mb-4 block">
-            Simple Process
+            Proceso Simple
           </span>
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            How it <span className="text-purple-400">works</span>
+            Cómo <span className="text-purple-400">funciona</span>
           </h2>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            Three steps to transform your creative career. No complexity, just results.
+            Tres pasos para transformar tu carrera creativa. Sin complejidad, solo resultados.
           </p>
         </motion.div>
 
@@ -81,7 +81,7 @@ export default function HowItWorks() {
 
                 {/* Hover Arrow */}
                 <div className="mt-6 flex items-center gap-2 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className={`text-${step.color}-400`}>Learn more</span>
+                  <span className={`text-${step.color}-400`}>Saber más</span>
                   <ArrowRight className={`w-4 h-4 text-${step.color}-400 group-hover:translate-x-1 transition-transform`} />
                 </div>
               </div>

@@ -18,26 +18,26 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-gray-500 text-sm max-w-sm leading-relaxed">
-              The creative operating system for serious artists. Production, distribution, monetization — all in one place.
+              El sistema operativo creativo para artistas serios. Producción, distribución, monetización — todo en un solo lugar.
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <h4 className="text-sm font-semibold text-white mb-4">Platform</h4>
+            <h4 className="text-sm font-semibold text-white mb-4">Plataforma</h4>
             <ul className="space-y-3">
-              <li><a href="#features" className="text-sm text-gray-500 hover:text-white transition-colors">Features</a></li>
-              <li><a href="#pricing" className="text-sm text-gray-500 hover:text-white transition-colors">Pricing</a></li>
-              <li><Link to={createPageUrl("Dashboard")} className="text-sm text-gray-500 hover:text-white transition-colors">Dashboard</Link></li>
+              <li><a href="#features" className="text-sm text-gray-500 hover:text-white transition-colors">Características</a></li>
+              <li><a href="#pricing" className="text-sm text-gray-500 hover:text-white transition-colors">Precios</a></li>
+              <li><Link to={createPageUrl("Dashboard")} className="text-sm text-gray-500 hover:text-white transition-colors">Panel</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-white mb-4">Company</h4>
+            <h4 className="text-sm font-semibold text-white mb-4">Compañía</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">About</a></li>
-              <li><a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Careers</a></li>
-              <li><a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Contact</a></li>
+              <li><a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Acerca de</a></li>
+              <li><a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Carreras</a></li>
+              <li><a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Contacto</a></li>
             </ul>
           </div>
         </div>
@@ -48,8 +48,8 @@ export default function Footer() {
             © {new Date().getFullYear()} La Cabaña Creative. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-sm text-gray-600 hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="text-sm text-gray-600 hover:text-white transition-colors">Terms</a>
+            <a href="#" className="text-sm text-gray-600 hover:text-white transition-colors">Privacidad</a>
+            <a href="#" className="text-sm text-gray-600 hover:text-white transition-colors">Términos</a>
           </div>
         </div>
       </div>

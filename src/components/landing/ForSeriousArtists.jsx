@@ -47,18 +47,18 @@ export default function ForSeriousArtists() {
 
           {/* Main Statement */}
           <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8 leading-tight">
-            <span className="text-gray-500">This is</span>{" "}
-            <span className="text-white">not</span>{" "}
-            <span className="text-gray-500">for</span>{" "}
-            <span className="text-white">hobbyists.</span>
+            <span className="text-gray-500">Esto</span>{" "}
+            <span className="text-white">no</span>{" "}
+            <span className="text-gray-500">es para</span>{" "}
+            <span className="text-white">aficionados.</span>
           </h2>
 
           <p className="text-xl sm:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed mb-12">
-            This is for artists who <span className="text-emerald-400 font-medium">invest</span> in their career.
+            Esto es para artistas que <span className="text-emerald-400 font-medium">invierten</span> en su carrera.
             <br className="hidden sm:block" />
-            Who treat their music like a <span className="text-purple-400 font-medium">business</span>.
+            Que tratan su música como un <span className="text-purple-400 font-medium">negocio</span>.
             <br className="hidden sm:block" />
-            Who demand <span className="text-orange-400 font-medium">results</span>.
+            Que exigen <span className="text-orange-400 font-medium">resultados</span>.
           </p>
 
           {/* Separator Line */}
@@ -71,9 +71,9 @@ export default function ForSeriousArtists() {
           {/* Supporting Stats */}
           <div className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
             {[
-              { value: "87%", label: "Artist Retention" },
-              { value: "3.2x", label: "Average Growth" },
-              { value: "6mo", label: "To ROI" },
+              { value: "87%", label: "Retención de Artistas" },
+              { value: "3.2x", label: "Crecimiento Promedio" },
+              { value: "6m", label: "Hasta ROI" },
             ].map((stat, i) => (
               <motion.div
                 key={i}

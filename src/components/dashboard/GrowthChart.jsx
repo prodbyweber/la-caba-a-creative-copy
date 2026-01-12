@@ -54,11 +54,11 @@ export default function GrowthChart() {
       <div className="p-6 border-b border-white/5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h3 className="text-lg font-semibold mb-1">Growth Trajectory</h3>
+            <h3 className="text-lg font-semibold mb-1">Trayectoria de Crecimiento</h3>
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <TrendingUp className="w-4 h-4 text-emerald-400" />
               <span className="text-emerald-400 font-medium">+24.5%</span>
-              <span>vs last period</span>
+              <span>vs período anterior</span>
             </div>
           </div>
           
@@ -83,8 +83,8 @@ export default function GrowthChart() {
         {/* Metric Toggles */}
         <div className="flex gap-4 mt-4">
           {[
-            { key: "streams", label: "Streams", color: "#10b981" },
-            { key: "views", label: "Views", color: "#a855f7" },
+            { key: "streams", label: "Reproducciones", color: "#10b981" },
+            { key: "views", label: "Vistas", color: "#a855f7" },
             { key: "clips", label: "Clips", color: "#f97316" },
           ].map((m) => (
             <button

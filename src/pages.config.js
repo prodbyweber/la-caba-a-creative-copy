@@ -1,13 +1,17 @@
-import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
+import Landing from './pages/Landing';
+import SocialAccounts from './pages/SocialAccounts';
+import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "Landing": Landing,
     "Dashboard": Dashboard,
+    "Landing": Landing,
+    "SocialAccounts": SocialAccounts,
 }
 
 export const pagesConfig = {
     mainPage: "Landing",
     Pages: PAGES,
+    Layout: __Layout,
 };

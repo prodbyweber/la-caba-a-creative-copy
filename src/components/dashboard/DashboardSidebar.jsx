@@ -11,24 +11,26 @@ import {
   HelpCircle,
   LogOut,
   X,
-  Music2
+  Music2,
+  Share2
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", active: true },
-  { icon: BarChart3, label: "Analytics" },
-  { icon: Film, label: "Clips" },
-  { icon: Music2, label: "Tracks" },
-  { icon: Archive, label: "Vault" },
-  { icon: Wallet, label: "Wallet" },
-  { icon: Calendar, label: "Sessions" },
+  { icon: LayoutDashboard, label: "Panel", active: true, page: "Dashboard" },
+  { icon: BarChart3, label: "Análisis", page: null },
+  { icon: Film, label: "Clips", page: null },
+  { icon: Music2, label: "Pistas", page: null },
+  { icon: Share2, label: "Redes Sociales", page: "SocialAccounts" },
+  { icon: Archive, label: "Bóveda", page: null },
+  { icon: Wallet, label: "Cartera", page: null },
+  { icon: Calendar, label: "Sesiones", page: null },
 ];
 
 const bottomItems = [
-  { icon: Settings, label: "Settings" },
-  { icon: HelpCircle, label: "Help" },
+  { icon: Settings, label: "Configuración" },
+  { icon: HelpCircle, label: "Ayuda" },
 ];
 
 export default function DashboardSidebar({ isOpen, onClose }) {
@@ -39,18 +41,34 @@ export default function DashboardSidebar({ isOpen, onClose }) {
         <div className="flex-1 px-4 py-6">
           <nav className="space-y-1">
             {menuItems.map((item, i) => (
-              <motion.button
-                key={i}
-                whileHover={{ x: 4 }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                  item.active 
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <item.icon className="w-5 h-5" />
-                {item.label}
-              </motion.button>
+              item.page ? (
+                <Link key={i} to={createPageUrl(item.page)}>
+                  <motion.button
+                    whileHover={{ x: 4 }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                      item.active 
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    {item.label}
+                  </motion.button>
+                </Link>
+              ) : (
+                <motion.button
+                  key={i}
+                  whileHover={{ x: 4 }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                    item.active 
+                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <item.icon className="w-5 h-5" />
+                  {item.label}
+                </motion.button>
+              )
             ))}
           </nav>
         </div>
@@ -70,7 +88,7 @@ export default function DashboardSidebar({ isOpen, onClose }) {
             <Link to={createPageUrl("Landing")}>
               <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:text-red-400 hover:bg-red-500/5 transition-all">
                 <LogOut className="w-5 h-5" />
-                Sign Out
+                Cerrar Sesión
               </button>
             </Link>
           </nav>
@@ -78,8 +96,8 @@ export default function DashboardSidebar({ isOpen, onClose }) {
 
         {/* Pro Badge */}
         <div className="mx-4 mb-6 p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20">
-          <div className="text-sm font-semibold text-white mb-1">Pro Member</div>
-          <div className="text-xs text-gray-400 mb-3">Renews Jan 15, 2025</div>
+          <div className="text-sm font-semibold text-white mb-1">Miembro Pro</div>
+          <div className="text-xs text-gray-400 mb-3">Renueva 15 Ene, 2025</div>
           <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
             <div className="h-full w-3/4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" />
           </div>
@@ -119,18 +137,34 @@ export default function DashboardSidebar({ isOpen, onClose }) {
               <div className="flex-1 px-4 py-6">
                 <nav className="space-y-1">
                   {menuItems.map((item, i) => (
-                    <button
-                      key={i}
-                      onClick={onClose}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                        item.active 
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-                          : 'text-gray-400 hover:text-white hover:bg-white/5'
-                      }`}
-                    >
-                      <item.icon className="w-5 h-5" />
-                      {item.label}
-                    </button>
+                    item.page ? (
+                      <Link key={i} to={createPageUrl(item.page)}>
+                        <button
+                          onClick={onClose}
+                          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                            item.active 
+                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                              : 'text-gray-400 hover:text-white hover:bg-white/5'
+                          }`}
+                        >
+                          <item.icon className="w-5 h-5" />
+                          {item.label}
+                        </button>
+                      </Link>
+                    ) : (
+                      <button
+                        key={i}
+                        onClick={onClose}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                          item.active 
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        <item.icon className="w-5 h-5" />
+                        {item.label}
+                      </button>
+                    )
                   ))}
                 </nav>
               </div>

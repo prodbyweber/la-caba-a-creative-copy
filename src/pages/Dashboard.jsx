@@ -25,8 +25,8 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <h1 className="text-3xl font-bold mb-2">Welcome back, <span className="text-emerald-400">Jay</span></h1>
-            <p className="text-gray-500">Here's what's happening with your music today.</p>
+            <h1 className="text-3xl font-bold mb-2">Bienvenido de nuevo, <span className="text-emerald-400">Jay</span></h1>
+            <p className="text-gray-500">Esto es lo que está pasando con tu música hoy.</p>
           </motion.div>
 
           {/* Main Grid */}

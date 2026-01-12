@@ -62,11 +62,11 @@ export default function ClipActivityFeed() {
       {/* Header */}
       <div className="p-6 border-b border-white/5 flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Clip Activity</h3>
-          <p className="text-sm text-gray-500">Your latest performing content</p>
+          <h3 className="text-lg font-semibold">Actividad de Clips</h3>
+          <p className="text-sm text-gray-500">Tu contenido más reciente con mejor rendimiento</p>
         </div>
         <button className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors">
-          View All
+          Ver Todo
         </button>
       </div>
 

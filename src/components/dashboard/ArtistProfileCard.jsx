@@ -36,7 +36,7 @@ export default function ArtistProfileCard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <div className="bg-[#0a0a0b] rounded-xl p-3">
-            <div className="text-xs text-gray-500 mb-1">Performance</div>
+            <div className="text-xs text-gray-500 mb-1">Rendimiento</div>
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-emerald-400">92</span>
               <div className="flex items-center text-xs text-emerald-400">
@@ -46,7 +46,7 @@ export default function ArtistProfileCard() {
             </div>
           </div>
           <div className="bg-[#0a0a0b] rounded-xl p-3">
-            <div className="text-xs text-gray-500 mb-1">Rank</div>
+            <div className="text-xs text-gray-500 mb-1">Rango</div>
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-orange-400">#24</span>
               <Award className="w-4 h-4 text-orange-400" />
@@ -58,9 +58,9 @@ export default function ArtistProfileCard() {
         <div className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
           <div className="flex items-center gap-2">
             <Star className="w-5 h-5 text-purple-400" />
-            <span className="text-sm font-medium">Pro Member</span>
+            <span className="text-sm font-medium">Miembro Pro</span>
           </div>
-          <span className="text-xs text-gray-500">Since 2023</span>
+          <span className="text-xs text-gray-500">Desde 2023</span>
         </div>
       </div>
     </motion.div>

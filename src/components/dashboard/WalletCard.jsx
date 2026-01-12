@@ -18,7 +18,7 @@ export default function WalletCard() {
           </div>
         </div>
 
-        <div className="text-sm text-gray-500 mb-2">Available Balance</div>
+        <div className="text-sm text-gray-500 mb-2">Saldo Disponible</div>
         <div className="flex items-baseline gap-2">
           <span className="text-4xl font-bold">$2,847</span>
           <span className="text-lg text-gray-500">.32</span>
@@ -30,7 +30,7 @@ export default function WalletCard() {
             <TrendingUp className="w-4 h-4" />
             <span>+$342.18</span>
           </div>
-          <span className="text-xs text-gray-500">this month</span>
+          <span className="text-xs text-gray-500">este mes</span>
         </div>
       </div>
 
@@ -43,8 +43,8 @@ export default function WalletCard() {
               <Coins className="w-5 h-5 text-orange-400" />
             </div>
             <div>
-              <div className="text-sm font-medium">EVA Coins</div>
-              <div className="text-xs text-gray-500">Bonus Credits</div>
+              <div className="text-sm font-medium">Monedas EVA</div>
+              <div className="text-xs text-gray-500">Créditos Bonus</div>
             </div>
           </div>
           <div className="text-lg font-bold text-orange-400">1,250</div>
@@ -53,11 +53,11 @@ export default function WalletCard() {
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-3">
           <div className="text-center p-3 rounded-xl bg-[#0a0a0b]">
-            <div className="text-xs text-gray-500 mb-1">Pending</div>
+            <div className="text-xs text-gray-500 mb-1">Pendiente</div>
             <div className="text-lg font-semibold">$486</div>
           </div>
           <div className="text-center p-3 rounded-xl bg-[#0a0a0b]">
-            <div className="text-xs text-gray-500 mb-1">Lifetime</div>
+            <div className="text-xs text-gray-500 mb-1">Histórico</div>
             <div className="text-lg font-semibold">$12.4K</div>
           </div>
         </div>
@@ -65,7 +65,7 @@ export default function WalletCard() {
         {/* Withdraw Button */}
         <button className="w-full mt-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium text-sm hover:bg-emerald-500/20 transition-all flex items-center justify-center gap-2">
           <ArrowUpRight className="w-4 h-4" />
-          Withdraw Funds
+          Retirar Fondos
         </button>
       </div>
     </motion.div>

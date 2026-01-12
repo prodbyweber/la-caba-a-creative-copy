@@ -5,17 +5,17 @@ import { Calendar, Clock, MapPin, Plus, ChevronRight } from "lucide-react";
 const sessions = [
   {
     id: 1,
-    title: "Recording Session",
-    date: "Today",
+    title: "Sesión de Grabación",
+    date: "Hoy",
     time: "2:00 PM",
-    location: "Studio A",
+    location: "Estudio A",
     type: "recording",
     color: "emerald"
   },
   {
     id: 2,
-    title: "Mix Review",
-    date: "Tomorrow",
+    title: "Revisión de Mezcla",
+    date: "Mañana",
     time: "11:00 AM",
     location: "Virtual",
     type: "review",
@@ -23,10 +23,10 @@ const sessions = [
   },
   {
     id: 3,
-    title: "Content Planning",
-    date: "Jan 18",
+    title: "Planificación de Contenido",
+    date: "18 Ene",
     time: "3:00 PM",
-    location: "Office",
+    location: "Oficina",
     type: "planning",
     color: "orange"
   }
@@ -47,8 +47,8 @@ export default function UpcomingSessionsCard() {
             <Calendar className="w-5 h-5 text-purple-400" />
           </div>
           <div>
-            <h3 className="font-semibold">Upcoming Sessions</h3>
-            <p className="text-xs text-gray-500">3 sessions this week</p>
+            <h3 className="font-semibold">Próximas Sesiones</h3>
+            <p className="text-xs text-gray-500">3 sesiones esta semana</p>
           </div>
         </div>
         <button className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all">
@@ -95,7 +95,7 @@ export default function UpcomingSessionsCard() {
       {/* View All */}
       <div className="p-4 pt-0">
         <button className="w-full py-2.5 rounded-xl border border-white/10 text-sm text-gray-400 hover:text-white hover:border-white/20 transition-all">
-          View Full Calendar
+          Ver Calendario Completo
         </button>
       </div>
     </motion.div>

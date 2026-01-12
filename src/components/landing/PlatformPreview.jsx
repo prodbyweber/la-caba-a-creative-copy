@@ -37,10 +37,10 @@ export default function PlatformPreview() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            Your creative <span className="text-emerald-400">command center</span>
+            Tu <span className="text-emerald-400">centro de comando</span> creativo
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Track your performance like a pro athlete. Every stream, every clip, every dollar — visualized.
+            Rastrea tu rendimiento como un atleta profesional. Cada reproducción, cada clip, cada dólar — visualizado.
           </p>
         </motion.div>
 
@@ -69,23 +69,23 @@ export default function PlatformPreview() {
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold">Jay Vega</h3>
-                        <p className="text-sm text-gray-500">Urban / Latin Trap</p>
+                        <p className="text-sm text-gray-500">Urbano / Latin Trap</p>
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       <div className="bg-[#0a0a0b] rounded-xl p-4">
                         <div className="text-2xl font-bold text-emerald-400">847K</div>
-                        <div className="text-xs text-gray-500">Total Streams</div>
+                        <div className="text-xs text-gray-500">Reproducciones</div>
                       </div>
                       <div className="bg-[#0a0a0b] rounded-xl p-4">
                         <div className="text-2xl font-bold text-purple-400">234</div>
-                        <div className="text-xs text-gray-500">Active Clips</div>
+                        <div className="text-xs text-gray-500">Clips Activos</div>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between py-3 border-t border-white/5">
-                      <span className="text-sm text-gray-400">Performance Score</span>
+                      <span className="text-sm text-gray-400">Puntuación</span>
                       <div className="flex items-center gap-2">
                         <span className="text-lg font-bold text-white">92</span>
                         <span className="text-xs text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full">+8%</span>
@@ -99,8 +99,8 @@ export default function PlatformPreview() {
                   <div className="bg-[#18181b]/80 rounded-2xl p-6 border border-white/5 h-full">
                     <div className="flex items-center justify-between mb-6">
                       <div>
-                        <h3 className="text-lg font-semibold">Growth Forecast</h3>
-                        <p className="text-sm text-gray-500">Based on your current trajectory</p>
+                        <h3 className="text-lg font-semibold">Pronóstico de Crecimiento</h3>
+                        <p className="text-sm text-gray-500">Basado en tu trayectoria actual</p>
                       </div>
                       <div className="flex items-center gap-2 text-emerald-400">
                         <TrendingUp className="w-4 h-4" />
@@ -136,9 +136,9 @@ export default function PlatformPreview() {
               {/* Metrics Row */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
                 {[
-                  { icon: Play, label: "Views", value: "1.2M", change: "+12%", color: "emerald" },
-                  { icon: Music2, label: "Streams", value: "847K", change: "+8%", color: "purple" },
-                  { icon: Users, label: "New Fans", value: "2.4K", change: "+34%", color: "orange" },
+                  { icon: Play, label: "Vistas", value: "1.2M", change: "+12%", color: "emerald" },
+                  { icon: Music2, label: "Reproducciones", value: "847K", change: "+8%", color: "purple" },
+                  { icon: Users, label: "Nuevos Fans", value: "2.4K", change: "+34%", color: "orange" },
                   { icon: Zap, label: "Engagement", value: "94%", change: "+5%", color: "emerald" },
                 ].map((metric, i) => (
                   <motion.div

@@ -6,61 +6,61 @@ import { createPageUrl } from "@/utils";
 
 const plans = [
   {
-    name: "Starter",
+    name: "Iniciador",
     price: "299",
-    period: "/month",
-    description: "For emerging artists ready to build structure",
+    period: "/mes",
+    description: "Para artistas emergentes listos para construir estructura",
     icon: Zap,
     color: "emerald",
     features: [
-      "Artist Dashboard Access",
-      "Basic Performance Analytics",
-      "Content Vault (10GB)",
-      "2 Studio Sessions/month",
-      "Distribution to 5 Platforms",
-      "Email Support"
+      "Acceso al Panel de Artista",
+      "Analíticas Básicas de Rendimiento",
+      "Bóveda de Contenido (10GB)",
+      "2 Sesiones de Estudio/mes",
+      "Distribución a 5 Plataformas",
+      "Soporte por Email"
     ],
-    cta: "Start Building",
+    cta: "Comenzar a Construir",
     popular: false
   },
   {
     name: "Pro",
     price: "599",
-    period: "/month",
-    description: "For serious artists scaling their career",
+    period: "/mes",
+    description: "Para artistas serios escalando su carrera",
     icon: Star,
     color: "purple",
     features: [
-      "Everything in Starter",
-      "Advanced Analytics & Forecasting",
-      "Content Vault (50GB)",
-      "6 Studio Sessions/month",
-      "Distribution to 15+ Platforms",
-      "Clip Control System",
-      "Smart Wallet",
-      "Priority Support"
+      "Todo en Iniciador",
+      "Analíticas Avanzadas y Pronósticos",
+      "Bóveda de Contenido (50GB)",
+      "6 Sesiones de Estudio/mes",
+      "Distribución a 15+ Plataformas",
+      "Sistema de Control de Clips",
+      "Cartera Inteligente",
+      "Soporte Prioritario"
     ],
-    cta: "Go Pro",
+    cta: "Ir a Pro",
     popular: true
   },
   {
     name: "Elite",
     price: "1,299",
-    period: "/month",
-    description: "For professional artists demanding excellence",
+    period: "/mes",
+    description: "Para artistas profesionales que exigen excelencia",
     icon: Crown,
     color: "orange",
     features: [
-      "Everything in Pro",
-      "AI-Powered Insights (Early Access)",
-      "Unlimited Content Vault",
-      "Unlimited Studio Sessions",
-      "Global Distribution",
-      "Dedicated Account Manager",
-      "Revenue Optimization",
-      "White-glove Support"
+      "Todo en Pro",
+      "Información IA (Acceso Anticipado)",
+      "Bóveda de Contenido Ilimitada",
+      "Sesiones de Estudio Ilimitadas",
+      "Distribución Global",
+      "Gestor de Cuenta Dedicado",
+      "Optimización de Ingresos",
+      "Soporte de Guante Blanco"
     ],
-    cta: "Join Elite",
+    cta: "Unirse a Elite",
     popular: false
   }
 ];
@@ -80,13 +80,13 @@ export default function MembershipPlans() {
           className="text-center mb-16"
         >
           <span className="text-orange-400 text-sm font-medium tracking-wider uppercase mb-4 block">
-            Membership
+            Membresía
           </span>
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            Invest in your <span className="text-purple-400">system</span>
+            Invierte en tu <span className="text-purple-400">sistema</span>
           </h2>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            Not just songs. A complete infrastructure for your creative career.
+            No solo canciones. Una infraestructura completa para tu carrera creativa.
           </p>
         </motion.div>
 
@@ -103,7 +103,7 @@ export default function MembershipPlans() {
               {/* Popular Badge */}
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-xs font-bold z-10">
-                  Most Popular
+                  Más Popular
                 </div>
               )}
 
@@ -174,7 +174,7 @@ export default function MembershipPlans() {
           className="text-center mt-12"
         >
           <p className="text-gray-500 text-sm">
-            14-day money-back guarantee. No questions asked.
+            Garantía de devolución de dinero de 14 días. Sin preguntas.
           </p>
         </motion.div>
       </div>

@@ -32,15 +32,15 @@ export default function FinalCTA() {
 
           {/* Headline */}
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
-            Build your career
+            Construye tu carrera
             <br />
             <span className="bg-gradient-to-r from-emerald-400 via-purple-400 to-orange-400 bg-clip-text text-transparent">
-              with structure
+              con estructura
             </span>
           </h2>
 
           <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-12">
-            Stop working hard without direction. Join the creative system that transforms artists into sustainable businesses.
+            Deja de trabajar duro sin dirección. Únete al sistema creativo que transforma artistas en negocios sostenibles.
           </p>
 
           {/* CTA Button */}
@@ -50,7 +50,7 @@ export default function FinalCTA() {
               whileTap={{ scale: 0.98 }}
               className="group inline-flex items-center gap-3 px-10 py-5 rounded-full bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-500 bg-[length:200%_100%] text-lg font-medium shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:bg-right transition-all duration-500"
             >
-              Apply for Membership
+              Solicitar Membresía
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </Link>
@@ -59,15 +59,15 @@ export default function FinalCTA() {
           <div className="mt-12 flex items-center justify-center gap-8 text-sm text-gray-500">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span>No commitment</span>
+              <span>Sin compromiso</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-purple-400" />
-              <span>Cancel anytime</span>
+              <span>Cancela en cualquier momento</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-orange-400" />
-              <span>Results guaranteed</span>
+              <span>Resultados garantizados</span>
             </div>
           </div>
         </motion.div>

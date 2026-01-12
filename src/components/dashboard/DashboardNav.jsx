@@ -33,7 +33,7 @@ export default function DashboardNav({ onMenuClick }) {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
             <input
               type="text"
-              placeholder="Search clips, tracks, analytics..."
+              placeholder="Buscar clips, pistas, análisis..."
               className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-sm placeholder:text-gray-500 focus:outline-none focus:border-emerald-500/50 transition-colors"
             />
           </div>

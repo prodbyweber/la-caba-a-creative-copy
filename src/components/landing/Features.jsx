@@ -14,43 +14,43 @@ import {
 const features = [
   {
     icon: LayoutDashboard,
-    title: "Artist Dashboard",
-    description: "Your complete creative command center. Performance at a glance.",
+    title: "Panel de Artista",
+    description: "Tu centro de comando creativo completo. Rendimiento de un vistazo.",
     color: "emerald",
     size: "large"
   },
   {
     icon: Film,
-    title: "Clip Control System",
-    description: "Manage, track, and optimize all your content clips across platforms.",
+    title: "Sistema de Control de Clips",
+    description: "Gestiona, rastrea y optimiza todos tus clips de contenido entre plataformas.",
     color: "purple",
     size: "normal"
   },
   {
     icon: Archive,
-    title: "Music & Content Vault",
-    description: "Secure storage for all your creative assets. Always accessible.",
+    title: "Bóveda de Música y Contenido",
+    description: "Almacenamiento seguro para todos tus activos creativos. Siempre accesible.",
     color: "orange",
     size: "normal"
   },
   {
     icon: Wallet,
-    title: "Smart Wallet",
-    description: "Track earnings, estimate royalties, manage your creative finances.",
+    title: "Cartera Inteligente",
+    description: "Rastrea ganancias, estima regalías, gestiona tus finanzas creativas.",
     color: "emerald",
     size: "normal"
   },
   {
     icon: Calendar,
-    title: "Session Calendar",
-    description: "Book studio time, schedule reviews, manage your creative workflow.",
+    title: "Calendario de Sesiones",
+    description: "Reserva tiempo de estudio, programa revisiones, gestiona tu flujo creativo.",
     color: "purple",
     size: "normal"
   },
   {
     icon: Globe,
-    title: "Multi-Platform Tracking",
-    description: "Unified analytics across Spotify, Apple Music, YouTube, TikTok, and more.",
+    title: "Seguimiento Multi-Plataforma",
+    description: "Análisis unificados en Spotify, Apple Music, YouTube, TikTok y más.",
     color: "orange",
     size: "large"
   }
@@ -71,13 +71,13 @@ export default function Features() {
           className="text-center mb-20"
         >
           <span className="text-purple-400 text-sm font-medium tracking-wider uppercase mb-4 block">
-            Feature Set
+            Características
           </span>
           <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            Everything you need to <span className="text-emerald-400">grow</span>
+            Todo lo que necesitas para <span className="text-emerald-400">crecer</span>
           </h2>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            Modular tools designed for serious artists. No fluff, just power.
+            Herramientas modulares diseñadas para artistas serios. Sin relleno, solo poder.
           </p>
         </motion.div>
 
@@ -119,17 +119,17 @@ export default function Features() {
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-purple-500 flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h4 className="text-lg font-semibold">AI-Powered Insights</h4>
-                <p className="text-sm text-gray-400">Get intelligent recommendations to boost your growth</p>
-              </div>
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-purple-500 flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold">Información Impulsada por IA</h4>
+              <p className="text-sm text-gray-400">Obtén recomendaciones inteligentes para impulsar tu crecimiento</p>
+            </div>
             </div>
             <div className="flex items-center gap-2 text-emerald-400">
-              <TrendingUp className="w-5 h-5" />
-              <span className="font-medium">Coming Q2 2025</span>
+            <TrendingUp className="w-5 h-5" />
+            <span className="font-medium">Próximamente Q2 2025</span>
             </div>
           </div>
         </motion.div>

@@ -36,9 +36,9 @@ export default function LandingNav() {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            <a href="#platform" className="text-sm text-gray-400 hover:text-white transition-colors">Platform</a>
-            <a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors">Features</a>
-            <a href="#pricing" className="text-sm text-gray-400 hover:text-white transition-colors">Pricing</a>
+            <a href="#platform" className="text-sm text-gray-400 hover:text-white transition-colors">Plataforma</a>
+            <a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors">Características</a>
+            <a href="#pricing" className="text-sm text-gray-400 hover:text-white transition-colors">Precios</a>
           </div>
 
           <div className="flex items-center gap-4">
@@ -46,13 +46,13 @@ export default function LandingNav() {
               to={createPageUrl("Dashboard")}
               className="hidden sm:block text-sm text-gray-400 hover:text-white transition-colors"
             >
-              Sign In
+              Iniciar Sesión
             </Link>
             <Link 
               to={createPageUrl("Dashboard")}
               className="px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-sm font-medium hover:shadow-lg hover:shadow-emerald-500/25 transition-all duration-300"
             >
-              Get Started
+              Comenzar
             </Link>
             <button 
               onClick={() => setMobileOpen(true)}
@@ -85,15 +85,15 @@ export default function LandingNav() {
               </div>
 
               <div className="flex flex-col gap-6">
-                <a href="#platform" onClick={() => setMobileOpen(false)} className="text-2xl font-light text-gray-300 hover:text-white">Platform</a>
-                <a href="#features" onClick={() => setMobileOpen(false)} className="text-2xl font-light text-gray-300 hover:text-white">Features</a>
-                <a href="#pricing" onClick={() => setMobileOpen(false)} className="text-2xl font-light text-gray-300 hover:text-white">Pricing</a>
+                <a href="#platform" onClick={() => setMobileOpen(false)} className="text-2xl font-light text-gray-300 hover:text-white">Plataforma</a>
+                <a href="#features" onClick={() => setMobileOpen(false)} className="text-2xl font-light text-gray-300 hover:text-white">Características</a>
+                <a href="#pricing" onClick={() => setMobileOpen(false)} className="text-2xl font-light text-gray-300 hover:text-white">Precios</a>
                 <div className="pt-6 border-t border-white/10">
                   <Link 
                     to={createPageUrl("Dashboard")}
                     className="block w-full py-4 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-center font-medium"
                   >
-                    Get Started
+                    Comenzar
                   </Link>
                 </div>
               </div>
