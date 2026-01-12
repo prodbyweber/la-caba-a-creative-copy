@@ -20,7 +20,7 @@ import { createPageUrl } from "@/utils";
 const menuItems = [
   { icon: LayoutDashboard, label: "Panel", active: true, page: "Dashboard" },
   { icon: BarChart3, label: "Análisis", page: null },
-  { icon: Film, label: "Clips", page: null },
+  { icon: Film, label: "Clips", page: "Clips" },
   { icon: Music2, label: "Pistas", page: null },
   { icon: Share2, label: "Redes Sociales", page: "SocialAccounts" },
   { icon: Archive, label: "Bóveda", page: null },
