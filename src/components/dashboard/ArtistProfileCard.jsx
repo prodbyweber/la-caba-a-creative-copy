@@ -19,8 +19,12 @@ export default function ArtistProfileCard() {
       <div className="px-6 pb-6 -mt-12 relative">
         {/* Avatar */}
         <div className="relative mb-4">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl font-bold border-4 border-[#111113]">
-            JLY
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-4 border-[#111113] shadow-xl">
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6965118e2b17684fa124077e/93ad1adc0_71b1d502-02cd-4c8e-8abb-31974036fa67.png"
+              alt="JLY Avatar"
+              className="w-full h-full object-cover"
+            />
           </div>
           <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center border-2 border-[#111113]">
             <Verified className="w-4 h-4 text-white" />
