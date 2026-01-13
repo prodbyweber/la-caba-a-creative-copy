@@ -20,22 +20,17 @@ export default function ArtistProfileCard() {
       className="bg-gradient-to-b from-[#141414] to-black rounded-2xl border border-white/5 overflow-hidden shadow-2xl"
     >
       <div className="relative">
-        {/* Subtle gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none z-10" />
-        
         {/* Artist Image - Full Width */}
-        <div className="relative h-72 sm:h-80 overflow-hidden">
+        <div className="relative h-96 sm:h-[450px] overflow-visible">
           <img 
             src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6965118e2b17684fa124077e/5cdacd140_jlytransparente.png"
             alt="JLY"
-            className="w-full h-full object-contain object-bottom"
+            className="w-full h-full object-contain object-center scale-110"
           />
-          {/* Vignette effect */}
-          <div className="absolute inset-0 shadow-[inset_0_0_80px_40px_rgba(0,0,0,0.8)]" />
         </div>
 
         {/* Content overlay */}
-        <div className="relative -mt-20 px-6 pb-6 z-20">
+        <div className="relative -mt-24 px-6 pb-6 z-20">
           <div className="grid grid-cols-[1fr,auto] gap-4 items-end">
             {/* Left Section - Info */}
             <div className="space-y-3">
