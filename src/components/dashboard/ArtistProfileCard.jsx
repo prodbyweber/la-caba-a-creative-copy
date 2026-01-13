@@ -20,7 +20,7 @@ export default function ArtistProfileCard() {
         {/* Avatar */}
         <div className="relative mb-4">
           <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl font-bold border-4 border-[#111113]">
-            JV
+            JLY
           </div>
           <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center border-2 border-[#111113]">
             <Verified className="w-4 h-4 text-white" />
@@ -29,8 +29,8 @@ export default function ArtistProfileCard() {
 
         {/* Name & Info */}
         <div className="mb-6">
-          <h3 className="text-xl font-bold mb-1">Jay Vega</h3>
-          <p className="text-sm text-gray-500">Urban / Latin Trap</p>
+          <h3 className="text-xl font-bold mb-1">JLY</h3>
+          <p className="text-sm text-gray-500">Urban / Catalan Trap</p>
         </div>
 
         {/* Stats Grid */}
