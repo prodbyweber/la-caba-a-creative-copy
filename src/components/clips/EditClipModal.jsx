@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Save, Loader, Calendar, Youtube, Instagram, Music2 } from "lucide-react";
+import { X, Save, Loader, Calendar, Youtube, Instagram, Music2, Upload, Image as ImageIcon, Video } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 
@@ -13,6 +13,7 @@ const platformConfig = {
 export default function EditClipModal({ clip, onClose, onUpdate }) {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
+  const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   const [formData, setFormData] = useState({
     title: clip.title || "",
     artist_id: clip.artist_id || "",
@@ -25,11 +26,14 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
     caption_tiktok: clip.caption_tiktok || "",
     hashtags: clip.hashtags || [],
     status: clip.status || "draft",
-    scheduled_at: clip.scheduled_at || ""
+    scheduled_at: clip.scheduled_at || "",
+    thumbnail_url: clip.thumbnail_url || ""
   });
 
   const [newTag, setNewTag] = useState("");
   const [newHashtag, setNewHashtag] = useState("");
+  const videoRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const { data: artists = [] } = useQuery({
     queryKey: ['artists'],
@@ -93,6 +97,48 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
     });
   };
 
+  const handleThumbnailUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingThumbnail(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData({ ...formData, thumbnail_url: file_url });
+    } catch (error) {
+      alert("Error al subir la portada");
+    } finally {
+      setUploadingThumbnail(false);
+    }
+  };
+
+  const captureFrameFromVideo = () => {
+    if (!videoRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      
+      setUploadingThumbnail(true);
+      try {
+        const file = new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' });
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        setFormData({ ...formData, thumbnail_url: file_url });
+      } catch (error) {
+        alert("Error al capturar el frame");
+      } finally {
+        setUploadingThumbnail(false);
+      }
+    }, 'image/jpeg', 0.9);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
       <motion.div
@@ -116,7 +162,7 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
 
           {/* Tabs */}
           <div className="flex gap-2 mt-6">
-            {["general", "captions", "schedule"].map(tab => (
+            {["general", "thumbnail", "captions", "schedule"].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -127,6 +173,7 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
                 }`}
               >
                 {tab === "general" && "General"}
+                {tab === "thumbnail" && "Portada"}
                 {tab === "captions" && "Captions"}
                 {tab === "schedule" && "Programar"}
               </button>
@@ -252,6 +299,101 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
                       </button>
                     </span>
                   ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "thumbnail" && (
+            <div className="space-y-6">
+              {/* Current Thumbnail Preview */}
+              <div>
+                <label className="text-sm font-medium text-gray-400 mb-3 block">
+                  Portada Actual
+                </label>
+                <div className="relative aspect-[9/16] max-w-sm mx-auto bg-[#0a0a0b] rounded-2xl overflow-hidden">
+                  {formData.thumbnail_url ? (
+                    <img 
+                      src={formData.thumbnail_url} 
+                      alt="Thumbnail" 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <ImageIcon className="w-12 h-12 text-gray-600" />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Upload Custom Thumbnail */}
+              <div>
+                <label className="text-sm font-medium text-gray-400 mb-3 block">
+                  Subir Portada Personalizada
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleThumbnailUpload}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingThumbnail}
+                  className="w-full py-4 rounded-xl border-2 border-dashed border-white/10 hover:border-purple-500/50 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                >
+                  {uploadingThumbnail ? (
+                    <>
+                      <Loader className="w-5 h-5 animate-spin" />
+                      Subiendo...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-5 h-5" />
+                      Subir imagen desde dispositivo
+                    </>
+                  )}
+                </button>
+                <p className="text-xs text-gray-500 mt-2 text-center">
+                  Proporción recomendada: 9:16 (vertical)
+                </p>
+              </div>
+
+              {/* Capture from Video */}
+              <div>
+                <label className="text-sm font-medium text-gray-400 mb-3 block">
+                  Capturar desde Video
+                </label>
+                <div className="bg-[#0a0a0b] rounded-2xl p-4 space-y-4">
+                  <div className="relative aspect-[9/16] max-w-xs mx-auto bg-black rounded-xl overflow-hidden">
+                    <video
+                      ref={videoRef}
+                      src={clip.file_url}
+                      className="w-full h-full object-contain"
+                      controls
+                    />
+                  </div>
+                  <button
+                    onClick={captureFrameFromVideo}
+                    disabled={uploadingThumbnail}
+                    className="w-full py-3 rounded-xl bg-purple-500 hover:bg-purple-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {uploadingThumbnail ? (
+                      <>
+                        <Loader className="w-4 h-4 animate-spin" />
+                        Capturando...
+                      </>
+                    ) : (
+                      <>
+                        <Video className="w-4 h-4" />
+                        Capturar frame actual
+                      </>
+                    )}
+                  </button>
+                  <p className="text-xs text-gray-500 text-center">
+                    Reproduce el video y pausa en el momento que desees capturar
+                  </p>
                 </div>
               </div>
             </div>

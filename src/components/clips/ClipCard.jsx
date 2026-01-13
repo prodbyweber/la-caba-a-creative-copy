@@ -15,6 +15,7 @@ import {
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import EditClipModal from "./EditClipModal.jsx";
+import ClipPreviewModal from "./ClipPreviewModal.jsx";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 
@@ -35,6 +36,7 @@ const platformIcons = {
 export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
   const { data: artist } = useQuery({
     queryKey: ['artist', clip.artist_id],
@@ -84,9 +86,12 @@ export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
                 <Play className="w-8 h-8 text-gray-600" />
               </div>
             )}
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <button
+              onClick={() => setPreviewModalOpen(true)}
+              className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+            >
               <Play className="w-8 h-8 text-white" fill="white" />
-            </div>
+            </button>
             {clip.duration && (
               <div className="absolute bottom-2 right-2 px-2 py-0.5 bg-black/80 rounded text-xs">
                 {Math.floor(clip.duration / 60)}:{String(Math.floor(clip.duration % 60)).padStart(2, '0')}
@@ -184,11 +189,14 @@ export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
               <Play className="w-12 h-12 text-gray-600" />
             </div>
           )}
-          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <button className="p-4 bg-purple-500 rounded-full hover:bg-purple-600 transition-colors">
+          <button
+            onClick={() => setPreviewModalOpen(true)}
+            className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+          >
+            <div className="p-4 bg-purple-500 rounded-full hover:bg-purple-600 transition-colors">
               <Play className="w-6 h-6 text-white" fill="white" />
-            </button>
-          </div>
+            </div>
+          </button>
           {clip.duration && (
             <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/80 rounded-lg text-xs font-medium">
               {Math.floor(clip.duration / 60)}:{String(Math.floor(clip.duration % 60)).padStart(2, '0')}
@@ -278,6 +286,14 @@ export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
           clip={clip}
           onClose={() => setEditModalOpen(false)}
           onUpdate={onUpdate}
+        />
+      )}
+
+      {/* Preview Modal */}
+      {previewModalOpen && (
+        <ClipPreviewModal 
+          clip={clip}
+          onClose={() => setPreviewModalOpen(false)}
         />
       )}
     </>
