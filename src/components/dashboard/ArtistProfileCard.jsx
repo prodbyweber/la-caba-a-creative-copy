@@ -3,68 +3,112 @@ import { motion } from "framer-motion";
 import { Star, TrendingUp, Award, Verified } from "lucide-react";
 
 export default function ArtistProfileCard() {
+  const stats = [
+    { label: "Streams", value: 88 },
+    { label: "Engagement", value: 92 },
+    { label: "Reach", value: 85 },
+    { label: "Growth", value: 94 },
+    { label: "Content", value: 90 },
+    { label: "Impact", value: 87 }
+  ];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className="bg-[#111113] rounded-2xl border border-white/5 overflow-hidden"
+      className="bg-gradient-to-br from-emerald-600/20 via-purple-600/20 to-pink-600/20 rounded-2xl border border-emerald-500/30 overflow-hidden backdrop-blur-sm"
     >
-      {/* Header Banner */}
-      <div className="h-24 bg-gradient-to-r from-purple-600/30 via-pink-500/30 to-orange-500/30 relative">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiMxMTExMTMiIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNNjAgMEgwdjYwaDYwVjB6TTU5IDFIMXY1OGg1OFYxeiIgZmlsbD0iIzFhMWExYSIgZmlsbC1vcGFjaXR5PSIuMyIvPjwvZz48L3N2Zz4=')] opacity-30" />
-      </div>
-
-      {/* Profile Content */}
-      <div className="px-6 pb-6 -mt-12 relative">
-        {/* Avatar */}
-        <div className="relative mb-4">
-          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden border-4 border-[#111113] shadow-xl">
-            <img 
-              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6965118e2b17684fa124077e/93ad1adc0_71b1d502-02cd-4c8e-8abb-31974036fa67.png"
-              alt="JLY Avatar"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center border-2 border-[#111113]">
-            <Verified className="w-4 h-4 text-white" />
-          </div>
+      <div className="relative p-6">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNDB2NDBIMHoiLz48cGF0aCBkPSJNMjAgMGwyMCAyMEgyMHoiIGZpbGw9IiNmZmYiLz48L2c+PC9zdmc+')] opacity-20" />
         </div>
 
-        {/* Name & Info */}
-        <div className="mb-6">
-          <h3 className="text-xl font-bold mb-1">JLY</h3>
-          <p className="text-sm text-gray-500">Urban / Catalan Trap</p>
-        </div>
+        <div className="relative grid grid-cols-[1fr,auto] gap-4">
+          {/* Left Section - Stats */}
+          <div className="space-y-4">
+            {/* Rating Badge */}
+            <div className="inline-flex flex-col items-center justify-center w-16 h-20 bg-gradient-to-b from-emerald-400 to-emerald-600 rounded-lg shadow-lg">
+              <div className="text-3xl font-black text-white">92</div>
+              <div className="text-[9px] font-bold text-emerald-900 uppercase tracking-wider">Overall</div>
+            </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="bg-[#0a0a0b] rounded-xl p-3">
-            <div className="text-xs text-gray-500 mb-1">Rendimiento</div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-emerald-400">92</span>
-              <div className="flex items-center text-xs text-emerald-400">
-                <TrendingUp className="w-3 h-3 mr-0.5" />
-                +8%
+            {/* Artist Info */}
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-2xl font-black text-white uppercase tracking-tight">JLY</h3>
+                <Verified className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-emerald-400 uppercase">Urban Trap</span>
+                <span className="text-xs text-gray-500">•</span>
+                <span className="text-xs text-gray-400">Lleida, CAT</span>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="space-y-2">
+              {stats.map((stat, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-gray-400 uppercase w-20">{stat.label}</span>
+                  <div className="flex-1 h-1.5 bg-black/40 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${stat.value}%` }}
+                      transition={{ delay: 0.2 + i * 0.1, duration: 0.5 }}
+                      className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full"
+                    />
+                  </div>
+                  <span className="text-sm font-bold text-white w-7 text-right">{stat.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Section - Artist Image */}
+          <div className="relative">
+            <div className="w-32 h-48 sm:w-36 sm:h-52 relative">
+              {/* Glow Effect */}
+              <div className="absolute inset-0 bg-gradient-to-t from-emerald-400/30 via-transparent to-transparent rounded-lg blur-xl" />
+              
+              {/* Image Container */}
+              <div className="relative h-full rounded-lg overflow-hidden">
+                <img 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6965118e2b17684fa124077e/7c769de29_71b1d502-02cd-4c8e-8abb-31974036fa67.png"
+                  alt="JLY"
+                  className="w-full h-full object-cover object-top"
+                />
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              </div>
+
+              {/* Pro Badge */}
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center gap-1.5 shadow-lg">
+                <Star className="w-3 h-3 text-white" fill="white" />
+                <span className="text-[10px] font-bold text-white uppercase tracking-wide">Pro</span>
               </div>
             </div>
           </div>
-          <div className="bg-[#0a0a0b] rounded-xl p-3">
-            <div className="text-xs text-gray-500 mb-1">Rango</div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-orange-400">#24</span>
-              <Award className="w-4 h-4 text-orange-400" />
-            </div>
-          </div>
         </div>
 
-        {/* Membership Badge */}
-        <div className="flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20">
-          <div className="flex items-center gap-2">
-            <Star className="w-5 h-5 text-purple-400" />
-            <span className="text-sm font-medium">Miembro Pro</span>
+        {/* Bottom Info */}
+        <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="text-center">
+              <div className="text-lg font-bold text-white">2.4M</div>
+              <div className="text-[10px] text-gray-500 uppercase">Streams</div>
+            </div>
+            <div className="w-px h-8 bg-white/10" />
+            <div className="text-center">
+              <div className="text-lg font-bold text-emerald-400">#24</div>
+              <div className="text-[10px] text-gray-500 uppercase">Ranking</div>
+            </div>
           </div>
-          <span className="text-xs text-gray-500">Desde 2023</span>
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+            <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-xs font-bold text-emerald-400">+18%</span>
+          </div>
         </div>
       </div>
     </motion.div>
