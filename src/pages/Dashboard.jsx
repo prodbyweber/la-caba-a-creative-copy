@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import ArtistProfileCard from "@/components/dashboard/ArtistProfileCard";
+import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import PerformanceOverview from "@/components/dashboard/PerformanceOverview";
 import GrowthChart from "@/components/dashboard/GrowthChart";
 import ClipActivityFeed from "@/components/dashboard/ClipActivityFeed";
@@ -33,6 +34,7 @@ export default function Dashboard() {
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Left Column */}
             <div className="lg:col-span-2 space-y-6">
+              <ProjectsSection />
               <PerformanceOverview />
               <GrowthChart />
               <ClipActivityFeed />
