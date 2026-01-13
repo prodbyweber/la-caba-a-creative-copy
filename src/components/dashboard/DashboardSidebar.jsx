@@ -25,7 +25,7 @@ const menuItems = [
   { icon: Share2, label: "Redes Sociales", page: "SocialAccounts" },
   { icon: Archive, label: "Bóveda", page: null },
   { icon: Wallet, label: "Cartera", page: null },
-  { icon: Calendar, label: "Sesiones", page: null },
+  { icon: Calendar, label: "Sesiones", page: "Sessions" },
 ];
 
 const bottomItems = [
