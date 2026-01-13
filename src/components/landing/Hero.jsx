@@ -24,28 +24,17 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8"
-          >
-            <Sparkles className="w-4 h-4 text-emerald-400" />
-            <span className="text-sm text-gray-300">El Sistema Operativo Creativo</span>
-          </motion.div>
-
           {/* Main Headline */}
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
-            <span className="block text-white">No es un estudio.</span>
+            <span className="block text-white">El estudio creativo definitivo</span>
             <span className="block bg-gradient-to-r from-emerald-400 via-purple-400 to-orange-400 bg-clip-text text-transparent">
-              Es un sistema para artistas.
+              para artistas que quieren conectar de verdad.
             </span>
           </h1>
 
           {/* Subheadline */}
-          <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-            Producción musical, digitalización, contenido y monetización — todo en un solo lugar.
+          <p className="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto mb-12 leading-relaxed">
+            Producción por horas, visuales cinematográficos y digitalización artística para proyectos que van en serio.
           </p>
 
           {/* CTAs */}
@@ -56,7 +45,7 @@ export default function Hero() {
                 whileTap={{ scale: 0.98 }}
                 className="group px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 font-medium text-lg flex items-center gap-3 shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all duration-300"
               >
-                Únete al Sistema Creativo
+                Aplicar a La Cabaña Creative
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </motion.button>
             </Link>
@@ -67,7 +56,7 @@ export default function Hero() {
               className="group px-8 py-4 rounded-full bg-white/5 border border-white/10 font-medium text-lg flex items-center gap-3 hover:bg-white/10 transition-all duration-300"
             >
               <Play className="w-5 h-5 text-purple-400" />
-              Ver cómo funciona
+              Ver cómo trabajamos
             </motion.button>
           </div>
         </motion.div>

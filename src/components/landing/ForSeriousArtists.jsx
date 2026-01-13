@@ -47,18 +47,35 @@ export default function ForSeriousArtists() {
 
           {/* Main Statement */}
           <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8 leading-tight">
-            <span className="text-gray-500">Esto</span>{" "}
-            <span className="text-white">no</span>{" "}
-            <span className="text-gray-500">es para</span>{" "}
-            <span className="text-white">aficionados.</span>
+            <span className="text-white">Esto no es para</span>{" "}
+            <span className="text-gray-500">todo el mundo.</span>
           </h2>
 
-          <p className="text-xl sm:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed mb-12">
-            Esto es para artistas que <span className="text-emerald-400 font-medium">invierten</span> en su carrera.
-            <br className="hidden sm:block" />
-            Que tratan su música como un <span className="text-purple-400 font-medium">negocio</span>.
-            <br className="hidden sm:block" />
-            Que exigen <span className="text-orange-400 font-medium">resultados</span>.
+          <p className="text-xl sm:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed mb-8">
+            La Cabaña Creative es para artistas que:
+          </p>
+
+          <div className="max-w-2xl mx-auto text-left space-y-3 mb-12">
+            <p className="text-lg text-gray-300 flex items-start gap-3">
+              <span className="text-emerald-400 font-bold">•</span>
+              <span><span className="text-white font-medium">Invierten</span> en su proyecto</span>
+            </p>
+            <p className="text-lg text-gray-300 flex items-start gap-3">
+              <span className="text-purple-400 font-bold">•</span>
+              <span><span className="text-white font-medium">Valoran</span> el proceso</span>
+            </p>
+            <p className="text-lg text-gray-300 flex items-start gap-3">
+              <span className="text-orange-400 font-bold">•</span>
+              <span>Buscan algo <span className="text-white font-medium">único y profesional</span></span>
+            </p>
+            <p className="text-lg text-gray-300 flex items-start gap-3">
+              <span className="text-emerald-400 font-bold">•</span>
+              <span>Entienden que la <span className="text-white font-medium">constancia</span> supera al golpe de suerte</span>
+            </p>
+          </div>
+
+          <p className="text-xl font-semibold text-white max-w-2xl mx-auto">
+            Si buscas algo rápido y barato, este no es tu sitio.
           </p>
 
           {/* Separator Line */}
@@ -68,26 +85,7 @@ export default function ForSeriousArtists() {
             <div className="w-24 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
           </div>
 
-          {/* Supporting Stats */}
-          <div className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-            {[
-              { value: "87%", label: "Retención de Artistas" },
-              { value: "3.2x", label: "Crecimiento Promedio" },
-              { value: "6m", label: "Hasta ROI" },
-            ].map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + i * 0.1 }}
-              >
-                <div className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-400 via-purple-400 to-orange-400 bg-clip-text text-transparent">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-gray-500 mt-1">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
+
         </motion.div>
       </div>
     </section>

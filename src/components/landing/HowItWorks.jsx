@@ -6,24 +6,24 @@ const steps = [
   {
     icon: Music,
     number: "01",
-    title: "Crea Música",
-    description: "Graba, produce y perfecciona tu sonido con nuestras instalaciones de clase mundial y orientación experta.",
+    title: "Producción musical por horas",
+    description: "Trabajamos el tiempo que el proyecto necesita. Sin atajos ni fórmulas. Proceso claro y profesional.",
     color: "emerald",
     gradient: "from-emerald-500 to-emerald-600"
   },
   {
     icon: Upload,
     number: "02",
-    title: "Distribuye Contenido",
-    description: "Envía tu música y clips a todas las plataformas principales con un clic. Automatizado, optimizado, rastreado.",
+    title: "Dirección creativa real",
+    description: "No hacemos canciones sueltas. Construimos identidad, narrativa y coherencia visual para tu proyecto.",
     color: "purple",
     gradient: "from-purple-500 to-purple-600"
   },
   {
     icon: BarChart3,
     number: "03",
-    title: "Rastrea y Monetiza",
-    description: "Observa tu crecimiento en tiempo real. Entiende qué funciona. Maximiza tus flujos de ingresos.",
+    title: "Flujo ordenado",
+    description: "Sin improvisación. Enfoque en progreso constante, no en promesas vacías. Estructura que funciona.",
     color: "orange",
     gradient: "from-orange-500 to-orange-600"
   }
@@ -41,14 +41,13 @@ export default function HowItWorks() {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span className="text-emerald-400 text-sm font-medium tracking-wider uppercase mb-4 block">
-            Proceso Simple
-          </span>
-          <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            Cómo <span className="text-purple-400">funciona</span>
+          <h2 className="text-4xl sm:text-5xl font-bold mb-6">
+            No grabamos canciones. <span className="text-emerald-400">Construimos proyectos.</span>
           </h2>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            Tres pasos para transformar tu carrera creativa. Sin complejidad, solo resultados.
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            Trabajamos por horas, no por canciones sueltas.
+            <br />
+            Creamos música, imagen y narrativa dentro de un proceso claro, profesional y sostenible para el artista y para el estudio.
           </p>
         </motion.div>
 

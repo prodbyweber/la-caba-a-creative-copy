@@ -13,44 +13,44 @@ import {
 
 const features = [
   {
-    icon: LayoutDashboard,
-    title: "Panel de Artista",
-    description: "Tu centro de comando creativo completo. Rendimiento de un vistazo.",
+    icon: Film,
+    title: "Universos visuales coherentes",
+    description: "Desde avatares 3D hasta films, clips y branding. No es solo estética: es identidad y dirección.",
     color: "emerald",
     size: "large"
   },
   {
-    icon: Film,
-    title: "Sistema de Control de Clips",
-    description: "Gestiona, rastrea y optimiza todos tus clips de contenido entre plataformas.",
+    icon: Music,
+    title: "La música se siente",
+    description: "Trabajamos la música desde la emoción. Nostalgia, energía, calma o intimidad. La producción al servicio de lo que quieres transmitir.",
     color: "purple",
     size: "normal"
   },
   {
     icon: Archive,
-    title: "Bóveda de Música y Contenido",
-    description: "Almacenamiento seguro para todos tus activos creativos. Siempre accesible.",
+    title: "Del estéreo al futuro del sonido",
+    description: "Adaptamos tu música a Dolby Atmos. Lista para Apple Music y formatos inmersivos. Más profundidad y calidad.",
     color: "orange",
     size: "normal"
   },
   {
-    icon: Wallet,
-    title: "Cartera Inteligente",
-    description: "Rastrea ganancias, estima regalías, gestiona tus finanzas creativas.",
+    icon: LayoutDashboard,
+    title: "Dashboard de artista",
+    description: "Control total de tu proyecto. Sesiones, clips, análisis y gestión en un solo lugar.",
     color: "emerald",
     size: "normal"
   },
   {
     icon: Calendar,
-    title: "Calendario de Sesiones",
-    description: "Reserva tiempo de estudio, programa revisiones, gestiona tu flujo creativo.",
+    title: "Trabajo por horas",
+    description: "No cobramos por canción. Trabajamos por tiempo y proceso creativo. Calidad garantizada.",
     color: "purple",
     size: "normal"
   },
   {
     icon: Globe,
-    title: "Seguimiento Multi-Plataforma",
-    description: "Análisis unificados en Spotify, Apple Music, YouTube, TikTok y más.",
+    title: "Imagen premium",
+    description: "Look cinematográfico y premium. Destacar en un entorno saturado requiere identidad visual potente.",
     color: "orange",
     size: "large"
   }
@@ -70,14 +70,14 @@ export default function Features() {
           viewport={{ once: true }}
           className="text-center mb-20"
         >
-          <span className="text-purple-400 text-sm font-medium tracking-wider uppercase mb-4 block">
-            Características
-          </span>
-          <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            Todo lo que necesitas para <span className="text-emerald-400">crecer</span>
+          <h2 className="text-4xl sm:text-5xl font-bold mb-6">
+            <span className="text-white">Digitalizamos artistas.</span>
           </h2>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            Herramientas modulares diseñadas para artistas serios. Sin relleno, solo poder.
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-4">
+            Imagen, identidad y narrativa para destacar en un entorno saturado.
+          </p>
+          <p className="text-gray-500 max-w-xl mx-auto">
+            Cada proyecto tiene una intención emocional clara.
           </p>
         </motion.div>
 
@@ -115,21 +115,21 @@ export default function Features() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-16 bg-gradient-to-r from-emerald-500/10 via-purple-500/10 to-orange-500/10 rounded-3xl p-8 border border-white/5"
+          className="mt-16 bg-gradient-to-r from-orange-500/10 via-purple-500/10 to-orange-500/10 rounded-3xl p-8 border border-orange-500/20"
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-purple-500 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h4 className="text-lg font-semibold">Información Impulsada por IA</h4>
-              <p className="text-sm text-gray-400">Obtén recomendaciones inteligentes para impulsar tu crecimiento</p>
+              <h4 className="text-lg font-semibold">Dolby Atmos</h4>
+              <p className="text-sm text-gray-400">Disponible según proyecto y viabilidad técnica</p>
             </div>
             </div>
-            <div className="flex items-center gap-2 text-emerald-400">
+            <div className="flex items-center gap-2 text-orange-400">
             <TrendingUp className="w-5 h-5" />
-            <span className="font-medium">Próximamente Q2 2025</span>
+            <span className="font-medium">Más recorrido</span>
             </div>
           </div>
         </motion.div>

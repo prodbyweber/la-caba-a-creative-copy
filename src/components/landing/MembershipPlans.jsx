@@ -9,58 +9,57 @@ const plans = [
     name: "Iniciador",
     price: "299",
     period: "/mes",
-    description: "Para artistas emergentes listos para construir estructura",
+    description: "Para empezar con estructura y dirección clara",
     icon: Zap,
     color: "emerald",
     features: [
-      "Acceso al Panel de Artista",
-      "Analíticas Básicas de Rendimiento",
-      "Bóveda de Contenido (10GB)",
-      "2 Sesiones de Estudio/mes",
-      "Distribución a 5 Plataformas",
-      "Soporte por Email"
+      "Acceso al Dashboard",
+      "4 horas de estudio/mes",
+      "Dirección creativa básica",
+      "Gestión de clips y calendario",
+      "Almacenamiento 10GB",
+      "Soporte por email"
     ],
-    cta: "Comenzar a Construir",
+    cta: "Solicitar acceso",
     popular: false
   },
   {
     name: "Pro",
     price: "599",
     period: "/mes",
-    description: "Para artistas serios escalando su carrera",
+    description: "Para artistas con visión que van en serio",
     icon: Star,
     color: "purple",
     features: [
       "Todo en Iniciador",
-      "Analíticas Avanzadas y Pronósticos",
-      "Bóveda de Contenido (50GB)",
-      "6 Sesiones de Estudio/mes",
-      "Distribución a 15+ Plataformas",
-      "Sistema de Control de Clips",
-      "Cartera Inteligente",
-      "Soporte Prioritario"
+      "12 horas de estudio/mes",
+      "Producción visual cinematográfica",
+      "Identidad y branding completo",
+      "Almacenamiento 50GB",
+      "Atmos disponible según proyecto",
+      "Soporte prioritario"
     ],
-    cta: "Ir a Pro",
+    cta: "Ver planes disponibles",
     popular: true
   },
   {
     name: "Elite",
     price: "1,299",
     period: "/mes",
-    description: "Para artistas profesionales que exigen excelencia",
+    description: "Para proyectos profesionales sin límites",
     icon: Crown,
     color: "orange",
     features: [
       "Todo en Pro",
-      "Información IA (Acceso Anticipado)",
-      "Bóveda de Contenido Ilimitada",
-      "Sesiones de Estudio Ilimitadas",
-      "Distribución Global",
-      "Gestor de Cuenta Dedicado",
-      "Optimización de Ingresos",
-      "Soporte de Guante Blanco"
+      "Horas ilimitadas",
+      "Avatar 3D y universo visual",
+      "Digitalización completa",
+      "Almacenamiento ilimitado",
+      "Dirección artística dedicada",
+      "Acceso preferente",
+      "Soporte 24/7"
     ],
-    cta: "Unirse a Elite",
+    cta: "Solicitar acceso",
     popular: false
   }
 ];
@@ -79,14 +78,15 @@ export default function MembershipPlans() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <span className="text-orange-400 text-sm font-medium tracking-wider uppercase mb-4 block">
-            Membresía
-          </span>
-          <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-            Invierte en tu <span className="text-purple-400">sistema</span>
+          <h2 className="text-4xl sm:text-5xl font-bold mb-6">
+            Trabajamos por <span className="text-emerald-400">membresía.</span>
           </h2>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            No solo canciones. Una infraestructura completa para tu carrera creativa.
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            No cobramos por canción.
+            <br />
+            Trabajamos por tiempo, foco y proceso creativo.
+            <br />
+            Así protegemos la calidad del proyecto y del trabajo.
           </p>
         </motion.div>
 
@@ -166,7 +166,7 @@ export default function MembershipPlans() {
           ))}
         </div>
 
-        {/* Money Back Guarantee */}
+        {/* Note */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -174,7 +174,7 @@ export default function MembershipPlans() {
           className="text-center mt-12"
         >
           <p className="text-gray-500 text-sm">
-            Garantía de devolución de dinero de 14 días. Sin preguntas.
+            Plazas limitadas. Proceso de selección aplicado.
           </p>
         </motion.div>
       </div>
