@@ -41,19 +41,23 @@ export default function TrackDetail() {
   });
 
   const togglePlay = async () => {
-    if (audioRef.current) {
-      try {
-        if (isPlaying) {
-          audioRef.current.pause();
-          setIsPlaying(false);
-        } else {
-          await audioRef.current.play();
-          setIsPlaying(true);
-        }
-      } catch (error) {
-        console.error('Error playing audio:', error);
+    if (!audioRef.current) {
+      console.error('Audio element not found');
+      return;
+    }
+
+    try {
+      if (isPlaying) {
+        audioRef.current.pause();
         setIsPlaying(false);
+      } else {
+        await audioRef.current.play();
+        setIsPlaying(true);
       }
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      setIsPlaying(false);
+      alert('Error al reproducir el audio. Verifica que el archivo sea válido.');
     }
   };
 

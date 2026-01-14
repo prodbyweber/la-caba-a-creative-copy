@@ -74,7 +74,10 @@ export default function ProjectDetail() {
 
   const togglePlay = (trackId) => {
     const audio = audioRefs.current[trackId];
-    if (!audio) return;
+    if (!audio) {
+      console.error('Audio element not found for track:', trackId);
+      return;
+    }
 
     if (playingTrackId === trackId) {
       audio.pause();
@@ -84,8 +87,15 @@ export default function ProjectDetail() {
       if (playingTrackId && audioRefs.current[playingTrackId]) {
         audioRefs.current[playingTrackId].pause();
       }
-      audio.play().catch(err => console.error('Error playing audio:', err));
-      setPlayingTrackId(trackId);
+      
+      // Reset and play
+      audio.currentTime = 0;
+      audio.play()
+        .then(() => setPlayingTrackId(trackId))
+        .catch(err => {
+          console.error('Error playing audio:', err);
+          setPlayingTrackId(null);
+        });
     }
   };
 
