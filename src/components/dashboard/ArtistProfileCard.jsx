@@ -12,6 +12,46 @@ export default function ArtistProfileCard({ compact = false }) {
     { label: "Impact", value: 87 }
   ];
 
+  if (compact) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-gradient-to-r from-[#141414] to-black rounded-xl border border-white/5 p-3"
+      >
+        <div className="flex items-center gap-3">
+          {/* Avatar */}
+          <div className="relative flex-shrink-0">
+            <div className="w-12 h-12 rounded-lg overflow-hidden border-2 border-red-500/30 bg-gradient-to-br from-red-500 to-red-700">
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6965118e2b17684fa124077e/5cdacd140_jlytransparente.png"
+                alt="JLY"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <h3 className="font-bold text-white text-sm">JLY</h3>
+              <Verified className="w-3 h-3 text-red-500" />
+            </div>
+            <p className="text-xs text-gray-500">Urban / Trap</p>
+          </div>
+
+          {/* Rating & Pro Badge */}
+          <div className="flex items-center gap-2">
+            <div className="flex flex-col items-center justify-center w-10 h-12 bg-gradient-to-b from-red-600 to-red-800 rounded-lg border border-red-500/50">
+              <div className="text-lg font-black text-white">92</div>
+              <div className="text-[8px] font-bold text-red-200 uppercase">Overall</div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
