@@ -175,18 +175,18 @@ export default function TracksSection({ jlyArtistId }) {
                         {/* Play Button Overlay */}
                         {track.audio_file_url && (
                           <>
-                            <div className={`absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity ${playingTrackId === track.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+                            <div className={`absolute inset-0 bg-black/60 transition-opacity ${playingTrackId === track.id ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-100 active:opacity-100'}`} />
                             <button
                               onClick={(e) => {
                                 e.preventDefault();
                                 togglePlay(track.id);
                               }}
-                              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-white/90 hover:bg-white hover:scale-110 flex items-center justify-center transition-all shadow-2xl z-10"
+                              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-black/70 hover:bg-black/90 hover:scale-110 flex items-center justify-center transition-all shadow-2xl z-10 ${playingTrackId === track.id ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-100 active:opacity-100'}`}
                             >
                               {playingTrackId === track.id ? (
-                                <Pause className="w-4 h-4 lg:w-5 lg:h-5 text-black" fill="black" />
+                                <Pause className="w-4 h-4 lg:w-5 lg:h-5 text-white" fill="white" />
                               ) : (
-                                <Play className="w-4 h-4 lg:w-5 lg:h-5 text-black ml-0.5" fill="black" />
+                                <Play className="w-4 h-4 lg:w-5 lg:h-5 text-white ml-0.5" fill="white" />
                               )}
                             </button>
                           </>
