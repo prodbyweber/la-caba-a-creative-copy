@@ -8,7 +8,8 @@ import {
   Calendar, 
   Globe,
   Sparkles,
-  TrendingUp
+  TrendingUp,
+  Music
 } from "lucide-react";
 
 const features = [
