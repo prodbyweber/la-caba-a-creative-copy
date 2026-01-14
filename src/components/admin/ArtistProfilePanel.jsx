@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { X, User, Mail, Phone, MapPin, Tag, ExternalLink, Music2, Play, Pause, FileText, Plus, Save } from "lucide-react";
+import { X, User, Mail, Phone, MapPin, Tag, ExternalLink, Music2, Play, Pause, FileText, Plus, Save, Edit, Upload, Check } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
@@ -8,6 +8,9 @@ export default function ArtistProfilePanel({ artist, onClose }) {
   const [activeTab, setActiveTab] = useState("overview");
   const [playingTrackId, setPlayingTrackId] = useState(null);
   const [revisionNotes, setRevisionNotes] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState(artist);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const audioRefs = useRef({});
   const queryClient = useQueryClient();
 
@@ -56,6 +59,40 @@ export default function ArtistProfilePanel({ artist, onClose }) {
     }
   });
 
+  const updateArtistMutation = useMutation({
+    mutationFn: (data) => base44.entities.Artist.update(artist.id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['artists'] });
+      setIsEditing(false);
+    }
+  });
+
+  const createNoteMutation = useMutation({
+    mutationFn: (data) => base44.entities.Note.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['artist-notes', artist.id] });
+    }
+  });
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingAvatar(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setEditForm({ ...editForm, avatar_url: file_url });
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleSaveArtist = () => {
+    updateArtistMutation.mutate(editForm);
+  };
+
   const togglePlay = async (trackId) => {
     const audio = audioRefs.current[trackId];
     if (!audio) return;
@@ -99,33 +136,107 @@ export default function ArtistProfilePanel({ artist, onClose }) {
         {/* Header */}
         <div className="sticky top-0 bg-[#0a0a0b]/95 backdrop-blur-xl z-10 border-b border-white/5">
           <div className="p-6 flex items-start justify-between">
-            <div className="flex items-start gap-4">
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500/20 to-purple-500/20 overflow-hidden">
-                {artist.avatar_url ? (
-                  <img src={artist.avatar_url} alt={artist.stageName} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <User className="w-8 h-8 text-white/40" />
-                  </div>
+            <div className="flex items-start gap-4 flex-1">
+              <div className="relative group">
+                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500/20 to-purple-500/20 overflow-hidden">
+                  {(isEditing ? editForm.avatar_url : artist.avatar_url) ? (
+                    <img src={isEditing ? editForm.avatar_url : artist.avatar_url} alt={artist.stageName} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <User className="w-8 h-8 text-white/40" />
+                    </div>
+                  )}
+                </div>
+                {isEditing && (
+                  <label className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-xl">
+                    <Upload className="w-5 h-5 text-white" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                      disabled={uploadingAvatar}
+                    />
+                  </label>
                 )}
               </div>
-              <div>
-                <h2 className="text-2xl font-bold mb-1">{artist.stageName}</h2>
-                {artist.legalName && (
-                  <p className="text-gray-500 text-sm">{artist.legalName}</p>
+              <div className="flex-1">
+                {isEditing ? (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={editForm.stageName}
+                      onChange={(e) => setEditForm({ ...editForm, stageName: e.target.value })}
+                      className="text-2xl font-bold bg-white/5 border border-white/10 rounded-lg px-3 py-1 w-full text-white"
+                      placeholder="Nombre artístico"
+                    />
+                    <input
+                      type="text"
+                      value={editForm.legalName || ''}
+                      onChange={(e) => setEditForm({ ...editForm, legalName: e.target.value })}
+                      className="text-sm bg-white/5 border border-white/10 rounded-lg px-3 py-1 w-full text-gray-300"
+                      placeholder="Nombre legal"
+                    />
+                    <select
+                      value={editForm.status}
+                      onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
+                      className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-sm text-white w-full"
+                    >
+                      <option value="Lead">Lead</option>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+                ) : (
+                  <>
+                    <h2 className="text-2xl font-bold mb-1">{artist.stageName}</h2>
+                    {artist.legalName && (
+                      <p className="text-gray-500 text-sm">{artist.legalName}</p>
+                    )}
+                    <span className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium ${
+                      artist.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400' :
+                      artist.status === 'Lead' ? 'bg-blue-500/10 text-blue-400' :
+                      'bg-gray-500/10 text-gray-400'
+                    }`}>
+                      {artist.status}
+                    </span>
+                  </>
                 )}
-                <span className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium ${
-                  artist.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400' :
-                  artist.status === 'Lead' ? 'bg-blue-500/10 text-blue-400' :
-                  'bg-gray-500/10 text-gray-400'
-                }`}>
-                  {artist.status}
-                </span>
               </div>
             </div>
-            <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/5">
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              {isEditing ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setIsEditing(false);
+                      setEditForm(artist);
+                    }}
+                    className="p-2 rounded-lg hover:bg-white/5 text-gray-400"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={handleSaveArtist}
+                    disabled={updateArtistMutation.isPending}
+                    className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium flex items-center gap-2"
+                  >
+                    <Check className="w-4 h-4" />
+                    Guardar
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="p-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white"
+                >
+                  <Edit className="w-5 h-5" />
+                </button>
+              )}
+              <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/5">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Tabs */}
@@ -153,77 +264,155 @@ export default function ArtistProfilePanel({ artist, onClose }) {
               {/* Contact Info */}
               <div>
                 <h3 className="text-lg font-bold mb-4">Contact Information</h3>
-                <div className="space-y-3">
-                  {artist.email && (
-                    <div className="flex items-center gap-3 text-gray-300">
+                {isEditing ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
                       <Mail className="w-4 h-4 text-gray-500" />
-                      <a href={`mailto:${artist.email}`} className="hover:text-emerald-400">
-                        {artist.email}
-                      </a>
+                      <input
+                        type="email"
+                        value={editForm.email || ''}
+                        onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white"
+                        placeholder="Email"
+                      />
                     </div>
-                  )}
-                  {artist.phone && (
-                    <div className="flex items-center gap-3 text-gray-300">
+                    <div className="flex items-center gap-3">
                       <Phone className="w-4 h-4 text-gray-500" />
-                      <a href={`tel:${artist.phone}`} className="hover:text-emerald-400">
-                        {artist.phone}
-                      </a>
+                      <input
+                        type="tel"
+                        value={editForm.phone || ''}
+                        onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white"
+                        placeholder="Teléfono"
+                      />
                     </div>
-                  )}
-                  {artist.location && (
-                    <div className="flex items-center gap-3 text-gray-300">
+                    <div className="flex items-center gap-3">
                       <MapPin className="w-4 h-4 text-gray-500" />
-                      <span>{artist.location}</span>
+                      <input
+                        type="text"
+                        value={editForm.location || ''}
+                        onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                        className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white"
+                        placeholder="Ubicación"
+                      />
                     </div>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {artist.email && (
+                      <div className="flex items-center gap-3 text-gray-300">
+                        <Mail className="w-4 h-4 text-gray-500" />
+                        <a href={`mailto:${artist.email}`} className="hover:text-emerald-400">
+                          {artist.email}
+                        </a>
+                      </div>
+                    )}
+                    {artist.phone && (
+                      <div className="flex items-center gap-3 text-gray-300">
+                        <Phone className="w-4 h-4 text-gray-500" />
+                        <a href={`tel:${artist.phone}`} className="hover:text-emerald-400">
+                          {artist.phone}
+                        </a>
+                      </div>
+                    )}
+                    {artist.location && (
+                      <div className="flex items-center gap-3 text-gray-300">
+                        <MapPin className="w-4 h-4 text-gray-500" />
+                        <span>{artist.location}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Genre & Tags */}
               <div>
                 <h3 className="text-lg font-bold mb-4">Genre & Tags</h3>
-                <div className="flex flex-wrap gap-2">
-                  {artist.genre && (
-                    <span className="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-sm">
-                      {artist.genre}
-                    </span>
-                  )}
-                  {artist.tags && artist.tags.map((tag, i) => (
-                    <span key={i} className="px-3 py-1 rounded-lg bg-purple-500/10 text-purple-400 text-sm">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                {isEditing ? (
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      value={editForm.genre || ''}
+                      onChange={(e) => setEditForm({ ...editForm, genre: e.target.value })}
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white"
+                      placeholder="Género musical"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {artist.genre && (
+                      <span className="px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-sm">
+                        {artist.genre}
+                      </span>
+                    )}
+                    {artist.tags && artist.tags.map((tag, i) => (
+                      <span key={i} className="px-3 py-1 rounded-lg bg-purple-500/10 text-purple-400 text-sm">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Social Links */}
-              {artist.social_links && Object.keys(artist.social_links).length > 0 && (
-                <div>
-                  <h3 className="text-lg font-bold mb-4">Social Media</h3>
-                  <div className="space-y-2">
-                    {Object.entries(artist.social_links).map(([platform, url]) => url && (
-                      <a
-                        key={platform}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-gray-300 hover:text-emerald-400"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        <span className="capitalize">{platform}</span>
-                      </a>
+              <div>
+                <h3 className="text-lg font-bold mb-4">Social Media</h3>
+                {isEditing ? (
+                  <div className="space-y-3">
+                    {['instagram', 'youtube', 'tiktok', 'spotify'].map((platform) => (
+                      <div key={platform} className="flex items-center gap-3">
+                        <ExternalLink className="w-4 h-4 text-gray-500" />
+                        <input
+                          type="url"
+                          value={editForm.social_links?.[platform] || ''}
+                          onChange={(e) => setEditForm({
+                            ...editForm,
+                            social_links: {
+                              ...editForm.social_links,
+                              [platform]: e.target.value
+                            }
+                          })}
+                          className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white"
+                          placeholder={`${platform.charAt(0).toUpperCase() + platform.slice(1)} URL`}
+                        />
+                      </div>
                     ))}
                   </div>
-                </div>
-              )}
+                ) : (
+                  artist.social_links && Object.keys(artist.social_links).length > 0 && (
+                    <div className="space-y-2">
+                      {Object.entries(artist.social_links).map(([platform, url]) => url && (
+                        <a
+                          key={platform}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-gray-300 hover:text-emerald-400"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          <span className="capitalize">{platform}</span>
+                        </a>
+                      ))}
+                    </div>
+                  )
+                )}
+              </div>
 
               {/* Notes */}
-              {artist.notes && (
-                <div>
-                  <h3 className="text-lg font-bold mb-4">Internal Notes</h3>
-                  <p className="text-gray-300 whitespace-pre-wrap">{artist.notes}</p>
-                </div>
-              )}
+              <div>
+                <h3 className="text-lg font-bold mb-4">Internal Notes</h3>
+                {isEditing ? (
+                  <textarea
+                    value={editForm.notes || ''}
+                    onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                    rows={4}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white resize-none"
+                    placeholder="Notas internas..."
+                  />
+                ) : (
+                  artist.notes && <p className="text-gray-300 whitespace-pre-wrap">{artist.notes}</p>
+                )}
+              </div>
             </div>
           )}
 
@@ -320,6 +509,43 @@ export default function ArtistProfilePanel({ artist, onClose }) {
                                       Mix: {track.mix_engineer}
                                     </div>
                                   )}
+                                  
+                                  {/* Revision 1 - Nota Interna */}
+                                  <div className="mt-2">
+                                    <div className="bg-purple-500/5 border border-purple-500/20 rounded-lg p-2">
+                                      <textarea
+                                        placeholder="Revisión 1 - Nota interna para el artista..."
+                                        rows={2}
+                                        value={revisionNotes[`track_${track.id}`] || ''}
+                                        onChange={(e) => setRevisionNotes({
+                                          ...revisionNotes,
+                                          [`track_${track.id}`]: e.target.value
+                                        })}
+                                        className="w-full bg-transparent text-xs text-white placeholder:text-gray-600 focus:outline-none resize-none"
+                                      />
+                                      <button
+                                        onClick={() => {
+                                          if (revisionNotes[`track_${track.id}`]) {
+                                            createNoteMutation.mutate({
+                                              artist_id: artist.id,
+                                              project_id: track.project_id,
+                                              track_id: track.id,
+                                              category: 'CreativeDirection',
+                                              text: `REVISIÓN 1: ${revisionNotes[`track_${track.id}`]}`
+                                            });
+                                            setRevisionNotes({
+                                              ...revisionNotes,
+                                              [`track_${track.id}`]: ''
+                                            });
+                                          }
+                                        }}
+                                        className="mt-2 px-3 py-1 rounded bg-purple-500 hover:bg-purple-600 text-white text-xs font-medium flex items-center gap-1"
+                                      >
+                                        <Save className="w-3 h-3" />
+                                        Enviar Revisión 1
+                                      </button>
+                                    </div>
+                                  </div>
                                 </div>
 
                                 {/* Status Badge */}
