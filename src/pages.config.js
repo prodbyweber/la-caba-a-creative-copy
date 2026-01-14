@@ -7,6 +7,7 @@ import Sessions from './pages/Sessions';
 import SocialAccounts from './pages/SocialAccounts';
 import TrackDetail from './pages/TrackDetail';
 import AdminDashboard from './pages/AdminDashboard';
+import Artists from './pages/Artists';
 import __Layout from './Layout.jsx';
 
 
@@ -20,6 +21,7 @@ export const PAGES = {
     "SocialAccounts": SocialAccounts,
     "TrackDetail": TrackDetail,
     "AdminDashboard": AdminDashboard,
+    "Artists": Artists,
 }
 
 export const pagesConfig = {
