@@ -447,7 +447,7 @@ function TrackModal({ isOpen, track, projects, onClose }) {
                   <option value="">Sin proyecto</option>
                   {projects.map((project) => (
                     <option key={project.id} value={project.id}>
-                      {project.title || project.name}
+                      {project.name}
                     </option>
                   ))}
                 </select>
