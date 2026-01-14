@@ -108,44 +108,42 @@ export default function TracksSection() {
                   transition={{ delay: index * 0.05 }}
                   className="bg-white/5 rounded-xl p-3 lg:p-4 border border-white/5 hover:border-purple-500/30 transition-all group"
                 >
-                  <Link to={createPageUrl(`TrackDetail?id=${track.id}`)} className="flex items-center gap-3 lg:gap-4 flex-1">
-                    {/* Cover */}
-                    <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center overflow-hidden flex-shrink-0">
-                      {track.cover_url ? (
-                        <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <Music2 className="w-4 h-4 lg:w-6 lg:h-6 text-white/40" />
-                      )}
-                    </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-white mb-0.5 lg:mb-1 text-sm lg:text-base truncate group-hover:text-purple-400 transition-colors">{track.title}</h4>
-                      <div className="hidden lg:flex flex-wrap items-center gap-3 text-sm text-gray-500">
-                        {track.composer && (
-                          <span className="text-xs">Compositor: {track.composer}</span>
-                        )}
-                        {track.mix_engineer && (
-                          <span className="text-xs">Mix: {track.mix_engineer}</span>
-                        )}
-                        {track.master_engineer && (
-                          <span className="text-xs">Master: {track.master_engineer}</span>
+                  <div className="flex items-center gap-3 lg:gap-4">
+                    <Link to={createPageUrl(`TrackDetail?id=${track.id}`)} className="flex items-center gap-3 lg:gap-4 flex-1">
+                      {/* Cover */}
+                      <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {track.cover_url ? (
+                          <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <Music2 className="w-4 h-4 lg:w-6 lg:h-6 text-white/40" />
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 lg:gap-2 mt-1 lg:mt-2 flex-wrap">
-                        <span className={`px-1.5 lg:px-2 py-0.5 rounded text-[10px] lg:text-xs font-medium ${statusColors[track.status]}`}>
-                          {statusLabels[track.status]}
-                        </span>
-                        {track.dolby_atmos && (
-                          <span className="px-1.5 lg:px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 text-[10px] lg:text-xs font-medium">
-                            Atmos
-                          </span>
-                        )}
-                        </div>
-                        </div>
-                        </Link>
 
-                        {/* Actions */}
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-white mb-0.5 lg:mb-1 text-sm lg:text-base truncate group-hover:text-purple-400 transition-colors">{track.title}</h4>
+                        <div className="hidden lg:flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                          {track.composers && track.composers.length > 0 && (
+                            <span className="text-xs">Compositores: {track.composers.join(', ')}</span>
+                          )}
+                          {track.mix_engineer && (
+                            <span className="text-xs">Mix: {track.mix_engineer}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 lg:gap-2 mt-1 lg:mt-2 flex-wrap">
+                          <span className={`px-1.5 lg:px-2 py-0.5 rounded text-[10px] lg:text-xs font-medium ${statusColors[track.status]}`}>
+                            {statusLabels[track.status]}
+                          </span>
+                          {track.dolby_atmos && (
+                            <span className="px-1.5 lg:px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 text-[10px] lg:text-xs font-medium">
+                              Atmos
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+
+                    {/* Actions */}
                     <div className="flex items-center gap-1 lg:gap-2 lg:opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => setEditingTrack(track)}
