@@ -31,6 +31,11 @@ export default function Dashboard() {
             <p className="text-gray-500">Esto es lo que está pasando con tu música hoy.</p>
           </motion.div>
 
+          {/* Mobile Artist Profile (compact) */}
+          <div className="lg:hidden mb-6">
+            <ArtistProfileCard compact={true} />
+          </div>
+
           {/* Main Grid */}
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Left Column */}
@@ -42,9 +47,11 @@ export default function Dashboard() {
               <ClipActivityFeed />
             </div>
 
-            {/* Right Column */}
+            {/* Right Column - Desktop only profile */}
             <div className="space-y-6">
-              <ArtistProfileCard />
+              <div className="hidden lg:block">
+                <ArtistProfileCard />
+              </div>
               <WalletCard />
               <UpcomingSessionsCard />
             </div>

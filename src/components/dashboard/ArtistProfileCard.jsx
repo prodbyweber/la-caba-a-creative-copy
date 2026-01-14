@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Star, TrendingUp, Award, Verified } from "lucide-react";
 
-export default function ArtistProfileCard() {
+export default function ArtistProfileCard({ compact = false }) {
   const stats = [
     { label: "Streams", value: 88 },
     { label: "Engagement", value: 92 },
