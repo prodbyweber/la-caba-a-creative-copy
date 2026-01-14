@@ -373,9 +373,10 @@ export default function ProjectDetail() {
                                 <button
                                   onClick={(e) => {
                                     e.preventDefault();
+                                    e.stopPropagation();
                                     togglePlay(track.id);
                                   }}
-                                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/90 hover:bg-white hover:scale-110 flex items-center justify-center transition-all shadow-2xl z-10"
+                                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/90 hover:bg-white active:scale-95 hover:scale-110 flex items-center justify-center transition-all shadow-2xl z-10 touch-manipulation"
                                 >
                                   {playingTrackId === track.id ? (
                                     <Pause className="w-5 h-5 text-black" fill="black" />

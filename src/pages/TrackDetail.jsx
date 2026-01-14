@@ -237,7 +237,7 @@ export default function TrackDetail() {
                     {/* Play Button */}
                     <button
                       onClick={togglePlay}
-                      className="w-full py-4 rounded-xl bg-purple-500 hover:bg-purple-600 transition-colors flex items-center justify-center gap-3 font-semibold"
+                      className="w-full py-4 rounded-xl bg-purple-500 hover:bg-purple-600 active:bg-purple-700 transition-colors flex items-center justify-center gap-3 font-semibold touch-manipulation"
                     >
                       {isPlaying ? (
                         <>
