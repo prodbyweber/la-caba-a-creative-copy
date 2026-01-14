@@ -6,8 +6,9 @@ import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import { 
   ArrowLeft, Plus, Music2, Palette, Edit, Trash2, 
-  Check, X, Image as ImageIcon, FileText, Sparkles, Play, Pause
+  Check, X, Image as ImageIcon, FileText, Sparkles, Play, Pause, GripVertical
 } from "lucide-react";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -100,6 +101,15 @@ export default function ProjectDetail() {
     updateProjectMutation.mutate({ moodboard_urls: newImages });
   };
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    const items = Array.from(moodboardImages);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    setMoodboardImages(items);
+    updateProjectMutation.mutate({ moodboard_urls: items });
+  };
+
   const togglePlay = (trackId) => {
     const audio = audioRefs.current[trackId];
     if (!audio) {
@@ -159,68 +169,109 @@ export default function ProjectDetail() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5 overflow-hidden mb-6"
+            className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5 p-6 mb-6"
           >
-            {/* Moodboard Collage */}
-            <div className="grid grid-cols-4 md:grid-cols-6 gap-1 p-1 bg-white/5">
-              {moodboardImages.map((url, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  className={`relative group overflow-hidden rounded-lg ${
-                    index % 7 === 0 || index % 7 === 4 ? 'col-span-2 row-span-2' : 
-                    index % 7 === 2 ? 'row-span-2' : ''
-                  }`}
-                  style={{ aspectRatio: index % 7 === 0 || index % 7 === 4 ? '1/1' : '1/1' }}
-                >
-                  <img 
-                    src={url} 
-                    alt={`Moodboard ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    onClick={() => handleRemoveMoodboardSlot(index)}
-                    className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                  >
-                    <X className="w-5 h-5 text-white" />
-                  </button>
-                </motion.div>
-              ))}
-              
-              {/* Add Slot Button */}
-              <label className={`relative border-2 border-dashed border-white/20 rounded-lg cursor-pointer hover:border-emerald-500/50 hover:bg-white/5 transition-all flex items-center justify-center ${
-                moodboardImages.length % 7 === 0 ? 'col-span-2 row-span-2' : ''
-              }`}
-              style={{ aspectRatio: '1/1' }}>
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h1 className="text-4xl font-bold mb-2">{project.name}</h1>
+                <p className="text-gray-400 mb-3">{project.description}</p>
+                <div className="flex items-center gap-3">
+                  <span className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                    project.status === 'active' 
+                      ? 'bg-emerald-500/10 text-emerald-400' 
+                      : 'bg-gray-500/10 text-gray-400'
+                  }`}>
+                    {project.status === 'active' ? 'Activo' : 'Completado'}
+                  </span>
+                  <span className="text-gray-500 text-sm">
+                    {tracks.length} tracks
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Moodboard Banner - Horizontal Scrollable */}
+            {moodboardImages.length > 0 && (
+              <div className="mb-4">
+                <p className="text-xs text-gray-500 mb-2 flex items-center gap-2">
+                  <Palette className="w-3 h-3" />
+                  Visual Moodboard
+                </p>
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <Droppable droppableId="moodboard" direction="horizontal">
+                    {(provided) => (
+                      <div
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin"
+                      >
+                        {moodboardImages.map((url, index) => (
+                          <Draggable key={`img-${index}`} draggableId={`img-${index}`} index={index}>
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className={`relative group flex-shrink-0 rounded-lg overflow-hidden ${
+                                  snapshot.isDragging ? 'opacity-50 ring-2 ring-emerald-500' : ''
+                                }`}
+                                style={{
+                                  width: index % 3 === 0 ? '200px' : index % 3 === 1 ? '140px' : '160px',
+                                  height: '120px',
+                                  ...provided.draggableProps.style
+                                }}
+                              >
+                                <img 
+                                  src={url} 
+                                  alt={`Ref ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
+                                <div {...provided.dragHandleProps} className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <GripVertical className="w-4 h-4 text-white drop-shadow-lg" />
+                                </div>
+                                <button
+                                  onClick={() => handleRemoveMoodboardSlot(index)}
+                                  className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  <X className="w-3 h-3 text-white" />
+                                </button>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                        
+                        {/* Add Image Button */}
+                        <label className="flex-shrink-0 w-32 h-[120px] border-2 border-dashed border-white/20 rounded-lg cursor-pointer hover:border-emerald-500/50 hover:bg-white/5 transition-all flex flex-col items-center justify-center gap-1">
+                          <input 
+                            type="file" 
+                            accept="image/*"
+                            onChange={(e) => e.target.files?.[0] && handleAddMoodboardSlot(e.target.files[0])}
+                            className="hidden"
+                          />
+                          <Plus className="w-5 h-5 text-gray-600" />
+                          <span className="text-[10px] text-gray-600">Añadir</span>
+                        </label>
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              </div>
+            )}
+
+            {moodboardImages.length === 0 && (
+              <label className="block w-full h-20 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-emerald-500/30 hover:bg-white/5 transition-all">
                 <input 
                   type="file" 
                   accept="image/*"
                   onChange={(e) => e.target.files?.[0] && handleAddMoodboardSlot(e.target.files[0])}
                   className="hidden"
                 />
-                <Plus className="w-6 h-6 text-gray-600" />
+                <div className="w-full h-full flex items-center justify-center gap-2 text-gray-600 text-sm">
+                  <Plus className="w-4 h-4" />
+                  Añadir referencias visuales al moodboard
+                </div>
               </label>
-            </div>
-
-            {/* Project Info */}
-            <div className="p-8">
-              <h1 className="text-4xl font-bold mb-2">{project.name}</h1>
-              <p className="text-gray-400 mb-4">{project.description}</p>
-              <div className="flex items-center gap-3">
-                <span className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                  project.status === 'active' 
-                    ? 'bg-emerald-500/10 text-emerald-400' 
-                    : 'bg-gray-500/10 text-gray-400'
-                }`}>
-                  {project.status === 'active' ? 'Activo' : 'Completado'}
-                </span>
-                <span className="text-gray-500 text-sm">
-                  {tracks.length} tracks
-                </span>
-              </div>
-            </div>
+            )}
           </motion.div>
 
           {/* Tabs */}
