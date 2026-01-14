@@ -6,7 +6,7 @@ import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import { 
   ArrowLeft, Plus, Music2, Palette, Edit, Trash2, 
-  Check, X, Image as ImageIcon, FileText, Sparkles
+  Check, X, Image as ImageIcon, FileText, Sparkles, Play, Pause
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -16,6 +16,8 @@ export default function ProjectDetail() {
   const [activeTab, setActiveTab] = useState("tracks");
   const [editingTrack, setEditingTrack] = useState(null);
   const [showAddTrack, setShowAddTrack] = useState(false);
+  const [playingTrackId, setPlayingTrackId] = useState(null);
+  const audioRefs = React.useRef({});
 
   const urlParams = new URLSearchParams(window.location.search);
   const projectId = urlParams.get('id');
@@ -69,6 +71,23 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ['tracks', projectId] });
     },
   });
+
+  const togglePlay = (trackId) => {
+    const audio = audioRefs.current[trackId];
+    if (!audio) return;
+
+    if (playingTrackId === trackId) {
+      audio.pause();
+      setPlayingTrackId(null);
+    } else {
+      // Pause any other playing track
+      if (playingTrackId && audioRefs.current[playingTrackId]) {
+        audioRefs.current[playingTrackId].pause();
+      }
+      audio.play().catch(err => console.error('Error playing audio:', err));
+      setPlayingTrackId(trackId);
+    }
+  };
 
   const tabs = [
     { id: "tracks", label: "Tracks", icon: Music2 },
@@ -190,10 +209,32 @@ export default function ProjectDetail() {
                       </div>
                     ) : (
                       <div className="p-4 flex items-center gap-4">
-                        {/* Track Number */}
-                        <div className="w-8 text-center font-bold text-gray-500">
-                          {track.track_number || index + 1}
-                        </div>
+                        {/* Play Button or Track Number */}
+                        {track.audio_file_url ? (
+                          <>
+                            <audio
+                              ref={(el) => { if (el) audioRefs.current[track.id] = el; }}
+                              src={track.audio_file_url}
+                              onEnded={() => setPlayingTrackId(null)}
+                              onPause={() => { if (playingTrackId === track.id) setPlayingTrackId(null); }}
+                              onPlay={() => setPlayingTrackId(track.id)}
+                            />
+                            <button
+                              onClick={() => togglePlay(track.id)}
+                              className="w-10 h-10 rounded-full bg-emerald-500 hover:bg-emerald-600 flex items-center justify-center transition-colors flex-shrink-0"
+                            >
+                              {playingTrackId === track.id ? (
+                                <Pause className="w-4 h-4 text-white" fill="white" />
+                              ) : (
+                                <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+                              )}
+                            </button>
+                          </>
+                        ) : (
+                          <div className="w-8 text-center font-bold text-gray-500">
+                            {track.track_number || index + 1}
+                          </div>
+                        )}
 
                         {/* Cover */}
                         <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center overflow-hidden flex-shrink-0">
