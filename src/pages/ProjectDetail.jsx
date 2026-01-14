@@ -351,7 +351,8 @@ export default function ProjectDetail() {
                             <audio
                               ref={(el) => { if (el) audioRefs.current[track.id] = el; }}
                               src={track.audio_file_url}
-                              preload="auto"
+                              preload="metadata"
+                              playsInline
                               onEnded={() => setPlayingTrackId(null)}
                               onPause={() => { if (playingTrackId === track.id) setPlayingTrackId(null); }}
                               onPlay={() => setPlayingTrackId(track.id)}
@@ -371,6 +372,12 @@ export default function ProjectDetail() {
                               <>
                                 <div className={`absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity ${playingTrackId === track.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
                                 <button
+                                  type="button"
+                                  onTouchEnd={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    togglePlay(track.id);
+                                  }}
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();

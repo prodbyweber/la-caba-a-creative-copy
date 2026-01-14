@@ -232,6 +232,7 @@ export default function TrackDetail() {
                         setIsPlaying(false);
                       }}
                       preload="metadata"
+                      playsInline
                     />
                     
                     {/* Play Button */}
