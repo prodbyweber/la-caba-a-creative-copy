@@ -18,6 +18,7 @@ export default function ProjectDetail() {
   const [showAddTrack, setShowAddTrack] = useState(false);
   const [playingTrackId, setPlayingTrackId] = useState(null);
   const audioRefs = React.useRef({});
+  const [moodboardImages, setMoodboardImages] = useState([]);
 
   const urlParams = new URLSearchParams(window.location.search);
   const projectId = urlParams.get('id');
@@ -49,6 +50,12 @@ export default function ProjectDetail() {
     enabled: !!project?.artist_id,
   });
 
+  React.useEffect(() => {
+    if (project?.moodboard_urls && Array.isArray(project.moodboard_urls)) {
+      setMoodboardImages(project.moodboard_urls);
+    }
+  }, [project]);
+
   const createTrackMutation = useMutation({
     mutationFn: (data) => base44.entities.Track.create(data),
     onSuccess: () => {
@@ -71,6 +78,27 @@ export default function ProjectDetail() {
       queryClient.invalidateQueries({ queryKey: ['tracks', projectId] });
     },
   });
+
+  const updateProjectMutation = useMutation({
+    mutationFn: (data) => base44.entities.Project.update(projectId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['project', projectId] });
+    },
+  });
+
+  const handleAddMoodboardSlot = async (file) => {
+    if (!file) return;
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    const newImages = [...moodboardImages, file_url];
+    setMoodboardImages(newImages);
+    updateProjectMutation.mutate({ moodboard_urls: newImages });
+  };
+
+  const handleRemoveMoodboardSlot = (index) => {
+    const newImages = moodboardImages.filter((_, i) => i !== index);
+    setMoodboardImages(newImages);
+    updateProjectMutation.mutate({ moodboard_urls: newImages });
+  };
 
   const togglePlay = (trackId) => {
     const audio = audioRefs.current[trackId];
@@ -131,24 +159,66 @@ export default function ProjectDetail() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5 p-8 mb-6"
+            className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5 overflow-hidden mb-6"
           >
-            <div className="flex items-start justify-between">
-              <div>
-                <h1 className="text-4xl font-bold mb-2">{project.name}</h1>
-                <p className="text-gray-400 mb-4">{project.description}</p>
-                <div className="flex items-center gap-3">
-                  <span className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                    project.status === 'active' 
-                      ? 'bg-emerald-500/10 text-emerald-400' 
-                      : 'bg-gray-500/10 text-gray-400'
-                  }`}>
-                    {project.status === 'active' ? 'Activo' : 'Completado'}
-                  </span>
-                  <span className="text-gray-500 text-sm">
-                    {tracks.length} tracks
-                  </span>
-                </div>
+            {/* Moodboard Collage */}
+            <div className="grid grid-cols-4 md:grid-cols-6 gap-1 p-1 bg-white/5">
+              {moodboardImages.map((url, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05 }}
+                  className={`relative group overflow-hidden rounded-lg ${
+                    index % 7 === 0 || index % 7 === 4 ? 'col-span-2 row-span-2' : 
+                    index % 7 === 2 ? 'row-span-2' : ''
+                  }`}
+                  style={{ aspectRatio: index % 7 === 0 || index % 7 === 4 ? '1/1' : '1/1' }}
+                >
+                  <img 
+                    src={url} 
+                    alt={`Moodboard ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    onClick={() => handleRemoveMoodboardSlot(index)}
+                    className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                  >
+                    <X className="w-5 h-5 text-white" />
+                  </button>
+                </motion.div>
+              ))}
+              
+              {/* Add Slot Button */}
+              <label className={`relative border-2 border-dashed border-white/20 rounded-lg cursor-pointer hover:border-emerald-500/50 hover:bg-white/5 transition-all flex items-center justify-center ${
+                moodboardImages.length % 7 === 0 ? 'col-span-2 row-span-2' : ''
+              }`}
+              style={{ aspectRatio: '1/1' }}>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={(e) => e.target.files?.[0] && handleAddMoodboardSlot(e.target.files[0])}
+                  className="hidden"
+                />
+                <Plus className="w-6 h-6 text-gray-600" />
+              </label>
+            </div>
+
+            {/* Project Info */}
+            <div className="p-8">
+              <h1 className="text-4xl font-bold mb-2">{project.name}</h1>
+              <p className="text-gray-400 mb-4">{project.description}</p>
+              <div className="flex items-center gap-3">
+                <span className={`px-3 py-1 rounded-lg text-sm font-medium ${
+                  project.status === 'active' 
+                    ? 'bg-emerald-500/10 text-emerald-400' 
+                    : 'bg-gray-500/10 text-gray-400'
+                }`}>
+                  {project.status === 'active' ? 'Activo' : 'Completado'}
+                </span>
+                <span className="text-gray-500 text-sm">
+                  {tracks.length} tracks
+                </span>
               </div>
             </div>
           </motion.div>
