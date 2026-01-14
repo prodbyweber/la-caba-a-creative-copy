@@ -8,6 +8,12 @@ import SocialAccounts from './pages/SocialAccounts';
 import TrackDetail from './pages/TrackDetail';
 import AdminDashboard from './pages/AdminDashboard';
 import Artists from './pages/Artists';
+import Projects from './pages/Projects';
+import Calendars from './pages/Calendars';
+import Revisions from './pages/Revisions';
+import Notes from './pages/Notes';
+import ContentCalendar from './pages/ContentCalendar';
+import Settings from './pages/Settings';
 import __Layout from './Layout.jsx';
 
 
@@ -22,6 +28,12 @@ export const PAGES = {
     "TrackDetail": TrackDetail,
     "AdminDashboard": AdminDashboard,
     "Artists": Artists,
+    "Projects": Projects,
+    "Calendars": Calendars,
+    "Revisions": Revisions,
+    "Notes": Notes,
+    "ContentCalendar": ContentCalendar,
+    "Settings": Settings,
 }
 
 export const pagesConfig = {
