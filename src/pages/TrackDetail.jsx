@@ -237,7 +237,7 @@ export default function TrackDetail() {
                   <div className="flex-1">
                     <h1 className="text-3xl font-bold mb-2">{track.title}</h1>
                     {project && (
-                      <p className="text-gray-500">Proyecto: {project.name}</p>
+                      <p className="text-gray-500">Proyecto: {project.title}</p>
                     )}
                   </div>
                   <Link 
