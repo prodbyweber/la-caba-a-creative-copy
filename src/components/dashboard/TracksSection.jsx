@@ -6,23 +6,36 @@ import { createPageUrl } from "@/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
-export default function TracksSection() {
+export default function TracksSection({ jlyArtistId }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTrack, setEditingTrack] = useState(null);
 
   const queryClient = useQueryClient();
 
-  const { data: tracks, isLoading } = useQuery({
+  const { data: allTracks = [], isLoading } = useQuery({
     queryKey: ['all-tracks'],
     queryFn: () => base44.entities.Track.list('-created_date'),
     initialData: [],
   });
 
-  const { data: projects } = useQuery({
+  const { data: allProjects = [] } = useQuery({
     queryKey: ['projects'],
     queryFn: () => base44.entities.Project.list(),
     initialData: [],
   });
+
+  // Filtrar proyectos del artista JLY
+  const projects = jlyArtistId 
+    ? allProjects.filter(project => project.artist_id === jlyArtistId)
+    : allProjects;
+
+  // Filtrar tracks que pertenecen a proyectos de JLY
+  const tracks = jlyArtistId
+    ? allTracks.filter(track => {
+        const project = allProjects.find(p => p.id === track.project_id);
+        return project && project.artist_id === jlyArtistId;
+      })
+    : allTracks;
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Track.delete(id),

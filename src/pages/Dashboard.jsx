@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import ArtistProfileCard from "@/components/dashboard/ArtistProfileCard";
@@ -13,6 +15,20 @@ import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [jlyArtistId, setJlyArtistId] = useState(null);
+
+  // Obtener el artista JLY de la base de datos
+  const { data: artists = [] } = useQuery({
+    queryKey: ['artists'],
+    queryFn: () => base44.entities.Artist.list()
+  });
+
+  useEffect(() => {
+    const jlyArtist = artists.find(artist => artist.stageName === "JLY");
+    if (jlyArtist) {
+      setJlyArtistId(jlyArtist.id);
+    }
+  }, [artists]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
@@ -40,8 +56,8 @@ export default function Dashboard() {
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Left Column */}
             <div className="lg:col-span-2 space-y-6">
-              <ProjectsSection />
-              <TracksSection />
+              <ProjectsSection jlyArtistId={jlyArtistId} />
+              <TracksSection jlyArtistId={jlyArtistId} />
               <PerformanceOverview />
               <GrowthChart />
               <ClipActivityFeed />

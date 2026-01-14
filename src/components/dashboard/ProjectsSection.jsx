@@ -8,7 +8,7 @@ import { createPageUrl } from "@/utils";
 import CreateProjectModal from "./CreateProjectModal";
 import useEmblaCarousel from 'embla-carousel-react';
 
-export default function ProjectsSection() {
+export default function ProjectsSection({ jlyArtistId }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [emblaRef] = useEmblaCarousel({ 
     align: 'start',
@@ -16,11 +16,16 @@ export default function ProjectsSection() {
     containScroll: 'trimSnaps'
   });
 
-  const { data: projects, isLoading } = useQuery({
+  const { data: allProjects = [], isLoading } = useQuery({
     queryKey: ['projects'],
     queryFn: () => base44.entities.Project.list('-created_date'),
     initialData: [],
   });
+
+  // Filtrar proyectos solo del artista JLY
+  const projects = jlyArtistId 
+    ? allProjects.filter(project => project.artist_id === jlyArtistId)
+    : allProjects;
 
   const { data: tracks } = useQuery({
     queryKey: ['tracks'],
@@ -147,6 +152,7 @@ export default function ProjectsSection() {
       <CreateProjectModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
+        jlyArtistId={jlyArtistId}
       />
     </>
   );
