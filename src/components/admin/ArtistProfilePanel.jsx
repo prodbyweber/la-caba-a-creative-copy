@@ -55,7 +55,7 @@ export default function ArtistProfilePanel({ artist, onClose }) {
         <div className="sticky top-0 bg-[#0a0a0b]/95 backdrop-blur-xl z-10 border-b border-white/5">
           <div className="p-6 flex items-start justify-between">
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-red-500/20 to-red-700/20 overflow-hidden border-2 border-red-500/30">
+              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500/20 to-purple-500/20 overflow-hidden">
                 {artist.avatar_url ? (
                   <img src={artist.avatar_url} alt={artist.stageName} className="w-full h-full object-cover" />
                 ) : (
