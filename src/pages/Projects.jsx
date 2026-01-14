@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Plus, Search, FolderKanban, Calendar, Clock, AlertCircle } from "lucide-react";
+import EditProjectModal from "@/components/admin/EditProjectModal";
+import { Plus, Search, FolderKanban, Calendar, Clock, AlertCircle, Edit } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { format, parseISO } from "date-fns";
@@ -12,6 +13,7 @@ export default function Projects() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
 
   const { data: projects = [], isLoading } = useQuery({
     queryKey: ['projects'],
@@ -129,29 +131,42 @@ export default function Projects() {
                 project.status !== 'Delivered';
 
               return (
-                <Link key={project.id} to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className={`bg-white/5 rounded-2xl p-6 border transition-all cursor-pointer group hover:border-emerald-500/30 ${
-                      isOverdue ? 'border-red-500/20' : 'border-white/5'
-                    }`}
-                  >
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className={`bg-white/5 rounded-2xl p-6 border transition-all group hover:border-emerald-500/30 ${
+                    isOverdue ? 'border-red-500/20' : 'border-white/5'
+                  }`}
+                >
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-4">
+                    <Link to={createPageUrl(`ProjectDetail?id=${project.id}`)} className="flex-1">
+                      <div>
+                        <h3 className="font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors cursor-pointer">
                           {project.title}
                         </h3>
                         {artist && (
                           <p className="text-sm text-gray-500">{artist.stageName}</p>
                         )}
                       </div>
+                    </Link>
+                    <div className="flex items-center gap-2">
                       {isOverdue && (
                         <AlertCircle className="w-5 h-5 text-red-400" />
                       )}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingProject(project);
+                        }}
+                        className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-emerald-400 opacity-0 group-hover:opacity-100 transition-all"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
                     </div>
+                  </div>
 
                     {/* Status & Type */}
                     <div className="flex gap-2 mb-4">
@@ -192,7 +207,6 @@ export default function Projects() {
                       )}
                     </div>
                   </motion.div>
-                </Link>
               );
             })}
           </div>
@@ -202,6 +216,13 @@ export default function Projects() {
       <CreateProjectModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
+        artists={artists}
+      />
+
+      <EditProjectModal
+        isOpen={!!editingProject}
+        onClose={() => setEditingProject(null)}
+        project={editingProject}
         artists={artists}
       />
     </AdminLayout>

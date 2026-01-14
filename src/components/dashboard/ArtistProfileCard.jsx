@@ -1,8 +1,17 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 import { Star, TrendingUp, Award, Verified } from "lucide-react";
 
 export default function ArtistProfileCard({ compact = false }) {
+  const { data: artists = [] } = useQuery({
+    queryKey: ['artists'],
+    queryFn: () => base44.entities.Artist.list()
+  });
+
+  const jlyArtist = artists.find(artist => artist.stageName === "JLY");
+
   const stats = [
     { label: "Streams", value: 88 },
     { label: "Engagement", value: 92 },
@@ -11,6 +20,10 @@ export default function ArtistProfileCard({ compact = false }) {
     { label: "Content", value: 90 },
     { label: "Impact", value: 87 }
   ];
+
+  if (!jlyArtist) {
+    return null;
+  }
 
   if (compact) {
     return (
@@ -24,8 +37,8 @@ export default function ArtistProfileCard({ compact = false }) {
           <div className="relative flex-shrink-0">
             <div className="w-12 h-12 rounded-lg overflow-hidden border-2 border-red-500/30 bg-gradient-to-br from-red-500 to-red-700">
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6965118e2b17684fa124077e/5cdacd140_jlytransparente.png"
-                alt="JLY"
+                src={jlyArtist.avatar_url || "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=400&h=400&fit=crop"}
+                alt={jlyArtist.stageName}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -34,10 +47,10 @@ export default function ArtistProfileCard({ compact = false }) {
           {/* Info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5">
-              <h3 className="font-bold text-white text-sm">JLY</h3>
+              <h3 className="font-bold text-white text-sm">{jlyArtist.stageName}</h3>
               <Verified className="w-3 h-3 text-red-500" />
             </div>
-            <p className="text-xs text-gray-500">Urban / Trap</p>
+            <p className="text-xs text-gray-500">{jlyArtist.genre || "Urban / Trap"}</p>
           </div>
 
           {/* Rating & Pro Badge */}
@@ -63,8 +76,8 @@ export default function ArtistProfileCard({ compact = false }) {
         {/* Artist Image - Full Width */}
         <div className="relative h-[450px] sm:h-[500px] overflow-visible pt-8">
           <img 
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6965118e2b17684fa124077e/5cdacd140_jlytransparente.png"
-            alt="JLY"
+            src={jlyArtist.avatar_url || "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=400&h=400&fit=crop"}
+            alt={jlyArtist.stageName}
             className="w-full h-full object-contain object-top scale-100"
           />
         </div>
@@ -77,11 +90,11 @@ export default function ArtistProfileCard({ compact = false }) {
               {/* Artist Info */}
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">JLY</h3>
+                  <h3 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">{jlyArtist.stageName}</h3>
                   <Verified className="w-5 h-5 text-red-500" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-gray-400">Urban / Catalan Trap</span>
+                  <span className="text-xs font-medium text-gray-400">{jlyArtist.genre || "Urban / Trap"}</span>
                 </div>
               </div>
 
