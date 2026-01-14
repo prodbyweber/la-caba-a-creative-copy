@@ -13,7 +13,10 @@ export default function TrackDetail() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
   const audioRef = useRef(null);
+  const progressRef = useRef(null);
 
   const urlParams = new URLSearchParams(window.location.search);
   const trackId = urlParams.get("id");
@@ -55,7 +58,7 @@ export default function TrackDetail() {
   };
 
   const handleTimeUpdate = () => {
-    if (audioRef.current) {
+    if (audioRef.current && !isDragging) {
       setCurrentTime(audioRef.current.currentTime);
     }
   };
@@ -63,17 +66,62 @@ export default function TrackDetail() {
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
       setDuration(audioRef.current.duration);
+      audioRef.current.volume = volume;
     }
   };
 
-  const handleSeek = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+  const updateTimeFromPosition = (clientX) => {
+    if (!progressRef.current || !duration) return;
+    const rect = progressRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
     const percentage = x / rect.width;
     const newTime = percentage * duration;
+    return newTime;
+  };
+
+  const handleProgressMouseDown = (e) => {
+    setIsDragging(true);
+    const newTime = updateTimeFromPosition(e.clientX);
+    setCurrentTime(newTime);
     if (audioRef.current) {
       audioRef.current.currentTime = newTime;
+    }
+  };
+
+  const handleProgressMouseMove = (e) => {
+    if (isDragging) {
+      const newTime = updateTimeFromPosition(e.clientX);
       setCurrentTime(newTime);
+      if (audioRef.current) {
+        audioRef.current.currentTime = newTime;
+      }
+    }
+  };
+
+  const handleProgressMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  React.useEffect(() => {
+    if (isDragging) {
+      const handleMouseMove = (e) => handleProgressMouseMove(e);
+      const handleMouseUp = () => handleProgressMouseUp();
+      
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [isDragging, duration]);
+
+  const handleVolumeChange = (e) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
     }
   };
 
@@ -175,6 +223,10 @@ export default function TrackDetail() {
                       onEnded={() => setIsPlaying(false)}
                       onPlay={() => setIsPlaying(true)}
                       onPause={() => setIsPlaying(false)}
+                      onError={(e) => {
+                        console.error('Error loading audio:', e);
+                        setIsPlaying(false);
+                      }}
                       preload="metadata"
                     />
                     
@@ -199,18 +251,38 @@ export default function TrackDetail() {
                     {/* Progress Bar */}
                     <div className="space-y-2">
                       <div 
-                        className="h-2 bg-white/10 rounded-full cursor-pointer overflow-hidden"
-                        onClick={handleSeek}
+                        ref={progressRef}
+                        className="relative h-2 bg-white/10 rounded-full cursor-pointer group"
+                        onMouseDown={handleProgressMouseDown}
                       >
                         <div 
-                          className="h-full bg-purple-500 rounded-full transition-all"
+                          className="absolute h-full bg-purple-500 rounded-full pointer-events-none"
                           style={{ width: `${(currentTime / duration) * 100}%` }}
+                        />
+                        <div 
+                          className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                          style={{ left: `${(currentTime / duration) * 100}%`, transform: 'translate(-50%, -50%)' }}
                         />
                       </div>
                       <div className="flex justify-between text-xs text-gray-500">
                         <span>{formatTime(currentTime)}</span>
                         <span>{formatTime(duration)}</span>
                       </div>
+                    </div>
+
+                    {/* Volume Control */}
+                    <div className="flex items-center gap-3 pt-2">
+                      <Volume2 className="w-4 h-4 text-gray-400" />
+                      <input
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value={volume}
+                        onChange={handleVolumeChange}
+                        className="flex-1 h-1 bg-white/10 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer"
+                      />
+                      <span className="text-xs text-gray-500 w-8 text-right">{Math.round(volume * 100)}%</span>
                     </div>
                   </div>
                 )}
