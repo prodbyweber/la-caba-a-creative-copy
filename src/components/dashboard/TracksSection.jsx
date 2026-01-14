@@ -62,12 +62,12 @@ export default function TracksSection({ jlyArtistId }) {
         audioRefs.current[playingTrackId].pause();
       }
       
-      // Reset and play
-      audio.currentTime = 0;
+      // Load and play
+      audio.load();
       audio.play()
         .then(() => setPlayingTrackId(trackId))
         .catch(err => {
-          console.error('Error playing audio:', err);
+          console.error('Error playing audio:', err, audio.src);
           setPlayingTrackId(null);
         });
     }
@@ -157,9 +157,11 @@ export default function TracksSection({ jlyArtistId }) {
                         <audio
                           ref={(el) => { if (el) audioRefs.current[track.id] = el; }}
                           src={track.audio_file_url}
+                          preload="auto"
                           onEnded={() => setPlayingTrackId(null)}
                           onPause={() => { if (playingTrackId === track.id) setPlayingTrackId(null); }}
                           onPlay={() => setPlayingTrackId(track.id)}
+                          onError={(e) => console.error('Audio load error:', e, track.audio_file_url)}
                         />
                       )}
                       
