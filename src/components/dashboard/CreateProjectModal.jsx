@@ -4,11 +4,14 @@ import { X, FolderPlus } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
-export default function CreateProjectModal({ isOpen, onClose }) {
+export default function CreateProjectModal({ isOpen, onClose, jlyArtistId }) {
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    status: "active"
+    artist_id: jlyArtistId || "",
+    title: "",
+    type: "Single",
+    status: "Draft",
+    genre: "",
+    description: ""
   });
 
   const queryClient = useQueryClient();
@@ -18,17 +21,24 @@ export default function CreateProjectModal({ isOpen, onClose }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       onClose();
-      setFormData({ name: "", description: "", status: "active" });
+      setFormData({
+        artist_id: jlyArtistId || "",
+        title: "",
+        type: "Single",
+        status: "Draft",
+        genre: "",
+        description: ""
+      });
     },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name.trim()) return;
+    if (!formData.title.trim() || !jlyArtistId) return;
     
     createMutation.mutate({
       ...formData,
-      artist_id: "current_artist" // Esto debería venir del usuario actual
+      artist_id: jlyArtistId
     });
   };
 
@@ -76,15 +86,64 @@ export default function CreateProjectModal({ isOpen, onClose }) {
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Nombre del Proyecto *
+                Título del Proyecto *
               </label>
               <input
                 type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="EP de verano, Álbum 2025..."
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
                 required
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Tipo
+                </label>
+                <select
+                  value={formData.type}
+                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                >
+                  <option value="Single">Single</option>
+                  <option value="EP">EP</option>
+                  <option value="Album">Álbum</option>
+                  <option value="ContentPack">Content Pack</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Estado
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                >
+                  <option value="Draft">Borrador</option>
+                  <option value="Recording">Grabación</option>
+                  <option value="Producing">Producción</option>
+                  <option value="Mixing">Mezcla</option>
+                  <option value="Mastering">Masterización</option>
+                  <option value="Delivered">Entregado</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Género
+              </label>
+              <input
+                type="text"
+                value={formData.genre}
+                onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
+                placeholder="Reggaeton, Trap, Urban..."
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
               />
             </div>
 
@@ -99,21 +158,6 @@ export default function CreateProjectModal({ isOpen, onClose }) {
                 rows={3}
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors resize-none"
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Estado
-              </label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
-              >
-                <option value="active">Activo</option>
-                <option value="completed">Completado</option>
-                <option value="archived">Archivado</option>
-              </select>
             </div>
 
             {/* Actions */}
