@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Music2, Upload, Edit, Trash2, Image as ImageIcon, Check, X } from "lucide-react";
+import { Plus, Music2, Upload, Edit, Trash2, Image as ImageIcon, Check, X, Play, Pause } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -9,6 +9,8 @@ import { base44 } from "@/api/base44Client";
 export default function TracksSection({ jlyArtistId }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTrack, setEditingTrack] = useState(null);
+  const [playingTrackId, setPlayingTrackId] = useState(null);
+  const audioRefs = React.useRef({});
 
   const queryClient = useQueryClient();
 
@@ -43,6 +45,23 @@ export default function TracksSection({ jlyArtistId }) {
       queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
     },
   });
+
+  const togglePlay = (trackId) => {
+    const audio = audioRefs.current[trackId];
+    if (!audio) return;
+
+    if (playingTrackId === trackId) {
+      audio.pause();
+      setPlayingTrackId(null);
+    } else {
+      // Pause any other playing track
+      if (playingTrackId && audioRefs.current[playingTrackId]) {
+        audioRefs.current[playingTrackId].pause();
+      }
+      audio.play().catch(err => console.error('Error playing audio:', err));
+      setPlayingTrackId(trackId);
+    }
+  };
 
   const statusColors = {
     idea: "bg-gray-500/10 text-gray-400",
@@ -122,6 +141,29 @@ export default function TracksSection({ jlyArtistId }) {
                   className="bg-white/5 rounded-xl p-3 lg:p-4 border border-white/5 hover:border-purple-500/30 transition-all group"
                 >
                   <div className="flex items-center gap-3 lg:gap-4">
+                    {/* Play Button */}
+                    {track.audio_file_url && (
+                      <>
+                        <audio
+                          ref={(el) => { if (el) audioRefs.current[track.id] = el; }}
+                          src={track.audio_file_url}
+                          onEnded={() => setPlayingTrackId(null)}
+                          onPause={() => { if (playingTrackId === track.id) setPlayingTrackId(null); }}
+                          onPlay={() => setPlayingTrackId(track.id)}
+                        />
+                        <button
+                          onClick={() => togglePlay(track.id)}
+                          className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-purple-500 hover:bg-purple-600 flex items-center justify-center transition-colors flex-shrink-0"
+                        >
+                          {playingTrackId === track.id ? (
+                            <Pause className="w-4 h-4 lg:w-5 lg:h-5 text-white" fill="white" />
+                          ) : (
+                            <Play className="w-4 h-4 lg:w-5 lg:h-5 text-white ml-0.5" fill="white" />
+                          )}
+                        </button>
+                      </>
+                    )}
+
                     <Link to={createPageUrl(`TrackDetail?id=${track.id}`)} className="flex items-center gap-3 lg:gap-4 flex-1">
                       {/* Cover */}
                       <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center overflow-hidden flex-shrink-0">
