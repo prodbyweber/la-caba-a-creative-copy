@@ -12,8 +12,7 @@ import {
   LogOut,
   X,
   Music2,
-  Share2,
-  Music
+  Share2
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
