@@ -209,9 +209,14 @@ export default function ProjectDetail() {
                       </div>
                     ) : (
                       <div className="p-4 flex items-center gap-4">
-                        {/* Play Button or Track Number */}
-                        {track.audio_file_url ? (
-                          <>
+                        {/* Track Number */}
+                        <div className="w-8 text-center font-bold text-gray-500 flex-shrink-0">
+                          {track.track_number || index + 1}
+                        </div>
+
+                        {/* Cover with Play Button Overlay */}
+                        <div className="relative group flex-shrink-0">
+                          {track.audio_file_url && (
                             <audio
                               ref={(el) => { if (el) audioRefs.current[track.id] = el; }}
                               src={track.audio_file_url}
@@ -219,30 +224,35 @@ export default function ProjectDetail() {
                               onPause={() => { if (playingTrackId === track.id) setPlayingTrackId(null); }}
                               onPlay={() => setPlayingTrackId(track.id)}
                             />
-                            <button
-                              onClick={() => togglePlay(track.id)}
-                              className="w-10 h-10 rounded-full bg-emerald-500 hover:bg-emerald-600 flex items-center justify-center transition-colors flex-shrink-0"
-                            >
-                              {playingTrackId === track.id ? (
-                                <Pause className="w-4 h-4 text-white" fill="white" />
-                              ) : (
-                                <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
-                              )}
-                            </button>
-                          </>
-                        ) : (
-                          <div className="w-8 text-center font-bold text-gray-500">
-                            {track.track_number || index + 1}
-                          </div>
-                        )}
-
-                        {/* Cover */}
-                        <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center overflow-hidden flex-shrink-0">
-                          {track.cover_url ? (
-                            <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
-                          ) : (
-                            <Music2 className="w-6 h-6 text-white/40" />
                           )}
+                          
+                          <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center overflow-hidden relative">
+                            {track.cover_url ? (
+                              <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <Music2 className="w-8 h-8 text-white/40" />
+                            )}
+                            
+                            {/* Play Button Overlay */}
+                            {track.audio_file_url && (
+                              <>
+                                <div className={`absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity ${playingTrackId === track.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    togglePlay(track.id);
+                                  }}
+                                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/90 hover:bg-white hover:scale-110 flex items-center justify-center transition-all shadow-2xl z-10"
+                                >
+                                  {playingTrackId === track.id ? (
+                                    <Pause className="w-5 h-5 text-black" fill="black" />
+                                  ) : (
+                                    <Play className="w-5 h-5 text-black ml-0.5" fill="black" />
+                                  )}
+                                </button>
+                              </>
+                            )}
+                          </div>
                         </div>
 
                         {/* Info */}

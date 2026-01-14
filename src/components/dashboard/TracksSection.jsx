@@ -140,10 +140,10 @@ export default function TracksSection({ jlyArtistId }) {
                   transition={{ delay: index * 0.05 }}
                   className="bg-white/5 rounded-xl p-3 lg:p-4 border border-white/5 hover:border-purple-500/30 transition-all group"
                 >
-                  <div className="flex items-center gap-3 lg:gap-4">
-                    {/* Play Button */}
-                    {track.audio_file_url && (
-                      <>
+                  <div className="flex items-center gap-4 lg:gap-5">
+                    {/* Cover with Play Button Overlay */}
+                    <div className="relative group flex-shrink-0">
+                      {track.audio_file_url && (
                         <audio
                           ref={(el) => { if (el) audioRefs.current[track.id] = el; }}
                           src={track.audio_file_url}
@@ -151,28 +151,38 @@ export default function TracksSection({ jlyArtistId }) {
                           onPause={() => { if (playingTrackId === track.id) setPlayingTrackId(null); }}
                           onPlay={() => setPlayingTrackId(track.id)}
                         />
-                        <button
-                          onClick={() => togglePlay(track.id)}
-                          className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-purple-500 hover:bg-purple-600 flex items-center justify-center transition-colors flex-shrink-0"
-                        >
-                          {playingTrackId === track.id ? (
-                            <Pause className="w-4 h-4 lg:w-5 lg:h-5 text-white" fill="white" />
-                          ) : (
-                            <Play className="w-4 h-4 lg:w-5 lg:h-5 text-white ml-0.5" fill="white" />
-                          )}
-                        </button>
-                      </>
-                    )}
-
-                    <Link to={createPageUrl(`TrackDetail?id=${track.id}`)} className="flex items-center gap-3 lg:gap-4 flex-1">
-                      {/* Cover */}
-                      <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center overflow-hidden flex-shrink-0">
+                      )}
+                      
+                      <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center overflow-hidden relative">
                         {track.cover_url ? (
                           <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
                         ) : (
-                          <Music2 className="w-4 h-4 lg:w-6 lg:h-6 text-white/40" />
+                          <Music2 className="w-6 h-6 lg:w-8 lg:h-8 text-white/40" />
+                        )}
+                        
+                        {/* Play Button Overlay */}
+                        {track.audio_file_url && (
+                          <>
+                            <div className={`absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity ${playingTrackId === track.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                togglePlay(track.id);
+                              }}
+                              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-white/90 hover:bg-white hover:scale-110 flex items-center justify-center transition-all shadow-2xl z-10"
+                            >
+                              {playingTrackId === track.id ? (
+                                <Pause className="w-4 h-4 lg:w-5 lg:h-5 text-black" fill="black" />
+                              ) : (
+                                <Play className="w-4 h-4 lg:w-5 lg:h-5 text-black ml-0.5" fill="black" />
+                              )}
+                            </button>
+                          </>
                         )}
                       </div>
+                    </div>
+
+                    <Link to={createPageUrl(`TrackDetail?id=${track.id}`)} className="flex items-center gap-3 lg:gap-4 flex-1 min-w-0">
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
