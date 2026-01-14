@@ -5,6 +5,7 @@ import Landing from './pages/Landing';
 import ProjectDetail from './pages/ProjectDetail';
 import Sessions from './pages/Sessions';
 import SocialAccounts from './pages/SocialAccounts';
+import TrackDetail from './pages/TrackDetail';
 import __Layout from './Layout.jsx';
 
 
@@ -16,6 +17,7 @@ export const PAGES = {
     "ProjectDetail": ProjectDetail,
     "Sessions": Sessions,
     "SocialAccounts": SocialAccounts,
+    "TrackDetail": TrackDetail,
 }
 
 export const pagesConfig = {

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Music2, Upload, Edit, Trash2, Image as ImageIcon, Check } from "lucide-react";
+import { Plus, Music2, Upload, Edit, Trash2, Image as ImageIcon, Check, X } from "lucide-react";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
@@ -106,7 +108,7 @@ export default function TracksSection() {
                   transition={{ delay: index * 0.05 }}
                   className="bg-white/5 rounded-xl p-3 lg:p-4 border border-white/5 hover:border-purple-500/30 transition-all group"
                 >
-                  <div className="flex items-center gap-3 lg:gap-4">
+                  <Link to={createPageUrl(`TrackDetail?id=${track.id}`)} className="flex items-center gap-3 lg:gap-4 flex-1">
                     {/* Cover */}
                     <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center overflow-hidden flex-shrink-0">
                       {track.cover_url ? (
@@ -118,7 +120,7 @@ export default function TracksSection() {
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-white mb-0.5 lg:mb-1 text-sm lg:text-base truncate">{track.title}</h4>
+                      <h4 className="font-bold text-white mb-0.5 lg:mb-1 text-sm lg:text-base truncate group-hover:text-purple-400 transition-colors">{track.title}</h4>
                       <div className="hidden lg:flex flex-wrap items-center gap-3 text-sm text-gray-500">
                         {track.composer && (
                           <span className="text-xs">Compositor: {track.composer}</span>
@@ -139,10 +141,11 @@ export default function TracksSection() {
                             Atmos
                           </span>
                         )}
-                      </div>
-                    </div>
+                        </div>
+                        </div>
+                        </Link>
 
-                    {/* Actions */}
+                        {/* Actions */}
                     <div className="flex items-center gap-1 lg:gap-2 lg:opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => setEditingTrack(track)}
@@ -189,7 +192,9 @@ function TrackModal({ isOpen, track, projects, onClose }) {
     project_id: "",
     track_number: null,
     cover_url: "",
-    composer: "",
+    audio_file_url: "",
+    composers: [],
+    producers: [],
     mix_engineer: "",
     master_engineer: "",
     dolby_atmos: false,
@@ -200,6 +205,9 @@ function TrackModal({ isOpen, track, projects, onClose }) {
     notes: ""
   });
   const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [newComposer, setNewComposer] = useState("");
+  const [newProducer, setNewProducer] = useState("");
 
   const queryClient = useQueryClient();
 
@@ -241,6 +249,67 @@ function TrackModal({ isOpen, track, projects, onClose }) {
     } finally {
       setUploadingCover(false);
     }
+  };
+
+  const handleAudioUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const maxSize = 70 * 1024 * 1024; // 70MB
+    if (file.size > maxSize) {
+      alert('El archivo supera los 70MB');
+      return;
+    }
+
+    const validTypes = ['audio/mpeg', 'audio/wav', 'audio/x-wav'];
+    if (!validTypes.includes(file.type)) {
+      alert('Solo se permiten archivos MP3 o WAV');
+      return;
+    }
+
+    setUploadingAudio(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData({ ...formData, audio_file_url: file_url });
+    } catch (error) {
+      console.error('Error uploading audio:', error);
+    } finally {
+      setUploadingAudio(false);
+    }
+  };
+
+  const addComposer = () => {
+    if (newComposer.trim()) {
+      setFormData({ 
+        ...formData, 
+        composers: [...(formData.composers || []), newComposer.trim()] 
+      });
+      setNewComposer("");
+    }
+  };
+
+  const removeComposer = (index) => {
+    setFormData({
+      ...formData,
+      composers: formData.composers.filter((_, i) => i !== index)
+    });
+  };
+
+  const addProducer = () => {
+    if (newProducer.trim()) {
+      setFormData({ 
+        ...formData, 
+        producers: [...(formData.producers || []), newProducer.trim()] 
+      });
+      setNewProducer("");
+    }
+  };
+
+  const removeProducer = (index) => {
+    setFormData({
+      ...formData,
+      producers: formData.producers.filter((_, i) => i !== index)
+    });
   };
 
   if (!isOpen) return null;
@@ -317,6 +386,33 @@ function TrackModal({ isOpen, track, projects, onClose }) {
               </div>
             </div>
 
+            {/* Audio Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-3">Archivo de Audio</label>
+              <div className="flex items-center gap-4">
+                <div className="w-32 h-32 rounded-xl bg-gradient-to-br from-emerald-500/20 to-blue-500/20 flex items-center justify-center">
+                  <Music2 className="w-12 h-12 text-white/40" />
+                </div>
+                <div className="flex-1">
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium transition-colors">
+                    <Upload className="w-4 h-4" />
+                    {uploadingAudio ? 'Subiendo...' : formData.audio_file_url ? 'Cambiar Audio' : 'Subir Audio'}
+                    <input
+                      type="file"
+                      accept="audio/mpeg,audio/wav"
+                      onChange={handleAudioUpload}
+                      className="hidden"
+                      disabled={uploadingAudio}
+                    />
+                  </label>
+                  <p className="text-xs text-gray-500 mt-2">MP3 o WAV. Máx 70MB.</p>
+                  {formData.audio_file_url && (
+                    <p className="text-xs text-emerald-400 mt-1">✓ Audio cargado</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Basic Info */}
             <div className="grid md:grid-cols-2 gap-4">
               <div>
@@ -353,17 +449,80 @@ function TrackModal({ isOpen, track, projects, onClose }) {
                 <span className="w-1 h-4 bg-purple-500 rounded-full" />
                 Créditos
               </h4>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Compositor</label>
-                  <input
-                    type="text"
-                    value={formData.composer}
-                    onChange={(e) => setFormData({ ...formData, composer: e.target.value })}
-                    placeholder="Nombre del compositor"
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors"
-                  />
+
+              {/* Composers */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Compositores</label>
+                <div className="space-y-2">
+                  {formData.composers?.map((composer, index) => (
+                    <div key={index} className="flex items-center gap-2 bg-white/5 px-3 py-2 rounded-lg">
+                      <span className="flex-1 text-white text-sm">{composer}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeComposer(index)}
+                        className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-red-400 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newComposer}
+                      onChange={(e) => setNewComposer(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addComposer())}
+                      placeholder="Agregar compositor"
+                      className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors"
+                    />
+                    <button
+                      type="button"
+                      onClick={addComposer}
+                      className="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-lg text-purple-400 font-medium transition-colors"
+                    >
+                      Agregar
+                    </button>
+                  </div>
                 </div>
+              </div>
+
+              {/* Producers */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Productores Musicales</label>
+                <div className="space-y-2">
+                  {formData.producers?.map((producer, index) => (
+                    <div key={index} className="flex items-center gap-2 bg-white/5 px-3 py-2 rounded-lg">
+                      <span className="flex-1 text-white text-sm">{producer}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeProducer(index)}
+                        className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-red-400 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newProducer}
+                      onChange={(e) => setNewProducer(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addProducer())}
+                      placeholder="Agregar productor"
+                      className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors"
+                    />
+                    <button
+                      type="button"
+                      onClick={addProducer}
+                      className="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-lg text-purple-400 font-medium transition-colors"
+                    >
+                      Agregar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">Ingeniero de Mezcla</label>
                   <input
@@ -384,8 +543,8 @@ function TrackModal({ isOpen, track, projects, onClose }) {
                     className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors"
                   />
                 </div>
-              </div>
-            </div>
+                </div>
+                </div>
 
             {/* Technical Info */}
             <div className="space-y-4">
