@@ -12,7 +12,8 @@ import {
   LogOut,
   X,
   Music2,
-  Share2
+  Share2,
+  Shield
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -29,6 +30,7 @@ const menuItems = [
 ];
 
 const bottomItems = [
+  { icon: Shield, label: "Admin Panel", page: "AdminDashboard" },
   { icon: Settings, label: "Configuración" },
   { icon: HelpCircle, label: "Ayuda" },
 ];
@@ -77,13 +79,22 @@ export default function DashboardSidebar({ isOpen, onClose }) {
         <div className="px-4 py-6 border-t border-white/5">
           <nav className="space-y-1">
             {bottomItems.map((item, i) => (
-              <button
-                key={i}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:text-white hover:bg-white/5 transition-all"
-              >
-                <item.icon className="w-5 h-5" />
-                {item.label}
-              </button>
+              item.page ? (
+                <Link key={i} to={createPageUrl(item.page)}>
+                  <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:text-white hover:bg-white/5 transition-all">
+                    <item.icon className="w-5 h-5" />
+                    {item.label}
+                  </button>
+                </Link>
+              ) : (
+                <button
+                  key={i}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:text-white hover:bg-white/5 transition-all"
+                >
+                  <item.icon className="w-5 h-5" />
+                  {item.label}
+                </button>
+              )
             ))}
             <Link to={createPageUrl("Landing")}>
               <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:text-red-400 hover:bg-red-500/5 transition-all">
@@ -172,13 +183,25 @@ export default function DashboardSidebar({ isOpen, onClose }) {
               <div className="px-4 py-6 border-t border-white/5">
                 <nav className="space-y-1">
                   {bottomItems.map((item, i) => (
-                    <button
-                      key={i}
-                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:text-white hover:bg-white/5 transition-all"
-                    >
-                      <item.icon className="w-5 h-5" />
-                      {item.label}
-                    </button>
+                    item.page ? (
+                      <Link key={i} to={createPageUrl(item.page)}>
+                        <button
+                          onClick={onClose}
+                          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:text-white hover:bg-white/5 transition-all"
+                        >
+                          <item.icon className="w-5 h-5" />
+                          {item.label}
+                        </button>
+                      </Link>
+                    ) : (
+                      <button
+                        key={i}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-500 hover:text-white hover:bg-white/5 transition-all"
+                      >
+                        <item.icon className="w-5 h-5" />
+                        {item.label}
+                      </button>
+                    )
                   ))}
                 </nav>
               </div>
