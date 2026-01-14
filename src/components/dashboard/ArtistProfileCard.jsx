@@ -1,8 +1,17 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Star, TrendingUp, Award, Verified } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 
 export default function ArtistProfileCard({ compact = false }) {
+  const { data: artists = [] } = useQuery({
+    queryKey: ['artists'],
+    queryFn: () => base44.entities.Artist.list()
+  });
+
+  const jlyArtist = artists.find(artist => artist.stageName === "JLY");
+  const avatarUrl = jlyArtist?.avatar_url || "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=400&h=400&fit=crop";
   const stats = [
     { label: "Streams", value: 88 },
     { label: "Engagement", value: 92 },
@@ -24,7 +33,7 @@ export default function ArtistProfileCard({ compact = false }) {
           <div className="relative flex-shrink-0">
             <div className="w-12 h-12 rounded-lg overflow-hidden border-2 border-red-500/30 bg-gradient-to-br from-red-500 to-red-700">
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6965118e2b17684fa124077e/5cdacd140_jlytransparente.png"
+                src={avatarUrl}
                 alt="JLY"
                 className="w-full h-full object-cover"
               />
@@ -63,7 +72,7 @@ export default function ArtistProfileCard({ compact = false }) {
         {/* Artist Image - Full Width */}
         <div className="relative h-[450px] sm:h-[500px] overflow-visible pt-8">
           <img 
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6965118e2b17684fa124077e/5cdacd140_jlytransparente.png"
+            src={avatarUrl}
             alt="JLY"
             className="w-full h-full object-contain object-top scale-100"
           />

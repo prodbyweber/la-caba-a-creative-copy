@@ -4,9 +4,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import ProjectHeader from "@/components/admin/ProjectHeader";
 import { 
   ArrowLeft, Plus, Music2, Palette, Edit, Trash2, 
-  Check, X, Image as ImageIcon, FileText, Sparkles
+  Check, X, Image as ImageIcon, FileText, Sparkles,
+  Upload, Play, Pause
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -99,30 +101,11 @@ export default function ProjectDetail() {
           </Link>
 
           {/* Project Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5 p-8 mb-6"
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <h1 className="text-4xl font-bold mb-2">{project.name}</h1>
-                <p className="text-gray-400 mb-4">{project.description}</p>
-                <div className="flex items-center gap-3">
-                  <span className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                    project.status === 'active' 
-                      ? 'bg-emerald-500/10 text-emerald-400' 
-                      : 'bg-gray-500/10 text-gray-400'
-                  }`}>
-                    {project.status === 'active' ? 'Activo' : 'Completado'}
-                  </span>
-                  <span className="text-gray-500 text-sm">
-                    {tracks.length} tracks
-                  </span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
+          <ProjectHeader 
+            project={project} 
+            tracksCount={tracks.length}
+            onUpdate={() => queryClient.invalidateQueries({ queryKey: ['project', projectId] })}
+          />
 
           {/* Tabs */}
           <div className="flex gap-2 mb-6">
@@ -208,8 +191,8 @@ export default function ProjectDetail() {
                         <div className="flex-1 min-w-0">
                           <h4 className="font-bold text-white mb-1">{track.title}</h4>
                           <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
-                            {track.composer && (
-                              <span>Compositor: {track.composer}</span>
+                            {track.composers && track.composers.length > 0 && (
+                              <span>Compositores: {track.composers.join(', ')}</span>
                             )}
                             {track.dolby_atmos && (
                               <span className="px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 text-xs font-medium">
@@ -226,6 +209,12 @@ export default function ProjectDetail() {
                               </span>
                             )}
                           </div>
+                          {/* Audio Player */}
+                          {track.audio_file_url && (
+                            <audio controls className="mt-2 w-full h-8">
+                              <source src={track.audio_file_url} type="audio/mpeg" />
+                            </audio>
+                          )}
                         </div>
 
                         {/* Stats */}
@@ -276,22 +265,92 @@ function TrackForm({ track, projectId, onSubmit, onCancel }) {
   const [formData, setFormData] = useState(track || {
     title: "",
     track_number: null,
-    composer: "",
+    cover_url: "",
+    audio_file_url: "",
+    composers: [],
+    producers: [],
     mix_engineer: "",
     master_engineer: "",
     dolby_atmos: false,
     genre: "",
+    bpm: null,
+    key: "",
     status: "idea",
     notes: ""
   });
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [newComposer, setNewComposer] = useState("");
+  const [newProducer, setNewProducer] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit({ ...formData, project_id: projectId });
   };
 
+  const handleCoverUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingCover(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData({ ...formData, cover_url: file_url });
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setUploadingCover(false);
+    }
+  };
+
+  const handleAudioUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 70 * 1024 * 1024) {
+      alert('Archivo muy grande (máx 70MB)');
+      return;
+    }
+    setUploadingAudio(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData({ ...formData, audio_file_url: file_url });
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setUploadingAudio(false);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Cover & Audio Upload */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Portada</label>
+          <div className="flex items-center gap-3">
+            <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center overflow-hidden">
+              {formData.cover_url ? (
+                <img src={formData.cover_url} alt="Cover" className="w-full h-full object-cover" />
+              ) : (
+                <ImageIcon className="w-8 h-8 text-white/40" />
+              )}
+            </div>
+            <label className="cursor-pointer px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-sm text-white font-medium transition-colors">
+              <Upload className="w-4 h-4 inline mr-2" />
+              {uploadingCover ? 'Subiendo...' : 'Subir'}
+              <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" disabled={uploadingCover} />
+            </label>
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Audio</label>
+          <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium transition-colors">
+            <Upload className="w-4 h-4" />
+            {uploadingAudio ? 'Subiendo...' : formData.audio_file_url ? 'Audio ✓' : 'Subir MP3/WAV'}
+            <input type="file" accept="audio/mpeg,audio/wav" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
+          </label>
+        </div>
+      </div>
+
       <div className="grid md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">Título *</label>
@@ -304,7 +363,7 @@ function TrackForm({ track, projectId, onSubmit, onCancel }) {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Número de Track</label>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Número</label>
           <input
             type="number"
             value={formData.track_number || ""}
@@ -314,16 +373,7 @@ function TrackForm({ track, projectId, onSubmit, onCancel }) {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Compositor</label>
-          <input
-            type="text"
-            value={formData.composer}
-            onChange={(e) => setFormData({ ...formData, composer: e.target.value })}
-            className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
-          />
-        </div>
+      <div className="grid md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">Mix Engineer</label>
           <input
@@ -344,13 +394,31 @@ function TrackForm({ track, projectId, onSubmit, onCancel }) {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-4 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">Género</label>
           <input
             type="text"
             value={formData.genre}
             onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
+            className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">BPM</label>
+          <input
+            type="number"
+            value={formData.bpm || ""}
+            onChange={(e) => setFormData({ ...formData, bpm: parseInt(e.target.value) || null })}
+            className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">Key</label>
+          <input
+            type="text"
+            value={formData.key}
+            onChange={(e) => setFormData({ ...formData, key: e.target.value })}
             className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
           />
         </div>
@@ -368,17 +436,18 @@ function TrackForm({ track, projectId, onSubmit, onCancel }) {
             <option value="completed">Completado</option>
           </select>
         </div>
-        <div className="flex items-end">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.dolby_atmos}
-              onChange={(e) => setFormData({ ...formData, dolby_atmos: e.target.checked })}
-              className="w-5 h-5 rounded bg-white/5 border-white/10"
-            />
-            <span className="text-sm font-medium text-gray-300">Dolby Atmos</span>
-          </label>
-        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={formData.dolby_atmos}
+            onChange={(e) => setFormData({ ...formData, dolby_atmos: e.target.checked })}
+            className="w-5 h-5 rounded bg-white/5 border-white/10"
+          />
+          <span className="text-sm font-medium text-gray-300">Dolby Atmos</span>
+        </label>
       </div>
 
       <div>
