@@ -16,7 +16,19 @@ export default function Artists() {
 
   const { data: artists = [], isLoading } = useQuery({
     queryKey: ['artists'],
-    queryFn: () => base44.entities.Artist.list('-created_date')
+    queryFn: async () => {
+      const allArtists = await base44.entities.Artist.list('-created_date');
+      // Asegurar que JLY tenga el avatar correcto
+      return allArtists.map(artist => {
+        if (artist.stageName === 'JLY' && !artist.avatar_url) {
+          return {
+            ...artist,
+            avatar_url: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6965118e2b17684fa124077e/5cdacd140_jlytransparente.png'
+          };
+        }
+        return artist;
+      });
+    }
   });
 
   const filteredArtists = artists.filter(artist => {
