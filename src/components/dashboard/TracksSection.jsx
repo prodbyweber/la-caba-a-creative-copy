@@ -46,30 +46,30 @@ export default function TracksSection({ jlyArtistId }) {
     },
   });
 
-  const togglePlay = (trackId) => {
+  const togglePlay = async (trackId) => {
     const audio = audioRefs.current[trackId];
     if (!audio) {
       console.error('Audio element not found for track:', trackId);
       return;
     }
 
-    if (playingTrackId === trackId) {
-      audio.pause();
-      setPlayingTrackId(null);
-    } else {
-      // Pause any other playing track
-      if (playingTrackId && audioRefs.current[playingTrackId]) {
-        audioRefs.current[playingTrackId].pause();
+    try {
+      if (playingTrackId === trackId) {
+        audio.pause();
+        setPlayingTrackId(null);
+      } else {
+        // Pause any other playing track
+        if (playingTrackId && audioRefs.current[playingTrackId]) {
+          audioRefs.current[playingTrackId].pause();
+        }
+        
+        // Play audio
+        setPlayingTrackId(trackId);
+        await audio.play();
       }
-      
-      // Load and play
-      audio.load();
-      audio.play()
-        .then(() => setPlayingTrackId(trackId))
-        .catch(err => {
-          console.error('Error playing audio:', err, audio.src);
-          setPlayingTrackId(null);
-        });
+    } catch (err) {
+      console.error('Error playing audio:', err);
+      setPlayingTrackId(null);
     }
   };
 

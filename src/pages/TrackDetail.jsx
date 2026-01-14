@@ -51,13 +51,12 @@ export default function TrackDetail() {
         audioRef.current.pause();
         setIsPlaying(false);
       } else {
-        await audioRef.current.play();
         setIsPlaying(true);
+        await audioRef.current.play();
       }
     } catch (error) {
       console.error('Error playing audio:', error);
       setIsPlaying(false);
-      alert('Error al reproducir el audio. Verifica que el archivo sea válido.');
     }
   };
 
