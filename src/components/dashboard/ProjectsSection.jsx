@@ -6,9 +6,15 @@ import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import CreateProjectModal from "./CreateProjectModal";
+import useEmblaCarousel from 'embla-carousel-react';
 
 export default function ProjectsSection() {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [emblaRef] = useEmblaCarousel({ 
+    align: 'start',
+    slidesToScroll: 1,
+    containScroll: 'trimSnaps'
+  });
 
   const { data: projects, isLoading } = useQuery({
     queryKey: ['projects'],
@@ -64,8 +70,8 @@ export default function ProjectsSection() {
           </button>
         </div>
 
-        {/* Projects List */}
-        <div className="divide-y divide-white/5">
+        {/* Projects Carousel */}
+        <div className="p-6">
           {projects.length === 0 ? (
             <div className="text-center py-12">
               <FolderOpen className="w-16 h-16 text-gray-600 mx-auto mb-4" />
@@ -78,20 +84,24 @@ export default function ProjectsSection() {
               </button>
             </div>
           ) : (
-            projects.map((project, i) => {
-              const projectTracks = getProjectTracks(project.id);
-              return (
-                <Link key={project.id} to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="p-4 hover:bg-white/[0.02] transition-colors group"
-                  >
-                    <div className="flex items-center gap-4">
-                      {/* Project Cover */}
-                      <div className="relative flex-shrink-0">
-                        <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 overflow-hidden">
+            <div className="overflow-hidden" ref={emblaRef}>
+              <div className="flex gap-3">
+                {projects.map((project, i) => {
+                  const projectTracks = getProjectTracks(project.id);
+                  return (
+                    <Link 
+                      key={project.id} 
+                      to={createPageUrl(`ProjectDetail?id=${project.id}`)}
+                      className="flex-[0_0_160px] sm:flex-[0_0_200px]"
+                    >
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="group bg-white/5 rounded-xl p-3 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer h-full"
+                      >
+                        {/* Project Cover */}
+                        <div className="relative aspect-square rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 mb-2 overflow-hidden">
                           {projectTracks[0]?.cover_url ? (
                             <img 
                               src={projectTracks[0].cover_url} 
@@ -100,26 +110,21 @@ export default function ProjectsSection() {
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                              <Music2 className="w-8 h-8 text-white/20" />
+                              <Music2 className="w-10 h-10 text-white/20" />
                             </div>
                           )}
+                          {/* Track Count Badge */}
+                          <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] font-medium">
+                            {projectTracks.length}
+                          </div>
                         </div>
-                        {/* Track Count Badge */}
-                        <div className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] font-medium border border-white/10">
-                          {projectTracks.length}
-                        </div>
-                      </div>
 
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm truncate mb-1 group-hover:text-emerald-400 transition-colors">
-                          {project.name}
-                        </h4>
-                        <p className="text-xs text-gray-500 truncate mb-1">
-                          {project.description || 'Sin descripción'}
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        {/* Info */}
+                        <div className="space-y-1">
+                          <h4 className="font-semibold text-sm text-white group-hover:text-emerald-400 transition-colors truncate">
+                            {project.name}
+                          </h4>
+                          <span className={`inline-block text-[10px] px-1.5 py-0.5 rounded-full ${
                             project.status === 'active' 
                               ? 'bg-emerald-500/10 text-emerald-400' 
                               : project.status === 'completed'
@@ -129,15 +134,12 @@ export default function ProjectsSection() {
                             {project.status === 'active' ? 'Activo' : project.status === 'completed' ? 'Completado' : 'Archivado'}
                           </span>
                         </div>
-                      </div>
-
-                      {/* Arrow */}
-                      <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all opacity-0 group-hover:opacity-100" />
-                    </div>
-                  </motion.div>
-                </Link>
-              );
-            })
+                      </motion.div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
       </motion.div>
