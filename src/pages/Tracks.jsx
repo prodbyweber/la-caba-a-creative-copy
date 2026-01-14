@@ -159,8 +159,12 @@ export default function TracksPage() {
                       <>
                         <div className={`absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity ${playingTrackId === track.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
                         <button
-                          onClick={() => togglePlay(track.id)}
-                          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white/90 hover:bg-white hover:scale-110 flex items-center justify-center transition-all shadow-2xl z-10"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            togglePlay(track.id);
+                          }}
+                          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white/90 hover:bg-white active:scale-95 hover:scale-110 flex items-center justify-center transition-all shadow-2xl z-10 touch-manipulation"
                         >
                           {playingTrackId === track.id ? (
                             <Pause className="w-6 h-6 text-black" fill="black" />
