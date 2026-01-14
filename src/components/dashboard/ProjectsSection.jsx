@@ -64,8 +64,8 @@ export default function ProjectsSection() {
           </button>
         </div>
 
-        {/* Projects Grid */}
-        <div className="p-6">
+        {/* Projects List */}
+        <div className="divide-y divide-white/5">
           {projects.length === 0 ? (
             <div className="text-center py-12">
               <FolderOpen className="w-16 h-16 text-gray-600 mx-auto mb-4" />
@@ -78,49 +78,48 @@ export default function ProjectsSection() {
               </button>
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {projects.map((project) => {
-                const projectTracks = getProjectTracks(project.id);
-                return (
-                  <Link key={project.id} to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
-                    <motion.div
-                      whileHover={{ y: -4 }}
-                      className="group bg-white/5 rounded-xl p-4 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer"
-                    >
-                      {/* Project Cover/Preview */}
-                      <div className="relative aspect-square rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 mb-3 overflow-hidden">
-                        {projectTracks[0]?.cover_url ? (
-                          <img 
-                            src={projectTracks[0].cover_url} 
-                            alt={project.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Music2 className="w-16 h-16 text-white/20" />
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        
+            projects.map((project, i) => {
+              const projectTracks = getProjectTracks(project.id);
+              return (
+                <Link key={project.id} to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="p-4 hover:bg-white/[0.02] transition-colors group"
+                  >
+                    <div className="flex items-center gap-4">
+                      {/* Project Cover */}
+                      <div className="relative flex-shrink-0">
+                        <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 overflow-hidden">
+                          {projectTracks[0]?.cover_url ? (
+                            <img 
+                              src={projectTracks[0].cover_url} 
+                              alt={project.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Music2 className="w-8 h-8 text-white/20" />
+                            </div>
+                          )}
+                        </div>
                         {/* Track Count Badge */}
-                        <div className="absolute top-2 right-2 px-2 py-1 rounded-lg bg-black/60 backdrop-blur-sm text-xs font-medium">
-                          {projectTracks.length} tracks
+                        <div className="absolute -bottom-1 -right-1 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] font-medium border border-white/10">
+                          {projectTracks.length}
                         </div>
                       </div>
 
-                      {/* Project Info */}
-                      <div className="space-y-2">
-                        <h4 className="font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center justify-between">
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-sm truncate mb-1 group-hover:text-emerald-400 transition-colors">
                           {project.name}
-                          <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
                         </h4>
-                        <p className="text-sm text-gray-500 line-clamp-1">
+                        <p className="text-xs text-gray-500 truncate mb-1">
                           {project.description || 'Sin descripción'}
                         </p>
-                        
-                        {/* Status Badge */}
                         <div className="flex items-center gap-2">
-                          <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
                             project.status === 'active' 
                               ? 'bg-emerald-500/10 text-emerald-400' 
                               : project.status === 'completed'
@@ -131,11 +130,14 @@ export default function ProjectsSection() {
                           </span>
                         </div>
                       </div>
-                    </motion.div>
-                  </Link>
-                );
-              })}
-            </div>
+
+                      {/* Arrow */}
+                      <ChevronRight className="w-4 h-4 text-gray-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all opacity-0 group-hover:opacity-100" />
+                    </div>
+                  </motion.div>
+                </Link>
+              );
+            })
           )}
         </div>
       </motion.div>
