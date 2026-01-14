@@ -26,7 +26,7 @@ export default function Hero() {
         >
           {/* Main Headline */}
           <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
-            <span className="block bg-gradient-to-r from-emerald-400 via-purple-400 to-orange-400 bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-r from-white via-orange-300 to-orange-500 bg-clip-text text-transparent">
               El estudio creativo para artistas que conectan de verdad
             </span>
           </h1>
