@@ -290,6 +290,8 @@ function TrackModal({ isOpen, track, projects, onClose }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
+      queryClient.invalidateQueries({ queryKey: ['tracks'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       onClose();
     },
   });
