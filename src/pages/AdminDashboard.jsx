@@ -43,6 +43,11 @@ export default function AdminDashboard() {
     queryFn: () => base44.entities.Artist.list('-created_date')
   });
 
+  const { data: tracks = [] } = useQuery({
+    queryKey: ['tracks'],
+    queryFn: () => base44.entities.Track.list('-created_date')
+  });
+
   // Calculate KPIs
   const todaySessions = sessions.filter(s => 
     s.start_time && isToday(parseISO(s.start_time))
@@ -144,8 +149,8 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Today's Timeline */}
-        <div className="grid lg:grid-cols-2 gap-6">
+        {/* Main Content Grid */}
+        <div className="grid lg:grid-cols-2 gap-6 mb-6">
           {/* Today's Sessions */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -244,6 +249,131 @@ export default function AdminDashboard() {
                         </span>
                         <span>
                           Due: {format(parseISO(deliverable.due_date_time), 'MMM d, HH:mm')}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </motion.div>
+        </div>
+
+        {/* Second Row */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Pending Revisions */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="bg-[#141414] rounded-2xl border border-white/5 p-6"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold">Revisiones Pendientes</h3>
+              <Link to={createPageUrl("Revisions")}>
+                <button className="text-sm text-emerald-400 hover:text-emerald-300">
+                  Ver Todas
+                </button>
+              </Link>
+            </div>
+
+            {openRevisions.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <CheckCircle2 className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+                <p>No hay revisiones pendientes</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {openRevisions.slice(0, 5).map((revision) => (
+                  <div 
+                    key={revision.id}
+                    className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-purple-500/30 transition-all"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-white mb-1">{revision.request_text}</h4>
+                        <div className="text-xs text-gray-500">Timecode: {revision.timecode}</div>
+                      </div>
+                      <span className={`px-2 py-0.5 rounded text-xs shrink-0 ml-2 ${
+                        revision.severity === 'Critical' ? 'bg-red-500/20 text-red-400' :
+                        revision.severity === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-blue-500/20 text-blue-400'
+                      }`}>
+                        {revision.severity}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <span className="px-2 py-0.5 rounded text-xs bg-purple-500/10 text-purple-400">
+                        {revision.revision_type}
+                      </span>
+                      <span className="text-xs">→ {revision.assigned_to}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </motion.div>
+
+          {/* Tracks en Producción */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="bg-[#141414] rounded-2xl border border-white/5 p-6"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold">Tracks en Producción</h3>
+              <Link to={createPageUrl("Tracks")}>
+                <button className="text-sm text-emerald-400 hover:text-emerald-300">
+                  Ver Todos
+                </button>
+              </Link>
+            </div>
+
+            {tracks.filter(t => t.status !== 'completed').length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <CheckCircle2 className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+                <p>No hay tracks en producción</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {tracks.filter(t => t.status !== 'completed').slice(0, 5).map((track) => {
+                  const createdDate = new Date(track.created_date);
+                  const deliveryDate = new Date(createdDate);
+                  deliveryDate.setDate(deliveryDate.getDate() + 7);
+                  const daysUntilDelivery = Math.ceil((deliveryDate - new Date()) / (1000 * 60 * 60 * 24));
+                  
+                  return (
+                    <div 
+                      key={track.id}
+                      className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-emerald-500/30 transition-all"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-white">{track.title}</h4>
+                          <div className="text-xs text-gray-500 mt-1">
+                            Creado: {format(createdDate, 'dd/MM/yyyy')}
+                          </div>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded text-xs shrink-0 ml-2 ${
+                          track.status === 'production' ? 'bg-yellow-500/20 text-yellow-400' :
+                          track.status === 'mixing' ? 'bg-blue-500/20 text-blue-400' :
+                          track.status === 'mastering' ? 'bg-purple-500/20 text-purple-400' :
+                          'bg-gray-500/20 text-gray-400'
+                        }`}>
+                          {track.status}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-400">
+                          Entrega: {format(deliveryDate, 'dd/MM/yyyy')}
+                        </span>
+                        <span className={`text-xs font-medium ${
+                          daysUntilDelivery < 0 ? 'text-red-400' :
+                          daysUntilDelivery <= 2 ? 'text-orange-400' :
+                          'text-emerald-400'
+                        }`}>
+                          {daysUntilDelivery < 0 ? 'Retrasado' : `${daysUntilDelivery} días`}
                         </span>
                       </div>
                     </div>
