@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
+import SessionDetailModal from "@/components/sessions/SessionDetailModal";
 import { 
   ChevronLeft, 
   ChevronRight,
@@ -36,10 +37,34 @@ const sessionTypeColors = {
 
 export default function SessionsCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedSession, setSelectedSession] = useState(null);
+
+  const { data: user } = useQuery({
+    queryKey: ['user'],
+    queryFn: () => base44.auth.me()
+  });
 
   const { data: sessions = [], isLoading } = useQuery({
     queryKey: ['sessions'],
-    queryFn: () => base44.entities.Session.list('-start_time'),
+    queryFn: async () => {
+      const allSessions = await base44.entities.Session.list('-start_time');
+      // Si el usuario no es admin, filtrar solo sus sesiones
+      if (user && user.role !== 'admin') {
+        const artists = await base44.entities.Artist.filter({ email: user.email });
+        if (artists.length > 0) {
+          const artistId = artists[0].id;
+          return allSessions.filter(s => s.artist_id === artistId);
+        }
+        return [];
+      }
+      return allSessions;
+    },
+    enabled: !!user
+  });
+
+  const { data: artists = [] } = useQuery({
+    queryKey: ['artists'],
+    queryFn: () => base44.entities.Artist.list()
   });
 
   const monthStart = startOfMonth(currentDate);
@@ -130,20 +155,29 @@ export default function SessionsCalendar() {
                 </div>
 
                 <div className="space-y-1">
-                  {daySessions.slice(0, 3).map(session => (
-                    <div
-                      key={session.id}
-                      className={`px-2 py-1 rounded-lg text-xs font-medium border ${
-                        sessionTypeColors[session.session_type]
-                      } cursor-pointer hover:opacity-80 transition-opacity`}
-                    >
-                      <div className="flex items-center gap-1 mb-0.5">
-                        <Clock className="w-3 h-3" />
-                        {format(parseISO(session.start_time), "HH:mm")}
-                      </div>
-                      <div className="truncate">{session.title}</div>
-                    </div>
-                  ))}
+                  {daySessions.slice(0, 3).map(session => {
+                    const isDone = session.status === "Done";
+                    return (
+                      <button
+                        key={session.id}
+                        onClick={() => setSelectedSession(session)}
+                        className={`w-full text-left px-2 py-1 rounded-lg text-xs font-medium border cursor-pointer hover:opacity-80 transition-all ${
+                          isDone 
+                            ? 'bg-red-500/10 border-red-500/30 text-red-400 opacity-60' 
+                            : sessionTypeColors[session.session_type] || 'bg-blue-500/20 border-blue-500/50 text-blue-400'
+                        }`}
+                      >
+                        <div className="flex items-center gap-1 mb-0.5">
+                          <Clock className="w-3 h-3" />
+                          {format(parseISO(session.start_time), "HH:mm")}
+                        </div>
+                        <div className="truncate">{session.title}</div>
+                        {isDone && (
+                          <div className="text-[10px] mt-0.5 font-semibold">FINALIZADO</div>
+                        )}
+                      </button>
+                    );
+                  })}
                   {daySessions.length > 3 && (
                     <div className="text-xs text-gray-500 pl-2">
                       +{daySessions.length - 3} más
@@ -155,6 +189,15 @@ export default function SessionsCalendar() {
           })}
         </div>
       </div>
+
+      {selectedSession && (
+        <SessionDetailModal
+          session={selectedSession}
+          onClose={() => setSelectedSession(null)}
+          artists={artists}
+          readOnly={user?.role !== 'admin'}
+        />
+      )}
     </div>
   );
 }

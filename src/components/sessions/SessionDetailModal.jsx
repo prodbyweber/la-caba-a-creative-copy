@@ -51,10 +51,18 @@ export default function SessionDetailModal({ session, onClose, artists, readOnly
     switch(status) {
       case "Pending": return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
       case "Confirmed": return "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
-      case "Done": return "bg-blue-500/20 text-blue-400 border-blue-500/30";
-      case "Cancelled": return "bg-red-500/20 text-red-400 border-red-500/30";
+      case "Done": return "bg-red-500/20 text-red-400 border-red-500/30";
+      case "Cancelled": return "bg-gray-500/20 text-gray-400 border-gray-500/30";
       default: return "bg-gray-500/20 text-gray-400 border-gray-500/30";
     }
+  };
+
+  const calculateDuration = () => {
+    if (!session.start_time || !session.end_time) return null;
+    const start = parseISO(session.start_time);
+    const end = parseISO(session.end_time);
+    const hours = Math.abs(end - start) / 36e5;
+    return hours.toFixed(1);
   };
 
   const artist = artists.find(a => a.id === formData.artist_id);
@@ -67,30 +75,50 @@ export default function SessionDetailModal({ session, onClose, artists, readOnly
         className="bg-[#111113] rounded-2xl border border-white/10 w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
       >
         {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-white/5">
+        <div className="p-4 sm:p-6 border-b border-white/5 bg-gradient-to-br from-white/5 to-transparent">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
-              {isEditing ? (
+              {isEditing && !readOnly ? (
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full text-xl sm:text-2xl font-bold bg-white/5 border border-white/10 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-500/50"
+                  className="w-full text-2xl sm:text-3xl font-bold bg-white/5 border border-white/10 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-500/50"
                 />
               ) : (
-                <h2 className="text-xl sm:text-2xl font-bold">{session.title}</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold mb-3">{session.title}</h2>
               )}
-              <div className="flex flex-wrap items-center gap-2 mt-2">
-                <span className={`px-3 py-1 rounded-lg text-xs font-medium border ${getStatusColor(formData.status)}`}>
-                  {formData.status}
+              
+              {/* Status, Duration & Time */}
+              <div className="flex flex-wrap items-center gap-3 mt-3">
+                <span className={`px-4 py-1.5 rounded-xl text-sm font-bold border ${getStatusColor(formData.status)}`}>
+                  {formData.status === "Done" ? "🔴 FINALIZADO" : formData.status === "Confirmed" ? "✅ Confirmado" : "⏳ Pendiente"}
                 </span>
-                <span className="text-xs sm:text-sm text-gray-500">
-                  {session.type}
-                </span>
+                
+                {session.start_time && session.end_time && (
+                  <>
+                    <div className="flex items-center gap-2 text-white bg-white/10 px-3 py-1.5 rounded-xl">
+                      <Clock className="w-4 h-4" />
+                      <span className="font-semibold">
+                        {format(parseISO(session.start_time), "HH:mm")} - {format(parseISO(session.end_time), "HH:mm")}
+                      </span>
+                    </div>
+                    {calculateDuration() && (
+                      <div className="text-sm text-emerald-400 font-semibold bg-emerald-500/10 px-3 py-1.5 rounded-xl">
+                        {calculateDuration()} horas
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-2 mt-3 text-sm text-gray-400">
+                <span>{session.type}</span>
                 {artist && (
-                  <span className="text-xs sm:text-sm text-gray-400">
-                    • {artist.stageName}
-                  </span>
+                  <>
+                    <span>•</span>
+                    <span className="text-white font-medium">{artist.stageName}</span>
+                  </>
                 )}
               </div>
             </div>
@@ -131,8 +159,8 @@ export default function SessionDetailModal({ session, onClose, artists, readOnly
                 </button>
                 <button
                   onClick={() => handleStatusChange("Done")}
-                  disabled={updateMutation.isPending || deleteMutation.isPending}
-                  className="py-2.5 px-4 rounded-xl font-medium text-sm bg-white/5 text-gray-400 hover:bg-blue-500/20 hover:text-blue-400 transition-all"
+                  disabled={updateMutation.isPending}
+                  className="py-2.5 px-4 rounded-xl font-medium text-sm bg-white/5 text-gray-400 hover:bg-red-500/20 hover:text-red-400 transition-all"
                 >
                   Finalizado
                 </button>
