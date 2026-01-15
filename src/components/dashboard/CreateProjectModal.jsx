@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, FolderPlus, Upload, Image as ImageIcon, Save } from "lucide-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { X, FolderPlus, Upload, Image as ImageIcon, Save, UserPlus } from "lucide-react";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
 export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, project = null }) {
   const [formData, setFormData] = useState({
     artist_id: jlyArtistId || "",
+    collaborator_artist_ids: [],
     title: "",
     type: "Single",
     status: "Draft",
@@ -25,10 +26,17 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
   const [uploading, setUploading] = useState(false);
   const [coverPreview, setCoverPreview] = useState("");
 
+  const { data: allArtists = [] } = useQuery({
+    queryKey: ['artists'],
+    queryFn: () => base44.entities.Artist.list(),
+    initialData: [],
+  });
+
   useEffect(() => {
     if (project) {
       setFormData({
         artist_id: project.artist_id || jlyArtistId || "",
+        collaborator_artist_ids: project.collaborator_artist_ids || [],
         title: project.title || "",
         type: project.type || "Single",
         status: project.status || "Draft",
@@ -47,6 +55,7 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
     } else {
       setFormData({
         artist_id: jlyArtistId || "",
+        collaborator_artist_ids: [],
         title: "",
         type: "Single",
         status: "Draft",
@@ -199,6 +208,86 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
                 required
               />
+            </div>
+
+            {/* Artistas */}
+            <div className="space-y-3 pt-2">
+              <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+                <UserPlus className="w-4 h-4" />
+                Artistas
+              </h4>
+              
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                  Artista Principal *
+                </label>
+                <select
+                  value={formData.artist_id}
+                  onChange={(e) => setFormData({ ...formData, artist_id: e.target.value })}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  required
+                >
+                  <option value="">Seleccionar artista...</option>
+                  {allArtists.map(artist => (
+                    <option key={artist.id} value={artist.id}>
+                      {artist.stageName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                  Colaboradores / Featuring (Opcional)
+                </label>
+                <select
+                  multiple
+                  value={formData.collaborator_artist_ids}
+                  onChange={(e) => {
+                    const selected = Array.from(e.target.selectedOptions, option => option.value);
+                    setFormData({ ...formData, collaborator_artist_ids: selected });
+                  }}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 transition-colors min-h-[100px]"
+                >
+                  {allArtists
+                    .filter(artist => artist.id !== formData.artist_id)
+                    .map(artist => (
+                      <option key={artist.id} value={artist.id}>
+                        {artist.stageName}
+                      </option>
+                    ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Mantén Ctrl/Cmd presionado para seleccionar múltiples</p>
+                
+                {/* Selected Collaborators */}
+                {formData.collaborator_artist_ids.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {formData.collaborator_artist_ids.map(id => {
+                      const artist = allArtists.find(a => a.id === id);
+                      return artist ? (
+                        <span
+                          key={id}
+                          className="px-3 py-1 rounded-lg bg-purple-500/20 text-purple-300 text-xs font-medium flex items-center gap-2"
+                        >
+                          {artist.stageName}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFormData({
+                                ...formData,
+                                collaborator_artist_ids: formData.collaborator_artist_ids.filter(cid => cid !== id)
+                              });
+                            }}
+                            className="hover:text-white"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ) : null;
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

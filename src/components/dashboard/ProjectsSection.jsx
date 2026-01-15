@@ -49,6 +49,17 @@ export default function ProjectsSection({ jlyArtistId }) {
     return artist?.stageName || 'Unknown Artist';
   };
 
+  const getCollaboratorNames = (collaboratorIds) => {
+    if (!collaboratorIds || collaboratorIds.length === 0) return "";
+    const names = collaboratorIds
+      .map(id => {
+        const artist = artists.find(a => a.id === id);
+        return artist?.stageName;
+      })
+      .filter(Boolean);
+    return names.length > 0 ? ` ft. ${names.join(', ')}` : "";
+  };
+
   const getProjectYear = (project) => {
     return project.start_date ? new Date(project.start_date).getFullYear() : new Date(project.created_date).getFullYear();
   };
@@ -161,7 +172,7 @@ export default function ProjectsSection({ jlyArtistId }) {
                             )}
                           </div>
                           <div className="text-[10px] text-gray-500 truncate">
-                            {getArtistName(project.artist_id)}
+                            {getArtistName(project.artist_id)}{getCollaboratorNames(project.collaborator_artist_ids)}
                           </div>
                           {project.genre && (
                             <div className="text-[10px] text-gray-600 truncate">
