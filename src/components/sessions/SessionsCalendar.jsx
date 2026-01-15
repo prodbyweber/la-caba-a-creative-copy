@@ -119,12 +119,24 @@ export default function SessionsCalendar() {
 
       {/* Calendar Grid */}
       <div className="bg-[#111113] rounded-2xl border border-white/5 overflow-hidden">
-        {/* Days Header */}
-        <div className="grid grid-cols-7 border-b border-white/5">
+        {/* Days Header - Hide on mobile */}
+        <div className="hidden md:grid grid-cols-7 border-b border-white/5">
           {["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map(day => (
             <div
               key={day}
               className="p-4 text-center text-sm font-medium text-gray-500 border-r border-white/5 last:border-r-0"
+            >
+              {day}
+            </div>
+          ))}
+        </div>
+
+        {/* Mobile Days Header */}
+        <div className="grid md:hidden grid-cols-7 border-b border-white/5">
+          {["L", "M", "M", "J", "V", "S", "D"].map((day, i) => (
+            <div
+              key={i}
+              className="p-2 text-center text-xs font-medium text-gray-500 border-r border-white/5 last:border-r-0"
             >
               {day}
             </div>
@@ -144,43 +156,43 @@ export default function SessionsCalendar() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.01 }}
-                className={`min-h-32 p-3 border-r border-b border-white/5 last:border-r-0 ${
+                className={`min-h-20 md:min-h-32 p-1.5 md:p-3 border-r border-b border-white/5 last:border-r-0 ${
                   !isCurrentMonth ? "bg-white/[0.02]" : ""
                 } ${isToday ? "bg-emerald-500/5" : ""}`}
               >
-                <div className={`text-sm font-medium mb-2 ${
+                <div className={`text-xs md:text-sm font-medium mb-1 md:mb-2 ${
                   !isCurrentMonth ? "text-gray-600" : isToday ? "text-emerald-400" : "text-gray-400"
                 }`}>
                   {format(day, "d")}
                 </div>
 
-                <div className="space-y-1">
-                  {daySessions.slice(0, 3).map(session => {
+                <div className="space-y-0.5 md:space-y-1">
+                  {daySessions.slice(0, window.innerWidth < 768 ? 2 : 3).map(session => {
                     const isDone = session.status === "Done";
                     return (
                       <button
                         key={session.id}
                         onClick={() => setSelectedSession(session)}
-                        className={`w-full text-left px-2 py-1 rounded-lg text-xs font-medium border cursor-pointer hover:opacity-80 transition-all ${
+                        className={`w-full text-left px-1 md:px-2 py-0.5 md:py-1 rounded text-[9px] md:text-xs font-medium border cursor-pointer hover:opacity-80 transition-all ${
                           isDone 
                             ? 'bg-red-500/10 border-red-500/30 text-red-400 opacity-60' 
                             : sessionTypeColors[session.session_type] || 'bg-blue-500/20 border-blue-500/50 text-blue-400'
                         }`}
                       >
-                        <div className="flex items-center gap-1 mb-0.5">
-                          <Clock className="w-3 h-3" />
-                          {format(parseISO(session.start_time), "HH:mm")}
+                        <div className="flex items-center gap-0.5 md:gap-1 mb-0.5">
+                          <Clock className="w-2 h-2 md:w-3 md:h-3 shrink-0" />
+                          <span className="text-[8px] md:text-xs">{format(parseISO(session.start_time), "HH:mm")}</span>
                         </div>
-                        <div className="truncate">{session.title}</div>
+                        <div className="truncate text-[9px] md:text-xs leading-tight">{session.title}</div>
                         {isDone && (
-                          <div className="text-[10px] mt-0.5 font-semibold">FINALIZADO</div>
+                          <div className="text-[8px] md:text-[10px] mt-0.5 font-semibold">✓</div>
                         )}
                       </button>
                     );
                   })}
-                  {daySessions.length > 3 && (
-                    <div className="text-xs text-gray-500 pl-2">
-                      +{daySessions.length - 3} más
+                  {daySessions.length > (window.innerWidth < 768 ? 2 : 3) && (
+                    <div className="text-[8px] md:text-xs text-gray-500 pl-1 md:pl-2">
+                      +{daySessions.length - (window.innerWidth < 768 ? 2 : 3)}
                     </div>
                   )}
                 </div>
