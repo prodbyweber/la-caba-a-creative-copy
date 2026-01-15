@@ -101,6 +101,7 @@ export default function UpcomingSessionsCard({ artistId }) {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 + i * 0.1 }}
+              onClick={() => setSelectedSession(session)}
               className="group p-3 rounded-xl bg-[#0a0a0b] hover:bg-white/5 transition-all cursor-pointer"
             >
               <div className="flex items-start gap-3">
@@ -136,6 +137,15 @@ export default function UpcomingSessionsCard({ artistId }) {
           Ver Calendario Completo
         </button>
       </div>
+
+      {selectedSession && (
+        <SessionDetailModal
+          session={selectedSession}
+          onClose={() => setSelectedSession(null)}
+          artists={[]}
+          readOnly={true}
+        />
+      )}
     </motion.div>
   );
 }
