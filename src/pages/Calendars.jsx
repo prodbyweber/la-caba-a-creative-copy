@@ -4,11 +4,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import SessionDetailModal from "@/components/sessions/SessionDetailModal";
-import { Plus, Calendar as CalendarIcon, Package } from "lucide-react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, isToday } from "date-fns";
+import { Plus, Calendar as CalendarIcon, Package, List, Clock, MapPin, User, CheckCircle2, AlertCircle } from "lucide-react";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, isToday, differenceInHours } from "date-fns";
 
 export default function Calendars() {
   const [activeTab, setActiveTab] = useState("sessions");
+  const [viewMode, setViewMode] = useState("calendar"); // "calendar" or "agenda"
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [showDeliverableModal, setShowDeliverableModal] = useState(false);
@@ -68,33 +69,62 @@ export default function Calendars() {
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6">
-          <button
-            onClick={() => setActiveTab("sessions")}
-            className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
-              activeTab === "sessions"
-                ? 'bg-emerald-500 text-white'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10'
-            }`}
-          >
-            <CalendarIcon className="w-5 h-5" />
-            Sessions Calendar ({sessions.length})
-          </button>
-          <button
-            onClick={() => setActiveTab("deliverables")}
-            className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
-              activeTab === "deliverables"
-                ? 'bg-emerald-500 text-white'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10'
-            }`}
-          >
-            <Package className="w-5 h-5" />
-            Deliverables ({deliverables.length})
-          </button>
+        {/* Tabs & View Mode Toggle */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveTab("sessions")}
+              className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
+                activeTab === "sessions"
+                  ? 'bg-emerald-500 text-white'
+                  : 'bg-white/5 text-gray-400 hover:bg-white/10'
+              }`}
+            >
+              <CalendarIcon className="w-5 h-5" />
+              Sessions Calendar ({sessions.length})
+            </button>
+            <button
+              onClick={() => setActiveTab("deliverables")}
+              className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
+                activeTab === "deliverables"
+                  ? 'bg-emerald-500 text-white'
+                  : 'bg-white/5 text-gray-400 hover:bg-white/10'
+              }`}
+            >
+              <Package className="w-5 h-5" />
+              Deliverables ({deliverables.length})
+            </button>
+          </div>
+
+          {/* View Mode Toggle */}
+          <div className="flex gap-2 bg-white/5 rounded-xl p-1">
+            <button
+              onClick={() => setViewMode("calendar")}
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
+                viewMode === "calendar"
+                  ? 'bg-white/10 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <CalendarIcon className="w-4 h-4" />
+              Calendario
+            </button>
+            <button
+              onClick={() => setViewMode("agenda")}
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
+                viewMode === "agenda"
+                  ? 'bg-white/10 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <List className="w-4 h-4" />
+              Agenda
+            </button>
+          </div>
         </div>
 
-        {/* Calendar Header */}
+        {/* Calendar/Agenda View */}
+        {viewMode === "calendar" ? (
         <div className="bg-[#141414] rounded-2xl border border-white/5 p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">{format(currentDate, 'MMMM yyyy')}</h2>
@@ -194,6 +224,24 @@ export default function Calendars() {
             })}
           </div>
         </div>
+        ) : (
+          /* Agenda View */
+          <div className="space-y-6">
+            {activeTab === "sessions" ? (
+              <AgendaView 
+                sessions={sessions} 
+                artists={artists}
+                onSessionClick={setSelectedSession}
+              />
+            ) : (
+              <DeliverablesAgendaView 
+                deliverables={deliverables}
+                artists={artists}
+                projects={projects}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       <CreateSessionModal
@@ -218,6 +266,225 @@ export default function Calendars() {
         />
       )}
     </AdminLayout>
+  );
+}
+
+function AgendaView({ sessions, artists, onSessionClick }) {
+  // Ordenar sesiones por fecha
+  const sortedSessions = [...sessions].sort((a, b) => 
+    new Date(a.start_time) - new Date(b.start_time)
+  );
+
+  // Agrupar por fecha
+  const sessionsByDate = sortedSessions.reduce((acc, session) => {
+    const date = format(parseISO(session.start_time), 'yyyy-MM-dd');
+    if (!acc[date]) acc[date] = [];
+    acc[date].push(session);
+    return acc;
+  }, {});
+
+  return (
+    <div className="space-y-6">
+      {Object.entries(sessionsByDate).map(([date, dateSessions]) => (
+        <div key={date} className="bg-[#141414] rounded-2xl border border-white/5 overflow-hidden">
+          {/* Date Header */}
+          <div className="px-6 py-4 border-b border-white/5 bg-white/5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold">
+                {format(parseISO(date), 'EEEE, d MMMM yyyy')}
+              </h3>
+              <span className="text-sm text-gray-500">{dateSessions.length} sesiones</span>
+            </div>
+          </div>
+
+          {/* Sessions List */}
+          <div className="p-4 space-y-3">
+            {dateSessions.map(session => {
+              const artist = artists.find(a => a.id === session.artist_id);
+              const duration = session.start_time && session.end_time 
+                ? differenceInHours(parseISO(session.end_time), parseISO(session.start_time))
+                : 0;
+              const isConfirmed = session.status === 'Confirmed';
+              const isDone = session.status === 'Done';
+
+              return (
+                <motion.div
+                  key={session.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  onClick={() => onSessionClick(session)}
+                  className="group relative bg-gradient-to-br from-white/5 to-transparent border border-white/10 hover:border-emerald-500/30 rounded-xl p-5 cursor-pointer transition-all"
+                >
+                  {/* Status Indicator */}
+                  <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-xl ${
+                    isDone ? 'bg-red-500' :
+                    isConfirmed ? 'bg-emerald-500' : 'bg-yellow-500'
+                  }`} />
+
+                  <div className="flex items-start justify-between gap-4">
+                    {/* Left Column */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-3">
+                        <h4 className="text-xl font-bold text-white truncate">{session.title}</h4>
+                        <span className={`px-3 py-1 rounded-lg text-xs font-bold border shrink-0 ${
+                          isDone ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+                          isConfirmed ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 
+                          'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                        }`}>
+                          {isDone ? (
+                            <>🔴 FINALIZADO</>
+                          ) : isConfirmed ? (
+                            <><CheckCircle2 className="w-3 h-3 inline mr-1" />Confirmado</>
+                          ) : (
+                            <><AlertCircle className="w-3 h-3 inline mr-1" />Por Confirmar</>
+                          )}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        {/* Time */}
+                        <div className="flex items-center gap-2 text-gray-300">
+                          <Clock className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <div>
+                            <div className="text-sm font-semibold">
+                              {format(parseISO(session.start_time), 'HH:mm')} - {format(parseISO(session.end_time), 'HH:mm')}
+                            </div>
+                            <div className="text-xs text-gray-500">{duration}h de duración</div>
+                          </div>
+                        </div>
+
+                        {/* Artist */}
+                        {artist && (
+                          <div className="flex items-center gap-2 text-gray-300">
+                            <User className="w-4 h-4 text-purple-400 shrink-0" />
+                            <div>
+                              <div className="text-sm font-semibold">{artist.stageName}</div>
+                              <div className="text-xs text-gray-500">Artista</div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Location */}
+                        <div className="flex items-center gap-2 text-gray-300">
+                          <MapPin className="w-4 h-4 text-blue-400 shrink-0" />
+                          <div>
+                            <div className="text-sm font-semibold">{session.location}</div>
+                            <div className="text-xs text-gray-500">Ubicación</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      {session.description && (
+                        <p className="mt-3 text-sm text-gray-400 line-clamp-2">{session.description}</p>
+                      )}
+                    </div>
+
+                    {/* Type Badge */}
+                    <span className={`px-3 py-1 rounded-lg text-xs font-semibold shrink-0 ${
+                      session.type === 'Session' ? 'bg-emerald-500/10 text-emerald-400' :
+                      session.type === 'Meeting' ? 'bg-blue-500/10 text-blue-400' :
+                      'bg-purple-500/10 text-purple-400'
+                    }`}>
+                      {session.type}
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      {sortedSessions.length === 0 && (
+        <div className="bg-[#141414] rounded-2xl border border-white/5 p-12 text-center">
+          <CalendarIcon className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+          <p className="text-gray-500">No hay sesiones programadas</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DeliverablesAgendaView({ deliverables, artists, projects }) {
+  const sortedDeliverables = [...deliverables].sort((a, b) => 
+    new Date(a.due_date_time) - new Date(b.due_date_time)
+  );
+
+  const deliverablesByDate = sortedDeliverables.reduce((acc, deliverable) => {
+    const date = format(parseISO(deliverable.due_date_time), 'yyyy-MM-dd');
+    if (!acc[date]) acc[date] = [];
+    acc[date].push(deliverable);
+    return acc;
+  }, {});
+
+  return (
+    <div className="space-y-6">
+      {Object.entries(deliverablesByDate).map(([date, dateDeliverables]) => (
+        <div key={date} className="bg-[#141414] rounded-2xl border border-white/5 overflow-hidden">
+          <div className="px-6 py-4 border-b border-white/5 bg-white/5">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold">
+                {format(parseISO(date), 'EEEE, d MMMM yyyy')}
+              </h3>
+              <span className="text-sm text-gray-500">{dateDeliverables.length} entregables</span>
+            </div>
+          </div>
+
+          <div className="p-4 space-y-3">
+            {dateDeliverables.map(deliverable => {
+              const artist = artists.find(a => a.id === deliverable.artist_id);
+              const project = projects.find(p => p.id === deliverable.project_id);
+              const isOverdue = deliverable.status === 'Overdue';
+
+              return (
+                <motion.div
+                  key={deliverable.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`bg-gradient-to-br from-white/5 to-transparent border rounded-xl p-5 ${
+                    isOverdue ? 'border-red-500/30' : 'border-white/10'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <h4 className="text-lg font-bold text-white">{deliverable.title}</h4>
+                        <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
+                          isOverdue ? 'bg-red-500/20 text-red-400' :
+                          deliverable.status === 'Sent' ? 'bg-blue-500/20 text-blue-400' :
+                          deliverable.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-400' :
+                          'bg-yellow-500/20 text-yellow-400'
+                        }`}>
+                          {deliverable.status}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-400">
+                        {artist && <span>👤 {artist.stageName}</span>}
+                        {project && <span>📁 {project.title}</span>}
+                        <span>🕐 {format(parseISO(deliverable.due_date_time), 'HH:mm')}</span>
+                      </div>
+                    </div>
+
+                    <span className="px-3 py-1 rounded-lg text-xs font-semibold bg-purple-500/10 text-purple-400">
+                      {deliverable.deliverable_type}
+                    </span>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      {sortedDeliverables.length === 0 && (
+        <div className="bg-[#141414] rounded-2xl border border-white/5 p-12 text-center">
+          <Package className="w-12 h-12 mx-auto mb-3 text-gray-600" />
+          <p className="text-gray-500">No hay entregables programados</p>
+        </div>
+      )}
+    </div>
   );
 }
 
