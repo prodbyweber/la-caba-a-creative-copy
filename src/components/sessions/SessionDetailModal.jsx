@@ -5,7 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 
-export default function SessionDetailModal({ session, onClose, artists }) {
+export default function SessionDetailModal({ session, onClose, artists, readOnly = false }) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     title: session.title || "",
@@ -108,41 +108,43 @@ export default function SessionDetailModal({ session, onClose, artists }) {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-          {/* Status Buttons */}
-          <div>
-            <label className="text-sm font-medium text-gray-400 mb-3 block">Estado de la Sesión</label>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                onClick={() => handleStatusChange("Pending")}
-                disabled={updateMutation.isPending}
-                className={`py-2.5 px-4 rounded-xl font-medium text-sm transition-all ${
-                  formData.status === "Pending"
-                    ? 'bg-yellow-500 text-black'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                }`}
-              >
-                Pendiente
-              </button>
-              <button
-                onClick={() => handleStatusChange("Confirmed")}
-                disabled={updateMutation.isPending}
-                className={`py-2.5 px-4 rounded-xl font-medium text-sm transition-all ${
-                  formData.status === "Confirmed"
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                }`}
-              >
-                Confirmado
-              </button>
-              <button
-                onClick={() => handleStatusChange("Done")}
-                disabled={updateMutation.isPending || deleteMutation.isPending}
-                className="py-2.5 px-4 rounded-xl font-medium text-sm bg-white/5 text-gray-400 hover:bg-blue-500/20 hover:text-blue-400 transition-all"
-              >
-                Finalizado
-              </button>
+          {/* Status Buttons - Solo para admins */}
+          {!readOnly && (
+            <div>
+              <label className="text-sm font-medium text-gray-400 mb-3 block">Estado de la Sesión</label>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => handleStatusChange("Pending")}
+                  disabled={updateMutation.isPending}
+                  className={`py-2.5 px-4 rounded-xl font-medium text-sm transition-all ${
+                    formData.status === "Pending"
+                      ? 'bg-yellow-500 text-black'
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                  }`}
+                >
+                  Pendiente
+                </button>
+                <button
+                  onClick={() => handleStatusChange("Confirmed")}
+                  disabled={updateMutation.isPending}
+                  className={`py-2.5 px-4 rounded-xl font-medium text-sm transition-all ${
+                    formData.status === "Confirmed"
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                  }`}
+                >
+                  Confirmado
+                </button>
+                <button
+                  onClick={() => handleStatusChange("Done")}
+                  disabled={updateMutation.isPending || deleteMutation.isPending}
+                  className="py-2.5 px-4 rounded-xl font-medium text-sm bg-white/5 text-gray-400 hover:bg-blue-500/20 hover:text-blue-400 transition-all"
+                >
+                  Finalizado
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Date & Time */}
           <div className="bg-white/5 rounded-xl p-4 space-y-3">
@@ -308,60 +310,71 @@ export default function SessionDetailModal({ session, onClose, artists }) {
 
         {/* Footer */}
         <div className="p-4 sm:p-6 border-t border-white/5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          <button
-            onClick={() => {
-              if (window.confirm("¿Estás seguro de eliminar esta sesión?")) {
-                deleteMutation.mutate();
-              }
-            }}
-            disabled={deleteMutation.isPending}
-            className="px-4 py-2.5 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
-          >
-            <Trash2 className="w-4 h-4" />
-            Eliminar
-          </button>
-          
-          <div className="flex gap-3">
-            {isEditing ? (
-              <>
-                <button
-                  onClick={() => {
-                    setIsEditing(false);
-                    setFormData({
-                      title: session.title || "",
-                      description: session.description || "",
-                      notes: session.notes || "",
-                      start_time: session.start_time ? format(parseISO(session.start_time), "yyyy-MM-dd'T'HH:mm") : "",
-                      end_time: session.end_time ? format(parseISO(session.end_time), "yyyy-MM-dd'T'HH:mm") : "",
-                      location: session.location || "Studio",
-                      status: session.status || "Pending",
-                      google_meet_link: session.google_meet_link || "",
-                      drive_link: session.drive_link || ""
-                    });
-                  }}
-                  disabled={updateMutation.isPending}
-                  className="flex-1 px-6 py-2.5 rounded-xl border border-white/10 font-medium text-sm hover:bg-white/5 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={updateMutation.isPending}
-                  className="flex-1 px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-purple-500 font-medium text-sm hover:shadow-lg transition-all flex items-center justify-center gap-2"
-                >
-                  <Save className="w-4 h-4" />
-                  {updateMutation.isPending ? "Guardando..." : "Guardar"}
-                </button>
-              </>
-            ) : (
+          {!readOnly ? (
+            <>
               <button
-                onClick={() => setIsEditing(true)}
-                className="flex-1 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 font-medium text-sm transition-colors"
+                onClick={() => {
+                  if (window.confirm("¿Estás seguro de eliminar esta sesión?")) {
+                    deleteMutation.mutate();
+                  }
+                }}
+                disabled={deleteMutation.isPending}
+                className="px-4 py-2.5 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
               >
-                Editar
+                <Trash2 className="w-4 h-4" />
+                Eliminar
               </button>
-            )}
-          </div>
+              
+              <div className="flex gap-3">
+                {isEditing ? (
+                  <>
+                    <button
+                      onClick={() => {
+                        setIsEditing(false);
+                        setFormData({
+                          title: session.title || "",
+                          description: session.description || "",
+                          notes: session.notes || "",
+                          start_time: session.start_time ? format(parseISO(session.start_time), "yyyy-MM-dd'T'HH:mm") : "",
+                          end_time: session.end_time ? format(parseISO(session.end_time), "yyyy-MM-dd'T'HH:mm") : "",
+                          location: session.location || "Studio",
+                          status: session.status || "Pending",
+                          google_meet_link: session.google_meet_link || "",
+                          drive_link: session.drive_link || ""
+                        });
+                      }}
+                      disabled={updateMutation.isPending}
+                      className="flex-1 px-6 py-2.5 rounded-xl border border-white/10 font-medium text-sm hover:bg-white/5 transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={handleSave}
+                      disabled={updateMutation.isPending}
+                      className="flex-1 px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-purple-500 font-medium text-sm hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                    >
+                      <Save className="w-4 h-4" />
+                      {updateMutation.isPending ? "Guardando..." : "Guardar"}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="flex-1 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 font-medium text-sm transition-colors"
+                  >
+                    Editar
+                  </button>
+                )}
+              </div>
+            </>
+          ) : (
+            <button
+              onClick={onClose}
+              className="w-full px-6 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 font-medium text-sm transition-colors"
+            >
+              Cerrar
+            </button>
+          )}
         </div>
       </motion.div>
     </div>

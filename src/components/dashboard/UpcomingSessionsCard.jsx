@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Calendar, Clock, MapPin, Plus, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { format, parseISO, isToday, isTomorrow } from "date-fns";
+import SessionDetailModal from "@/components/sessions/SessionDetailModal";
 
 export default function UpcomingSessionsCard({ artistId }) {
+  const [selectedSession, setSelectedSession] = useState(null);
   const { data: sessions = [], isLoading } = useQuery({
     queryKey: ['artist-sessions', artistId],
     queryFn: async () => {
