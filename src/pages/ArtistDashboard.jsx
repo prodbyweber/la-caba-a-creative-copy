@@ -146,9 +146,9 @@ export default function ArtistDashboard() {
             {/* Right Column */}
             <div className="lg:col-span-8 space-y-6">
               <PerformanceOverview />
-              <SocialMetricsCard artist={artist} />
               <ProjectsSection jlyArtistId={artist.id} />
               <TracksSection jlyArtistId={artist.id} />
+              <SocialMetricsCard artist={artist} />
               <GrowthChart />
               <ClipActivityFeed />
             </div>
