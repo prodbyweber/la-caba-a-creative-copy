@@ -39,14 +39,8 @@ export default function SessionDetailModal({ session, onClose, artists, readOnly
   });
 
   const handleStatusChange = (newStatus) => {
-    if (newStatus === "Done") {
-      if (window.confirm("¿Marcar como finalizado? Esto eliminará la sesión del calendario.")) {
-        deleteMutation.mutate();
-      }
-    } else {
-      updateMutation.mutate({ status: newStatus });
-      setFormData({ ...formData, status: newStatus });
-    }
+    updateMutation.mutate({ status: newStatus });
+    setFormData({ ...formData, status: newStatus });
   };
 
   const handleSave = () => {
