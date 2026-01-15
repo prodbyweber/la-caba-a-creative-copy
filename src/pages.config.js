@@ -1,4 +1,5 @@
 import AdminDashboard from './pages/AdminDashboard';
+import ArtistDashboard from './pages/ArtistDashboard';
 import Artists from './pages/Artists';
 import Calendars from './pages/Calendars';
 import Clips from './pages/Clips';
@@ -15,12 +16,12 @@ import Settings from './pages/Settings';
 import SocialAccounts from './pages/SocialAccounts';
 import TrackDetail from './pages/TrackDetail';
 import Tracks from './pages/Tracks';
-import ArtistDashboard from './pages/ArtistDashboard';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "AdminDashboard": AdminDashboard,
+    "ArtistDashboard": ArtistDashboard,
     "Artists": Artists,
     "Calendars": Calendars,
     "Clips": Clips,
@@ -37,7 +38,6 @@ export const PAGES = {
     "SocialAccounts": SocialAccounts,
     "TrackDetail": TrackDetail,
     "Tracks": Tracks,
-    "ArtistDashboard": ArtistDashboard,
 }
 
 export const pagesConfig = {

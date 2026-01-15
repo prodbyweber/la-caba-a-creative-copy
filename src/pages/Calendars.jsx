@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
+import SessionDetailModal from "@/components/sessions/SessionDetailModal";
 import { Plus, Calendar as CalendarIcon, Package } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, isToday } from "date-fns";
 
@@ -11,6 +12,7 @@ export default function Calendars() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [showDeliverableModal, setShowDeliverableModal] = useState(false);
+  const [selectedSession, setSelectedSession] = useState(null);
 
   const { data: sessions = [] } = useQuery({
     queryKey: ['sessions'],
@@ -150,12 +152,13 @@ export default function Calendars() {
                   </div>
                   <div className="space-y-1">
                     {activeTab === "sessions" && daySessions.slice(0, 3).map((session) => (
-                      <div
+                      <button
                         key={session.id}
-                        className="text-xs p-1 rounded bg-blue-500/20 text-blue-400 truncate"
+                        onClick={() => setSelectedSession(session)}
+                        className="w-full text-left text-xs p-1 rounded bg-blue-500/20 text-blue-400 truncate hover:bg-blue-500/30 transition-colors"
                       >
                         {format(parseISO(session.start_time), 'HH:mm')} {session.title}
-                      </div>
+                      </button>
                     ))}
                     {activeTab === "deliverables" && dayDeliverables.slice(0, 3).map((deliverable) => (
                       <div
@@ -196,6 +199,14 @@ export default function Calendars() {
         artists={artists}
         projects={projects}
       />
+
+      {selectedSession && (
+        <SessionDetailModal
+          session={selectedSession}
+          onClose={() => setSelectedSession(null)}
+          artists={artists}
+        />
+      )}
     </AdminLayout>
   );
 }
