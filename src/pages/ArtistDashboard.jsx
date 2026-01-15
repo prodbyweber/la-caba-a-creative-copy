@@ -106,18 +106,18 @@ export default function ArtistDashboard() {
                       <img 
                         src={artist.avatar_url}
                         alt={artist.stageName}
-                        className="w-full h-full object-cover object-center"
+                        className="w-full h-full object-cover object-top"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20">
                         <span className="text-4xl font-bold text-white/40">{artist.stageName[0]}</span>
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
                   </div>
 
-                  <div className="relative px-4 pb-4 -mt-12 z-20">
-                    <div className="bg-black/60 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                  <div className="relative px-4 pb-4 -mt-8 z-20">
+                    <div className="bg-black/80 backdrop-blur-md rounded-xl p-4 border border-white/10">
                       <h3 className="text-xl font-black text-white uppercase tracking-tight mb-1">
                         {artist.stageName}
                       </h3>
