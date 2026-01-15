@@ -92,41 +92,46 @@ export default function ArtistDashboard() {
           <div className="grid lg:grid-cols-12 gap-6">
             {/* Left Column */}
             <div className="lg:col-span-4 space-y-6">
-              {/* Artist Profile Card with custom data */}
+              {/* Artist Profile Card - Compact */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-gradient-to-b from-[#141414] to-black rounded-2xl border border-white/5 overflow-hidden shadow-2xl"
+                className="bg-gradient-to-b from-[#141414] to-black rounded-xl border border-white/5 overflow-hidden"
               >
                 <div className="relative">
-                  <div className="relative h-[450px] sm:h-[500px] overflow-visible pt-8">
+                  <div className="relative h-[180px] overflow-hidden">
                     {artist.avatar_url ? (
                       <img 
                         src={artist.avatar_url}
                         alt={artist.stageName}
-                        className="w-full h-full object-contain object-top scale-100"
+                        className="w-full h-full object-cover object-center"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20">
-                        <span className="text-6xl font-bold text-white/40">{artist.stageName[0]}</span>
+                        <span className="text-4xl font-bold text-white/40">{artist.stageName[0]}</span>
                       </div>
                     )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                   </div>
 
-                  <div className="relative px-6 pb-6 z-20">
-                    <div className="grid grid-cols-[1fr,auto] gap-4 items-start">
-                      <div className="space-y-2 bg-black/40 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                  <div className="relative px-4 pb-4 -mt-12 z-20">
+                    <div className="bg-black/60 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                      <h3 className="text-xl font-black text-white uppercase tracking-tight mb-1">
+                        {artist.stageName}
+                      </h3>
+                      <span className="text-xs font-medium text-gray-400">{artist.genre || 'Artist'}</span>
+                      <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
                         <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
-                              {artist.stageName}
-                            </h3>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-medium text-gray-400">{artist.genre || 'Artist'}</span>
-                          </div>
+                          <div className="text-gray-500">Status</div>
+                          <div className="text-emerald-400 font-semibold">{artist.status}</div>
                         </div>
+                        {artist.location && (
+                          <div className="text-right">
+                            <div className="text-gray-500">Location</div>
+                            <div className="text-white font-semibold">{artist.location}</div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
