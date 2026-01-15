@@ -18,12 +18,19 @@ export default function Artists() {
     queryKey: ['artists'],
     queryFn: async () => {
       const allArtists = await base44.entities.Artist.list('-created_date');
-      // Asegurar que JLY tenga el avatar correcto
+      // Asegurar que los artistas tengan avatares correctos
       return allArtists.map(artist => {
         if (artist.stageName === 'JLY' && !artist.avatar_url) {
           return {
             ...artist,
             avatar_url: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6965118e2b17684fa124077e/5cdacd140_jlytransparente.png'
+          };
+        }
+        // Puedes agregar más artistas aquí con sus avatares
+        if (artist.stageName === 'Ronby' && !artist.avatar_url) {
+          return {
+            ...artist,
+            avatar_url: 'https://via.placeholder.com/400x400/7c3aed/ffffff?text=RONBY'
           };
         }
         return artist;

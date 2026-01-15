@@ -1,8 +1,10 @@
 import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { X, User, Mail, Phone, MapPin, Tag, ExternalLink, Music2, Play, Pause, FileText, Plus, Save, Edit, Upload, Check } from "lucide-react";
+import { X, User, Mail, Phone, MapPin, Tag, ExternalLink, Music2, Play, Pause, FileText, Plus, Save, Edit, Upload, Check, LayoutDashboard } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import { Link } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 
 export default function ArtistProfilePanel({ artist, onClose }) {
   const [activeTab, setActiveTab] = useState("overview");
@@ -241,6 +243,12 @@ export default function ArtistProfilePanel({ artist, onClose }) {
 
           {/* Tabs */}
           <div className="px-6 flex gap-2 overflow-x-auto pb-2">
+            <Link to={createPageUrl(`ArtistDashboard?id=${artist.id}`)}>
+              <button className="px-4 py-2 rounded-lg whitespace-nowrap transition-all bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 flex items-center gap-2 font-medium">
+                <LayoutDashboard className="w-4 h-4" />
+                Ver Dashboard
+              </button>
+            </Link>
             {tabs.map((tab) => (
               <button
                 key={tab.id}
