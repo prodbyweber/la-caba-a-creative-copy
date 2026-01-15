@@ -12,7 +12,8 @@ import {
   Menu,
   X,
   Search,
-  Music2
+  Music2,
+  TrendingUp
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -24,6 +25,7 @@ const navItems = [
   { icon: Music2, label: "Tracks", page: "Tracks" },
   { icon: Calendar, label: "Calendars", page: "Calendars" },
   { icon: GitPullRequest, label: "Revisions", page: "Revisions" },
+  { icon: TrendingUp, label: "Contabilidad", page: "Accounting" },
   { icon: MessageSquare, label: "Notes", page: "Notes" },
   { icon: Video, label: "Content", page: "ContentCalendar" },
   { icon: Settings, label: "Settings", page: "Settings" }
