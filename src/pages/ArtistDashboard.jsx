@@ -15,6 +15,7 @@ import GrowthChart from "@/components/dashboard/GrowthChart";
 import ClipActivityFeed from "@/components/dashboard/ClipActivityFeed";
 import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
 import WalletCard from "@/components/dashboard/WalletCard";
+import SocialMetricsCard from "@/components/dashboard/SocialMetricsCard";
 
 export default function ArtistDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -145,6 +146,7 @@ export default function ArtistDashboard() {
             {/* Right Column */}
             <div className="lg:col-span-8 space-y-6">
               <PerformanceOverview />
+              <SocialMetricsCard artist={artist} />
               <ProjectsSection jlyArtistId={artist.id} />
               <TracksSection jlyArtistId={artist.id} />
               <GrowthChart />
