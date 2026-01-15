@@ -72,7 +72,13 @@ export default function CreateSessionModal({ onClose }) {
   const getDaysInMonth = () => {
     const start = startOfMonth(currentMonth);
     const end = endOfMonth(currentMonth);
-    return eachDayOfInterval({ start, end });
+    const days = eachDayOfInterval({ start, end });
+    
+    // Calcular días vacíos al inicio para alinear con el día de la semana
+    const firstDayOfWeek = start.getDay(); // 0 = Domingo, 6 = Sábado
+    const emptyDays = Array(firstDayOfWeek).fill(null);
+    
+    return [...emptyDays, ...days];
   };
 
   const daysInMonth = getDaysInMonth();
@@ -178,6 +184,11 @@ export default function CreateSessionModal({ onClose }) {
             {/* Días del mes */}
             <div className="grid grid-cols-7 gap-1 sm:gap-2">
               {daysInMonth.map((day, index) => {
+                // Si es un día vacío (null), renderizar espacio vacío
+                if (!day) {
+                  return <div key={`empty-${index}`} className="aspect-square" />;
+                }
+                
                 const isSelected = isSameDay(day, selectedDate);
                 const isCurrentDay = isToday(day);
                 
