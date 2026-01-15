@@ -33,8 +33,23 @@ export default function ProjectsSection({ jlyArtistId }) {
     initialData: [],
   });
 
+  const { data: artists = [] } = useQuery({
+    queryKey: ['artists'],
+    queryFn: () => base44.entities.Artist.list(),
+    initialData: [],
+  });
+
   const getProjectTracks = (projectId) => {
     return tracks.filter(track => track.project_id === projectId);
+  };
+
+  const getArtistName = (artistId) => {
+    const artist = artists.find(a => a.id === artistId);
+    return artist?.stageName || 'Unknown Artist';
+  };
+
+  const getProjectYear = (project) => {
+    return project.start_date ? new Date(project.start_date).getFullYear() : new Date(project.created_date).getFullYear();
   };
 
   if (isLoading) {
@@ -124,20 +139,28 @@ export default function ProjectsSection({ jlyArtistId }) {
                           </div>
                         </div>
 
-                        {/* Info */}
+                        {/* Info - Estilo Netflix */}
                         <div className="space-y-1">
-                          <h4 className="font-semibold text-sm text-white group-hover:text-emerald-400 transition-colors truncate">
-                            {project.name}
+                          <h4 className="font-bold text-sm text-white group-hover:text-emerald-400 transition-colors truncate">
+                            {project.title}
                           </h4>
-                          <span className={`inline-block text-[10px] px-1.5 py-0.5 rounded-full ${
-                            project.status === 'active' 
-                              ? 'bg-emerald-500/10 text-emerald-400' 
-                              : project.status === 'completed'
-                              ? 'bg-blue-500/10 text-blue-400'
-                              : 'bg-gray-500/10 text-gray-400'
-                          }`}>
-                            {project.status === 'active' ? 'Activo' : project.status === 'completed' ? 'Completado' : 'Archivado'}
-                          </span>
+                          <div className="flex flex-wrap items-center gap-1 text-[10px] text-gray-400">
+                            <span className="font-medium text-white">{getProjectYear(project)}</span>
+                            {project.type && (
+                              <>
+                                <span>•</span>
+                                <span className="text-emerald-400 font-semibold">{project.type}</span>
+                              </>
+                            )}
+                          </div>
+                          <div className="text-[10px] text-gray-500 truncate">
+                            {getArtistName(project.artist_id)}
+                          </div>
+                          {project.genre && (
+                            <div className="text-[10px] text-gray-600 truncate">
+                              {project.genre}
+                            </div>
+                          )}
                         </div>
                       </motion.div>
                     </Link>
