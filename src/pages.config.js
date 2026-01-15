@@ -16,6 +16,7 @@ import Settings from './pages/Settings';
 import SocialAccounts from './pages/SocialAccounts';
 import TrackDetail from './pages/TrackDetail';
 import Tracks from './pages/Tracks';
+import Accounting from './pages/Accounting';
 import __Layout from './Layout.jsx';
 
 
@@ -38,6 +39,7 @@ export const PAGES = {
     "SocialAccounts": SocialAccounts,
     "TrackDetail": TrackDetail,
     "Tracks": Tracks,
+    "Accounting": Accounting,
 }
 
 export const pagesConfig = {
