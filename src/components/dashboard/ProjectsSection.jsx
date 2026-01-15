@@ -10,6 +10,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 
 export default function ProjectsSection({ jlyArtistId }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
   const [emblaRef] = useEmblaCarousel({ 
     align: 'start',
     slidesToScroll: 1,
@@ -109,12 +110,12 @@ export default function ProjectsSection({ jlyArtistId }) {
                 {projects.map((project, i) => {
                   const projectTracks = getProjectTracks(project.id);
                   return (
-                    <Link 
+                    <div 
                       key={project.id} 
-                      to={createPageUrl(`ProjectDetail?id=${project.id}`)}
                       className="flex-[0_0_160px] sm:flex-[0_0_200px]"
                     >
                       <motion.div
+                        onClick={() => setEditingProject(project)}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: i * 0.05 }}
@@ -122,10 +123,16 @@ export default function ProjectsSection({ jlyArtistId }) {
                       >
                         {/* Project Cover */}
                         <div className="relative aspect-square rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 mb-2 overflow-hidden">
-                          {projectTracks[0]?.cover_url ? (
+                          {project.cover_url ? (
+                            <img 
+                              src={project.cover_url} 
+                              alt={project.title}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : projectTracks[0]?.cover_url ? (
                             <img 
                               src={projectTracks[0].cover_url} 
-                              alt={project.name}
+                              alt={project.title}
                               className="w-full h-full object-cover"
                             />
                           ) : (
@@ -163,7 +170,7 @@ export default function ProjectsSection({ jlyArtistId }) {
                           )}
                         </div>
                       </motion.div>
-                    </Link>
+                    </div>
                   );
                 })}
               </div>
@@ -173,9 +180,13 @@ export default function ProjectsSection({ jlyArtistId }) {
       </motion.div>
 
       <CreateProjectModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
+        isOpen={showCreateModal || editingProject !== null}
+        onClose={() => {
+          setShowCreateModal(false);
+          setEditingProject(null);
+        }}
         jlyArtistId={jlyArtistId}
+        project={editingProject}
       />
     </>
   );
