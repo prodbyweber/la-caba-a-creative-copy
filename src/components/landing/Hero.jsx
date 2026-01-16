@@ -2,98 +2,86 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Play, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-      {/* Background Effects */}
-      <div className="absolute inset-0">
-        {/* Gradient Orbs */}
-        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-emerald-500/20 rounded-full blur-[128px]" />
-        <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-purple-600/20 rounded-full blur-[128px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-500/5 rounded-full blur-[100px]" />
-        
-        {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiMxMTExMTMiIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNNjAgMEgwdjYwaDYwVjB6TTU5IDFIMXY1OGg1OFYxeiIgZmlsbD0iIzFhMWExYSIgZmlsbC1vcGFjaXR5PSIuMyIvPjwvZz48L3N2Zz4=')] opacity-40" />
-      </div>
+    <section className="relative min-h-screen flex flex-col justify-between overflow-hidden bg-black">
+      {/* Dark textured background */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black opacity-60" />
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGZpbGw9IiMwMDAwMDAiIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNNjAgMEgwdjYwaDYwVjB6TTU5IDFIMXY1OGg1OFYxeiIgZmlsbD0iIzFhMWExYSIgZmlsbC1vcGFjaXR5PSIuMSIvPjwvZz48L3N2Zz4=')] opacity-30" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          {/* Main Headline */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
-            <span className="block bg-gradient-to-r from-white via-orange-300 to-orange-500 bg-clip-text text-transparent">
-              El estudio creativo definitivo para artistas que buscan conectar
-            </span>
-          </h1>
+      {/* Content Container */}
+      <div className="relative z-10 flex-1 flex flex-col justify-center px-6 sm:px-8 lg:px-12 pt-24 pb-8">
+        <div className="max-w-7xl mx-auto w-full">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-left max-w-2xl"
+          >
+            {/* Main Headline */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 sm:mb-8 leading-[1.1]">
+              <span className="block text-white">
+                El estudio creativo definitivo para artistas que buscan conectar
+              </span>
+            </h1>
 
-          {/* Subheadline */}
-          <p className="text-lg sm:text-xl text-gray-400 max-w-3xl mx-auto mb-12 leading-relaxed">
-            Producción por horas, visuales cinematográficos y digitalización artística para proyectos que van en serio.
-          </p>
+            {/* Subheadline */}
+            <p className="text-base sm:text-lg md:text-xl text-gray-400 mb-8 sm:mb-12 leading-relaxed max-w-xl">
+              Producción por horas, visuales cinematográficos y digitalización artística para proyectos que van en serio.
+            </p>
 
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            {/* CTA Button */}
             <Link to={createPageUrl("Dashboard")}>
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="group px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 font-medium text-lg flex items-center gap-3 shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all duration-300"
+                className="group px-8 py-4 sm:px-10 sm:py-5 rounded-full bg-gradient-to-r from-white to-gray-200 text-black font-semibold text-base sm:text-lg flex items-center gap-3 shadow-2xl shadow-white/10 hover:shadow-white/20 transition-all duration-300 w-full sm:w-auto justify-center"
               >
                 Aplicar a La Cabaña Creative
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </motion.button>
             </Link>
-            
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="group px-8 py-4 rounded-full bg-white/5 border border-white/10 font-medium text-lg flex items-center gap-3 hover:bg-white/10 transition-all duration-300"
-            >
-              <Play className="w-5 h-5 text-purple-400" />
-              Ver cómo trabajamos
-            </motion.button>
-          </div>
-        </motion.div>
-
-        {/* Stats Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-          className="mt-24 grid grid-cols-3 gap-8 max-w-3xl mx-auto"
-        >
-          {[
-            { value: "500+", label: "Artistas" },
-            { value: "2.5M", label: "Reproducciones" },
-            { value: "$120K", label: "Ingresos Generados" },
-          ].map((stat, i) => (
-            <div key={i} className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-white mb-1">{stat.value}</div>
-              <div className="text-sm text-gray-500">{stat.label}</div>
-            </div>
-          ))}
-        </motion.div>
+          </motion.div>
+        </div>
       </div>
 
-      {/* Scroll Indicator */}
+      {/* Hero Image - Artist */}
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.8 }}
+        className="relative z-20 w-full flex justify-center items-end"
+      >
+        <div className="relative w-full max-w-md lg:max-w-lg xl:max-w-xl mx-auto">
+          {/* Large Background Text - 2026 */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="text-[180px] sm:text-[220px] md:text-[280px] lg:text-[340px] font-black text-white/5 select-none leading-none">
+              2026
+            </span>
+          </div>
+
+          {/* Artist Image */}
+          <img
+            src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=1000&fit=crop&q=80"
+            alt="Artist in studio"
+            className="relative w-full h-auto object-contain mix-blend-lighten opacity-90"
+            style={{ maxHeight: '60vh' }}
+          />
+        </div>
+      </motion.div>
+
+      {/* Website URL at bottom */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        transition={{ delay: 1 }}
+        className="relative z-10 pb-6 text-center"
       >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="w-6 h-10 rounded-full border-2 border-white/20 flex justify-center pt-2"
-        >
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-        </motion.div>
+        <p className="text-white/70 text-sm sm:text-base font-medium">
+          lacabanacreative.com
+        </p>
       </motion.div>
     </section>
   );
