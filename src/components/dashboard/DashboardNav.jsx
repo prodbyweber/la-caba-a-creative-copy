@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Menu, Bell, Search, Settings } from "lucide-react";
+import { Menu, Bell, Search, Settings, Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -41,6 +41,11 @@ export default function DashboardNav({ onMenuClick }) {
 
         {/* Right */}
         <div className="flex items-center gap-3">
+          <Link to={createPageUrl("Landing")}>
+            <button className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all">
+              <Home className="w-5 h-5" />
+            </button>
+          </Link>
           <button className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all">
             <Search className="w-5 h-5 md:hidden" />
             <Bell className="w-5 h-5 hidden md:block" />
