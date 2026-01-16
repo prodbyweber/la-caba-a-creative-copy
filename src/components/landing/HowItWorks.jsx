@@ -108,26 +108,31 @@ export default function HowItWorks() {
                 transition={{ duration: 0.3 }}
                 className="w-full max-w-sm mx-auto"
               >
-                <div className={`bg-gradient-to-br ${steps[activeIndex].gradient} rounded-3xl p-8`}>
-                  {/* Icon */}
-                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6">
-                    <steps[activeIndex].icon className="w-8 h-8 text-white" />
-                  </div>
+                {(() => {
+                  const CurrentIcon = steps[activeIndex].icon;
+                  return (
+                    <div className={`bg-gradient-to-br ${steps[activeIndex].gradient} rounded-3xl p-8`}>
+                      {/* Icon */}
+                      <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6">
+                        <CurrentIcon className="w-8 h-8 text-white" />
+                      </div>
 
-                  <h3 className="text-2xl font-bold mb-3 text-white">{steps[activeIndex].title}</h3>
-                  <p className="text-white/80 leading-relaxed mb-4">{steps[activeIndex].description}</p>
-                  
-                  <div className="text-white font-semibold text-lg mb-6">{steps[activeIndex].price}</div>
+                      <h3 className="text-2xl font-bold mb-3 text-white">{steps[activeIndex].title}</h3>
+                      <p className="text-white/80 leading-relaxed mb-4">{steps[activeIndex].description}</p>
+                      
+                      <div className="text-white font-semibold text-lg mb-6">{steps[activeIndex].price}</div>
 
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <button className="flex-1 bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-white/90 transition-all">
-                      Comprar ahora
-                    </button>
-                    <button className="flex-1 bg-white/10 backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-xl hover:bg-white/20 transition-all border border-white/20">
-                      Ver más
-                    </button>
-                  </div>
-                </div>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <button className="flex-1 bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-white/90 transition-all">
+                          Comprar ahora
+                        </button>
+                        <button className="flex-1 bg-white/10 backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-xl hover:bg-white/20 transition-all border border-white/20">
+                          Ver más
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()}
               </motion.div>
             </AnimatePresence>
           </div>
