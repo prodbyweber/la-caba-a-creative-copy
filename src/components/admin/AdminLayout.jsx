@@ -28,6 +28,7 @@ const navItems = [
   { icon: TrendingUp, label: "Contabilidad", page: "Accounting" },
   { icon: MessageSquare, label: "Notes", page: "Notes" },
   { icon: Video, label: "Content", page: "ContentCalendar" },
+  { icon: Settings, label: "Landing Editor", page: "LandingEditor" },
   { icon: Settings, label: "Settings", page: "Settings" }
 ];
 

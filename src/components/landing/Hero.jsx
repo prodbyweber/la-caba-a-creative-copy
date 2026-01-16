@@ -47,41 +47,29 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Hero Image - Artist */}
+      {/* Hero Image - Artist (Smaller) */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.8 }}
-        className="relative z-20 w-full flex justify-center items-end"
+        className="relative z-20 w-full flex justify-center items-end pb-12"
       >
-        <div className="relative w-full max-w-md lg:max-w-lg xl:max-w-xl mx-auto">
+        <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto">
           {/* Large Background Text - 2026 */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-[180px] sm:text-[220px] md:text-[280px] lg:text-[340px] font-black text-white/5 select-none leading-none">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none -top-8">
+            <span className="text-[120px] sm:text-[160px] md:text-[200px] font-black text-white/5 select-none leading-none">
               2026
             </span>
           </div>
 
           {/* Artist Image */}
           <img
-            src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=1000&fit=crop&q=80"
+            src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=600&h=800&fit=crop&q=80"
             alt="Artist in studio"
-            className="relative w-full h-auto object-contain mix-blend-lighten opacity-90"
-            style={{ maxHeight: '60vh' }}
+            className="relative w-full h-auto object-contain mix-blend-lighten opacity-80"
+            style={{ maxHeight: '45vh' }}
           />
         </div>
-      </motion.div>
-
-      {/* Website URL at bottom */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-        className="relative z-10 pb-6 text-center"
-      >
-        <p className="text-white/70 text-sm sm:text-base font-medium">
-          lacabanacreative.com
-        </p>
       </motion.div>
     </section>
   );
