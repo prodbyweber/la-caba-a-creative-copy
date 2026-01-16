@@ -61,16 +61,15 @@ export default function AdminLayout({ children, activePage }) {
                 <div className="text-[10px] text-gray-500">La Cabaña Creative</div>
               </div>
             </div>
-            </div>
 
             {/* Homepage Button */}
             <Link to={createPageUrl("Landing")}>
-            <button className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium transition-colors">
-              <Home className="w-4 h-4" />
-              <span>Homepage</span>
-            </button>
+              <button className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium transition-colors">
+                <Home className="w-4 h-4" />
+                <span>Homepage</span>
+              </button>
             </Link>
-            </div>
+          </div>
 
           {/* Global Search */}
           <div className="hidden md:flex items-center flex-1 max-w-xl mx-8">
