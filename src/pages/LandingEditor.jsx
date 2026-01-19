@@ -73,11 +73,25 @@ export default function LandingEditor() {
     const file = e.target.files[0];
     if (!file) return;
 
+    // Validate file size (30MB max)
+    const maxSize = 30 * 1024 * 1024; // 30MB in bytes
+    if (file.size > maxSize) {
+      alert('El archivo es demasiado grande. Máximo 30MB.');
+      return;
+    }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Por favor selecciona un archivo de imagen válido.');
+      return;
+    }
+
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      updateMutation.mutate({ hero_image_url: file_url });
+      await updateMutation.mutateAsync({ hero_image_url: file_url });
     } catch (error) {
       console.error('Error uploading image:', error);
+      alert('Error al subir la imagen. Por favor intenta de nuevo.');
     }
   };
 

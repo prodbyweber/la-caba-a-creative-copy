@@ -8,6 +8,7 @@ import ClipsSettings from './pages/ClipsSettings';
 import ContentCalendar from './pages/ContentCalendar';
 import Dashboard from './pages/Dashboard';
 import Landing from './pages/Landing';
+import LandingEditor from './pages/LandingEditor';
 import Notes from './pages/Notes';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
@@ -17,7 +18,6 @@ import Settings from './pages/Settings';
 import SocialAccounts from './pages/SocialAccounts';
 import TrackDetail from './pages/TrackDetail';
 import Tracks from './pages/Tracks';
-import LandingEditor from './pages/LandingEditor';
 import __Layout from './Layout.jsx';
 
 
@@ -32,6 +32,7 @@ export const PAGES = {
     "ContentCalendar": ContentCalendar,
     "Dashboard": Dashboard,
     "Landing": Landing,
+    "LandingEditor": LandingEditor,
     "Notes": Notes,
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
@@ -41,7 +42,6 @@ export const PAGES = {
     "SocialAccounts": SocialAccounts,
     "TrackDetail": TrackDetail,
     "Tracks": Tracks,
-    "LandingEditor": LandingEditor,
 }
 
 export const pagesConfig = {
