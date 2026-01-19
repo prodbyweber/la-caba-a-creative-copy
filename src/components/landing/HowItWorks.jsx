@@ -64,7 +64,7 @@ export default function HowItWorks({ config }) {
         </motion.div>
 
         {/* Desktop Grid View */}
-        <div className="hidden md:grid md:grid-cols-3 gap-4 lg:gap-6">
+        <div className="hidden md:grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
           {displaySteps.map((step, i) => (
             <motion.div
               key={i}
@@ -74,24 +74,27 @@ export default function HowItWorks({ config }) {
               transition={{ delay: i * 0.15 }}
               className="relative group"
             >
-              <div className={`bg-gradient-to-br ${step.gradient} rounded-2xl p-6 h-full flex flex-col`}>
-                {/* Number */}
-                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4">
-                  <span className="text-xl font-bold text-white">{String(i + 1).padStart(2, '0')}</span>
+              <div className="bg-white/5 backdrop-blur-sm rounded-3xl overflow-hidden border border-white/10 hover:border-white/20 transition-all">
+                {/* Top Section - Large Title Area */}
+                <div className={`bg-gradient-to-br ${step.gradient} p-8 h-48 flex items-center justify-center`}>
+                  <h3 className="text-2xl font-black text-white text-center leading-tight uppercase tracking-tight">
+                    {step.title}
+                  </h3>
                 </div>
 
-                <h3 className="text-xl font-bold mb-2 text-white">{step.title}</h3>
-                <p className="text-white/80 text-sm leading-relaxed mb-3 flex-1">{step.description}</p>
-                
-                <div className="text-white font-semibold text-base mb-4">{step.price}</div>
-
-                <div className="flex gap-2">
-                  <button className="flex-1 bg-white text-black font-semibold py-2.5 px-3 rounded-lg hover:bg-white/90 transition-all text-sm">
-                    Comprar ahora
-                  </button>
-                  <button className="flex-1 bg-white/10 backdrop-blur-sm text-white font-semibold py-2.5 px-3 rounded-lg hover:bg-white/20 transition-all text-sm border border-white/20">
-                    Ver más
-                  </button>
+                {/* Bottom Section - Dark Card */}
+                <div className="bg-[#0f1011] p-6">
+                  <div className="text-emerald-400 font-bold text-xl mb-3">{step.price}</div>
+                  <p className="text-white/70 text-sm leading-relaxed mb-6 min-h-[80px]">{step.description}</p>
+                  
+                  <div className="flex gap-2">
+                    <button className="flex-1 bg-white text-black font-semibold py-3 px-4 rounded-xl hover:bg-white/90 transition-all text-sm">
+                      Comprar ahora
+                    </button>
+                    <button className="flex-1 bg-white/5 text-white font-semibold py-3 px-4 rounded-xl hover:bg-white/10 transition-all text-sm border border-white/20">
+                      Ver más
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -100,7 +103,7 @@ export default function HowItWorks({ config }) {
 
         {/* Mobile Carousel */}
         <div className="md:hidden relative">
-          <div className="overflow-hidden">
+          <div className="overflow-hidden px-4">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeIndex}
@@ -110,24 +113,27 @@ export default function HowItWorks({ config }) {
                 transition={{ duration: 0.3 }}
                 className="w-full max-w-sm mx-auto"
               >
-                <div className={`bg-gradient-to-br ${displaySteps[activeIndex].gradient} rounded-2xl p-6`}>
-                  {/* Number */}
-                  <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-5">
-                    <span className="text-2xl font-bold text-white">{String(activeIndex + 1).padStart(2, '0')}</span>
+                <div className="bg-white/5 backdrop-blur-sm rounded-3xl overflow-hidden border border-white/10">
+                  {/* Top Section - Large Title Area */}
+                  <div className={`bg-gradient-to-br ${displaySteps[activeIndex].gradient} p-8 h-40 flex items-center justify-center`}>
+                    <h3 className="text-xl font-black text-white text-center leading-tight uppercase tracking-tight">
+                      {displaySteps[activeIndex].title}
+                    </h3>
                   </div>
 
-                  <h3 className="text-xl font-bold mb-2 text-white">{displaySteps[activeIndex].title}</h3>
-                  <p className="text-white/80 text-sm leading-relaxed mb-3">{displaySteps[activeIndex].description}</p>
-                  
-                  <div className="text-white font-semibold text-base mb-5">{displaySteps[activeIndex].price}</div>
-
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <button className="flex-1 bg-white text-black font-semibold py-2.5 px-4 rounded-lg hover:bg-white/90 transition-all text-sm">
-                          Comprar ahora
-                        </button>
-                        <button className="flex-1 bg-white/10 backdrop-blur-sm text-white font-semibold py-2.5 px-4 rounded-lg hover:bg-white/20 transition-all text-sm border border-white/20">
-                          Ver más
-                        </button>
+                  {/* Bottom Section - Dark Card */}
+                  <div className="bg-[#0f1011] p-5">
+                    <div className="text-emerald-400 font-bold text-lg mb-3">{displaySteps[activeIndex].price}</div>
+                    <p className="text-white/70 text-sm leading-relaxed mb-5">{displaySteps[activeIndex].description}</p>
+                    
+                    <div className="flex flex-col gap-2">
+                      <button className="w-full bg-white text-black font-semibold py-3 px-4 rounded-xl hover:bg-white/90 transition-all text-sm">
+                        Comprar ahora
+                      </button>
+                      <button className="w-full bg-white/5 text-white font-semibold py-3 px-4 rounded-xl hover:bg-white/10 transition-all text-sm border border-white/20">
+                        Ver más
+                      </button>
+                    </div>
                   </div>
                 </div>
               </motion.div>
