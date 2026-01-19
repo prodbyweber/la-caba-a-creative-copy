@@ -4,7 +4,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
-export default function FinalCTA() {
+export default function FinalCTA({ config }) {
   return (
     <section className="relative py-32 overflow-hidden">
       {/* Background Effects */}
@@ -32,19 +32,11 @@ export default function FinalCTA() {
 
           {/* Headline */}
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6">
-            Construye tu proyecto
-            <br />
-            <span className="bg-gradient-to-r from-emerald-400 via-purple-400 to-orange-400 bg-clip-text text-transparent">
-              con estructura
-            </span>
+            {config?.final_cta_title || 'Construye tu proyecto con estructura'}
           </h2>
 
           <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-            Menos caos.
-            <br />
-            Más claridad.
-            <br />
-            Más avance real.
+            {config?.final_cta_subtitle || 'Menos caos. Más claridad. Más avance real.'}
           </p>
 
           {/* CTA Button */}
@@ -54,7 +46,7 @@ export default function FinalCTA() {
               whileTap={{ scale: 0.98 }}
               className="group inline-flex items-center gap-3 px-10 py-5 rounded-full bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-500 bg-[length:200%_100%] text-lg font-medium shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:bg-right transition-all duration-500"
             >
-              Aplicar ahora
+              {config?.final_cta_button || 'Aplicar ahora'}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </Link>

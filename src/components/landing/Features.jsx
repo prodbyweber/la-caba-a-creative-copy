@@ -57,7 +57,7 @@ const features = [
   }
 ];
 
-export default function Features() {
+export default function Features({ config }) {
   return (
     <section id="features" className="relative py-32 overflow-hidden">
       {/* Background Elements */}
@@ -72,10 +72,10 @@ export default function Features() {
           className="text-center mb-20"
         >
           <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-            <span className="text-white">Digitalizamos artistas.</span>
+            <span className="text-white">{config?.features_title || 'Digitalizamos artistas.'}</span>
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-4">
-            Imagen, identidad y narrativa para destacar en un entorno saturado.
+            {config?.features_subtitle || 'Imagen, identidad y narrativa para destacar en un entorno saturado.'}
           </p>
           <p className="text-gray-500 max-w-xl mx-auto">
             Cada proyecto tiene una intención emocional clara.

@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Shield, Target, Zap } from "lucide-react";
 
-export default function ForSeriousArtists() {
+export default function ForSeriousArtists({ config }) {
   return (
     <section className="relative py-32 overflow-hidden">
       {/* Dramatic Background */}
@@ -47,35 +47,48 @@ export default function ForSeriousArtists() {
 
           {/* Main Statement */}
           <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-8 leading-tight">
-            <span className="text-white">Esto no es para</span>{" "}
-            <span className="text-gray-500">todo el mundo.</span>
+            <span className="text-white">{config?.serious_artists_title || 'Esto no es para todo el mundo.'}</span>
           </h2>
 
           <p className="text-xl sm:text-2xl text-gray-400 max-w-3xl mx-auto leading-relaxed mb-8">
-            La Cabaña Creative es para artistas que:
+            {config?.serious_artists_subtitle || 'La Cabaña Creative es para artistas que:'}
           </p>
 
           <div className="max-w-2xl mx-auto text-left space-y-3 mb-12">
-            <p className="text-lg text-gray-300 flex items-start gap-3">
-              <span className="text-emerald-400 font-bold">•</span>
-              <span><span className="text-white font-medium">Invierten</span> en su proyecto</span>
-            </p>
-            <p className="text-lg text-gray-300 flex items-start gap-3">
-              <span className="text-purple-400 font-bold">•</span>
-              <span><span className="text-white font-medium">Valoran</span> el proceso</span>
-            </p>
-            <p className="text-lg text-gray-300 flex items-start gap-3">
-              <span className="text-orange-400 font-bold">•</span>
-              <span>Buscan algo <span className="text-white font-medium">único y profesional</span></span>
-            </p>
-            <p className="text-lg text-gray-300 flex items-start gap-3">
-              <span className="text-emerald-400 font-bold">•</span>
-              <span>Entienden que la <span className="text-white font-medium">constancia</span> supera al golpe de suerte</span>
-            </p>
+            {(config?.serious_artists_points && config.serious_artists_points.length > 0) ? (
+              config.serious_artists_points.map((point, i) => {
+                const colors = ['emerald', 'purple', 'orange', 'emerald'];
+                return (
+                  <p key={i} className="text-lg text-gray-300 flex items-start gap-3">
+                    <span className={`text-${colors[i % colors.length]}-400 font-bold`}>•</span>
+                    <span>{point}</span>
+                  </p>
+                );
+              })
+            ) : (
+              <>
+                <p className="text-lg text-gray-300 flex items-start gap-3">
+                  <span className="text-emerald-400 font-bold">•</span>
+                  <span><span className="text-white font-medium">Invierten</span> en su proyecto</span>
+                </p>
+                <p className="text-lg text-gray-300 flex items-start gap-3">
+                  <span className="text-purple-400 font-bold">•</span>
+                  <span><span className="text-white font-medium">Valoran</span> el proceso</span>
+                </p>
+                <p className="text-lg text-gray-300 flex items-start gap-3">
+                  <span className="text-orange-400 font-bold">•</span>
+                  <span>Buscan algo <span className="text-white font-medium">único y profesional</span></span>
+                </p>
+                <p className="text-lg text-gray-300 flex items-start gap-3">
+                  <span className="text-emerald-400 font-bold">•</span>
+                  <span>Entienden que la <span className="text-white font-medium">constancia</span> supera al golpe de suerte</span>
+                </p>
+              </>
+            )}
           </div>
 
           <p className="text-xl font-semibold text-white max-w-2xl mx-auto">
-            Si buscas algo rápido y barato, este no es tu sitio.
+            {config?.serious_artists_footer || 'Si buscas algo rápido y barato, este no es tu sitio.'}
           </p>
 
           {/* Separator Line */}

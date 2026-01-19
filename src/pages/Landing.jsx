@@ -44,13 +44,13 @@ export default function Landing() {
 
   const sectionComponents = {
     hero: (props) => <Hero config={config} {...props} />,
-    services: ServicesCarousel,
-    features: Features,
-    howItWorks: HowItWorks,
-    forSeriousArtists: ForSeriousArtists,
+    services: (props) => <ServicesCarousel config={config} {...props} />,
+    features: (props) => <Features config={config} {...props} />,
+    howItWorks: (props) => <HowItWorks config={config} {...props} />,
+    forSeriousArtists: (props) => <ForSeriousArtists config={config} {...props} />,
     platformPreview: PlatformPreview,
-    membershipPlans: MembershipPlans,
-    finalCTA: FinalCTA
+    membershipPlans: (props) => <MembershipPlans config={config} {...props} />,
+    finalCTA: (props) => <FinalCTA config={config} {...props} />
   };
 
   if (!config) {

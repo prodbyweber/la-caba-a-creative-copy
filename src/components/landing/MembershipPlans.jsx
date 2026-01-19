@@ -64,7 +64,7 @@ const plans = [
   }
 ];
 
-export default function MembershipPlans() {
+export default function MembershipPlans({ config }) {
   return (
     <section id="pricing" className="relative py-32 overflow-hidden">
       {/* Background */}
@@ -79,14 +79,10 @@ export default function MembershipPlans() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-            Trabajamos por <span className="text-emerald-400">membresía.</span>
+            {config?.membership_title || 'Trabajamos por membresía.'}
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-            No cobramos por canción.
-            <br />
-            Trabajamos por tiempo, foco y proceso creativo.
-            <br />
-            Así protegemos la calidad del proyecto y del trabajo.
+            {config?.membership_subtitle || 'No cobramos por canción. Trabajamos por tiempo, foco y proceso creativo. Así protegemos la calidad del proyecto y del trabajo.'}
           </p>
         </motion.div>
 

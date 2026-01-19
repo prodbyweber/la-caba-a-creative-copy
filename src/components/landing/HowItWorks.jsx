@@ -29,7 +29,7 @@ const steps = [
   }
 ];
 
-export default function HowItWorks() {
+export default function HowItWorks({ config }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const nextSlide = () => {
@@ -52,12 +52,10 @@ export default function HowItWorks() {
           className="text-center mb-12 sm:mb-16"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
-            Formas de trabajar conmigo
+            {config?.how_it_works_title || 'Formas de trabajar conmigo'}
           </h2>
           <p className="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Trabajamos por horas, no por canciones sueltas.
-            <br className="hidden sm:block" />
-            Proceso claro, profesional y sostenible.
+            {config?.how_it_works_subtitle || 'Trabajamos por horas, no por canciones sueltas. Proceso claro, profesional y sostenible.'}
           </p>
         </motion.div>
 

@@ -50,7 +50,7 @@ const services = [
   }
 ];
 
-export default function ServicesCarousel() {
+export default function ServicesCarousel({ config }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
@@ -97,10 +97,10 @@ export default function ServicesCarousel() {
           className="text-center mb-12 sm:mb-16"
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-6">
-            Formas de <span className="text-emerald-400">trabajar contigo</span>
+            {config?.services_title || 'Formas de trabajar contigo'}
           </h2>
           <p className="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto px-4">
-            Servicios diseñados para artistas que buscan profesionalismo y resultados reales.
+            {config?.services_subtitle || 'Servicios diseñados para artistas que buscan profesionalismo y resultados reales.'}
           </p>
         </motion.div>
 
