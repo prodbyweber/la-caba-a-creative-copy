@@ -48,7 +48,26 @@ export default function LandingEditor() {
         features: [],
         how_it_works_title: "Formas de trabajar conmigo",
         how_it_works_subtitle: "Trabajamos por horas, no por canciones sueltas. Proceso claro, profesional y sostenible.",
-        how_it_works_steps: [],
+        how_it_works_steps: [
+          {
+            title: "Producción musical por horas",
+            description: "Trabajamos el tiempo que el proyecto necesita. Sin atajos ni fórmulas. Proceso claro y profesional.",
+            price: "Desde €50/hora",
+            gradient: "from-emerald-500 to-emerald-600"
+          },
+          {
+            title: "Dirección creativa real",
+            description: "No hacemos canciones sueltas. Construimos identidad, narrativa y coherencia visual para tu proyecto.",
+            price: "Desde €300/mes",
+            gradient: "from-purple-500 to-purple-600"
+          },
+          {
+            title: "Flujo ordenado",
+            description: "Sin improvisación. Enfoque en progreso constante, no en promesas vacías. Estructura que funciona.",
+            price: "Consultoría personalizada",
+            gradient: "from-orange-500 to-orange-600"
+          }
+        ],
         serious_artists_title: "Esto no es para todo el mundo.",
         serious_artists_subtitle: "La Cabaña Creative es para artistas que:",
         serious_artists_points: [],

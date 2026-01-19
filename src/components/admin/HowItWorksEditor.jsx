@@ -14,10 +14,33 @@ const gradientOptions = [
   { value: "from-yellow-500 to-yellow-600", label: "Amarillo", color: "bg-gradient-to-br from-yellow-500 to-yellow-600" }
 ];
 
+const defaultSteps = [
+  {
+    title: "Producción musical por horas",
+    description: "Trabajamos el tiempo que el proyecto necesita. Sin atajos ni fórmulas. Proceso claro y profesional.",
+    price: "Desde €50/hora",
+    gradient: "from-emerald-500 to-emerald-600"
+  },
+  {
+    title: "Dirección creativa real",
+    description: "No hacemos canciones sueltas. Construimos identidad, narrativa y coherencia visual para tu proyecto.",
+    price: "Desde €300/mes",
+    gradient: "from-purple-500 to-purple-600"
+  },
+  {
+    title: "Flujo ordenado",
+    description: "Sin improvisación. Enfoque en progreso constante, no en promesas vacías. Estructura que funciona.",
+    price: "Consultoría personalizada",
+    gradient: "from-orange-500 to-orange-600"
+  }
+];
+
 export default function HowItWorksEditor({ config, onUpdate }) {
   const [expandedIndex, setExpandedIndex] = useState(null);
 
-  const steps = config?.how_it_works_steps || [];
+  const steps = config?.how_it_works_steps && config.how_it_works_steps.length > 0 
+    ? config.how_it_works_steps 
+    : defaultSteps;
 
   const addStep = () => {
     const newStep = {
@@ -52,13 +75,13 @@ export default function HowItWorksEditor({ config, onUpdate }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-gray-400">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <p className="text-xs sm:text-sm text-gray-400">
           Arrastra para reordenar, haz clic para editar
         </p>
         <button
           onClick={addStep}
-          className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-lg border border-emerald-500/20 text-emerald-400 text-sm flex items-center gap-2 transition-colors"
+          className="px-3 sm:px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 rounded-lg border border-emerald-500/20 text-emerald-400 text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Agregar Tarjeta
@@ -91,19 +114,19 @@ export default function HowItWorksEditor({ config, onUpdate }) {
                         }`}
                       >
                         {/* Header */}
-                        <div className="flex items-center gap-3 p-4 cursor-pointer hover:bg-white/5 transition-colors"
+                        <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 cursor-pointer hover:bg-white/5 transition-colors"
                           onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
                         >
-                          <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
-                            <GripVertical className="w-5 h-5 text-gray-500" />
+                          <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing flex-shrink-0">
+                            <GripVertical className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
                           </div>
                           
-                          <div className={`w-10 h-10 rounded-lg ${step.gradient} flex items-center justify-center flex-shrink-0`}>
-                            <span className="text-white font-bold">{String(index + 1).padStart(2, '0')}</span>
+                          <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg ${step.gradient} flex items-center justify-center flex-shrink-0`}>
+                            <span className="text-white font-bold text-sm sm:text-base">{String(index + 1).padStart(2, '0')}</span>
                           </div>
 
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-semibold text-white truncate">{step.title}</h4>
+                            <h4 className="font-semibold text-white truncate text-sm sm:text-base">{step.title}</h4>
                             <p className="text-xs text-gray-400 truncate">{step.price}</p>
                           </div>
 
@@ -112,15 +135,15 @@ export default function HowItWorksEditor({ config, onUpdate }) {
                               e.stopPropagation();
                               removeStep(index);
                             }}
-                            className="p-2 hover:bg-red-500/10 rounded-lg text-red-400 transition-colors"
+                            className="p-1.5 sm:p-2 hover:bg-red-500/10 rounded-lg text-red-400 transition-colors flex-shrink-0"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
 
                           {expandedIndex === index ? (
-                            <ChevronUp className="w-5 h-5 text-gray-400" />
+                            <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
                           ) : (
-                            <ChevronDown className="w-5 h-5 text-gray-400" />
+                            <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0" />
                           )}
                         </div>
 
@@ -167,19 +190,19 @@ export default function HowItWorksEditor({ config, onUpdate }) {
 
                             <div>
                               <label className="text-sm text-gray-400 mb-2 block">Color de Gradiente</label>
-                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                                 {gradientOptions.map((option) => (
                                   <button
                                     key={option.value}
                                     onClick={() => updateStep(index, 'gradient', option.value)}
-                                    className={`p-3 rounded-lg border-2 transition-all ${
+                                    className={`p-2 sm:p-3 rounded-lg border-2 transition-all ${
                                       step.gradient === option.value
                                         ? 'border-white scale-105'
                                         : 'border-white/10 hover:border-white/30'
                                     }`}
                                   >
-                                    <div className={`h-12 rounded-lg ${option.color}`} />
-                                    <p className="text-xs text-gray-400 mt-2 text-center">{option.label}</p>
+                                    <div className={`h-10 sm:h-12 rounded-lg ${option.color}`} />
+                                    <p className="text-xs text-gray-400 mt-1 sm:mt-2 text-center">{option.label}</p>
                                   </button>
                                 ))}
                               </div>
