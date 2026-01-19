@@ -11,7 +11,7 @@ import Features from "@/components/landing/Features";
 import ForSeriousArtists from "@/components/landing/ForSeriousArtists";
 import MembershipPlans from "@/components/landing/MembershipPlans";
 import FinalCTA from "@/components/landing/FinalCTA";
-import ServicesCarousel from "@/components/landing/ServicesCarousel";
+
 import LandingNav from "@/components/landing/LandingNav";
 import Footer from "@/components/landing/Footer";
 
@@ -29,10 +29,9 @@ export default function Landing() {
       }
       
       return {
-        sections_order: ["hero", "services", "features", "howItWorks", "forSeriousArtists", "platformPreview", "membershipPlans", "finalCTA"],
+        sections_order: ["hero", "features", "howItWorks", "forSeriousArtists", "platformPreview", "membershipPlans", "finalCTA"],
         sections_enabled: {
           hero: true,
-          services: true,
           features: true,
           howItWorks: true,
           forSeriousArtists: true,
@@ -48,7 +47,6 @@ export default function Landing() {
 
   const sectionComponents = {
     hero: (props) => <Hero config={config} {...props} />,
-    services: (props) => <ServicesCarousel config={config} {...props} />,
     features: (props) => <Features config={config} {...props} />,
     howItWorks: (props) => <HowItWorks config={config} {...props} />,
     forSeriousArtists: (props) => <ForSeriousArtists config={config} {...props} />,
@@ -63,7 +61,6 @@ export default function Landing() {
         <LandingNav />
         <main>
           <Hero config={config} />
-          <ServicesCarousel />
           <Features />
           <HowItWorks />
           <ForSeriousArtists />

@@ -78,10 +78,9 @@ export default function LandingEditor() {
         final_cta_title: "Construye tu proyecto con estructura",
         final_cta_subtitle: "Menos caos. Más claridad. Más avance real.",
         final_cta_button: "Aplicar ahora",
-        sections_order: ["hero", "services", "features", "howItWorks", "forSeriousArtists", "platformPreview", "membershipPlans", "finalCTA"],
+        sections_order: ["hero", "features", "howItWorks", "forSeriousArtists", "platformPreview", "membershipPlans", "finalCTA"],
         sections_enabled: {
           hero: true,
-          services: true,
           features: true,
           howItWorks: true,
           forSeriousArtists: true,
@@ -132,10 +131,11 @@ export default function LandingEditor() {
   const sectionLabels = {
     hero: "Hero Principal",
     features: "Características",
-    services: "Servicios (Carrusel)",
-    howItWorks: "Cómo Trabajamos",
-    plans: "Planes de Membresía",
-    stats: "Estadísticas"
+    howItWorks: "Servicios / Cómo Trabajamos",
+    forSeriousArtists: "Para Artistas Serios",
+    platformPreview: "Preview de Plataforma",
+    membershipPlans: "Planes de Membresía",
+    finalCTA: "CTA Final"
   };
 
   if (isLoading) {
@@ -243,23 +243,6 @@ export default function LandingEditor() {
                 onChange={(v) => updateField('hero_image_url', v)}
                 isUploading={isUploading}
                 setIsUploading={setIsUploading}
-              />
-            </SectionEditor>
-
-            {/* Services Section Editor */}
-            <SectionEditor title="💼 Servicios (Carrusel)">
-              <TextInput
-                label="Título de la Sección"
-                value={config.services_title}
-                onChange={(v) => updateField('services_title', v)}
-                placeholder="Formas de trabajar contigo"
-              />
-              <TextInput
-                label="Subtítulo"
-                value={config.services_subtitle}
-                onChange={(v) => updateField('services_subtitle', v)}
-                placeholder="Servicios diseñados para artistas..."
-                multiline
               />
             </SectionEditor>
 
