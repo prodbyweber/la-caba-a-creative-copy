@@ -52,25 +52,37 @@ export default function HowItWorksEditor({ config, onUpdate }) {
     onUpdate([...steps, newStep]);
   };
 
+  const [localSteps, setLocalSteps] = useState(steps);
+
+  React.useEffect(() => {
+    setLocalSteps(steps);
+  }, [steps]);
+
   const updateStep = (index, field, value) => {
-    const newSteps = [...steps];
+    const newSteps = [...localSteps];
     newSteps[index] = { ...newSteps[index], [field]: value };
-    console.log('Updating steps:', newSteps);
-    onUpdate(newSteps);
+    setLocalSteps(newSteps);
+  };
+
+  const saveStep = (index) => {
+    onUpdate(localSteps);
   };
 
   const removeStep = (index) => {
-    onUpdate(steps.filter((_, i) => i !== index));
+    const newSteps = localSteps.filter((_, i) => i !== index);
+    setLocalSteps(newSteps);
+    onUpdate(newSteps);
     if (expandedIndex === index) setExpandedIndex(null);
   };
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
 
-    const items = Array.from(steps);
+    const items = Array.from(localSteps);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
+    setLocalSteps(items);
     onUpdate(items);
   };
 
@@ -104,7 +116,7 @@ export default function HowItWorksEditor({ config, onUpdate }) {
           <Droppable droppableId="how-it-works-steps">
             {(provided) => (
               <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
-                {steps.map((step, index) => (
+                {localSteps.map((step, index) => (
                   <Draggable key={index} draggableId={`step-${index}`} index={index}>
                     {(provided, snapshot) => (
                       <div
@@ -162,6 +174,7 @@ export default function HowItWorksEditor({ config, onUpdate }) {
                                 type="text"
                                 value={step.title}
                                 onChange={(e) => updateStep(index, 'title', e.target.value)}
+                                onBlur={() => saveStep(index)}
                                 className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
                                 placeholder="Ej: Producción musical por horas"
                               />
@@ -172,6 +185,7 @@ export default function HowItWorksEditor({ config, onUpdate }) {
                               <textarea
                                 value={step.description}
                                 onChange={(e) => updateStep(index, 'description', e.target.value)}
+                                onBlur={() => saveStep(index)}
                                 rows={3}
                                 className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white resize-none focus:outline-none focus:border-emerald-500/50"
                                 placeholder="Describe el servicio..."
@@ -184,6 +198,7 @@ export default function HowItWorksEditor({ config, onUpdate }) {
                                 type="text"
                                 value={step.price}
                                 onChange={(e) => updateStep(index, 'price', e.target.value)}
+                                onBlur={() => saveStep(index)}
                                 className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
                                 placeholder="Ej: Desde €50/hora"
                               />
@@ -195,7 +210,10 @@ export default function HowItWorksEditor({ config, onUpdate }) {
                                 {gradientOptions.map((option) => (
                                   <button
                                     key={option.value}
-                                    onClick={() => updateStep(index, 'gradient', option.value)}
+                                    onClick={() => {
+                                      updateStep(index, 'gradient', option.value);
+                                      saveStep(index);
+                                    }}
                                     className={`p-2 sm:p-3 rounded-lg border-2 transition-all ${
                                       step.gradient === option.value
                                         ? 'border-white scale-105'
