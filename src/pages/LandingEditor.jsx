@@ -99,6 +99,9 @@ export default function LandingEditor() {
     mutationFn: (data) => base44.entities.LandingConfig.update(config.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['landingConfig'] });
+    },
+    onError: (error) => {
+      console.error('Error updating config:', error);
     }
   });
 
@@ -113,6 +116,7 @@ export default function LandingEditor() {
   };
 
   const updateField = (field, value) => {
+    console.log('Updating field:', field, 'with value:', value);
     updateMutation.mutate({ [field]: value });
   };
 

@@ -55,6 +55,7 @@ export default function HowItWorksEditor({ config, onUpdate }) {
   const updateStep = (index, field, value) => {
     const newSteps = [...steps];
     newSteps[index] = { ...newSteps[index], [field]: value };
+    console.log('Updating steps:', newSteps);
     onUpdate(newSteps);
   };
 

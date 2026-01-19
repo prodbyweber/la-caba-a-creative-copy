@@ -23,7 +23,10 @@ export default function Landing() {
     queryKey: ['landingConfig'],
     queryFn: async () => {
       const configs = await base44.entities.LandingConfig.list();
-      if (configs.length > 0) return configs[0];
+      if (configs.length > 0) {
+        console.log('Loaded config:', configs[0]);
+        return configs[0];
+      }
       
       return {
         sections_order: ["hero", "services", "features", "howItWorks", "forSeriousArtists", "platformPreview", "membershipPlans", "finalCTA"],
@@ -39,7 +42,8 @@ export default function Landing() {
         }
       };
     },
-    staleTime: 60000
+    staleTime: 5000,
+    refetchOnWindowFocus: true
   });
 
   const sectionComponents = {
