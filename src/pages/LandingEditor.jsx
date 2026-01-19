@@ -232,22 +232,25 @@ export default function LandingEditor() {
                       <img 
                         src={config.hero_image_url} 
                         alt="Hero" 
-                        className="w-20 h-20 object-cover rounded-lg"
+                        className="w-20 h-20 object-cover rounded-lg border border-white/10"
                       />
                     )}
-                    <label className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 text-white cursor-pointer flex items-center gap-2 transition-colors">
+                    <label className={`px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 text-white cursor-pointer flex items-center gap-2 transition-colors ${
+                      updateMutation.isPending ? 'opacity-50 pointer-events-none' : ''
+                    }`}>
                       <Upload className="w-4 h-4" />
-                      Cambiar Imagen
+                      {updateMutation.isPending ? 'Subiendo...' : 'Cambiar Imagen'}
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleImageUpload}
                         className="hidden"
+                        disabled={updateMutation.isPending}
                       />
                     </label>
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
-                    Recomendado: Imagen con fondo transparente PNG
+                    Recomendado: PNG con fondo transparente. Máximo 30MB.
                   </p>
                 </div>
               </div>
