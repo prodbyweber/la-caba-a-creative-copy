@@ -198,20 +198,22 @@ export default function LandingEditor() {
                 <div>
                   <label className="text-sm text-gray-400 mb-2 block">Título</label>
                   <textarea
-                    value={config.hero_title}
+                    value={config.hero_title || ""}
                     onChange={(e) => updateMutation.mutate({ hero_title: e.target.value })}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white resize-none"
+                    className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white resize-none focus:outline-none focus:border-emerald-500/50"
                     rows={2}
+                    placeholder="El estudio creativo definitivo..."
                   />
                 </div>
 
                 <div>
                   <label className="text-sm text-gray-400 mb-2 block">Subtítulo</label>
                   <textarea
-                    value={config.hero_subtitle}
+                    value={config.hero_subtitle || ""}
                     onChange={(e) => updateMutation.mutate({ hero_subtitle: e.target.value })}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white resize-none"
+                    className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white resize-none focus:outline-none focus:border-emerald-500/50"
                     rows={2}
+                    placeholder="Producción por horas..."
                   />
                 </div>
 
@@ -219,9 +221,10 @@ export default function LandingEditor() {
                   <label className="text-sm text-gray-400 mb-2 block">Texto del Botón</label>
                   <input
                     type="text"
-                    value={config.hero_cta_text}
+                    value={config.hero_cta_text || ""}
                     onChange={(e) => updateMutation.mutate({ hero_cta_text: e.target.value })}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white"
+                    className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
+                    placeholder="Aplicar a La Cabaña Creative"
                   />
                 </div>
 

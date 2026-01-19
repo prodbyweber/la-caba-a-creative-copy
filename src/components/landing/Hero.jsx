@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { ArrowRight } from "lucide-react";
 
-export default function Hero() {
+export default function Hero({ config }) {
   return (
     <section className="relative min-h-screen flex flex-col justify-between overflow-hidden bg-black">
       {/* Dark textured background */}
@@ -23,13 +23,13 @@ export default function Hero() {
             {/* Main Headline */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 sm:mb-8 leading-[1.1]">
               <span className="block text-white">
-                El estudio creativo definitivo para artistas que buscan conectar
+                {config?.hero_title || "El estudio creativo definitivo para artistas que buscan conectar"}
               </span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-base sm:text-lg md:text-xl text-gray-400 mb-8 sm:mb-12 leading-relaxed max-w-xl">
-              Producción por horas, visuales cinematográficos y digitalización artística para proyectos que van en serio.
+              {config?.hero_subtitle || "Producción por horas, visuales cinematográficos y digitalización artística para proyectos que van en serio."}
             </p>
 
             {/* CTA Button */}
@@ -39,7 +39,7 @@ export default function Hero() {
                 whileTap={{ scale: 0.98 }}
                 className="group px-8 py-4 sm:px-10 sm:py-5 rounded-full bg-gradient-to-r from-white to-gray-200 text-black font-semibold text-base sm:text-lg flex items-center gap-3 shadow-2xl shadow-white/10 hover:shadow-white/20 transition-all duration-300 w-full sm:w-auto justify-center"
               >
-                Aplicar a La Cabaña Creative
+                {config?.hero_cta_text || "Aplicar a La Cabaña Creative"}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </motion.button>
             </Link>
@@ -64,7 +64,7 @@ export default function Hero() {
 
           {/* Artist Image */}
           <img
-            src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=600&h=800&fit=crop&q=80"
+            src={config?.hero_image_url || "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=600&h=800&fit=crop&q=80"}
             alt="Artist in studio"
             className="relative w-full h-auto object-contain mix-blend-lighten opacity-80"
             style={{ maxHeight: '45vh' }}

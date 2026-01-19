@@ -43,7 +43,7 @@ export default function Landing() {
   });
 
   const sectionComponents = {
-    hero: Hero,
+    hero: (props) => <Hero config={config} {...props} />,
     services: ServicesCarousel,
     features: Features,
     howItWorks: HowItWorks,
@@ -58,7 +58,7 @@ export default function Landing() {
       <div className="min-h-screen bg-[#0a0a0b] text-white overflow-x-hidden">
         <LandingNav />
         <main>
-          <Hero />
+          <Hero config={config} />
           <ServicesCarousel />
           <Features />
           <HowItWorks />
