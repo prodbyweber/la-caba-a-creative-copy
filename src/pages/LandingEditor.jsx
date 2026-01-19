@@ -5,6 +5,7 @@ import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { SectionEditor, TextInput, ImageUpload, ArrayEditor } from "@/components/admin/SectionEditor";
+import HowItWorksEditor from "@/components/admin/HowItWorksEditor";
 import { 
   Eye, 
   GripVertical, 
@@ -271,6 +272,13 @@ export default function LandingEditor() {
                 placeholder="Trabajamos por horas..."
                 multiline
               />
+              <div className="pt-4 border-t border-white/10 mt-4">
+                <label className="text-sm text-gray-400 mb-3 block font-medium">Tarjetas de Servicios</label>
+                <HowItWorksEditor 
+                  config={config}
+                  onUpdate={(steps) => updateField('how_it_works_steps', steps)}
+                />
+              </div>
             </SectionEditor>
 
             {/* Serious Artists Section Editor */}

@@ -32,12 +32,16 @@ const steps = [
 export default function HowItWorks({ config }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
+  const displaySteps = config?.how_it_works_steps && config.how_it_works_steps.length > 0 
+    ? config.how_it_works_steps 
+    : steps;
+
   const nextSlide = () => {
-    setActiveIndex((prev) => (prev + 1) % steps.length);
+    setActiveIndex((prev) => (prev + 1) % displaySteps.length);
   };
 
   const prevSlide = () => {
-    setActiveIndex((prev) => (prev - 1 + steps.length) % steps.length);
+    setActiveIndex((prev) => (prev - 1 + displaySteps.length) % displaySteps.length);
   };
 
   return (
@@ -61,7 +65,7 @@ export default function HowItWorks({ config }) {
 
         {/* Desktop Grid View */}
         <div className="hidden md:grid md:grid-cols-3 gap-6 lg:gap-8">
-          {steps.map((step, i) => (
+          {displaySteps.map((step, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 30 }}
@@ -71,9 +75,9 @@ export default function HowItWorks({ config }) {
               className="relative group"
             >
               <div className={`bg-gradient-to-br ${step.gradient} rounded-3xl p-8 h-full flex flex-col`}>
-                {/* Icon */}
+                {/* Number */}
                 <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6">
-                  <step.icon className="w-7 h-7 text-white" />
+                  <span className="text-2xl font-bold text-white">{String(i + 1).padStart(2, '0')}</span>
                 </div>
 
                 <h3 className="text-2xl font-bold mb-3 text-white">{step.title}</h3>
@@ -106,19 +110,16 @@ export default function HowItWorks({ config }) {
                 transition={{ duration: 0.3 }}
                 className="w-full max-w-sm mx-auto"
               >
-                {(() => {
-                  const CurrentIcon = steps[activeIndex].icon;
-                  return (
-                    <div className={`bg-gradient-to-br ${steps[activeIndex].gradient} rounded-3xl p-8`}>
-                      {/* Icon */}
-                      <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6">
-                        <CurrentIcon className="w-8 h-8 text-white" />
-                      </div>
+                <div className={`bg-gradient-to-br ${displaySteps[activeIndex].gradient} rounded-3xl p-8`}>
+                  {/* Number */}
+                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-6">
+                    <span className="text-3xl font-bold text-white">{String(activeIndex + 1).padStart(2, '0')}</span>
+                  </div>
 
-                      <h3 className="text-2xl font-bold mb-3 text-white">{steps[activeIndex].title}</h3>
-                      <p className="text-white/80 leading-relaxed mb-4">{steps[activeIndex].description}</p>
-                      
-                      <div className="text-white font-semibold text-lg mb-6">{steps[activeIndex].price}</div>
+                  <h3 className="text-2xl font-bold mb-3 text-white">{displaySteps[activeIndex].title}</h3>
+                  <p className="text-white/80 leading-relaxed mb-4">{displaySteps[activeIndex].description}</p>
+                  
+                  <div className="text-white font-semibold text-lg mb-6">{displaySteps[activeIndex].price}</div>
 
                       <div className="flex flex-col sm:flex-row gap-3">
                         <button className="flex-1 bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-white/90 transition-all">
@@ -127,10 +128,8 @@ export default function HowItWorks({ config }) {
                         <button className="flex-1 bg-white/10 backdrop-blur-sm text-white font-semibold py-3 px-6 rounded-xl hover:bg-white/20 transition-all border border-white/20">
                           Ver más
                         </button>
-                      </div>
-                    </div>
-                  );
-                })()}
+                  </div>
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>
@@ -146,7 +145,7 @@ export default function HowItWorks({ config }) {
 
             {/* Dots Indicator */}
             <div className="flex gap-2">
-              {steps.map((_, idx) => (
+              {displaySteps.map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveIndex(idx)}
