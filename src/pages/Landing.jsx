@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import Hero from "@/components/landing/Hero";
 import PlatformPreview from "@/components/landing/PlatformPreview";
+import HowItWorks from "@/components/landing/HowItWorks";
 import Features from "@/components/landing/Features";
 import ForSeriousArtists from "@/components/landing/ForSeriousArtists";
 import MembershipPlans from "@/components/landing/MembershipPlans";
@@ -28,11 +29,12 @@ export default function Landing() {
       }
       
       return {
-        sections_order: ["hero", "services", "features", "forSeriousArtists", "platformPreview", "membershipPlans", "finalCTA"],
+        sections_order: ["hero", "services", "features", "howItWorks", "forSeriousArtists", "platformPreview", "membershipPlans", "finalCTA"],
         sections_enabled: {
           hero: true,
           services: true,
           features: true,
+          howItWorks: true,
           forSeriousArtists: true,
           platformPreview: true,
           membershipPlans: true,
@@ -48,6 +50,7 @@ export default function Landing() {
     hero: (props) => <Hero config={config} {...props} />,
     services: (props) => <ServicesCarousel config={config} {...props} />,
     features: (props) => <Features config={config} {...props} />,
+    howItWorks: (props) => <HowItWorks config={config} {...props} />,
     forSeriousArtists: (props) => <ForSeriousArtists config={config} {...props} />,
     platformPreview: PlatformPreview,
     membershipPlans: (props) => <MembershipPlans config={config} {...props} />,
@@ -62,6 +65,7 @@ export default function Landing() {
           <Hero config={config} />
           <ServicesCarousel />
           <Features />
+          <HowItWorks />
           <ForSeriousArtists />
           <PlatformPreview />
           <MembershipPlans />

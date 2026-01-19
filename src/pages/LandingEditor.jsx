@@ -78,11 +78,12 @@ export default function LandingEditor() {
         final_cta_title: "Construye tu proyecto con estructura",
         final_cta_subtitle: "Menos caos. Más claridad. Más avance real.",
         final_cta_button: "Aplicar ahora",
-        sections_order: ["hero", "services", "features", "forSeriousArtists", "platformPreview", "membershipPlans", "finalCTA"],
+        sections_order: ["hero", "services", "features", "howItWorks", "forSeriousArtists", "platformPreview", "membershipPlans", "finalCTA"],
         sections_enabled: {
           hero: true,
           services: true,
           features: true,
+          howItWorks: true,
           forSeriousArtists: true,
           platformPreview: true,
           membershipPlans: true,
