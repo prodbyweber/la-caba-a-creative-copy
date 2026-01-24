@@ -118,180 +118,183 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout activePage="AdminDashboard">
-      <div className="p-6 max-w-[1600px] mx-auto">
+      <div className="p-4 sm:p-6 max-w-[1600px] mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6"
         >
-          <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-gray-500">Overview of La Cabaña Creative operations</p>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Admin Dashboard</h1>
+          <p className="text-sm sm:text-base text-gray-500">Overview of La Cabaña Creative operations</p>
         </motion.div>
 
-        {/* KPI Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+        {/* KPI Cards - Horizontal Compact */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
           {kpis.map((kpi, i) => (
             <Link key={i} to={kpi.link}>
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className={`bg-gradient-to-br from-${kpi.color}-500/10 to-${kpi.color}-500/5 border border-${kpi.color}-500/20 rounded-2xl p-6 hover:border-${kpi.color}-500/40 transition-all cursor-pointer`}
+                className={`bg-gradient-to-br from-${kpi.color}-500/10 to-${kpi.color}-500/5 border border-${kpi.color}-500/20 rounded-xl p-3 sm:p-4 hover:border-${kpi.color}-500/40 transition-all cursor-pointer`}
               >
-                <kpi.icon className={`w-8 h-8 text-${kpi.color}-400 mb-3`} />
-                <div className={`text-3xl font-bold text-${kpi.color}-400 mb-1`}>
+                <kpi.icon className={`w-5 h-5 sm:w-6 sm:h-6 text-${kpi.color}-400 mb-2`} />
+                <div className={`text-xl sm:text-2xl font-bold text-${kpi.color}-400 mb-0.5`}>
                   {kpi.value}
                 </div>
-                <div className="text-sm text-gray-500">{kpi.label}</div>
+                <div className="text-xs text-gray-500 leading-tight">{kpi.label}</div>
               </motion.div>
             </Link>
           ))}
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-6 mb-6">
-          {/* Today's Sessions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-[#141414] rounded-2xl border border-white/5 p-6"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold">Today's Sessions</h3>
+        {/* Task Management Section - Combined Sessions & Deliverables */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-[#141414] rounded-2xl border border-white/5 p-4 sm:p-6 mb-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold">Lista de Tareas y Sesiones</h2>
+            <div className="flex gap-2">
               <Link to={createPageUrl("Calendars")}>
-                <button className="text-sm text-emerald-400 hover:text-emerald-300">
-                  View Calendar
+                <button className="text-xs sm:text-sm px-3 py-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg hover:bg-emerald-500/20 transition-all">
+                  Ver Calendario
                 </button>
               </Link>
             </div>
+          </div>
 
-            {todaySessions.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-                <p>No sessions scheduled for today</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {todaySessions.slice(0, 5).map((session) => (
-                  <div 
-                    key={session.id}
-                    className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-emerald-500/30 transition-all"
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-semibold text-white">{session.title}</h4>
-                      <span className="text-xs text-gray-500">
-                        {format(parseISO(session.start_time), 'HH:mm')}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
-                      <span className={`px-2 py-0.5 rounded text-xs ${
-                        session.type === 'Session' ? 'bg-emerald-500/10 text-emerald-400' :
-                        session.type === 'Meeting' ? 'bg-blue-500/10 text-blue-400' :
-                        'bg-purple-500/10 text-purple-400'
-                      }`}>
-                        {session.type}
-                      </span>
-                      <span>{session.location}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </motion.div>
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
+            {/* Today's Sessions */}
+            <div className="space-y-3">
+              <h3 className="text-base sm:text-lg font-semibold text-white flex items-center gap-2">
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
+                Sesiones Hoy
+              </h3>
 
-          {/* Due Deliverables */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-[#141414] rounded-2xl border border-white/5 p-6"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold">Due Deliverables</h3>
-              <Link to={createPageUrl("Calendars")}>
-                <button className="text-sm text-emerald-400 hover:text-emerald-300">
-                  View All
-                </button>
-              </Link>
-            </div>
-
-            {dueDeliverables.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <CheckCircle2 className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-                <p>All deliverables up to date!</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {dueDeliverables.slice(0, 5).map((deliverable) => {
-                  const isOverdue = new Date(deliverable.due_date_time) < new Date();
-                  return (
+              {todaySessions.length === 0 ? (
+                <div className="text-center py-6 sm:py-8 text-gray-500 bg-white/5 rounded-xl border border-white/5">
+                  <Calendar className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 text-gray-600" />
+                  <p className="text-sm">No hay sesiones programadas para hoy</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {todaySessions.slice(0, 5).map((session) => (
                     <div 
-                      key={deliverable.id}
-                      className={`p-4 rounded-xl border transition-all ${
-                        isOverdue 
-                          ? 'bg-red-500/5 border-red-500/20' 
-                          : 'bg-white/5 border-white/5'
-                      }`}
+                      key={session.id}
+                      className="p-3 sm:p-4 rounded-xl bg-white/5 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer"
                     >
                       <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-semibold text-white">{deliverable.title}</h4>
-                        {isOverdue && (
-                          <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-400">
-                            Overdue
-                          </span>
-                        )}
+                        <h4 className="font-semibold text-white text-sm sm:text-base">{session.title}</h4>
+                        <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+                          {format(parseISO(session.start_time), 'HH:mm')}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-400">
-                        <span className="px-2 py-0.5 rounded text-xs bg-blue-500/10 text-blue-400">
-                          {deliverable.deliverable_type}
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400">
+                        <span className={`px-2 py-0.5 rounded text-xs ${
+                          session.type === 'Session' ? 'bg-emerald-500/10 text-emerald-400' :
+                          session.type === 'Meeting' ? 'bg-blue-500/10 text-blue-400' :
+                          'bg-purple-500/10 text-purple-400'
+                        }`}>
+                          {session.type}
                         </span>
-                        <span>
-                          Due: {format(parseISO(deliverable.due_date_time), 'MMM d, HH:mm')}
-                        </span>
+                        <span className="truncate">{session.location}</span>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </motion.div>
-        </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-        {/* Second Row */}
-        <div className="grid lg:grid-cols-2 gap-6">
+            {/* Due Deliverables */}
+            <div className="space-y-3">
+              <h3 className="text-base sm:text-lg font-semibold text-white flex items-center gap-2">
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+                Entregables Pendientes
+              </h3>
+
+              {dueDeliverables.length === 0 ? (
+                <div className="text-center py-6 sm:py-8 text-gray-500 bg-white/5 rounded-xl border border-white/5">
+                  <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 text-gray-600" />
+                  <p className="text-sm">¡Todos los entregables al día!</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {dueDeliverables.slice(0, 5).map((deliverable) => {
+                    const isOverdue = new Date(deliverable.due_date_time) < new Date();
+                    return (
+                      <div 
+                        key={deliverable.id}
+                        className={`p-3 sm:p-4 rounded-xl border transition-all cursor-pointer ${
+                          isOverdue 
+                            ? 'bg-red-500/5 border-red-500/20 hover:border-red-500/40' 
+                            : 'bg-white/5 border-white/5 hover:border-blue-500/30'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-semibold text-white text-sm sm:text-base">{deliverable.title}</h4>
+                          {isOverdue && (
+                            <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-400 whitespace-nowrap ml-2">
+                              Atrasado
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-400">
+                          <span className="px-2 py-0.5 rounded text-xs bg-blue-500/10 text-blue-400">
+                            {deliverable.deliverable_type}
+                          </span>
+                          <span className="text-xs">
+                            {format(parseISO(deliverable.due_date_time), 'MMM d, HH:mm')}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Additional Info Row */}
+        <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Pending Revisions */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="bg-[#141414] rounded-2xl border border-white/5 p-6"
+            transition={{ delay: 0.4 }}
+            className="bg-[#141414] rounded-2xl border border-white/5 p-4 sm:p-6"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold">Revisiones Pendientes</h3>
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h3 className="text-base sm:text-lg font-bold flex items-center gap-2">
+                <GitPullRequest className="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" />
+                Revisiones Pendientes
+              </h3>
               <Link to={createPageUrl("Revisions")}>
-                <button className="text-sm text-emerald-400 hover:text-emerald-300">
+                <button className="text-xs sm:text-sm text-emerald-400 hover:text-emerald-300">
                   Ver Todas
                 </button>
               </Link>
             </div>
 
             {openRevisions.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <CheckCircle2 className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-                <p>No hay revisiones pendientes</p>
+              <div className="text-center py-6 sm:py-8 text-gray-500 bg-white/5 rounded-xl border border-white/5">
+                <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 text-gray-600" />
+                <p className="text-sm">No hay revisiones pendientes</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {openRevisions.slice(0, 5).map((revision) => (
                   <div 
                     key={revision.id}
-                    className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-purple-500/30 transition-all"
+                    className="p-3 sm:p-4 rounded-xl bg-white/5 border border-white/5 hover:border-purple-500/30 transition-all cursor-pointer"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
-                        <h4 className="font-semibold text-white mb-1">{revision.request_text}</h4>
+                        <h4 className="font-semibold text-white mb-1 text-sm sm:text-base">{revision.request_text}</h4>
                         <div className="text-xs text-gray-500">Timecode: {revision.timecode}</div>
                       </div>
                       <span className={`px-2 py-0.5 rounded text-xs shrink-0 ml-2 ${
@@ -302,7 +305,7 @@ export default function AdminDashboard() {
                         {revision.severity}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400">
                       <span className="px-2 py-0.5 rounded text-xs bg-purple-500/10 text-purple-400">
                         {revision.revision_type}
                       </span>
@@ -318,25 +321,28 @@ export default function AdminDashboard() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="bg-[#141414] rounded-2xl border border-white/5 p-6"
+            transition={{ delay: 0.5 }}
+            className="bg-[#141414] rounded-2xl border border-white/5 p-4 sm:p-6"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold">Tracks en Producción</h3>
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
+              <h3 className="text-base sm:text-lg font-bold flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
+                Tracks en Producción
+              </h3>
               <Link to={createPageUrl("Tracks")}>
-                <button className="text-sm text-emerald-400 hover:text-emerald-300">
+                <button className="text-xs sm:text-sm text-emerald-400 hover:text-emerald-300">
                   Ver Todos
                 </button>
               </Link>
             </div>
 
             {tracks.filter(t => t.status !== 'completed').length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <CheckCircle2 className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-                <p>No hay tracks en producción</p>
+              <div className="text-center py-6 sm:py-8 text-gray-500 bg-white/5 rounded-xl border border-white/5">
+                <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 text-gray-600" />
+                <p className="text-sm">No hay tracks en producción</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {tracks.filter(t => t.status !== 'completed').slice(0, 5).map((track) => {
                   const createdDate = new Date(track.created_date);
                   const deliveryDate = new Date(createdDate);
@@ -346,11 +352,11 @@ export default function AdminDashboard() {
                   return (
                     <div 
                       key={track.id}
-                      className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-emerald-500/30 transition-all"
+                      className="p-3 sm:p-4 rounded-xl bg-white/5 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer"
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
-                          <h4 className="font-semibold text-white">{track.title}</h4>
+                          <h4 className="font-semibold text-white text-sm sm:text-base">{track.title}</h4>
                           <div className="text-xs text-gray-500 mt-1">
                             Creado: {format(createdDate, 'dd/MM/yyyy')}
                           </div>
@@ -364,7 +370,7 @@ export default function AdminDashboard() {
                           {track.status}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center justify-between text-xs sm:text-sm">
                         <span className="text-gray-400">
                           Entrega: {format(deliveryDate, 'dd/MM/yyyy')}
                         </span>
