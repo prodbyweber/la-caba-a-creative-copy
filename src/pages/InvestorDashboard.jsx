@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
+import AddEquipmentModal from "@/components/investor/AddEquipmentModal";
+import AddDigitalBudgetModal from "@/components/investor/AddDigitalBudgetModal";
+import AddExpenseModal from "@/components/investor/AddExpenseModal";
+import AddRevenueModal from "@/components/investor/AddRevenueModal";
 import { 
   TrendingUp, 
   DollarSign, 
@@ -16,11 +20,22 @@ import {
   CreditCard,
   Clock,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  Plus,
+  Pencil,
+  Trash2
 } from "lucide-react";
 
 export default function InvestorDashboard() {
   const [selectedMonth, setSelectedMonth] = useState("2026-01");
+  const [revenueView, setRevenueView] = useState("mensual"); // mensual, trimestral, semestral
+  const [showEquipmentModal, setShowEquipmentModal] = useState(false);
+  const [showDigitalModal, setShowDigitalModal] = useState(false);
+  const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [showRevenueModal, setShowRevenueModal] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+
+  const queryClient = useQueryClient();
 
   // Queries
   const { data: investments = [] } = useQuery({
@@ -81,11 +96,61 @@ export default function InvestorDashboard() {
   const monthExpenses = monthlyExpenses.filter(exp => exp.month === selectedMonth);
   const totalMonthExpense = monthExpenses.reduce((sum, exp) => sum + exp.amount, 0);
 
-  const monthRevenues = revenues.filter(rev => rev.month === selectedMonth);
-  const totalMonthRevenue = monthRevenues.reduce((sum, rev) => sum + rev.amount, 0);
+  // Revenue calculations based on view
+  const getRevenueData = () => {
+    const currentDate = new Date(selectedMonth + "-01");
+    
+    if (revenueView === "mensual") {
+      const filtered = revenues.filter(rev => rev.month === selectedMonth);
+      return { data: filtered, total: filtered.reduce((sum, rev) => sum + rev.amount, 0) };
+    } else if (revenueView === "trimestral") {
+      const months = [];
+      for (let i = 0; i < 3; i++) {
+        const date = new Date(currentDate);
+        date.setMonth(date.getMonth() - i);
+        months.push(date.toISOString().slice(0, 7));
+      }
+      const filtered = revenues.filter(rev => months.includes(rev.month));
+      return { data: filtered, total: filtered.reduce((sum, rev) => sum + rev.amount, 0) };
+    } else {
+      const months = [];
+      for (let i = 0; i < 6; i++) {
+        const date = new Date(currentDate);
+        date.setMonth(date.getMonth() - i);
+        months.push(date.toISOString().slice(0, 7));
+      }
+      const filtered = revenues.filter(rev => months.includes(rev.month));
+      return { data: filtered, total: filtered.reduce((sum, rev) => sum + rev.amount, 0) };
+    }
+  };
+
+  const { data: revenueData, total: totalRevenue } = getRevenueData();
+  const monthRevenues = revenueData;
+  const totalMonthRevenue = totalRevenue;
 
   const netProfit = totalMonthRevenue - totalMonthExpense;
   const profitMargin = totalMonthRevenue > 0 ? ((netProfit / totalMonthRevenue) * 100).toFixed(1) : 0;
+
+  // Delete mutations
+  const deleteEquipment = useMutation({
+    mutationFn: (id) => base44.entities.Equipment.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['equipment'] })
+  });
+
+  const deleteDigitalBudget = useMutation({
+    mutationFn: (id) => base44.entities.DigitalBudget.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['digitalBudgets'] })
+  });
+
+  const deleteExpense = useMutation({
+    mutationFn: (id) => base44.entities.MonthlyExpense.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['monthlyExpenses'] })
+  });
+
+  const deleteRevenue = useMutation({
+    mutationFn: (id) => base44.entities.Revenue.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['revenues'] })
+  });
 
   const kpis = [
     {
@@ -203,9 +268,21 @@ export default function InvestorDashboard() {
               <Package className="w-5 h-5 text-blue-600" />
               Inversión en Equipo Audiovisual
             </h2>
-            <div className="text-right">
-              <div className="text-sm text-gray-600">Invertido</div>
-              <div className="text-lg font-bold text-gray-900">€{purchasedEquipmentCost.toLocaleString()}</div>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <div className="text-sm text-gray-600">Invertido</div>
+                <div className="text-lg font-bold text-gray-900">€{purchasedEquipmentCost.toLocaleString()}</div>
+              </div>
+              <button
+                onClick={() => {
+                  setEditingItem(null);
+                  setShowEquipmentModal(true);
+                }}
+                className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Agregar
+              </button>
             </div>
           </div>
 
@@ -218,6 +295,7 @@ export default function InvestorDashboard() {
                   <th className="text-right py-2 px-3 text-gray-700 font-medium">Precio</th>
                   <th className="text-center py-2 px-3 text-gray-700 font-medium">Estado</th>
                   <th className="text-center py-2 px-3 text-gray-700 font-medium">Impacto</th>
+                  <th className="text-center py-2 px-3 text-gray-700 font-medium">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -251,6 +329,25 @@ export default function InvestorDashboard() {
                           {eq.impact}
                         </span>
                       </td>
+                      <td className="py-3 px-3 text-center">
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => {
+                              setEditingItem(eq);
+                              setShowEquipmentModal(true);
+                            }}
+                            className="p-1 hover:bg-blue-50 rounded text-blue-600"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => deleteEquipment.mutate(eq.id)}
+                            className="p-1 hover:bg-red-50 rounded text-red-600"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -268,10 +365,22 @@ export default function InvestorDashboard() {
             transition={{ delay: 0.5 }}
             className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm"
           >
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-purple-600" />
-              Presupuesto Digital
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <CreditCard className="w-5 h-5 text-purple-600" />
+                Presupuesto Desarrollo Digital
+              </h3>
+              <button
+                onClick={() => {
+                  setEditingItem(null);
+                  setShowDigitalModal(true);
+                }}
+                className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2 text-sm"
+              >
+                <Plus className="w-4 h-4" />
+                Agregar
+              </button>
+            </div>
 
             <div className="grid grid-cols-3 gap-3 mb-4">
               <div className="bg-blue-50 rounded-lg p-3">
@@ -289,18 +398,41 @@ export default function InvestorDashboard() {
             </div>
 
             <div className="space-y-2">
-              {digitalBudgets.map((db) => (
-                <div key={db.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <div className="font-medium text-gray-900 text-sm">{db.concept}</div>
-                    <div className="text-xs text-gray-600">{db.category}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-semibold text-gray-900">€{db.executed_cost.toLocaleString()} / €{db.assigned_budget.toLocaleString()}</div>
-                    <span className="text-xs text-gray-600">{db.status}</span>
-                  </div>
+              {digitalBudgets.length === 0 ? (
+                <div className="text-center py-6 text-gray-500 text-sm">
+                  No hay presupuestos registrados
                 </div>
-              ))}
+              ) : (
+                digitalBudgets.map((db) => (
+                  <div key={db.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg group">
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900 text-sm">{db.concept}</div>
+                      <div className="text-xs text-gray-600">{db.category}</div>
+                    </div>
+                    <div className="text-right mr-2">
+                      <div className="text-sm font-semibold text-gray-900">€{db.executed_cost.toLocaleString()} / €{db.assigned_budget.toLocaleString()}</div>
+                      <span className="text-xs text-gray-600">{db.status}</span>
+                    </div>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => {
+                          setEditingItem(db);
+                          setShowDigitalModal(true);
+                        }}
+                        className="p-1 hover:bg-purple-50 rounded text-purple-600"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => deleteDigitalBudget.mutate(db.id)}
+                        className="p-1 hover:bg-red-50 rounded text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </motion.div>
 
@@ -361,12 +493,24 @@ export default function InvestorDashboard() {
                 <Clock className="w-5 h-5 text-red-600" />
                 Gastos Mensuales
               </h3>
-              <input
-                type="month"
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              <div className="flex items-center gap-2">
+                <input
+                  type="month"
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  onClick={() => {
+                    setEditingItem(null);
+                    setShowExpenseModal(true);
+                  }}
+                  className="px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2 text-sm"
+                >
+                  <Plus className="w-4 h-4" />
+                  Agregar
+                </button>
+              </div>
             </div>
 
             <div className="bg-red-50 rounded-lg p-4 mb-4">
@@ -381,12 +525,29 @@ export default function InvestorDashboard() {
                 </div>
               ) : (
                 monthExpenses.map((exp) => (
-                  <div key={exp.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
+                  <div key={exp.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg group">
+                    <div className="flex-1">
                       <div className="font-medium text-gray-900 text-sm">{exp.category}</div>
                       {exp.description && <div className="text-xs text-gray-600">{exp.description}</div>}
                     </div>
-                    <div className="text-sm font-semibold text-gray-900">€{exp.amount.toLocaleString()}</div>
+                    <div className="text-sm font-semibold text-gray-900 mr-2">€{exp.amount.toLocaleString()}</div>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => {
+                          setEditingItem(exp);
+                          setShowExpenseModal(true);
+                        }}
+                        className="p-1 hover:bg-red-50 rounded text-red-600"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => deleteExpense.mutate(exp.id)}
+                        className="p-1 hover:bg-red-50 rounded text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))
               )}
@@ -400,10 +561,33 @@ export default function InvestorDashboard() {
             transition={{ delay: 0.8 }}
             className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm"
           >
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-emerald-600" />
-              Ingresos del Mes
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-emerald-600" />
+                Ingresos
+              </h3>
+              <div className="flex items-center gap-2">
+                <select
+                  value={revenueView}
+                  onChange={(e) => setRevenueView(e.target.value)}
+                  className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                >
+                  <option value="mensual">Mensual</option>
+                  <option value="trimestral">Trimestral (3 meses)</option>
+                  <option value="semestral">Semestral (6 meses)</option>
+                </select>
+                <button
+                  onClick={() => {
+                    setEditingItem(null);
+                    setShowRevenueModal(true);
+                  }}
+                  className="px-3 py-1 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 flex items-center gap-2 text-sm"
+                >
+                  <Plus className="w-4 h-4" />
+                  Agregar
+                </button>
+              </div>
+            </div>
 
             <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-emerald-50 rounded-lg p-3">
@@ -434,12 +618,32 @@ export default function InvestorDashboard() {
                 </div>
               ) : (
                 monthRevenues.map((rev) => (
-                  <div key={rev.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div>
+                  <div key={rev.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg group">
+                    <div className="flex-1">
                       <div className="font-medium text-gray-900 text-sm">{rev.source}</div>
-                      {rev.description && <div className="text-xs text-gray-600">{rev.description}</div>}
+                      <div className="text-xs text-gray-600">
+                        {rev.description && <span>{rev.description} • </span>}
+                        <span>{rev.month}</span>
+                      </div>
                     </div>
-                    <div className="text-sm font-semibold text-emerald-700">€{rev.amount.toLocaleString()}</div>
+                    <div className="text-sm font-semibold text-emerald-700 mr-2">€{rev.amount.toLocaleString()}</div>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => {
+                          setEditingItem(rev);
+                          setShowRevenueModal(true);
+                        }}
+                        className="p-1 hover:bg-emerald-50 rounded text-emerald-600"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => deleteRevenue.mutate(rev.id)}
+                        className="p-1 hover:bg-red-50 rounded text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))
               )}
@@ -583,6 +787,42 @@ export default function InvestorDashboard() {
           )}
         </motion.div>
       </div>
+
+      {/* Modals */}
+      <AddEquipmentModal 
+        isOpen={showEquipmentModal} 
+        onClose={() => {
+          setShowEquipmentModal(false);
+          setEditingItem(null);
+        }} 
+        equipment={editingItem}
+      />
+      <AddDigitalBudgetModal 
+        isOpen={showDigitalModal} 
+        onClose={() => {
+          setShowDigitalModal(false);
+          setEditingItem(null);
+        }} 
+        budget={editingItem}
+      />
+      <AddExpenseModal 
+        isOpen={showExpenseModal} 
+        onClose={() => {
+          setShowExpenseModal(false);
+          setEditingItem(null);
+        }} 
+        expense={editingItem}
+        defaultMonth={selectedMonth}
+      />
+      <AddRevenueModal 
+        isOpen={showRevenueModal} 
+        onClose={() => {
+          setShowRevenueModal(false);
+          setEditingItem(null);
+        }} 
+        revenue={editingItem}
+        defaultMonth={selectedMonth}
+      />
     </AdminLayout>
   );
 }
