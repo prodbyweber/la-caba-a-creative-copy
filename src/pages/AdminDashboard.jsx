@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
+import VoiceAssistant from "@/components/admin/VoiceAssistant";
+import CreateSessionModal from "@/components/admin/CreateSessionModal";
+import CreateDeliverableModal from "@/components/admin/CreateDeliverableModal";
+import CreateRevisionModal from "@/components/admin/CreateRevisionModal";
+import StatusButton from "@/components/admin/StatusButton";
 import { 
   Calendar, 
   Clock, 
@@ -11,13 +16,20 @@ import {
   FolderKanban,
   TrendingUp,
   Users,
-  CheckCircle2
+  CheckCircle2,
+  Plus
 } from "lucide-react";
 import { format, isToday, parseISO } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 export default function AdminDashboard() {
+  const [showSessionModal, setShowSessionModal] = useState(false);
+  const [showDeliverableModal, setShowDeliverableModal] = useState(false);
+  const [showRevisionModal, setShowRevisionModal] = useState(false);
+  
+  const queryClient = useQueryClient();
+
   const { data: sessions = [] } = useQuery({
     queryKey: ['sessions'],
     queryFn: () => base44.entities.Session.list('-start_time')
@@ -70,6 +82,22 @@ export default function AdminDashboard() {
   );
 
   const activeArtists = artists.filter(a => a.status === 'Active');
+
+  // Update status mutations
+  const updateSessionStatus = useMutation({
+    mutationFn: ({ id, status }) => base44.entities.Session.update(id, { status }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] })
+  });
+
+  const updateDeliverableStatus = useMutation({
+    mutationFn: ({ id, status }) => base44.entities.Deliverable.update(id, { status }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['deliverables'] })
+  });
+
+  const updateRevisionStatus = useMutation({
+    mutationFn: ({ id, status }) => base44.entities.Revision.update(id, { status }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['revisions'] })
+  });
 
   const kpis = [
     {
@@ -158,9 +186,30 @@ export default function AdminDashboard() {
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <h2 className="text-xl sm:text-2xl font-bold">Lista de Tareas y Sesiones</h2>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setShowSessionModal(true)}
+                className="text-xs sm:text-sm px-3 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 transition-all flex items-center gap-1"
+              >
+                <Plus className="w-3 h-3" />
+                Sesión
+              </button>
+              <button
+                onClick={() => setShowDeliverableModal(true)}
+                className="text-xs sm:text-sm px-3 py-1.5 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-all flex items-center gap-1"
+              >
+                <Plus className="w-3 h-3" />
+                Entregable
+              </button>
+              <button
+                onClick={() => setShowRevisionModal(true)}
+                className="text-xs sm:text-sm px-3 py-1.5 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition-all flex items-center gap-1"
+              >
+                <Plus className="w-3 h-3" />
+                Revisión
+              </button>
               <Link to={createPageUrl("Calendars")}>
-                <button className="text-xs sm:text-sm px-3 py-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg hover:bg-emerald-500/20 transition-all">
+                <button className="text-xs sm:text-sm px-3 py-1.5 bg-white/5 text-gray-400 rounded-lg hover:bg-white/10 transition-all">
                   Ver Calendario
                 </button>
               </Link>
@@ -189,9 +238,17 @@ export default function AdminDashboard() {
                     >
                       <div className="flex items-start justify-between mb-2">
                         <h4 className="font-semibold text-white text-sm sm:text-base">{session.title}</h4>
-                        <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
-                          {format(parseISO(session.start_time), 'HH:mm')}
-                        </span>
+                        <div className="flex items-center gap-2 ml-2">
+                          <StatusButton 
+                            status={session.status}
+                            onStatusChange={(id, status) => updateSessionStatus.mutate({ id, status })}
+                            entity="session"
+                            id={session.id}
+                          />
+                          <span className="text-xs text-gray-500 whitespace-nowrap">
+                            {format(parseISO(session.start_time), 'HH:mm')}
+                          </span>
+                        </div>
                       </div>
                       <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400">
                         <span className={`px-2 py-0.5 rounded text-xs ${
@@ -235,12 +292,20 @@ export default function AdminDashboard() {
                         }`}
                       >
                         <div className="flex items-start justify-between mb-2">
-                          <h4 className="font-semibold text-white text-sm sm:text-base">{deliverable.title}</h4>
-                          {isOverdue && (
-                            <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-400 whitespace-nowrap ml-2">
-                              Atrasado
-                            </span>
-                          )}
+                          <h4 className="font-semibold text-white text-sm sm:text-base flex-1">{deliverable.title}</h4>
+                          <div className="flex items-center gap-2 ml-2">
+                            <StatusButton 
+                              status={deliverable.status}
+                              onStatusChange={(id, status) => updateDeliverableStatus.mutate({ id, status })}
+                              entity="deliverable"
+                              id={deliverable.id}
+                            />
+                            {isOverdue && (
+                              <span className="px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-400 whitespace-nowrap">
+                                Atrasado
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-400">
                           <span className="px-2 py-0.5 rounded text-xs bg-blue-500/10 text-blue-400">
@@ -297,13 +362,21 @@ export default function AdminDashboard() {
                         <h4 className="font-semibold text-white mb-1 text-sm sm:text-base">{revision.request_text}</h4>
                         <div className="text-xs text-gray-500">Timecode: {revision.timecode}</div>
                       </div>
-                      <span className={`px-2 py-0.5 rounded text-xs shrink-0 ml-2 ${
-                        revision.severity === 'Critical' ? 'bg-red-500/20 text-red-400' :
-                        revision.severity === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                        'bg-blue-500/20 text-blue-400'
-                      }`}>
-                        {revision.severity}
-                      </span>
+                      <div className="flex items-center gap-2 ml-2">
+                        <StatusButton 
+                          status={revision.status}
+                          onStatusChange={(id, status) => updateRevisionStatus.mutate({ id, status })}
+                          entity="revision"
+                          id={revision.id}
+                        />
+                        <span className={`px-2 py-0.5 rounded text-xs shrink-0 ${
+                          revision.severity === 'Critical' ? 'bg-red-500/20 text-red-400' :
+                          revision.severity === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                          'bg-blue-500/20 text-blue-400'
+                        }`}>
+                          {revision.severity}
+                        </span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400">
                       <span className="px-2 py-0.5 rounded text-xs bg-purple-500/10 text-purple-400">
@@ -390,6 +463,14 @@ export default function AdminDashboard() {
           </motion.div>
         </div>
       </div>
+
+      {/* Modals */}
+      <CreateSessionModal isOpen={showSessionModal} onClose={() => setShowSessionModal(false)} />
+      <CreateDeliverableModal isOpen={showDeliverableModal} onClose={() => setShowDeliverableModal(false)} />
+      <CreateRevisionModal isOpen={showRevisionModal} onClose={() => setShowRevisionModal(false)} />
+      
+      {/* Voice Assistant */}
+      <VoiceAssistant />
     </AdminLayout>
   );
 }
