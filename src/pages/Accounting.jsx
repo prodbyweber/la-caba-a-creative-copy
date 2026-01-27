@@ -81,19 +81,21 @@ export default function Accounting() {
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+            className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-gray-900 focus:outline-none focus:border-emerald-500/50"
+            style={{ color: '#111' }}
           >
             {[2024, 2025, 2026, 2027].map(year => (
-              <option key={year} value={year}>{year}</option>
+              <option key={year} value={year} style={{ color: '#111' }}>{year}</option>
             ))}
           </select>
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(Number(e.target.value))}
-            className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+            className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-gray-900 focus:outline-none focus:border-emerald-500/50"
+            style={{ color: '#111' }}
           >
             {months.map((month, idx) => (
-              <option key={idx} value={idx + 1}>{month}</option>
+              <option key={idx} value={idx + 1} style={{ color: '#111' }}>{month}</option>
             ))}
           </select>
         </div>
@@ -339,16 +341,17 @@ export default function Accounting() {
 }
 
 function IncomeModal({ onClose, selectedMonth, selectedYear }) {
+  const currentDate = new Date();
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
+    date: currentDate.toISOString().split('T')[0],
     artist_id: '',
     artist_name: '',
     services: [],
     amount: '',
     payment_method: '',
     notes: '',
-    month: selectedMonth,
-    year: selectedYear
+    month: currentDate.getMonth() + 1,
+    year: currentDate.getFullYear()
   });
 
   const queryClient = useQueryClient();
@@ -395,6 +398,35 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Mes *</label>
+              <select
+                value={formData.month}
+                onChange={(e) => setFormData({ ...formData, month: Number(e.target.value) })}
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                required
+              >
+                {['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'].map((month, idx) => (
+                  <option key={idx} value={idx + 1}>{month}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Año *</label>
+              <select
+                value={formData.year}
+                onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                required
+              >
+                {[2024, 2025, 2026, 2027, 2028].map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Fecha *</label>
@@ -516,15 +548,16 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
 }
 
 function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
+  const currentDate = new Date();
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
+    date: currentDate.toISOString().split('T')[0],
     category: 'Empresa',
     concept: '',
     amount: '',
     payment_method: '',
     notes: '',
-    month: selectedMonth,
-    year: selectedYear
+    month: currentDate.getMonth() + 1,
+    year: currentDate.getFullYear()
   });
 
   const queryClient = useQueryClient();
@@ -560,6 +593,35 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Mes *</label>
+              <select
+                value={formData.month}
+                onChange={(e) => setFormData({ ...formData, month: Number(e.target.value) })}
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                required
+              >
+                {['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'].map((month, idx) => (
+                  <option key={idx} value={idx + 1}>{month}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Año *</label>
+              <select
+                value={formData.year}
+                onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                required
+              >
+                {[2024, 2025, 2026, 2027, 2028].map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Fecha *</label>
