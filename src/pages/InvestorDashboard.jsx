@@ -7,6 +7,8 @@ import AddEquipmentModal from "@/components/investor/AddEquipmentModal";
 import AddDigitalBudgetModal from "@/components/investor/AddDigitalBudgetModal";
 import AddExpenseModal from "@/components/investor/AddExpenseModal";
 import AddRevenueModal from "@/components/investor/AddRevenueModal";
+import AddPendingPurchaseModal from "@/components/investor/AddPendingPurchaseModal";
+import AddPhaseModal from "@/components/investor/AddPhaseModal";
 import { 
   TrendingUp, 
   DollarSign, 
@@ -33,6 +35,8 @@ export default function InvestorDashboard() {
   const [showDigitalModal, setShowDigitalModal] = useState(false);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [showRevenueModal, setShowRevenueModal] = useState(false);
+  const [showPendingPurchaseModal, setShowPendingPurchaseModal] = useState(false);
+  const [showPhaseModal, setShowPhaseModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
 
   const queryClient = useQueryClient();
@@ -150,6 +154,16 @@ export default function InvestorDashboard() {
   const deleteRevenue = useMutation({
     mutationFn: (id) => base44.entities.Revenue.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['revenues'] })
+  });
+
+  const deletePendingPurchase = useMutation({
+    mutationFn: (id) => base44.entities.PendingPurchase.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['pendingPurchases'] })
+  });
+
+  const deletePhase = useMutation({
+    mutationFn: (id) => base44.entities.ProjectPhase.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['phases'] })
   });
 
   const kpis = [
@@ -671,10 +685,22 @@ export default function InvestorDashboard() {
           transition={{ delay: 0.9 }}
           className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 mb-6 shadow-sm"
         >
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5 text-orange-600" />
-            Productos y Compras Pendientes
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5 text-orange-600" />
+              Productos y Compras Pendientes
+            </h2>
+            <button
+              onClick={() => {
+                setEditingItem(null);
+                setShowPendingPurchaseModal(true);
+              }}
+              className="px-3 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-2 text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Agregar
+            </button>
+          </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -685,12 +711,13 @@ export default function InvestorDashboard() {
                   <th className="text-center py-2 px-3 text-gray-700 font-medium">Prioridad</th>
                   <th className="text-center py-2 px-3 text-gray-700 font-medium">Impacto</th>
                   <th className="text-center py-2 px-3 text-gray-700 font-medium">Estado</th>
+                  <th className="text-center py-2 px-3 text-gray-700 font-medium">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {pendingPurchases.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="text-center py-8 text-gray-500">
+                    <td colSpan="6" className="text-center py-8 text-gray-500">
                       No hay compras pendientes
                     </td>
                   </tr>
@@ -726,6 +753,25 @@ export default function InvestorDashboard() {
                           {purchase.status}
                         </span>
                       </td>
+                      <td className="py-3 px-3">
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => {
+                              setEditingItem(purchase);
+                              setShowPendingPurchaseModal(true);
+                            }}
+                            className="p-1 hover:bg-orange-50 rounded text-orange-600"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => deletePendingPurchase.mutate(purchase.id)}
+                            className="p-1 hover:bg-red-50 rounded text-red-600"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))
                 )}
@@ -741,10 +787,22 @@ export default function InvestorDashboard() {
           transition={{ delay: 1 }}
           className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 shadow-sm"
         >
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-blue-600" />
-            Cronograma y Fases del Proyecto
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-blue-600" />
+              Cronograma y Fases del Proyecto
+            </h2>
+            <button
+              onClick={() => {
+                setEditingItem(null);
+                setShowPhaseModal(true);
+              }}
+              className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Agregar Fase
+            </button>
+          </div>
 
           {phases.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
@@ -755,18 +813,35 @@ export default function InvestorDashboard() {
               {phases.map((phase) => (
                 <div key={phase.id} className="border border-gray-200 rounded-lg p-4">
                   <div className="flex items-start justify-between mb-3">
-                    <div>
+                    <div className="flex-1">
                       <h4 className="font-bold text-gray-900 text-base">{phase.phase_name}</h4>
                       <p className="text-sm text-gray-600 mt-1">{phase.objectives}</p>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      phase.status === "Completada" ? "bg-emerald-100 text-emerald-700" :
-                      phase.status === "En Progreso" ? "bg-blue-100 text-blue-700" :
-                      phase.status === "Retrasada" ? "bg-red-100 text-red-700" :
-                      "bg-gray-100 text-gray-700"
-                    }`}>
-                      {phase.status}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        phase.status === "Completada" ? "bg-emerald-100 text-emerald-700" :
+                        phase.status === "En Progreso" ? "bg-blue-100 text-blue-700" :
+                        phase.status === "Retrasada" ? "bg-red-100 text-red-700" :
+                        "bg-gray-100 text-gray-700"
+                      }`}>
+                        {phase.status}
+                      </span>
+                      <button
+                        onClick={() => {
+                          setEditingItem(phase);
+                          setShowPhaseModal(true);
+                        }}
+                        className="p-1 hover:bg-blue-50 rounded text-blue-600"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => deletePhase.mutate(phase.id)}
+                        className="p-1 hover:bg-red-50 rounded text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
@@ -835,6 +910,22 @@ export default function InvestorDashboard() {
         }} 
         revenue={editingItem}
         defaultMonth={selectedMonth}
+      />
+      <AddPendingPurchaseModal 
+        isOpen={showPendingPurchaseModal} 
+        onClose={() => {
+          setShowPendingPurchaseModal(false);
+          setEditingItem(null);
+        }} 
+        purchase={editingItem}
+      />
+      <AddPhaseModal 
+        isOpen={showPhaseModal} 
+        onClose={() => {
+          setShowPhaseModal(false);
+          setEditingItem(null);
+        }} 
+        phase={editingItem}
       />
     </AdminLayout>
   );

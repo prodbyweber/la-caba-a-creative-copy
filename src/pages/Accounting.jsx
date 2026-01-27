@@ -44,6 +44,16 @@ export default function Accounting() {
   const totalExpenses = businessExpenses + personalExpenses;
   const netProfit = totalIncome - totalExpenses;
 
+  // Total de todos los gastos del año
+  const { data: allExpenses = [] } = useQuery({
+    queryKey: ['allExpenses', selectedYear],
+    queryFn: async () => {
+      const all = await base44.entities.Expense.list('-date');
+      return all.filter(e => e.year === selectedYear);
+    }
+  });
+  const totalYearExpenses = allExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+
   const months = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -87,6 +97,24 @@ export default function Accounting() {
             ))}
           </select>
         </div>
+
+        {/* Total Gastos del Año */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border border-orange-500/20 rounded-2xl p-6 mb-6"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-2">Total de Gastos {selectedYear}</h3>
+              <div className="text-4xl font-bold text-white">€{totalYearExpenses.toLocaleString()}</div>
+              <p className="text-sm text-gray-400 mt-2">Acumulado del año completo</p>
+            </div>
+            <div className="w-16 h-16 rounded-xl bg-orange-500/20 flex items-center justify-center">
+              <TrendingDown className="w-8 h-8 text-orange-400" />
+            </div>
+          </div>
+        </motion.div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
