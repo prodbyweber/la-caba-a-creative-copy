@@ -11,7 +11,8 @@ export default function AddExpenseModal({ isOpen, onClose, expense = null, defau
     category: "Operativos",
     amount: 0,
     description: "",
-    is_recurring: false
+    is_recurring: false,
+    payment_status: "unpaid"
   });
 
   const mutation = useMutation({
@@ -111,6 +112,18 @@ export default function AddExpenseModal({ isOpen, onClose, expense = null, defau
               <label htmlFor="recurring" className="text-sm text-gray-300">
                 Es un gasto recurrente
               </label>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Estado de Pago</label>
+              <select
+                value={formData.payment_status}
+                onChange={(e) => setFormData({ ...formData, payment_status: e.target.value })}
+                className="w-full px-3 py-2 bg-[#0f1011] border border-white/10 rounded-lg focus:ring-2 focus:ring-red-500 text-white"
+              >
+                <option value="unpaid">Sin Pagar</option>
+                <option value="paid">Pagado</option>
+              </select>
             </div>
 
             <div className="flex gap-3 pt-4">

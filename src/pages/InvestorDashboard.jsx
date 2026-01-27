@@ -527,13 +527,23 @@ export default function InvestorDashboard() {
                 monthExpenses.map((exp) => (
                   <div key={exp.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg group">
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900 text-sm">{exp.category}</div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className="font-medium text-gray-900 text-sm">{exp.category}</div>
+                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                          exp.payment_status === 'paid' 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-red-100 text-red-700'
+                        }`}>
+                          {exp.payment_status === 'paid' ? 'Pagado' : 'Sin Pagar'}
+                        </span>
+                      </div>
                       {exp.description && <div className="text-xs text-gray-600">{exp.description}</div>}
                     </div>
                     <div className="text-sm font-semibold text-gray-900 mr-2">€{exp.amount.toLocaleString()}</div>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setEditingItem(exp);
                           setShowExpenseModal(true);
                         }}
@@ -542,7 +552,10 @@ export default function InvestorDashboard() {
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => deleteExpense.mutate(exp.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteExpense.mutate(exp.id);
+                        }}
                         className="p-1 hover:bg-red-50 rounded text-red-600"
                       >
                         <Trash2 className="w-4 h-4" />
