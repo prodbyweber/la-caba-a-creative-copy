@@ -40,35 +40,35 @@ export default function AddEquipmentModal({ isOpen, onClose, equipment = null })
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto"
+          className="bg-[#1a1a1c] rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto border border-white/10"
         >
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900">
+            <h3 className="text-xl font-bold text-white">
               {equipment ? "Editar Equipo" : "Agregar Equipo"}
             </h3>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <button onClick={onClose} className="text-gray-400 hover:text-white">
               <X className="w-5 h-5" />
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Nombre</label>
               <input
                 type="text"
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-[#0f1011] border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Categoría</label>
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-[#0f1011] border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
               >
                 <option value="Audio">Audio</option>
                 <option value="Video">Video</option>
@@ -79,23 +79,23 @@ export default function AddEquipmentModal({ isOpen, onClose, equipment = null })
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Precio (€)</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Precio (€)</label>
               <input
                 type="number"
                 required
                 step="0.01"
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-[#0f1011] border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Estado</label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-[#0f1011] border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
               >
                 <option value="Planificado">Planificado</option>
                 <option value="Pendiente">Pendiente</option>
@@ -104,11 +104,11 @@ export default function AddEquipmentModal({ isOpen, onClose, equipment = null })
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Impacto</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Impacto</label>
               <select
                 value={formData.impact}
                 onChange={(e) => setFormData({ ...formData, impact: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-[#0f1011] border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
               >
                 <option value="Bajo">Bajo</option>
                 <option value="Medio">Medio</option>
@@ -117,22 +117,22 @@ export default function AddEquipmentModal({ isOpen, onClose, equipment = null })
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Compra</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Fecha de Compra</label>
               <input
                 type="date"
                 value={formData.purchase_date}
                 onChange={(e) => setFormData({ ...formData, purchase_date: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-[#0f1011] border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Link de Referencia</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Link de Referencia</label>
               <input
                 type="url"
                 value={formData.reference_link}
                 onChange={(e) => setFormData({ ...formData, reference_link: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-[#0f1011] border border-white/10 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
                 placeholder="https://..."
               />
             </div>
@@ -141,7 +141,7 @@ export default function AddEquipmentModal({ isOpen, onClose, equipment = null })
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                className="flex-1 px-4 py-2 border border-white/10 rounded-lg text-gray-300 hover:bg-white/5"
               >
                 Cancelar
               </button>
