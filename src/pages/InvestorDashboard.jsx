@@ -7,8 +7,6 @@ import AddEquipmentModal from "@/components/investor/AddEquipmentModal";
 import AddDigitalBudgetModal from "@/components/investor/AddDigitalBudgetModal";
 import AddExpenseModal from "@/components/investor/AddExpenseModal";
 import AddRevenueModal from "@/components/investor/AddRevenueModal";
-import AddPendingPurchaseModal from "@/components/investor/AddPendingPurchaseModal";
-import AddProjectPhaseModal from "@/components/investor/AddProjectPhaseModal";
 import { 
   TrendingUp, 
   DollarSign, 
@@ -35,8 +33,6 @@ export default function InvestorDashboard() {
   const [showDigitalModal, setShowDigitalModal] = useState(false);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [showRevenueModal, setShowRevenueModal] = useState(false);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
-  const [showPhaseModal, setShowPhaseModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
 
   const queryClient = useQueryClient();
@@ -154,16 +150,6 @@ export default function InvestorDashboard() {
   const deleteRevenue = useMutation({
     mutationFn: (id) => base44.entities.Revenue.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['revenues'] })
-  });
-
-  const deletePurchase = useMutation({
-    mutationFn: (id) => base44.entities.PendingPurchase.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['pendingPurchases'] })
-  });
-
-  const deletePhase = useMutation({
-    mutationFn: (id) => base44.entities.ProjectPhase.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['projectPhases'] })
   });
 
   const kpis = [
@@ -849,22 +835,6 @@ export default function InvestorDashboard() {
         }} 
         revenue={editingItem}
         defaultMonth={selectedMonth}
-      />
-      <AddPendingPurchaseModal 
-        isOpen={showPurchaseModal} 
-        onClose={() => {
-          setShowPurchaseModal(false);
-          setEditingItem(null);
-        }} 
-        purchase={editingItem}
-      />
-      <AddProjectPhaseModal 
-        isOpen={showPhaseModal} 
-        onClose={() => {
-          setShowPhaseModal(false);
-          setEditingItem(null);
-        }} 
-        phase={editingItem}
       />
     </AdminLayout>
   );
