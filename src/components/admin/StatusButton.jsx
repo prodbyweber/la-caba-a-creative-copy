@@ -21,26 +21,38 @@ export default function StatusButton({ status, onStatusChange, entity, id }) {
   const statusConfig = getStatusConfig();
   const normalizedStatus = status?.toLowerCase().replace(/_/g, '');
   
-  let currentKey = 'pending';
-  if (normalizedStatus === 'inprogress') currentKey = 'inProgress';
-  else if (normalizedStatus === 'done' || normalizedStatus === 'fixed' || normalizedStatus === 'completed') currentKey = 'done';
-  else if (normalizedStatus === 'open' || normalizedStatus === 'pending') currentKey = 'pending';
+  let currentKey;
+  if (normalizedStatus === 'inprogress' || normalizedStatus === 'confirmed' || normalizedStatus === 'sent') {
+    currentKey = 'inProgress';
+  } else if (normalizedStatus === 'done' || normalizedStatus === 'fixed' || normalizedStatus === 'completed' || normalizedStatus === 'approved') {
+    currentKey = entity === 'revision' ? 'fixed' : 'done';
+  } else if (normalizedStatus === 'open') {
+    currentKey = 'open';
+  } else {
+    currentKey = entity === 'revision' ? 'open' : 'pending';
+  }
 
-  const currentConfig = statusConfig[currentKey] || statusConfig.pending;
+  const currentConfig = statusConfig[currentKey];
+  if (!currentConfig) return null;
+  
   const Icon = currentConfig.icon;
 
   const handleClick = (e) => {
     e.stopPropagation();
     
+    const isRevision = entity === 'revision';
+    const pendingKey = isRevision ? 'open' : 'pending';
+    const doneKey = isRevision ? 'fixed' : 'done';
+    
     const nextStatus = 
-      currentKey === 'pending' ? 'inProgress' : 
-      currentKey === 'inProgress' ? 'done' : 
-      'pending';
+      currentKey === pendingKey ? 'inProgress' : 
+      currentKey === 'inProgress' ? doneKey : 
+      pendingKey;
     
     const statusValue = 
       entity === 'session' ? (nextStatus === 'pending' ? 'Pending' : nextStatus === 'inProgress' ? 'Confirmed' : 'Done') :
       entity === 'deliverable' ? (nextStatus === 'pending' ? 'Pending' : nextStatus === 'inProgress' ? 'Sent' : 'Approved') :
-      entity === 'revision' ? (nextStatus === 'pending' ? 'Open' : nextStatus === 'inProgress' ? 'InProgress' : 'Fixed') :
+      entity === 'revision' ? (nextStatus === 'open' ? 'Open' : nextStatus === 'inProgress' ? 'InProgress' : 'Fixed') :
       status;
 
     onStatusChange(id, statusValue);
