@@ -6,12 +6,25 @@ import { base44 } from "@/api/base44Client";
 
 export default function AddRevenueModal({ isOpen, onClose, revenue = null, defaultMonth }) {
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState(revenue || {
+  const [formData, setFormData] = useState({
     month: defaultMonth || new Date().toISOString().slice(0, 7),
     source: "Estudio",
     amount: 0,
     description: ""
   });
+
+  React.useEffect(() => {
+    if (revenue) {
+      setFormData(revenue);
+    } else {
+      setFormData({
+        month: defaultMonth || new Date().toISOString().slice(0, 7),
+        source: "Estudio",
+        amount: 0,
+        description: ""
+      });
+    }
+  }, [revenue, defaultMonth, isOpen]);
 
   const mutation = useMutation({
     mutationFn: (data) => revenue 

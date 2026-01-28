@@ -6,7 +6,7 @@ import { base44 } from "@/api/base44Client";
 
 export default function AddEquipmentModal({ isOpen, onClose, equipment = null }) {
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState(equipment || {
+  const [formData, setFormData] = useState({
     name: "",
     category: "Audio",
     price: 0,
@@ -15,6 +15,22 @@ export default function AddEquipmentModal({ isOpen, onClose, equipment = null })
     purchase_date: "",
     reference_link: ""
   });
+
+  React.useEffect(() => {
+    if (equipment) {
+      setFormData(equipment);
+    } else {
+      setFormData({
+        name: "",
+        category: "Audio",
+        price: 0,
+        status: "Planificado",
+        impact: "Medio",
+        purchase_date: "",
+        reference_link: ""
+      });
+    }
+  }, [equipment, isOpen]);
 
   const mutation = useMutation({
     mutationFn: (data) => equipment 

@@ -6,13 +6,27 @@ import { base44 } from "@/api/base44Client";
 
 export default function AddDigitalBudgetModal({ isOpen, onClose, budget = null }) {
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState(budget || {
+  const [formData, setFormData] = useState({
     concept: "",
     category: "Desarrollo Web",
     assigned_budget: 0,
     executed_cost: 0,
     status: "MVP"
   });
+
+  React.useEffect(() => {
+    if (budget) {
+      setFormData(budget);
+    } else {
+      setFormData({
+        concept: "",
+        category: "Desarrollo Web",
+        assigned_budget: 0,
+        executed_cost: 0,
+        status: "MVP"
+      });
+    }
+  }, [budget, isOpen]);
 
   const mutation = useMutation({
     mutationFn: (data) => budget 
