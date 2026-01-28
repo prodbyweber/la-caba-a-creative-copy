@@ -529,6 +529,15 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                 className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
+                onChange={(e) => {
+                  const date = new Date(e.target.value);
+                  setFormData({ 
+                    ...formData, 
+                    date: e.target.value,
+                    month: date.getMonth() + 1,
+                    year: date.getFullYear()
+                  });
+                }}
                 required
               />
             </div>
@@ -730,6 +739,15 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) 
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                 className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
+                onChange={(e) => {
+                  const date = new Date(e.target.value);
+                  setFormData({ 
+                    ...formData, 
+                    date: e.target.value,
+                    month: date.getMonth() + 1,
+                    year: date.getFullYear()
+                  });
+                }}
                 required
               />
             </div>
