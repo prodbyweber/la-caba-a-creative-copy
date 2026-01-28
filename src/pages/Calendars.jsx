@@ -152,10 +152,10 @@ export default function Calendars() {
           </div>
 
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-1 md:gap-2">
+          <div className="grid grid-cols-7 gap-2 md:gap-3">
             {/* Desktop Headers */}
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-              <div key={day} className="hidden md:block text-center text-sm font-medium text-gray-500 py-2">
+            {['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'].map((day) => (
+              <div key={day} className="hidden md:block text-center text-sm font-semibold text-gray-400 py-3 border-b border-white/10">
                 {day}
               </div>
             ))}
@@ -175,48 +175,48 @@ export default function Calendars() {
               return (
                 <div
                   key={i}
-                  className={`min-h-16 md:min-h-24 p-1 md:p-2 rounded-lg border transition-all ${
+                  className={`min-h-20 md:min-h-32 lg:min-h-40 p-2 md:p-3 rounded-xl border transition-all cursor-pointer ${
                     isTodayDate
-                      ? 'bg-emerald-500/10 border-emerald-500/30'
+                      ? 'bg-emerald-500/10 border-emerald-500/30 shadow-lg shadow-emerald-500/10'
                       : hasItems
-                      ? 'bg-white/5 border-white/10 hover:border-emerald-500/30'
-                      : 'bg-white/5 border-white/5'
+                      ? 'bg-white/5 border-white/10 hover:border-emerald-500/30 hover:bg-white/10'
+                      : 'bg-white/5 border-white/5 hover:bg-white/10'
                   }`}
                 >
-                  <div className={`text-xs md:text-sm font-medium mb-0.5 md:mb-1 ${
+                  <div className={`text-sm md:text-lg font-bold mb-2 ${
                     isTodayDate ? 'text-emerald-400' : 'text-gray-400'
                   }`}>
                     {format(day, 'd')}
                   </div>
-                  <div className="space-y-0.5 md:space-y-1">
-                    {activeTab === "sessions" && daySessions.slice(0, 2).map((session) => (
+                  <div className="space-y-1 md:space-y-2">
+                    {activeTab === "sessions" && daySessions.slice(0, 3).map((session) => (
                       <button
                         key={session.id}
                         onClick={() => setSelectedSession(session)}
-                        className="w-full text-left text-[9px] md:text-xs p-0.5 md:p-1 rounded bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors"
+                        className="w-full text-left text-[10px] md:text-xs lg:text-sm p-1.5 md:p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors border border-blue-500/20"
                       >
-                        <div className="font-semibold truncate mb-0.5">
+                        <div className="font-bold truncate mb-0.5">
                           {format(parseISO(session.start_time), 'HH:mm')}
                         </div>
-                        <div className="truncate leading-tight">{session.title}</div>
+                        <div className="truncate leading-tight font-medium opacity-90">{session.title}</div>
                       </button>
                     ))}
-                    {activeTab === "deliverables" && dayDeliverables.slice(0, 2).map((deliverable) => (
+                    {activeTab === "deliverables" && dayDeliverables.slice(0, 3).map((deliverable) => (
                       <div
                         key={deliverable.id}
-                        className={`text-[9px] md:text-xs p-0.5 md:p-1 rounded truncate ${
+                        className={`text-[10px] md:text-xs lg:text-sm p-1.5 md:p-2 rounded-lg truncate font-medium border ${
                           deliverable.status === 'Overdue' 
-                            ? 'bg-red-500/20 text-red-400'
-                            : 'bg-purple-500/20 text-purple-400'
+                            ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                            : 'bg-purple-500/20 text-purple-400 border-purple-500/30'
                         }`}
                       >
                         {deliverable.title}
                       </div>
                     ))}
-                    {((activeTab === "sessions" && daySessions.length > 2) || 
-                      (activeTab === "deliverables" && dayDeliverables.length > 2)) && (
-                      <div className="text-[8px] md:text-[10px] text-gray-500">
-                        +{(activeTab === "sessions" ? daySessions : dayDeliverables).length - 2}
+                    {((activeTab === "sessions" && daySessions.length > 3) || 
+                      (activeTab === "deliverables" && dayDeliverables.length > 3)) && (
+                      <div className="text-[10px] md:text-xs text-gray-500 font-medium px-1">
+                        +{(activeTab === "sessions" ? daySessions : dayDeliverables).length - 3} más
                       </div>
                     )}
                   </div>
