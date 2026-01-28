@@ -512,7 +512,8 @@ export default function InvestorDashboard() {
                   type="month"
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-1 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{ colorScheme: 'light' }}
                 />
                 <button
                   onClick={() => {
@@ -597,7 +598,7 @@ export default function InvestorDashboard() {
                 <select
                   value={revenueView}
                   onChange={(e) => setRevenueView(e.target.value)}
-                  className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="px-3 py-1 border border-gray-300 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
                   <option value="mensual">Mensual</option>
                   <option value="trimestral">Trimestral (3 meses)</option>
