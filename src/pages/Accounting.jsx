@@ -545,8 +545,6 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
               <input
                 type="date"
                 value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 onChange={(e) => {
                   const date = new Date(e.target.value);
                   setFormData({ 
@@ -556,6 +554,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
                     year: date.getFullYear()
                   });
                 }}
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>
@@ -772,8 +771,6 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) 
               <input
                 type="date"
                 value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 onChange={(e) => {
                   const date = new Date(e.target.value);
                   setFormData({ 
@@ -783,6 +780,7 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) 
                     year: date.getFullYear()
                   });
                 }}
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>
