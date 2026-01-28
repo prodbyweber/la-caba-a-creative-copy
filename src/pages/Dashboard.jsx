@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import ArtistProfileCard from "@/components/dashboard/ArtistProfileCard";
@@ -16,6 +18,21 @@ import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [jlyArtistId, setJlyArtistId] = useState(null);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  // Obtener usuario actual
+  useEffect(() => {
+    base44.auth.me().then(userData => {
+      setUser(userData);
+      // Si es admin, redirigir al AdminDashboard
+      if (userData.role === 'admin') {
+        navigate(createPageUrl('AdminDashboard'));
+      }
+    }).catch(err => {
+      console.error('Error al obtener usuario:', err);
+    });
+  }, [navigate]);
 
   // Obtener el artista JLY de la base de datos
   const { data: artists = [] } = useQuery({
@@ -29,6 +46,11 @@ export default function Dashboard() {
       setJlyArtistId(jlyArtist.id);
     }
   }, [artists]);
+
+  // No mostrar nada mientras se verifica el usuario
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
