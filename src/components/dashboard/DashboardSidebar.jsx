@@ -30,7 +30,6 @@ const menuItems = [
 ];
 
 const bottomItems = [
-  { icon: Shield, label: "Admin Panel", page: "AdminDashboard" },
   { icon: Settings, label: "Configuración" },
   { icon: HelpCircle, label: "Ayuda" },
 ];

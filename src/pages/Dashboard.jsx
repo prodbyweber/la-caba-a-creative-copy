@@ -25,10 +25,8 @@ export default function Dashboard() {
   useEffect(() => {
     base44.auth.me().then(userData => {
       setUser(userData);
-      // Si es admin, redirigir al AdminDashboard
-      if (userData.role === 'admin') {
-        navigate(createPageUrl('AdminDashboard'));
-      }
+      // NO redirigir automáticamente al AdminDashboard
+      // El admin puede estar viendo el dashboard de un artista
     }).catch(err => {
       console.error('Error al obtener usuario:', err);
     });
