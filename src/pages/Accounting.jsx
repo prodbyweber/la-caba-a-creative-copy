@@ -434,7 +434,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>
@@ -445,7 +445,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
                 step="0.01"
                 value={formData.amount}
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>
@@ -456,7 +456,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
             <select
               value={formData.artist_id}
               onChange={(e) => setFormData({ ...formData, artist_id: e.target.value })}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+              className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
             >
               <option value="">Seleccionar artista...</option>
               {artists.map(artist => (
@@ -469,7 +469,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
                 value={formData.artist_name}
                 onChange={(e) => setFormData({ ...formData, artist_name: e.target.value })}
                 placeholder="O escribe el nombre..."
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 mt-2"
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 placeholder:text-gray-500 focus:outline-none focus:border-emerald-500 mt-2"
               />
             )}
           </div>
@@ -502,7 +502,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
             <select
               value={formData.payment_method}
               onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+              className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
               required
             >
               <option value="">Seleccionar...</option>
@@ -629,7 +629,7 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>
@@ -638,7 +638,7 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
               <select
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               >
                 <option value="Empresa">Empresa</option>
@@ -654,7 +654,7 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
               value={formData.concept}
               onChange={(e) => setFormData({ ...formData, concept: e.target.value })}
               placeholder="Equipamiento, alquiler, servicios..."
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50"
+              className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 placeholder:text-gray-500 focus:outline-none focus:border-emerald-500"
               required
             />
           </div>
@@ -667,7 +667,7 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
                 step="0.01"
                 value={formData.amount}
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               />
             </div>
@@ -676,7 +676,7 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
               <select
                 value={formData.payment_method}
                 onChange={(e) => setFormData({ ...formData, payment_method: e.target.value })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
               >
                 <option value="">Seleccionar...</option>
                 <option value="Visum">Visum</option>
