@@ -49,6 +49,7 @@
  */
 import Accounting from './pages/Accounting';
 import AdminDashboard from './pages/AdminDashboard';
+import Analytics from './pages/Analytics';
 import ArtistDashboard from './pages/ArtistDashboard';
 import Artists from './pages/Artists';
 import Calendars from './pages/Calendars';
@@ -69,13 +70,13 @@ import Settings from './pages/Settings';
 import SocialAccounts from './pages/SocialAccounts';
 import TrackDetail from './pages/TrackDetail';
 import Tracks from './pages/Tracks';
-import Analytics from './pages/Analytics';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "Accounting": Accounting,
     "AdminDashboard": AdminDashboard,
+    "Analytics": Analytics,
     "ArtistDashboard": ArtistDashboard,
     "Artists": Artists,
     "Calendars": Calendars,
@@ -96,7 +97,6 @@ export const PAGES = {
     "SocialAccounts": SocialAccounts,
     "TrackDetail": TrackDetail,
     "Tracks": Tracks,
-    "Analytics": Analytics,
 }
 
 export const pagesConfig = {

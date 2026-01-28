@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import SessionDetailModal from "@/components/sessions/SessionDetailModal";
-import { Plus, Calendar as CalendarIcon, Package, List, Clock, MapPin, User, CheckCircle2, AlertCircle } from "lucide-react";
+import { Plus, Calendar as CalendarIcon, Package, List, Clock, MapPin, User, CheckCircle2, AlertCircle, Archive, Trash2 } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, isToday, differenceInHours } from "date-fns";
 
 export default function Calendars() {
@@ -270,35 +271,82 @@ export default function Calendars() {
 }
 
 function AgendaView({ sessions, artists, onSessionClick }) {
-  // Ordenar sesiones por fecha
-  const sortedSessions = [...sessions].sort((a, b) => 
-    new Date(a.start_time) - new Date(b.start_time)
+  const [showArchived, setShowArchived] = React.useState(false);
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.Session.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sessions'] });
+    },
+  });
+
+  // Separar sesiones activas y finalizadas
+  const activeSessions = sessions.filter(s => s.status !== 'Done');
+  const archivedSessions = sessions.filter(s => s.status === 'Done');
+
+  // Ordenar activas por prioridad y fecha
+  const sortedActiveSessions = [...activeSessions].sort((a, b) => {
+    // Primero por estado (Pending > Confirmed > otros)
+    const statusPriority = { 'Pending': 0, 'Scheduled': 1, 'Confirmed': 2 };
+    const statusA = statusPriority[a.status] ?? 3;
+    const statusB = statusPriority[b.status] ?? 3;
+    if (statusA !== statusB) return statusA - statusB;
+    
+    // Luego por fecha
+    return new Date(a.start_time) - new Date(b.start_time);
+  });
+
+  // Ordenar archivadas por fecha (más recientes primero)
+  const sortedArchivedSessions = [...archivedSessions].sort((a, b) => 
+    new Date(b.start_time) - new Date(a.start_time)
   );
 
-  // Agrupar por fecha
-  const sessionsByDate = sortedSessions.reduce((acc, session) => {
+  // Agrupar activas por fecha
+  const activeSessionsByDate = sortedActiveSessions.reduce((acc, session) => {
     const date = format(parseISO(session.start_time), 'yyyy-MM-dd');
     if (!acc[date]) acc[date] = [];
     acc[date].push(session);
     return acc;
   }, {});
 
+  // Agrupar archivadas por fecha
+  const archivedSessionsByDate = sortedArchivedSessions.reduce((acc, session) => {
+    const date = format(parseISO(session.start_time), 'yyyy-MM-dd');
+    if (!acc[date]) acc[date] = [];
+    acc[date].push(session);
+    return acc;
+  }, {});
+
+  const handleDelete = (sessionId, sessionTitle) => {
+    if (window.confirm(`¿Eliminar permanentemente "${sessionTitle}"?`)) {
+      deleteMutation.mutate(sessionId);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      {Object.entries(sessionsByDate).map(([date, dateSessions]) => (
-        <div key={date} className="bg-[#141414] rounded-2xl border border-white/5 overflow-hidden">
+      {/* Sesiones Activas */}
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-lg sm:text-xl font-bold text-emerald-400">
+          Sesiones Pendientes ({activeSessions.length})
+        </h2>
+      </div>
+
+      {Object.entries(activeSessionsByDate).map(([date, dateSessions]) => (
+        <div key={date} className="bg-[#141414] rounded-xl sm:rounded-2xl border border-white/5 overflow-hidden">
           {/* Date Header */}
-          <div className="px-6 py-4 border-b border-white/5 bg-white/5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5 bg-white/5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <h3 className="text-base sm:text-lg font-bold">
                 {format(parseISO(date), 'EEEE, d MMMM yyyy')}
               </h3>
-              <span className="text-sm text-gray-500">{dateSessions.length} sesiones</span>
+              <span className="text-xs sm:text-sm text-gray-500">{dateSessions.length} sesiones</span>
             </div>
           </div>
 
           {/* Sessions List */}
-          <div className="p-4 space-y-3">
+          <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
             {dateSessions.map(session => {
               const artist = artists.find(a => a.id === session.artist_id);
               const duration = session.start_time && session.end_time 
@@ -313,27 +361,23 @@ function AgendaView({ sessions, artists, onSessionClick }) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   onClick={() => onSessionClick(session)}
-                  className="group relative bg-gradient-to-br from-white/5 to-transparent border border-white/10 hover:border-emerald-500/30 rounded-xl p-5 cursor-pointer transition-all"
+                  className="group relative bg-gradient-to-br from-white/5 to-transparent border border-white/10 hover:border-emerald-500/30 rounded-lg sm:rounded-xl p-3 sm:p-5 cursor-pointer transition-all"
                 >
                   {/* Status Indicator */}
-                  <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-xl ${
-                    isDone ? 'bg-red-500' :
+                  <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-lg sm:rounded-t-xl ${
                     isConfirmed ? 'bg-emerald-500' : 'bg-yellow-500'
                   }`} />
 
-                  <div className="flex items-start justify-between gap-4">
-                    {/* Left Column */}
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+                    {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-3">
-                        <h4 className="text-xl font-bold text-white truncate">{session.title}</h4>
-                        <span className={`px-3 py-1 rounded-lg text-xs font-bold border shrink-0 ${
-                          isDone ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                        <h4 className="text-base sm:text-xl font-bold text-white truncate">{session.title}</h4>
+                        <span className={`px-2 sm:px-3 py-1 rounded-lg text-xs font-bold border shrink-0 self-start ${
                           isConfirmed ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 
                           'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
                         }`}>
-                          {isDone ? (
-                            <>🔴 FINALIZADO</>
-                          ) : isConfirmed ? (
+                          {isConfirmed ? (
                             <><CheckCircle2 className="w-3 h-3 inline mr-1" />Confirmado</>
                           ) : (
                             <><AlertCircle className="w-3 h-3 inline mr-1" />Por Confirmar</>
@@ -341,15 +385,15 @@ function AgendaView({ sessions, artists, onSessionClick }) {
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                         {/* Time */}
                         <div className="flex items-center gap-2 text-gray-300">
                           <Clock className="w-4 h-4 text-emerald-400 shrink-0" />
-                          <div>
-                            <div className="text-sm font-semibold">
+                          <div className="min-w-0">
+                            <div className="text-xs sm:text-sm font-semibold truncate">
                               {format(parseISO(session.start_time), 'HH:mm')} - {format(parseISO(session.end_time), 'HH:mm')}
                             </div>
-                            <div className="text-xs text-gray-500">{duration}h de duración</div>
+                            <div className="text-xs text-gray-500">{duration}h duración</div>
                           </div>
                         </div>
 
@@ -357,8 +401,8 @@ function AgendaView({ sessions, artists, onSessionClick }) {
                         {artist && (
                           <div className="flex items-center gap-2 text-gray-300">
                             <User className="w-4 h-4 text-purple-400 shrink-0" />
-                            <div>
-                              <div className="text-sm font-semibold">{artist.stageName}</div>
+                            <div className="min-w-0">
+                              <div className="text-xs sm:text-sm font-semibold truncate">{artist.stageName}</div>
                               <div className="text-xs text-gray-500">Artista</div>
                             </div>
                           </div>
@@ -367,8 +411,8 @@ function AgendaView({ sessions, artists, onSessionClick }) {
                         {/* Location */}
                         <div className="flex items-center gap-2 text-gray-300">
                           <MapPin className="w-4 h-4 text-blue-400 shrink-0" />
-                          <div>
-                            <div className="text-sm font-semibold">{session.location}</div>
+                          <div className="min-w-0">
+                            <div className="text-xs sm:text-sm font-semibold truncate">{session.location}</div>
                             <div className="text-xs text-gray-500">Ubicación</div>
                           </div>
                         </div>
@@ -376,12 +420,12 @@ function AgendaView({ sessions, artists, onSessionClick }) {
 
                       {/* Description */}
                       {session.description && (
-                        <p className="mt-3 text-sm text-gray-400 line-clamp-2">{session.description}</p>
+                        <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-gray-400 line-clamp-2">{session.description}</p>
                       )}
                     </div>
 
                     {/* Type Badge */}
-                    <span className={`px-3 py-1 rounded-lg text-xs font-semibold shrink-0 ${
+                    <span className={`px-2 sm:px-3 py-1 rounded-lg text-xs font-semibold shrink-0 self-start ${
                       session.type === 'Session' ? 'bg-emerald-500/10 text-emerald-400' :
                       session.type === 'Meeting' ? 'bg-blue-500/10 text-blue-400' :
                       'bg-purple-500/10 text-purple-400'
@@ -396,10 +440,117 @@ function AgendaView({ sessions, artists, onSessionClick }) {
         </div>
       ))}
 
-      {sortedSessions.length === 0 && (
-        <div className="bg-[#141414] rounded-2xl border border-white/5 p-12 text-center">
-          <CalendarIcon className="w-12 h-12 mx-auto mb-3 text-gray-600" />
-          <p className="text-gray-500">No hay sesiones programadas</p>
+      {sortedActiveSessions.length === 0 && (
+        <div className="bg-[#141414] rounded-xl sm:rounded-2xl border border-white/5 p-8 sm:p-12 text-center">
+          <CalendarIcon className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 text-gray-600" />
+          <p className="text-sm sm:text-base text-gray-500">No hay sesiones programadas</p>
+        </div>
+      )}
+
+      {/* Sesiones Archivadas (Finalizadas) */}
+      {archivedSessions.length > 0 && (
+        <div className="mt-8 pt-8 border-t border-white/10">
+          <button
+            onClick={() => setShowArchived(!showArchived)}
+            className="flex items-center justify-between w-full mb-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-gray-500/20 flex items-center justify-center">
+                <Archive className="w-5 h-5 text-gray-400" />
+              </div>
+              <div className="text-left">
+                <h2 className="text-base sm:text-lg font-bold text-gray-400">
+                  Sesiones Archivadas
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-600">{archivedSessions.length} finalizadas</p>
+              </div>
+            </div>
+            <motion.div
+              animate={{ rotate: showArchived ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              ▼
+            </motion.div>
+          </button>
+
+          {showArchived && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="space-y-6"
+            >
+              {Object.entries(archivedSessionsByDate).map(([date, dateSessions]) => (
+                <div key={date} className="bg-[#141414] rounded-xl sm:rounded-2xl border border-white/5 overflow-hidden opacity-70">
+                  <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-white/5 bg-white/5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <h3 className="text-sm sm:text-base font-bold text-gray-400">
+                        {format(parseISO(date), 'EEEE, d MMMM yyyy')}
+                      </h3>
+                      <span className="text-xs sm:text-sm text-gray-600">{dateSessions.length} sesiones</span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 sm:p-4 space-y-2 sm:space-y-3">
+                    {dateSessions.map(session => {
+                      const artist = artists.find(a => a.id === session.artist_id);
+                      const duration = session.start_time && session.end_time 
+                        ? differenceInHours(parseISO(session.end_time), parseISO(session.start_time))
+                        : 0;
+
+                      return (
+                        <div
+                          key={session.id}
+                          className="relative bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-lg sm:rounded-xl p-3 sm:p-4"
+                        >
+                          <div className="absolute top-0 left-0 right-0 h-1 rounded-t-lg sm:rounded-t-xl bg-gray-500" />
+
+                          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                                <h4 className="text-sm sm:text-base font-bold text-gray-400 truncate">{session.title}</h4>
+                                <span className="px-2 py-0.5 rounded text-xs font-bold bg-gray-500/20 text-gray-400 self-start">
+                                  🔴 FINALIZADO
+                                </span>
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs sm:text-sm text-gray-500">
+                                <div className="flex items-center gap-2">
+                                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
+                                  <span className="truncate">{format(parseISO(session.start_time), 'HH:mm')} - {format(parseISO(session.end_time), 'HH:mm')}</span>
+                                </div>
+                                {artist && (
+                                  <div className="flex items-center gap-2">
+                                    <User className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
+                                    <span className="truncate">{artist.stageName}</span>
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-2">
+                                  <MapPin className="w-3 h-3 sm:w-4 sm:h-4 shrink-0" />
+                                  <span className="truncate">{session.location}</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(session.id, session.title);
+                              }}
+                              className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium transition-colors flex items-center gap-1.5 self-start sm:self-center"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              Eliminar
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          )}
         </div>
       )}
     </div>
