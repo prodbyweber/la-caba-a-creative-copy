@@ -13,7 +13,9 @@ import {
   User,
   Download,
   Filter,
-  X
+  X,
+  Edit2,
+  Copy
 } from "lucide-react";
 
 export default function Accounting() {
@@ -21,6 +23,8 @@ export default function Accounting() {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [showIncomeModal, setShowIncomeModal] = useState(false);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [editingExpense, setEditingExpense] = useState(null);
+  const [editingIncome, setEditingIncome] = useState(null);
 
   const { data: incomes = [] } = useQuery({
     queryKey: ['incomes', selectedYear, selectedMonth],
@@ -59,6 +63,41 @@ export default function Accounting() {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
 
+  const queryClient = useQueryClient();
+
+  const duplicateExpense = useMutation({
+    mutationFn: async (expense) => {
+      const nextMonth = expense.month === 12 ? 1 : expense.month + 1;
+      const nextYear = expense.month === 12 ? expense.year + 1 : expense.year;
+      const { id, created_date, updated_date, created_by, ...expenseData } = expense;
+      return base44.entities.Expense.create({
+        ...expenseData,
+        month: nextMonth,
+        year: nextYear
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: ['allExpenses'] });
+    }
+  });
+
+  const duplicateIncome = useMutation({
+    mutationFn: async (income) => {
+      const nextMonth = income.month === 12 ? 1 : income.month + 1;
+      const nextYear = income.month === 12 ? income.year + 1 : income.year;
+      const { id, created_date, updated_date, created_by, ...incomeData } = income;
+      return base44.entities.Income.create({
+        ...incomeData,
+        month: nextMonth,
+        year: nextYear
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['incomes'] });
+    }
+  });
+
   return (
     <AdminLayout>
       <div className="max-w-7xl mx-auto space-y-6">
@@ -81,21 +120,19 @@ export default function Accounting() {
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-gray-900 focus:outline-none focus:border-emerald-500/50"
-            style={{ color: '#111' }}
+            className="px-4 py-2.5 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
           >
             {[2024, 2025, 2026, 2027].map(year => (
-              <option key={year} value={year} style={{ color: '#111' }}>{year}</option>
+              <option key={year} value={year}>{year}</option>
             ))}
           </select>
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(Number(e.target.value))}
-            className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-gray-900 focus:outline-none focus:border-emerald-500/50"
-            style={{ color: '#111' }}
+            className="px-4 py-2.5 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
           >
             {months.map((month, idx) => (
-              <option key={idx} value={idx + 1} style={{ color: '#111' }}>{month}</option>
+              <option key={idx} value={idx + 1}>{month}</option>
             ))}
           </select>
         </div>
@@ -213,6 +250,7 @@ export default function Accounting() {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase">Método Pago</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase">Monto</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase">Notas</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -239,6 +277,27 @@ export default function Accounting() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
                       {income.notes || '-'}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingIncome(income);
+                            setShowIncomeModal(true);
+                          }}
+                          className="p-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-emerald-400 transition-colors"
+                          title="Editar"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => duplicateIncome.mutate(income)}
+                          className="p-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 transition-colors"
+                          title="Duplicar al siguiente mes"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -279,6 +338,7 @@ export default function Accounting() {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase">Método Pago</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase">Monto</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase">Notas</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -304,6 +364,27 @@ export default function Accounting() {
                     <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
                       {expense.notes || '-'}
                     </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingExpense(expense);
+                            setShowExpenseModal(true);
+                          }}
+                          className="p-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-red-400 transition-colors"
+                          title="Editar"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => duplicateExpense.mutate(expense)}
+                          className="p-1.5 hover:bg-white/10 rounded-lg text-gray-400 hover:text-blue-400 transition-colors"
+                          title="Duplicar al siguiente mes"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
                 {expenses.length === 0 && (
@@ -322,27 +403,35 @@ export default function Accounting() {
       {/* Income Modal */}
       {showIncomeModal && (
         <IncomeModal
-          onClose={() => setShowIncomeModal(false)}
+          onClose={() => {
+            setShowIncomeModal(false);
+            setEditingIncome(null);
+          }}
           selectedMonth={selectedMonth}
           selectedYear={selectedYear}
+          editingIncome={editingIncome}
         />
       )}
 
       {/* Expense Modal */}
       {showExpenseModal && (
         <ExpenseModal
-          onClose={() => setShowExpenseModal(false)}
+          onClose={() => {
+            setShowExpenseModal(false);
+            setEditingExpense(null);
+          }}
           selectedMonth={selectedMonth}
           selectedYear={selectedYear}
+          editingExpense={editingExpense}
         />
       )}
     </AdminLayout>
   );
 }
 
-function IncomeModal({ onClose, selectedMonth, selectedYear }) {
+function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
   const currentDate = new Date();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(editingIncome || {
     date: currentDate.toISOString().split('T')[0],
     artist_id: '',
     artist_name: '',
@@ -361,7 +450,9 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Income.create(data),
+    mutationFn: (data) => editingIncome 
+      ? base44.entities.Income.update(editingIncome.id, data)
+      : base44.entities.Income.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['incomes'] });
       onClose();
@@ -391,8 +482,8 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
         className="bg-[#111113] rounded-2xl border border-white/10 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
       >
         <div className="p-6 border-b border-white/5 flex items-center justify-between">
-          <h3 className="text-xl font-bold text-white">Nuevo Ingreso</h3>
-          <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-lg">
+          <h3 className="text-xl font-bold text-white">{editingIncome ? 'Editar Ingreso' : 'Nuevo Ingreso'}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-lg text-white">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -538,7 +629,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
               disabled={createMutation.isPending}
               className="flex-1 px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition-colors disabled:opacity-50"
             >
-              {createMutation.isPending ? 'Guardando...' : 'Guardar Ingreso'}
+              {createMutation.isPending ? 'Guardando...' : (editingIncome ? 'Actualizar Ingreso' : 'Guardar Ingreso')}
             </button>
           </div>
         </form>
@@ -547,9 +638,9 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
   );
 }
 
-function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
+function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) {
   const currentDate = new Date();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(editingExpense || {
     date: currentDate.toISOString().split('T')[0],
     category: 'Empresa',
     concept: '',
@@ -563,9 +654,12 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Expense.create(data),
+    mutationFn: (data) => editingExpense
+      ? base44.entities.Expense.update(editingExpense.id, data)
+      : base44.entities.Expense.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: ['allExpenses'] });
       onClose();
     }
   });
@@ -586,8 +680,8 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
         className="bg-[#111113] rounded-2xl border border-white/10 w-full max-w-2xl"
       >
         <div className="p-6 border-b border-white/5 flex items-center justify-between">
-          <h3 className="text-xl font-bold text-white">Nuevo Gasto</h3>
-          <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-lg">
+          <h3 className="text-xl font-bold text-white">{editingExpense ? 'Editar Gasto' : 'Nuevo Gasto'}</h3>
+          <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-lg text-white">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -712,7 +806,7 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
               disabled={createMutation.isPending}
               className="flex-1 px-4 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-medium transition-colors disabled:opacity-50"
             >
-              {createMutation.isPending ? 'Guardando...' : 'Guardar Gasto'}
+              {createMutation.isPending ? 'Guardando...' : (editingExpense ? 'Actualizar Gasto' : 'Guardar Gasto')}
             </button>
           </div>
         </form>
