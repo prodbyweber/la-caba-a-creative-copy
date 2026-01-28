@@ -25,7 +25,7 @@ export default function CreateSessionModal({ onClose }) {
     title: "",
     description: "",
     session_type: "studio",
-    location: "La Cabaña Creative - Lleida",
+    location: "La Cabaña Creative, Calle de Rufino González 14, Madrid",
     artist_id: "",
     status: "scheduled",
     notes: ""
