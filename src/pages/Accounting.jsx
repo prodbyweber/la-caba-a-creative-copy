@@ -591,6 +591,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
                 required
               />
             </div>
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Artista</label>
@@ -836,6 +837,7 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) 
                 <option value="Personal">Personal</option>
               </select>
             </div>
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Concepto *</label>
