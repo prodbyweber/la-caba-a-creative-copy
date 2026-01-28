@@ -404,7 +404,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
               <select
                 value={formData.month}
                 onChange={(e) => setFormData({ ...formData, month: Number(e.target.value) })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               >
                 {['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'].map((month, idx) => (
@@ -417,7 +417,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
               <select
                 value={formData.year}
                 onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               >
                 {[2024, 2025, 2026, 2027, 2028].map(year => (
@@ -521,7 +521,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear }) {
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 resize-none"
+              className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 placeholder:text-gray-500 focus:outline-none focus:border-emerald-500 resize-none"
             />
           </div>
 
@@ -599,7 +599,7 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
               <select
                 value={formData.month}
                 onChange={(e) => setFormData({ ...formData, month: Number(e.target.value) })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               >
                 {['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'].map((month, idx) => (
@@ -612,7 +612,7 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
               <select
                 value={formData.year}
                 onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               >
                 {[2024, 2025, 2026, 2027, 2028].map(year => (
@@ -695,7 +695,7 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear }) {
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               rows={3}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 resize-none"
+              className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 placeholder:text-gray-500 focus:outline-none focus:border-emerald-500 resize-none"
             />
           </div>
 
