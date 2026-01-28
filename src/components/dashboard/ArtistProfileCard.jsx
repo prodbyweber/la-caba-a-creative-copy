@@ -5,11 +5,11 @@ import { Star, TrendingUp, Award, Verified } from "lucide-react";
 export default function ArtistProfileCard({ compact = false }) {
   const stats = [
     { label: "Streams", value: 88 },
-    { label: "Engagement", value: 92 },
-    { label: "Reach", value: 85 },
-    { label: "Growth", value: 94 },
-    { label: "Content", value: 90 },
-    { label: "Impact", value: 87 }
+    { label: "Interacción", value: 92 },
+    { label: "Alcance", value: 85 },
+    { label: "Crecimiento", value: 94 },
+    { label: "Contenido", value: 90 },
+    { label: "Impacto", value: 87 }
   ];
 
   if (compact) {

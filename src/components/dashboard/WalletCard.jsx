@@ -20,7 +20,7 @@ export default function WalletCard() {
 
         <div className="text-sm text-gray-500 mb-2">Saldo Disponible</div>
         <div className="flex items-baseline gap-2">
-          <span className="text-4xl font-bold">$2,847</span>
+          <span className="text-4xl font-bold">€2,847</span>
           <span className="text-lg text-gray-500">.32</span>
         </div>
 
@@ -28,7 +28,7 @@ export default function WalletCard() {
         <div className="flex items-center gap-2 mt-3">
           <div className="flex items-center gap-1 text-sm text-emerald-400">
             <TrendingUp className="w-4 h-4" />
-            <span>+$342.18</span>
+            <span>+€342.18</span>
           </div>
           <span className="text-xs text-gray-500">este mes</span>
         </div>
@@ -54,11 +54,11 @@ export default function WalletCard() {
         <div className="grid grid-cols-2 gap-3">
           <div className="text-center p-3 rounded-xl bg-[#0a0a0b]">
             <div className="text-xs text-gray-500 mb-1">Pendiente</div>
-            <div className="text-lg font-semibold">$486</div>
+            <div className="text-lg font-semibold">€486</div>
           </div>
           <div className="text-center p-3 rounded-xl bg-[#0a0a0b]">
             <div className="text-xs text-gray-500 mb-1">Histórico</div>
-            <div className="text-lg font-semibold">$12.4K</div>
+            <div className="text-lg font-semibold">€12.4K</div>
           </div>
         </div>
 
