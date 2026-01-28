@@ -6,7 +6,7 @@ import { base44 } from "@/api/base44Client";
 
 export default function AddPhaseModal({ isOpen, onClose, phase }) {
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState(phase || {
+  const [formData, setFormData] = useState({
     phase_name: "",
     objectives: "",
     budget: 0,
@@ -15,6 +15,22 @@ export default function AddPhaseModal({ isOpen, onClose, phase }) {
     completion_percentage: 0,
     status: "Planificada"
   });
+
+  React.useEffect(() => {
+    if (phase) {
+      setFormData(phase);
+    } else {
+      setFormData({
+        phase_name: "",
+        objectives: "",
+        budget: 0,
+        start_date: "",
+        end_date: "",
+        completion_percentage: 0,
+        status: "Planificada"
+      });
+    }
+  }, [phase]);
 
   const mutation = useMutation({
     mutationFn: (data) => {

@@ -6,7 +6,7 @@ import { base44 } from "@/api/base44Client";
 
 export default function AddExpenseModal({ isOpen, onClose, expense = null, defaultMonth }) {
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState(expense || {
+  const [formData, setFormData] = useState({
     month: defaultMonth || new Date().toISOString().slice(0, 7),
     category: "Operativos",
     amount: 0,
@@ -14,6 +14,21 @@ export default function AddExpenseModal({ isOpen, onClose, expense = null, defau
     is_recurring: false,
     payment_status: "unpaid"
   });
+
+  React.useEffect(() => {
+    if (expense) {
+      setFormData(expense);
+    } else {
+      setFormData({
+        month: defaultMonth || new Date().toISOString().slice(0, 7),
+        category: "Operativos",
+        amount: 0,
+        description: "",
+        is_recurring: false,
+        payment_status: "unpaid"
+      });
+    }
+  }, [expense, defaultMonth]);
 
   const mutation = useMutation({
     mutationFn: (data) => expense 

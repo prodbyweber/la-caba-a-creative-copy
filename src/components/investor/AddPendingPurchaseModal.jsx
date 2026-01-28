@@ -6,7 +6,7 @@ import { base44 } from "@/api/base44Client";
 
 export default function AddPendingPurchaseModal({ isOpen, onClose, purchase }) {
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState(purchase || {
+  const [formData, setFormData] = useState({
     product: "",
     price: 0,
     priority: "Media",
@@ -15,6 +15,22 @@ export default function AddPendingPurchaseModal({ isOpen, onClose, purchase }) {
     alternatives: "",
     reference_link: ""
   });
+
+  React.useEffect(() => {
+    if (purchase) {
+      setFormData(purchase);
+    } else {
+      setFormData({
+        product: "",
+        price: 0,
+        priority: "Media",
+        impact: "Medio",
+        status: "Pendiente",
+        alternatives: "",
+        reference_link: ""
+      });
+    }
+  }, [purchase]);
 
   const mutation = useMutation({
     mutationFn: (data) => {
