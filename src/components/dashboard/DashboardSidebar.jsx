@@ -13,16 +13,18 @@ import {
   X,
   Music2,
   Share2,
-  Shield
+  Shield,
+  FolderKanban
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Panel", active: true, page: "Dashboard" },
-  { icon: BarChart3, label: "Análisis", page: null },
+  { icon: BarChart3, label: "Análisis", page: "Analytics" },
   { icon: Film, label: "Clips", page: "Clips" },
   { icon: Music2, label: "Tracks", page: "Tracks" },
+  { icon: FolderKanban, label: "Proyectos", page: "Projects" },
   { icon: Share2, label: "Redes Sociales", page: "SocialAccounts" },
   { icon: Archive, label: "Bóveda", page: null },
   { icon: Wallet, label: "Cartera", page: null },
