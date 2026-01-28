@@ -445,7 +445,10 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
 
   React.useEffect(() => {
     if (editingIncome) {
-      setFormData(editingIncome);
+      setFormData({
+        ...editingIncome,
+        services: editingIncome.services || []
+      });
     } else {
       setFormData({
         date: currentDate.toISOString().split('T')[0],
@@ -459,7 +462,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
         year: selectedYear
       });
     }
-  }, [editingIncome]);
+  }, [editingIncome, selectedMonth, selectedYear]);
 
   const queryClient = useQueryClient();
   const { data: artists = [] } = useQuery({
@@ -695,7 +698,7 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) 
         year: selectedYear
       });
     }
-  }, [editingExpense]);
+  }, [editingExpense, selectedMonth, selectedYear]);
 
   const queryClient = useQueryClient();
 
