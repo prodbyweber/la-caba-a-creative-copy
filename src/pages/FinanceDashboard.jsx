@@ -36,7 +36,7 @@ export default function FinanceDashboard() {
   
   const queryClient = useQueryClient();
 
-  // Queries
+  // Queries - Mes actual
   const { data: incomes = [] } = useQuery({
     queryKey: ['incomes', selectedYear, selectedMonth],
     queryFn: async () => {
@@ -61,6 +61,20 @@ export default function FinanceDashboard() {
     }
   });
 
+  // Queries - Todos los datos (para caja total e histórico)
+  const { data: allIncomes = [] } = useQuery({
+    queryKey: ['allIncomes'],
+    queryFn: () => base44.entities.Income.list('-date')
+  });
+
+  const { data: allExpenses = [] } = useQuery({
+    queryKey: ['allExpenses'],
+    queryFn: async () => {
+      const all = await base44.entities.Expense.list('-date');
+      return all.filter(e => e.category === 'Empresa');
+    }
+  });
+
   const { data: clients = [] } = useQuery({
     queryKey: ['clients'],
     queryFn: () => base44.entities.Client.list()
@@ -76,18 +90,29 @@ export default function FinanceDashboard() {
     queryFn: () => base44.entities.PaymentStatus.list()
   });
 
-  // Cálculos
+  // Cálculos - Mes actual
   const totalIncome = incomes.reduce((sum, i) => sum + (i.amount || 0), 0);
   const totalExpenses = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
   const totalPersonalExpenses = personalExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
   const studioBenefit = totalIncome - totalExpenses;
 
-  // Métodos de cobro
+  // Cálculos - Caja total del estudio (todo el histórico)
+  const totalCaja = allIncomes.reduce((sum, i) => sum + (i.amount || 0), 0) - allExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+
+  // Métodos de cobro - Del mes actual para el desglose
   const paymentMethodStats = {
     'Tarjeta': incomes.filter(i => i.payment_method === 'Tarjeta').reduce((sum, i) => sum + i.amount, 0),
     'Bizum': incomes.filter(i => i.payment_method === 'Bizum').reduce((sum, i) => sum + i.amount, 0),
     'Efectivo': incomes.filter(i => i.payment_method === 'Efectivo').reduce((sum, i) => sum + i.amount, 0),
     'Transferencia': incomes.filter(i => i.payment_method === 'Transferencia Bancaria').reduce((sum, i) => sum + i.amount, 0)
+  };
+
+  // Histórico total por método de cobro
+  const paymentMethodHistorical = {
+    'Tarjeta': allIncomes.filter(i => i.payment_method === 'Tarjeta').reduce((sum, i) => sum + i.amount, 0),
+    'Bizum': allIncomes.filter(i => i.payment_method === 'Bizum').reduce((sum, i) => sum + i.amount, 0),
+    'Efectivo': allIncomes.filter(i => i.payment_method === 'Efectivo').reduce((sum, i) => sum + i.amount, 0),
+    'Transferencia': allIncomes.filter(i => i.payment_method === 'Transferencia Bancaria').reduce((sum, i) => sum + i.amount, 0)
   };
 
   // Estados de cobro
@@ -103,12 +128,18 @@ export default function FinanceDashboard() {
   // Delete mutations
   const deleteIncome = useMutation({
     mutationFn: (id) => base44.entities.Income.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['incomes'] })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['incomes'] });
+      queryClient.invalidateQueries({ queryKey: ['allIncomes'] });
+    }
   });
 
   const deleteExpense = useMutation({
     mutationFn: (id) => base44.entities.Expense.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['expenses'] })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: ['allExpenses'] });
+    }
   });
 
   const deletePersonalExpense = useMutation({
@@ -169,8 +200,9 @@ export default function FinanceDashboard() {
                   <DollarSign className="w-6 h-6 text-emerald-400" />
                 </div>
               </div>
-              <div className="text-3xl font-bold text-white mb-1">€{totalIncome.toLocaleString()}</div>
+              <div className="text-3xl font-bold text-white mb-1">€{totalCaja.toLocaleString()}</div>
               <div className="text-sm text-gray-400">Caja del Estudio</div>
+              <div className="text-xs text-gray-500 mt-1">Histórico total</div>
             </motion.div>
 
             <motion.div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
@@ -214,21 +246,24 @@ export default function FinanceDashboard() {
             </h3>
             <div className="space-y-3">
               {[
-                { icon: CreditCard, label: 'Tarjeta', amount: paymentMethodStats['Tarjeta'], color: 'blue' },
-                { icon: Smartphone, label: 'Bizum', amount: paymentMethodStats['Bizum'], color: 'purple' },
-                { icon: Banknote, label: 'Efectivo', amount: paymentMethodStats['Efectivo'], color: 'emerald' },
-                { icon: Building2, label: 'Transferencia', amount: paymentMethodStats['Transferencia'], color: 'orange' }
+                { icon: CreditCard, label: 'Tarjeta', amount: paymentMethodStats['Tarjeta'], historical: paymentMethodHistorical['Tarjeta'], color: 'blue' },
+                { icon: Smartphone, label: 'Bizum', amount: paymentMethodStats['Bizum'], historical: paymentMethodHistorical['Bizum'], color: 'purple' },
+                { icon: Banknote, label: 'Efectivo', amount: paymentMethodStats['Efectivo'], historical: paymentMethodHistorical['Efectivo'], color: 'emerald' },
+                { icon: Building2, label: 'Transferencia', amount: paymentMethodStats['Transferencia'], historical: paymentMethodHistorical['Transferencia'], color: 'orange' }
               ].map((method, i) => (
                 <div key={i} className="flex items-center justify-between p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors">
                   <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-lg bg-${method.color}-500/20 flex items-center justify-center`}>
                       <method.icon className={`w-5 h-5 text-${method.color}-400`} />
                     </div>
-                    <span className="text-white font-medium">{method.label}</span>
+                    <div>
+                      <div className="text-white font-medium">{method.label}</div>
+                      <div className="text-xs text-gray-500">Total: €{method.historical.toLocaleString()}</div>
+                    </div>
                   </div>
                   <div className="text-right">
                     <div className="text-lg font-bold text-white">€{method.amount.toLocaleString()}</div>
-                    <div className="text-xs text-gray-500">{totalIncome > 0 ? ((method.amount / totalIncome) * 100).toFixed(1) : 0}%</div>
+                    <div className="text-xs text-gray-500">Este mes · {totalIncome > 0 ? ((method.amount / totalIncome) * 100).toFixed(1) : 0}%</div>
                   </div>
                 </div>
               ))}
@@ -777,6 +812,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
       : base44.entities.Income.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['incomes'] });
+      queryClient.invalidateQueries({ queryKey: ['allIncomes'] });
       onClose();
     }
   });
@@ -1025,6 +1061,7 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) 
       : base44.entities.Expense.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: ['allExpenses'] });
       onClose();
     }
   });
