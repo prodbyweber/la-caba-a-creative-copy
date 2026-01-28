@@ -513,12 +513,21 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Mes *</label>
               <select
                 value={formData.month}
-                onChange={(e) => setFormData({ ...formData, month: Number(e.target.value) })}
+                onChange={(e) => {
+                  const newMonth = Number(e.target.value);
+                  const dateObj = new Date(formData.date);
+                  dateObj.setMonth(newMonth - 1);
+                  setFormData({ 
+                    ...formData, 
+                    month: newMonth,
+                    date: dateObj.toISOString().split('T')[0]
+                  });
+                }}
                 className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               >
@@ -528,10 +537,38 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
               </select>
             </div>
             <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Día *</label>
+              <input
+                type="number"
+                min="1"
+                max="31"
+                value={formData.date ? new Date(formData.date).getDate() : 1}
+                onChange={(e) => {
+                  const dateObj = new Date(formData.date || new Date());
+                  dateObj.setDate(Number(e.target.value));
+                  setFormData({ 
+                    ...formData, 
+                    date: dateObj.toISOString().split('T')[0]
+                  });
+                }}
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
+                required
+              />
+            </div>
+            <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Año *</label>
               <select
                 value={formData.year}
-                onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
+                onChange={(e) => {
+                  const newYear = Number(e.target.value);
+                  const dateObj = new Date(formData.date);
+                  dateObj.setFullYear(newYear);
+                  setFormData({ 
+                    ...formData, 
+                    year: newYear,
+                    date: dateObj.toISOString().split('T')[0]
+                  });
+                }}
                 className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               >
@@ -544,24 +581,6 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Fecha *</label>
-              <input
-                type="date"
-                value={formData.date}
-                onChange={(e) => {
-                  const date = new Date(e.target.value);
-                  setFormData({ 
-                    ...formData, 
-                    date: e.target.value,
-                    month: date.getMonth() + 1,
-                    year: date.getFullYear()
-                  });
-                }}
-                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
-                required
-              />
-            </div>
-            <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Monto (€) *</label>
               <input
                 type="number"
@@ -572,7 +591,6 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
                 required
               />
             </div>
-          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Artista</label>
@@ -739,12 +757,21 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) 
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Mes *</label>
               <select
                 value={formData.month}
-                onChange={(e) => setFormData({ ...formData, month: Number(e.target.value) })}
+                onChange={(e) => {
+                  const newMonth = Number(e.target.value);
+                  const dateObj = new Date(formData.date);
+                  dateObj.setMonth(newMonth - 1);
+                  setFormData({ 
+                    ...formData, 
+                    month: newMonth,
+                    date: dateObj.toISOString().split('T')[0]
+                  });
+                }}
                 className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               >
@@ -754,10 +781,38 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) 
               </select>
             </div>
             <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Día *</label>
+              <input
+                type="number"
+                min="1"
+                max="31"
+                value={formData.date ? new Date(formData.date).getDate() : 1}
+                onChange={(e) => {
+                  const dateObj = new Date(formData.date || new Date());
+                  dateObj.setDate(Number(e.target.value));
+                  setFormData({ 
+                    ...formData, 
+                    date: dateObj.toISOString().split('T')[0]
+                  });
+                }}
+                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
+                required
+              />
+            </div>
+            <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Año *</label>
               <select
                 value={formData.year}
-                onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
+                onChange={(e) => {
+                  const newYear = Number(e.target.value);
+                  const dateObj = new Date(formData.date);
+                  dateObj.setFullYear(newYear);
+                  setFormData({ 
+                    ...formData, 
+                    year: newYear,
+                    date: dateObj.toISOString().split('T')[0]
+                  });
+                }}
                 className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
                 required
               >
@@ -770,24 +825,6 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) 
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Fecha *</label>
-              <input
-                type="date"
-                value={formData.date}
-                onChange={(e) => {
-                  const date = new Date(e.target.value);
-                  setFormData({ 
-                    ...formData, 
-                    date: e.target.value,
-                    month: date.getMonth() + 1,
-                    year: date.getFullYear()
-                  });
-                }}
-                className="w-full px-4 py-3 bg-white rounded-xl text-gray-900 border border-white/20 focus:outline-none focus:border-emerald-500"
-                required
-              />
-            </div>
-            <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Categoría *</label>
               <select
                 value={formData.category}
@@ -799,7 +836,6 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) 
                 <option value="Personal">Personal</option>
               </select>
             </div>
-          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Concepto *</label>
