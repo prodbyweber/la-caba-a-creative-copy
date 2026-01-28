@@ -462,10 +462,13 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const selectedArtist = artists.find(a => a.id === formData.artist_id);
+    const dateObj = new Date(formData.date);
     createMutation.mutate({
       ...formData,
       artist_name: selectedArtist?.stageName || formData.artist_name,
-      amount: Number(formData.amount)
+      amount: Number(formData.amount),
+      month: formData.month,
+      year: formData.year
     });
   };
 
@@ -666,9 +669,12 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) 
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const dateObj = new Date(formData.date);
     createMutation.mutate({
       ...formData,
-      amount: Number(formData.amount)
+      amount: Number(formData.amount),
+      month: formData.month,
+      year: formData.year
     });
   };
 
