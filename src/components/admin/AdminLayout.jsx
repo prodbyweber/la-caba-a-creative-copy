@@ -14,7 +14,8 @@ import {
   Search,
   Music2,
   TrendingUp,
-  Home
+  Home,
+  DollarSign
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -22,6 +23,7 @@ import { createPageUrl } from "@/utils";
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", page: "AdminDashboard" },
   { icon: TrendingUp, label: "Inversor", page: "InvestorDashboard" },
+  { icon: DollarSign, label: "Contabilidad Pro", page: "FinanceDashboard" },
   { icon: Users, label: "Artists", page: "Artists" },
   { icon: FolderKanban, label: "Projects", page: "Projects" },
   { icon: Music2, label: "Tracks", page: "Tracks" },
