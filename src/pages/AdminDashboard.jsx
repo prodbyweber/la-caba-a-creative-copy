@@ -154,35 +154,14 @@ export default function AdminDashboard() {
           className="mb-6"
         >
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-sm sm:text-base text-gray-500">Overview of La Cabaña Creative operations</p>
+          <p className="text-sm sm:text-base text-gray-500">Actividades prioritarias</p>
         </motion.div>
 
-        {/* KPI Cards - Horizontal Compact */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-          {kpis.map((kpi, i) => (
-            <Link key={i} to={kpi.link}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className={`bg-gradient-to-br from-${kpi.color}-500/10 to-${kpi.color}-500/5 border border-${kpi.color}-500/20 rounded-xl p-3 sm:p-4 hover:border-${kpi.color}-500/40 transition-all cursor-pointer`}
-              >
-                <kpi.icon className={`w-5 h-5 sm:w-6 sm:h-6 text-${kpi.color}-400 mb-2`} />
-                <div className={`text-xl sm:text-2xl font-bold text-${kpi.color}-400 mb-0.5`}>
-                  {kpi.value}
-                </div>
-                <div className="text-xs text-gray-500 leading-tight">{kpi.label}</div>
-              </motion.div>
-            </Link>
-          ))}
-        </div>
-
-        {/* Task Management Section - Combined Sessions & Deliverables */}
+        {/* Task Management Section - PRIORIDAD MÁXIMA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-[#141414] rounded-2xl border border-white/5 p-4 sm:p-6 mb-6"
+          className="bg-gradient-to-br from-emerald-500/5 to-purple-500/5 rounded-2xl border-2 border-emerald-500/20 p-4 sm:p-6 mb-6 shadow-xl shadow-emerald-500/10"
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <h2 className="text-xl sm:text-2xl font-bold">Lista de Tareas y Sesiones</h2>
@@ -325,7 +304,7 @@ export default function AdminDashboard() {
         </motion.div>
 
         {/* Additional Info Row */}
-        <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 mb-8">
           {/* Pending Revisions */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -389,78 +368,29 @@ export default function AdminDashboard() {
               </div>
             )}
           </motion.div>
+        </div>
 
-          {/* Tracks en Producción */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="bg-[#141414] rounded-2xl border border-white/5 p-4 sm:p-6"
-          >
-            <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <h3 className="text-base sm:text-lg font-bold flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" />
-                Tracks en Producción
-              </h3>
-              <Link to={createPageUrl("Tracks")}>
-                <button className="text-xs sm:text-sm text-emerald-400 hover:text-emerald-300">
-                  Ver Todos
-                </button>
+        {/* KPI Cards - Resumen General (Al final) */}
+        <div className="border-t border-white/10 pt-6">
+          <h2 className="text-lg font-bold text-gray-400 mb-4">Resumen General</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {kpis.map((kpi, i) => (
+              <Link key={i} to={kpi.link}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 + i * 0.05 }}
+                  className={`bg-gradient-to-br from-${kpi.color}-500/10 to-${kpi.color}-500/5 border border-${kpi.color}-500/20 rounded-xl p-3 sm:p-4 hover:border-${kpi.color}-500/40 transition-all cursor-pointer`}
+                >
+                  <kpi.icon className={`w-5 h-5 sm:w-6 sm:h-6 text-${kpi.color}-400 mb-2`} />
+                  <div className={`text-xl sm:text-2xl font-bold text-${kpi.color}-400 mb-0.5`}>
+                    {kpi.value}
+                  </div>
+                  <div className="text-xs text-gray-500 leading-tight">{kpi.label}</div>
+                </motion.div>
               </Link>
-            </div>
-
-            {tracks.filter(t => t.status !== 'completed').length === 0 ? (
-              <div className="text-center py-6 sm:py-8 text-gray-500 bg-white/5 rounded-xl border border-white/5">
-                <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 text-gray-600" />
-                <p className="text-sm">No hay tracks en producción</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {tracks.filter(t => t.status !== 'completed').slice(0, 5).map((track) => {
-                  const createdDate = new Date(track.created_date);
-                  const deliveryDate = new Date(createdDate);
-                  deliveryDate.setDate(deliveryDate.getDate() + 7);
-                  const daysUntilDelivery = Math.ceil((deliveryDate - new Date()) / (1000 * 60 * 60 * 24));
-                  
-                  return (
-                    <div 
-                      key={track.id}
-                      className="p-3 sm:p-4 rounded-xl bg-white/5 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-white text-sm sm:text-base">{track.title}</h4>
-                          <div className="text-xs text-gray-500 mt-1">
-                            Creado: {format(createdDate, 'dd/MM/yyyy')}
-                          </div>
-                        </div>
-                        <span className={`px-2 py-0.5 rounded text-xs shrink-0 ml-2 ${
-                          track.status === 'production' ? 'bg-yellow-500/20 text-yellow-400' :
-                          track.status === 'mixing' ? 'bg-blue-500/20 text-blue-400' :
-                          track.status === 'mastering' ? 'bg-purple-500/20 text-purple-400' :
-                          'bg-gray-500/20 text-gray-400'
-                        }`}>
-                          {track.status}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs sm:text-sm">
-                        <span className="text-gray-400">
-                          Entrega: {format(deliveryDate, 'dd/MM/yyyy')}
-                        </span>
-                        <span className={`text-xs font-medium ${
-                          daysUntilDelivery < 0 ? 'text-red-400' :
-                          daysUntilDelivery <= 2 ? 'text-orange-400' :
-                          'text-emerald-400'
-                        }`}>
-                          {daysUntilDelivery < 0 ? 'Retrasado' : `${daysUntilDelivery} días`}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </motion.div>
+            ))}
+          </div>
         </div>
       </div>
 
