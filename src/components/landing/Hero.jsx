@@ -33,7 +33,7 @@ export default function Hero({ config }) {
             </p>
 
             {/* CTA Button */}
-            <Link to={createPageUrl("Dashboard")}>
+            <Link to={createPageUrl("AdminDashboard")}>
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
