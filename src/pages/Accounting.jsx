@@ -431,7 +431,7 @@ export default function Accounting() {
 
 function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
   const currentDate = new Date();
-  const [formData, setFormData] = useState(editingIncome || {
+  const [formData, setFormData] = useState({
     date: currentDate.toISOString().split('T')[0],
     artist_id: '',
     artist_name: '',
@@ -442,6 +442,24 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
     month: currentDate.getMonth() + 1,
     year: currentDate.getFullYear()
   });
+
+  React.useEffect(() => {
+    if (editingIncome) {
+      setFormData(editingIncome);
+    } else {
+      setFormData({
+        date: currentDate.toISOString().split('T')[0],
+        artist_id: '',
+        artist_name: '',
+        services: [],
+        amount: '',
+        payment_method: '',
+        notes: '',
+        month: selectedMonth,
+        year: selectedYear
+      });
+    }
+  }, [editingIncome]);
 
   const queryClient = useQueryClient();
   const { data: artists = [] } = useQuery({
@@ -652,7 +670,7 @@ function IncomeModal({ onClose, selectedMonth, selectedYear, editingIncome }) {
 
 function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) {
   const currentDate = new Date();
-  const [formData, setFormData] = useState(editingExpense || {
+  const [formData, setFormData] = useState({
     date: currentDate.toISOString().split('T')[0],
     category: 'Empresa',
     concept: '',
@@ -662,6 +680,23 @@ function ExpenseModal({ onClose, selectedMonth, selectedYear, editingExpense }) 
     month: currentDate.getMonth() + 1,
     year: currentDate.getFullYear()
   });
+
+  React.useEffect(() => {
+    if (editingExpense) {
+      setFormData(editingExpense);
+    } else {
+      setFormData({
+        date: currentDate.toISOString().split('T')[0],
+        category: 'Empresa',
+        concept: '',
+        amount: '',
+        payment_method: '',
+        notes: '',
+        month: selectedMonth,
+        year: selectedYear
+      });
+    }
+  }, [editingExpense]);
 
   const queryClient = useQueryClient();
 
