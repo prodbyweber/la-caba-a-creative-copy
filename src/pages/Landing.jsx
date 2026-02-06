@@ -5,13 +5,9 @@ import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import Hero from "@/components/landing/Hero";
-import PlatformPreview from "@/components/landing/PlatformPreview";
-import HowItWorks from "@/components/landing/HowItWorks";
-import Features from "@/components/landing/Features";
-import ForSeriousArtists from "@/components/landing/ForSeriousArtists";
-import MembershipPlans from "@/components/landing/MembershipPlans";
-import FinalCTA from "@/components/landing/FinalCTA";
-
+import OffersCarousel from "@/components/landing/OffersCarousel";
+import FilterSection from "@/components/landing/FilterSection";
+import LocationSection from "@/components/landing/LocationSection";
 import LandingNav from "@/components/landing/LandingNav";
 import Footer from "@/components/landing/Footer";
 
@@ -55,34 +51,15 @@ export default function Landing() {
     finalCTA: (props) => <FinalCTA config={config} {...props} />
   };
 
-  if (!config) {
-    return (
-      <div className="min-h-screen bg-[#0a0a0b] text-white overflow-x-hidden">
-        <LandingNav />
-        <main>
-          <Hero config={config} />
-          <Features />
-          <HowItWorks />
-          <ForSeriousArtists />
-          <PlatformPreview />
-          <MembershipPlans />
-          <FinalCTA />
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white overflow-x-hidden">
       <LandingNav />
       
       <main>
-        {config.sections_order.map((sectionKey) => {
-          if (!config.sections_enabled[sectionKey]) return null;
-          const SectionComponent = sectionComponents[sectionKey];
-          return SectionComponent ? <SectionComponent key={sectionKey} /> : null;
-        })}
+        <Hero config={config} />
+        <OffersCarousel />
+        <FilterSection />
+        <LocationSection />
       </main>
 
       <Footer />

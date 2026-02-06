@@ -23,26 +23,32 @@ export default function Hero({ config }) {
             {/* Main Headline */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 sm:mb-8 leading-[1.1]">
               <span className="block text-white">
-                {config?.hero_title || "El estudio creativo definitivo para artistas que buscan conectar"}
+                Construye tu marca como artista.
+              </span>
+              <span className="block text-white">
+                Crea música de alto nivel.
+              </span>
+              <span className="block text-emerald-400">
+                Posiciónate para competir.
               </span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-base sm:text-lg md:text-xl text-gray-400 mb-8 sm:mb-12 leading-relaxed max-w-xl">
-              {config?.hero_subtitle || "Producción por horas, visuales cinematográficos y digitalización artística para proyectos que van en serio."}
+              Formación, dirección creativa y producción musical para artistas que quieren ir en serio.
             </p>
 
             {/* CTA Button */}
-            <Link to={createPageUrl("AdminDashboard")}>
+            <a href="#ofertas">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="group px-8 py-4 sm:px-10 sm:py-5 rounded-full bg-gradient-to-r from-white to-gray-200 text-black font-semibold text-base sm:text-lg flex items-center gap-3 shadow-2xl shadow-white/10 hover:shadow-white/20 transition-all duration-300 w-full sm:w-auto justify-center"
               >
-                {config?.hero_cta_text || "Aplicar a La Cabaña Creative"}
+                Ver formas de ayudarte
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </motion.button>
-            </Link>
+            </a>
           </motion.div>
         </div>
       </div>

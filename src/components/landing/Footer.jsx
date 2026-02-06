@@ -17,27 +17,30 @@ export default function Footer() {
                 La Cabaña <span className="text-emerald-400">Creative</span>
               </span>
             </div>
-            <p className="text-gray-500 text-sm max-w-sm leading-relaxed">
-              El sistema operativo creativo para artistas serios. Producción, distribución, monetización — todo en un solo lugar.
+            <p className="text-gray-500 text-sm max-w-sm leading-relaxed mb-3">
+              Formación, dirección creativa y producción musical para artistas que quieren ir en serio.
+            </p>
+            <p className="text-xs text-gray-600 italic">
+              Algunos servicios requieren validación previa
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <h4 className="text-sm font-semibold text-white mb-4">Plataforma</h4>
+            <h4 className="text-sm font-semibold text-white mb-4">Servicios</h4>
             <ul className="space-y-3">
-              <li><a href="#features" className="text-sm text-gray-500 hover:text-white transition-colors">Características</a></li>
-              <li><a href="#pricing" className="text-sm text-gray-500 hover:text-white transition-colors">Precios</a></li>
-              <li><Link to={createPageUrl("Dashboard")} className="text-sm text-gray-500 hover:text-white transition-colors">Panel</Link></li>
+              <li><a href="#ofertas" className="text-sm text-gray-500 hover:text-white transition-colors">Cursos</a></li>
+              <li><a href="#ofertas" className="text-sm text-gray-500 hover:text-white transition-colors">Consultoría</a></li>
+              <li><a href="#ofertas" className="text-sm text-gray-500 hover:text-white transition-colors">Producción</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-white mb-4">Compañía</h4>
+            <h4 className="text-sm font-semibold text-white mb-4">Contacto</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Acerca de</a></li>
-              <li><a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Carreras</a></li>
-              <li><a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Contacto</a></li>
+              <li><a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Instagram</a></li>
+              <li><a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">YouTube</a></li>
+              <li><a href="#" className="text-sm text-gray-500 hover:text-white transition-colors">Email</a></li>
             </ul>
           </div>
         </div>
