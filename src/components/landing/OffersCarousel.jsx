@@ -152,7 +152,7 @@ export default function OffersCarousel() {
           <div 
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scroll-smooth"
+            className="flex gap-4 sm:gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scroll-smooth px-4 sm:px-0"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none'
@@ -165,73 +165,53 @@ export default function OffersCarousel() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="flex-shrink-0 w-[85vw] sm:w-[380px] snap-center"
+                className="flex-shrink-0 w-[280px] sm:w-[340px] snap-center"
               >
-                <div className="h-full bg-zinc-800/50 backdrop-blur-sm rounded-3xl border border-zinc-700/50 overflow-hidden hover:border-zinc-600 transition-all duration-300 flex flex-col">
+                <div className="h-full bg-zinc-900/90 backdrop-blur-sm rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300 flex flex-col shadow-xl border border-zinc-800/50">
                   
-                  {/* Image (if provided) */}
-                  {offer.image_url && (
-                    <div className="w-full h-48 overflow-hidden">
+                  {/* Top Section - Light background */}
+                  <div className="bg-zinc-200 p-6 sm:p-8 min-h-[140px] sm:min-h-[160px] flex items-center justify-center">
+                    {offer.image_url ? (
                       <img 
                         src={offer.image_url} 
                         alt={offer.title}
-                        className="w-full h-full object-cover"
+                        className="max-w-full max-h-[100px] sm:max-h-[120px] object-contain"
                       />
-                    </div>
-                  )}
-
-                  <div className="p-8 flex flex-col flex-1">
-                    {/* Title */}
-                    <h3 className="text-2xl font-bold text-white mb-3 leading-tight">
-                      {offer.title}
-                    </h3>
-
-                    {/* Price/Tag */}
-                    {offer.price && (
-                      <div className="text-lg font-semibold text-emerald-400 mb-4">
-                        {offer.price}
-                      </div>
+                    ) : (
+                      <h3 className="text-2xl sm:text-3xl font-black text-zinc-900 text-center leading-tight">
+                        {offer.title}
+                      </h3>
                     )}
-                    {offer.tag && !offer.price && (
-                      <div className="text-sm font-medium text-gray-400 mb-4">
-                        {offer.tag}
+                  </div>
+
+                  {/* Bottom Section - Dark background */}
+                  <div className="bg-zinc-900 p-6 sm:p-8 flex flex-col flex-1">
+                    {/* Title (if image exists) */}
+                    {offer.image_url && (
+                      <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-tight">
+                        {offer.title}
+                      </h3>
+                    )}
+
+                    {/* Price */}
+                    {offer.price && (
+                      <div className="text-lg sm:text-xl font-semibold text-emerald-400 mb-4">
+                        {offer.price}
                       </div>
                     )}
 
                     {/* Description */}
-                    <p className="text-gray-300 text-sm leading-relaxed mb-6 flex-1">
+                    <p className="text-gray-400 text-sm sm:text-base leading-relaxed mb-6 flex-1">
                       {offer.description}
                     </p>
 
-                    {/* Highlights */}
-                    {offer.highlights && offer.highlights.length > 0 && (
-                      <div className="space-y-2 mb-6 pb-6 border-b border-zinc-700/50">
-                        {offer.highlights.slice(0, 3).map((item, i) => (
-                          <div key={i} className="flex items-start gap-2 text-sm text-gray-400">
-                            <span className="text-emerald-400 mt-0.5">•</span>
-                            <span>{item}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* CTA Buttons */}
-                    <div className="flex gap-3 mt-auto">
-                      <button
-                        onClick={() => setSelectedOffer(offer)}
-                        className="flex-1 py-3 px-4 rounded-xl bg-white text-black hover:bg-gray-100 font-semibold text-sm transition-all"
-                      >
-                        {offer.cta || 'Ver más'}
-                      </button>
-                      {offer.featured && (
-                        <button
-                          onClick={() => setSelectedOffer(offer)}
-                          className="py-3 px-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 font-semibold text-sm transition-all"
-                        >
-                          <ArrowRight className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
+                    {/* Single CTA Button */}
+                    <button
+                      onClick={() => setSelectedOffer(offer)}
+                      className="w-full py-3 px-4 rounded-xl bg-white text-black hover:bg-gray-100 font-semibold text-sm transition-all"
+                    >
+                      {offer.cta || 'Ver más'}
+                    </button>
                   </div>
                 </div>
               </motion.div>
