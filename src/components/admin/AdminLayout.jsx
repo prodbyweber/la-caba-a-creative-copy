@@ -54,13 +54,18 @@ export default function AdminLayout({ children, activePage }) {
             
             <div className="flex items-center gap-3">
               <Link to={createPageUrl("Landing")}>
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-purple-600 flex items-center justify-center cursor-pointer hover:scale-105 transition-transform">
-                  <span className="text-white font-bold text-sm">W</span>
-                </div>
+                <img 
+                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/2b10817bf_LOGOPNGTRANSPARENTCABANACREATIVE.png" 
+                  alt="La Cabaña Creative"
+                  className="h-9 w-auto cursor-pointer hover:scale-105 transition-transform"
+                />
               </Link>
               <div className="hidden sm:block">
-                <div className="text-sm font-bold">Prod. by Weber</div>
-                <div className="text-[10px] text-gray-500">La Cabaña Creative</div>
+                <div className="text-sm font-bold">
+                  <span className="text-white">La Cabaña </span>
+                  <span className="text-orange-500">Creative</span>
+                </div>
+                <div className="text-[10px] text-gray-500">Prod. by Weber</div>
               </div>
             </div>
 
