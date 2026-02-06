@@ -14,60 +14,58 @@ export default function Hero({ config }) {
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-black to-black" />
       
       {/* Main Container */}
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-12 py-20 lg:py-0">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[calc(100vh-10rem)]">
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-12 py-20 flex flex-col items-center text-center gap-12">
+        
+        {/* Top: Text Content */}
+        <motion.div
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7 }}
+          className="max-w-4xl"
+        >
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1] mb-6 lg:mb-8">
+            {heroTitle}
+          </h1>
           
-          {/* Left: Text Content */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7 }}
-            className="order-2 lg:order-1"
-          >
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1] mb-6 lg:mb-8">
-              {heroTitle}
-            </h1>
-            
-            <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 leading-relaxed mb-8 lg:mb-10 max-w-xl">
-              {heroSubtitle}
-            </p>
-            
-            <a href="#ofertas">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-8 py-4 bg-white text-black rounded-full font-semibold text-base sm:text-lg hover:bg-gray-100 transition-all shadow-lg inline-flex items-center gap-2"
-              >
-                {heroCTA}
-              </motion.button>
-            </a>
-          </motion.div>
+          <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 leading-relaxed mb-8 lg:mb-10 max-w-3xl mx-auto">
+            {heroSubtitle}
+          </p>
+          
+          <a href="#ofertas">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-8 py-4 bg-white text-black rounded-full font-semibold text-base sm:text-lg hover:bg-gray-100 transition-all shadow-lg inline-flex items-center gap-2"
+            >
+              {heroCTA}
+            </motion.button>
+          </a>
+        </motion.div>
 
-          {/* Right: Artist Image */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="order-1 lg:order-2 relative"
-          >
-            <div className="relative w-full aspect-[3/4] lg:aspect-[4/5] max-w-md lg:max-w-none mx-auto">
-              {/* Background glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 via-transparent to-purple-500/20 rounded-3xl blur-3xl" />
+        {/* Bottom: Artist Image */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="relative w-full max-w-3xl"
+        >
+          <div className="relative w-full aspect-video">
+            {/* Background glow effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 via-transparent to-purple-500/20 rounded-3xl blur-3xl" />
+            
+            {/* Image container */}
+            <div className="relative h-full rounded-3xl overflow-hidden">
+              <img
+                src={heroImage}
+                alt="Artist"
+                className="w-full h-full object-cover object-center"
+              />
               
-              {/* Image container */}
-              <div className="relative h-full rounded-3xl overflow-hidden">
-                <img
-                  src={heroImage}
-                  alt="Artist"
-                  className="w-full h-full object-cover object-center"
-                />
-                
-                {/* Gradient overlay at bottom */}
-                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
-              </div>
+              {/* Gradient overlay at bottom */}
+              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </div>
 
       {/* Bottom bar with tags - visible on desktop */}
