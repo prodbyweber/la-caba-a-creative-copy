@@ -57,9 +57,10 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                   >
                     <iframe
                       src={offer.trailer_url}
-                      className="w-full h-full"
-                      allow="autoplay; fullscreen; picture-in-picture"
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                       allowFullScreen
+                      referrerPolicy="strict-origin-when-cross-origin"
                       title={`${offer.title} Trailer`}
                     />
                   </motion.div>

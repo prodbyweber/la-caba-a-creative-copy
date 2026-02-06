@@ -261,16 +261,27 @@ function OfferModal({ isOpen, offer, onSave, onClose }) {
             <h4 className="text-lg font-semibold text-white mb-4">Información detallada (Panel)</h4>
 
             <div>
-              <label className="block text-sm text-gray-400 mb-2">URL del Trailer (YouTube/Vimeo embed)</label>
+              <label className="block text-sm text-gray-400 mb-2">URL del Trailer (YouTube/Vimeo)</label>
               <input
                 type="text"
                 value={formData.trailer_url || ''}
-                onChange={(e) => setFormData({ ...formData, trailer_url: e.target.value })}
-                placeholder="https://www.youtube.com/embed/VIDEO_ID"
+                onChange={(e) => {
+                  let url = e.target.value;
+                  // Auto-convert YouTube watch URLs to embed format
+                  if (url.includes('youtube.com/watch?v=')) {
+                    const videoId = url.split('v=')[1]?.split('&')[0];
+                    if (videoId) url = `https://www.youtube.com/embed/${videoId}`;
+                  } else if (url.includes('youtu.be/')) {
+                    const videoId = url.split('youtu.be/')[1]?.split('?')[0];
+                    if (videoId) url = `https://www.youtube.com/embed/${videoId}`;
+                  }
+                  setFormData({ ...formData, trailer_url: url });
+                }}
+                placeholder="https://www.youtube.com/watch?v=... o https://www.youtube.com/embed/..."
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
               />
               <p className="text-xs text-gray-500 mt-2">
-                💡 Usa el formato embed: youtube.com/embed/VIDEO_ID o player.vimeo.com/video/VIDEO_ID
+                💡 Pega cualquier link de YouTube o Vimeo, se convertirá automáticamente al formato correcto
               </p>
             </div>
 
