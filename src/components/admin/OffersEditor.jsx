@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Edit2, Trash2, GripVertical, X } from "lucide-react";
+import { Plus, Edit2, Trash2, GripVertical, X, Upload, Image as ImageIcon } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 export default function OffersEditor({ offers = [], onUpdate }) {
   const [editingIndex, setEditingIndex] = useState(null);
@@ -130,6 +131,7 @@ export default function OffersEditor({ offers = [], onUpdate }) {
 
 function OfferModal({ isOpen, offer, onSave, onClose }) {
   const [formData, setFormData] = useState(offer);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   React.useEffect(() => {
     setFormData(offer);
@@ -143,6 +145,21 @@ function OfferModal({ isOpen, offer, onSave, onClose }) {
   const updateArrayField = (field, value) => {
     const items = value.split('\n').filter(item => item.trim());
     setFormData({ ...formData, [field]: items });
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingImage(true);
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData({ ...formData, image_url: file_url });
+    } catch (error) {
+      alert('Error al subir la imagen: ' + error.message);
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -339,17 +356,58 @@ function OfferModal({ isOpen, offer, onSave, onClose }) {
             </div>
 
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Imagen de la tarjeta (URL)</label>
-              <input
-                type="text"
-                value={formData.image_url || ''}
-                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                placeholder="https://images.unsplash.com/photo-..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
-              />
-              <p className="text-xs text-gray-500 mt-2">
-                💡 Imagen que aparecerá en la tarjeta. Puede ser de Unsplash, tu Drive, etc.
-              </p>
+              <label className="block text-sm text-gray-400 mb-2">Imagen de la tarjeta</label>
+              
+              {/* Image Preview */}
+              {formData.image_url && (
+                <div className="mb-3 relative rounded-xl overflow-hidden border border-white/10">
+                  <img 
+                    src={formData.image_url} 
+                    alt="Preview" 
+                    className="w-full h-40 object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, image_url: '' })}
+                    className="absolute top-2 right-2 p-1.5 bg-black/70 hover:bg-black/90 rounded-lg text-white transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* Upload Button */}
+              <label className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl cursor-pointer transition-colors">
+                {uploadingImage ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                    <span className="text-sm text-gray-400">Subiendo...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-400">Subir desde mis archivos</span>
+                  </>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploadingImage}
+                  className="hidden"
+                />
+              </label>
+
+              {/* URL Input */}
+              <div className="mt-2">
+                <input
+                  type="text"
+                  value={formData.image_url || ''}
+                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  placeholder="O pega una URL de imagen"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-emerald-500/50"
+                />
+              </div>
             </div>
           </div>
 
