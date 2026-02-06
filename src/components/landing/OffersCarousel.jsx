@@ -152,7 +152,7 @@ export default function OffersCarousel() {
           <div 
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className="flex gap-4 sm:gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scroll-smooth px-4 sm:px-0"
+            className="flex gap-4 overflow-x-auto pb-8 snap-x snap-mandatory scroll-smooth px-4 sm:px-0"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none'
@@ -165,50 +165,50 @@ export default function OffersCarousel() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="flex-shrink-0 w-[280px] sm:w-[340px] snap-center"
+                className="flex-shrink-0 w-[260px] sm:w-[300px] snap-center"
               >
                 <div className="h-full bg-zinc-900/90 backdrop-blur-sm rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300 flex flex-col shadow-xl border border-zinc-800/50">
                   
                   {/* Top Section - Light background */}
-                  <div className="bg-zinc-200 p-6 sm:p-8 min-h-[140px] sm:min-h-[160px] flex items-center justify-center">
+                  <div className="bg-zinc-200 p-6 min-h-[120px] flex items-center justify-center">
                     {offer.image_url ? (
                       <img 
                         src={offer.image_url} 
                         alt={offer.title}
-                        className="max-w-full max-h-[100px] sm:max-h-[120px] object-contain"
+                        className="max-w-full max-h-[80px] object-contain"
                       />
                     ) : (
-                      <h3 className="text-2xl sm:text-3xl font-black text-zinc-900 text-center leading-tight">
+                      <h3 className="text-xl sm:text-2xl font-black text-zinc-900 text-center leading-tight">
                         {offer.title}
                       </h3>
                     )}
                   </div>
 
                   {/* Bottom Section - Dark background */}
-                  <div className="bg-zinc-900 p-6 sm:p-8 flex flex-col flex-1">
+                  <div className="bg-zinc-900 p-5 flex flex-col">
                     {/* Title (if image exists) */}
                     {offer.image_url && (
-                      <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 leading-tight">
+                      <h3 className="text-lg font-bold text-white mb-2 leading-tight">
                         {offer.title}
                       </h3>
                     )}
 
                     {/* Price */}
                     {offer.price && (
-                      <div className="text-lg sm:text-xl font-semibold text-emerald-400 mb-4">
+                      <div className="text-base font-semibold text-emerald-400 mb-3">
                         {offer.price}
                       </div>
                     )}
 
                     {/* Description */}
-                    <p className="text-gray-400 text-sm sm:text-base leading-relaxed mb-6 flex-1">
+                    <p className="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-3">
                       {offer.description}
                     </p>
 
                     {/* Single CTA Button */}
                     <button
                       onClick={() => setSelectedOffer(offer)}
-                      className="w-full py-3 px-4 rounded-xl bg-white text-black hover:bg-gray-100 font-semibold text-sm transition-all"
+                      className="w-full py-2.5 px-4 rounded-xl bg-white text-black hover:bg-gray-100 font-semibold text-sm transition-all"
                     >
                       {offer.cta || 'Ver más'}
                     </button>
