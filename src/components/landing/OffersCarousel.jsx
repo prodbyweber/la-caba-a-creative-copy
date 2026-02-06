@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Check } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
+import OfferDetailPanel from "./OfferDetailPanel";
 
-const offers = [
+const defaultOffers = [
   {
     id: 1,
     tag: "Gratis",
@@ -73,6 +76,17 @@ const offers = [
 ];
 
 export default function OffersCarousel() {
+  const [selectedOffer, setSelectedOffer] = useState(null);
+
+  const { data: config } = useQuery({
+    queryKey: ['landingConfig'],
+    queryFn: async () => {
+      const configs = await base44.entities.LandingConfig.list();
+      return configs.length > 0 ? configs[0] : null;
+    }
+  });
+
+  const offers = config?.offers && config.offers.length > 0 ? config.offers : defaultOffers;
   return (
     <section id="ofertas" className="relative py-20 sm:py-32 overflow-hidden bg-black">
       {/* Background gradient */}
@@ -163,11 +177,14 @@ export default function OffersCarousel() {
                   )}
 
                   {/* CTA */}
-                  <button className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
-                    offer.featured
-                      ? 'bg-emerald-500 text-black hover:bg-emerald-400'
-                      : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'
-                  }`}>
+                  <button
+                    onClick={() => setSelectedOffer(offer)}
+                    className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
+                      offer.featured
+                        ? 'bg-emerald-500 text-black hover:bg-emerald-400'
+                        : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'
+                    }`}
+                  >
                     {offer.cta}
                     <ArrowRight className="w-4 h-4" />
                   </button>
@@ -182,6 +199,12 @@ export default function OffersCarousel() {
           <p className="text-xs text-gray-600">← Desliza para ver todas las opciones →</p>
         </div>
       </div>
+
+      <OfferDetailPanel
+        offer={selectedOffer}
+        isOpen={!!selectedOffer}
+        onClose={() => setSelectedOffer(null)}
+      />
 
       <style jsx>{`
         .scrollbar-hide::-webkit-scrollbar {

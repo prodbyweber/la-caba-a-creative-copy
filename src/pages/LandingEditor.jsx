@@ -6,6 +6,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { SectionEditor, TextInput, ImageUpload, ArrayEditor } from "@/components/admin/SectionEditor";
 import HowItWorksEditor from "@/components/admin/HowItWorksEditor";
+import OffersEditor from "@/components/admin/OffersEditor";
 import { 
   Eye, 
   GripVertical, 
@@ -215,8 +216,16 @@ export default function LandingEditor() {
               Editar Contenido de la Landing
             </h2>
 
+            {/* Offers Section Editor */}
+            <SectionEditor title="💎 Formas de Ayudarte" defaultOpen={true}>
+              <OffersEditor 
+                offers={config.offers || []}
+                onUpdate={(offers) => updateField('offers', offers)}
+              />
+            </SectionEditor>
+
             {/* Hero Section Editor */}
-            <SectionEditor title="🎬 Hero Principal" defaultOpen={true}>
+            <SectionEditor title="🎬 Hero Principal">
               <TextInput
                 label="Título"
                 value={config.hero_title}
