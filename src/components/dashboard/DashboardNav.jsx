@@ -18,11 +18,13 @@ export default function DashboardNav({ onMenuClick }) {
           </button>
           
           <Link to={createPageUrl("Landing")} className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-purple-600 flex items-center justify-center">
-              <span className="text-white font-bold">LC</span>
-            </div>
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/2b10817bf_LOGOPNGTRANSPARENTCABANACREATIVE.png" 
+              alt="La Cabaña Creative"
+              className="h-9 w-auto"
+            />
             <span className="text-lg font-semibold tracking-tight hidden sm:block">
-              La Cabaña
+              La Cabaña <span className="text-orange-500">Creative</span>
             </span>
           </Link>
         </div>

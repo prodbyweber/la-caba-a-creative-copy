@@ -10,11 +10,13 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-purple-600 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">LC</span>
-              </div>
+              <img 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/2b10817bf_LOGOPNGTRANSPARENTCABANACREATIVE.png" 
+                alt="La Cabaña Creative"
+                className="h-12 w-auto"
+              />
               <span className="text-xl font-semibold tracking-tight">
-                La Cabaña <span className="text-emerald-400">Creative</span>
+                La Cabaña <span className="text-orange-500">Creative</span>
               </span>
             </div>
             <p className="text-gray-500 text-sm max-w-sm leading-relaxed mb-3">
