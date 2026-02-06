@@ -239,14 +239,17 @@ function OfferModal({ isOpen, offer, onSave, onClose }) {
             <h4 className="text-lg font-semibold text-white mb-4">Información detallada (Panel)</h4>
 
             <div>
-              <label className="block text-sm text-gray-400 mb-2">URL del Trailer (YouTube/Vimeo)</label>
+              <label className="block text-sm text-gray-400 mb-2">URL del Trailer (YouTube/Vimeo embed)</label>
               <input
                 type="text"
                 value={formData.trailer_url || ''}
                 onChange={(e) => setFormData({ ...formData, trailer_url: e.target.value })}
-                placeholder="https://youtube.com/embed/..."
+                placeholder="https://www.youtube.com/embed/VIDEO_ID"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
               />
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Usa el formato embed: youtube.com/embed/VIDEO_ID o player.vimeo.com/video/VIDEO_ID
+              </p>
             </div>
 
             <div>
@@ -289,6 +292,45 @@ function OfferModal({ isOpen, offer, onSave, onClose }) {
                 placeholder="Ejemplo:&#10;El mapa del artista&#10;Guía y Explorador&#10;Dirección y producción creativa"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50 resize-none"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Highlights - Incluye (uno por línea)</label>
+              <textarea
+                value={(formData.highlights || []).join('\n')}
+                onChange={(e) => updateArrayField('highlights', e.target.value)}
+                rows={3}
+                placeholder="Ejemplo:&#10;10 horas de creación&#10;1 mix & master&#10;1 revisión de contenido"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50 resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Detalles técnicos (uno por línea)</label>
+              <textarea
+                value={(formData.technical || []).join('\n')}
+                onChange={(e) => updateArrayField('technical', e.target.value)}
+                rows={3}
+                placeholder="Ejemplo:&#10;Mix + Master 170 €&#10;Mix 120 €&#10;Dolby Atmos desde 450 €"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50 resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Color de la tarjeta</label>
+              <select
+                value={formData.color}
+                onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
+              >
+                <option value="emerald">Esmeralda</option>
+                <option value="purple">Morado</option>
+                <option value="blue">Azul</option>
+                <option value="orange">Naranja</option>
+                <option value="red">Rojo</option>
+                <option value="zinc">Gris</option>
+                <option value="teal">Turquesa</option>
+              </select>
             </div>
           </div>
 
