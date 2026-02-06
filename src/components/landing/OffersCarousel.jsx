@@ -77,6 +77,8 @@ const defaultOffers = [
 
 export default function OffersCarousel() {
   const [selectedOffer, setSelectedOffer] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollContainerRef = React.useRef(null);
 
   const { data: config } = useQuery({
     queryKey: ['landingConfig'],
@@ -87,45 +89,85 @@ export default function OffersCarousel() {
   });
 
   const offers = config?.offers && config.offers.length > 0 ? config.offers : defaultOffers;
+
+  const scrollToIndex = (index) => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const cardWidth = container.scrollWidth / offers.length;
+      container.scrollTo({
+        left: cardWidth * index,
+        behavior: 'smooth'
+      });
+      setCurrentIndex(index);
+    }
+  };
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const cardWidth = container.scrollWidth / offers.length;
+      const newIndex = Math.round(container.scrollLeft / cardWidth);
+      setCurrentIndex(newIndex);
+    }
+  };
+
   return (
-    <section id="ofertas" className="relative py-20 sm:py-32 overflow-hidden bg-black">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-black opacity-80" />
+    <section id="ofertas" className="relative py-20 sm:py-32 overflow-hidden bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950">
       
-      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 sm:px-8">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12 sm:mb-16"
+          className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
             Formas de ayudarte
           </h2>
-          <p className="text-gray-400 text-base sm:text-lg max-w-2xl mx-auto">
-            Elige el nivel de acompañamiento que necesitas
-          </p>
         </motion.div>
 
-        {/* Horizontal Scroll Carousel */}
+        {/* Carousel Container */}
         <div className="relative">
-          <div className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide">
+          {/* Left Arrow */}
+          <button
+            onClick={() => scrollToIndex(Math.max(0, currentIndex - 1))}
+            disabled={currentIndex === 0}
+            className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 z-20 w-12 h-12 items-center justify-center rounded-full bg-white hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-xl"
+          >
+            <ArrowRight className="w-5 h-5 text-black rotate-180" />
+          </button>
+
+          {/* Right Arrow */}
+          <button
+            onClick={() => scrollToIndex(Math.min(offers.length - 1, currentIndex + 1))}
+            disabled={currentIndex === offers.length - 1}
+            className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 z-20 w-12 h-12 items-center justify-center rounded-full bg-white hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-xl"
+          >
+            <ArrowRight className="w-5 h-5 text-black" />
+          </button>
+
+          {/* Horizontal Scroll Carousel */}
+          <div 
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scroll-smooth"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            }}
+          >
             {offers.map((offer, index) => (
               <motion.div
                 key={offer.id}
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className={`flex-shrink-0 w-[85vw] sm:w-96 snap-center ${
-                  offer.featured ? 'ring-2 ring-emerald-500/30' : ''
-                }`}
+                className="flex-shrink-0 w-[85vw] sm:w-[380px] snap-center"
               >
-                <div className={`h-full bg-zinc-900 rounded-2xl border ${
-                  offer.featured ? 'border-emerald-500/30' : 'border-zinc-800'
-                } overflow-hidden hover:border-zinc-700 transition-all duration-300 flex flex-col`}>
+                <div className="h-full bg-zinc-800/50 backdrop-blur-sm rounded-3xl border border-zinc-700/50 overflow-hidden hover:border-zinc-600 transition-all duration-300 flex flex-col">
                   
                   {/* Image (if provided) */}
                   {offer.image_url && (
@@ -138,68 +180,58 @@ export default function OffersCarousel() {
                     </div>
                   )}
 
-                  <div className="p-6 sm:p-8 flex flex-col flex-1">
-                    {/* Tag */}
-                    {offer.tag && (
-                      <span className={`inline-block mb-4 px-3 py-1 rounded-full text-xs font-semibold ${
-                        offer.tag === "Gratis" 
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                          : 'bg-zinc-800 text-gray-400'
-                      }`}>
-                        {offer.tag}
-                      </span>
-                    )}
-
-                    {/* Title & Price */}
-                    <h3 className={`${offer.title_font_size || 'text-2xl'} ${offer.title_font_weight || 'font-bold'} text-white mb-2`}>
+                  <div className="p-8 flex flex-col flex-1">
+                    {/* Title */}
+                    <h3 className="text-2xl font-bold text-white mb-3 leading-tight">
                       {offer.title}
                     </h3>
+
+                    {/* Price/Tag */}
                     {offer.price && (
-                      <div className={`${offer.price_font_size || 'text-4xl'} font-bold text-white mb-4`}>
+                      <div className="text-lg font-semibold text-emerald-400 mb-4">
                         {offer.price}
+                      </div>
+                    )}
+                    {offer.tag && !offer.price && (
+                      <div className="text-sm font-medium text-gray-400 mb-4">
+                        {offer.tag}
                       </div>
                     )}
 
                     {/* Description */}
-                    <p className={`text-gray-400 ${offer.description_font_size || 'text-base'} leading-relaxed mb-6 flex-1`}>
+                    <p className="text-gray-300 text-sm leading-relaxed mb-6 flex-1">
                       {offer.description}
                     </p>
 
-                  {/* Highlights */}
-                  {offer.highlights && (
-                    <div className="space-y-2 mb-6">
-                      {offer.highlights.map((item, i) => (
-                        <div key={i} className="flex items-center gap-2 text-sm text-gray-300">
-                          <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                          <span>{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                    {/* Highlights */}
+                    {offer.highlights && offer.highlights.length > 0 && (
+                      <div className="space-y-2 mb-6 pb-6 border-b border-zinc-700/50">
+                        {offer.highlights.slice(0, 3).map((item, i) => (
+                          <div key={i} className="flex items-start gap-2 text-sm text-gray-400">
+                            <span className="text-emerald-400 mt-0.5">•</span>
+                            <span>{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
 
-                  {/* Technical details */}
-                  {offer.technical && (
-                    <div className="space-y-1 mb-6">
-                      {offer.technical.map((item, i) => (
-                        <div key={i} className="text-xs text-gray-500">
-                          • {item}
-                        </div>
-                      ))}
+                    {/* CTA Buttons */}
+                    <div className="flex gap-3 mt-auto">
+                      <button
+                        onClick={() => setSelectedOffer(offer)}
+                        className="flex-1 py-3 px-4 rounded-xl bg-white text-black hover:bg-gray-100 font-semibold text-sm transition-all"
+                      >
+                        {offer.cta || 'Ver más'}
+                      </button>
+                      {offer.featured && (
+                        <button
+                          onClick={() => setSelectedOffer(offer)}
+                          className="py-3 px-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 font-semibold text-sm transition-all"
+                        >
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
-                  )}
-
-                    {/* CTA */}
-                    <button
-                      onClick={() => setSelectedOffer(offer)}
-                      className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
-                        offer.featured
-                          ? 'bg-emerald-500 text-black hover:bg-emerald-400'
-                          : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'
-                      }`}
-                    >
-                      {offer.cta}
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -207,9 +239,19 @@ export default function OffersCarousel() {
           </div>
         </div>
 
-        {/* Scroll hint */}
-        <div className="text-center mt-8">
-          <p className="text-xs text-gray-600">← Desliza para ver todas las opciones →</p>
+        {/* Dots Indicators */}
+        <div className="flex items-center justify-center gap-2 mt-8">
+          {offers.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => scrollToIndex(index)}
+              className={`transition-all ${
+                index === currentIndex 
+                  ? 'w-8 h-2 bg-white rounded-full' 
+                  : 'w-2 h-2 bg-gray-600 rounded-full hover:bg-gray-500'
+              }`}
+            />
+          ))}
         </div>
       </div>
 
@@ -220,12 +262,8 @@ export default function OffersCarousel() {
       />
 
       <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
+        div::-webkit-scrollbar {
           display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
         }
       `}</style>
     </section>
