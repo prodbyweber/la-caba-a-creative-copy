@@ -125,33 +125,45 @@ export default function OffersCarousel() {
               >
                 <div className={`h-full bg-zinc-900 rounded-2xl border ${
                   offer.featured ? 'border-emerald-500/30' : 'border-zinc-800'
-                } p-6 sm:p-8 flex flex-col hover:border-zinc-700 transition-all duration-300`}>
+                } overflow-hidden hover:border-zinc-700 transition-all duration-300 flex flex-col`}>
                   
-                  {/* Tag */}
-                  {offer.tag && (
-                    <span className={`inline-block mb-4 px-3 py-1 rounded-full text-xs font-semibold ${
-                      offer.tag === "Gratis" 
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                        : 'bg-zinc-800 text-gray-400'
-                    }`}>
-                      {offer.tag}
-                    </span>
-                  )}
-
-                  {/* Title & Price */}
-                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
-                    {offer.title}
-                  </h3>
-                  {offer.price && (
-                    <div className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                      {offer.price}
+                  {/* Image (if provided) */}
+                  {offer.image_url && (
+                    <div className="w-full h-48 overflow-hidden">
+                      <img 
+                        src={offer.image_url} 
+                        alt={offer.title}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   )}
 
-                  {/* Description */}
-                  <p className="text-gray-400 text-sm sm:text-base leading-relaxed mb-6 flex-1">
-                    {offer.description}
-                  </p>
+                  <div className="p-6 sm:p-8 flex flex-col flex-1">
+                    {/* Tag */}
+                    {offer.tag && (
+                      <span className={`inline-block mb-4 px-3 py-1 rounded-full text-xs font-semibold ${
+                        offer.tag === "Gratis" 
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                          : 'bg-zinc-800 text-gray-400'
+                      }`}>
+                        {offer.tag}
+                      </span>
+                    )}
+
+                    {/* Title & Price */}
+                    <h3 className={`${offer.title_font_size || 'text-2xl'} ${offer.title_font_weight || 'font-bold'} text-white mb-2`}>
+                      {offer.title}
+                    </h3>
+                    {offer.price && (
+                      <div className={`${offer.price_font_size || 'text-4xl'} font-bold text-white mb-4`}>
+                        {offer.price}
+                      </div>
+                    )}
+
+                    {/* Description */}
+                    <p className={`text-gray-400 ${offer.description_font_size || 'text-base'} leading-relaxed mb-6 flex-1`}>
+                      {offer.description}
+                    </p>
 
                   {/* Highlights */}
                   {offer.highlights && (
@@ -176,18 +188,19 @@ export default function OffersCarousel() {
                     </div>
                   )}
 
-                  {/* CTA */}
-                  <button
-                    onClick={() => setSelectedOffer(offer)}
-                    className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
-                      offer.featured
-                        ? 'bg-emerald-500 text-black hover:bg-emerald-400'
-                        : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'
-                    }`}
-                  >
-                    {offer.cta}
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+                    {/* CTA */}
+                    <button
+                      onClick={() => setSelectedOffer(offer)}
+                      className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
+                        offer.featured
+                          ? 'bg-emerald-500 text-black hover:bg-emerald-400'
+                          : 'bg-white/10 text-white hover:bg-white/20 border border-white/10'
+                      }`}
+                    >
+                      {offer.cta}
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             ))}

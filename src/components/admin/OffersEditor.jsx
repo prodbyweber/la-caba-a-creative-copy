@@ -21,7 +21,12 @@ export default function OffersEditor({ offers = [], onUpdate }) {
     full_description: "",
     for_who: "",
     what_you_gain: [],
-    key_content: []
+    key_content: [],
+    image_url: "",
+    title_font_size: "text-2xl",
+    title_font_weight: "font-bold",
+    description_font_size: "text-base",
+    price_font_size: "text-4xl"
   };
 
   const handleAdd = () => {
@@ -331,6 +336,82 @@ function OfferModal({ isOpen, offer, onSave, onClose }) {
                 <option value="zinc">Gris</option>
                 <option value="teal">Turquesa</option>
               </select>
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Imagen de la tarjeta (URL)</label>
+              <input
+                type="text"
+                value={formData.image_url || ''}
+                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                placeholder="https://images.unsplash.com/photo-..."
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Imagen que aparecerá en la tarjeta. Puede ser de Unsplash, tu Drive, etc.
+              </p>
+            </div>
+          </div>
+
+          {/* Typography Styles */}
+          <div className="pt-6 border-t border-white/10 space-y-4">
+            <h4 className="text-lg font-semibold text-white mb-4">Estilos tipográficos</h4>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Tamaño título</label>
+                <select
+                  value={formData.title_font_size || 'text-2xl'}
+                  onChange={(e) => setFormData({ ...formData, title_font_size: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
+                >
+                  <option value="text-xl">Pequeño (XL)</option>
+                  <option value="text-2xl">Mediano (2XL)</option>
+                  <option value="text-3xl">Grande (3XL)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Peso título</label>
+                <select
+                  value={formData.title_font_weight || 'font-bold'}
+                  onChange={(e) => setFormData({ ...formData, title_font_weight: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
+                >
+                  <option value="font-normal">Normal</option>
+                  <option value="font-semibold">Semi Bold</option>
+                  <option value="font-bold">Bold</option>
+                  <option value="font-black">Black</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Tamaño descripción</label>
+                <select
+                  value={formData.description_font_size || 'text-base'}
+                  onChange={(e) => setFormData({ ...formData, description_font_size: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
+                >
+                  <option value="text-xs">Muy pequeño</option>
+                  <option value="text-sm">Pequeño</option>
+                  <option value="text-base">Normal</option>
+                  <option value="text-lg">Grande</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Tamaño precio</label>
+                <select
+                  value={formData.price_font_size || 'text-4xl'}
+                  onChange={(e) => setFormData({ ...formData, price_font_size: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
+                >
+                  <option value="text-2xl">Pequeño (2XL)</option>
+                  <option value="text-3xl">Mediano (3XL)</option>
+                  <option value="text-4xl">Grande (4XL)</option>
+                  <option value="text-5xl">Muy grande (5XL)</option>
+                </select>
+              </div>
             </div>
           </div>
 
