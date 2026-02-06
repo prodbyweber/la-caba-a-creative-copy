@@ -23,19 +23,13 @@ export default function Hero({ config }) {
             {/* Main Headline */}
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 sm:mb-8 leading-[1.1]">
               <span className="block text-white">
-                Construye tu marca como artista.
-              </span>
-              <span className="block text-white">
-                Crea música de alto nivel.
-              </span>
-              <span className="block text-emerald-400">
-                Posiciónate para competir.
+                {config?.hero_title || "El estudio creativo definitivo para artistas que buscan conectar"}
               </span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-base sm:text-lg md:text-xl text-gray-400 mb-8 sm:mb-12 leading-relaxed max-w-xl">
-              Formación, dirección creativa y producción musical para artistas que quieren ir en serio.
+              {config?.hero_subtitle || "Producción por horas, visuales cinematográficos y digitalización artística para proyectos que van en serio."}
             </p>
 
             {/* CTA Button */}
@@ -45,7 +39,7 @@ export default function Hero({ config }) {
                 whileTap={{ scale: 0.98 }}
                 className="group px-8 py-4 sm:px-10 sm:py-5 rounded-full bg-gradient-to-r from-white to-gray-200 text-black font-semibold text-base sm:text-lg flex items-center gap-3 shadow-2xl shadow-white/10 hover:shadow-white/20 transition-all duration-300 w-full sm:w-auto justify-center"
               >
-                Ver formas de ayudarte
+                {config?.hero_cta_text || "Aplicar a La Cabaña Creative"}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </motion.button>
             </a>
