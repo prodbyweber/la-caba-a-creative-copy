@@ -364,50 +364,61 @@ export default function LandingEditor() {
                 isUploading={isUploading}
                 setIsUploading={setIsUploading}
               />
-              
-              <div className="pt-4 border-t border-white/10 mt-4">
-                <label className="text-sm text-gray-400 mb-3 block font-medium">Logos de Marcas</label>
-                <div className="space-y-3">
-                  {(config.brand_logos || []).map((logo, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <img src={logo} alt={`Brand ${index + 1}`} className="w-16 h-10 object-contain bg-white/5 rounded p-1" />
-                      <button
-                        onClick={() => {
-                          const newLogos = config.brand_logos.filter((_, i) => i !== index);
-                          updateField('brand_logos', newLogos);
-                        }}
-                        className="p-2 hover:bg-red-500/20 rounded-lg text-red-400 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                  
-                  <label className="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 rounded-xl border border-dashed border-white/20 text-white cursor-pointer transition-all">
+            </SectionEditor>
+
+            {/* Brands Logos Section Editor */}
+            <SectionEditor title="🏢 Logos de Marcas Colaboradoras">
+              <div className="space-y-3">
+                {(config.brand_logos || []).map((logo, index) => (
+                  <div key={index} className="flex items-center gap-3 bg-white/5 rounded-xl p-3 border border-white/10">
+                    <img src={logo} alt={`Brand ${index + 1}`} className="w-20 h-12 object-contain bg-white rounded p-2" />
                     <input
-                      type="file"
-                      accept="image/png"
-                      className="hidden"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        
-                        setIsUploading(true);
-                        try {
-                          const { file_url } = await base44.integrations.Core.UploadFile({ file });
-                          const newLogos = [...(config.brand_logos || []), file_url];
-                          updateField('brand_logos', newLogos);
-                        } catch (error) {
-                          console.error('Error uploading logo:', error);
-                        } finally {
-                          setIsUploading(false);
-                        }
+                      type="text"
+                      value={logo}
+                      onChange={(e) => {
+                        const newLogos = [...config.brand_logos];
+                        newLogos[index] = e.target.value;
+                        updateField('brand_logos', newLogos);
                       }}
+                      className="flex-1 px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                      placeholder="URL de la imagen del logo"
                     />
-                    <Upload className="w-4 h-4" />
-                    <span className="text-sm">Subir logo PNG</span>
-                  </label>
-                </div>
+                    <button
+                      onClick={() => {
+                        const newLogos = config.brand_logos.filter((_, i) => i !== index);
+                        updateField('brand_logos', newLogos);
+                      }}
+                      className="p-2 hover:bg-red-500/20 rounded-lg text-red-400 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+                
+                <label className="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 rounded-xl border border-dashed border-white/20 text-white cursor-pointer transition-all">
+                  <input
+                    type="file"
+                    accept="image/png,image/jpg,image/jpeg"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      
+                      setIsUploading(true);
+                      try {
+                        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                        const newLogos = [...(config.brand_logos || []), file_url];
+                        updateField('brand_logos', newLogos);
+                      } catch (error) {
+                        console.error('Error uploading logo:', error);
+                      } finally {
+                        setIsUploading(false);
+                      }
+                    }}
+                  />
+                  <Upload className="w-4 h-4" />
+                  <span className="text-sm">{isUploading ? 'Subiendo...' : 'Subir nuevo logo'}</span>
+                </label>
               </div>
             </SectionEditor>
 
