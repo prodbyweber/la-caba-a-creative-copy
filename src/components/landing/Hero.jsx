@@ -95,8 +95,10 @@ export default function Hero({ config }) {
         </div>
       </div>
 
-      {/* Brands Carousel */}
-      <BrandsCarousel logos={config?.brand_logos} />
+      {/* Brands Carousel - Outside hero section */}
     </section>
+    
+    {/* Brands Carousel */}
+    <BrandsCarousel logos={config?.brand_logos} />
   );
 }
