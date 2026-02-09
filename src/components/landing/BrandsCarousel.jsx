@@ -2,10 +2,19 @@ import React from "react";
 import { motion } from "framer-motion";
 
 export default function BrandsCarousel({ logos }) {
-  if (!logos || logos.length === 0) return null;
-
+  // Mostrar logos por defecto si no hay configurados
+  const defaultLogos = [
+    "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=100&fit=crop",
+    "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200&h=100&fit=crop",
+    "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=200&h=100&fit=crop",
+    "https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=200&h=100&fit=crop",
+    "https://images.unsplash.com/photo-1614624532983-4ce03382d63d?w=200&h=100&fit=crop"
+  ];
+  
+  const displayLogos = (logos && logos.length > 0) ? logos : defaultLogos;
+  
   // Duplicar logos para loop infinito suave
-  const duplicatedLogos = [...logos, ...logos, ...logos];
+  const duplicatedLogos = [...displayLogos, ...displayLogos, ...displayLogos];
 
   return (
     <section className="relative py-6 bg-zinc-950/50 border-t border-white/5">
@@ -18,13 +27,13 @@ export default function BrandsCarousel({ logos }) {
           <motion.div
             className="flex gap-16 items-center"
             animate={{
-              x: [0, -100 * logos.length],
+              x: [0, -100 * displayLogos.length],
             }}
             transition={{
               x: {
                 repeat: Infinity,
                 repeatType: "loop",
-                duration: logos.length * 3,
+                duration: displayLogos.length * 3,
                 ease: "linear",
               },
             }}
