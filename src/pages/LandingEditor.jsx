@@ -41,6 +41,13 @@ export default function LandingEditor() {
         hero_subtitle: "Producción por horas, visuales cinematográficos y digitalización artística para proyectos que van en serio.",
         hero_image_url: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&h=1000&fit=crop&q=80",
         hero_cta_text: "Aplicar a La Cabaña Creative",
+        brand_logos: [
+          "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=100&fit=crop",
+          "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=200&h=100&fit=crop",
+          "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=200&h=100&fit=crop",
+          "https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=200&h=100&fit=crop",
+          "https://images.unsplash.com/photo-1614624532983-4ce03382d63d?w=200&h=100&fit=crop"
+        ],
         services_title: "Formas de trabajar contigo",
         services_subtitle: "Servicios diseñados para artistas que buscan profesionalismo y resultados reales.",
         services: [],
