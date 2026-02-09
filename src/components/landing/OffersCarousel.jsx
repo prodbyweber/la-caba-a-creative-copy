@@ -201,9 +201,9 @@ export default function OffersCarousel() {
                     )}
 
                     {/* Description */}
-                    <p className="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-3">
+                    <div className="text-gray-400 text-sm leading-relaxed mb-4 whitespace-pre-line">
                       {offer.description}
-                    </p>
+                    </div>
 
                     {/* Single CTA Button */}
                     <button
