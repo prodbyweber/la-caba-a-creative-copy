@@ -185,7 +185,7 @@ export default function OffersCarousel() {
                   </div>
 
                   {/* Bottom Section - Dark background */}
-                  <div className="bg-zinc-900 p-5 flex flex-col">
+                  <div className="bg-zinc-900 p-5 flex flex-col flex-1">
                     {/* Title (if image exists) */}
                     {offer.image_url && (
                       <h3 className="text-lg font-bold text-white mb-2 leading-tight">
@@ -193,22 +193,56 @@ export default function OffersCarousel() {
                       </h3>
                     )}
 
+                    {/* Tag */}
+                    {offer.tag && (
+                      <div className="text-xs text-gray-500 mb-3">
+                        {offer.tag}
+                      </div>
+                    )}
+
                     {/* Price */}
                     {offer.price && (
-                      <div className="text-base font-semibold text-emerald-400 mb-3">
+                      <div className="text-2xl font-bold text-white mb-4">
                         {offer.price}
                       </div>
                     )}
 
                     {/* Description */}
-                    <p className="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-3">
+                    <p className="text-gray-400 text-sm leading-relaxed mb-4">
                       {offer.description}
                     </p>
+
+                    {/* Highlights List */}
+                    {offer.highlights && offer.highlights.length > 0 && (
+                      <div className="mb-4 space-y-2">
+                        {offer.highlights.map((item, i) => (
+                          <div key={i} className="flex items-start gap-2 text-sm text-gray-300">
+                            <Check className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                            <span>{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Technical List */}
+                    {offer.technical && offer.technical.length > 0 && (
+                      <div className="mb-4 space-y-2">
+                        {offer.technical.map((item, i) => (
+                          <div key={i} className="flex items-start gap-2 text-sm text-gray-300">
+                            <Check className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                            <span>{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Spacer to push button to bottom */}
+                    <div className="flex-1" />
 
                     {/* Single CTA Button */}
                     <button
                       onClick={() => setSelectedOffer(offer)}
-                      className="w-full py-2.5 px-4 rounded-xl bg-white text-black hover:bg-gray-100 font-semibold text-sm transition-all"
+                      className="w-full py-2.5 px-4 rounded-xl bg-white text-black hover:bg-gray-100 font-semibold text-sm transition-all mt-4"
                     >
                       {offer.cta || 'Ver más'}
                     </button>
