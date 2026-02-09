@@ -1,7 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import BrandsCarousel from "./BrandsCarousel";
 
 export default function Hero({ config }) {
   const heroTitle = config?.hero_title || "El estudio creativo definitivo para artistas que buscan conectar";
@@ -95,10 +94,6 @@ export default function Hero({ config }) {
         </div>
       </div>
 
-      {/* Brands Carousel - Outside hero section */}
     </section>
-    
-    {/* Brands Carousel */}
-    <BrandsCarousel logos={config?.brand_logos} />
   );
 }

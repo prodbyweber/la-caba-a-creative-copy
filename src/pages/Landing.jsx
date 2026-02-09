@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import Hero from "@/components/landing/Hero";
 import OffersCarousel from "@/components/landing/OffersCarousel";
+import BrandsCarousel from "@/components/landing/BrandsCarousel";
 import LandingNav from "@/components/landing/LandingNav";
 import Footer from "@/components/landing/Footer";
 
@@ -21,6 +22,7 @@ export default function Landing() {
       
       <main>
         <Hero config={config} />
+        <BrandsCarousel logos={config?.brand_logos} />
         <OffersCarousel />
       </main>
 
