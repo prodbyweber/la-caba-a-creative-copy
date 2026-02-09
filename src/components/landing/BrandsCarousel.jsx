@@ -20,7 +20,7 @@ export default function BrandsCarousel({ logos }) {
     <section className="relative py-6 bg-zinc-950/50 border-t border-white/5">
       <div className="max-w-full overflow-hidden">
         <div className="text-center mb-4">
-          <span className="text-xs uppercase tracking-wider text-gray-500">Han confiado en mí</span>
+          <span className="text-xs uppercase tracking-wider text-gray-500">Hemos colaborado con</span>
         </div>
         
         <div className="relative overflow-hidden">
