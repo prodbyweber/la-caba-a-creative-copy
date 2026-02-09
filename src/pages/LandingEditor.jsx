@@ -383,6 +383,30 @@ export default function LandingEditor() {
                       className="flex-1 px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
                       placeholder="URL de la imagen del logo"
                     />
+                    <label className="p-2 hover:bg-emerald-500/20 rounded-lg text-emerald-400 transition-colors cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/png,image/jpg,image/jpeg"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          
+                          setIsUploading(true);
+                          try {
+                            const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                            const newLogos = [...config.brand_logos];
+                            newLogos[index] = file_url;
+                            updateField('brand_logos', newLogos);
+                          } catch (error) {
+                            console.error('Error uploading logo:', error);
+                          } finally {
+                            setIsUploading(false);
+                          }
+                        }}
+                      />
+                      <Upload className="w-4 h-4" />
+                    </label>
                     <button
                       onClick={() => {
                         const newLogos = config.brand_logos.filter((_, i) => i !== index);
