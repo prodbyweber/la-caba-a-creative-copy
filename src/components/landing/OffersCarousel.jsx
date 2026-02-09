@@ -170,7 +170,7 @@ export default function OffersCarousel() {
                 <div className="h-full bg-zinc-900/90 backdrop-blur-sm rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300 flex flex-col shadow-xl border border-zinc-800/50">
                   
                   {/* Top Section - Light background */}
-                  <div className="bg-zinc-200 h-[160px] overflow-hidden flex items-center justify-center">
+                  <div className="bg-zinc-200 h-[200px] overflow-hidden flex items-center justify-center">
                     {offer.image_url ? (
                       <img 
                         src={offer.image_url} 
@@ -201,7 +201,7 @@ export default function OffersCarousel() {
                     )}
 
                     {/* Description */}
-                    <div className="text-gray-400 text-sm leading-relaxed mb-4 whitespace-pre-line">
+                    <div className="text-gray-400 text-sm leading-relaxed mb-4 whitespace-pre-line line-clamp-3">
                       {offer.description}
                     </div>
 
