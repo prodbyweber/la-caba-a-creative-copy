@@ -17,10 +17,10 @@ export default function ExploracionSection() {
         >
           {/* Título Principal - Estilo espaciado */}
           <div className="space-y-2">
-            <h2 className="text-5xl sm:text-6xl md:text-7xl font-light tracking-[0.3em] text-white/90 uppercase">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-light tracking-[0.2em] text-white/90 uppercase">
               EXPLORACIÓN
             </h2>
-            <p className="text-xl sm:text-2xl text-white/80 font-light tracking-wide">
+            <p className="text-lg sm:text-xl text-white/80 font-light tracking-wide">
               con Prod. by Weber
             </p>
           </div>
@@ -44,9 +44,9 @@ export default function ExploracionSection() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4, duration: 0.8 }}
-            className="space-y-6 max-w-xl mx-auto"
+            className="space-y-6 max-w-2xl mx-auto px-4"
           >
-            <p className="text-base sm:text-lg text-white/70 leading-relaxed font-light">
+            <p className="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed font-light">
               Exploración con Prod. by Weber no es una revisión de contenido, es una sesión privada de 40 minutos conmigo, donde te digo sin filtro qué estás haciendo mal, qué está frenando tus ventas y cómo ajustar tu mensaje para que tu marca se perciba como referente y empiece a atraer clientes reales: sales con claridad, dirección y una forma distinta de usar tus redes para vender, no para "ver si pega".
             </p>
           </motion.div>
@@ -67,16 +67,22 @@ export default function ExploracionSection() {
             />
           </motion.div>
 
-          {/* CTA Final */}
+          {/* Botón Agendar Sesión */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.8, duration: 0.6 }}
+            className="space-y-4"
           >
-            <button className="px-8 py-3 border border-white/30 rounded-full text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm tracking-wider">
-              lacabanacreative.com
+            <button className="px-10 py-4 bg-white text-black hover:bg-white/90 font-semibold rounded-full transition-all text-base sm:text-lg shadow-xl hover:scale-105">
+              Agendar Sesión
             </button>
+            <div>
+              <button className="px-6 py-2 border border-white/30 rounded-full text-white/80 hover:bg-white/10 hover:text-white transition-all text-xs sm:text-sm tracking-wider">
+                lacabanacreative.com
+              </button>
+            </div>
           </motion.div>
         </motion.div>
       </div>
