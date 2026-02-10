@@ -7,6 +7,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { SectionEditor, TextInput, ImageUpload, ArrayEditor } from "@/components/admin/SectionEditor";
 import HowItWorksEditor from "@/components/admin/HowItWorksEditor";
 import OffersEditor from "@/components/admin/OffersEditor";
+import TimelineEditor from "@/components/admin/TimelineEditor";
 import { 
   Eye, 
   GripVertical, 
@@ -332,6 +333,14 @@ export default function LandingEditor() {
               <OffersEditor 
                 offers={config.offers || []}
                 onUpdate={(offers) => updateField('offers', offers)}
+              />
+            </SectionEditor>
+
+            {/* Timeline Section Editor */}
+            <SectionEditor title="📅 Timeline Biográfico">
+              <TimelineEditor 
+                timeline={config.timeline_milestones || []}
+                onUpdate={(timeline) => updateField('timeline_milestones', timeline)}
               />
             </SectionEditor>
 
