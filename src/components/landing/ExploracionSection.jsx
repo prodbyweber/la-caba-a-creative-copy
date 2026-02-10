@@ -1,112 +1,83 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
 
 export default function ExploracionSection() {
   return (
-    <section className="relative py-20 sm:py-32 overflow-hidden bg-zinc-950">
-      <div className="relative z-10 max-w-4xl mx-auto px-6 sm:px-8">
+    <section className="relative min-h-screen py-20 overflow-hidden bg-black">
+      {/* Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-emerald-950/20 to-black" />
+      
+      <div className="relative z-10 max-w-2xl mx-auto px-6 flex flex-col items-center justify-center min-h-screen text-center">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center"
+          transition={{ duration: 0.8 }}
+          className="space-y-12"
         >
-          {/* Título */}
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-8">
-            Exploración con Prod. by Weber
-          </h2>
-
-          {/* Card Central */}
-          <div className="bg-gradient-to-br from-zinc-900 to-zinc-800 border border-zinc-700 rounded-3xl p-8 sm:p-12 max-w-2xl mx-auto">
-            {/* Precio Destacado */}
-            <div className="mb-6">
-              <div className="text-6xl sm:text-7xl font-black text-white mb-2">600 €</div>
-              <div className="text-lg text-gray-400 font-medium">Sesión privada 1 a 1</div>
-            </div>
-
-            {/* Subtítulo */}
-            <p className="text-xl sm:text-2xl text-white font-semibold mb-8 leading-relaxed">
-              No es una llamada informativa.<br />
-              Es una sesión privada para entender tu proyecto y decidir cómo llevarlo al siguiente nivel.
+          {/* Título Principal - Estilo espaciado */}
+          <div className="space-y-2">
+            <h2 className="text-5xl sm:text-6xl md:text-7xl font-light tracking-[0.3em] text-white/90 uppercase">
+              EXPLORACIÓN
+            </h2>
+            <p className="text-xl sm:text-2xl text-white/80 font-light tracking-wide">
+              con Prod. by Weber
             </p>
-
-            {/* Descripción Principal */}
-            <div className="text-left mb-8 space-y-4 text-gray-300 leading-relaxed">
-              <p>
-                La <span className="text-white font-semibold">Exploración con Prod. by Weber</span> es una sesión privada 1 a 1 donde analizamos tu proyecto artístico, tu música y tu dirección creativa actual.
-              </p>
-
-              <div className="space-y-2 py-4">
-                <p className="text-white font-semibold">Durante la sesión:</p>
-                <ul className="space-y-2 pl-4">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                    <span>Detectamos qué está funcionando y qué no</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                    <span>Identificamos bloqueos creativos o estratégicos</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                    <span>Definimos si tu proyecto necesita producción, dirección creativa o estructura</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                    <span>Trazamos el siguiente paso lógico para que avances con claridad</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="pt-4">
-                <p className="text-white font-semibold mb-2">Sales con:</p>
-                <ul className="space-y-2 pl-4">
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-400">•</span>
-                    <span>Una visión clara de tu proyecto</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-400">•</span>
-                    <span>Dirección concreta</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-400">•</span>
-                    <span>Criterio profesional para tomar decisiones</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            {/* Detalles de la Sesión */}
-            <div className="grid grid-cols-2 gap-3 mb-8 text-sm">
-              <div className="bg-zinc-800/50 rounded-xl p-3 text-center">
-                <div className="text-gray-400 mb-1">Duración</div>
-                <div className="text-white font-semibold">40 minutos</div>
-              </div>
-              <div className="bg-zinc-800/50 rounded-xl p-3 text-center">
-                <div className="text-gray-400 mb-1">Modalidad</div>
-                <div className="text-white font-semibold">Online</div>
-              </div>
-            </div>
-
-            {/* Valores */}
-            <div className="flex flex-wrap justify-center gap-3 mb-8 text-xs text-gray-400">
-              <span className="px-3 py-1 bg-zinc-800/50 rounded-full">Sin promesas vacías</span>
-              <span className="px-3 py-1 bg-zinc-800/50 rounded-full">Sin plantillas genéricas</span>
-              <span className="px-3 py-1 bg-zinc-800/50 rounded-full">Exploración real</span>
-            </div>
-
-            {/* CTA */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full py-4 px-8 bg-white hover:bg-gray-100 text-black font-bold text-lg rounded-xl transition-all shadow-xl"
-            >
-              Reservar Exploración – 600 €
-            </motion.button>
           </div>
+
+          {/* Precio en Badge */}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="inline-block"
+          >
+            <div className="px-12 py-4 border-2 border-white/30 rounded-full">
+              <span className="text-3xl sm:text-4xl font-bold text-white tracking-wide">$600 EUR</span>
+            </div>
+          </motion.div>
+
+          {/* Descripción Principal */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="space-y-6 max-w-xl mx-auto"
+          >
+            <p className="text-base sm:text-lg text-white/70 leading-relaxed font-light">
+              Exploración con Prod. by Weber no es una revisión de contenido, es una sesión privada de 40 minutos conmigo, donde te digo sin filtro qué estás haciendo mal, qué está frenando tus ventas y cómo ajustar tu mensaje para que tu marca se perciba como referente y empiece a atraer clientes reales: sales con claridad, dirección y una forma distinta de usar tus redes para vender, no para "ver si pega".
+            </p>
+          </motion.div>
+
+          {/* Imagen placeholder (puedes reemplazar con tu foto) */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="w-64 h-64 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/10"
+          >
+            {/* Reemplaza el src con tu imagen real */}
+            <img 
+              src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=400&h=400&fit=crop&q=80" 
+              alt="Prod. by Weber"
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
+
+          {/* CTA Final */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.8, duration: 0.6 }}
+          >
+            <button className="px-8 py-3 border border-white/30 rounded-full text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm tracking-wider">
+              lacabanacreative.com
+            </button>
+          </motion.div>
         </motion.div>
       </div>
     </section>
