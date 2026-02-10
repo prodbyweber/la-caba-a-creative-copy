@@ -8,6 +8,7 @@ import { SectionEditor, TextInput, ImageUpload, ArrayEditor } from "@/components
 import HowItWorksEditor from "@/components/admin/HowItWorksEditor";
 import OffersEditor from "@/components/admin/OffersEditor";
 import TimelineEditor from "@/components/admin/TimelineEditor";
+import StoriesEditor from "@/components/admin/StoriesEditor";
 import { 
   Eye, 
   GripVertical, 
@@ -333,6 +334,14 @@ export default function LandingEditor() {
               <OffersEditor 
                 offers={config.offers || []}
                 onUpdate={(offers) => updateField('offers', offers)}
+              />
+            </SectionEditor>
+
+            {/* Testimonials Section Editor */}
+            <SectionEditor title="💬 Historias que hemos contado">
+              <StoriesEditor 
+                testimonials={config.testimonials || []}
+                onUpdate={(testimonials) => updateField('testimonials', testimonials)}
               />
             </SectionEditor>
 

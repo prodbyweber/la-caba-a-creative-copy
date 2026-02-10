@@ -1,8 +1,10 @@
 import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 
-const testimonials = [
+const defaultTestimonials = [
   {
     id: 1,
     image: "https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=600&h=400&fit=crop&q=80",
@@ -34,6 +36,15 @@ const testimonials = [
 ];
 
 export default function StoriesSection() {
+  const { data: config } = useQuery({
+    queryKey: ['landingConfig'],
+    queryFn: async () => {
+      const configs = await base44.entities.LandingConfig.list();
+      return configs.length > 0 ? configs[0] : null;
+    }
+  });
+
+  const testimonials = config?.testimonials || defaultTestimonials;
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef(null);
 
