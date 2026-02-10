@@ -20,20 +20,20 @@ import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, isAfter, isBe
 import { es } from "date-fns/locale";
 
 export default function Accounting() {
-  const [dateRange, setDateRange] = useState("month");
+  const [selectedMonth, setSelectedMonth] = useState(format(new Date(), 'yyyy-MM'));
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
   const [showIncomeModal, setShowIncomeModal] = useState(false);
   const [showGastoModal, setShowGastoModal] = useState(false);
   const [selectedIncome, setSelectedIncome] = useState(null);
+  const [showDistributionPanel, setShowDistributionPanel] = useState(false);
   
   const queryClient = useQueryClient();
 
   const getDateRange = () => {
-    const now = new Date();
-    if (dateRange === "today") return { start: now, end: now };
-    if (dateRange === "week") return { start: startOfWeek(now, { locale: es }), end: endOfWeek(now, { locale: es }) };
-    if (dateRange === "month") return { start: startOfMonth(now), end: endOfMonth(now) };
-    return { start: startOfMonth(now), end: endOfMonth(now) };
+    const [year, month] = selectedMonth.split('-');
+    const start = new Date(parseInt(year), parseInt(month) - 1, 1);
+    const end = new Date(parseInt(year), parseInt(month), 0);
+    return { start, end };
   };
 
   const { start, end } = getDateRange();
@@ -55,6 +55,18 @@ export default function Accounting() {
   });
 
   // Mutations
+  const createIncomeMutation = useMutation({
+    mutationFn: (data) => {
+      const calculatedData = {
+        ...data,
+        sueldo_monto_calculado: data.amount * (data.sueldo_porcentaje || 35) / 100,
+        sueldo_estado: "Sin pagar"
+      };
+      return base44.entities.Income.create(calculatedData);
+    },
+    onSuccess: () => queryClient.invalidateQueries(['incomes'])
+  });
+
   const updateIncomeMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Income.update(id, data),
     onSuccess: () => queryClient.invalidateQueries(['incomes', 'personalLedger'])
@@ -63,6 +75,11 @@ export default function Accounting() {
   const createLedgerMutation = useMutation({
     mutationFn: (data) => base44.entities.PersonalLedger.create(data),
     onSuccess: () => queryClient.invalidateQueries(['personalLedger'])
+  });
+
+  const createGastoMutation = useMutation({
+    mutationFn: (data) => base44.entities.GastoFijo.create(data),
+    onSuccess: () => queryClient.invalidateQueries(['gastosFijos'])
   });
 
   const updateGastoMutation = useMutation({
@@ -90,6 +107,10 @@ export default function Accounting() {
     .reduce((sum, inc) => sum + (inc.amount * (inc.sueldo_porcentaje || 35) / 100), 0);
   
   const sueldoPendiente = sueldoCalculado - sueldoPagado;
+
+  const negocioCalculado = filteredIncomes.reduce((sum, inc) => sum + (inc.amount * 0.40), 0);
+  const reinversionCalculado = filteredIncomes.reduce((sum, inc) => sum + (inc.amount * 0.15), 0);
+  const adsCalculado = filteredIncomes.reduce((sum, inc) => sum + (inc.amount * 0.10), 0);
 
   const gastosVencidos = gastosFijos.filter(g => {
     if (g.estado === "Pagado" || !g.proxima_fecha_pago) return false;
@@ -161,22 +182,27 @@ export default function Accounting() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <select
-                value={dateRange}
-                onChange={(e) => setDateRange(e.target.value)}
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
                 className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white text-sm"
+              />
+
+              <button
+                onClick={() => setShowDistributionPanel(!showDistributionPanel)}
+                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-xl text-white text-sm font-medium flex items-center gap-2"
               >
-                <option value="today">Hoy</option>
-                <option value="week">Esta semana</option>
-                <option value="month">Este mes</option>
-              </select>
+                <Wallet className="w-4 h-4" />
+                Distribución
+              </button>
 
               <button
                 onClick={() => setShowIncomeModal(true)}
                 className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-xl text-white text-sm font-medium flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
-                Nuevo Ingreso
+                <span className="hidden sm:inline">Ingreso</span>
               </button>
 
               <button
@@ -184,10 +210,44 @@ export default function Accounting() {
                 className="px-4 py-2 bg-purple-500 hover:bg-purple-600 rounded-xl text-white text-sm font-medium flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
-                Gasto Fijo
+                <span className="hidden sm:inline">Gasto</span>
               </button>
             </div>
           </div>
+
+          {/* Distribution Panel */}
+          {showDistributionPanel && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/20 rounded-2xl p-6 mb-6"
+            >
+              <h3 className="text-lg font-bold text-white mb-4">Distribución del mes</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                  <div className="text-sm text-gray-400 mb-1">Sueldo Personal (35%)</div>
+                  <div className="text-xl font-bold text-purple-400">{sueldoCalculado.toFixed(2)}€</div>
+                  <div className="text-xs text-gray-500 mt-2">Pagado: {sueldoPagado.toFixed(2)}€</div>
+                </div>
+                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                  <div className="text-sm text-gray-400 mb-1">Negocio (40%)</div>
+                  <div className="text-xl font-bold text-blue-400">{negocioCalculado.toFixed(2)}€</div>
+                  <div className="text-xs text-gray-500 mt-2">Operativa del estudio</div>
+                </div>
+                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                  <div className="text-sm text-gray-400 mb-1">Reinversión (15%)</div>
+                  <div className="text-xl font-bold text-orange-400">{reinversionCalculado.toFixed(2)}€</div>
+                  <div className="text-xs text-gray-500 mt-2">Equipos y mejoras</div>
+                </div>
+                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+                  <div className="text-sm text-gray-400 mb-1">Ads / Visibilidad (10%)</div>
+                  <div className="text-xl font-bold text-pink-400">{adsCalculado.toFixed(2)}€</div>
+                  <div className="text-xs text-gray-500 mt-2">Marketing y publicidad</div>
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
@@ -302,48 +362,70 @@ export default function Accounting() {
                         key={income.id}
                         className="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-white/20 transition-colors"
                       >
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-semibold text-white">{income.client_name}</span>
-                              <span className="text-xs px-2 py-0.5 bg-white/10 rounded text-gray-400">
-                                {income.payment_method}
-                              </span>
-                            </div>
-                            <div className="text-sm text-gray-400">{income.concept}</div>
-                            <div className="text-xs text-gray-500 mt-1">
-                              {format(parseISO(income.date), 'dd MMM yyyy', { locale: es })}
-                            </div>
-                          </div>
+                        <div className="flex flex-col gap-3">
+                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                           <div className="flex-1">
+                             <div className="flex items-center gap-2 mb-1 flex-wrap">
+                               <span className="font-semibold text-white">{income.client_name}</span>
+                               <span className="text-xs px-2 py-0.5 bg-white/10 rounded text-gray-400">
+                                 {income.payment_method}
+                               </span>
+                             </div>
+                             <div className="text-sm text-gray-400">{income.concept}</div>
+                             <div className="text-xs text-gray-500 mt-1">
+                               {format(parseISO(income.date), 'dd MMM yyyy', { locale: es })}
+                             </div>
+                           </div>
 
-                          <div className="flex items-center gap-3">
-                            <div className="text-right">
-                              <div className="text-lg font-bold text-white">{income.amount.toFixed(2)}€</div>
-                              <div className="text-xs text-purple-400">Sueldo: {montoSueldo.toFixed(2)}€</div>
-                            </div>
+                           <div className="flex items-center gap-3">
+                             <div className="text-right">
+                               <div className="text-lg font-bold text-white">{income.amount.toFixed(2)}€</div>
+                               <div className="text-xs text-purple-400">Sueldo: {montoSueldo.toFixed(2)}€</div>
+                             </div>
 
-                            <button
-                              onClick={() => toggleSueldoPagado(income)}
-                              disabled={updateIncomeMutation.isPending}
-                              className={`px-4 py-2 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-                                income.sueldo_estado === "Pagado"
-                                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                                  : 'bg-white/5 text-gray-400 border border-white/10 hover:border-white/20'
-                              }`}
-                            >
-                              {income.sueldo_estado === "Pagado" ? (
-                                <>
-                                  <Check className="w-4 h-4" />
-                                  Pagado
-                                </>
-                              ) : (
-                                <>
-                                  <X className="w-4 h-4" />
-                                  Sin pagar
-                                </>
-                              )}
-                            </button>
-                          </div>
+                             <button
+                               onClick={() => toggleSueldoPagado(income)}
+                               disabled={updateIncomeMutation.isPending}
+                               className={`px-3 py-2 rounded-xl font-medium text-xs sm:text-sm transition-all flex items-center gap-2 whitespace-nowrap ${
+                                 income.sueldo_estado === "Pagado"
+                                   ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                   : 'bg-white/5 text-gray-400 border border-white/10 hover:border-white/20'
+                               }`}
+                             >
+                               {income.sueldo_estado === "Pagado" ? (
+                                 <>
+                                   <Check className="w-4 h-4" />
+                                   <span className="hidden sm:inline">Pagado</span>
+                                 </>
+                               ) : (
+                                 <>
+                                   <X className="w-4 h-4" />
+                                   <span className="hidden sm:inline">Sin pagar</span>
+                                 </>
+                               )}
+                             </button>
+                           </div>
+                         </div>
+
+                         {/* Distribution breakdown */}
+                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-white/5">
+                           <div className="text-xs">
+                             <span className="text-gray-500">Negocio (40%)</span>
+                             <div className="text-blue-400 font-medium">{(income.amount * 0.40).toFixed(2)}€</div>
+                           </div>
+                           <div className="text-xs">
+                             <span className="text-gray-500">Reinversión (15%)</span>
+                             <div className="text-orange-400 font-medium">{(income.amount * 0.15).toFixed(2)}€</div>
+                           </div>
+                           <div className="text-xs">
+                             <span className="text-gray-500">Ads (10%)</span>
+                             <div className="text-pink-400 font-medium">{(income.amount * 0.10).toFixed(2)}€</div>
+                           </div>
+                           <div className="text-xs">
+                             <span className="text-gray-500">Sueldo (35%)</span>
+                             <div className="text-purple-400 font-medium">{montoSueldo.toFixed(2)}€</div>
+                           </div>
+                         </div>
                         </div>
                       </div>
                     );
@@ -455,7 +537,157 @@ export default function Accounting() {
         </div>
       </div>
 
-      {/* Modals aquí (simplificados por brevedad) */}
+      {/* Income Modal */}
+      {showIncomeModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#111113] rounded-2xl border border-white/10 p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
+          >
+            <h3 className="text-xl font-bold text-white mb-4">Nuevo Ingreso</h3>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target);
+              await createIncomeMutation.mutateAsync({
+                date: formData.get('date'),
+                client_name: formData.get('client_name'),
+                concept: formData.get('concept'),
+                amount: parseFloat(formData.get('amount')),
+                payment_method: formData.get('payment_method'),
+                notes: formData.get('notes')
+              });
+              setShowIncomeModal(false);
+              e.target.reset();
+            }} className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Fecha</label>
+                <input type="date" name="date" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white" />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Cliente</label>
+                <input type="text" name="client_name" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white" />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Concepto</label>
+                <input type="text" name="concept" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white" />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Monto (€)</label>
+                <input type="number" step="0.01" name="amount" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white" />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Método de pago</label>
+                <select name="payment_method" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white">
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Wise">Wise</option>
+                  <option value="Transferencia">Transferencia</option>
+                  <option value="Plataforma online">Plataforma online</option>
+                  <option value="Bizum">Bizum</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Notas (opcional)</label>
+                <textarea name="notes" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white" rows="2"></textarea>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setShowIncomeModal(false)} className="flex-1 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-white">
+                  Cancelar
+                </button>
+                <button type="submit" disabled={createIncomeMutation.isPending} className="flex-1 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-xl text-white">
+                  {createIncomeMutation.isPending ? 'Guardando...' : 'Guardar'}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Gasto Fijo Modal */}
+      {showGastoModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-[#111113] rounded-2xl border border-white/10 p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
+          >
+            <h3 className="text-xl font-bold text-white mb-4">Nuevo Gasto Fijo</h3>
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.target);
+              const frecuencia = formData.get('frecuencia');
+              const diaVenc = parseInt(formData.get('dia_vencimiento') || '1');
+              
+              // Calcular próxima fecha de pago
+              const now = new Date();
+              const proximaFecha = new Date(now.getFullYear(), now.getMonth(), diaVenc);
+              if (proximaFecha < now) {
+                proximaFecha.setMonth(proximaFecha.getMonth() + 1);
+              }
+              
+              await createGastoMutation.mutateAsync({
+                nombre: formData.get('nombre'),
+                categoria: formData.get('categoria'),
+                importe: parseFloat(formData.get('importe')),
+                frecuencia: frecuencia,
+                dia_vencimiento: frecuencia === 'Mensual' ? diaVenc : null,
+                proxima_fecha_pago: format(proximaFecha, 'yyyy-MM-dd'),
+                estado: "Pendiente",
+                notas: formData.get('notas')
+              });
+              setShowGastoModal(false);
+              e.target.reset();
+            }} className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Nombre</label>
+                <input type="text" name="nombre" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white" />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Categoría</label>
+                <select name="categoria" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white">
+                  <option value="Alquiler">Alquiler</option>
+                  <option value="Suscripciones">Suscripciones</option>
+                  <option value="Ads">Ads</option>
+                  <option value="Estudio">Estudio</option>
+                  <option value="Hardware">Hardware</option>
+                  <option value="Servicios">Servicios</option>
+                  <option value="Otros">Otros</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Importe (€)</label>
+                <input type="number" step="0.01" name="importe" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white" />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Frecuencia</label>
+                <select name="frecuencia" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white">
+                  <option value="Mensual">Mensual</option>
+                  <option value="Semanal">Semanal</option>
+                  <option value="Trimestral">Trimestral</option>
+                  <option value="Anual">Anual</option>
+                  <option value="Puntual">Puntual</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Día de vencimiento (1-31)</label>
+                <input type="number" min="1" max="31" name="dia_vencimiento" defaultValue="1" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white" />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Notas (opcional)</label>
+                <textarea name="notas" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white" rows="2"></textarea>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setShowGastoModal(false)} className="flex-1 px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-white">
+                  Cancelar
+                </button>
+                <button type="submit" disabled={createGastoMutation.isPending} className="flex-1 px-4 py-2 bg-purple-500 hover:bg-purple-600 rounded-xl text-white">
+                  {createGastoMutation.isPending ? 'Guardando...' : 'Guardar'}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
