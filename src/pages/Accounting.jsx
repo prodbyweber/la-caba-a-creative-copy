@@ -12,7 +12,9 @@ import {
   Clock,
   TrendingUp,
   CreditCard,
-  Calendar
+  Calendar,
+  Building2,
+  Zap
 } from "lucide-react";
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfDay, parseISO, isAfter } from "date-fns";
 import { es } from "date-fns/locale";
@@ -102,6 +104,11 @@ export default function Accounting() {
   const sueldoCalculado = filteredIncomes.reduce((s, i) => s + (i.amount * 0.35), 0);
   const sueldoPagado = filteredIncomes.filter(i => i.sueldo_estado === "Pagado").reduce((s, i) => s + (i.amount * 0.35), 0);
   const sueldoPendiente = sueldoCalculado - sueldoPagado;
+  
+  // Distribución automática
+  const negocioCalculado = filteredIncomes.reduce((s, i) => s + (i.amount * 0.40), 0);
+  const reinversionCalculada = filteredIncomes.reduce((s, i) => s + (i.amount * 0.15), 0);
+  const adsCalculado = filteredIncomes.reduce((s, i) => s + (i.amount * 0.10), 0);
   
   const totalGastosFijos = gastosFijos.reduce((s, g) => s + g.importe, 0);
   const gastosPagados = gastosFijos.filter(g => g.estado === "Pagado").reduce((s, g) => s + g.importe, 0);
@@ -308,12 +315,15 @@ export default function Accounting() {
               <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
                 <div className="p-6 border-b border-white/10">
                   <h2 className="text-xl font-bold text-white">Ingresos</h2>
-                  <p className="text-sm text-gray-500 mt-1">Toca para marcar tu sueldo como pagado</p>
+                  <p className="text-sm text-gray-500 mt-1">Toca un ingreso para marcar tu sueldo como pagado</p>
                 </div>
 
                 <div className="divide-y divide-white/5">
                   {filteredIncomes.map((income) => {
                     const montoSueldo = income.amount * 0.35;
+                    const montoNegocio = income.amount * 0.40;
+                    const montoReinversion = income.amount * 0.15;
+                    const montoAds = income.amount * 0.10;
                     const isPaid = income.sueldo_estado === "Pagado";
                     
                     return (
@@ -321,38 +331,73 @@ export default function Accounting() {
                         key={income.id}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        onClick={() => toggleSueldoPagado(income)}
-                        className="p-4 hover:bg-white/5 transition-colors cursor-pointer group"
+                        className="p-4 hover:bg-white/5 transition-colors"
                       >
-                        <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start justify-between gap-4 mb-3">
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
+                            <div className="flex items-center gap-2 mb-2">
                               <span className="text-2xl">{paymentMethodIcons[income.payment_method] || '💳'}</span>
-                              <div>
+                              <div className="flex-1">
                                 <div className="font-semibold text-white text-lg">{income.client_name}</div>
-                                <div className="text-sm text-gray-400">{income.concept}</div>
+                                <div className="text-sm text-gray-400">{income.concept || 'Sin concepto'}</div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-3 mt-2">
+                            <div className="flex items-center gap-2 ml-10">
                               <div className="text-xs text-gray-600 flex items-center gap-1">
                                 <Calendar className="w-3 h-3" />
                                 {format(parseISO(income.date), 'dd MMM yyyy', { locale: es })}
-                              </div>
-                              <div className={`px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 ${
-                                isPaid 
-                                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                                  : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
-                              }`}>
-                                {isPaid ? <Check className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
-                                {isPaid ? 'Sueldo pagado' : 'Sueldo pendiente'}
                               </div>
                             </div>
                           </div>
 
                           <div className="text-right">
                             <div className="text-2xl font-bold text-emerald-400">+{income.amount.toLocaleString('es-ES')}€</div>
-                            <div className="text-sm text-purple-400 font-medium mt-1">Tu parte: {montoSueldo.toLocaleString('es-ES')}€</div>
-                            <div className="text-xs text-gray-600 mt-1">(35% sueldo)</div>
+                          </div>
+                        </div>
+
+                        {/* Distribución automática */}
+                        <div className="ml-10 p-3 bg-white/5 rounded-xl">
+                          <div className="text-xs text-gray-500 mb-2">Distribución automática:</div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="flex justify-between text-xs">
+                              <span className="text-purple-400">👤 Sueldo (35%)</span>
+                              <span className="text-white font-medium">{montoSueldo.toLocaleString('es-ES')}€</span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                              <span className="text-blue-400">🏢 Negocio (40%)</span>
+                              <span className="text-white font-medium">{montoNegocio.toLocaleString('es-ES')}€</span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                              <span className="text-amber-400">📈 Reinversión (15%)</span>
+                              <span className="text-white font-medium">{montoReinversion.toLocaleString('es-ES')}€</span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                              <span className="text-pink-400">⚡ Ads (10%)</span>
+                              <span className="text-white font-medium">{montoAds.toLocaleString('es-ES')}€</span>
+                            </div>
+                          </div>
+
+                          <div className="mt-3 pt-3 border-t border-white/10">
+                            <button
+                              onClick={() => toggleSueldoPagado(income)}
+                              className={`w-full py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all ${
+                                isPaid
+                                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                  : 'bg-orange-500/20 text-orange-400 border border-orange-500/30 hover:bg-orange-500/30'
+                              }`}
+                            >
+                              {isPaid ? (
+                                <>
+                                  <Check className="w-4 h-4" />
+                                  Sueldo pagado
+                                </>
+                              ) : (
+                                <>
+                                  <Clock className="w-4 h-4" />
+                                  Marcar sueldo como pagado
+                                </>
+                              )}
+                            </button>
                           </div>
                         </div>
                       </motion.div>
@@ -440,40 +485,41 @@ export default function Accounting() {
               </div>
             </div>
 
-            {/* Sidebar - Tu Sueldo */}
-            <div className="space-y-6">
-              <div className="bg-gradient-to-br from-purple-500/20 via-purple-500/10 to-transparent border border-purple-500/30 rounded-2xl p-6 sticky top-24">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
-                    <Wallet className="w-6 h-6 text-purple-400" />
+            {/* Sidebar - Distribución */}
+            <div className="space-y-4">
+              {/* Tu Sueldo */}
+              <div className="bg-gradient-to-br from-purple-500/20 via-purple-500/10 to-transparent border border-purple-500/30 rounded-2xl p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                    <Wallet className="w-5 h-5 text-purple-400" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white">Tu Sueldo</h3>
+                    <h3 className="text-base font-bold text-white">Tu Sueldo (35%)</h3>
                     <p className="text-xs text-gray-500">Personal · Revolut</p>
                   </div>
                 </div>
 
-                <div className="space-y-4 mb-6">
+                <div className="space-y-3 mb-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-400">Calculado (35%)</span>
-                    <span className="text-xl font-bold text-white">{sueldoCalculado.toLocaleString('es-ES')}€</span>
+                    <span className="text-xs text-gray-400">Calculado</span>
+                    <span className="text-lg font-bold text-white">{sueldoCalculado.toLocaleString('es-ES')}€</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-400">Pagado</span>
-                    <span className="text-xl font-bold text-emerald-400">{sueldoPagado.toLocaleString('es-ES')}€</span>
+                    <span className="text-xs text-gray-400">Pagado</span>
+                    <span className="text-lg font-bold text-emerald-400">{sueldoPagado.toLocaleString('es-ES')}€</span>
                   </div>
-                  <div className="pt-4 border-t border-white/10 flex justify-between items-center">
-                    <span className="text-sm text-gray-400">Pendiente</span>
-                    <span className="text-xl font-bold text-orange-400">{sueldoPendiente.toLocaleString('es-ES')}€</span>
+                  <div className="pt-3 border-t border-white/10 flex justify-between items-center">
+                    <span className="text-xs text-gray-400">Pendiente</span>
+                    <span className="text-lg font-bold text-orange-400">{sueldoPendiente.toLocaleString('es-ES')}€</span>
                   </div>
                 </div>
 
                 {personalLedger.length > 0 && (
-                  <div className="bg-white/5 rounded-xl p-4">
-                    <div className="text-xs text-gray-400 mb-3 font-medium">Últimos pagos</div>
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                  <div className="bg-white/5 rounded-xl p-3">
+                    <div className="text-xs text-gray-400 mb-2 font-medium">Últimos pagos</div>
+                    <div className="space-y-1.5 max-h-32 overflow-y-auto">
                       {personalLedger.slice(0, 5).map((entry) => (
-                        <div key={entry.id} className="flex justify-between items-center text-sm">
+                        <div key={entry.id} className="flex justify-between items-center text-xs">
                           <div className="text-gray-400">
                             {format(parseISO(entry.fecha), 'dd MMM', { locale: es })}
                           </div>
@@ -483,6 +529,54 @@ export default function Accounting() {
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* Negocio */}
+              <div className="bg-gradient-to-br from-blue-500/20 via-blue-500/10 to-transparent border border-blue-500/30 rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                      <Building2 className="w-4 h-4 text-blue-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white">Negocio (40%)</h3>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-2xl font-bold text-blue-400">{negocioCalculado.toLocaleString('es-ES')}€</div>
+                <p className="text-xs text-gray-500 mt-1">Operativo · Gastos fijos</p>
+              </div>
+
+              {/* Reinversión */}
+              <div className="bg-gradient-to-br from-amber-500/20 via-amber-500/10 to-transparent border border-amber-500/30 rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center">
+                      <TrendingUp className="w-4 h-4 text-amber-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white">Reinversión (15%)</h3>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-2xl font-bold text-amber-400">{reinversionCalculada.toLocaleString('es-ES')}€</div>
+                <p className="text-xs text-gray-500 mt-1">Crecimiento · Equipamiento</p>
+              </div>
+
+              {/* Ads */}
+              <div className="bg-gradient-to-br from-pink-500/20 via-pink-500/10 to-transparent border border-pink-500/30 rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-pink-500/20 rounded-lg flex items-center justify-center">
+                      <Zap className="w-4 h-4 text-pink-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white">Ads (10%)</h3>
+                    </div>
+                  </div>
+                </div>
+                <div className="text-2xl font-bold text-pink-400">{adsCalculado.toLocaleString('es-ES')}€</div>
+                <p className="text-xs text-gray-500 mt-1">Marketing · Publicidad</p>
               </div>
             </div>
           </div>
