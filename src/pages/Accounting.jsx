@@ -5,29 +5,34 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { motion } from "framer-motion";
 import {
   DollarSign,
-  TrendingUp,
-  TrendingDown,
   Wallet,
+  AlertCircle,
   Plus,
   Check,
-  ChevronLeft,
-  ChevronRight,
-  Building2,
-  User,
-  ShoppingBag,
-  Zap,
-  Home
+  Clock,
+  TrendingUp,
+  CreditCard,
+  Calendar
 } from "lucide-react";
-import { format, startOfMonth, endOfMonth, parseISO, addMonths, subMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfDay, parseISO, isAfter } from "date-fns";
 import { es } from "date-fns/locale";
 
 export default function Accounting() {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showModal, setShowModal] = useState(null);
+  const [dateRange, setDateRange] = useState("month");
+  const [showIncomeModal, setShowIncomeModal] = useState(false);
+  const [showGastoModal, setShowGastoModal] = useState(false);
   
   const queryClient = useQueryClient();
-  const start = startOfMonth(selectedDate);
-  const end = endOfMonth(selectedDate);
+
+  const getDateRange = () => {
+    const now = new Date();
+    if (dateRange === "today") return { start: startOfDay(now), end: now };
+    if (dateRange === "week") return { start: startOfWeek(now, { locale: es }), end: endOfWeek(now, { locale: es }) };
+    if (dateRange === "month") return { start: startOfMonth(now), end: endOfMonth(now) };
+    return { start: startOfMonth(now), end: endOfMonth(now) };
+  };
+
+  const { start, end } = getDateRange();
 
   // Queries
   const { data: incomes = [] } = useQuery({
@@ -38,21 +43,6 @@ export default function Accounting() {
   const { data: gastosFijos = [] } = useQuery({
     queryKey: ['gastosFijos'],
     queryFn: () => base44.entities.GastoFijo.list()
-  });
-
-  const { data: gastosUnicos = [] } = useQuery({
-    queryKey: ['gastosUnicos'],
-    queryFn: () => base44.entities.GastoUnico.list('-fecha')
-  });
-
-  const { data: gastosPersonalesFijos = [] } = useQuery({
-    queryKey: ['gastosPersonalesFijos'],
-    queryFn: () => base44.entities.GastoPersonalFijo.list()
-  });
-
-  const { data: gastosPersonalesUnicos = [] } = useQuery({
-    queryKey: ['gastosPersonalesUnicos'],
-    queryFn: () => base44.entities.GastoPersonalUnico.list('-fecha')
   });
 
   const { data: personalLedger = [] } = useQuery({
@@ -74,39 +64,15 @@ export default function Accounting() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['incomes']);
-      setShowModal(null);
+      setShowIncomeModal(false);
     }
   });
 
-  const createGastoFijoMutation = useMutation({
+  const createGastoMutation = useMutation({
     mutationFn: (data) => base44.entities.GastoFijo.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries(['gastosFijos']);
-      setShowModal(null);
-    }
-  });
-
-  const createGastoUnicoMutation = useMutation({
-    mutationFn: (data) => base44.entities.GastoUnico.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['gastosUnicos']);
-      setShowModal(null);
-    }
-  });
-
-  const createGastoPersonalFijoMutation = useMutation({
-    mutationFn: (data) => base44.entities.GastoPersonalFijo.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['gastosPersonalesFijos']);
-      setShowModal(null);
-    }
-  });
-
-  const createGastoPersonalUnicoMutation = useMutation({
-    mutationFn: (data) => base44.entities.GastoPersonalUnico.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['gastosPersonalesUnicos']);
-      setShowModal(null);
+      setShowGastoModal(false);
     }
   });
 
@@ -120,35 +86,34 @@ export default function Accounting() {
     onSuccess: () => queryClient.invalidateQueries(['personalLedger'])
   });
 
-  // Filter by month
-  const filteredIncomes = incomes.filter(i => {
-    const d = parseISO(i.date);
-    return d >= start && d <= end;
+  const updateGastoMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.GastoFijo.update(id, data),
+    onSuccess: () => queryClient.invalidateQueries(['gastosFijos'])
   });
 
-  const filteredGastosUnicos = gastosUnicos.filter(g => {
-    const d = parseISO(g.fecha);
-    return d >= start && d <= end;
-  });
-
-  const filteredGastosPersonalesUnicos = gastosPersonalesUnicos.filter(g => {
-    const d = parseISO(g.fecha);
-    return d >= start && d <= end;
+  // Filter by date range
+  const filteredIncomes = incomes.filter(income => {
+    const incomeDate = parseISO(income.date);
+    return incomeDate >= start && incomeDate <= end;
   });
 
   // Calculations
-  const totalIngresos = filteredIncomes.reduce((s, i) => s + i.amount, 0);
+  const totalFacturacion = filteredIncomes.reduce((s, i) => s + i.amount, 0);
   const sueldoCalculado = filteredIncomes.reduce((s, i) => s + (i.amount * 0.35), 0);
   const sueldoPagado = filteredIncomes.filter(i => i.sueldo_estado === "Pagado").reduce((s, i) => s + (i.amount * 0.35), 0);
   const sueldoPendiente = sueldoCalculado - sueldoPagado;
-
+  
   const totalGastosFijos = gastosFijos.reduce((s, g) => s + g.importe, 0);
-  const totalGastosUnicos = filteredGastosUnicos.reduce((s, g) => s + g.importe, 0);
-  const totalGastosPersonalesFijos = gastosPersonalesFijos.reduce((s, g) => s + g.importe, 0);
-  const totalGastosPersonalesUnicos = filteredGastosPersonalesUnicos.reduce((s, g) => s + g.importe, 0);
+  const gastosPagados = gastosFijos.filter(g => g.estado === "Pagado").reduce((s, g) => s + g.importe, 0);
+  const porcentajePagado = totalGastosFijos > 0 ? (gastosPagados / totalGastosFijos) * 100 : 0;
 
-  const balance = totalIngresos - totalGastosFijos - totalGastosUnicos;
-  const balancePersonal = sueldoPagado - totalGastosPersonalesFijos - totalGastosPersonalesUnicos;
+  const gastosVencidos = gastosFijos.filter(g => {
+    if (g.estado === "Pagado" || !g.proxima_fecha_pago) return false;
+    return isAfter(new Date(), parseISO(g.proxima_fecha_pago));
+  }).length;
+
+  const ingresosSinPagar = filteredIncomes.filter(i => i.sueldo_estado === "Sin pagar").length;
+  const alertasTotal = gastosVencidos + ingresosSinPagar;
 
   const toggleSueldoPagado = async (income) => {
     const nuevo = income.sueldo_estado === "Pagado" ? "Sin pagar" : "Pagado";
@@ -158,7 +123,8 @@ export default function Accounting() {
       id: income.id,
       data: {
         sueldo_estado: nuevo,
-        sueldo_fecha_pago: nuevo === "Pagado" ? format(new Date(), 'yyyy-MM-dd') : null
+        sueldo_fecha_pago: nuevo === "Pagado" ? format(new Date(), 'yyyy-MM-dd') : null,
+        sueldo_metodo_pago: nuevo === "Pagado" ? "Revolut" : null
       }
     });
 
@@ -174,238 +140,363 @@ export default function Accounting() {
     }
   };
 
+  const marcarGastoPagado = async (gasto) => {
+    const calcularProximaFecha = (fecha, frecuencia) => {
+      const base = new Date(fecha);
+      if (frecuencia === "Mensual") base.setMonth(base.getMonth() + 1);
+      else if (frecuencia === "Semanal") base.setDate(base.getDate() + 7);
+      else if (frecuencia === "Trimestral") base.setMonth(base.getMonth() + 3);
+      else if (frecuencia === "Anual") base.setFullYear(base.getFullYear() + 1);
+      return format(base, 'yyyy-MM-dd');
+    };
+
+    await updateGastoMutation.mutateAsync({
+      id: gasto.id,
+      data: {
+        estado: "Pagado",
+        ultima_fecha_pagado: format(new Date(), 'yyyy-MM-dd'),
+        proxima_fecha_pago: gasto.frecuencia !== "Puntual" ? calcularProximaFecha(new Date(), gasto.frecuencia) : null
+      }
+    });
+  };
+
+  const paymentMethodIcons = {
+    'Efectivo': '💵',
+    'Wise': '🌐',
+    'Transferencia': '🏦',
+    'Plataforma online': '💳',
+    'Bizum': '📱'
+  };
+
   return (
     <AdminLayout activePage="FinanceDashboard">
-      <div className="min-h-screen bg-[#0a0a0b]">
-        {/* Sticky Header */}
-        <div className="sticky top-0 z-20 bg-[#0a0a0b]/95 backdrop-blur-xl border-b border-white/5">
-          <div className="max-w-[1600px] mx-auto px-3 md:px-6 py-3">
-            <div className="flex items-center justify-between">
+      <div className="min-h-screen bg-gradient-to-br from-[#0a0a0b] via-[#0d0d0f] to-[#0a0a0b]">
+        {/* Header */}
+        <div className="sticky top-0 z-20 bg-[#0a0a0b]/80 backdrop-blur-2xl border-b border-white/5">
+          <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <h1 className="text-xl md:text-2xl font-bold text-white">Contabilidad Pro</h1>
-                <p className="text-xs text-gray-600">Weber Studio</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-white">Panel Financiero</h1>
+                <p className="text-sm text-gray-500">Prod. by Weber</p>
               </div>
-              
-              <div className="flex items-center gap-2">
-                <button onClick={() => setSelectedDate(subMonths(selectedDate, 1))} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center">
-                  <ChevronLeft className="w-4 h-4 text-white" />
-                </button>
-                <div className="text-sm font-medium text-white min-w-[100px] text-center">
-                  {format(selectedDate, 'MMM yyyy', { locale: es })}
+
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex bg-white/5 rounded-xl p-1">
+                  {['today', 'week', 'month'].map((range) => (
+                    <button
+                      key={range}
+                      onClick={() => setDateRange(range)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                        dateRange === range
+                          ? 'bg-emerald-500 text-white'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      {range === 'today' ? 'Hoy' : range === 'week' ? 'Semana' : 'Mes'}
+                    </button>
+                  ))}
                 </div>
-                <button onClick={() => setSelectedDate(addMonths(selectedDate, 1))} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center">
-                  <ChevronRight className="w-4 h-4 text-white" />
+
+                <button
+                  onClick={() => setShowIncomeModal(true)}
+                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-xl text-white font-medium flex items-center gap-2 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">Ingreso</span>
+                </button>
+
+                <button
+                  onClick={() => setShowGastoModal(true)}
+                  className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white font-medium flex items-center gap-2 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">Gasto</span>
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="max-w-[1600px] mx-auto px-3 md:px-6 py-4 space-y-4">
-          {/* Summary Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/20 rounded-xl p-3">
-              <div className="text-xs text-emerald-400 mb-1">Ingresos</div>
-              <div className="text-xl md:text-2xl font-bold text-white">{totalIngresos.toFixed(0)}€</div>
-              <div className="text-xs text-gray-600">{filteredIncomes.length} movimientos</div>
-            </div>
-            
-            <div className="bg-gradient-to-br from-red-500/10 to-red-600/5 border border-red-500/20 rounded-xl p-3">
-              <div className="text-xs text-red-400 mb-1">Gastos Negocio</div>
-              <div className="text-xl md:text-2xl font-bold text-white">{(totalGastosFijos + totalGastosUnicos).toFixed(0)}€</div>
-              <div className="text-xs text-gray-600">Fijos + Únicos</div>
-            </div>
-            
-            <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20 rounded-xl p-3">
-              <div className="text-xs text-blue-400 mb-1">Balance</div>
-              <div className="text-xl md:text-2xl font-bold text-white">{balance.toFixed(0)}€</div>
-              <div className="text-xs text-gray-600">Este mes</div>
-            </div>
-            
-            <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border border-purple-500/20 rounded-xl p-3">
-              <div className="text-xs text-purple-400 mb-1">Sueldo Santi</div>
-              <div className="text-xl md:text-2xl font-bold text-white">{sueldoPagado.toFixed(0)}€</div>
-              <div className="text-xs text-gray-600">de {sueldoCalculado.toFixed(0)}€</div>
-            </div>
+        <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
+          {/* KPI Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gradient-to-br from-emerald-500/20 via-emerald-500/10 to-transparent border border-emerald-500/30 rounded-2xl p-6 hover:border-emerald-500/50 transition-all cursor-pointer"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                  <DollarSign className="w-6 h-6 text-emerald-400" />
+                </div>
+                <TrendingUp className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div className="text-sm text-emerald-300 mb-1">Facturación</div>
+              <div className="text-3xl font-bold text-white mb-1">{totalFacturacion.toLocaleString('es-ES')}€</div>
+              <div className="text-xs text-gray-500">{filteredIncomes.length} ingresos</div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-gradient-to-br from-blue-500/20 via-blue-500/10 to-transparent border border-blue-500/30 rounded-2xl p-6 hover:border-blue-500/50 transition-all cursor-pointer"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                  <CreditCard className="w-6 h-6 text-blue-400" />
+                </div>
+              </div>
+              <div className="text-sm text-blue-300 mb-1">Gastos Fijos</div>
+              <div className="text-3xl font-bold text-white mb-1">{totalGastosFijos.toLocaleString('es-ES')}€</div>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-blue-400 to-blue-600" style={{ width: `${porcentajePagado}%` }} />
+                </div>
+                <span className="text-xs text-gray-500">{porcentajePagado.toFixed(0)}%</span>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-gradient-to-br from-purple-500/20 via-purple-500/10 to-transparent border border-purple-500/30 rounded-2xl p-6 hover:border-purple-500/50 transition-all cursor-pointer"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                  <Wallet className="w-6 h-6 text-purple-400" />
+                </div>
+              </div>
+              <div className="text-sm text-purple-300 mb-1">Tu Sueldo</div>
+              <div className="text-3xl font-bold text-white mb-1">{sueldoPagado.toLocaleString('es-ES')}€</div>
+              <div className="text-xs text-gray-500">
+                Pendiente: <span className="text-orange-400 font-medium">{sueldoPendiente.toLocaleString('es-ES')}€</span>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className={`bg-gradient-to-br rounded-2xl p-6 transition-all cursor-pointer ${
+                alertasTotal > 0
+                  ? 'from-orange-500/20 via-orange-500/10 to-transparent border border-orange-500/30 hover:border-orange-500/50'
+                  : 'from-white/5 via-white/5 to-transparent border border-white/10 hover:border-white/20'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                  alertasTotal > 0 ? 'bg-orange-500/20' : 'bg-white/10'
+                }`}>
+                  <AlertCircle className={`w-6 h-6 ${alertasTotal > 0 ? 'text-orange-400' : 'text-gray-500'}`} />
+                </div>
+              </div>
+              <div className="text-sm text-gray-400 mb-1">Alertas</div>
+              <div className="text-3xl font-bold text-white mb-1">{alertasTotal}</div>
+              <div className="text-xs text-gray-500">
+                {gastosVencidos > 0 && `${gastosVencidos} gastos vencidos`}
+                {gastosVencidos > 0 && ingresosSinPagar > 0 && ' · '}
+                {ingresosSinPagar > 0 && `${ingresosSinPagar} sueldos pendientes`}
+              </div>
+            </motion.div>
           </div>
 
-          {/* Main Grid */}
-          <div className="grid lg:grid-cols-3 gap-4">
-            {/* Left Column */}
-            <div className="lg:col-span-2 space-y-4">
-              {/* Ingresos */}
-              <div className="bg-[#111113] rounded-xl border border-white/5">
-                <div className="p-3 border-b border-white/5 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-emerald-400" />
-                    <h3 className="text-sm font-semibold text-white">Ingresos</h3>
-                  </div>
-                  <button onClick={() => setShowModal('income')} className="w-7 h-7 bg-emerald-500 hover:bg-emerald-600 rounded-lg flex items-center justify-center">
-                    <Plus className="w-4 h-4 text-white" />
-                  </button>
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Ingresos */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
+                <div className="p-6 border-b border-white/10">
+                  <h2 className="text-xl font-bold text-white">Ingresos</h2>
+                  <p className="text-sm text-gray-500 mt-1">Toca para marcar tu sueldo como pagado</p>
                 </div>
-                <div className="p-3 space-y-2 max-h-64 overflow-y-auto">
-                  {filteredIncomes.map(inc => (
-                    <div key={inc.id} onClick={() => toggleSueldoPagado(inc)} className="flex items-center justify-between p-2 bg-white/5 rounded-lg hover:bg-white/10 cursor-pointer">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-white truncate">{inc.client_name}</div>
-                        <div className="text-xs text-gray-500 truncate">{inc.concept}</div>
-                      </div>
-                      <div className="text-right ml-2">
-                        <div className="text-sm font-bold text-emerald-400">+{inc.amount.toFixed(0)}€</div>
-                        <div className="text-xs text-gray-600">{format(parseISO(inc.date), 'dd MMM', { locale: es })}</div>
-                      </div>
-                      <div className={`ml-2 w-6 h-6 rounded flex items-center justify-center ${inc.sueldo_estado === "Pagado" ? 'bg-emerald-500/20' : 'bg-white/5'}`}>
-                        {inc.sueldo_estado === "Pagado" && <Check className="w-3 h-3 text-emerald-400" />}
-                      </div>
+
+                <div className="divide-y divide-white/5">
+                  {filteredIncomes.map((income) => {
+                    const montoSueldo = income.amount * 0.35;
+                    const isPaid = income.sueldo_estado === "Pagado";
+                    
+                    return (
+                      <motion.div
+                        key={income.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        onClick={() => toggleSueldoPagado(income)}
+                        className="p-4 hover:bg-white/5 transition-colors cursor-pointer group"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-2xl">{paymentMethodIcons[income.payment_method] || '💳'}</span>
+                              <div>
+                                <div className="font-semibold text-white text-lg">{income.client_name}</div>
+                                <div className="text-sm text-gray-400">{income.concept}</div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3 mt-2">
+                              <div className="text-xs text-gray-600 flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {format(parseISO(income.date), 'dd MMM yyyy', { locale: es })}
+                              </div>
+                              <div className={`px-2 py-1 rounded-lg text-xs font-medium flex items-center gap-1 ${
+                                isPaid 
+                                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                  : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                              }`}>
+                                {isPaid ? <Check className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+                                {isPaid ? 'Sueldo pagado' : 'Sueldo pendiente'}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-emerald-400">+{income.amount.toLocaleString('es-ES')}€</div>
+                            <div className="text-sm text-purple-400 font-medium mt-1">Tu parte: {montoSueldo.toLocaleString('es-ES')}€</div>
+                            <div className="text-xs text-gray-600 mt-1">(35% sueldo)</div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+
+                  {filteredIncomes.length === 0 && (
+                    <div className="p-12 text-center">
+                      <div className="text-gray-500 mb-2">Sin ingresos en este período</div>
+                      <button
+                        onClick={() => setShowIncomeModal(true)}
+                        className="text-emerald-400 text-sm hover:text-emerald-300"
+                      >
+                        Registrar primer ingreso
+                      </button>
                     </div>
-                  ))}
-                  {filteredIncomes.length === 0 && <div className="text-center py-6 text-xs text-gray-600">Sin ingresos</div>}
+                  )}
                 </div>
               </div>
 
-              {/* Gastos Fijos Negocio */}
-              <div className="bg-[#111113] rounded-xl border border-white/5">
-                <div className="p-3 border-b border-white/5 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-blue-400" />
-                    <h3 className="text-sm font-semibold text-white">Gastos Fijos</h3>
-                    <span className="text-xs text-gray-600">{totalGastosFijos.toFixed(0)}€</span>
-                  </div>
-                  <button onClick={() => setShowModal('gastoFijo')} className="w-7 h-7 bg-blue-500 hover:bg-blue-600 rounded-lg flex items-center justify-center">
-                    <Plus className="w-4 h-4 text-white" />
-                  </button>
+              {/* Gastos Fijos */}
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden">
+                <div className="p-6 border-b border-white/10">
+                  <h2 className="text-xl font-bold text-white">Gastos Fijos</h2>
+                  <p className="text-sm text-gray-500 mt-1">Checklist financiera mensual</p>
                 </div>
-                <div className="p-3 grid grid-cols-2 gap-2">
-                  {gastosFijos.slice(0, 4).map(g => (
-                    <div key={g.id} className="p-2 bg-white/5 rounded-lg">
-                      <div className="text-xs text-gray-400 truncate">{g.nombre}</div>
-                      <div className="text-sm font-bold text-white">{g.importe.toFixed(0)}€</div>
-                    </div>
-                  ))}
-                  {gastosFijos.length === 0 && <div className="col-span-2 text-center py-4 text-xs text-gray-600">Sin gastos</div>}
-                </div>
-              </div>
 
-              {/* Gastos Únicos */}
-              <div className="bg-[#111113] rounded-xl border border-white/5">
-                <div className="p-3 border-b border-white/5 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-orange-400" />
-                    <h3 className="text-sm font-semibold text-white">Gastos Únicos</h3>
-                    <span className="text-xs text-gray-600">{totalGastosUnicos.toFixed(0)}€</span>
-                  </div>
-                  <button onClick={() => setShowModal('gastoUnico')} className="w-7 h-7 bg-orange-500 hover:bg-orange-600 rounded-lg flex items-center justify-center">
-                    <Plus className="w-4 h-4 text-white" />
-                  </button>
-                </div>
-                <div className="p-3 space-y-2 max-h-48 overflow-y-auto">
-                  {filteredGastosUnicos.map(g => (
-                    <div key={g.id} className="flex items-center justify-between p-2 bg-white/5 rounded-lg">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm text-white truncate">{g.nombre}</div>
-                        <div className="text-xs text-gray-600">{g.categoria}</div>
+                <div className="p-4 space-y-3">
+                  {gastosFijos.map((gasto) => {
+                    const isVencido = gasto.proxima_fecha_pago && isAfter(new Date(), parseISO(gasto.proxima_fecha_pago)) && gasto.estado !== "Pagado";
+                    const isPagado = gasto.estado === "Pagado";
+                    
+                    return (
+                      <div
+                        key={gasto.id}
+                        className={`p-4 rounded-xl border transition-all ${
+                          isVencido 
+                            ? 'bg-red-500/10 border-red-500/30'
+                            : isPagado
+                            ? 'bg-emerald-500/10 border-emerald-500/30'
+                            : 'bg-white/5 border-white/10'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="font-semibold text-white mb-1">{gasto.nombre}</div>
+                            <div className="flex items-center gap-3 text-xs text-gray-500">
+                              <span>{gasto.categoria}</span>
+                              <span>·</span>
+                              <span>{gasto.frecuencia}</span>
+                              {gasto.proxima_fecha_pago && (
+                                <>
+                                  <span>·</span>
+                                  <span>Vence: {format(parseISO(gasto.proxima_fecha_pago), 'dd MMM', { locale: es })}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="text-right flex items-center gap-3">
+                            <div className="text-lg font-bold text-white">{gasto.importe.toLocaleString('es-ES')}€</div>
+                            <button
+                              onClick={() => marcarGastoPagado(gasto)}
+                              disabled={isPagado}
+                              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                                isPagado
+                                  ? 'bg-emerald-500/20 text-emerald-400 cursor-default'
+                                  : 'bg-white/10 text-white hover:bg-emerald-500/20 hover:text-emerald-400'
+                              }`}
+                            >
+                              <Check className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-sm font-bold text-red-400">-{g.importe.toFixed(0)}€</div>
+                    );
+                  })}
+
+                  {gastosFijos.length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      Sin gastos fijos registrados
                     </div>
-                  ))}
-                  {filteredGastosUnicos.length === 0 && <div className="text-center py-4 text-xs text-gray-600">Sin gastos</div>}
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Right Column - Personal */}
-            <div className="space-y-4">
-              {/* Sueldo Santi */}
-              <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border border-purple-500/20 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <User className="w-4 h-4 text-purple-400" />
-                  <h3 className="text-sm font-semibold text-white">Sueldo Santi</h3>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Calculado (35%)</span>
-                    <span className="text-white font-medium">{sueldoCalculado.toFixed(0)}€</span>
+            {/* Sidebar - Tu Sueldo */}
+            <div className="space-y-6">
+              <div className="bg-gradient-to-br from-purple-500/20 via-purple-500/10 to-transparent border border-purple-500/30 rounded-2xl p-6 sticky top-24">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                    <Wallet className="w-6 h-6 text-purple-400" />
                   </div>
-                  <div className="flex justify-between text-xs">
-                    <span className="text-gray-400">Pagado</span>
-                    <span className="text-emerald-400 font-medium">{sueldoPagado.toFixed(0)}€</span>
-                  </div>
-                  <div className="flex justify-between text-xs pt-2 border-t border-white/10">
-                    <span className="text-gray-400">Pendiente</span>
-                    <span className="text-orange-400 font-medium">{sueldoPendiente.toFixed(0)}€</span>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Tu Sueldo</h3>
+                    <p className="text-xs text-gray-500">Personal · Revolut</p>
                   </div>
                 </div>
-              </div>
 
-              {/* Gastos Personales Fijos */}
-              <div className="bg-[#111113] rounded-xl border border-white/5">
-                <div className="p-3 border-b border-white/5 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Home className="w-4 h-4 text-pink-400" />
-                    <h3 className="text-sm font-semibold text-white">Gastos Fijos Santi</h3>
+                <div className="space-y-4 mb-6">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-400">Calculado (35%)</span>
+                    <span className="text-xl font-bold text-white">{sueldoCalculado.toLocaleString('es-ES')}€</span>
                   </div>
-                  <button onClick={() => setShowModal('gastoPersonalFijo')} className="w-7 h-7 bg-pink-500 hover:bg-pink-600 rounded-lg flex items-center justify-center">
-                    <Plus className="w-4 h-4 text-white" />
-                  </button>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-400">Pagado</span>
+                    <span className="text-xl font-bold text-emerald-400">{sueldoPagado.toLocaleString('es-ES')}€</span>
+                  </div>
+                  <div className="pt-4 border-t border-white/10 flex justify-between items-center">
+                    <span className="text-sm text-gray-400">Pendiente</span>
+                    <span className="text-xl font-bold text-orange-400">{sueldoPendiente.toLocaleString('es-ES')}€</span>
+                  </div>
                 </div>
-                <div className="p-3 space-y-2">
-                  {gastosPersonalesFijos.slice(0, 3).map(g => (
-                    <div key={g.id} className="flex justify-between p-2 bg-white/5 rounded-lg">
-                      <span className="text-xs text-gray-400 truncate">{g.nombre}</span>
-                      <span className="text-xs font-bold text-white">{g.importe.toFixed(0)}€</span>
+
+                {personalLedger.length > 0 && (
+                  <div className="bg-white/5 rounded-xl p-4">
+                    <div className="text-xs text-gray-400 mb-3 font-medium">Últimos pagos</div>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {personalLedger.slice(0, 5).map((entry) => (
+                        <div key={entry.id} className="flex justify-between items-center text-sm">
+                          <div className="text-gray-400">
+                            {format(parseISO(entry.fecha), 'dd MMM', { locale: es })}
+                          </div>
+                          <div className="text-emerald-400 font-medium">+{entry.monto.toLocaleString('es-ES')}€</div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                  <div className="pt-2 border-t border-white/10 flex justify-between text-xs">
-                    <span className="text-gray-400">Total</span>
-                    <span className="text-white font-bold">{totalGastosPersonalesFijos.toFixed(0)}€</span>
                   </div>
-                </div>
-              </div>
-
-              {/* Gastos Personales Únicos */}
-              <div className="bg-[#111113] rounded-xl border border-white/5">
-                <div className="p-3 border-b border-white/5 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <ShoppingBag className="w-4 h-4 text-yellow-400" />
-                    <h3 className="text-sm font-semibold text-white">Gastos Únicos Santi</h3>
-                  </div>
-                  <button onClick={() => setShowModal('gastoPersonalUnico')} className="w-7 h-7 bg-yellow-500 hover:bg-yellow-600 rounded-lg flex items-center justify-center">
-                    <Plus className="w-4 h-4 text-white" />
-                  </button>
-                </div>
-                <div className="p-3 space-y-2 max-h-48 overflow-y-auto">
-                  {filteredGastosPersonalesUnicos.slice(0, 5).map(g => (
-                    <div key={g.id} className="flex justify-between p-2 bg-white/5 rounded-lg">
-                      <span className="text-xs text-gray-400 truncate">{g.nombre}</span>
-                      <span className="text-xs font-bold text-red-400">-{g.importe.toFixed(0)}€</span>
-                    </div>
-                  ))}
-                  <div className="pt-2 border-t border-white/10 flex justify-between text-xs">
-                    <span className="text-gray-400">Total</span>
-                    <span className="text-white font-bold">{totalGastosPersonalesUnicos.toFixed(0)}€</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Balance Personal */}
-              <div className="bg-gradient-to-br from-indigo-500/10 to-indigo-600/5 border border-indigo-500/20 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Wallet className="w-4 h-4 text-indigo-400" />
-                  <h3 className="text-sm font-semibold text-white">Balance Personal</h3>
-                </div>
-                <div className="text-2xl font-bold text-white">{balancePersonal.toFixed(0)}€</div>
-                <div className="text-xs text-gray-500 mt-1">Después de gastos</div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Modals */}
-        {showModal === 'income' && (
+        {/* Income Modal */}
+        {showIncomeModal && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-4">
-            <div className="bg-[#111113] rounded-t-3xl md:rounded-2xl border border-white/10 p-6 w-full md:max-w-md">
-              <h3 className="text-lg font-bold text-white mb-4">Nuevo Ingreso</h3>
+            <motion.div
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-[#111113] rounded-t-3xl md:rounded-2xl border border-white/20 p-6 w-full md:max-w-md max-h-[90vh] overflow-y-auto"
+            >
+              <h3 className="text-xl font-bold text-white mb-6">Registrar Ingreso</h3>
               <form onSubmit={(e) => {
                 e.preventDefault();
                 const fd = new FormData(e.target);
@@ -414,162 +505,125 @@ export default function Accounting() {
                   client_name: fd.get('client_name'),
                   concept: fd.get('concept'),
                   amount: fd.get('amount'),
-                  payment_method: fd.get('payment_method')
+                  payment_method: fd.get('payment_method'),
+                  notes: fd.get('notes')
                 });
-              }} className="space-y-3">
-                <input type="date" name="date" required defaultValue={format(new Date(), 'yyyy-MM-dd')} className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <input type="text" name="client_name" required placeholder="Cliente" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <input type="text" name="concept" required placeholder="Concepto" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <input type="number" step="0.01" name="amount" required placeholder="Monto €" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <select name="payment_method" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm">
-                  <option value="Efectivo">Efectivo</option>
-                  <option value="Wise">Wise</option>
-                  <option value="Transferencia">Transferencia</option>
-                  <option value="Bizum">Bizum</option>
-                </select>
-                <div className="flex gap-2 pt-2">
-                  <button type="button" onClick={() => setShowModal(null)} className="flex-1 px-4 py-2 bg-white/5 rounded-lg text-white text-sm">Cancelar</button>
-                  <button type="submit" className="flex-1 px-4 py-2 bg-emerald-500 rounded-lg text-white text-sm">Guardar</button>
+              }} className="space-y-4">
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Fecha</label>
+                  <input type="date" name="date" required defaultValue={format(new Date(), 'yyyy-MM-dd')} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500" />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Cliente / Proyecto</label>
+                  <input type="text" name="client_name" required className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500" placeholder="Nombre del cliente" />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Concepto</label>
+                  <input type="text" name="concept" required className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500" placeholder="Reserva, sesión, pago final..." />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Monto total</label>
+                  <input type="number" step="0.01" name="amount" required className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-2xl font-bold focus:outline-none focus:border-emerald-500" placeholder="0.00" />
+                  <p className="text-xs text-gray-600 mt-2">Tu sueldo será el 35% automáticamente</p>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Método de pago</label>
+                  <select name="payment_method" required className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500">
+                    <option value="Efectivo">💵 Efectivo</option>
+                    <option value="Wise">🌐 Wise</option>
+                    <option value="Transferencia">🏦 Transferencia</option>
+                    <option value="Plataforma online">💳 Plataforma online</option>
+                    <option value="Bizum">📱 Bizum</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Notas (opcional)</label>
+                  <textarea name="notes" rows="2" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500" placeholder="Información adicional"></textarea>
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <button type="button" onClick={() => setShowIncomeModal(false)} className="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 rounded-xl text-white font-medium transition-colors">
+                    Cancelar
+                  </button>
+                  <button type="submit" disabled={createIncomeMutation.isPending} className="flex-1 px-4 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-xl text-white font-medium transition-colors">
+                    {createIncomeMutation.isPending ? 'Guardando...' : 'Guardar'}
+                  </button>
                 </div>
               </form>
-            </div>
+            </motion.div>
           </div>
         )}
 
-        {showModal === 'gastoFijo' && (
+        {/* Gasto Modal */}
+        {showGastoModal && (
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-4">
-            <div className="bg-[#111113] rounded-t-3xl md:rounded-2xl border border-white/10 p-6 w-full md:max-w-md">
-              <h3 className="text-lg font-bold text-white mb-4">Nuevo Gasto Fijo</h3>
+            <motion.div
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-[#111113] rounded-t-3xl md:rounded-2xl border border-white/20 p-6 w-full md:max-w-md max-h-[90vh] overflow-y-auto"
+            >
+              <h3 className="text-xl font-bold text-white mb-6">Registrar Gasto Fijo</h3>
               <form onSubmit={(e) => {
                 e.preventDefault();
                 const fd = new FormData(e.target);
-                createGastoFijoMutation.mutate({
+                const frecuencia = fd.get('frecuencia');
+                const diaVenc = parseInt(fd.get('dia_vencimiento') || '1');
+                const now = new Date();
+                const proximaFecha = new Date(now.getFullYear(), now.getMonth(), diaVenc);
+                if (proximaFecha < now) proximaFecha.setMonth(proximaFecha.getMonth() + 1);
+                
+                createGastoMutation.mutate({
                   nombre: fd.get('nombre'),
                   categoria: fd.get('categoria'),
                   importe: parseFloat(fd.get('importe')),
-                  frecuencia: fd.get('frecuencia'),
-                  estado: "Pendiente"
+                  frecuencia,
+                  dia_vencimiento: frecuencia === 'Mensual' ? diaVenc : null,
+                  proxima_fecha_pago: format(proximaFecha, 'yyyy-MM-dd'),
+                  estado: "Pendiente",
+                  notas: fd.get('notas')
                 });
-              }} className="space-y-3">
-                <input type="text" name="nombre" required placeholder="Nombre" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <select name="categoria" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm">
-                  <option value="Alquiler">Alquiler</option>
-                  <option value="Suscripciones">Suscripciones</option>
-                  <option value="Servicios">Servicios</option>
-                </select>
-                <input type="number" step="0.01" name="importe" required placeholder="Importe €" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <select name="frecuencia" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm">
-                  <option value="Mensual">Mensual</option>
-                  <option value="Trimestral">Trimestral</option>
-                  <option value="Anual">Anual</option>
-                </select>
-                <div className="flex gap-2 pt-2">
-                  <button type="button" onClick={() => setShowModal(null)} className="flex-1 px-4 py-2 bg-white/5 rounded-lg text-white text-sm">Cancelar</button>
-                  <button type="submit" className="flex-1 px-4 py-2 bg-blue-500 rounded-lg text-white text-sm">Guardar</button>
+              }} className="space-y-4">
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Nombre del gasto</label>
+                  <input type="text" name="nombre" required className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500" placeholder="Alquiler, hosting..." />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Categoría</label>
+                  <select name="categoria" required className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500">
+                    <option value="Alquiler">Alquiler</option>
+                    <option value="Suscripciones">Suscripciones</option>
+                    <option value="Ads">Ads</option>
+                    <option value="Estudio">Estudio</option>
+                    <option value="Hardware">Hardware</option>
+                    <option value="Servicios">Servicios</option>
+                    <option value="Otros">Otros</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Importe mensual</label>
+                  <input type="number" step="0.01" name="importe" required className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-2xl font-bold focus:outline-none focus:border-blue-500" placeholder="0.00" />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Frecuencia</label>
+                  <select name="frecuencia" required className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500">
+                    <option value="Mensual">Mensual</option>
+                    <option value="Trimestral">Trimestral</option>
+                    <option value="Anual">Anual</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-2 block">Día de vencimiento</label>
+                  <input type="number" min="1" max="31" name="dia_vencimiento" defaultValue="1" className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-blue-500" />
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <button type="button" onClick={() => setShowGastoModal(false)} className="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 rounded-xl text-white font-medium transition-colors">
+                    Cancelar
+                  </button>
+                  <button type="submit" disabled={createGastoMutation.isPending} className="flex-1 px-4 py-3 bg-blue-500 hover:bg-blue-600 rounded-xl text-white font-medium transition-colors">
+                    {createGastoMutation.isPending ? 'Guardando...' : 'Guardar'}
+                  </button>
                 </div>
               </form>
-            </div>
-          </div>
-        )}
-
-        {showModal === 'gastoUnico' && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-4">
-            <div className="bg-[#111113] rounded-t-3xl md:rounded-2xl border border-white/10 p-6 w-full md:max-w-md">
-              <h3 className="text-lg font-bold text-white mb-4">Nuevo Gasto Único</h3>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                const fd = new FormData(e.target);
-                createGastoUnicoMutation.mutate({
-                  fecha: fd.get('fecha'),
-                  nombre: fd.get('nombre'),
-                  categoria: fd.get('categoria'),
-                  importe: parseFloat(fd.get('importe')),
-                  estado: "Pagado"
-                });
-              }} className="space-y-3">
-                <input type="date" name="fecha" required defaultValue={format(new Date(), 'yyyy-MM-dd')} className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <input type="text" name="nombre" required placeholder="Nombre" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <select name="categoria" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm">
-                  <option value="Equipamiento">Equipamiento</option>
-                  <option value="Marketing">Marketing</option>
-                  <option value="Formación">Formación</option>
-                </select>
-                <input type="number" step="0.01" name="importe" required placeholder="Importe €" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <div className="flex gap-2 pt-2">
-                  <button type="button" onClick={() => setShowModal(null)} className="flex-1 px-4 py-2 bg-white/5 rounded-lg text-white text-sm">Cancelar</button>
-                  <button type="submit" className="flex-1 px-4 py-2 bg-orange-500 rounded-lg text-white text-sm">Guardar</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {showModal === 'gastoPersonalFijo' && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-4">
-            <div className="bg-[#111113] rounded-t-3xl md:rounded-2xl border border-white/10 p-6 w-full md:max-w-md">
-              <h3 className="text-lg font-bold text-white mb-4">Gasto Personal Fijo</h3>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                const fd = new FormData(e.target);
-                createGastoPersonalFijoMutation.mutate({
-                  nombre: fd.get('nombre'),
-                  categoria: fd.get('categoria'),
-                  importe: parseFloat(fd.get('importe')),
-                  frecuencia: fd.get('frecuencia'),
-                  estado: "Pendiente"
-                });
-              }} className="space-y-3">
-                <input type="text" name="nombre" required placeholder="Nombre" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <select name="categoria" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm">
-                  <option value="Vivienda">Vivienda</option>
-                  <option value="Transporte">Transporte</option>
-                  <option value="Salud">Salud</option>
-                  <option value="Gimnasio">Gimnasio</option>
-                </select>
-                <input type="number" step="0.01" name="importe" required placeholder="Importe €" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <select name="frecuencia" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm">
-                  <option value="Mensual">Mensual</option>
-                  <option value="Trimestral">Trimestral</option>
-                </select>
-                <div className="flex gap-2 pt-2">
-                  <button type="button" onClick={() => setShowModal(null)} className="flex-1 px-4 py-2 bg-white/5 rounded-lg text-white text-sm">Cancelar</button>
-                  <button type="submit" className="flex-1 px-4 py-2 bg-pink-500 rounded-lg text-white text-sm">Guardar</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {showModal === 'gastoPersonalUnico' && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-4">
-            <div className="bg-[#111113] rounded-t-3xl md:rounded-2xl border border-white/10 p-6 w-full md:max-w-md">
-              <h3 className="text-lg font-bold text-white mb-4">Gasto Personal Único</h3>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                const fd = new FormData(e.target);
-                createGastoPersonalUnicoMutation.mutate({
-                  fecha: fd.get('fecha'),
-                  nombre: fd.get('nombre'),
-                  categoria: fd.get('categoria'),
-                  importe: parseFloat(fd.get('importe')),
-                  estado: "Pagado"
-                });
-              }} className="space-y-3">
-                <input type="date" name="fecha" required defaultValue={format(new Date(), 'yyyy-MM-dd')} className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <input type="text" name="nombre" required placeholder="Nombre" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <select name="categoria" required className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm">
-                  <option value="Ocio">Ocio</option>
-                  <option value="Comida">Comida</option>
-                  <option value="Compras">Compras</option>
-                  <option value="Viajes">Viajes</option>
-                </select>
-                <input type="number" step="0.01" name="importe" required placeholder="Importe €" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm" />
-                <div className="flex gap-2 pt-2">
-                  <button type="button" onClick={() => setShowModal(null)} className="flex-1 px-4 py-2 bg-white/5 rounded-lg text-white text-sm">Cancelar</button>
-                  <button type="submit" className="flex-1 px-4 py-2 bg-yellow-500 rounded-lg text-white text-sm">Guardar</button>
-                </div>
-              </form>
-            </div>
+            </motion.div>
           </div>
         )}
       </div>
