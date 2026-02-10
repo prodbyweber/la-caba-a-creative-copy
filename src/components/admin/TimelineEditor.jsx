@@ -6,24 +6,37 @@ import { base44 } from "@/api/base44Client";
 export default function TimelineEditor({ timeline = [], onUpdate }) {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [uploading, setUploading] = useState(null);
+  const [localMilestones, setLocalMilestones] = useState(timeline);
+
+  React.useEffect(() => {
+    setLocalMilestones(timeline);
+  }, [timeline]);
 
   const addMilestone = () => {
-    onUpdate([...timeline, {
+    const newMilestones = [...timeline, {
       year: new Date().getFullYear().toString(),
       title: "Nuevo hito",
       description: "Descripción del hito",
       image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&h=500&fit=crop&q=80"
-    }]);
+    }];
+    setLocalMilestones(newMilestones);
+    onUpdate(newMilestones);
   };
 
-  const updateMilestone = (index, field, value) => {
-    const updated = [...timeline];
+  const updateMilestoneLocal = (index, field, value) => {
+    const updated = [...localMilestones];
     updated[index] = { ...updated[index], [field]: value };
-    onUpdate(updated);
+    setLocalMilestones(updated);
+  };
+
+  const saveMilestone = (index) => {
+    onUpdate(localMilestones);
   };
 
   const removeMilestone = (index) => {
-    onUpdate(timeline.filter((_, i) => i !== index));
+    const newMilestones = timeline.filter((_, i) => i !== index);
+    setLocalMilestones(newMilestones);
+    onUpdate(newMilestones);
   };
 
   const handleImageUpload = async (index, file) => {
@@ -32,7 +45,10 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
     setUploading(index);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      updateMilestone(index, 'image', file_url);
+      const updated = [...localMilestones];
+      updated[index] = { ...updated[index], image: file_url };
+      setLocalMilestones(updated);
+      onUpdate(updated);
     } catch (error) {
       console.error('Error uploading image:', error);
     } finally {
@@ -44,7 +60,7 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
         <span className="text-sm text-gray-400 font-medium">
-          {timeline.length} hitos en el timeline
+          {localMilestones.length} hitos en el timeline
         </span>
         <button
           onClick={addMilestone}
@@ -57,7 +73,7 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
 
       <div className="space-y-3">
         <AnimatePresence>
-          {timeline.map((milestone, index) => (
+          {localMilestones.map((milestone, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: -10 }}
@@ -118,7 +134,8 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
                         <input
                           type="text"
                           value={milestone.year}
-                          onChange={(e) => updateMilestone(index, 'year', e.target.value)}
+                          onChange={(e) => updateMilestoneLocal(index, 'year', e.target.value)}
+                          onBlur={() => saveMilestone(index)}
                           className="w-full px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-white focus:outline-none focus:border-emerald-500 transition-colors"
                           placeholder="2024"
                         />
@@ -132,7 +149,8 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
                         <input
                           type="text"
                           value={milestone.title}
-                          onChange={(e) => updateMilestone(index, 'title', e.target.value)}
+                          onChange={(e) => updateMilestoneLocal(index, 'title', e.target.value)}
+                          onBlur={() => saveMilestone(index)}
                           className="w-full px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-white focus:outline-none focus:border-emerald-500 transition-colors"
                           placeholder="Los inicios"
                         />
@@ -145,7 +163,8 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
                         </label>
                         <textarea
                           value={milestone.description}
-                          onChange={(e) => updateMilestone(index, 'description', e.target.value)}
+                          onChange={(e) => updateMilestoneLocal(index, 'description', e.target.value)}
+                          onBlur={() => saveMilestone(index)}
                           rows={3}
                           className="w-full px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-white focus:outline-none focus:border-emerald-500 transition-colors resize-none"
                           placeholder="Una breve descripción del hito..."
@@ -162,7 +181,8 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
                             <input
                               type="text"
                               value={milestone.image}
-                              onChange={(e) => updateMilestone(index, 'image', e.target.value)}
+                              onChange={(e) => updateMilestoneLocal(index, 'image', e.target.value)}
+                              onBlur={() => saveMilestone(index)}
                               className="w-full px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500 transition-colors"
                               placeholder="URL de la imagen"
                             />
@@ -190,7 +210,7 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
         </AnimatePresence>
       </div>
 
-      {timeline.length === 0 && (
+      {localMilestones.length === 0 && (
         <div className="text-center py-12 border border-dashed border-white/20 rounded-xl">
           <p className="text-gray-500 mb-4">No hay hitos en el timeline</p>
           <button
