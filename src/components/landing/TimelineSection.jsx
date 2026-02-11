@@ -213,23 +213,6 @@ export default function TimelineSection() {
                     </motion.div>
                   ))}
                 </div>
-
-                {/* Mobile Navigation Arrows */}
-                <div className="flex lg:hidden items-center justify-center gap-3 mt-6">
-                  <button
-                    onClick={prevSlide}
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-
-                  <button
-                    onClick={nextSlide}
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </div>
               </div>
 
               {/* Dots Indicator */}
