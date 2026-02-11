@@ -257,7 +257,7 @@ export default function TimelineSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="lg:hidden mt-12 px-4"
+          className="lg:hidden mt-6 px-4"
         >
           <div className="text-center max-w-2xl mx-auto">
             <h3 className="text-xl font-bold text-white mb-3">
