@@ -215,19 +215,19 @@ export default function TimelineSection() {
                 </div>
 
                 {/* Navigation Arrows Below Cards - Mobile */}
-                <div className="flex lg:hidden items-center justify-center gap-4 mt-6">
+                <div className="flex lg:hidden items-center justify-center gap-4 mt-6 px-4">
                   <button
                     onClick={prevSlide}
-                    className="w-12 h-12 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all"
+                    className="w-14 h-14 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white shadow-xl transition-all z-30"
                   >
-                    <ChevronLeft className="w-5 h-5" />
+                    <ChevronLeft className="w-6 h-6" />
                   </button>
 
                   <button
                     onClick={nextSlide}
-                    className="w-12 h-12 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all"
+                    className="w-14 h-14 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white shadow-xl transition-all z-30"
                   >
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRight className="w-6 h-6" />
                   </button>
                 </div>
               </div>
