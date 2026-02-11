@@ -80,43 +80,43 @@ export default function StoriesSection() {
   };
 
   return (
-    <section className="relative py-20 sm:py-32 overflow-hidden bg-gradient-to-b from-zinc-100 to-zinc-50">
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 sm:px-8">
+    <section className="relative py-12 sm:py-20 lg:py-32 overflow-hidden bg-gradient-to-b from-zinc-100 to-zinc-50">
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-8 sm:mb-12 lg:mb-16"
         >
-          <h2 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-900 mb-2">
             Historias que hemos contado
           </h2>
         </motion.div>
 
         {/* Carousel Container */}
-        <div className="relative max-w-5xl mx-auto">
+        <div className="relative max-w-4xl mx-auto">
           {/* Navigation Arrows - Desktop */}
           <button
             onClick={prevSlide}
-            className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 z-20 w-12 h-12 items-center justify-center rounded-full bg-white hover:bg-zinc-100 shadow-xl transition-all"
+            className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-14 z-20 w-10 h-10 items-center justify-center rounded-full bg-white hover:bg-zinc-200 shadow-lg transition-all"
           >
-            <ChevronLeft className="w-6 h-6 text-zinc-900" />
+            <ChevronLeft className="w-5 h-5 text-zinc-900" />
           </button>
 
           <button
             onClick={nextSlide}
-            className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 z-20 w-12 h-12 items-center justify-center rounded-full bg-white hover:bg-zinc-100 shadow-xl transition-all"
+            className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 z-20 w-10 h-10 items-center justify-center rounded-full bg-white hover:bg-zinc-200 shadow-lg transition-all"
           >
-            <ChevronRight className="w-6 h-6 text-zinc-900" />
+            <ChevronRight className="w-5 h-5 text-zinc-900" />
           </button>
 
           {/* Testimonials Carousel */}
           <div 
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scroll-smooth px-4 sm:px-0"
+            className="flex gap-4 sm:gap-5 lg:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth px-4 sm:px-6 lg:px-0 -mx-4 sm:-mx-6 lg:mx-0"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none'
@@ -129,11 +129,11 @@ export default function StoriesSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="flex-shrink-0 w-[85vw] sm:w-[400px] snap-center"
+                className="flex-shrink-0 w-[75vw] sm:w-[320px] lg:w-[340px] snap-center"
               >
-                <div className="h-full bg-white rounded-3xl overflow-hidden shadow-2xl hover:scale-[1.02] transition-all duration-300">
-                  {/* Image */}
-                  <div className="h-64 overflow-hidden">
+                <div className="h-full bg-zinc-900 rounded-2xl lg:rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300">
+                  {/* Image - Más pequeña */}
+                  <div className="h-48 sm:h-52 lg:h-56 overflow-hidden">
                     <img 
                       src={testimonial.image} 
                       alt={testimonial.name}
@@ -141,24 +141,24 @@ export default function StoriesSection() {
                     />
                   </div>
 
-                  {/* Content */}
-                  <div className="bg-zinc-900 p-8">
-                    {/* Quote */}
-                    <div className="mb-6 min-h-[180px]">
-                      <p className="text-white/90 text-base leading-relaxed italic">
+                  {/* Content - Fondo oscuro */}
+                  <div className="p-5 sm:p-6">
+                    {/* Quote - Más compacta */}
+                    <div className="mb-5">
+                      <p className="text-white/90 text-sm sm:text-base leading-relaxed italic line-clamp-6">
                         "{testimonial.quote}"
                       </p>
                     </div>
 
-                    {/* Divider */}
-                    <div className="w-full h-px bg-white/20 mb-6" />
+                    {/* Divider más sutil */}
+                    <div className="w-full h-px bg-white/10 mb-4" />
 
                     {/* Author */}
                     <div>
-                      <h4 className="text-white font-bold text-lg mb-1">
+                      <h4 className="text-white font-bold text-base sm:text-lg mb-0.5">
                         {testimonial.name}
                       </h4>
-                      <p className="text-white/60 text-sm">
+                      <p className="text-white/50 text-xs sm:text-sm">
                         {testimonial.role}
                       </p>
                     </div>
@@ -169,34 +169,35 @@ export default function StoriesSection() {
           </div>
 
           {/* Mobile Navigation Arrows */}
-          <div className="flex lg:hidden items-center justify-center gap-4 mt-6">
+          <div className="flex lg:hidden items-center justify-center gap-3 mt-6">
             <button
               onClick={prevSlide}
-              className="w-12 h-12 flex items-center justify-center rounded-full bg-white hover:bg-zinc-100 shadow-lg transition-all"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-zinc-900 hover:bg-zinc-800 text-white shadow-lg transition-all"
             >
-              <ChevronLeft className="w-6 h-6 text-zinc-900" />
+              <ChevronLeft className="w-5 h-5" />
             </button>
 
             <button
               onClick={nextSlide}
-              className="w-12 h-12 flex items-center justify-center rounded-full bg-white hover:bg-zinc-100 shadow-lg transition-all"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-zinc-900 hover:bg-zinc-800 text-white shadow-lg transition-all"
             >
-              <ChevronRight className="w-6 h-6 text-zinc-900" />
+              <ChevronRight className="w-5 h-5" />
             </button>
           </div>
         </div>
 
         {/* Dots Indicators */}
-        <div className="flex items-center justify-center gap-2 mt-8">
+        <div className="flex items-center justify-center gap-2 mt-6 sm:mt-8">
           {testimonials.map((_, index) => (
             <button
               key={index}
               onClick={() => scrollToIndex(index)}
-              className={`transition-all ${
+              className={`h-1.5 sm:h-2 rounded-full transition-all ${
                 index === currentIndex 
-                  ? 'w-8 h-2 bg-zinc-900 rounded-full' 
-                  : 'w-2 h-2 bg-zinc-400 rounded-full hover:bg-zinc-600'
+                  ? 'w-6 sm:w-8 bg-zinc-900' 
+                  : 'w-1.5 sm:w-2 bg-zinc-400 hover:bg-zinc-600'
               }`}
+              aria-label={`Ver testimonio ${index + 1}`}
             />
           ))}
         </div>
