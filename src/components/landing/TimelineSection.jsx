@@ -141,101 +141,107 @@ export default function TimelineSection() {
           >
             <div className="relative">
               {/* Title - Mobile */}
-              <div className="mb-6 lg:hidden px-6">
-                <h2 className="text-2xl font-bold text-white mb-2">
+              <div className="mb-4 lg:hidden px-4">
+                <h2 className="text-2xl font-bold text-white mb-1">
                   Mi Trayectoria
                 </h2>
-                <p className="text-white/60 text-sm">
-                  Desliza para ver más →
-                </p>
               </div>
 
-              {/* Navigation Arrows */}
-              <div className="flex items-center justify-center lg:justify-end gap-3 mb-6 px-6 lg:px-0">
+              {/* Carousel Container */}
+              <div className="relative max-w-4xl mx-auto lg:mx-0">
+                {/* Navigation Arrows - Desktop */}
                 <button
                   onClick={prevSlide}
-                  disabled={currentIndex === 0}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-lg ${
-                    currentIndex === 0 
-                      ? 'bg-white/5 text-white/30 cursor-not-allowed' 
-                      : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                  }`}
+                  className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-14 z-20 w-10 h-10 items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 shadow-lg transition-all"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-5 h-5 text-white" />
                 </button>
+
                 <button
                   onClick={nextSlide}
-                  disabled={currentIndex === milestones.length - 1}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-lg ${
-                    currentIndex === milestones.length - 1
-                      ? 'bg-white/5 text-white/30 cursor-not-allowed' 
-                      : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                  }`}
+                  className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 z-20 w-10 h-10 items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 shadow-lg transition-all"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-5 h-5 text-white" />
                 </button>
-              </div>
 
-              {/* Timeline Cards */}
-              <div 
-                ref={scrollContainerRef}
-                onScroll={handleScroll}
-                className="flex gap-4 overflow-x-auto pb-6 snap-x snap-mandatory scroll-smooth px-6 lg:gap-6 lg:px-0"
-                style={{
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
-                }}
-              >
-                {milestones.map((milestone, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1, duration: 0.5 }}
-                    className="flex-shrink-0 w-[45vw] snap-start lg:w-[280px]"
-                  >
-                    <div className="relative rounded-lg lg:rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-shadow duration-300 h-full">
-                      {/* Image */}
-                      <div className="aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-900 to-black">
-                        <img 
-                          src={milestone.image}
-                          alt={milestone.year}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-
-                      {/* Gradient Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-
-                      {/* Content */}
-                      <div className="absolute bottom-0 left-0 right-0 p-2.5 lg:p-6">
-                        <div className="text-emerald-400 text-xl lg:text-5xl font-bold mb-0.5 lg:mb-2">
-                          {milestone.year}
+                {/* Timeline Cards */}
+                <div 
+                  ref={scrollContainerRef}
+                  onScroll={handleScroll}
+                  className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth px-4 lg:gap-6 lg:px-0 -mx-4 lg:mx-0"
+                  style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                    WebkitOverflowScrolling: 'touch'
+                  }}
+                >
+                  {milestones.map((milestone, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: index * 0.1, duration: 0.5 }}
+                      className="flex-shrink-0 w-[45vw] snap-center lg:w-[280px]"
+                    >
+                      <div className="relative rounded-lg lg:rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-shadow duration-300 h-full">
+                        {/* Image */}
+                        <div className="aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-900 to-black">
+                          <img 
+                            src={milestone.image}
+                            alt={milestone.year}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                        <h4 className="text-white font-bold text-xs lg:text-lg mb-0.5 lg:mb-2">
-                          {milestone.title}
-                        </h4>
-                        <p className="text-white/70 text-[10px] lg:text-sm leading-tight line-clamp-4">
-                          {milestone.description}
-                        </p>
+
+                        {/* Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+
+                        {/* Content */}
+                        <div className="absolute bottom-0 left-0 right-0 p-2.5 lg:p-6">
+                          <div className="text-emerald-400 text-xl lg:text-5xl font-bold mb-0.5 lg:mb-2">
+                            {milestone.year}
+                          </div>
+                          <h4 className="text-white font-bold text-xs lg:text-lg mb-0.5 lg:mb-2">
+                            {milestone.title}
+                          </h4>
+                          <p className="text-white/70 text-[10px] lg:text-sm leading-tight line-clamp-4">
+                            {milestone.description}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Mobile Navigation Arrows */}
+                <div className="flex lg:hidden items-center justify-center gap-3 mt-6">
+                  <button
+                    onClick={prevSlide}
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  <button
+                    onClick={nextSlide}
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
               {/* Dots Indicator */}
-              <div className="flex items-center justify-center gap-2 mt-8 px-6">
+              <div className="flex items-center justify-center gap-2 mt-6 lg:mt-8">
                 {milestones.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => scrollToIndex(index)}
-                    className={`h-2 rounded-full transition-all ${
+                    className={`h-1.5 lg:h-2 rounded-full transition-all ${
                       currentIndex === index 
-                        ? 'w-8 bg-emerald-400' 
-                        : 'w-2 bg-white/30 hover:bg-white/50'
+                        ? 'w-6 lg:w-8 bg-emerald-400' 
+                        : 'w-1.5 lg:w-2 bg-white/30 hover:bg-white/50'
                     }`}
                     aria-label={`Ver hito ${index + 1}`}
                   />
