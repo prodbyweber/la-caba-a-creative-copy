@@ -237,16 +237,31 @@ export default function TimelineSection() {
                   </button>
                 </div>
 
-                {/* Dots Indicator */}
-                <div className="flex items-center justify-center gap-2">
+                  {milestones.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => scrollToIndex(index)}
+                      className={`h-2 rounded-full transition-all ${
+                        currentIndex === index 
+                          ? 'w-8 bg-emerald-400' 
+                          : 'w-2 bg-white/30 hover:bg-white/50'
+                      }`}
+                      aria-label={`Ver hito ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Desktop Dots Indicator */}
+              <div className="hidden lg:flex items-center justify-center gap-2 mt-8">
                 {milestones.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => scrollToIndex(index)}
-                    className={`h-1.5 lg:h-2 rounded-full transition-all ${
+                    className={`h-2 rounded-full transition-all ${
                       currentIndex === index 
-                        ? 'w-6 lg:w-8 bg-emerald-400' 
-                        : 'w-1.5 lg:w-2 bg-white/30 hover:bg-white/50'
+                        ? 'w-8 bg-emerald-400' 
+                        : 'w-2 bg-white/30 hover:bg-white/50'
                     }`}
                     aria-label={`Ver hito ${index + 1}`}
                   />
