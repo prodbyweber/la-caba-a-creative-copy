@@ -85,7 +85,7 @@ export default function TimelineSection() {
 
   return (
     <section className="relative py-12 sm:py-20 lg:py-32 overflow-hidden bg-black">
-      <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-0 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start lg:items-center">
           {/* Left Side - Profile Image & Bio */}
           <motion.div
@@ -141,38 +141,38 @@ export default function TimelineSection() {
           >
             <div className="relative">
               {/* Title - Mobile */}
-              <div className="mb-6 lg:hidden text-center">
-                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+              <div className="mb-6 lg:hidden text-center px-4">
+                <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
                   Mi Trayectoria
                 </h2>
-                <p className="text-white/60 text-sm">
-                  Desliza para ver más
+                <p className="text-white/60 text-xs sm:text-sm">
+                  Desliza para ver más →
                 </p>
               </div>
 
               {/* Navigation Arrows */}
-              <div className="flex items-center justify-center lg:justify-end gap-3 mb-4 lg:mb-6">
+              <div className="flex items-center justify-center lg:justify-end gap-3 mb-4 lg:mb-6 px-4 lg:px-0">
                 <button
                   onClick={prevSlide}
                   disabled={currentIndex === 0}
-                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all shadow-lg ${
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg ${
                     currentIndex === 0 
                       ? 'bg-white/5 text-white/30 cursor-not-allowed' 
                       : 'bg-emerald-500 hover:bg-emerald-600 text-white'
                   }`}
                 >
-                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
                   onClick={nextSlide}
                   disabled={currentIndex === milestones.length - 1}
-                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all shadow-lg ${
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg ${
                     currentIndex === milestones.length - 1
                       ? 'bg-white/5 text-white/30 cursor-not-allowed' 
                       : 'bg-emerald-500 hover:bg-emerald-600 text-white'
                   }`}
                 >
-                  <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
 
@@ -180,12 +180,13 @@ export default function TimelineSection() {
               <div 
                 ref={scrollContainerRef}
                 onScroll={handleScroll}
-                className="flex gap-3 overflow-x-scroll pb-4 snap-x snap-mandatory scroll-smooth lg:gap-6 lg:overflow-x-auto"
+                className="flex gap-4 overflow-x-auto overflow-y-hidden pb-4 snap-x snap-mandatory scroll-smooth pl-4 pr-4 lg:gap-6 lg:pl-0 lg:pr-0"
                 style={{
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                   WebkitOverflowScrolling: 'touch',
-                  scrollSnapType: 'x mandatory'
+                  scrollSnapType: 'x mandatory',
+                  touchAction: 'pan-x'
                 }}
               >
                 {milestones.map((milestone, index) => (
@@ -195,16 +196,15 @@ export default function TimelineSection() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1, duration: 0.5 }}
-                    className="flex-shrink-0 w-[80vw] snap-center lg:w-[280px] lg:snap-start"
-                    style={{ scrollSnapAlign: 'center' }}
+                    className="flex-shrink-0 w-[75vw] max-w-[280px] snap-center lg:w-[280px] lg:snap-start"
                   >
-                    <div className="relative rounded-xl lg:rounded-2xl overflow-hidden group cursor-pointer shadow-xl hover:shadow-2xl transition-shadow duration-300 h-full">
+                    <div className="relative rounded-xl lg:rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-shadow duration-300">
                       {/* Image */}
                       <div className="aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-900 to-black">
                         <img 
                           src={milestone.image}
                           alt={milestone.year}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                          className="w-full h-full object-cover"
                         />
                       </div>
 
@@ -212,14 +212,14 @@ export default function TimelineSection() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
 
                       {/* Content */}
-                      <div className="absolute bottom-0 left-0 right-0 p-5 lg:p-6">
-                        <div className="text-emerald-400 text-4xl lg:text-5xl font-bold mb-2">
+                      <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-6">
+                        <div className="text-emerald-400 text-3xl lg:text-5xl font-bold mb-1 lg:mb-2">
                           {milestone.year}
                         </div>
-                        <h4 className="text-white font-bold text-base lg:text-lg mb-2">
+                        <h4 className="text-white font-bold text-sm lg:text-lg mb-1 lg:mb-2">
                           {milestone.title}
                         </h4>
-                        <p className="text-white/70 text-sm leading-relaxed line-clamp-3">
+                        <p className="text-white/70 text-xs lg:text-sm leading-relaxed line-clamp-3">
                           {milestone.description}
                         </p>
                       </div>
@@ -229,15 +229,15 @@ export default function TimelineSection() {
               </div>
 
               {/* Dots Indicator - Mobile & Tablet */}
-              <div className="flex items-center justify-center gap-2 mt-6 lg:mt-8">
+              <div className="flex items-center justify-center gap-2 mt-6 lg:mt-8 px-4">
                 {milestones.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => scrollToIndex(index)}
-                    className={`h-1.5 sm:h-2 rounded-full transition-all ${
+                    className={`h-1.5 rounded-full transition-all ${
                       currentIndex === index 
-                        ? 'w-6 sm:w-8 bg-emerald-400 shadow-lg shadow-emerald-500/50' 
-                        : 'w-1.5 sm:w-2 bg-white/30 hover:bg-white/50'
+                        ? 'w-6 bg-emerald-400 shadow-lg shadow-emerald-500/50' 
+                        : 'w-1.5 bg-white/30 hover:bg-white/50'
                     }`}
                     aria-label={`Ver hito ${index + 1}`}
                   />
