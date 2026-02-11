@@ -87,17 +87,17 @@ export default function TimelineSection() {
     <section className="relative py-12 sm:py-20 lg:py-32 overflow-hidden bg-black">
       <div className="relative z-10 w-full max-w-[1400px] mx-auto px-0 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start lg:items-center">
-          {/* Left Side - Profile Image & Bio */}
+          {/* Left Side - Profile Image & Bio - Hidden on mobile */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="relative order-2 lg:order-1 px-4 sm:px-0"
+            className="hidden lg:block relative order-2 lg:order-1 px-4 sm:px-0"
           >
             <div className="relative">
-              {/* Main Profile Image - Hidden on mobile */}
-              <div className="hidden lg:block relative w-full max-w-md mx-auto lg:mx-0">
+              {/* Main Profile Image */}
+              <div className="relative w-full max-w-md mx-auto lg:mx-0">
                 <div className="aspect-[3/4] rounded-xl lg:rounded-2xl overflow-hidden shadow-2xl">
                   <img 
                     src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=600&h=800&fit=crop&q=80"
@@ -131,13 +131,13 @@ export default function TimelineSection() {
             </div>
           </motion.div>
 
-          {/* Right Side - Timeline Carousel */}
+          {/* Right Side - Timeline Carousel - Full width on mobile */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="relative order-1 lg:order-2"
+            className="relative order-1 lg:order-2 lg:col-span-1 col-span-full"
           >
             <div className="relative">
               {/* Title - Mobile */}
