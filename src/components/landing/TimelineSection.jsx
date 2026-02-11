@@ -149,17 +149,17 @@ export default function TimelineSection() {
 
               {/* Carousel Container */}
               <div className="relative max-w-4xl mx-auto lg:mx-0">
-                {/* Navigation Arrows - Mobile & Desktop */}
+                {/* Navigation Arrows - Desktop only on sides */}
                 <button
                   onClick={prevSlide}
-                  className="absolute left-2 lg:left-0 top-1/2 -translate-y-1/2 lg:-translate-x-14 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 shadow-lg transition-all"
+                  className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-14 z-20 w-10 h-10 items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 shadow-lg transition-all"
                 >
                   <ChevronLeft className="w-5 h-5 text-white" />
                 </button>
 
                 <button
                   onClick={nextSlide}
-                  className="absolute right-2 lg:right-0 top-1/2 -translate-y-1/2 lg:translate-x-14 z-20 w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 shadow-lg transition-all"
+                  className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 z-20 w-10 h-10 items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 shadow-lg transition-all"
                 >
                   <ChevronRight className="w-5 h-5 text-white" />
                 </button>
@@ -213,10 +213,27 @@ export default function TimelineSection() {
                     </motion.div>
                   ))}
                 </div>
+
+                {/* Navigation Arrows Below Cards - Mobile */}
+                <div className="flex lg:hidden items-center justify-center gap-4 mt-6">
+                  <button
+                    onClick={prevSlide}
+                    className="w-12 h-12 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  <button
+                    onClick={nextSlide}
+                    className="w-12 h-12 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
               {/* Dots Indicator */}
-              <div className="flex items-center justify-center gap-2 mt-6 lg:mt-8">
+              <div className="flex items-center justify-center gap-2 mt-4 lg:mt-8">
                 {milestones.map((_, index) => (
                   <button
                     key={index}
