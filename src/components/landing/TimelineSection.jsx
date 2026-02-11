@@ -96,8 +96,8 @@ export default function TimelineSection() {
             className="relative order-2 lg:order-1 px-4 sm:px-0"
           >
             <div className="relative">
-              {/* Main Profile Image */}
-              <div className="relative w-full max-w-[280px] sm:max-w-sm lg:max-w-md mx-auto lg:mx-0">
+              {/* Main Profile Image - Hidden on mobile */}
+              <div className="hidden lg:block relative w-full max-w-md mx-auto lg:mx-0">
                 <div className="aspect-[3/4] rounded-xl lg:rounded-2xl overflow-hidden shadow-2xl">
                   <img 
                     src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=600&h=800&fit=crop&q=80"
@@ -116,12 +116,12 @@ export default function TimelineSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.3, duration: 0.6 }}
-                className="mt-6 lg:mt-8 space-y-3 lg:space-y-4 text-center lg:text-left px-2 sm:px-0"
+                className="mt-0 lg:mt-8 space-y-2 lg:space-y-4 text-center lg:text-left px-2 sm:px-0"
               >
-                <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
+                <h3 className="text-lg lg:text-3xl font-bold text-white">
                   Prod. by Weber
                 </h3>
-                <p className="text-white/70 leading-relaxed text-sm sm:text-base lg:text-lg max-w-md mx-auto lg:mx-0">
+                <p className="text-white/70 leading-relaxed text-xs lg:text-lg max-w-md mx-auto lg:mx-0">
                   Más de 8 años ayudando a artistas a construir proyectos coherentes. 
                   Los sistemas que enseño han sido utilizados por empresas y profesionales 
                   de la industria. Mi mensaje no es para todos, pero si estás aquí, 
