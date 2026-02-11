@@ -250,6 +250,27 @@ export default function TimelineSection() {
             </div>
           </motion.div>
         </div>
+
+        {/* Mobile Biography Section - Only visible on mobile */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="lg:hidden mt-12 px-4"
+        >
+          <div className="text-center max-w-2xl mx-auto">
+            <h3 className="text-xl font-bold text-white mb-3">
+              Prod. by Weber
+            </h3>
+            <p className="text-white/70 leading-relaxed text-sm">
+              Más de 8 años ayudando a artistas a construir proyectos coherentes. 
+              Los sistemas que enseño han sido utilizados por empresas y profesionales 
+              de la industria. Mi mensaje no es para todos, pero si estás aquí, 
+              probablemente sea para ti.
+            </p>
+          </div>
+        </motion.div>
       </div>
 
       <style jsx>{`
