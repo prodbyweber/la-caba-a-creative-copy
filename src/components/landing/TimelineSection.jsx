@@ -116,12 +116,12 @@ export default function TimelineSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.3, duration: 0.6 }}
-                className="mt-6 lg:mt-8 space-y-2 lg:space-y-4 text-left pl-4 pr-4 lg:px-0 lg:text-left"
+                className="mt-6 lg:mt-8 space-y-2 lg:space-y-4 text-left pl-4 pr-8 lg:px-0 lg:text-left"
               >
                 <h3 className="text-base lg:text-3xl font-bold text-white">
                   Prod. by Weber
                 </h3>
-                <p className="text-white/70 leading-relaxed text-sm lg:text-lg max-w-full lg:max-w-md">
+                <p className="text-white/70 leading-relaxed text-sm lg:text-lg max-w-[85%] lg:max-w-md">
                   Más de 8 años ayudando a artistas a construir proyectos coherentes. 
                   Los sistemas que enseño han sido utilizados por empresas y profesionales 
                   de la industria. Mi mensaje no es para todos, pero si estás aquí, 
