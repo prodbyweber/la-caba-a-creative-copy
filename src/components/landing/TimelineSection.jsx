@@ -53,7 +53,8 @@ export default function TimelineSection() {
   const scrollToIndex = (index) => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
-      const cardWidth = 320; // Approximate card width + gap
+      const isMobile = window.innerWidth < 1024;
+      const cardWidth = isMobile ? window.innerWidth * 0.85 + 16 : 320;
       container.scrollTo({
         left: cardWidth * index,
         behavior: 'smooth'
@@ -65,7 +66,8 @@ export default function TimelineSection() {
   const handleScroll = () => {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
-      const cardWidth = 320;
+      const isMobile = window.innerWidth < 1024;
+      const cardWidth = isMobile ? window.innerWidth * 0.85 + 16 : 320;
       const newIndex = Math.round(container.scrollLeft / cardWidth);
       setCurrentIndex(newIndex);
     }
@@ -138,8 +140,8 @@ export default function TimelineSection() {
             className="relative"
           >
             <div className="relative">
-              {/* Navigation Arrows */}
-              <div className="flex items-center justify-end gap-3 mb-6">
+              {/* Navigation Arrows - Desktop Only */}
+              <div className="hidden lg:flex items-center justify-end gap-3 mb-6">
                 <button
                   onClick={prevSlide}
                   disabled={currentIndex === 0}
@@ -168,10 +170,11 @@ export default function TimelineSection() {
               <div 
                 ref={scrollContainerRef}
                 onScroll={handleScroll}
-                className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth"
+                className="flex gap-4 lg:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth px-4 lg:px-0 -mx-4 lg:mx-0"
                 style={{
                   scrollbarWidth: 'none',
-                  msOverflowStyle: 'none'
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch'
                 }}
               >
                 {milestones.map((milestone, index) => (
@@ -181,7 +184,7 @@ export default function TimelineSection() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1, duration: 0.5 }}
-                    className="flex-shrink-0 w-[280px] snap-start"
+                    className="flex-shrink-0 w-[85vw] sm:w-[320px] lg:w-[280px] snap-center lg:snap-start"
                   >
                     <div className="relative rounded-2xl overflow-hidden group cursor-pointer">
                       {/* Image */}
@@ -198,10 +201,10 @@ export default function TimelineSection() {
 
                       {/* Content */}
                       <div className="absolute bottom-0 left-0 right-0 p-6">
-                        <div className="text-emerald-400 text-5xl font-bold mb-2">
+                        <div className="text-emerald-400 text-4xl sm:text-5xl font-bold mb-2">
                           {milestone.year}
                         </div>
-                        <h4 className="text-white font-bold text-lg mb-2">
+                        <h4 className="text-white font-bold text-base sm:text-lg mb-2">
                           {milestone.title}
                         </h4>
                         <p className="text-white/70 text-sm leading-relaxed">
@@ -210,6 +213,21 @@ export default function TimelineSection() {
                       </div>
                     </div>
                   </motion.div>
+                ))}
+              </div>
+
+              {/* Dots Indicator - Mobile Only */}
+              <div className="flex lg:hidden items-center justify-center gap-2 mt-6">
+                {milestones.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => scrollToIndex(index)}
+                    className={`h-2 rounded-full transition-all ${
+                      currentIndex === index 
+                        ? 'w-8 bg-emerald-400' 
+                        : 'w-2 bg-white/30'
+                    }`}
+                  />
                 ))}
               </div>
             </div>
