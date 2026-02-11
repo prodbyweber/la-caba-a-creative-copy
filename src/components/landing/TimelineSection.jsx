@@ -214,8 +214,8 @@ export default function TimelineSection() {
                   ))}
                 </div>
 
-                {/* Mobile Navigation Arrows */}
-                <div className="flex lg:hidden items-center justify-center gap-3 mt-6">
+                {/* Mobile Navigation Arrows - Below Cards */}
+                <div className="flex lg:hidden items-center justify-center gap-3 mt-4">
                   <button
                     onClick={prevSlide}
                     className="w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition-all"
@@ -233,7 +233,7 @@ export default function TimelineSection() {
               </div>
 
               {/* Dots Indicator */}
-              <div className="flex items-center justify-center gap-2 mt-6 lg:mt-8">
+              <div className="flex items-center justify-center gap-2 mt-4 lg:mt-8">
                 {milestones.map((_, index) => (
                   <button
                     key={index}
@@ -247,6 +247,36 @@ export default function TimelineSection() {
                   />
                 ))}
               </div>
+            </div>
+          </motion.div>
+
+          {/* Left Side - Profile Image & Bio - Mobile positioned after timeline */}
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative order-2 lg:order-1 px-4 sm:px-0 lg:hidden mt-8"
+          >
+            <div className="relative">
+              {/* Bio Text */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+                className="space-y-2 text-left"
+              >
+                <h3 className="text-base font-bold text-white">
+                  Prod. by Weber
+                </h3>
+                <p className="text-white/70 leading-relaxed text-sm pr-8">
+                  Más de 8 años ayudando a artistas a construir proyectos coherentes. 
+                  Los sistemas que enseño han sido utilizados por empresas y profesionales 
+                  de la industria. Mi mensaje no es para todos, pero si estás aquí, 
+                  probablemente sea para ti.
+                </p>
+              </motion.div>
             </div>
           </motion.div>
         </div>
