@@ -214,43 +214,42 @@ export default function TimelineSection() {
                   ))}
                 </div>
 
-              </div>
-
-              {/* Mobile Navigation Controls - Below Cards */}
-              <div className="lg:hidden mt-8 space-y-6">
-                {/* Navigation Buttons */}
-                <div className="flex items-center justify-center gap-4">
-                  <button
-                    onClick={prevSlide}
-                    className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-90"
-                    style={{ backgroundColor: '#1a1a1a' }}
-                  >
-                    <ChevronLeft className="w-7 h-7 text-white" strokeWidth={2.5} />
-                  </button>
-
-                  <button
-                    onClick={nextSlide}
-                    className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-90"
-                    style={{ backgroundColor: '#1a1a1a' }}
-                  >
-                    <ChevronRight className="w-7 h-7 text-white" strokeWidth={2.5} />
-                  </button>
-                </div>
-
-                {/* Dots Indicator Mobile */}
-                <div className="flex items-center justify-center gap-2">
-                  {milestones.map((_, index) => (
+                {/* Mobile Navigation Controls - Below Cards */}
+                <div className="lg:hidden mt-6 space-y-4 px-4">
+                  {/* Navigation Buttons */}
+                  <div className="flex items-center justify-center gap-4">
                     <button
-                      key={index}
-                      onClick={() => scrollToIndex(index)}
-                      className={`h-2 rounded-full transition-all ${
-                        currentIndex === index 
-                          ? 'w-8 bg-emerald-400' 
-                          : 'w-2 bg-white/30 hover:bg-white/50'
-                      }`}
-                      aria-label={`Ver hito ${index + 1}`}
-                    />
-                  ))}
+                      onClick={prevSlide}
+                      className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-90"
+                      style={{ backgroundColor: '#1a1a1a' }}
+                    >
+                      <ChevronLeft className="w-6 h-6 text-white" strokeWidth={2.5} />
+                    </button>
+
+                    <button
+                      onClick={nextSlide}
+                      className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-90"
+                      style={{ backgroundColor: '#1a1a1a' }}
+                    >
+                      <ChevronRight className="w-6 h-6 text-white" strokeWidth={2.5} />
+                    </button>
+                  </div>
+
+                  {/* Dots Indicator Mobile */}
+                  <div className="flex items-center justify-center gap-2">
+                    {milestones.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => scrollToIndex(index)}
+                        className={`h-2 rounded-full transition-all ${
+                          currentIndex === index 
+                            ? 'w-8 bg-emerald-400' 
+                            : 'w-2 bg-white/30 hover:bg-white/50'
+                        }`}
+                        aria-label={`Ver hito ${index + 1}`}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
 
