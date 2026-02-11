@@ -54,7 +54,7 @@ export default function TimelineSection() {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const isMobile = window.innerWidth < 1024;
-      const cardWidth = isMobile ? window.innerWidth * 0.85 + 16 : 320;
+      const cardWidth = isMobile ? (window.innerWidth * 0.8) + 12 : 320;
       container.scrollTo({
         left: cardWidth * index,
         behavior: 'smooth'
@@ -67,7 +67,7 @@ export default function TimelineSection() {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const isMobile = window.innerWidth < 1024;
-      const cardWidth = isMobile ? window.innerWidth * 0.85 + 16 : 320;
+      const cardWidth = isMobile ? (window.innerWidth * 0.8) + 12 : 320;
       const newIndex = Math.round(container.scrollLeft / cardWidth);
       setCurrentIndex(newIndex);
     }
@@ -180,11 +180,12 @@ export default function TimelineSection() {
               <div 
                 ref={scrollContainerRef}
                 onScroll={handleScroll}
-                className="flex gap-3 sm:gap-4 lg:gap-6 overflow-x-auto pb-2 lg:pb-4 snap-x snap-mandatory scroll-smooth px-2 sm:px-4 lg:px-0 -mx-2 sm:-mx-4 lg:mx-0"
+                className="flex gap-3 overflow-x-scroll pb-4 snap-x snap-mandatory scroll-smooth lg:gap-6 lg:overflow-x-auto"
                 style={{
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  WebkitOverflowScrolling: 'touch'
+                  WebkitOverflowScrolling: 'touch',
+                  scrollSnapType: 'x mandatory'
                 }}
               >
                 {milestones.map((milestone, index) => (
@@ -194,9 +195,10 @@ export default function TimelineSection() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1, duration: 0.5 }}
-                    className="flex-shrink-0 w-[80vw] sm:w-[300px] lg:w-[280px] snap-center lg:snap-start"
+                    className="flex-shrink-0 w-[80vw] snap-center lg:w-[280px] lg:snap-start"
+                    style={{ scrollSnapAlign: 'center' }}
                   >
-                    <div className="relative rounded-xl lg:rounded-2xl overflow-hidden group cursor-pointer shadow-xl hover:shadow-2xl transition-shadow duration-300">
+                    <div className="relative rounded-xl lg:rounded-2xl overflow-hidden group cursor-pointer shadow-xl hover:shadow-2xl transition-shadow duration-300 h-full">
                       {/* Image */}
                       <div className="aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-900 to-black">
                         <img 
@@ -210,14 +212,14 @@ export default function TimelineSection() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
 
                       {/* Content */}
-                      <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 lg:p-6">
-                        <div className="text-emerald-400 text-3xl sm:text-4xl lg:text-5xl font-bold mb-1 sm:mb-2">
+                      <div className="absolute bottom-0 left-0 right-0 p-5 lg:p-6">
+                        <div className="text-emerald-400 text-4xl lg:text-5xl font-bold mb-2">
                           {milestone.year}
                         </div>
-                        <h4 className="text-white font-bold text-sm sm:text-base lg:text-lg mb-1 sm:mb-2">
+                        <h4 className="text-white font-bold text-base lg:text-lg mb-2">
                           {milestone.title}
                         </h4>
-                        <p className="text-white/70 text-xs sm:text-sm leading-relaxed line-clamp-3">
+                        <p className="text-white/70 text-sm leading-relaxed line-clamp-3">
                           {milestone.description}
                         </p>
                       </div>
