@@ -213,13 +213,13 @@ export default function TimelineSection() {
 
                       {/* Content */}
                       <div className="absolute bottom-0 left-0 right-0 p-3 lg:p-6">
-                        <div className="text-emerald-400 text-2xl lg:text-5xl font-bold mb-1 lg:mb-2">
+                        <div className="text-emerald-400 text-2xl lg:text-5xl font-bold mb-0.5 lg:mb-2">
                           {milestone.year}
                         </div>
-                        <h4 className="text-white font-bold text-xs lg:text-lg mb-1 lg:mb-2">
+                        <h4 className="text-white font-bold text-xs lg:text-lg mb-0.5 lg:mb-2">
                           {milestone.title}
                         </h4>
-                        <p className="text-white/70 text-[10px] lg:text-sm leading-relaxed line-clamp-2 lg:line-clamp-3">
+                        <p className="text-white/70 text-[10px] lg:text-sm leading-snug line-clamp-3 lg:line-clamp-4">
                           {milestone.description}
                         </p>
                       </div>
