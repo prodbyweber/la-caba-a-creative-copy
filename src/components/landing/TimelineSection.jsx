@@ -54,7 +54,7 @@ export default function TimelineSection() {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const isMobile = window.innerWidth < 1024;
-      const cardWidth = isMobile ? (window.innerWidth * 0.8) + 12 : 320;
+      const cardWidth = isMobile ? (window.innerWidth * 0.45) + 8 : 320;
       container.scrollTo({
         left: cardWidth * index,
         behavior: 'smooth'
@@ -67,7 +67,7 @@ export default function TimelineSection() {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const isMobile = window.innerWidth < 1024;
-      const cardWidth = isMobile ? (window.innerWidth * 0.8) + 12 : 320;
+      const cardWidth = isMobile ? (window.innerWidth * 0.45) + 8 : 320;
       const newIndex = Math.round(container.scrollLeft / cardWidth);
       setCurrentIndex(newIndex);
     }
@@ -93,7 +93,7 @@ export default function TimelineSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="relative order-2 lg:order-1"
+            className="relative order-2 lg:order-1 px-4 sm:px-0"
           >
             <div className="relative">
               {/* Main Profile Image */}
@@ -116,7 +116,7 @@ export default function TimelineSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.3, duration: 0.6 }}
-                className="mt-6 lg:mt-8 space-y-3 lg:space-y-4 text-center lg:text-left"
+                className="mt-6 lg:mt-8 space-y-3 lg:space-y-4 text-center lg:text-left px-2 sm:px-0"
               >
                 <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
                   Prod. by Weber
@@ -141,11 +141,11 @@ export default function TimelineSection() {
           >
             <div className="relative">
               {/* Title - Mobile */}
-              <div className="mb-6 lg:hidden text-center px-4">
-                <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
+              <div className="mb-6 lg:hidden text-left px-4">
+                <h2 className="text-lg sm:text-xl font-bold text-white mb-1">
                   Mi Trayectoria
                 </h2>
-                <p className="text-white/60 text-xs sm:text-sm">
+                <p className="text-white/60 text-xs">
                   Desliza para ver más →
                 </p>
               </div>
@@ -180,7 +180,7 @@ export default function TimelineSection() {
               <div 
                 ref={scrollContainerRef}
                 onScroll={handleScroll}
-                className="flex gap-4 overflow-x-auto overflow-y-hidden pb-4 snap-x snap-mandatory scroll-smooth pl-4 pr-4 lg:gap-6 lg:pl-0 lg:pr-0"
+                className="flex gap-2 overflow-x-auto overflow-y-hidden pb-4 snap-x snap-mandatory scroll-smooth pl-4 pr-4 lg:gap-6 lg:pl-0 lg:pr-0"
                 style={{
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
@@ -196,9 +196,9 @@ export default function TimelineSection() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1, duration: 0.5 }}
-                    className="flex-shrink-0 w-[75vw] max-w-[280px] snap-center lg:w-[280px] lg:snap-start"
+                    className="flex-shrink-0 w-[45vw] snap-start lg:w-[280px]"
                   >
-                    <div className="relative rounded-xl lg:rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-shadow duration-300">
+                    <div className="relative rounded-lg lg:rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-shadow duration-300">
                       {/* Image */}
                       <div className="aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-900 to-black">
                         <img 
@@ -212,14 +212,14 @@ export default function TimelineSection() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
 
                       {/* Content */}
-                      <div className="absolute bottom-0 left-0 right-0 p-4 lg:p-6">
-                        <div className="text-emerald-400 text-3xl lg:text-5xl font-bold mb-1 lg:mb-2">
+                      <div className="absolute bottom-0 left-0 right-0 p-3 lg:p-6">
+                        <div className="text-emerald-400 text-2xl lg:text-5xl font-bold mb-1 lg:mb-2">
                           {milestone.year}
                         </div>
-                        <h4 className="text-white font-bold text-sm lg:text-lg mb-1 lg:mb-2">
+                        <h4 className="text-white font-bold text-xs lg:text-lg mb-1 lg:mb-2">
                           {milestone.title}
                         </h4>
-                        <p className="text-white/70 text-xs lg:text-sm leading-relaxed line-clamp-3">
+                        <p className="text-white/70 text-[10px] lg:text-sm leading-relaxed line-clamp-2 lg:line-clamp-3">
                           {milestone.description}
                         </p>
                       </div>
