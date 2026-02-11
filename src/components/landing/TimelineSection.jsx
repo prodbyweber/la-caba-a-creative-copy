@@ -237,6 +237,8 @@ export default function TimelineSection() {
                   </button>
                 </div>
 
+                {/* Dots Indicator Mobile */}
+                <div className="flex items-center justify-center gap-2">
                   {milestones.map((_, index) => (
                     <button
                       key={index}
