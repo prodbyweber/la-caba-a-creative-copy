@@ -50,12 +50,6 @@ export default function LandingNav() {
             >
               Iniciar Sesión
             </Link>
-            <Link 
-              to={createPageUrl("Dashboard")}
-              className="px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-sm font-medium hover:shadow-lg hover:shadow-emerald-500/25 transition-all duration-300"
-            >
-              Comenzar
-            </Link>
             <button 
               onClick={() => setMobileOpen(true)}
               className="md:hidden p-2 text-gray-400 hover:text-white"
