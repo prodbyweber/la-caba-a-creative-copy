@@ -116,12 +116,12 @@ export default function TimelineSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.3, duration: 0.6 }}
-                className="mt-0 lg:mt-8 space-y-2 lg:space-y-4 text-center lg:text-left px-2 sm:px-0"
+                className="mt-0 lg:mt-8 space-y-2 lg:space-y-4 text-left px-4 lg:px-0 lg:text-left"
               >
                 <h3 className="text-lg lg:text-3xl font-bold text-white">
                   Prod. by Weber
                 </h3>
-                <p className="text-white/70 leading-relaxed text-xs lg:text-lg max-w-md mx-auto lg:mx-0">
+                <p className="text-white/70 leading-relaxed text-sm lg:text-lg max-w-md lg:mx-0">
                   Más de 8 años ayudando a artistas a construir proyectos coherentes. 
                   Los sistemas que enseño han sido utilizados por empresas y profesionales 
                   de la industria. Mi mensaje no es para todos, pero si estás aquí, 
@@ -141,11 +141,11 @@ export default function TimelineSection() {
           >
             <div className="relative">
               {/* Title - Mobile */}
-              <div className="mb-6 lg:hidden text-left px-4">
-                <h2 className="text-lg sm:text-xl font-bold text-white mb-1">
+              <div className="mb-6 lg:hidden px-4">
+                <h2 className="text-xl font-bold text-white mb-1">
                   Mi Trayectoria
                 </h2>
-                <p className="text-white/60 text-xs">
+                <p className="text-white/60 text-sm">
                   Desliza para ver más →
                 </p>
               </div>
