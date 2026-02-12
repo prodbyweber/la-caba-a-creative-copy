@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ArrowLeft, Check, Music, Target, Sparkles, Globe, DollarSign, Lightbulb, Upload } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 
 const countries = ["España", "México", "Argentina", "Colombia", "Chile", "Perú", "Venezuela", "Ecuador", "Guatemala", "Cuba", "Bolivia", "República Dominicana", "Honduras", "Paraguay", "El Salvador", "Nicaragua", "Costa Rica", "Panamá", "Puerto Rico", "Uruguay", "Estados Unidos", "Canadá", "Brasil", "Francia", "Alemania", "Italia", "Reino Unido", "Portugal", "Otro"];
 
-const formSteps = [
+const defaultFormSteps = [
   {
     id: 1,
     icon: Music,
@@ -232,11 +234,27 @@ const CountrySelector = ({ value, onChange, label, required }) => {
   );
 };
 
-export default function ArtistApplicationForm({ isOpen, onClose, onSuccess }) {
+export default function ArtistApplicationForm({ isOpen, onClose, onSuccess, formId }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectionWarning, setSelectionWarning] = useState("");
+
+  const { data: customForm } = useQuery({
+    queryKey: ['applicationForm', formId],
+    queryFn: async () => {
+      if (!formId) return null;
+      try {
+        const forms = await base44.entities.ApplicationForm.filter({ id: formId });
+        return forms[0];
+      } catch (error) {
+        return null;
+      }
+    },
+    enabled: !!formId
+  });
+
+  const formSteps = customForm?.steps || defaultFormSteps;
 
   const handleFieldChange = (fieldName, value) => {
     setFormData(prev => ({ ...prev, [fieldName]: value }));

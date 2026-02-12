@@ -176,6 +176,7 @@ function FormBuilder({ form, onSave, onCancel }) {
   });
 
   const [editingStepIndex, setEditingStepIndex] = useState(null);
+  const [editingFieldIndex, setEditingFieldIndex] = useState(null);
 
   const handleSave = () => {
     if (!formData.name) {
@@ -220,14 +221,178 @@ function FormBuilder({ form, onSave, onCancel }) {
     const step = formData.steps[stepIndex];
     const updatedStep = {
       ...step,
-      fields: [...step.fields, {
+      fields: [...(step.fields || []), {
         name: `field_${Date.now()}`,
         label: "Nueva pregunta",
         type: "text",
-        required: false
+        required: false,
+        placeholder: ""
       }]
     };
     updateStep(stepIndex, updatedStep);
+  };
+
+  const updateField = (stepIndex, fieldIndex, updatedField) => {
+    const step = formData.steps[stepIndex];
+    const updatedStep = {
+      ...step,
+      fields: step.fields.map((field, i) => i === fieldIndex ? updatedField : field)
+    };
+    updateStep(stepIndex, updatedStep);
+  };
+
+  const deleteField = (stepIndex, fieldIndex) => {
+    const step = formData.steps[stepIndex];
+    const updatedStep = {
+      ...step,
+      fields: step.fields.filter((_, i) => i !== fieldIndex)
+    };
+    updateStep(stepIndex, updatedStep);
+  };
+
+  const loadDefaultForm = () => {
+    const defaultSteps = [
+      {
+        id: 1,
+        icon: "Music",
+        title: "Información Básica",
+        subtitle: "Cuéntanos quién eres",
+        fields: [
+          { name: "nombre", label: "Nombre", type: "text", placeholder: "Tu nombre", required: true },
+          { name: "apellido", label: "Apellido", type: "text", placeholder: "Tu apellido", required: true },
+          { name: "nombre_artistico", label: "Nombre artístico", type: "text", placeholder: "Tu nombre de artista", required: true },
+          { name: "email", label: "Email", type: "email", placeholder: "tu@email.com", required: true },
+          { name: "telefono", label: "Teléfono", type: "phone", placeholder: "Número de teléfono", required: true },
+          { name: "sexo", label: "Sexo", type: "sex", options: ["Masculino", "Femenino", "Prefiero no decirlo"], required: true },
+          { name: "pais_nacimiento", label: "País de nacimiento", type: "country", required: true },
+          { name: "pais_residencia", label: "País de residencia actual", type: "country", required: true }
+        ]
+      },
+      {
+        id: 2,
+        icon: "Sparkles",
+        title: "Identidad Artística",
+        subtitle: "Define tu esencia musical",
+        fields: [
+          { 
+            name: "generos", 
+            label: "¿Qué géneros definen tu sonido?", 
+            type: "multi-cards",
+            maxSelections: 4,
+            options: [
+              { value: "urbano", label: "Urbano" },
+              { value: "pop", label: "Pop" },
+              { value: "rnb", label: "R&B" },
+              { value: "trap", label: "Trap" },
+              { value: "reggaeton", label: "Reggaeton" },
+              { value: "rap", label: "Rap" },
+              { value: "indie", label: "Indie" },
+              { value: "electronica", label: "Electrónica" },
+              { value: "rock", label: "Rock" },
+              { value: "otro", label: "Otro" }
+            ],
+            required: true 
+          },
+          { 
+            name: "emociones", 
+            label: "¿Qué emociones transmite tu música?", 
+            type: "multi-cards",
+            maxSelections: 4,
+            options: [
+              { value: "energia", label: "Energía" },
+              { value: "melancolia", label: "Melancolía" },
+              { value: "felicidad", label: "Felicidad" },
+              { value: "intensidad", label: "Intensidad" },
+              { value: "romance", label: "Romance" },
+              { value: "rebeldia", label: "Rebeldía" },
+              { value: "nostalgia", label: "Nostalgia" },
+              { value: "esperanza", label: "Esperanza" }
+            ],
+            required: true 
+          }
+        ]
+      },
+      {
+        id: 3,
+        icon: "Globe",
+        title: "Presencia Digital",
+        subtitle: "Comparte tus redes",
+        fields: [
+          { name: "spotify", label: "Spotify", type: "text", placeholder: "https://open.spotify.com/artist/...", icon: "spotify", required: false },
+          { name: "instagram", label: "Instagram", type: "text", placeholder: "https://instagram.com/...", icon: "instagram", required: false },
+          { name: "tiktok", label: "TikTok", type: "text", placeholder: "https://tiktok.com/@...", icon: "tiktok", required: false },
+          { name: "youtube", label: "YouTube", type: "text", placeholder: "https://youtube.com/@...", icon: "youtube", required: false },
+          { name: "facebook", label: "Facebook", type: "text", placeholder: "https://facebook.com/...", icon: "facebook", required: false }
+        ]
+      },
+      {
+        id: 4,
+        icon: "Target",
+        title: "Experiencia",
+        subtitle: "Tu trayectoria musical",
+        fields: [
+          { 
+            name: "experiencia", 
+            label: "¿Cuánto tiempo llevas creando música?", 
+            type: "timeline",
+            options: [
+              { value: "nuevo", label: "Menos de 1 año" },
+              { value: "intermedio", label: "1-2 años" },
+              { value: "avanzado", label: "3-5 años" },
+              { value: "profesional", label: "Más de 5 años" }
+            ],
+            required: true 
+          },
+          { name: "referencia_sonido", label: "Artista de referencia", type: "text", placeholder: "¿Quién inspira tu sonido?", required: false }
+        ]
+      },
+      {
+        id: 5,
+        icon: "DollarSign",
+        title: "Inversión",
+        subtitle: "Compromiso con tu carrera",
+        fields: [
+          { 
+            name: "presupuesto", 
+            label: "¿Cuánto estás dispuesto a invertir mensualmente?", 
+            type: "pricing",
+            options: [
+              { value: "1500-2500", label: "1.500 € – 2.500 €", subtitle: "Inicio" },
+              { value: "2500-5000", label: "2.500 € – 5.000 €", subtitle: "Crecimiento", featured: true },
+              { value: "7500-10000", label: "7.500 € – 10.000 €", subtitle: "Profesional" }
+            ],
+            required: true 
+          }
+        ]
+      },
+      {
+        id: 6,
+        icon: "Lightbulb",
+        title: "Visión",
+        subtitle: "Tu objetivo final",
+        fields: [
+          { 
+            name: "objetivo_principal", 
+            label: "¿Qué buscas lograr?", 
+            type: "objectives",
+            options: [
+              { value: "marca", label: "Definir mi sonido y marca" },
+              { value: "primer_proyecto", label: "Producir mi primer proyecto profesional" },
+              { value: "escalar", label: "Escalar mi proyecto actual" },
+              { value: "calidad", label: "Mejorar la calidad de mi música" }
+            ],
+            required: true 
+          },
+          { name: "vision", label: "¿Dónde te ves en 1 año?", type: "textarea", placeholder: "Cuéntanos tu visión...", required: false }
+        ]
+      }
+    ];
+
+    setFormData({
+      ...formData,
+      steps: defaultSteps
+    });
+    toast({ title: "Formulario por defecto cargado" });
   };
 
   return (
@@ -271,14 +436,26 @@ function FormBuilder({ form, onSave, onCancel }) {
               className="bg-zinc-800 border-zinc-700 text-white"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={formData.is_active}
-              onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
-              className="w-4 h-4"
-            />
-            <label className="text-sm text-white/60">Formulario activo</label>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={formData.is_active}
+                onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
+                className="w-4 h-4"
+              />
+              <label className="text-sm text-white/60">Formulario activo</label>
+            </div>
+            {formData.steps.length === 0 && (
+              <Button
+                size="sm"
+                onClick={loadDefaultForm}
+                variant="outline"
+                className="text-emerald-400 border-emerald-500/30"
+              >
+                Cargar formulario por defecto
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -330,20 +507,96 @@ function FormBuilder({ form, onSave, onCancel }) {
                   placeholder="Subtítulo"
                   className="bg-zinc-800 border-zinc-700 text-white"
                 />
-                <div className="text-sm text-white/40">
-                  {step.fields?.length || 0} campos configurados
+                
+                {/* Fields List */}
+                <div className="pt-4 border-t border-zinc-700 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm text-white/60 font-medium">Campos del paso</label>
+                    <Button
+                      size="sm"
+                      onClick={() => addFieldToStep(stepIndex)}
+                      variant="outline"
+                      className="h-8"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      Campo
+                    </Button>
+                  </div>
+                  
+                  {(step.fields || []).map((field, fieldIndex) => (
+                    <div key={fieldIndex} className="bg-zinc-800 rounded-lg p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-white font-medium">{field.label || "Campo sin nombre"}</span>
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setEditingFieldIndex(editingFieldIndex === fieldIndex ? null : fieldIndex)}
+                            className="h-7 px-2"
+                          >
+                            <Edit2 className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => deleteField(stepIndex, fieldIndex)}
+                            className="h-7 px-2 text-red-400 hover:text-red-300"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {editingFieldIndex === fieldIndex && (
+                        <div className="space-y-2 pt-2 border-t border-zinc-700">
+                          <Input
+                            value={field.name}
+                            onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, name: e.target.value })}
+                            placeholder="Nombre del campo (interno)"
+                            className="bg-zinc-900 border-zinc-600 text-white text-sm h-8"
+                          />
+                          <Input
+                            value={field.label}
+                            onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, label: e.target.value })}
+                            placeholder="Etiqueta visible"
+                            className="bg-zinc-900 border-zinc-600 text-white text-sm h-8"
+                          />
+                          <select
+                            value={field.type}
+                            onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, type: e.target.value })}
+                            className="w-full bg-zinc-900 border border-zinc-600 rounded text-white text-sm h-8 px-2"
+                          >
+                            <option value="text">Texto</option>
+                            <option value="email">Email</option>
+                            <option value="phone">Teléfono</option>
+                            <option value="textarea">Área de texto</option>
+                            <option value="country">Selector de país</option>
+                            <option value="sex">Sexo</option>
+                            <option value="multi-cards">Tarjetas múltiples</option>
+                            <option value="timeline">Timeline</option>
+                            <option value="pricing">Precios</option>
+                            <option value="objectives">Objetivos</option>
+                          </select>
+                          <Input
+                            value={field.placeholder || ""}
+                            onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, placeholder: e.target.value })}
+                            placeholder="Placeholder"
+                            className="bg-zinc-900 border-zinc-600 text-white text-sm h-8"
+                          />
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={field.required || false}
+                              onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, required: e.target.checked })}
+                              className="w-3 h-3"
+                            />
+                            <label className="text-xs text-white/60">Campo requerido</label>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                <Button
-                  size="sm"
-                  onClick={() => addFieldToStep(stepIndex)}
-                  variant="outline"
-                >
-                  <Plus className="w-3 h-3 mr-2" />
-                  Agregar Campo
-                </Button>
-                <p className="text-xs text-white/40">
-                  Nota: La configuración avanzada de campos estará disponible próximamente
-                </p>
               </CardContent>
             )}
           </Card>
