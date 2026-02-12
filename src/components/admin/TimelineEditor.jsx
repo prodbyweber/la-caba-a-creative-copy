@@ -17,50 +17,10 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
       year: new Date().getFullYear().toString(),
       title: "Nuevo hito",
       description: "Descripción del hito",
-      image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&h=500&fit=crop&q=80",
-      playlist: {
-        title: "",
-        songs: []
-      }
+      image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&h=500&fit=crop&q=80"
     }];
     setLocalMilestones(newMilestones);
     onUpdate(newMilestones);
-  };
-
-  const addSong = (milestoneIndex) => {
-    const updated = [...localMilestones];
-    if (!updated[milestoneIndex].playlist) {
-      updated[milestoneIndex].playlist = { title: "", songs: [] };
-    }
-    updated[milestoneIndex].playlist.songs.push({
-      title: "",
-      artist: "",
-      youtube_url: ""
-    });
-    setLocalMilestones(updated);
-    onUpdate(updated);
-  };
-
-  const updateSong = (milestoneIndex, songIndex, field, value) => {
-    const updated = [...localMilestones];
-    updated[milestoneIndex].playlist.songs[songIndex][field] = value;
-    setLocalMilestones(updated);
-  };
-
-  const removeSong = (milestoneIndex, songIndex) => {
-    const updated = [...localMilestones];
-    updated[milestoneIndex].playlist.songs.splice(songIndex, 1);
-    setLocalMilestones(updated);
-    onUpdate(updated);
-  };
-
-  const updatePlaylistTitle = (milestoneIndex, title) => {
-    const updated = [...localMilestones];
-    if (!updated[milestoneIndex].playlist) {
-      updated[milestoneIndex].playlist = { title: "", songs: [] };
-    }
-    updated[milestoneIndex].playlist.title = title;
-    setLocalMilestones(updated);
   };
 
   const updateMilestoneLocal = (index, field, value) => {
@@ -243,71 +203,103 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
                       </div>
 
                       {/* Playlist Section */}
-                      <div className="pt-4 border-t border-white/10">
-                        <label className="text-xs text-gray-400 mb-3 block font-medium">
-                          Playlist de Música
-                        </label>
+                      <div className="space-y-4 mt-4 p-4 bg-white/5 rounded-lg border border-white/10">
+                        <h4 className="text-sm font-medium text-white">Playlist (Opcional)</h4>
                         
-                        {/* Playlist Title */}
-                        <div className="mb-3">
+                        <div>
+                          <label className="text-xs text-gray-400 mb-2 block font-medium">
+                            Título del Álbum/Single
+                          </label>
                           <input
                             type="text"
-                            value={milestone.playlist?.title || ""}
-                            onChange={(e) => updatePlaylistTitle(index, e.target.value)}
+                            value={milestone.playlist?.title || ''}
+                            onChange={(e) => {
+                              const updated = [...localMilestones];
+                              if (!updated[index].playlist) {
+                                updated[index].playlist = { title: '', songs: [] };
+                              }
+                              updated[index].playlist.title = e.target.value;
+                              setLocalMilestones(updated);
+                            }}
                             onBlur={() => saveMilestone(index)}
-                            className="w-full px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-white focus:outline-none focus:border-emerald-500 transition-colors"
-                            placeholder="Título del álbum o single"
+                            className="w-full px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                            placeholder="Ej: Mi Primer Álbum"
                           />
                         </div>
 
-                        {/* Songs List */}
-                        <div className="space-y-2 mb-3">
-                          {milestone.playlist?.songs?.map((song, songIndex) => (
-                            <div key={songIndex} className="bg-white/5 rounded-lg p-3 space-y-2">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs text-gray-500">Canción {songIndex + 1}</span>
-                                <button
-                                  onClick={() => removeSong(index, songIndex)}
-                                  className="p-1 hover:bg-red-500/20 rounded text-red-400"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </button>
-                              </div>
+                        <div className="space-y-2">
+                          <label className="text-xs text-gray-400 font-medium">Canciones</label>
+                          {(milestone.playlist?.songs || []).map((song, songIndex) => (
+                            <div key={songIndex} className="p-3 bg-white/5 rounded-lg space-y-2 border border-white/10">
                               <input
                                 type="text"
-                                value={song.title}
-                                onChange={(e) => updateSong(index, songIndex, 'title', e.target.value)}
-                                onBlur={() => saveMilestone(index)}
-                                className="w-full px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
                                 placeholder="Título de la canción"
+                                value={song.title}
+                                onChange={(e) => {
+                                  const updated = [...localMilestones];
+                                  updated[index].playlist.songs[songIndex].title = e.target.value;
+                                  setLocalMilestones(updated);
+                                }}
+                                onBlur={() => saveMilestone(index)}
+                                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded text-white text-sm focus:outline-none focus:border-emerald-500"
                               />
                               <input
                                 type="text"
-                                value={song.artist}
-                                onChange={(e) => updateSong(index, songIndex, 'artist', e.target.value)}
-                                onBlur={() => saveMilestone(index)}
-                                className="w-full px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
                                 placeholder="Artista"
+                                value={song.artist}
+                                onChange={(e) => {
+                                  const updated = [...localMilestones];
+                                  updated[index].playlist.songs[songIndex].artist = e.target.value;
+                                  setLocalMilestones(updated);
+                                }}
+                                onBlur={() => saveMilestone(index)}
+                                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded text-white text-sm focus:outline-none focus:border-emerald-500"
                               />
                               <input
                                 type="text"
+                                placeholder="URL de YouTube"
                                 value={song.youtube_url}
-                                onChange={(e) => updateSong(index, songIndex, 'youtube_url', e.target.value)}
+                                onChange={(e) => {
+                                  const updated = [...localMilestones];
+                                  updated[index].playlist.songs[songIndex].youtube_url = e.target.value;
+                                  setLocalMilestones(updated);
+                                }}
                                 onBlur={() => saveMilestone(index)}
-                                className="w-full px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
-                                placeholder="URL de YouTube Music"
+                                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded text-white text-sm focus:outline-none focus:border-emerald-500"
                               />
+                              <button
+                                onClick={() => {
+                                  const updated = [...localMilestones];
+                                  updated[index].playlist.songs.splice(songIndex, 1);
+                                  setLocalMilestones(updated);
+                                  onUpdate(updated);
+                                }}
+                                className="text-red-400 text-sm hover:text-red-300 transition-colors"
+                              >
+                                Eliminar canción
+                              </button>
                             </div>
                           ))}
+                          
+                          <button
+                            onClick={() => {
+                              const updated = [...localMilestones];
+                              if (!updated[index].playlist) {
+                                updated[index].playlist = { title: '', songs: [] };
+                              }
+                              updated[index].playlist.songs.push({
+                                title: '',
+                                artist: '',
+                                youtube_url: ''
+                              });
+                              setLocalMilestones(updated);
+                              onUpdate(updated);
+                            }}
+                            className="w-full px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-lg text-sm font-medium transition-colors"
+                          >
+                            + Agregar Canción
+                          </button>
                         </div>
-
-                        <button
-                          onClick={() => addSong(index)}
-                          className="w-full px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 text-sm transition-colors flex items-center justify-center gap-2"
-                        >
-                          <Plus className="w-4 h-4" />
-                          Añadir canción
-                        </button>
                       </div>
                     </div>
                   </motion.div>
