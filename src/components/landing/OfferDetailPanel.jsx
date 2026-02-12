@@ -1,13 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Play, CheckCircle, ArrowRight, Clock, Lock } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 import ArtistApplicationForm from "./ArtistApplicationForm";
 
 export default function OfferDetailPanel({ offer, isOpen, onClose }) {
   const [videoWatchTime, setVideoWatchTime] = useState(0);
   const [isVideoCompleted, setIsVideoCompleted] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const VIDEO_DURATION = 240; // 4 minutes in seconds
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      try {
+        const user = await base44.auth.me();
+        setIsAdmin(user?.role === 'admin');
+      } catch (error) {
+        setIsAdmin(false);
+      }
+    };
+    if (isOpen) {
+      checkAdmin();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -198,7 +214,7 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                   )}
 
                   {/* Video Progress Indicator */}
-                  {!isVideoCompleted && (
+                  {!isVideoCompleted && !isAdmin && (
                     <div className="mb-6 p-4 bg-zinc-800/50 rounded-xl border border-zinc-700">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2 text-sm text-gray-400">
@@ -223,8 +239,17 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                     </div>
                   )}
 
-                  {/* Application Button - Unlocked after video */}
-                  {isVideoCompleted && (
+                  {/* Admin Badge */}
+                  {isAdmin && !isVideoCompleted && (
+                    <div className="mb-4 p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/30">
+                      <p className="text-xs text-emerald-400 font-medium">
+                        ✓ Modo Admin: Acceso completo sin restricciones
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Application Button - Unlocked after video or for admins */}
+                  {(isVideoCompleted || isAdmin) && (
                     <motion.button
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
