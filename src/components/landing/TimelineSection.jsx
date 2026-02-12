@@ -54,9 +54,11 @@ export default function TimelineSection() {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const isMobile = window.innerWidth < 1024;
-      const cardWidth = isMobile ? (window.innerWidth * 0.45) + 8 : 320;
+      const gap = isMobile ? 8 : 24;
+      const cardWidth = isMobile ? (window.innerWidth * 0.45) : 280;
+      const scrollPosition = (cardWidth + gap) * index;
       container.scrollTo({
-        left: cardWidth * index,
+        left: scrollPosition,
         behavior: 'smooth'
       });
       setCurrentIndex(index);
@@ -67,9 +69,10 @@ export default function TimelineSection() {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const isMobile = window.innerWidth < 1024;
-      const cardWidth = isMobile ? (window.innerWidth * 0.45) + 8 : 320;
-      const newIndex = Math.round(container.scrollLeft / cardWidth);
-      setCurrentIndex(newIndex);
+      const gap = isMobile ? 8 : 24;
+      const cardWidth = isMobile ? (window.innerWidth * 0.45) : 280;
+      const newIndex = Math.round(container.scrollLeft / (cardWidth + gap));
+      setCurrentIndex(Math.min(newIndex, milestones.length - 1));
     }
   };
 
@@ -168,7 +171,7 @@ export default function TimelineSection() {
                 <div 
                   ref={scrollContainerRef}
                   onScroll={handleScroll}
-                  className="flex gap-2 lg:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth pl-4 pr-8 lg:px-0"
+                  className="flex gap-2 lg:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth pl-4 pr-4 lg:px-0"
                   style={{
                     scrollbarWidth: 'none',
                     msOverflowStyle: 'none',
