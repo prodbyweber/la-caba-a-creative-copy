@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
-import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Music, Play, ExternalLink } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
@@ -48,6 +48,7 @@ export default function TimelineSection() {
 
   const milestones = config?.timeline_milestones || defaultMilestones;
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [hoveredCard, setHoveredCard] = useState(null);
   const scrollContainerRef = useRef(null);
 
   const scrollToIndex = (index) => {
@@ -186,14 +187,22 @@ export default function TimelineSection() {
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.1, duration: 0.5 }}
                       className="flex-shrink-0 w-[45vw] snap-start lg:w-[280px]"
+                      onMouseEnter={() => setHoveredCard(index)}
+                      onMouseLeave={() => setHoveredCard(null)}
                     >
-                      <div className="relative rounded-lg lg:rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-shadow duration-300 h-full">
+                      <motion.div 
+                        className="relative rounded-lg lg:rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300 h-full"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.3 }}
+                      >
                         {/* Image */}
                         <div className="aspect-[3/4] overflow-hidden bg-gradient-to-br from-gray-900 to-black">
-                          <img 
+                          <motion.img 
                             src={milestone.image}
                             alt={milestone.year}
                             className="w-full h-full object-cover"
+                            animate={{ scale: hoveredCard === index ? 1.1 : 1 }}
+                            transition={{ duration: 0.3 }}
                           />
                         </div>
 
@@ -211,8 +220,63 @@ export default function TimelineSection() {
                           <p className="text-white/70 text-[10px] lg:text-sm leading-tight line-clamp-4">
                             {milestone.description}
                           </p>
+                          
+                          {milestone.playlist && milestone.playlist.songs?.length > 0 && (
+                            <div className="mt-2 flex items-center gap-1 text-emerald-400">
+                              <Music className="w-3 h-3 lg:w-4 lg:h-4" />
+                              <span className="text-[10px] lg:text-xs">
+                                {milestone.playlist.songs.length} {milestone.playlist.songs.length === 1 ? 'canción' : 'canciones'}
+                              </span>
+                            </div>
+                          )}
                         </div>
-                      </div>
+
+                        {/* Playlist Overlay on Hover - Desktop Only */}
+                        <AnimatePresence>
+                          {hoveredCard === index && milestone.playlist && milestone.playlist.songs?.length > 0 && (
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              className="hidden lg:block absolute inset-0 bg-black/95 backdrop-blur-sm p-4 overflow-y-auto"
+                            >
+                              <div className="space-y-3">
+                                <div className="flex items-center gap-2 mb-4">
+                                  <Music className="w-5 h-5 text-emerald-400" />
+                                  <h5 className="text-white font-bold text-sm">
+                                    {milestone.playlist.title || 'Playlist'}
+                                  </h5>
+                                </div>
+                                
+                                {milestone.playlist.songs.map((song, songIndex) => (
+                                  <a
+                                    key={songIndex}
+                                    href={song.youtube_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block p-2 bg-zinc-900/50 rounded hover:bg-zinc-800/50 transition-colors group"
+                                  >
+                                    <div className="flex items-start justify-between gap-2">
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2">
+                                          <Play className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                                          <p className="text-white text-xs font-medium truncate">
+                                            {song.title}
+                                          </p>
+                                        </div>
+                                        <p className="text-white/60 text-[10px] truncate ml-5">
+                                          {song.artist}
+                                        </p>
+                                      </div>
+                                      <ExternalLink className="w-3 h-3 text-white/40 group-hover:text-emerald-400 flex-shrink-0 transition-colors" />
+                                    </div>
+                                  </a>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
                     </motion.div>
                   ))}
                 </div>
