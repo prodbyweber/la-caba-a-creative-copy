@@ -1,11 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Play, CheckCircle, ArrowRight } from "lucide-react";
+import { X, Play, CheckCircle, ArrowRight, Clock, Lock } from "lucide-react";
+import ArtistApplicationForm from "./ArtistApplicationForm";
 
 export default function OfferDetailPanel({ offer, isOpen, onClose }) {
+  const [videoWatchTime, setVideoWatchTime] = useState(0);
+  const [isVideoCompleted, setIsVideoCompleted] = useState(false);
+  const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const VIDEO_DURATION = 240; // 4 minutes in seconds
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      setVideoWatchTime(0);
+      setIsVideoCompleted(false);
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -13,6 +21,32 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
       document.body.style.overflow = 'unset';
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || isVideoCompleted) return;
+
+    const interval = setInterval(() => {
+      setVideoWatchTime(prev => {
+        const newTime = prev + 1;
+        if (newTime >= VIDEO_DURATION) {
+          setIsVideoCompleted(true);
+          clearInterval(interval);
+          return VIDEO_DURATION;
+        }
+        return newTime;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isOpen, isVideoCompleted]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const progress = (videoWatchTime / VIDEO_DURATION) * 100;
 
   if (!offer) return null;
 
@@ -163,13 +197,55 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                     </div>
                   )}
 
+                  {/* Video Progress Indicator */}
+                  {!isVideoCompleted && (
+                    <div className="mb-6 p-4 bg-zinc-800/50 rounded-xl border border-zinc-700">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 text-sm text-gray-400">
+                          <Clock className="w-4 h-4" />
+                          <span>Tiempo de visualización</span>
+                        </div>
+                        <span className="text-sm font-mono text-emerald-400">
+                          {formatTime(videoWatchTime)} / {formatTime(VIDEO_DURATION)}
+                        </span>
+                      </div>
+                      <div className="h-2 bg-zinc-900 rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${progress}%` }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">
+                        Al finalizar el video se habilitará el botón para agendar tu meeting
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Application Button - Unlocked after video */}
+                  {isVideoCompleted && (
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setShowApplicationForm(true)}
+                      className="w-full py-4 sm:py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 mb-4"
+                    >
+                      <CheckCircle className="w-5 h-5" />
+                      Aplicar ahora - Agendar Meeting
+                      <ArrowRight className="w-5 h-5" />
+                    </motion.button>
+                  )}
+
                   {/* CTA Button */}
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className={`w-full py-4 sm:py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all ${
                       offer.featured
-                        ? 'bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/20'
+                        ? 'bg-white text-black hover:bg-gray-100'
                         : 'bg-white text-black hover:bg-gray-100'
                     }`}
                   >
@@ -180,6 +256,16 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
               </div>
             </div>
           </motion.div>
+
+          {/* Application Form Modal */}
+          <ArtistApplicationForm
+            isOpen={showApplicationForm}
+            onClose={() => setShowApplicationForm(false)}
+            onSuccess={() => {
+              setShowApplicationForm(false);
+              alert('¡Formulario enviado! Recibirás un email con el enlace de Calendly para agendar tu meeting.');
+            }}
+          />
         </>
       )}
     </AnimatePresence>

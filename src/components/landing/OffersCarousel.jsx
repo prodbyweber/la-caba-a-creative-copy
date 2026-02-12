@@ -205,13 +205,20 @@ export default function OffersCarousel() {
                       {offer.description}
                     </div>
 
-                    {/* Single CTA Button */}
-                    <button
-                      onClick={() => setSelectedOffer(offer)}
-                      className="w-full py-2.5 px-4 rounded-xl bg-white text-black hover:bg-gray-100 font-semibold text-sm transition-all"
-                    >
-                      {offer.cta || 'Ver más'}
-                    </button>
+                    {/* Dual CTA Buttons */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setSelectedOffer(offer)}
+                        className="flex-1 py-2.5 px-4 rounded-xl bg-zinc-800 text-white hover:bg-zinc-700 font-semibold text-sm transition-all border border-zinc-700"
+                      >
+                        Ver más
+                      </button>
+                      <button
+                        className="flex-1 py-2.5 px-4 rounded-xl bg-white text-black hover:bg-gray-100 font-semibold text-sm transition-all"
+                      >
+                        Comprar
+                      </button>
+                    </div>
                   </div>
                 </div>
               </motion.div>
