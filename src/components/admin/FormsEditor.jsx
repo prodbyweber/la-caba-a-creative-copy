@@ -548,41 +548,147 @@ function FormBuilder({ form, onSave, onCancel }) {
                       </div>
                       
                       {editingFieldIndex === fieldIndex && (
-                        <div className="space-y-2 pt-2 border-t border-zinc-700">
-                          <Input
-                            value={field.name}
-                            onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, name: e.target.value })}
-                            placeholder="Nombre del campo (interno)"
-                            className="bg-zinc-900 border-zinc-600 text-white text-sm h-8"
-                          />
-                          <Input
-                            value={field.label}
-                            onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, label: e.target.value })}
-                            placeholder="Etiqueta visible"
-                            className="bg-zinc-900 border-zinc-600 text-white text-sm h-8"
-                          />
-                          <select
-                            value={field.type}
-                            onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, type: e.target.value })}
-                            className="w-full bg-zinc-900 border border-zinc-600 rounded text-white text-sm h-8 px-2"
-                          >
-                            <option value="text">Texto</option>
-                            <option value="email">Email</option>
-                            <option value="phone">Teléfono</option>
-                            <option value="textarea">Área de texto</option>
-                            <option value="country">Selector de país</option>
-                            <option value="sex">Sexo</option>
-                            <option value="multi-cards">Tarjetas múltiples</option>
-                            <option value="timeline">Timeline</option>
-                            <option value="pricing">Precios</option>
-                            <option value="objectives">Objetivos</option>
-                          </select>
-                          <Input
-                            value={field.placeholder || ""}
-                            onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, placeholder: e.target.value })}
-                            placeholder="Placeholder"
-                            className="bg-zinc-900 border-zinc-600 text-white text-sm h-8"
-                          />
+                        <div className="space-y-3 pt-2 border-t border-zinc-700">
+                          <div>
+                            <label className="text-xs text-white/40 mb-1 block">Nombre interno</label>
+                            <Input
+                              value={field.name}
+                              onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, name: e.target.value })}
+                              placeholder="nombre_campo"
+                              className="bg-zinc-900 border-zinc-600 text-white text-sm h-8"
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="text-xs text-white/40 mb-1 block">Pregunta visible</label>
+                            <Input
+                              value={field.label}
+                              onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, label: e.target.value })}
+                              placeholder="¿Cuál es tu pregunta?"
+                              className="bg-zinc-900 border-zinc-600 text-white text-sm h-8"
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="text-xs text-white/40 mb-1 block">Tipo de campo</label>
+                            <select
+                              value={field.type}
+                              onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, type: e.target.value })}
+                              className="w-full bg-zinc-900 border border-zinc-600 rounded text-white text-sm h-8 px-2"
+                            >
+                              <option value="text">Texto</option>
+                              <option value="email">Email</option>
+                              <option value="phone">Teléfono</option>
+                              <option value="textarea">Área de texto</option>
+                              <option value="country">Selector de país</option>
+                              <option value="sex">Sexo</option>
+                              <option value="multi-cards">Tarjetas múltiples</option>
+                              <option value="timeline">Timeline</option>
+                              <option value="pricing">Precios</option>
+                              <option value="objectives">Objetivos</option>
+                            </select>
+                          </div>
+
+                          {!["country", "sex", "multi-cards", "timeline", "pricing", "objectives"].includes(field.type) && (
+                            <div>
+                              <label className="text-xs text-white/40 mb-1 block">Placeholder</label>
+                              <Input
+                                value={field.placeholder || ""}
+                                onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, placeholder: e.target.value })}
+                                placeholder="Texto de ejemplo..."
+                                className="bg-zinc-900 border-zinc-600 text-white text-sm h-8"
+                              />
+                            </div>
+                          )}
+
+                          {field.type === "multi-cards" && (
+                            <div>
+                              <label className="text-xs text-white/40 mb-1 block">Máximo de selecciones</label>
+                              <Input
+                                type="number"
+                                value={field.maxSelections || 4}
+                                onChange={(e) => updateField(stepIndex, fieldIndex, { ...field, maxSelections: parseInt(e.target.value) || 4 })}
+                                className="bg-zinc-900 border-zinc-600 text-white text-sm h-8"
+                              />
+                            </div>
+                          )}
+
+                          {["sex", "multi-cards", "timeline", "pricing", "objectives"].includes(field.type) && (
+                            <div className="pt-2 border-t border-zinc-600">
+                              <div className="flex items-center justify-between mb-2">
+                                <label className="text-xs text-white/40 font-medium">Opciones</label>
+                                <Button
+                                  size="sm"
+                                  onClick={() => {
+                                    const newOption = field.type === "pricing" 
+                                      ? { value: "", label: "", subtitle: "" }
+                                      : { value: "", label: "" };
+                                    updateField(stepIndex, fieldIndex, {
+                                      ...field,
+                                      options: [...(field.options || []), newOption]
+                                    });
+                                  }}
+                                  className="h-6 px-2 text-xs"
+                                >
+                                  <Plus className="w-3 h-3 mr-1" />
+                                  Opción
+                                </Button>
+                              </div>
+
+                              <div className="space-y-2 max-h-48 overflow-y-auto">
+                                {(field.options || []).map((option, optIndex) => (
+                                  <div key={optIndex} className="bg-zinc-950 rounded p-2 space-y-1">
+                                    <div className="flex items-center gap-2">
+                                      <Input
+                                        value={option.value}
+                                        onChange={(e) => {
+                                          const newOptions = [...(field.options || [])];
+                                          newOptions[optIndex] = { ...option, value: e.target.value };
+                                          updateField(stepIndex, fieldIndex, { ...field, options: newOptions });
+                                        }}
+                                        placeholder="valor"
+                                        className="flex-1 bg-black/30 border-zinc-700 text-white text-xs h-7"
+                                      />
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => {
+                                          const newOptions = (field.options || []).filter((_, i) => i !== optIndex);
+                                          updateField(stepIndex, fieldIndex, { ...field, options: newOptions });
+                                        }}
+                                        className="h-7 w-7 p-0 text-red-400 hover:text-red-300"
+                                      >
+                                        <Trash2 className="w-3 h-3" />
+                                      </Button>
+                                    </div>
+                                    <Input
+                                      value={option.label}
+                                      onChange={(e) => {
+                                        const newOptions = [...(field.options || [])];
+                                        newOptions[optIndex] = { ...option, label: e.target.value };
+                                        updateField(stepIndex, fieldIndex, { ...field, options: newOptions });
+                                      }}
+                                      placeholder="Texto visible"
+                                      className="bg-black/30 border-zinc-700 text-white text-xs h-7"
+                                    />
+                                    {field.type === "pricing" && (
+                                      <Input
+                                        value={option.subtitle || ""}
+                                        onChange={(e) => {
+                                          const newOptions = [...(field.options || [])];
+                                          newOptions[optIndex] = { ...option, subtitle: e.target.value };
+                                          updateField(stepIndex, fieldIndex, { ...field, options: newOptions });
+                                        }}
+                                        placeholder="Subtítulo (opcional)"
+                                        className="bg-black/30 border-zinc-700 text-white text-xs h-7"
+                                      />
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          
                           <div className="flex items-center gap-2">
                             <input
                               type="checkbox"
