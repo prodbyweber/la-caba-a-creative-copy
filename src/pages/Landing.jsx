@@ -8,6 +8,7 @@ import StoriesSection from "@/components/landing/StoriesSection";
 import StartupsSection from "@/components/landing/StartupsSection";
 import TimelineSection from "@/components/landing/TimelineSection";
 import ExploracionSection from "@/components/landing/ExploracionSection";
+import MemberBanner from "@/components/landing/MemberBanner";
 import LandingNav from "@/components/landing/LandingNav";
 import Footer from "@/components/landing/Footer";
 
@@ -32,6 +33,7 @@ export default function Landing() {
         <OffersCarousel />
         <ExploracionSection />
         <StartupsSection />
+        <MemberBanner />
       </main>
 
       <Footer />
