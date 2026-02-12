@@ -388,10 +388,12 @@ export default function ArtistApplicationForm({ isOpen, onClose, onSuccess }) {
                       transition={{ delay: 0.1 * (index + 1) }}
                       className="space-y-3"
                     >
-                      <label className="block text-sm font-medium text-white/60 tracking-wide">
-                        {field.label}
-                        {field.required && <span className="text-emerald-400 ml-1">*</span>}
-                      </label>
+                      {field.type !== "country" && (
+                        <label className="block text-sm font-medium text-white/60 tracking-wide">
+                          {field.label}
+                          {field.required && <span className="text-emerald-400 ml-1">*</span>}
+                        </label>
+                      )}
 
                       {field.type === "multi-cards" && (
                         <>

@@ -14,6 +14,7 @@ export default function OffersEditor({ offers = [], onUpdate }) {
     price: "",
     description: "",
     cta: "Ver más",
+    form_id: "",
     color: "emerald",
     featured: false,
     highlights: [],
