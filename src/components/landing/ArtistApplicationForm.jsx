@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ArrowLeft, Check, Music, Target, Sparkles, Globe, DollarSign, Lightbulb, Upload } from "lucide-react";
 
+const countries = ["España", "México", "Argentina", "Colombia", "Chile", "Perú", "Venezuela", "Ecuador", "Guatemala", "Cuba", "Bolivia", "República Dominicana", "Honduras", "Paraguay", "El Salvador", "Nicaragua", "Costa Rica", "Panamá", "Puerto Rico", "Uruguay", "Estados Unidos", "Canadá", "Brasil", "Francia", "Alemania", "Italia", "Reino Unido", "Portugal", "Otro"];
+
 const formSteps = [
   {
     id: 1,
@@ -9,9 +11,14 @@ const formSteps = [
     title: "Información Básica",
     subtitle: "Cuéntanos quién eres",
     fields: [
-      { name: "nombre", label: "Nombre artístico", type: "text", placeholder: "Tu nombre de artista", required: true },
+      { name: "nombre", label: "Nombre", type: "text", placeholder: "Tu nombre", required: true },
+      { name: "apellido", label: "Apellido", type: "text", placeholder: "Tu apellido", required: true },
+      { name: "nombre_artistico", label: "Nombre artístico", type: "text", placeholder: "Tu nombre de artista", required: true },
       { name: "email", label: "Email", type: "email", placeholder: "tu@email.com", required: true },
-      { name: "telefono", label: "Teléfono", type: "tel", placeholder: "+34 600 000 000", required: true },
+      { name: "telefono", label: "Teléfono", type: "phone", placeholder: "Número de teléfono", required: true },
+      { name: "sexo", label: "Sexo", type: "sex", options: ["Masculino", "Femenino", "Prefiero no decirlo"], required: true },
+      { name: "pais_nacimiento", label: "País de nacimiento", type: "country", required: true },
+      { name: "pais_residencia", label: "País de residencia actual", type: "country", required: true },
     ]
   },
   {
@@ -21,30 +28,38 @@ const formSteps = [
     subtitle: "Define tu esencia musical",
     fields: [
       { 
-        name: "genero", 
-        label: "¿Qué género defines tu sonido?", 
-        type: "cards",
+        name: "generos", 
+        label: "¿Qué géneros definen tu sonido?", 
+        type: "multi-cards",
+        maxSelections: 4,
         options: [
-          { value: "urbano", label: "Urbano", emoji: "🎤" },
-          { value: "pop", label: "Pop", emoji: "✨" },
-          { value: "rnb", label: "R&B", emoji: "🎵" },
-          { value: "trap", label: "Trap", emoji: "🔥" },
-          { value: "reggaeton", label: "Reggaeton", emoji: "🌴" },
-          { value: "otro", label: "Otro", emoji: "🎹" }
+          { value: "urbano", label: "Urbano" },
+          { value: "pop", label: "Pop" },
+          { value: "rnb", label: "R&B" },
+          { value: "trap", label: "Trap" },
+          { value: "reggaeton", label: "Reggaeton" },
+          { value: "rap", label: "Rap" },
+          { value: "indie", label: "Indie" },
+          { value: "electronica", label: "Electrónica" },
+          { value: "rock", label: "Rock" },
+          { value: "otro", label: "Otro" }
         ],
         required: true 
       },
       { 
-        name: "emocion", 
-        label: "¿Qué emoción transmite tu música?", 
-        type: "cards",
+        name: "emociones", 
+        label: "¿Qué emociones transmite tu música?", 
+        type: "multi-cards",
+        maxSelections: 4,
         options: [
-          { value: "energia", label: "Energía", emoji: "⚡" },
-          { value: "melancolia", label: "Melancolía", emoji: "🌙" },
-          { value: "felicidad", label: "Felicidad", emoji: "☀️" },
-          { value: "intensidad", label: "Intensidad", emoji: "🔥" },
-          { value: "romance", label: "Romance", emoji: "💫" },
-          { value: "rebeldia", label: "Rebeldía", emoji: "🚀" }
+          { value: "energia", label: "Energía" },
+          { value: "melancolia", label: "Melancolía" },
+          { value: "felicidad", label: "Felicidad" },
+          { value: "intensidad", label: "Intensidad" },
+          { value: "romance", label: "Romance" },
+          { value: "rebeldia", label: "Rebeldía" },
+          { value: "nostalgia", label: "Nostalgia" },
+          { value: "esperanza", label: "Esperanza" }
         ],
         required: true 
       },
@@ -53,19 +68,21 @@ const formSteps = [
   {
     id: 3,
     icon: Globe,
-    title: "Referencias y Música",
-    subtitle: "Muéstranos tu trabajo",
+    title: "Presencia Digital",
+    subtitle: "Comparte tus redes",
     fields: [
-      { name: "musica_publicada", label: "Enlace a tu música", type: "text", placeholder: "Spotify, YouTube, SoundCloud...", required: false },
-      { name: "instagram", label: "Instagram", type: "text", placeholder: "@tuusuario", required: false },
-      { name: "referencia_sonido", label: "Artista de referencia", type: "text", placeholder: "¿Quién inspira tu sonido?", required: false },
+      { name: "spotify", label: "Spotify", type: "text", placeholder: "https://open.spotify.com/artist/...", icon: "spotify", required: false },
+      { name: "instagram", label: "Instagram", type: "text", placeholder: "https://instagram.com/...", icon: "instagram", required: false },
+      { name: "tiktok", label: "TikTok", type: "text", placeholder: "https://tiktok.com/@...", icon: "tiktok", required: false },
+      { name: "youtube", label: "YouTube", type: "text", placeholder: "https://youtube.com/@...", icon: "youtube", required: false },
+      { name: "facebook", label: "Facebook", type: "text", placeholder: "https://facebook.com/...", icon: "facebook", required: false },
     ]
   },
   {
     id: 4,
     icon: Target,
-    title: "Presencia Digital",
-    subtitle: "Tu alcance actual",
+    title: "Experiencia",
+    subtitle: "Tu trayectoria musical",
     fields: [
       { 
         name: "experiencia", 
@@ -79,7 +96,7 @@ const formSteps = [
         ],
         required: true 
       },
-      { name: "seguidores", label: "Total de seguidores (aprox.)", type: "text", placeholder: "Ej: 5,000", required: false },
+      { name: "referencia_sonido", label: "Artista de referencia", type: "text", placeholder: "¿Quién inspira tu sonido?", required: false },
     ]
   },
   {
@@ -93,10 +110,9 @@ const formSteps = [
         label: "¿Cuánto estás dispuesto a invertir mensualmente?", 
         type: "pricing",
         options: [
-          { value: "300-500", label: "300-500€", subtitle: "Inicio" },
-          { value: "500-1000", label: "500-1.000€", subtitle: "Crecimiento", featured: true },
-          { value: "1000-2000", label: "1.000-2.000€", subtitle: "Profesional" },
-          { value: "2000+", label: "+2.000€", subtitle: "Elite" }
+          { value: "1500-2500", label: "1.500 € – 2.500 €", subtitle: "Inicio" },
+          { value: "2500-5000", label: "2.500 € – 5.000 €", subtitle: "Crecimiento", featured: true },
+          { value: "7500-10000", label: "7.500 € – 10.000 €", subtitle: "Profesional" },
         ],
         required: true 
       },
@@ -113,10 +129,10 @@ const formSteps = [
         label: "¿Qué buscas lograr?", 
         type: "objectives",
         options: [
-          { value: "marca", label: "Definir mi sonido y marca", icon: "🎯" },
-          { value: "primer_proyecto", label: "Producir mi primer proyecto profesional", icon: "🎤" },
-          { value: "escalar", label: "Escalar mi proyecto actual", icon: "📈" },
-          { value: "calidad", label: "Mejorar la calidad de mi música", icon: "✨" }
+          { value: "marca", label: "Definir mi sonido y marca" },
+          { value: "primer_proyecto", label: "Producir mi primer proyecto profesional" },
+          { value: "escalar", label: "Escalar mi proyecto actual" },
+          { value: "calidad", label: "Mejorar la calidad de mi música" }
         ],
         required: true 
       },
@@ -125,15 +141,15 @@ const formSteps = [
   }
 ];
 
-const SelectableCard = ({ option, selected, onClick }) => (
+const SelectableCard = ({ option, selected, onClick, isMulti, showWarning }) => (
   <motion.button
     type="button"
     onClick={() => onClick(option.value)}
     whileHover={{ scale: 1.02, y: -2 }}
     whileTap={{ scale: 0.98 }}
-    className={`relative p-6 rounded-2xl border-2 transition-all text-left ${
+    className={`relative p-5 rounded-xl border transition-all text-left ${
       selected
-        ? 'border-emerald-400 bg-emerald-400/5 shadow-lg shadow-emerald-500/20'
+        ? 'border-emerald-400/60 bg-emerald-400/5 shadow-lg shadow-emerald-400/10'
         : 'border-white/10 bg-white/5 hover:border-white/20'
     }`}
   >
@@ -141,24 +157,114 @@ const SelectableCard = ({ option, selected, onClick }) => (
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        className="absolute top-3 right-3 w-6 h-6 rounded-full bg-emerald-400 flex items-center justify-center"
+        className="absolute top-3 right-3 w-5 h-5 rounded-full bg-emerald-400 flex items-center justify-center"
       >
-        <Check className="w-4 h-4 text-black" />
+        <Check className="w-3 h-3 text-black" strokeWidth={3} />
       </motion.div>
     )}
-    <div className="text-3xl mb-3">{option.emoji || option.icon}</div>
-    <div className="text-white font-semibold text-lg mb-1">{option.label}</div>
-    {option.subtitle && <div className="text-white/50 text-sm">{option.subtitle}</div>}
+    <div className="text-white font-medium text-base">{option.label}</div>
+    {option.subtitle && <div className="text-white/40 text-sm mt-1">{option.subtitle}</div>}
   </motion.button>
 );
+
+const CountrySelector = ({ value, onChange, label, required }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  
+  const filteredCountries = countries.filter(c => 
+    c.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <div className="relative">
+      <label className="block text-sm font-medium text-white/60 tracking-wide mb-3">
+        {label}
+        {required && <span className="text-emerald-400 ml-1">*</span>}
+      </label>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-left hover:border-white/20 transition-all flex items-center justify-between"
+      >
+        <span className={value ? "text-white" : "text-white/30"}>
+          {value || "Seleccionar país"}
+        </span>
+        <ChevronRight className={`w-4 h-4 text-white/40 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+      </button>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute z-50 w-full mt-2 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden"
+          >
+            <div className="p-3 border-b border-white/10">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Buscar país..."
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-white/30 focus:border-emerald-400/50 focus:ring-1 focus:ring-emerald-400/20"
+              />
+            </div>
+            <div className="max-h-60 overflow-y-auto">
+              {filteredCountries.map(country => (
+                <button
+                  key={country}
+                  type="button"
+                  onClick={() => {
+                    onChange(country);
+                    setIsOpen(false);
+                    setSearch("");
+                  }}
+                  className="w-full px-4 py-3 text-left text-white hover:bg-white/5 transition-colors text-sm"
+                >
+                  {country}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 export default function ArtistApplicationForm({ isOpen, onClose, onSuccess }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectionWarning, setSelectionWarning] = useState("");
 
   const handleFieldChange = (fieldName, value) => {
     setFormData(prev => ({ ...prev, [fieldName]: value }));
+  };
+
+  const handleMultiSelect = (fieldName, value, maxSelections) => {
+    const current = formData[fieldName] || [];
+    
+    if (current.includes(value)) {
+      // Deselect
+      setFormData(prev => ({
+        ...prev,
+        [fieldName]: current.filter(v => v !== value)
+      }));
+      setSelectionWarning("");
+    } else {
+      // Select
+      if (current.length >= maxSelections) {
+        setSelectionWarning(`Puedes seleccionar hasta ${maxSelections} opciones.`);
+        setTimeout(() => setSelectionWarning(""), 3000);
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          [fieldName]: [...current, value]
+        }));
+        setSelectionWarning("");
+      }
+    }
   };
 
   const handleNext = () => {
@@ -287,16 +393,82 @@ export default function ArtistApplicationForm({ isOpen, onClose, onSuccess }) {
                         {field.required && <span className="text-emerald-400 ml-1">*</span>}
                       </label>
 
-                      {field.type === "cards" && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {field.type === "multi-cards" && (
+                        <>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            {field.options.map(option => (
+                              <SelectableCard
+                                key={option.value}
+                                option={option}
+                                isMulti={true}
+                                selected={(formData[field.name] || []).includes(option.value)}
+                                onClick={(value) => handleMultiSelect(field.name, value, field.maxSelections)}
+                              />
+                            ))}
+                          </div>
+                          {selectionWarning && (
+                            <motion.p
+                              initial={{ opacity: 0, y: -5 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="text-sm text-amber-400 mt-2"
+                            >
+                              {selectionWarning}
+                            </motion.p>
+                          )}
+                          <p className="text-xs text-white/30 mt-2">
+                            Selecciona hasta {field.maxSelections} opciones
+                          </p>
+                        </>
+                      )}
+
+                      {field.type === "sex" && (
+                        <div className="grid grid-cols-3 gap-3">
                           {field.options.map(option => (
-                            <SelectableCard
-                              key={option.value}
-                              option={option}
-                              selected={formData[field.name] === option.value}
-                              onClick={(value) => handleFieldChange(field.name, value)}
-                            />
+                            <motion.button
+                              key={option}
+                              type="button"
+                              onClick={() => handleFieldChange(field.name, option)}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              className={`p-4 rounded-xl border transition-all ${
+                                formData[field.name] === option
+                                  ? 'border-emerald-400/60 bg-emerald-400/5'
+                                  : 'border-white/10 bg-white/5 hover:border-white/20'
+                              }`}
+                            >
+                              <div className="text-white text-sm font-medium text-center">{option}</div>
+                            </motion.button>
                           ))}
+                        </div>
+                      )}
+
+                      {field.type === "country" && (
+                        <CountrySelector
+                          value={formData[field.name]}
+                          onChange={(value) => handleFieldChange(field.name, value)}
+                          label={field.label}
+                          required={field.required}
+                        />
+                      )}
+
+                      {field.type === "phone" && (
+                        <div className="flex gap-3">
+                          <select
+                            className="w-24 px-3 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/20 transition-all"
+                          >
+                            <option value="+34">🇪🇸 +34</option>
+                            <option value="+52">🇲🇽 +52</option>
+                            <option value="+54">🇦🇷 +54</option>
+                            <option value="+57">🇨🇴 +57</option>
+                            <option value="+1">🇺🇸 +1</option>
+                          </select>
+                          <input
+                            type="tel"
+                            value={formData[field.name] || ""}
+                            onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                            placeholder={field.placeholder}
+                            className="flex-1 px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:border-emerald-400/50 focus:ring-2 focus:ring-emerald-400/20 focus:bg-white/10 transition-all"
+                          />
                         </div>
                       )}
 
