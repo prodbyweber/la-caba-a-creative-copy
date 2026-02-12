@@ -8,18 +8,39 @@ import { base44 } from "@/api/base44Client";
 export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+      } catch (error) {
+        setUser(null);
+      }
+    };
+    checkUser();
+  }, []);
 
   const handleLogin = async () => {
     try {
-      const user = await base44.auth.me();
-      if (user?.role === 'admin') {
+      const currentUser = await base44.auth.me();
+      if (currentUser?.role === 'admin') {
         navigate(createPageUrl("AdminDashboard"));
       } else {
         alert("Acceso restringido: Solo administradores pueden acceder");
       }
     } catch (error) {
       base44.auth.redirectToLogin(window.location.href);
+    }
+  };
+
+  const handleAccountClick = () => {
+    if (user?.role === 'admin') {
+      navigate(createPageUrl("AdminDashboard"));
+    } else {
+      navigate(createPageUrl("UserProfile"));
     }
   };
 
@@ -97,12 +118,32 @@ export default function LandingNav() {
           </div>
 
           <div className="flex items-center gap-4">
-            <button
-              onClick={handleLogin}
-              className="hidden sm:block text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              Iniciar Sesión
-            </button>
+            {user ? (
+              <button
+                onClick={handleAccountClick}
+                className="hidden sm:flex items-center gap-2 text-sm hover:text-white transition-colors"
+              >
+                {user.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt={user.full_name}
+                    className="w-8 h-8 rounded-full object-cover border-2 border-emerald-500"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-sm">
+                    {user.full_name?.[0]?.toUpperCase() || "U"}
+                  </div>
+                )}
+                <span className="text-gray-400">Mi Cuenta</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleLogin}
+                className="hidden sm:block text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                Iniciar Sesión
+              </button>
+            )}
             <button 
               onClick={() => setMobileOpen(true)}
               className="md:hidden p-2 text-gray-400 hover:text-white"
@@ -150,12 +191,32 @@ export default function LandingNav() {
                   </button>
                 ))}
                 <div className="pt-6 border-t border-white/10">
-                  <button
-                    onClick={handleLogin}
-                    className="block w-full py-4 rounded-full bg-white text-black text-center font-medium hover:bg-gray-100 transition-colors"
-                  >
-                    Iniciar Sesión
-                  </button>
+                  {user ? (
+                    <button
+                      onClick={handleAccountClick}
+                      className="flex items-center gap-3 w-full py-4 px-5 rounded-full bg-white text-black font-medium hover:bg-gray-100 transition-colors"
+                    >
+                      {user.avatar_url ? (
+                        <img
+                          src={user.avatar_url}
+                          alt={user.full_name}
+                          className="w-10 h-10 rounded-full object-cover border-2 border-emerald-500"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold">
+                          {user.full_name?.[0]?.toUpperCase() || "U"}
+                        </div>
+                      )}
+                      <span>Mi Cuenta</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleLogin}
+                      className="block w-full py-4 rounded-full bg-white text-black text-center font-medium hover:bg-gray-100 transition-colors"
+                    >
+                      Iniciar Sesión
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
