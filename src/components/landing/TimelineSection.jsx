@@ -54,7 +54,7 @@ export default function TimelineSection() {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const isMobile = window.innerWidth < 1024;
-      const cardWidth = isMobile ? (window.innerWidth * 0.7) + 8 : 320;
+      const cardWidth = isMobile ? (window.innerWidth * 0.45) + 8 : 320;
       container.scrollTo({
         left: cardWidth * index,
         behavior: 'smooth'
@@ -67,7 +67,7 @@ export default function TimelineSection() {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const isMobile = window.innerWidth < 1024;
-      const cardWidth = isMobile ? (window.innerWidth * 0.7) + 8 : 320;
+      const cardWidth = isMobile ? (window.innerWidth * 0.45) + 8 : 320;
       const newIndex = Math.round(container.scrollLeft / cardWidth);
       setCurrentIndex(newIndex);
     }
@@ -182,7 +182,7 @@ export default function TimelineSection() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.1, duration: 0.5 }}
-                      className="flex-shrink-0 w-[70vw] snap-start lg:w-[280px]"
+                      className="flex-shrink-0 w-[45vw] snap-start lg:w-[280px]"
                     >
                       <div className="relative rounded-lg lg:rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-shadow duration-300 h-full">
                         {/* Image */}
