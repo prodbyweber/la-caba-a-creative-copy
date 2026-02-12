@@ -1,12 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Menu, X } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    try {
+      const user = await base44.auth.me();
+      if (user?.role === 'admin') {
+        navigate(createPageUrl("AdminDashboard"));
+      } else {
+        alert("Acceso restringido: Solo administradores pueden acceder");
+      }
+    } catch (error) {
+      base44.auth.redirectToLogin(window.location.href);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -82,12 +97,12 @@ export default function LandingNav() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link 
-              to={createPageUrl("Dashboard")}
+            <button
+              onClick={handleLogin}
               className="hidden sm:block text-sm text-gray-400 hover:text-white transition-colors"
             >
               Iniciar Sesión
-            </Link>
+            </button>
             <button 
               onClick={() => setMobileOpen(true)}
               className="md:hidden p-2 text-gray-400 hover:text-white"
@@ -135,12 +150,12 @@ export default function LandingNav() {
                   </button>
                 ))}
                 <div className="pt-6 border-t border-white/10">
-                  <Link 
-                    to={createPageUrl("Dashboard")}
+                  <button
+                    onClick={handleLogin}
                     className="block w-full py-4 rounded-full bg-white text-black text-center font-medium hover:bg-gray-100 transition-colors"
                   >
                     Iniciar Sesión
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>
