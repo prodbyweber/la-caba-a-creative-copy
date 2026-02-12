@@ -290,6 +290,7 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
               setShowApplicationForm(false);
               alert('¡Formulario enviado! Recibirás un email con el enlace de Calendly para agendar tu meeting.');
             }}
+            formId={offer?.form_id}
           />
         </>
       )}
