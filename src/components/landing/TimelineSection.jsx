@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Music, Play, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, Music, Play } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
@@ -186,13 +186,16 @@ export default function TimelineSection() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.1, duration: 0.5 }}
-                      className="flex-shrink-0 w-[45vw] snap-start lg:w-[280px]"
                       onMouseEnter={() => setHoveredCard(index)}
                       onMouseLeave={() => setHoveredCard(null)}
+                      className="flex-shrink-0 w-[45vw] snap-start lg:w-[280px]"
                     >
                       <motion.div 
                         className="relative rounded-lg lg:rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300 h-full"
-                        whileHover={{ scale: 1.05 }}
+                        animate={{ 
+                          scale: hoveredCard === index ? 1.05 : 1,
+                          zIndex: hoveredCard === index ? 20 : 1
+                        }}
                         transition={{ duration: 0.3 }}
                       >
                         {/* Image */}
@@ -220,58 +223,58 @@ export default function TimelineSection() {
                           <p className="text-white/70 text-[10px] lg:text-sm leading-tight line-clamp-4">
                             {milestone.description}
                           </p>
-                          
-                          {milestone.playlist && milestone.playlist.songs?.length > 0 && (
-                            <div className="mt-2 flex items-center gap-1 text-emerald-400">
-                              <Music className="w-3 h-3 lg:w-4 lg:h-4" />
-                              <span className="text-[10px] lg:text-xs">
-                                {milestone.playlist.songs.length} {milestone.playlist.songs.length === 1 ? 'canción' : 'canciones'}
-                              </span>
-                            </div>
-                          )}
                         </div>
 
-                        {/* Playlist Overlay on Hover - Desktop Only */}
+                        {/* Playlist Overlay - Shows on Hover */}
                         <AnimatePresence>
                           {hoveredCard === index && milestone.playlist && milestone.playlist.songs?.length > 0 && (
                             <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              className="hidden lg:block absolute inset-0 bg-black/95 backdrop-blur-sm p-4 overflow-y-auto"
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: 20 }}
+                              transition={{ duration: 0.2 }}
+                              className="absolute inset-0 bg-black/95 backdrop-blur-sm flex flex-col p-3 lg:p-6"
                             >
-                              <div className="space-y-3">
-                                <div className="flex items-center gap-2 mb-4">
-                                  <Music className="w-5 h-5 text-emerald-400" />
-                                  <h5 className="text-white font-bold text-sm">
-                                    {milestone.playlist.title || 'Playlist'}
-                                  </h5>
-                                </div>
-                                
+                              {/* Playlist Header */}
+                              <div className="flex items-center gap-2 mb-3 lg:mb-4">
+                                <Music className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-400" />
+                                <h5 className="text-white font-bold text-xs lg:text-lg">
+                                  {milestone.playlist.title || "Playlist"}
+                                </h5>
+                              </div>
+
+                              {/* Songs List */}
+                              <div className="flex-1 overflow-y-auto space-y-1.5 lg:space-y-2 custom-scrollbar">
                                 {milestone.playlist.songs.map((song, songIndex) => (
                                   <a
                                     key={songIndex}
                                     href={song.youtube_url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="block p-2 bg-zinc-900/50 rounded hover:bg-zinc-800/50 transition-colors group"
+                                    className="block p-2 lg:p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group"
                                   >
-                                    <div className="flex items-start justify-between gap-2">
+                                    <div className="flex items-start gap-2 lg:gap-3">
+                                      <div className="flex-shrink-0 w-6 h-6 lg:w-8 lg:h-8 rounded bg-emerald-500/20 flex items-center justify-center group-hover:bg-emerald-500/30 transition-colors">
+                                        <Play className="w-3 h-3 lg:w-4 lg:h-4 text-emerald-400" />
+                                      </div>
                                       <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2">
-                                          <Play className="w-3 h-3 text-emerald-400 flex-shrink-0" />
-                                          <p className="text-white text-xs font-medium truncate">
-                                            {song.title}
-                                          </p>
-                                        </div>
-                                        <p className="text-white/60 text-[10px] truncate ml-5">
+                                        <p className="text-white text-[10px] lg:text-sm font-medium truncate">
+                                          {song.title}
+                                        </p>
+                                        <p className="text-gray-400 text-[8px] lg:text-xs truncate">
                                           {song.artist}
                                         </p>
                                       </div>
-                                      <ExternalLink className="w-3 h-3 text-white/40 group-hover:text-emerald-400 flex-shrink-0 transition-colors" />
                                     </div>
                                   </a>
                                 ))}
+                              </div>
+
+                              {/* Footer Info */}
+                              <div className="mt-2 lg:mt-3 pt-2 lg:pt-3 border-t border-white/10">
+                                <p className="text-gray-500 text-[8px] lg:text-xs text-center">
+                                  {milestone.playlist.songs.length} {milestone.playlist.songs.length === 1 ? 'canción' : 'canciones'}
+                                </p>
                               </div>
                             </motion.div>
                           )}
@@ -366,6 +369,21 @@ export default function TimelineSection() {
       <style jsx>{`
         div::-webkit-scrollbar {
           display: none;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+          display: block;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 2px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(16, 185, 129, 0.5);
+          border-radius: 2px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(16, 185, 129, 0.7);
         }
       `}</style>
     </section>

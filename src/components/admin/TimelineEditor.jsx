@@ -17,10 +17,50 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
       year: new Date().getFullYear().toString(),
       title: "Nuevo hito",
       description: "Descripción del hito",
-      image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&h=500&fit=crop&q=80"
+      image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&h=500&fit=crop&q=80",
+      playlist: {
+        title: "",
+        songs: []
+      }
     }];
     setLocalMilestones(newMilestones);
     onUpdate(newMilestones);
+  };
+
+  const addSong = (milestoneIndex) => {
+    const updated = [...localMilestones];
+    if (!updated[milestoneIndex].playlist) {
+      updated[milestoneIndex].playlist = { title: "", songs: [] };
+    }
+    updated[milestoneIndex].playlist.songs.push({
+      title: "",
+      artist: "",
+      youtube_url: ""
+    });
+    setLocalMilestones(updated);
+    onUpdate(updated);
+  };
+
+  const updateSong = (milestoneIndex, songIndex, field, value) => {
+    const updated = [...localMilestones];
+    updated[milestoneIndex].playlist.songs[songIndex][field] = value;
+    setLocalMilestones(updated);
+  };
+
+  const removeSong = (milestoneIndex, songIndex) => {
+    const updated = [...localMilestones];
+    updated[milestoneIndex].playlist.songs.splice(songIndex, 1);
+    setLocalMilestones(updated);
+    onUpdate(updated);
+  };
+
+  const updatePlaylistTitle = (milestoneIndex, title) => {
+    const updated = [...localMilestones];
+    if (!updated[milestoneIndex].playlist) {
+      updated[milestoneIndex].playlist = { title: "", songs: [] };
+    }
+    updated[milestoneIndex].playlist.title = title;
+    setLocalMilestones(updated);
   };
 
   const updateMilestoneLocal = (index, field, value) => {
@@ -200,6 +240,74 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
                             </span>
                           </label>
                         </div>
+                      </div>
+
+                      {/* Playlist Section */}
+                      <div className="pt-4 border-t border-white/10">
+                        <label className="text-xs text-gray-400 mb-3 block font-medium">
+                          Playlist de Música
+                        </label>
+                        
+                        {/* Playlist Title */}
+                        <div className="mb-3">
+                          <input
+                            type="text"
+                            value={milestone.playlist?.title || ""}
+                            onChange={(e) => updatePlaylistTitle(index, e.target.value)}
+                            onBlur={() => saveMilestone(index)}
+                            className="w-full px-4 py-2 bg-white/5 rounded-lg border border-white/10 text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                            placeholder="Título del álbum o single"
+                          />
+                        </div>
+
+                        {/* Songs List */}
+                        <div className="space-y-2 mb-3">
+                          {milestone.playlist?.songs?.map((song, songIndex) => (
+                            <div key={songIndex} className="bg-white/5 rounded-lg p-3 space-y-2">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-xs text-gray-500">Canción {songIndex + 1}</span>
+                                <button
+                                  onClick={() => removeSong(index, songIndex)}
+                                  className="p-1 hover:bg-red-500/20 rounded text-red-400"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              </div>
+                              <input
+                                type="text"
+                                value={song.title}
+                                onChange={(e) => updateSong(index, songIndex, 'title', e.target.value)}
+                                onBlur={() => saveMilestone(index)}
+                                className="w-full px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                                placeholder="Título de la canción"
+                              />
+                              <input
+                                type="text"
+                                value={song.artist}
+                                onChange={(e) => updateSong(index, songIndex, 'artist', e.target.value)}
+                                onBlur={() => saveMilestone(index)}
+                                className="w-full px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                                placeholder="Artista"
+                              />
+                              <input
+                                type="text"
+                                value={song.youtube_url}
+                                onChange={(e) => updateSong(index, songIndex, 'youtube_url', e.target.value)}
+                                onBlur={() => saveMilestone(index)}
+                                className="w-full px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                                placeholder="URL de YouTube Music"
+                              />
+                            </div>
+                          ))}
+                        </div>
+
+                        <button
+                          onClick={() => addSong(index)}
+                          className="w-full px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-gray-400 text-sm transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Añadir canción
+                        </button>
                       </div>
                     </div>
                   </motion.div>
