@@ -28,10 +28,10 @@ export default function Landing() {
         <Hero config={config} />
         <BrandsCarousel logos={config?.brand_logos} />
         <StoriesSection />
-        <StartupsSection />
         <TimelineSection />
         <OffersCarousel />
         <ExploracionSection />
+        <StartupsSection />
       </main>
 
       <Footer />
