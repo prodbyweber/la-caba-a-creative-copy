@@ -10,6 +10,7 @@ import OffersEditor from "@/components/admin/OffersEditor";
 import TimelineEditor from "@/components/admin/TimelineEditor";
 import StoriesEditor from "@/components/admin/StoriesEditor";
 import StartupsEditor from "@/components/admin/StartupsEditor";
+import FormsEditor from "@/components/admin/FormsEditor";
 import { 
   Eye, 
   GripVertical, 
@@ -329,6 +330,11 @@ export default function LandingEditor() {
               <Settings className="w-5 h-5 text-emerald-400" />
               Editar Contenido de la Landing
             </h2>
+
+            {/* Forms Management */}
+            <SectionEditor title="📋 Gestión de Formularios" defaultOpen={false}>
+              <FormsEditor />
+            </SectionEditor>
 
             {/* Offers Section Editor */}
             <SectionEditor title="💎 Formas de Ayudarte" defaultOpen={true}>

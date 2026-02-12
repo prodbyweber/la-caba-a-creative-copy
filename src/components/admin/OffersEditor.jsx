@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Edit2, Trash2, GripVertical, X, Upload, Image as ImageIcon } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
 
 export default function OffersEditor({ offers = [], onUpdate }) {
   const [editingIndex, setEditingIndex] = useState(null);
@@ -134,6 +135,11 @@ function OfferModal({ isOpen, offer, onSave, onClose }) {
   const [formData, setFormData] = useState(offer);
   const [uploadingImage, setUploadingImage] = useState(false);
 
+  const { data: forms = [] } = useQuery({
+    queryKey: ['applicationForms'],
+    queryFn: () => base44.entities.ApplicationForm.list()
+  });
+
   React.useEffect(() => {
     setFormData(offer);
   }, [offer]);
@@ -242,6 +248,25 @@ function OfferModal({ isOpen, offer, onSave, onClose }) {
                 onChange={(e) => setFormData({ ...formData, cta: e.target.value })}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Formulario Asignado</label>
+              <select
+                value={formData.form_id || ""}
+                onChange={(e) => setFormData({ ...formData, form_id: e.target.value })}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
+              >
+                <option value="">Sin formulario asignado</option>
+                {forms.map(form => (
+                  <option key={form.id} value={form.id}>
+                    {form.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-2">
+                Selecciona el formulario que se mostrará al hacer clic en "Ver más"
+              </p>
             </div>
 
             <div className="flex items-center gap-4">
