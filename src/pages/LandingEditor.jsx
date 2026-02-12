@@ -9,6 +9,7 @@ import HowItWorksEditor from "@/components/admin/HowItWorksEditor";
 import OffersEditor from "@/components/admin/OffersEditor";
 import TimelineEditor from "@/components/admin/TimelineEditor";
 import StoriesEditor from "@/components/admin/StoriesEditor";
+import StartupsEditor from "@/components/admin/StartupsEditor";
 import { 
   Eye, 
   GripVertical, 
@@ -343,6 +344,11 @@ export default function LandingEditor() {
                 testimonials={config.testimonials || []}
                 onUpdate={(testimonials) => updateField('testimonials', testimonials)}
               />
+            </SectionEditor>
+
+            {/* Startups Section Editor */}
+            <SectionEditor title="🚀 Nuestras Startups">
+              <StartupsEditor />
             </SectionEditor>
 
             {/* Timeline Section Editor */}
