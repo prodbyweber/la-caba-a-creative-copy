@@ -54,7 +54,7 @@ export default function TimelineSection() {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const isMobile = window.innerWidth < 1024;
-      const cardWidth = isMobile ? (window.innerWidth * 0.45) + 8 : 320;
+      const cardWidth = isMobile ? (window.innerWidth * 0.7) + 8 : 320;
       container.scrollTo({
         left: cardWidth * index,
         behavior: 'smooth'
@@ -67,7 +67,7 @@ export default function TimelineSection() {
     if (scrollContainerRef.current) {
       const container = scrollContainerRef.current;
       const isMobile = window.innerWidth < 1024;
-      const cardWidth = isMobile ? (window.innerWidth * 0.45) + 8 : 320;
+      const cardWidth = isMobile ? (window.innerWidth * 0.7) + 8 : 320;
       const newIndex = Math.round(container.scrollLeft / cardWidth);
       setCurrentIndex(newIndex);
     }
@@ -168,7 +168,7 @@ export default function TimelineSection() {
                 <div 
                   ref={scrollContainerRef}
                   onScroll={handleScroll}
-                  className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth px-4 lg:gap-6 lg:px-0 -mx-4 lg:mx-0"
+                  className="flex gap-2 lg:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth pl-4 pr-8 lg:px-0"
                   style={{
                     scrollbarWidth: 'none',
                     msOverflowStyle: 'none',
@@ -182,7 +182,7 @@ export default function TimelineSection() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.1, duration: 0.5 }}
-                      className="flex-shrink-0 w-[45vw] snap-center lg:w-[280px]"
+                      className="flex-shrink-0 w-[70vw] snap-start lg:w-[280px]"
                     >
                       <div className="relative rounded-lg lg:rounded-2xl overflow-hidden cursor-pointer shadow-xl hover:shadow-2xl transition-shadow duration-300 h-full">
                         {/* Image */}
@@ -215,28 +215,30 @@ export default function TimelineSection() {
                 </div>
 
                 {/* Mobile Navigation Controls - Below Cards */}
-                <div className="lg:hidden mt-6 space-y-4 px-4">
+                <div className="lg:hidden mt-4 space-y-3 px-4">
                   {/* Navigation Buttons */}
-                  <div className="flex items-center justify-center gap-4">
+                  <div className="flex items-center justify-start gap-3 pl-2">
                     <button
                       onClick={prevSlide}
-                      className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-90"
+                      disabled={currentIndex === 0}
+                      className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
                       style={{ backgroundColor: '#1a1a1a' }}
                     >
-                      <ChevronLeft className="w-6 h-6 text-white" strokeWidth={2.5} />
+                      <ChevronLeft className="w-5 h-5 text-white" strokeWidth={2.5} />
                     </button>
 
                     <button
                       onClick={nextSlide}
-                      className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-90"
+                      disabled={currentIndex === milestones.length - 1}
+                      className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed"
                       style={{ backgroundColor: '#1a1a1a' }}
                     >
-                      <ChevronRight className="w-6 h-6 text-white" strokeWidth={2.5} />
+                      <ChevronRight className="w-5 h-5 text-white" strokeWidth={2.5} />
                     </button>
                   </div>
 
                   {/* Dots Indicator Mobile */}
-                  <div className="flex items-center justify-center gap-2">
+                  <div className="flex items-center justify-start gap-2 pl-2">
                     {milestones.map((_, index) => (
                       <button
                         key={index}
