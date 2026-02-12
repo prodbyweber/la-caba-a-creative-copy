@@ -28,11 +28,11 @@ export default function Landing() {
       <main>
         <Hero config={config} />
         <BrandsCarousel logos={config?.brand_logos} />
-        <StoriesSection />
-        <TimelineSection />
-        <OffersCarousel />
-        <ExploracionSection />
-        <StartupsSection />
+        <div id="stories"><StoriesSection /></div>
+        <div id="timeline"><TimelineSection /></div>
+        <div id="offers"><OffersCarousel /></div>
+        <div id="exploracion"><ExploracionSection /></div>
+        <div id="startups"><StartupsSection /></div>
         <MemberBanner />
       </main>
 
