@@ -116,7 +116,7 @@ export default function StoriesSection() {
           <div 
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className="flex gap-4 sm:gap-5 lg:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth px-4 sm:px-6 lg:px-0 -mx-4 sm:-mx-6 lg:mx-0"
+            className="flex gap-4 sm:gap-5 lg:gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth px-4 sm:px-6 lg:px-8"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none'
