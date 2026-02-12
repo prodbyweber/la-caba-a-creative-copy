@@ -14,6 +14,28 @@ export default function LandingNav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const offset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
+    setMobileOpen(false);
+  };
+
+  const navItems = [
+    { label: "Quién Soy", id: "timeline" },
+    { label: "Artistas", id: "stories" },
+    { label: "Exploración", id: "exploracion" },
+    { label: "Startups", id: "startups" },
+    { label: "Comenzar", id: "offers", highlight: true }
+  ];
+
   return (
     <>
       <motion.nav
@@ -37,10 +59,26 @@ export default function LandingNav() {
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#platform" className="text-sm text-gray-400 hover:text-white transition-colors">Plataforma</a>
-            <a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors">Características</a>
-            <a href="#pricing" className="text-sm text-gray-400 hover:text-white transition-colors">Precios</a>
+          <div className="hidden md:flex items-center gap-6">
+            {navItems.map((item) => (
+              item.highlight ? (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className="px-5 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-medium hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
+                >
+                  {item.label}
+                </button>
+              ) : (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className="text-sm text-gray-400 hover:text-white transition-colors font-medium"
+                >
+                  {item.label}
+                </button>
+              )
+            ))}
           </div>
 
           <div className="flex items-center gap-4">
@@ -83,15 +121,25 @@ export default function LandingNav() {
               </div>
 
               <div className="flex flex-col gap-6">
-                <a href="#platform" onClick={() => setMobileOpen(false)} className="text-2xl font-light text-gray-300 hover:text-white">Plataforma</a>
-                <a href="#features" onClick={() => setMobileOpen(false)} className="text-2xl font-light text-gray-300 hover:text-white">Características</a>
-                <a href="#pricing" onClick={() => setMobileOpen(false)} className="text-2xl font-light text-gray-300 hover:text-white">Precios</a>
+                {navItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => scrollToSection(item.id)}
+                    className={`text-2xl font-light text-left transition-colors ${
+                      item.highlight 
+                        ? 'text-emerald-400 font-medium' 
+                        : 'text-gray-300 hover:text-white'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
                 <div className="pt-6 border-t border-white/10">
                   <Link 
                     to={createPageUrl("Dashboard")}
-                    className="block w-full py-4 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-center font-medium"
+                    className="block w-full py-4 rounded-full bg-white text-black text-center font-medium hover:bg-gray-100 transition-colors"
                   >
-                    Comenzar
+                    Iniciar Sesión
                   </Link>
                 </div>
               </div>
