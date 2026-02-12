@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Plus, Trash2, Copy, Edit2, Save, X } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
+import toast from "react-hot-toast";
 
 export default function FormsEditor() {
   const [editingForm, setEditingForm] = useState(null);
@@ -22,9 +22,12 @@ export default function FormsEditor() {
     mutationFn: (formData) => base44.entities.ApplicationForm.create(formData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applicationForms'] });
-      toast({ title: "Formulario creado exitosamente" });
+      toast.success("Formulario creado exitosamente");
       setShowFormBuilder(false);
       setEditingForm(null);
+    },
+    onError: (error) => {
+      toast.error("Error al crear formulario: " + error.message);
     }
   });
 
@@ -32,8 +35,12 @@ export default function FormsEditor() {
     mutationFn: ({ id, data }) => base44.entities.ApplicationForm.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applicationForms'] });
-      toast({ title: "Formulario actualizado exitosamente" });
+      toast.success("Formulario actualizado exitosamente");
+      setShowFormBuilder(false);
       setEditingForm(null);
+    },
+    onError: (error) => {
+      toast.error("Error al actualizar formulario: " + error.message);
     }
   });
 
@@ -41,7 +48,10 @@ export default function FormsEditor() {
     mutationFn: (id) => base44.entities.ApplicationForm.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['applicationForms'] });
-      toast({ title: "Formulario eliminado" });
+      toast.success("Formulario eliminado");
+    },
+    onError: (error) => {
+      toast.error("Error al eliminar formulario: " + error.message);
     }
   });
 
@@ -180,11 +190,11 @@ function FormBuilder({ form, onSave, onCancel }) {
 
   const handleSave = () => {
     if (!formData.name) {
-      toast({ title: "Error", description: "El nombre es requerido", variant: "destructive" });
+      toast.error("El nombre del formulario es requerido");
       return;
     }
     if (formData.steps.length === 0) {
-      toast({ title: "Error", description: "Agrega al menos un paso", variant: "destructive" });
+      toast.error("Agrega al menos un paso al formulario");
       return;
     }
     onSave(formData);
@@ -392,7 +402,7 @@ function FormBuilder({ form, onSave, onCancel }) {
       ...formData,
       steps: defaultSteps
     });
-    toast({ title: "Formulario por defecto cargado" });
+    toast.success("Formulario por defecto cargado");
   };
 
   return (
