@@ -5,12 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Plus, Trash2, Save, GripVertical } from "lucide-react";
+import { Plus, Trash2, Save, GripVertical, Upload } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 export default function StartupsEditor() {
   const queryClient = useQueryClient();
   const [editingStartups, setEditingStartups] = useState(null);
+  const [uploadingIndex, setUploadingIndex] = useState(null);
 
   const { data: config } = useQuery({
     queryKey: ['landingConfig'],
@@ -73,6 +74,21 @@ export default function StartupsEditor() {
     updateMutation.mutate({ startups: editingStartups });
   };
 
+  const handleImageUpload = async (index, file) => {
+    if (!file) return;
+    
+    setUploadingIndex(index);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      handleUpdateStartup(index, 'image', file_url);
+      toast.success('Imagen subida correctamente');
+    } catch (error) {
+      toast.error('Error al subir imagen: ' + error.message);
+    } finally {
+      setUploadingIndex(null);
+    }
+  };
+
   if (!editingStartups) {
     return <div className="text-white">Cargando...</div>;
   }
@@ -110,14 +126,47 @@ export default function StartupsEditor() {
                   {/* Image URL */}
                   <div>
                     <label className="text-sm text-zinc-400 mb-1 block">
-                      URL de Imagen
+                      Imagen de Portada
                     </label>
-                    <Input
-                      value={startup.image}
-                      onChange={(e) => handleUpdateStartup(index, 'image', e.target.value)}
-                      placeholder="https://..."
-                      className="bg-zinc-800 border-zinc-700 text-white"
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        value={startup.image}
+                        onChange={(e) => handleUpdateStartup(index, 'image', e.target.value)}
+                        placeholder="https://..."
+                        className="bg-zinc-800 border-zinc-700 text-white flex-1"
+                      />
+                      <label className="relative">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageUpload(index, e.target.files[0])}
+                          className="hidden"
+                          disabled={uploadingIndex === index}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="bg-zinc-800 border-zinc-700 hover:bg-zinc-700"
+                          disabled={uploadingIndex === index}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.currentTarget.previousElementSibling.click();
+                          }}
+                        >
+                          {uploadingIndex === index ? (
+                            <>
+                              <div className="w-4 h-4 border-2 border-zinc-400 border-t-transparent rounded-full animate-spin mr-2" />
+                              Subiendo...
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="w-4 h-4 mr-2" />
+                              Subir
+                            </>
+                          )}
+                        </Button>
+                      </label>
+                    </div>
                   </div>
 
                   {/* Name */}
