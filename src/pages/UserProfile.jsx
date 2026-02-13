@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
-import { Camera, ArrowLeft, Save, LogOut } from "lucide-react";
+import { Camera, ArrowLeft, Save, LogOut, Edit, Music, Palette } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,15 @@ export default function UserProfile() {
   const { data: user, isLoading } = useQuery({
     queryKey: ['currentUser'],
     queryFn: () => base44.auth.me()
+  });
+
+  const { data: adnData } = useQuery({
+    queryKey: ['myADN'],
+    queryFn: async () => {
+      const user = await base44.auth.me();
+      const adns = await base44.entities.ADNdeMarca.filter({ user_id: user.id });
+      return adns.length > 0 ? adns[0] : null;
+    }
   });
 
   const [formData, setFormData] = useState({
@@ -192,6 +201,106 @@ export default function UserProfile() {
             </Button>
           </div>
         </motion.div>
+
+        {/* ADN de Marca Section */}
+        {adnData && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-zinc-900/50 backdrop-blur-xl rounded-2xl border border-white/10 p-6 sm:p-8 mt-6"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <Palette className="w-6 h-6 text-emerald-400" />
+                <h2 className="text-2xl font-bold">ADN de Marca</h2>
+              </div>
+              <button
+                onClick={() => navigate(createPageUrl("ADNdeMarca"))}
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 transition-colors"
+              >
+                <Edit className="w-4 h-4" />
+                Editar
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Banner Preview */}
+              <div 
+                className="relative rounded-xl overflow-hidden h-32 flex items-center justify-center"
+                style={{
+                  background: adnData.colors?.length >= 4 
+                    ? `linear-gradient(135deg, ${adnData.colors[0]} 0%, ${adnData.colors[1]} 35%, ${adnData.colors[2]} 65%, ${adnData.colors[3]} 100%)`
+                    : 'linear-gradient(135deg, #0D0D0D 0%, #10B981 100%)'
+                }}
+              >
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-white drop-shadow-lg">{adnData.nombre_artistico}</h3>
+                  <p className="text-white/80 text-sm">{adnData.project_theme}</p>
+                </div>
+              </div>
+
+              {/* Quick Info */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-white/5 rounded-lg">
+                  <p className="text-xs text-gray-500 mb-1">Países</p>
+                  <p className="text-sm text-white">{adnData.pais_nacimiento} → {adnData.pais_residencia}</p>
+                </div>
+                <div className="p-4 bg-white/5 rounded-lg">
+                  <p className="text-xs text-gray-500 mb-1">Energía</p>
+                  <p className="text-sm text-white">{adnData.vibe}</p>
+                </div>
+              </div>
+
+              {/* Keywords */}
+              {adnData.project_keywords?.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {adnData.project_keywords.map((keyword, idx) => (
+                    <span key={idx} className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs">
+                      {keyword}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Musical References */}
+              {adnData.musical_references?.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Music className="w-4 h-4 text-gray-400" />
+                    <p className="text-sm text-gray-400">Referencias Musicales</p>
+                  </div>
+                  <div className="space-y-2">
+                    {adnData.musical_references.map((ref, idx) => (
+                      <a
+                        key={idx}
+                        href={ref.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block p-2 bg-white/5 rounded text-xs text-emerald-400 hover:bg-white/10 transition-colors truncate"
+                      >
+                        {ref.url}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Colors */}
+              {adnData.colors?.length > 0 && (
+                <div className="flex gap-2">
+                  {adnData.colors.map((color, idx) => (
+                    <div
+                      key={idx}
+                      style={{ backgroundColor: color }}
+                      className="w-12 h-12 rounded-lg ring-1 ring-white/20"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );
