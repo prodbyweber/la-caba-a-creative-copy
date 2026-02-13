@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Upload, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, Upload, ChevronDown, ChevronUp, GripVertical } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 export default function TimelineEditor({ timeline = [], onUpdate }) {
   const [expandedIndex, setExpandedIndex] = useState(null);
@@ -56,6 +57,17 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
     }
   };
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    
+    const items = Array.from(localMilestones);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    
+    setLocalMilestones(items);
+    onUpdate(items);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-4">
@@ -71,22 +83,37 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
         </button>
       </div>
 
-      <div className="space-y-3">
-        <AnimatePresence>
-          {localMilestones.map((milestone, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="bg-white/5 rounded-xl border border-white/10 overflow-hidden"
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="timeline-milestones">
+          {(provided) => (
+            <div 
+              className="space-y-3"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
             >
-              {/* Header */}
-              <div className="flex items-center justify-between p-4">
-                <button
-                  onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
-                  className="flex items-center gap-3 flex-1 text-left"
-                >
+              {localMilestones.map((milestone, index) => (
+                <Draggable key={`milestone-${index}`} draggableId={`milestone-${index}`} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      className={`bg-white/5 rounded-xl border border-white/10 overflow-hidden transition-shadow ${
+                        snapshot.isDragging ? 'shadow-2xl shadow-emerald-500/20' : ''
+                      }`}
+                    >
+                      {/* Header */}
+                      <div className="flex items-center justify-between p-4">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div 
+                            {...provided.dragHandleProps}
+                            className="cursor-grab active:cursor-grabbing text-gray-400 hover:text-white transition-colors"
+                          >
+                            <GripVertical className="w-5 h-5" />
+                          </div>
+                          <button
+                            onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
+                            className="flex items-center gap-3 flex-1 text-left"
+                          >
                   <div className="w-16 h-20 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
                     <img 
                       src={milestone.image} 
@@ -101,20 +128,21 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
                     </div>
                     <p className="text-gray-500 text-xs line-clamp-1">{milestone.description}</p>
                   </div>
-                  {expandedIndex === index ? (
-                    <ChevronUp className="w-5 h-5 text-gray-400" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-400" />
-                  )}
-                </button>
-                
-                <button
-                  onClick={() => removeMilestone(index)}
-                  className="ml-2 p-2 hover:bg-red-500/20 rounded-lg text-red-400 transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
+                            {expandedIndex === index ? (
+                              <ChevronUp className="w-5 h-5 text-gray-400" />
+                            ) : (
+                              <ChevronDown className="w-5 h-5 text-gray-400" />
+                            )}
+                          </button>
+                        </div>
+                        
+                        <button
+                          onClick={() => removeMilestone(index)}
+                          className="ml-2 p-2 hover:bg-red-500/20 rounded-lg text-red-400 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
 
               {/* Expanded Content */}
               <AnimatePresence>
@@ -302,13 +330,18 @@ export default function TimelineEditor({ timeline = [], onUpdate }) {
                         </div>
                       </div>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
 
       {localMilestones.length === 0 && (
         <div className="text-center py-12 border border-dashed border-white/20 rounded-xl">
