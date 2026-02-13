@@ -113,7 +113,7 @@ export default function ADNdeMarca() {
   const [countrySearch, setCountrySearch] = useState("");
   const [musicRefInput, setMusicRefInput] = useState({ url: "", note: "" });
   
-  const totalSteps = 11;
+  const totalSteps = 10;
 
   const countries = [
     { name: "España", code: "+34" },
@@ -259,22 +259,20 @@ export default function ADNdeMarca() {
     switch(currentStep) {
       case 1: return selections.firstName.trim() && selections.lastName.trim() && selections.artistName.trim() && selections.birthCountry && selections.residenceCountry && selections.phoneNumber.trim();
       case 2: return selections.emotions.length > 0;
-      case 3: return true;
-      case 4: return selections.vibe !== "";
-      case 5: return hasPaid || user?.role === 'admin';
-      case 6: return selections.genres.length > 0;
-      case 7: return selections.textures.length > 0;
-      case 8: return true;
-      case 9: return selections.narratives.length > 0;
-      case 10: return selections.visualLinks.length > 0;
-      case 11: return selections.colors.length >= 4;
-      case 12: return selections.typography.primary !== "";
+      case 3: return selections.vibe !== "";
+      case 4: return selections.genres.length > 0;
+      case 5: return selections.textures.length > 0;
+      case 6: return hasPaid || user?.role === 'admin';
+      case 7: return true;
+      case 8: return selections.narratives.length > 0;
+      case 9: return selections.visualLinks.length > 0;
+      case 10: return selections.colors.length >= 4 && selections.typography.primary !== "";
       default: return false;
     }
   };
 
   const handleStepChange = (newStep) => {
-    if (newStep === 5 && !hasPaid && user?.role !== 'admin') {
+    if (newStep === 6 && !hasPaid && user?.role !== 'admin') {
       setShowPaymentGate(true);
     } else {
       setCurrentStep(newStep);
@@ -284,7 +282,7 @@ export default function ADNdeMarca() {
   const handlePaymentSuccess = () => {
     setHasPaid(true);
     setShowPaymentGate(false);
-    setCurrentStep(5);
+    setCurrentStep(6);
   };
 
   const saveDNA = async () => {
@@ -427,9 +425,6 @@ export default function ADNdeMarca() {
         );
 
       case 3:
-        return null;
-
-      case 4:
         return (
           <StepContainer title="Energía / Vibe" subtitle="¿Qué nivel de energía transmite tu arte?">
             <SelectionGrid>
@@ -446,7 +441,7 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 5:
+      case 4:
         return (
           <StepContainer title="Géneros Musicales" subtitle="¿Qué géneros te representan?">
             <SelectionGrid>
@@ -463,7 +458,7 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 6:
+      case 5:
         return (
           <StepContainer title="Textura Sonora" subtitle="¿Cómo suena tu música?">
             <SelectionGrid>
@@ -480,7 +475,8 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-
+      case 6:
+        return null;
 
       case 7:
         return (
@@ -654,7 +650,7 @@ export default function ADNdeMarca() {
 
       case 10:
         return (
-          <StepContainer title="Paleta de Color" subtitle="Define los colores de tu identidad visual basados en tu moodboard">
+          <StepContainer title="Paleta de Color y Tipografía" subtitle="Define los colores y fuentes de tu identidad visual">
             <div className="space-y-6">
               {/* Moodboard Reference */}
               {selections.visualLinks.length > 0 && (
@@ -734,16 +730,9 @@ export default function ADNdeMarca() {
                   ))}
                 </div>
               </div>
-            </div>
-          </StepContainer>
-        );
 
-      case 11:
-        return (
-          <StepContainer title="Tipografías" subtitle="Elige las fuentes que representan tu identidad">
-            <div className="space-y-8">
-              {/* Primary Font */}
-              <div>
+              {/* Tipografía Section */}
+              <div className="pt-8 border-t border-white/10">
                 <label className="block text-sm text-gray-400 mb-3">Tipografía Principal</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {[
@@ -769,19 +758,19 @@ export default function ADNdeMarca() {
                     </motion.button>
                   ))}
                 </div>
-              </div>
 
-              {/* Typography Preview */}
-              {selections.typography.primary && (
-                <div className="p-8 bg-white/5 rounded-2xl border border-white/10">
-                  <p className="text-sm text-gray-400 mb-4">Preview</p>
-                  <div className="space-y-4">
-                    <h1 className="text-4xl font-bold text-white">{selections.artistName}</h1>
-                    <h2 className="text-2xl text-gray-300">{selections.firstName} {selections.lastName}</h2>
-                    <p className="text-gray-400">{selections.emotions.slice(0, 3).join(' · ')}</p>
+                {/* Typography Preview */}
+                {selections.typography.primary && (
+                  <div className="mt-6 p-8 bg-white/5 rounded-2xl border border-white/10">
+                    <p className="text-sm text-gray-400 mb-4">Preview</p>
+                    <div className="space-y-4">
+                      <h1 className="text-4xl font-bold text-white">{selections.artistName}</h1>
+                      <h2 className="text-2xl text-gray-300">{selections.firstName} {selections.lastName}</h2>
+                      <p className="text-gray-400">{selections.emotions.slice(0, 3).join(' · ')}</p>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </StepContainer>
         );
@@ -848,42 +837,49 @@ export default function ADNdeMarca() {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="absolute inset-0 bg-black/95 backdrop-blur-xl rounded-2xl z-50 flex items-center justify-center p-8"
+                className="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-4"
               >
-                <div className="max-w-md w-full text-center space-y-6">
-                  <div className="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center">
-                    <Check className="w-10 h-10 text-white" />
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="max-w-lg w-full bg-zinc-900/80 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 sm:p-12 text-center space-y-8 shadow-2xl"
+                >
+                  <div className="w-24 h-24 mx-auto bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/50">
+                    <Check className="w-12 h-12 text-white" strokeWidth={3} />
                   </div>
-                  <h3 className="text-3xl font-bold text-white">Desbloquea tu ADN de Marca Completo</h3>
-                  <p className="text-gray-400 leading-relaxed">
-                    Accede a todas las preguntas avanzadas, paleta de colores personalizada, tipografías y genera tu moodboard profesional.
-                  </p>
+                  
+                  <div className="space-y-3">
+                    <h3 className="text-3xl sm:text-4xl font-bold text-white">Desbloquea tu ADN de Marca Completo</h3>
+                    <p className="text-gray-400 text-base leading-relaxed max-w-md mx-auto">
+                      Accede a todas las preguntas avanzadas, paleta de colores personalizada, tipografías y genera tu moodboard profesional.
+                    </p>
+                  </div>
 
-                  <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                    <div className="text-5xl font-bold text-white mb-2">27€</div>
-                    <div className="text-gray-500 text-sm">Pago único • Acceso completo</div>
+                  <div className="bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-2xl p-8 border border-emerald-500/20">
+                    <div className="text-6xl font-black text-white mb-3 bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">27€</div>
+                    <div className="text-gray-400 text-sm font-medium">Pago único • Acceso completo de por vida</div>
                   </div>
 
                   <div className="space-y-3">
                     <button
                       onClick={handlePaymentSuccess}
-                      className="w-full px-6 py-4 bg-emerald-500 hover:bg-emerald-600 rounded-lg font-medium transition-all shadow-xl shadow-emerald-500/20"
+                      className="w-full px-8 py-5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 rounded-xl font-semibold text-lg transition-all shadow-xl shadow-emerald-500/30 hover:shadow-2xl hover:shadow-emerald-500/40 hover:scale-105 active:scale-100"
                     >
                       Proceder al Pago
                     </button>
                     <button
                       onClick={() => setShowPaymentGate(false)}
-                      className="w-full px-6 py-3 bg-white/5 hover:bg-white/10 rounded-lg font-medium transition-all"
+                      className="w-full px-8 py-4 bg-white/5 hover:bg-white/10 rounded-xl font-medium transition-all border border-white/10"
                     >
-                      Cancelar
+                      Ahora no
                     </button>
                   </div>
-                </div>
+                </motion.div>
               </motion.div>
             )}
 
             {/* Preview Overlay - Demo sombreado si no ha pagado */}
-            {currentStep > 4 && !hasPaid && user?.role !== 'admin' && (
+            {currentStep > 5 && !hasPaid && user?.role !== 'admin' && (
               <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-2xl pointer-events-none z-10">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
                   <div className="bg-black/80 backdrop-blur-xl px-8 py-6 rounded-xl border border-white/20">
@@ -942,10 +938,10 @@ export default function ADNdeMarca() {
                 </button>
               )}
               
-              {currentStep === 4 && !hasPaid && user?.role === 'admin' && (
+              {currentStep === 5 && !hasPaid && user?.role === 'admin' && (
                 <button
-                  onClick={() => setCurrentStep(5)}
-                  className="fixed bottom-6 right-6 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-xs font-medium transition-all shadow-lg"
+                  onClick={() => setCurrentStep(6)}
+                  className="fixed bottom-6 right-6 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-xs font-medium transition-all shadow-lg z-50"
                 >
                   Avanzar (admin)
                 </button>
