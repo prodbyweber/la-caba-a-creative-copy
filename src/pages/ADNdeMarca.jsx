@@ -63,6 +63,7 @@ export default function ADNdeMarca() {
   const [selections, setSelections] = useState({
     firstName: "",
     lastName: "",
+    artistName: "",
     birthCountry: "",
     residenceCountry: "",
     phoneCode: "+34",
@@ -80,13 +81,39 @@ export default function ADNdeMarca() {
     typography: { primary: "", secondary: "" }
   });
 
+  const [user, setUser] = React.useState(null);
+  const [hasPaid, setHasPaid] = React.useState(false);
+  const [showPaymentGate, setShowPaymentGate] = React.useState(false);
+  const [savedDnaId, setSavedDnaId] = React.useState(null);
+
+  React.useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+        
+        // Cargar DNA guardado si existe
+        const dnas = await base44.entities.ArtistBrandDNA.filter({ user_id: currentUser.id });
+        if (dnas.length > 0) {
+          const dna = dnas[0];
+          setSelections(dna);
+          setSavedDnaId(dna.id);
+          setHasPaid(dna.has_paid || false);
+        }
+      } catch (error) {
+        console.error("Error loading user:", error);
+      }
+    };
+    loadUser();
+  }, []);
+
   const [tempInput, setTempInput] = useState("");
   const [limitWarning, setLimitWarning] = useState("");
 
   const [countrySearch, setCountrySearch] = useState("");
   const [musicRefInput, setMusicRefInput] = useState({ url: "", note: "" });
   
-  const totalSteps = 10;
+  const totalSteps = 11;
 
   const countries = [
     { name: "España", code: "+34" },
@@ -230,21 +257,58 @@ export default function ADNdeMarca() {
 
   const canProceed = () => {
     switch(currentStep) {
-      case 1: return selections.firstName.trim() && selections.lastName.trim() && selections.birthCountry && selections.residenceCountry && selections.phoneNumber.trim();
+      case 1: return selections.firstName.trim() && selections.lastName.trim() && selections.artistName.trim() && selections.birthCountry && selections.residenceCountry && selections.phoneNumber.trim();
       case 2: return selections.emotions.length > 0;
-      case 3: return selections.vibe !== "";
-      case 4: return selections.genres.length > 0;
-      case 5: return selections.textures.length > 0;
-      case 6: return true;
-      case 7: return selections.narratives.length > 0;
-      case 8: return selections.visualLinks.length > 0;
-      case 9: return selections.colors.length >= 4;
-      case 10: return selections.typography.primary !== "";
+      case 3: return hasPaid || user?.role === 'admin';
+      case 4: return selections.vibe !== "";
+      case 5: return selections.genres.length > 0;
+      case 6: return selections.textures.length > 0;
+      case 7: return true;
+      case 8: return selections.narratives.length > 0;
+      case 9: return selections.visualLinks.length > 0;
+      case 10: return selections.colors.length >= 4;
+      case 11: return selections.typography.primary !== "";
       default: return false;
     }
   };
 
+  const handleStepChange = (newStep) => {
+    if (newStep === 3 && !hasPaid && user?.role !== 'admin') {
+      setShowPaymentGate(true);
+    } else {
+      setCurrentStep(newStep);
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    setHasPaid(true);
+    setShowPaymentGate(false);
+    setCurrentStep(3);
+  };
+
+  const saveDNA = async () => {
+    try {
+      const dnaData = {
+        ...selections,
+        user_id: user.id,
+        has_paid: hasPaid
+      };
+
+      if (savedDnaId) {
+        await base44.entities.ArtistBrandDNA.update(savedDnaId, dnaData);
+      } else {
+        const created = await base44.entities.ArtistBrandDNA.create(dnaData);
+        setSavedDnaId(created.id);
+      }
+      
+      alert("ADN de Marca guardado exitosamente");
+    } catch (error) {
+      alert("Error al guardar: " + error.message);
+    }
+  };
+
   const generateResult = () => {
+    saveDNA();
     setShowResult(true);
   };
 
@@ -275,6 +339,17 @@ export default function ADNdeMarca() {
                     placeholder="Tu apellido"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Nombre artístico *</label>
+                <input
+                  type="text"
+                  value={selections.artistName}
+                  onChange={(e) => setSelections(prev => ({ ...prev, artistName: e.target.value }))}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  placeholder="Tu nombre artístico"
+                />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -351,6 +426,9 @@ export default function ADNdeMarca() {
         );
 
       case 3:
+        return null;
+
+      case 4:
         return (
           <StepContainer title="Energía / Vibe" subtitle="¿Qué nivel de energía transmite tu arte?">
             <SelectionGrid>
@@ -367,7 +445,7 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 4:
+      case 5:
         return (
           <StepContainer title="Géneros Musicales" subtitle="¿Qué géneros te representan?">
             <SelectionGrid>
@@ -384,7 +462,7 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 5:
+      case 6:
         return (
           <StepContainer title="Textura Sonora" subtitle="¿Cómo suena tu música?">
             <SelectionGrid>
@@ -403,7 +481,7 @@ export default function ADNdeMarca() {
 
 
 
-      case 6:
+      case 7:
         return (
           <StepContainer title="Referencias Musicales" subtitle="Comparte canciones que inspiren tu sonido">
             <div className="space-y-6">
@@ -482,7 +560,7 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 7:
+      case 8:
         return (
           <StepContainer title="Narrativa" subtitle="¿Qué historias cuentas?">
             <SelectionGrid>
@@ -511,7 +589,7 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 8:
+      case 9:
         return (
           <StepContainer title="Referencias Visuales" subtitle="Comparte imágenes que inspiren tu estética">
             <div className="space-y-6">
@@ -573,7 +651,7 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 9:
+      case 10:
         return (
           <StepContainer title="Paleta de Color" subtitle="Define los colores de tu identidad visual basados en tu moodboard">
             <div className="space-y-6">
@@ -659,7 +737,7 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 10:
+      case 11:
         return (
           <StepContainer title="Tipografías" subtitle="Elige las fuentes que representan tu identidad">
             <div className="space-y-8">
@@ -697,8 +775,8 @@ export default function ADNdeMarca() {
                 <div className="p-8 bg-white/5 rounded-2xl border border-white/10">
                   <p className="text-sm text-gray-400 mb-4">Preview</p>
                   <div className="space-y-4">
-                    <h1 className="text-4xl font-bold text-white">{selections.firstName} {selections.lastName}</h1>
-                    <h2 className="text-2xl text-gray-300">ADN de Marca</h2>
+                    <h1 className="text-4xl font-bold text-white">{selections.artistName}</h1>
+                    <h2 className="text-2xl text-gray-300">{selections.firstName} {selections.lastName}</h2>
                     <p className="text-gray-400">{selections.emotions.slice(0, 3).join(' · ')}</p>
                   </div>
                 </div>
@@ -753,17 +831,69 @@ export default function ADNdeMarca() {
 
         {/* Content */}
         <div className="max-w-5xl mx-auto px-6 pb-32">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {renderStep()}
-            </motion.div>
-          </AnimatePresence>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="relative"
+          >
+            {renderStep()}
+
+            {/* Payment Gate Overlay */}
+            {showPaymentGate && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="absolute inset-0 bg-black/95 backdrop-blur-xl rounded-2xl z-50 flex items-center justify-center p-8"
+              >
+                <div className="max-w-md w-full text-center space-y-6">
+                  <div className="w-20 h-20 mx-auto bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center">
+                    <Check className="w-10 h-10 text-white" />
+                  </div>
+                  <h3 className="text-3xl font-bold text-white">Desbloquea tu ADN de Marca Completo</h3>
+                  <p className="text-gray-400 leading-relaxed">
+                    Accede a todas las preguntas avanzadas, paleta de colores personalizada, tipografías y genera tu moodboard profesional.
+                  </p>
+
+                  <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+                    <div className="text-5xl font-bold text-white mb-2">27€</div>
+                    <div className="text-gray-500 text-sm">Pago único • Acceso completo</div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <button
+                      onClick={handlePaymentSuccess}
+                      className="w-full px-6 py-4 bg-emerald-500 hover:bg-emerald-600 rounded-lg font-medium transition-all shadow-xl shadow-emerald-500/20"
+                    >
+                      Proceder al Pago
+                    </button>
+                    <button
+                      onClick={() => setShowPaymentGate(false)}
+                      className="w-full px-6 py-3 bg-white/5 hover:bg-white/10 rounded-lg font-medium transition-all"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Preview Overlay - Demo sombreado si no ha pagado */}
+            {currentStep > 2 && !hasPaid && user?.role !== 'admin' && (
+              <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-2xl pointer-events-none z-10">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+                  <div className="bg-black/80 backdrop-blur-xl px-8 py-6 rounded-xl border border-white/20">
+                    <p className="text-white font-medium text-lg mb-2">Vista Previa</p>
+                    <p className="text-gray-400 text-sm">Desbloquea el acceso completo</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
 
           {/* Warning Message */}
           <AnimatePresence>
@@ -797,17 +927,26 @@ export default function ADNdeMarca() {
                   disabled={!canProceed()}
                   className="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2"
                 >
-                  Ver mi ADN de Marca
+                  Guardar y Ver mi ADN de Marca
                   <Check className="w-4 h-4" />
                 </button>
               ) : (
                 <button
-                  onClick={() => setCurrentStep(Math.min(totalSteps, currentStep + 1))}
+                  onClick={() => handleStepChange(Math.min(totalSteps, currentStep + 1))}
                   disabled={!canProceed()}
                   className="px-8 py-3 bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed rounded-lg font-medium transition-all flex items-center gap-2"
                 >
                   Siguiente
                   <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+              
+              {currentStep === 2 && !hasPaid && user?.role === 'admin' && (
+                <button
+                  onClick={() => setCurrentStep(3)}
+                  className="fixed bottom-6 right-6 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-xs font-medium transition-all shadow-lg"
+                >
+                  Avanzar (admin)
                 </button>
               )}
             </div>
@@ -906,8 +1045,8 @@ function ResultView({ selections, onReset }) {
               }}
             >
               <div className="relative z-10 text-center">
-                <h1 className="text-5xl font-bold text-white drop-shadow-2xl mb-3">{selections.firstName} {selections.lastName}</h1>
-                <p className="text-white/90 text-xl">ADN de Marca</p>
+                <h1 className="text-5xl font-bold text-white drop-shadow-2xl mb-3">{selections.artistName}</h1>
+                <p className="text-white/90 text-xl">{selections.firstName} {selections.lastName}</p>
               </div>
             </div>
             {/* Aura */}
@@ -999,11 +1138,17 @@ function ResultView({ selections, onReset }) {
             >
               Descargar PDF
             </button>
-            <button className="w-full px-8 py-4 bg-emerald-500 hover:bg-emerald-600 rounded-lg font-medium transition-all shadow-xl shadow-emerald-500/20 text-lg">
-              Guardar ADN de Marca (27€)
+            <button 
+              onClick={saveDNA}
+              className="w-full px-8 py-4 bg-emerald-500 hover:bg-emerald-600 rounded-lg font-medium transition-all shadow-xl shadow-emerald-500/20 text-lg"
+            >
+              Actualizar ADN de Marca
             </button>
-            <button className="w-full px-8 py-4 bg-white/5 hover:bg-white/10 rounded-lg font-medium transition-all border border-white/10 text-lg">
-              Branding Personalizado con Dirección Creativa (750€)
+            <button 
+              onClick={onReset}
+              className="w-full px-8 py-4 bg-white/5 hover:bg-white/10 rounded-lg font-medium transition-all border border-white/10 text-lg"
+            >
+              Editar Respuestas
             </button>
           </div>
         </div>
