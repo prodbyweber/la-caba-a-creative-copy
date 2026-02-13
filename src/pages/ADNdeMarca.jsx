@@ -61,31 +61,62 @@ export default function ADNdeMarca() {
   const [showResult, setShowResult] = useState(false);
   
   const [selections, setSelections] = useState({
-    projectStory: "",
-    projectMessage: "",
-    projectTheme: "",
-    projectKeywords: [],
+    firstName: "",
+    lastName: "",
+    birthCountry: "",
+    residenceCountry: "",
+    phoneCode: "+34",
+    phoneNumber: "",
     emotions: [],
     vibe: "",
     genres: [],
     textures: [],
-    colors: ["#000000", "#FFFFFF", "#10B981", "#6366F1"],
-    customColors: [],
-    palette: null,
-    typography: { primary: "", secondary: "" },
-    aesthetics: [],
+    musicReferences: [],
     narratives: [],
     narrativeText: "",
-    artistReferences: [],
     visualLinks: [],
-    cinematicRefs: []
+    colors: ["#000000", "#FFFFFF", "#10B981", "#6366F1"],
+    palette: null,
+    typography: { primary: "", secondary: "" }
   });
 
   const [tempInput, setTempInput] = useState("");
   const [limitWarning, setLimitWarning] = useState("");
 
-  const [loadingImages, setLoadingImages] = useState({});
+  const [countrySearch, setCountrySearch] = useState("");
+  const [musicRefInput, setMusicRefInput] = useState({ url: "", note: "" });
+  
   const totalSteps = 10;
+
+  const countries = [
+    { name: "España", code: "+34" },
+    { name: "México", code: "+52" },
+    { name: "Argentina", code: "+54" },
+    { name: "Colombia", code: "+57" },
+    { name: "Chile", code: "+56" },
+    { name: "Perú", code: "+51" },
+    { name: "Venezuela", code: "+58" },
+    { name: "Ecuador", code: "+593" },
+    { name: "Guatemala", code: "+502" },
+    { name: "Cuba", code: "+53" },
+    { name: "Bolivia", code: "+591" },
+    { name: "República Dominicana", code: "+1-809" },
+    { name: "Honduras", code: "+504" },
+    { name: "Paraguay", code: "+595" },
+    { name: "El Salvador", code: "+503" },
+    { name: "Nicaragua", code: "+505" },
+    { name: "Costa Rica", code: "+506" },
+    { name: "Puerto Rico", code: "+1-787" },
+    { name: "Panamá", code: "+507" },
+    { name: "Uruguay", code: "+598" },
+    { name: "Estados Unidos", code: "+1" },
+    { name: "Francia", code: "+33" },
+    { name: "Italia", code: "+39" },
+    { name: "Alemania", code: "+49" },
+    { name: "Reino Unido", code: "+44" },
+    { name: "Portugal", code: "+351" },
+    { name: "Brasil", code: "+55" }
+  ].sort((a, b) => a.name.localeCompare(b.name));
 
   const toggleSelection = (category, item, maxLimit) => {
     const current = selections[category];
@@ -189,14 +220,36 @@ export default function ADNdeMarca() {
     }));
   };
 
+  const addMusicReference = () => {
+    if (!musicRefInput.url.trim() || selections.musicReferences.length >= 4) return;
+    setSelections(prev => ({
+      ...prev,
+      musicReferences: [...prev.musicReferences, { ...musicRefInput }]
+    }));
+    setMusicRefInput({ url: "", note: "" });
+  };
+
+  const removeMusicReference = (index) => {
+    setSelections(prev => ({
+      ...prev,
+      musicReferences: prev.musicReferences.filter((_, i) => i !== index)
+    }));
+  };
+
+  const getYouTubeEmbedId = (url) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
   const canProceed = () => {
     switch(currentStep) {
-      case 1: return selections.projectStory.trim().length > 0;
+      case 1: return selections.firstName.trim() && selections.lastName.trim() && selections.birthCountry && selections.residenceCountry && selections.phoneNumber.trim();
       case 2: return selections.emotions.length > 0;
       case 3: return selections.vibe !== "";
       case 4: return selections.genres.length > 0;
       case 5: return selections.textures.length > 0;
-      case 6: return selections.aesthetics.length > 0;
+      case 6: return true;
       case 7: return selections.narratives.length > 0;
       case 8: return selections.visualLinks.length > 0;
       case 9: return selections.colors.length >= 4;
@@ -213,68 +266,81 @@ export default function ADNdeMarca() {
     switch(currentStep) {
       case 1:
         return (
-          <StepContainer title="¿De qué trata tu proyecto musical?" subtitle="Cuéntanos la historia detrás de tu arte">
+          <StepContainer title="Datos Básicos" subtitle="Información de contacto">
             <div className="space-y-6">
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Historia breve del artista</label>
-                <textarea
-                  value={selections.projectStory}
-                  onChange={(e) => setSelections(prev => ({ ...prev, projectStory: e.target.value }))}
-                  rows={4}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors resize-none"
-                  placeholder="¿Quién eres? ¿De dónde vienes? ¿Qué te llevó a la música?"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">¿Qué quieres transmitir con tu música?</label>
-                <textarea
-                  value={selections.projectMessage}
-                  onChange={(e) => setSelections(prev => ({ ...prev, projectMessage: e.target.value }))}
-                  rows={4}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors resize-none"
-                  placeholder="¿Qué mensaje o emoción quieres que sientan tus oyentes?"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Temática del single / EP / álbum</label>
-                <textarea
-                  value={selections.projectTheme}
-                  onChange={(e) => setSelections(prev => ({ ...prev, projectTheme: e.target.value }))}
-                  rows={3}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors resize-none"
-                  placeholder="¿De qué habla tu proyecto actual?"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">3-5 palabras clave que definan tu proyecto</label>
-                <div className="flex gap-2 mb-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Nombre *</label>
                   <input
                     type="text"
-                    value={tempInput}
-                    onChange={(e) => setTempInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
-                    disabled={selections.projectKeywords.length >= 5}
-                    className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 disabled:opacity-50"
-                    placeholder="Ej: Intenso, Urbano, Rebelde..."
+                    value={selections.firstName}
+                    onChange={(e) => setSelections(prev => ({ ...prev, firstName: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                    placeholder="Tu nombre"
                   />
-                  <button
-                    onClick={addKeyword}
-                    disabled={selections.projectKeywords.length >= 5}
-                    className="px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Añadir
-                  </button>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {selections.projectKeywords.map((keyword, idx) => (
-                    <span key={idx} className="px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-full text-sm flex items-center gap-2 ring-1 ring-emerald-500/30">
-                      {keyword}
-                      <X className="w-3 h-3 cursor-pointer" onClick={() => removeKeyword(idx)} />
-                    </span>
-                  ))}
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Apellido *</label>
+                  <input
+                    type="text"
+                    value={selections.lastName}
+                    onChange={(e) => setSelections(prev => ({ ...prev, lastName: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                    placeholder="Tu apellido"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">País de nacimiento *</label>
+                  <select
+                    value={selections.birthCountry}
+                    onChange={(e) => setSelections(prev => ({ ...prev, birthCountry: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  >
+                    <option value="" className="bg-[#0B0B0D]">Selecciona un país</option>
+                    {countries.map(country => (
+                      <option key={country.name} value={country.name} className="bg-[#0B0B0D]">{country.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">País de residencia *</label>
+                  <select
+                    value={selections.residenceCountry}
+                    onChange={(e) => setSelections(prev => ({ ...prev, residenceCountry: e.target.value }))}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  >
+                    <option value="" className="bg-[#0B0B0D]">Selecciona un país</option>
+                    {countries.map(country => (
+                      <option key={country.name} value={country.name} className="bg-[#0B0B0D]">{country.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Número de teléfono *</label>
+                <div className="flex gap-3">
+                  <select
+                    value={selections.phoneCode}
+                    onChange={(e) => setSelections(prev => ({ ...prev, phoneCode: e.target.value }))}
+                    className="w-32 px-3 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
+                  >
+                    {countries.map(country => (
+                      <option key={country.code} value={country.code} className="bg-[#0B0B0D]">
+                        {country.code}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="tel"
+                    value={selections.phoneNumber}
+                    onChange={(e) => setSelections(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                    className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                    placeholder="123 456 789"
+                  />
                 </div>
               </div>
             </div>
@@ -349,20 +415,113 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
+
+
       case 6:
         return (
-          <StepContainer title="Estética Visual" subtitle="¿Qué estilo visual te define?">
+          <StepContainer title="Referencias Musicales" subtitle="Comparte canciones que inspiren tu sonido">
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm text-gray-400 mb-3">
+                  Añade hasta 4 canciones de YouTube (máx. 4)
+                </label>
+                <div className="space-y-3 mb-4">
+                  <input
+                    type="text"
+                    value={musicRefInput.url}
+                    onChange={(e) => setMusicRefInput(prev => ({ ...prev, url: e.target.value }))}
+                    disabled={selections.musicReferences.length >= 4}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 disabled:opacity-50"
+                    placeholder="https://youtube.com/watch?v=..."
+                  />
+                  <textarea
+                    value={musicRefInput.note}
+                    onChange={(e) => setMusicRefInput(prev => ({ ...prev, note: e.target.value }))}
+                    disabled={selections.musicReferences.length >= 4}
+                    rows={2}
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors resize-none disabled:opacity-50"
+                    placeholder="¿Qué te gusta de esta referencia? (opcional)"
+                  />
+                  <button
+                    onClick={addMusicReference}
+                    disabled={selections.musicReferences.length >= 4 || !musicRefInput.url.trim()}
+                    className="w-full px-4 py-3 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Añadir Referencia ({selections.musicReferences.length}/4)
+                  </button>
+                </div>
+
+                {selections.musicReferences.length > 0 && (
+                  <div className="space-y-4">
+                    {selections.musicReferences.map((ref, idx) => {
+                      const videoId = getYouTubeEmbedId(ref.url);
+                      return (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="bg-white/5 rounded-xl overflow-hidden border border-white/10"
+                        >
+                          {videoId && (
+                            <div className="aspect-video w-full">
+                              <iframe
+                                width="100%"
+                                height="100%"
+                                src={`https://www.youtube.com/embed/${videoId}`}
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                className="w-full h-full"
+                              />
+                            </div>
+                          )}
+                          <div className="p-4">
+                            {ref.note && (
+                              <p className="text-sm text-gray-400 mb-3 italic">"{ref.note}"</p>
+                            )}
+                            <button
+                              onClick={() => removeMusicReference(idx)}
+                              className="text-sm text-red-400 hover:text-red-300 transition-colors"
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          </StepContainer>
+        );
+
+      case 7:
+        return (
+          <StepContainer title="Narrativa" subtitle="¿Qué historias cuentas?">
             <SelectionGrid>
-              {aesthetics.map(aesthetic => (
+              {narratives.map(narrative => (
                 <SelectionButton
-                  key={aesthetic}
-                  selected={selections.aesthetics.includes(aesthetic)}
-                  onClick={() => toggleSelection('aesthetics', aesthetic, 3)}
+                  key={narrative}
+                  selected={selections.narratives.includes(narrative)}
+                  onClick={() => toggleSelection('narratives', narrative, 3)}
                 >
-                  {aesthetic}
+                  {narrative}
                 </SelectionButton>
               ))}
             </SelectionGrid>
+            <div className="mt-8">
+              <label className="block text-sm text-gray-400 mb-3">
+                Describe en 2 líneas la historia que quieres contar (opcional)
+              </label>
+              <textarea
+                value={selections.narrativeText}
+                onChange={(e) => setSelections(prev => ({ ...prev, narrativeText: e.target.value }))}
+                rows={3}
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors resize-none"
+                placeholder="Escribe aquí tu historia..."
+              />
+            </div>
           </StepContainer>
         );
 
@@ -458,8 +617,29 @@ export default function ADNdeMarca() {
 
       case 9:
         return (
-          <StepContainer title="Paleta de Color" subtitle="Define los colores de tu identidad visual">
+          <StepContainer title="Paleta de Color" subtitle="Define los colores de tu identidad visual basados en tu moodboard">
             <div className="space-y-6">
+              {/* Moodboard Reference */}
+              {selections.visualLinks.length > 0 && (
+                <div>
+                  <p className="text-sm text-emerald-400 mb-3">Tu Moodboard de Referencia</p>
+                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mb-6">
+                    {selections.visualLinks.slice(0, 12).map((url, idx) => (
+                      <div key={idx} className="aspect-square rounded-lg overflow-hidden bg-white/5">
+                        <img 
+                          src={url} 
+                          alt={`Ref ${idx}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=200&h=200&fit=crop';
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Color Selectors */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {selections.colors.map((color, idx) => (
@@ -565,35 +745,6 @@ export default function ADNdeMarca() {
                   </div>
                 </div>
               )}
-            </div>
-          </StepContainer>
-        );
-
-      case 7:
-        return (
-          <StepContainer title="Narrativa" subtitle="¿Qué historias cuentas?">
-            <SelectionGrid>
-              {narratives.map(narrative => (
-                <SelectionButton
-                  key={narrative}
-                  selected={selections.narratives.includes(narrative)}
-                  onClick={() => toggleSelection('narratives', narrative, 3)}
-                >
-                  {narrative}
-                </SelectionButton>
-              ))}
-            </SelectionGrid>
-            <div className="mt-8">
-              <label className="block text-sm text-gray-400 mb-3">
-                Describe en 2 líneas la historia que quieres contar (opcional)
-              </label>
-              <textarea
-                value={selections.narrativeText}
-                onChange={(e) => setSelections(prev => ({ ...prev, narrativeText: e.target.value }))}
-                rows={3}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors resize-none"
-                placeholder="Escribe aquí tu historia..."
-              />
             </div>
           </StepContainer>
         );
