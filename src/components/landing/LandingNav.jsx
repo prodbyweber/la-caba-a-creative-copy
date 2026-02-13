@@ -37,11 +37,7 @@ export default function LandingNav() {
   };
 
   const handleAccountClick = () => {
-    if (user?.role === 'admin') {
-      navigate(createPageUrl("AdminDashboard"));
-    } else {
-      navigate(createPageUrl("UserProfile"));
-    }
+    navigate(createPageUrl("UserProfile"));
   };
 
   useEffect(() => {

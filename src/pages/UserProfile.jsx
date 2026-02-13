@@ -103,13 +103,23 @@ export default function UserProfile() {
             <ArrowLeft className="w-5 h-5" />
             Volver
           </button>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            Cerrar Sesión
-          </button>
+          <div className="flex items-center gap-3">
+            {user?.role === 'admin' && (
+              <button
+                onClick={() => navigate(createPageUrl("AdminDashboard"))}
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-all"
+              >
+                Admin Dashboard
+              </button>
+            )}
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors"
+            >
+              <LogOut className="w-5 h-5" />
+              Cerrar Sesión
+            </button>
+          </div>
         </div>
 
         <motion.div
