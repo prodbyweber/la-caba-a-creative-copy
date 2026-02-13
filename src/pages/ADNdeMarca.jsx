@@ -352,71 +352,6 @@ export default function ADNdeMarca() {
       case 6:
         return (
           <StepContainer title="Estética Visual" subtitle="¿Qué estilo visual te define?">
-            <div className="space-y-8">
-              {Object.entries(
-                colorPalettes.reduce((acc, palette) => {
-                  if (!acc[palette.category]) acc[palette.category] = [];
-                  acc[palette.category].push(palette);
-                  return acc;
-                }, {})
-              ).map(([category, palettes]) => (
-                <div key={category}>
-                  <h3 className="text-sm text-gray-500 mb-3 font-medium">{category}</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {palettes.map(palette => (
-                      <motion.div
-                        key={palette.name}
-                        whileHover={{ scale: 1.02 }}
-                        onClick={() => selectPalette(palette)}
-                        className={`cursor-pointer rounded-lg overflow-hidden transition-all ${
-                          selections.palette === palette.name
-                            ? 'ring-2 ring-emerald-500 shadow-lg shadow-emerald-500/20'
-                            : 'hover:ring-1 hover:ring-white/20'
-                        }`}
-                      >
-                        <div className="flex h-24">
-                          {palette.colors.map((color, idx) => (
-                            <div
-                              key={idx}
-                              style={{ backgroundColor: color }}
-                              className="flex-1 transition-transform hover:scale-105"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                selectColor(color);
-                              }}
-                            />
-                          ))}
-                        </div>
-                        <div className="bg-white/5 px-3 py-2">
-                          <p className="text-xs text-white/70">{palette.name}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              
-              {selections.colors.length > 0 && (
-                <div className="mt-6">
-                  <p className="text-sm text-gray-400 mb-2">Colores seleccionados:</p>
-                  <div className="flex gap-2">
-                    {selections.colors.map((color, idx) => (
-                      <div
-                        key={idx}
-                        style={{ backgroundColor: color }}
-                        className="w-12 h-12 rounded-lg ring-1 ring-white/20"
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </StepContainer>
-        );
-
-      case 6:
-        return (
-          <StepContainer title="Estética Visual" subtitle="¿Qué estilo visual te define?">
             <SelectionGrid>
               {aesthetics.map(aesthetic => (
                 <SelectionButton
@@ -634,9 +569,9 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 11:
+      case 7:
         return (
-          <StepContainer title="Historias que cuentas" subtitle="Define las narrativas de tu música">
+          <StepContainer title="Narrativa" subtitle="¿Qué historias cuentas?">
             <SelectionGrid>
               {narratives.map(narrative => (
                 <SelectionButton
@@ -662,8 +597,6 @@ export default function ADNdeMarca() {
             </div>
           </StepContainer>
         );
-
-
 
       default:
         return null;
