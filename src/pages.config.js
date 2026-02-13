@@ -47,7 +47,6 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
-import ADNdeMarca from './pages/ADNdeMarca';
 import Accounting from './pages/Accounting';
 import AdminDashboard from './pages/AdminDashboard';
 import Analytics from './pages/Analytics';
@@ -72,11 +71,11 @@ import SocialAccounts from './pages/SocialAccounts';
 import TrackDetail from './pages/TrackDetail';
 import Tracks from './pages/Tracks';
 import UserProfile from './pages/UserProfile';
+import ADNdeMarca from './pages/ADNdeMarca';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "ADNdeMarca": ADNdeMarca,
     "Accounting": Accounting,
     "AdminDashboard": AdminDashboard,
     "Analytics": Analytics,
@@ -101,6 +100,7 @@ export const PAGES = {
     "TrackDetail": TrackDetail,
     "Tracks": Tracks,
     "UserProfile": UserProfile,
+    "ADNdeMarca": ADNdeMarca,
 }
 
 export const pagesConfig = {

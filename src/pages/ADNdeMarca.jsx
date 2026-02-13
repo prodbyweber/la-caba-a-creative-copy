@@ -1,11 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, X, Save, Play } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, ArrowRight, Check, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
 
 const emotions = [
   "Melancolía", "Euforia", "Nostalgia", "Rebeldía", "Paz", "Ansiedad",
@@ -60,25 +57,14 @@ const narratives = [
 ];
 
 export default function ADNdeMarca() {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(1);
   const [showResult, setShowResult] = useState(false);
-  const [adnId, setAdnId] = useState(null);
   
   const [selections, setSelections] = useState({
-    nombre: "",
-    apellido: "",
-    nombre_artistico: "",
-    pais_nacimiento: "",
-    pais_residencia: "",
-    telefono: "",
     projectStory: "",
     projectMessage: "",
-    projectType: "",
     projectTheme: "",
     projectKeywords: [],
-    musicalReferences: [],
     emotions: [],
     vibe: "",
     genres: [],
@@ -95,103 +81,11 @@ export default function ADNdeMarca() {
     cinematicRefs: []
   });
 
-  // Load existing ADN if available
-  const { data: existingADN } = useQuery({
-    queryKey: ['myADN'],
-    queryFn: async () => {
-      const user = await base44.auth.me();
-      const adns = await base44.entities.ADNdeMarca.filter({ user_id: user.id });
-      return adns.length > 0 ? adns[0] : null;
-    }
-  });
-
-  useEffect(() => {
-    if (existingADN) {
-      setAdnId(existingADN.id);
-      setSelections({
-        nombre: existingADN.nombre || "",
-        apellido: existingADN.apellido || "",
-        nombre_artistico: existingADN.nombre_artistico || "",
-        pais_nacimiento: existingADN.pais_nacimiento || "",
-        pais_residencia: existingADN.pais_residencia || "",
-        telefono: existingADN.telefono || "",
-        projectStory: existingADN.project_story || "",
-        projectMessage: existingADN.project_message || "",
-        projectType: existingADN.project_type || "",
-        projectTheme: existingADN.project_theme || "",
-        projectKeywords: existingADN.project_keywords || [],
-        musicalReferences: existingADN.musical_references || [],
-        emotions: existingADN.emotions || [],
-        vibe: existingADN.vibe || "",
-        genres: existingADN.genres || [],
-        textures: existingADN.textures || [],
-        colors: existingADN.colors || ["#000000", "#FFFFFF", "#10B981", "#6366F1"],
-        customColors: [],
-        palette: existingADN.palette || null,
-        typography: existingADN.typography || { primary: "", secondary: "" },
-        aesthetics: existingADN.aesthetics || [],
-        narratives: existingADN.narratives || [],
-        narrativeText: existingADN.narrative_text || "",
-        artistReferences: existingADN.artist_references || [],
-        visualLinks: existingADN.visual_links || [],
-        cinematicRefs: []
-      });
-    }
-  }, [existingADN]);
-
-  const saveADNMutation = useMutation({
-    mutationFn: async (data) => {
-      const user = await base44.auth.me();
-      const payload = {
-        user_id: user.id,
-        nombre: data.nombre,
-        apellido: data.apellido,
-        nombre_artistico: data.nombre_artistico,
-        pais_nacimiento: data.pais_nacimiento,
-        pais_residencia: data.pais_residencia,
-        telefono: data.telefono,
-        project_story: data.projectStory,
-        project_message: data.projectMessage,
-        project_type: data.projectType,
-        project_theme: data.projectTheme,
-        project_keywords: data.projectKeywords,
-        musical_references: data.musicalReferences,
-        emotions: data.emotions,
-        vibe: data.vibe,
-        genres: data.genres,
-        textures: data.textures,
-        aesthetics: data.aesthetics,
-        narratives: data.narratives,
-        narrative_text: data.narrativeText,
-        colors: data.colors,
-        palette: data.palette,
-        typography: data.typography,
-        visual_links: data.visualLinks,
-        artist_references: data.artistReferences
-      };
-
-      if (adnId) {
-        return await base44.entities.ADNdeMarca.update(adnId, payload);
-      } else {
-        return await base44.entities.ADNdeMarca.create(payload);
-      }
-    },
-    onSuccess: (data) => {
-      setAdnId(data.id);
-      queryClient.invalidateQueries({ queryKey: ['myADN'] });
-      toast.success(adnId ? 'ADN actualizado' : 'ADN guardado');
-    },
-    onError: () => {
-      toast.error('Error al guardar');
-    }
-  });
-
   const [tempInput, setTempInput] = useState("");
   const [limitWarning, setLimitWarning] = useState("");
 
   const [loadingImages, setLoadingImages] = useState({});
-  const [refInput, setRefInput] = useState({ url: "", note: "" });
-  const totalSteps = 11;
+  const totalSteps = 10;
 
   const toggleSelection = (category, item, maxLimit) => {
     const current = selections[category];
@@ -295,53 +189,20 @@ export default function ADNdeMarca() {
     }));
   };
 
-  const addMusicalReference = () => {
-    if (!refInput.url.trim()) return;
-    if (selections.musicalReferences.length >= 5) {
-      setLimitWarning("Máximo 5 referencias musicales.");
-      setTimeout(() => setLimitWarning(""), 2000);
-      return;
-    }
-    
-    const youtubePattern = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|music\.youtube\.com)\/.+/;
-    if (!youtubePattern.test(refInput.url)) {
-      toast.error("Por favor, introduce un enlace válido de YouTube o YouTube Music");
-      return;
-    }
-
-    setSelections(prev => ({
-      ...prev,
-      musicalReferences: [...prev.musicalReferences, { ...refInput }]
-    }));
-    setRefInput({ url: "", note: "" });
-  };
-
-  const removeMusicalReference = (index) => {
-    setSelections(prev => ({
-      ...prev,
-      musicalReferences: prev.musicalReferences.filter((_, i) => i !== index)
-    }));
-  };
-
   const canProceed = () => {
     switch(currentStep) {
-      case 1: return selections.nombre_artistico.trim().length > 0;
+      case 1: return selections.projectStory.trim().length > 0;
       case 2: return selections.emotions.length > 0;
       case 3: return selections.vibe !== "";
       case 4: return selections.genres.length > 0;
       case 5: return selections.textures.length > 0;
-      case 6: return selections.projectStory.trim().length > 0;
-      case 7: return true; // Referencias musicales opcionales
-      case 8: return selections.aesthetics.length > 0;
-      case 9: return selections.narratives.length > 0;
-      case 10: return selections.colors.length >= 4;
-      case 11: return selections.typography.primary !== "";
+      case 6: return selections.aesthetics.length > 0;
+      case 7: return selections.narratives.length > 0;
+      case 8: return selections.visualLinks.length > 0;
+      case 9: return selections.colors.length >= 4;
+      case 10: return selections.typography.primary !== "";
       default: return false;
     }
-  };
-
-  const handleSaveADN = () => {
-    saveADNMutation.mutate(selections);
   };
 
   const generateResult = () => {
@@ -352,80 +213,7 @@ export default function ADNdeMarca() {
     switch(currentStep) {
       case 1:
         return (
-          <StepContainer title="Datos del Artista" subtitle="Comencemos por conocerte">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Nombre *</label>
-                <input
-                  type="text"
-                  value={selections.nombre}
-                  onChange={(e) => setSelections(prev => ({ ...prev, nombre: e.target.value }))}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
-                  placeholder="Tu nombre"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Apellido</label>
-                <input
-                  type="text"
-                  value={selections.apellido}
-                  onChange={(e) => setSelections(prev => ({ ...prev, apellido: e.target.value }))}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
-                  placeholder="Tu apellido"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm text-gray-400 mb-2">Nombre Artístico *</label>
-                <input
-                  type="text"
-                  value={selections.nombre_artistico}
-                  onChange={(e) => setSelections(prev => ({ ...prev, nombre_artistico: e.target.value }))}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
-                  placeholder="¿Cómo te llamas artísticamente?"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">País de Nacimiento</label>
-                <input
-                  type="text"
-                  value={selections.pais_nacimiento}
-                  onChange={(e) => setSelections(prev => ({ ...prev, pais_nacimiento: e.target.value }))}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
-                  placeholder="Ej: España, México..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">País de Residencia</label>
-                <input
-                  type="text"
-                  value={selections.pais_residencia}
-                  onChange={(e) => setSelections(prev => ({ ...prev, pais_residencia: e.target.value }))}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
-                  placeholder="Ej: España, México..."
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm text-gray-400 mb-2">Número de Teléfono</label>
-                <input
-                  type="tel"
-                  value={selections.telefono}
-                  onChange={(e) => setSelections(prev => ({ ...prev, telefono: e.target.value }))}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
-                  placeholder="+34 600 000 000"
-                />
-              </div>
-            </div>
-          </StepContainer>
-        );
-
-      case 2:
-        return (
-          <StepContainer title="Emoción Núcleo" subtitle="¿Qué emociones definen tu música?">
+          <StepContainer title="¿De qué trata tu proyecto musical?" subtitle="Cuéntanos la historia detrás de tu arte">
             <div className="space-y-6">
               <div>
                 <label className="block text-sm text-gray-400 mb-2">Historia breve del artista</label>
@@ -563,160 +351,6 @@ export default function ADNdeMarca() {
 
       case 6:
         return (
-          <StepContainer title="¿De qué trata tu proyecto musical?" subtitle="Cuéntanos la historia detrás de tu arte">
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Historia breve del artista</label>
-                <textarea
-                  value={selections.projectStory}
-                  onChange={(e) => setSelections(prev => ({ ...prev, projectStory: e.target.value }))}
-                  rows={4}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors resize-none"
-                  placeholder="¿Quién eres? ¿De dónde vienes? ¿Qué te llevó a la música?"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">¿Qué quieres transmitir con tu música?</label>
-                <textarea
-                  value={selections.projectMessage}
-                  onChange={(e) => setSelections(prev => ({ ...prev, projectMessage: e.target.value }))}
-                  rows={4}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors resize-none"
-                  placeholder="¿Qué mensaje o emoción quieres que sientan tus oyentes?"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Proyecto actual</label>
-                <select
-                  value={selections.projectType}
-                  onChange={(e) => setSelections(prev => ({ ...prev, projectType: e.target.value }))}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 transition-colors"
-                >
-                  <option value="">Selecciona...</option>
-                  <option value="Single">Single</option>
-                  <option value="EP">EP</option>
-                  <option value="Álbum">Álbum</option>
-                  <option value="Otro">Otro</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">Temática del proyecto</label>
-                <textarea
-                  value={selections.projectTheme}
-                  onChange={(e) => setSelections(prev => ({ ...prev, projectTheme: e.target.value }))}
-                  rows={3}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors resize-none"
-                  placeholder="¿De qué habla tu proyecto actual?"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-400 mb-2">3-5 palabras clave que definan tu proyecto</label>
-                <div className="flex gap-2 mb-3">
-                  <input
-                    type="text"
-                    value={tempInput}
-                    onChange={(e) => setTempInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
-                    disabled={selections.projectKeywords.length >= 5}
-                    className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 disabled:opacity-50"
-                    placeholder="Ej: Intenso, Urbano, Rebelde..."
-                  />
-                  <button
-                    onClick={addKeyword}
-                    disabled={selections.projectKeywords.length >= 5}
-                    className="px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Añadir
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {selections.projectKeywords.map((keyword, idx) => (
-                    <span key={idx} className="px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-full text-sm flex items-center gap-2 ring-1 ring-emerald-500/30">
-                      {keyword}
-                      <X className="w-3 h-3 cursor-pointer" onClick={() => removeKeyword(idx)} />
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </StepContainer>
-        );
-
-      case 7:
-        return (
-          <StepContainer title="Referencias Musicales" subtitle="Comparte hasta 5 canciones que te inspiren">
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 gap-3">
-                  <input
-                    type="text"
-                    value={refInput.url}
-                    onChange={(e) => setRefInput(prev => ({ ...prev, url: e.target.value }))}
-                    className="px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50"
-                    placeholder="URL de YouTube o YouTube Music"
-                  />
-                  <input
-                    type="text"
-                    value={refInput.note}
-                    onChange={(e) => setRefInput(prev => ({ ...prev, note: e.target.value }))}
-                    className="px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50"
-                    placeholder="¿Qué te gusta de esta referencia? (opcional)"
-                  />
-                </div>
-                <button
-                  onClick={addMusicalReference}
-                  disabled={selections.musicalReferences.length >= 5}
-                  className="w-full px-4 py-3 bg-emerald-500/20 text-emerald-400 rounded-lg hover:bg-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Añadir Referencia ({selections.musicalReferences.length}/5)
-                </button>
-              </div>
-
-              {selections.musicalReferences.length > 0 && (
-                <div className="space-y-3">
-                  {selections.musicalReferences.map((ref, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="p-4 bg-white/5 rounded-lg border border-white/10"
-                    >
-                      <div className="flex items-start gap-3">
-                        <Play className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-1" />
-                        <div className="flex-1 min-w-0">
-                          <a 
-                            href={ref.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-sm text-white hover:text-emerald-400 transition-colors break-all"
-                          >
-                            {ref.url}
-                          </a>
-                          {ref.note && (
-                            <p className="text-xs text-gray-500 mt-1">{ref.note}</p>
-                          )}
-                        </div>
-                        <button
-                          onClick={() => removeMusicalReference(idx)}
-                          className="p-1 hover:bg-red-500/20 rounded text-red-400"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </StepContainer>
-        );
-
-      case 8:
-        return (
           <StepContainer title="Estética Visual" subtitle="¿Qué estilo visual te define?">
             <SelectionGrid>
               {aesthetics.map(aesthetic => (
@@ -732,9 +366,9 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 10:
+      case 8:
         return (
-          <StepContainer title="Paleta de Color" subtitle="Define los colores de tu identidad visual">
+          <StepContainer title="Referencias Visuales" subtitle="Comparte imágenes que inspiren tu estética">
             <div className="space-y-6">
               <div>
                 <label className="block text-sm text-gray-400 mb-3">
@@ -822,9 +456,9 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 11:
+      case 9:
         return (
-          <StepContainer title="Tipografías" subtitle="Elige las fuentes que representan tu identidad">
+          <StepContainer title="Paleta de Color" subtitle="Define los colores de tu identidad visual">
             <div className="space-y-6">
               {/* Color Selectors */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -887,9 +521,9 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 12:
+      case 10:
         return (
-          <StepContainer title="Referencias Visuales (Opcional)" subtitle="Comparte imágenes que inspiren tu estética">
+          <StepContainer title="Tipografías" subtitle="Elige las fuentes que representan tu identidad">
             <div className="space-y-8">
               {/* Primary Font */}
               <div>
@@ -935,7 +569,7 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 9:
+      case 7:
         return (
           <StepContainer title="Narrativa" subtitle="¿Qué historias cuentas?">
             <SelectionGrid>
@@ -1050,15 +684,12 @@ export default function ADNdeMarca() {
 
               {currentStep === totalSteps ? (
                 <button
-                  onClick={() => {
-                    handleSaveADN();
-                    generateResult();
-                  }}
-                  disabled={!canProceed() || saveADNMutation.isPending}
+                  onClick={generateResult}
+                  disabled={!canProceed()}
                   className="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg font-medium transition-all shadow-lg shadow-emerald-500/20 flex items-center gap-2"
                 >
-                  {saveADNMutation.isPending ? 'Guardando...' : 'Guardar y Ver ADN'}
-                  <Save className="w-4 h-4" />
+                  Ver mi ADN de Marca
+                  <Check className="w-4 h-4" />
                 </button>
               ) : (
                 <button
@@ -1116,7 +747,6 @@ function SelectionButton({ children, selected, onClick }) {
 }
 
 function ResultView({ selections, onReset }) {
-  const navigate = useNavigate();
   const aura = selections.emotions[0] || "Intenso";
   const identidad = `Un artista que transmite ${selections.emotions.join(', ')} a través de una estética ${selections.aesthetics.join(' y ')}. Su música combina ${selections.genres.join(', ')} con una textura ${selections.textures[0]?.toLowerCase()}, creando una experiencia ${selections.vibe?.toLowerCase()}.`;
 
@@ -1167,7 +797,7 @@ function ResultView({ selections, onReset }) {
               }}
             >
               <div className="relative z-10 text-center">
-                <h1 className="text-5xl font-bold text-white drop-shadow-2xl mb-3">{selections.nombre_artistico || 'Tu Nombre Artístico'}</h1>
+                <h1 className="text-5xl font-bold text-white drop-shadow-2xl mb-3">Tu Nombre Artístico</h1>
                 <p className="text-white/90 text-xl">{selections.projectTheme || 'Tu Proyecto Musical'}</p>
                 <div className="flex gap-2 justify-center mt-4">
                   {selections.projectKeywords.slice(0, 3).map((keyword, idx) => (
@@ -1236,23 +866,6 @@ function ResultView({ selections, onReset }) {
               )}
             </div>
 
-            {/* Referencias Musicales */}
-            {selections.musicalReferences?.length > 0 && (
-              <div>
-                <h3 className="text-sm text-emerald-400 mb-3 font-medium">Referencias Musicales</h3>
-                <div className="space-y-2">
-                  {selections.musicalReferences.map((ref, idx) => (
-                    <div key={idx} className="p-3 bg-white/5 rounded-lg">
-                      <a href={ref.url} target="_blank" rel="noopener noreferrer" className="text-sm text-emerald-400 hover:text-emerald-300 break-all">
-                        {ref.url}
-                      </a>
-                      {ref.note && <p className="text-xs text-gray-500 mt-1">{ref.note}</p>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Moodboard Visual */}
             {selections.visualLinks.length > 0 && (
               <div>
@@ -1282,16 +895,13 @@ function ResultView({ selections, onReset }) {
           {/* CTAs */}
           <div className="space-y-4">
             <button 
-              onClick={() => navigate(createPageUrl("UserProfile"))}
-              className="w-full px-8 py-4 bg-emerald-500 hover:bg-emerald-600 rounded-lg font-medium transition-all shadow-xl shadow-emerald-500/20 text-lg"
-            >
-              Ir a Mi Perfil
-            </button>
-            <button 
               onClick={handleDownloadPDF}
               className="w-full px-8 py-4 bg-white/10 hover:bg-white/15 rounded-lg font-medium transition-all border border-white/20 text-lg"
             >
               Descargar PDF
+            </button>
+            <button className="w-full px-8 py-4 bg-emerald-500 hover:bg-emerald-600 rounded-lg font-medium transition-all shadow-xl shadow-emerald-500/20 text-lg">
+              Guardar ADN de Marca (27€)
             </button>
             <button className="w-full px-8 py-4 bg-white/5 hover:bg-white/10 rounded-lg font-medium transition-all border border-white/10 text-lg">
               Branding Personalizado con Dirección Creativa (750€)
