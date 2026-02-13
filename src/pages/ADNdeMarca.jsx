@@ -262,17 +262,17 @@ export default function ADNdeMarca() {
       case 3: return selections.vibe !== "";
       case 4: return selections.genres.length > 0;
       case 5: return selections.textures.length > 0;
-      case 6: return hasPaid || user?.role === 'admin';
-      case 7: return true;
-      case 8: return selections.narratives.length > 0;
-      case 9: return selections.visualLinks.length > 0;
+      case 6: return true;
+      case 7: return selections.narratives.length > 0;
+      case 8: return selections.visualLinks.length > 0;
+      case 9: return hasPaid || user?.role === 'admin';
       case 10: return selections.colors.length >= 4 && selections.typography.primary !== "";
       default: return false;
     }
   };
 
   const handleStepChange = (newStep) => {
-    if (newStep === 6 && !hasPaid && user?.role !== 'admin') {
+    if (newStep === 9 && !hasPaid && user?.role !== 'admin') {
       setShowPaymentGate(true);
     } else {
       setCurrentStep(newStep);
@@ -282,7 +282,7 @@ export default function ADNdeMarca() {
   const handlePaymentSuccess = () => {
     setHasPaid(true);
     setShowPaymentGate(false);
-    setCurrentStep(6);
+    setCurrentStep(9);
   };
 
   const saveDNA = async () => {
@@ -476,9 +476,6 @@ export default function ADNdeMarca() {
         );
 
       case 6:
-        return null;
-
-      case 7:
         return (
           <StepContainer title="Referencias Musicales" subtitle="Comparte canciones que inspiren tu sonido">
             <div className="space-y-6">
@@ -557,7 +554,7 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 8:
+      case 7:
         return (
           <StepContainer title="Narrativa" subtitle="¿Qué historias cuentas?">
             <SelectionGrid>
@@ -586,7 +583,7 @@ export default function ADNdeMarca() {
           </StepContainer>
         );
 
-      case 9:
+      case 8:
         return (
           <StepContainer title="Referencias Visuales" subtitle="Comparte imágenes que inspiren tu estética">
             <div className="space-y-6">
@@ -647,6 +644,9 @@ export default function ADNdeMarca() {
             </div>
           </StepContainer>
         );
+
+      case 9:
+        return null;
 
       case 10:
         return (
@@ -879,7 +879,7 @@ export default function ADNdeMarca() {
             )}
 
             {/* Preview Overlay - Demo sombreado si no ha pagado */}
-            {currentStep > 5 && !hasPaid && user?.role !== 'admin' && (
+            {currentStep > 8 && !hasPaid && user?.role !== 'admin' && (
               <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-2xl pointer-events-none z-10">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
                   <div className="bg-black/80 backdrop-blur-xl px-8 py-6 rounded-xl border border-white/20">
@@ -938,9 +938,9 @@ export default function ADNdeMarca() {
                 </button>
               )}
               
-              {currentStep === 5 && !hasPaid && user?.role === 'admin' && (
+              {currentStep === 8 && !hasPaid && user?.role === 'admin' && (
                 <button
-                  onClick={() => setCurrentStep(6)}
+                  onClick={() => setCurrentStep(9)}
                   className="fixed bottom-6 right-6 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-xs font-medium transition-all shadow-lg z-50"
                 >
                   Avanzar (admin)
