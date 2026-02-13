@@ -191,21 +191,7 @@ export default function ADNdeMarca() {
     }));
   };
 
-  const addKeyword = () => {
-    if (!tempInput.trim() || selections.projectKeywords.length >= 5) return;
-    setSelections(prev => ({
-      ...prev,
-      projectKeywords: [...prev.projectKeywords, tempInput.trim()]
-    }));
-    setTempInput("");
-  };
 
-  const removeKeyword = (index) => {
-    setSelections(prev => ({
-      ...prev,
-      projectKeywords: prev.projectKeywords.filter((_, i) => i !== index)
-    }));
-  };
 
   const updateColor = (index, color) => {
     const newColors = [...selections.colors];
@@ -582,35 +568,7 @@ export default function ADNdeMarca() {
                 )}
               </div>
 
-              <div>
-                <label className="block text-sm text-gray-400 mb-3">
-                  Artistas de referencia (opcional)
-                </label>
-                <div className="flex gap-2 mb-3">
-                  <input
-                    type="text"
-                    value={tempInput}
-                    onChange={(e) => setTempInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addReference('artistReferences')}
-                    className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50"
-                    placeholder="Nombre del artista"
-                  />
-                  <button
-                    onClick={() => addReference('artistReferences')}
-                    className="px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-400 rounded-lg transition-colors"
-                  >
-                    Añadir
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {selections.artistReferences.map((ref, idx) => (
-                    <span key={idx} className="px-3 py-1 bg-white/10 rounded-full text-sm text-white flex items-center gap-2">
-                      {ref}
-                      <X className="w-3 h-3 cursor-pointer" onClick={() => removeReference('artistReferences', idx)} />
-                    </span>
-                  ))}
-                </div>
-              </div>
+
             </div>
           </StepContainer>
         );
@@ -739,9 +697,9 @@ export default function ADNdeMarca() {
                 <div className="p-8 bg-white/5 rounded-2xl border border-white/10">
                   <p className="text-sm text-gray-400 mb-4">Preview</p>
                   <div className="space-y-4">
-                    <h1 className="text-4xl font-bold text-white">Tu Nombre Artístico</h1>
-                    <h2 className="text-2xl text-gray-300">{selections.projectTheme || 'Título del Proyecto'}</h2>
-                    <p className="text-gray-400">{selections.projectKeywords.join(' · ') || 'Intenso · Urbano · Auténtico'}</p>
+                    <h1 className="text-4xl font-bold text-white">{selections.firstName} {selections.lastName}</h1>
+                    <h2 className="text-2xl text-gray-300">ADN de Marca</h2>
+                    <p className="text-gray-400">{selections.emotions.slice(0, 3).join(' · ')}</p>
                   </div>
                 </div>
               )}
@@ -899,7 +857,7 @@ function SelectionButton({ children, selected, onClick }) {
 
 function ResultView({ selections, onReset }) {
   const aura = selections.emotions[0] || "Intenso";
-  const identidad = `Un artista que transmite ${selections.emotions.join(', ')} a través de una estética ${selections.aesthetics.join(' y ')}. Su música combina ${selections.genres.join(', ')} con una textura ${selections.textures[0]?.toLowerCase()}, creando una experiencia ${selections.vibe?.toLowerCase()}.`;
+  const identidad = `Un artista que transmite ${selections.emotions.join(', ')}. Su música combina ${selections.genres.join(', ')} con una textura ${selections.textures[0]?.toLowerCase()}, creando una experiencia ${selections.vibe?.toLowerCase()}.`;
 
   const handleDownloadPDF = async () => {
     const html2canvas = (await import('html2canvas')).default;
@@ -948,15 +906,8 @@ function ResultView({ selections, onReset }) {
               }}
             >
               <div className="relative z-10 text-center">
-                <h1 className="text-5xl font-bold text-white drop-shadow-2xl mb-3">Tu Nombre Artístico</h1>
-                <p className="text-white/90 text-xl">{selections.projectTheme || 'Tu Proyecto Musical'}</p>
-                <div className="flex gap-2 justify-center mt-4">
-                  {selections.projectKeywords.slice(0, 3).map((keyword, idx) => (
-                    <span key={idx} className="px-3 py-1 bg-black/30 backdrop-blur-sm rounded-full text-sm text-white">
-                      {keyword}
-                    </span>
-                  ))}
-                </div>
+                <h1 className="text-5xl font-bold text-white drop-shadow-2xl mb-3">{selections.firstName} {selections.lastName}</h1>
+                <p className="text-white/90 text-xl">ADN de Marca</p>
               </div>
             </div>
             {/* Aura */}
@@ -991,9 +942,6 @@ function ResultView({ selections, onReset }) {
             {/* Visual */}
             <div>
               <h3 className="text-sm text-emerald-400 mb-3 font-medium">Visual</h3>
-              <p className="text-gray-300 mb-4">
-                <span className="text-white font-medium">Estética:</span> {selections.aesthetics.join(', ')}
-              </p>
               <div className="flex gap-3">
                 {selections.colors.map((color, idx) => (
                   <div
