@@ -792,7 +792,7 @@ export default function ADNdeMarca() {
   };
 
   if (showResult) {
-    return <ResultView selections={selections} onReset={() => { setShowResult(false); setCurrentStep(1); }} />;
+    return <ResultView selections={selections} onReset={() => { setShowResult(false); setCurrentStep(1); }} saveDNA={saveDNA} />;
   }
 
   return (
@@ -995,7 +995,7 @@ function SelectionButton({ children, selected, onClick }) {
   );
 }
 
-function ResultView({ selections, onReset }) {
+function ResultView({ selections, onReset, saveDNA }) {
   const aura = selections.emotions[0] || "Intenso";
   const identidad = `Un artista que transmite ${selections.emotions.join(', ')}. Su música combina ${selections.genres.join(', ')} con una textura ${selections.textures[0]?.toLowerCase()}, creando una experiencia ${selections.vibe?.toLowerCase()}.`;
 
