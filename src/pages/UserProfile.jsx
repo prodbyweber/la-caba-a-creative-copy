@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
-import { Camera, ArrowLeft, Save, LogOut } from "lucide-react";
+import { Camera, ArrowLeft, Save, LogOut, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,16 @@ export default function UserProfile() {
   const { data: user, isLoading } = useQuery({
     queryKey: ['currentUser'],
     queryFn: () => base44.auth.me()
+  });
+
+  const { data: brandDNA } = useQuery({
+    queryKey: ['userBrandDNA', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const dnas = await base44.entities.ArtistBrandDNA.filter({ user_id: user.id });
+      return dnas.length > 0 ? dnas[0] : null;
+    },
+    enabled: !!user?.id
   });
 
   const [formData, setFormData] = useState({
@@ -191,6 +201,122 @@ export default function UserProfile() {
               )}
             </Button>
           </div>
+        </motion.div>
+
+        {/* ADN de Marca Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-zinc-900/50 backdrop-blur-xl rounded-2xl border border-white/10 p-6 sm:p-8 mt-6"
+        >
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">ADN de Marca</h2>
+                <p className="text-sm text-gray-400">Tu identidad artística</p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate(createPageUrl("ADNdeMarca"))}
+              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-sm font-medium transition-all"
+            >
+              {brandDNA ? 'Editar' : 'Crear'}
+            </button>
+          </div>
+
+          {brandDNA ? (
+            <div className="space-y-6">
+              {/* Banner Preview */}
+              <div 
+                className="relative rounded-xl overflow-hidden h-32 flex items-center justify-center"
+                style={{
+                  background: brandDNA.colors?.length >= 4 
+                    ? `linear-gradient(135deg, ${brandDNA.colors[0]} 0%, ${brandDNA.colors[1]} 35%, ${brandDNA.colors[2]} 65%, ${brandDNA.colors[3]} 100%)`
+                    : 'linear-gradient(135deg, #10B981 0%, #059669 100%)'
+                }}
+              >
+                <div className="relative z-10 text-center">
+                  <h3 className="text-2xl font-bold text-white drop-shadow-lg">
+                    {brandDNA.artistName || formData.full_name}
+                  </h3>
+                </div>
+              </div>
+
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {brandDNA.emotions?.length > 0 && (
+                  <div className="bg-white/5 rounded-lg p-3">
+                    <p className="text-xs text-gray-500 mb-1">Emociones</p>
+                    <p className="text-sm font-medium text-white">{brandDNA.emotions.slice(0, 2).join(', ')}</p>
+                  </div>
+                )}
+                {brandDNA.genres?.length > 0 && (
+                  <div className="bg-white/5 rounded-lg p-3">
+                    <p className="text-xs text-gray-500 mb-1">Géneros</p>
+                    <p className="text-sm font-medium text-white">{brandDNA.genres.slice(0, 2).join(', ')}</p>
+                  </div>
+                )}
+                {brandDNA.vibe && (
+                  <div className="bg-white/5 rounded-lg p-3">
+                    <p className="text-xs text-gray-500 mb-1">Energía</p>
+                    <p className="text-sm font-medium text-white">{brandDNA.vibe}</p>
+                  </div>
+                )}
+                {brandDNA.colors?.length > 0 && (
+                  <div className="bg-white/5 rounded-lg p-3">
+                    <p className="text-xs text-gray-500 mb-1">Paleta</p>
+                    <div className="flex gap-1 mt-1">
+                      {brandDNA.colors.slice(0, 4).map((color, idx) => (
+                        <div
+                          key={idx}
+                          style={{ backgroundColor: color }}
+                          className="w-6 h-6 rounded border border-white/20"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 border-t border-white/10">
+                <p className="text-sm text-gray-400">
+                  {brandDNA.has_paid ? (
+                    <span className="text-emerald-400 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                      ADN Completo Desbloqueado
+                    </span>
+                  ) : (
+                    <span className="text-orange-400 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-orange-400" />
+                      ADN Básico (Desbloquea el completo)
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-emerald-500/20 to-teal-600/20 rounded-full flex items-center justify-center mb-4">
+                <Sparkles className="w-8 h-8 text-emerald-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                Crea tu ADN de Marca
+              </h3>
+              <p className="text-sm text-gray-400 max-w-md mx-auto mb-6">
+                Define tu identidad artística, emociones, géneros, paleta de colores y más.
+              </p>
+              <button
+                onClick={() => navigate(createPageUrl("ADNdeMarca"))}
+                className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 rounded-lg font-medium transition-all shadow-lg shadow-emerald-500/20"
+              >
+                Comenzar Ahora
+              </button>
+            </div>
+          )}
         </motion.div>
       </div>
     </div>
