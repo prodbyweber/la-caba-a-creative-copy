@@ -259,21 +259,22 @@ export default function ADNdeMarca() {
     switch(currentStep) {
       case 1: return selections.firstName.trim() && selections.lastName.trim() && selections.artistName.trim() && selections.birthCountry && selections.residenceCountry && selections.phoneNumber.trim();
       case 2: return selections.emotions.length > 0;
-      case 3: return hasPaid || user?.role === 'admin';
+      case 3: return true;
       case 4: return selections.vibe !== "";
-      case 5: return selections.genres.length > 0;
-      case 6: return selections.textures.length > 0;
-      case 7: return true;
-      case 8: return selections.narratives.length > 0;
-      case 9: return selections.visualLinks.length > 0;
-      case 10: return selections.colors.length >= 4;
-      case 11: return selections.typography.primary !== "";
+      case 5: return hasPaid || user?.role === 'admin';
+      case 6: return selections.genres.length > 0;
+      case 7: return selections.textures.length > 0;
+      case 8: return true;
+      case 9: return selections.narratives.length > 0;
+      case 10: return selections.visualLinks.length > 0;
+      case 11: return selections.colors.length >= 4;
+      case 12: return selections.typography.primary !== "";
       default: return false;
     }
   };
 
   const handleStepChange = (newStep) => {
-    if (newStep === 3 && !hasPaid && user?.role !== 'admin') {
+    if (newStep === 5 && !hasPaid && user?.role !== 'admin') {
       setShowPaymentGate(true);
     } else {
       setCurrentStep(newStep);
@@ -283,7 +284,7 @@ export default function ADNdeMarca() {
   const handlePaymentSuccess = () => {
     setHasPaid(true);
     setShowPaymentGate(false);
-    setCurrentStep(3);
+    setCurrentStep(5);
   };
 
   const saveDNA = async () => {
@@ -882,7 +883,7 @@ export default function ADNdeMarca() {
             )}
 
             {/* Preview Overlay - Demo sombreado si no ha pagado */}
-            {currentStep > 2 && !hasPaid && user?.role !== 'admin' && (
+            {currentStep > 4 && !hasPaid && user?.role !== 'admin' && (
               <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-2xl pointer-events-none z-10">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
                   <div className="bg-black/80 backdrop-blur-xl px-8 py-6 rounded-xl border border-white/20">
@@ -941,9 +942,9 @@ export default function ADNdeMarca() {
                 </button>
               )}
               
-              {currentStep === 2 && !hasPaid && user?.role === 'admin' && (
+              {currentStep === 4 && !hasPaid && user?.role === 'admin' && (
                 <button
-                  onClick={() => setCurrentStep(3)}
+                  onClick={() => setCurrentStep(5)}
                   className="fixed bottom-6 right-6 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-xs font-medium transition-all shadow-lg"
                 >
                   Avanzar (admin)
