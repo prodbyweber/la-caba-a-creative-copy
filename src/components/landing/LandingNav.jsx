@@ -67,6 +67,7 @@ export default function LandingNav() {
   const navItems = [
     { label: "Quién Soy", id: "timeline" },
     { label: "Artistas", id: "stories" },
+    { label: "ADN de Marca", page: "ADNdeMarca" },
     { label: "Exploración", id: "exploracion" },
     { label: "Startups", id: "startups" },
     { label: "Comenzar", id: "offers", highlight: true }
@@ -99,12 +100,20 @@ export default function LandingNav() {
             {navItems.map((item) => (
               item.highlight ? (
                 <button
-                  key={item.id}
+                  key={item.id || item.page}
                   onClick={() => scrollToSection(item.id)}
                   className="px-5 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-medium hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
                 >
                   {item.label}
                 </button>
+              ) : item.page ? (
+                <Link
+                  key={item.page}
+                  to={createPageUrl(item.page)}
+                  className="text-sm text-gray-400 hover:text-white transition-colors font-medium"
+                >
+                  {item.label}
+                </Link>
               ) : (
                 <button
                   key={item.id}
@@ -178,17 +187,28 @@ export default function LandingNav() {
 
               <div className="flex flex-col gap-6">
                 {navItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => scrollToSection(item.id)}
-                    className={`text-2xl font-light text-left transition-colors ${
-                      item.highlight 
-                        ? 'text-emerald-400 font-medium' 
-                        : 'text-gray-300 hover:text-white'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
+                  item.page ? (
+                    <Link
+                      key={item.page}
+                      to={createPageUrl(item.page)}
+                      onClick={() => setMobileOpen(false)}
+                      className="text-2xl font-light text-left text-gray-300 hover:text-white transition-colors"
+                    >
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <button
+                      key={item.id}
+                      onClick={() => scrollToSection(item.id)}
+                      className={`text-2xl font-light text-left transition-colors ${
+                        item.highlight 
+                          ? 'text-emerald-400 font-medium' 
+                          : 'text-gray-300 hover:text-white'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  )
                 ))}
                 <div className="pt-6 border-t border-white/10">
                   {user ? (
