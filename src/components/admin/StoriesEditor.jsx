@@ -177,7 +177,13 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
             >
               {/* Header */}
               <div className="flex items-center justify-between p-4 bg-white/5">
-                <div className="flex items-center gap-3 flex-1">
+                <div 
+                  className="flex items-center gap-3 flex-1 cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setExpandedIndex(expandedIndex === index ? null : index);
+                  }}
+                >
                   <div className="w-16 h-16 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
                     <img 
                       src={testimonial.image} 
@@ -189,19 +195,30 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                     <div className="text-white font-medium mb-1">{testimonial.name}</div>
                     <p className="text-gray-500 text-xs">{testimonial.role}</p>
                   </div>
+                  <div className="text-gray-400">
+                    {expandedIndex === index ? (
+                      <ChevronUp className="w-5 h-5" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5" />
+                    )}
+                  </div>
                 </div>
                 
                 <button
-                  onClick={() => removeTestimonial(index)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeTestimonial(index);
+                  }}
                   className="ml-2 p-2 hover:bg-red-500/20 rounded-lg text-red-400 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Content - Siempre visible */}
-              <div className="border-t border-white/10">
-                <div className="p-4 space-y-4">
+              {/* Content - Visible cuando está expandido */}
+              {expandedIndex === index && (
+                <div className="border-t border-white/10">
+                  <div className="p-4 space-y-4" onClick={(e) => e.stopPropagation()}>
                       {/* Name */}
                       <div>
                         <label className="text-xs text-gray-400 mb-2 block font-medium">
@@ -514,8 +531,9 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                           </div>
                         )}
                       </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </motion.div>
           ))}
         </AnimatePresence>
