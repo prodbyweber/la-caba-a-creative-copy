@@ -176,11 +176,8 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
               className="bg-white/5 rounded-xl border border-white/10 overflow-hidden"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-4">
-                <button
-                  onClick={() => setExpandedIndex(expandedIndex === index ? null : index)}
-                  className="flex items-center gap-3 flex-1 text-left"
-                >
+              <div className="flex items-center justify-between p-4 bg-white/5">
+                <div className="flex items-center gap-3 flex-1">
                   <div className="w-16 h-16 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
                     <img 
                       src={testimonial.image} 
@@ -192,12 +189,7 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                     <div className="text-white font-medium mb-1">{testimonial.name}</div>
                     <p className="text-gray-500 text-xs">{testimonial.role}</p>
                   </div>
-                  {expandedIndex === index ? (
-                    <ChevronUp className="w-5 h-5 text-gray-400" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-400" />
-                  )}
-                </button>
+                </div>
                 
                 <button
                   onClick={() => removeTestimonial(index)}
@@ -207,16 +199,9 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                 </button>
               </div>
 
-              {/* Expanded Content */}
-              <AnimatePresence>
-                {expandedIndex === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    className="border-t border-white/10"
-                  >
-                    <div className="p-4 space-y-4">
+              {/* Content - Siempre visible */}
+              <div className="border-t border-white/10">
+                <div className="p-4 space-y-4">
                       {/* Name */}
                       <div>
                         <label className="text-xs text-gray-400 mb-2 block font-medium">
@@ -295,7 +280,7 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
 
                       {/* Tracks Section */}
                       <div className="border-t border-white/10 pt-4 mt-4">
-                        <div className="flex items-center justify-between mb-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                           <div className="flex items-center gap-2">
                             <Music className="w-4 h-4 text-emerald-400" />
                             <label className="text-xs text-gray-400 font-medium">
@@ -303,68 +288,94 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                             </label>
                           </div>
                           <button
-                            onClick={() => addTrack(index)}
-                            className="px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 rounded text-emerald-400 text-xs transition-colors"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              addTrack(index);
+                            }}
+                            type="button"
+                            className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 rounded text-emerald-400 text-xs transition-colors whitespace-nowrap"
                           >
                             + Track
                           </button>
                         </div>
                         
                         {testimonial.tracks?.length > 0 && (
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             {testimonial.tracks.map((track, trackIdx) => (
-                              <div key={trackIdx} className="p-3 bg-white/5 rounded-lg space-y-2">
-                                <div className="flex items-start gap-2">
+                              <div key={trackIdx} className="p-3 bg-zinc-800/50 rounded-lg space-y-2 border border-white/5">
+                                <div className="flex flex-col sm:flex-row items-start gap-2">
                                   <input
                                     type="text"
                                     value={track.title}
-                                    onChange={(e) => updateTrack(index, trackIdx, 'title', e.target.value)}
+                                    onChange={(e) => {
+                                      e.stopPropagation();
+                                      updateTrack(index, trackIdx, 'title', e.target.value);
+                                    }}
                                     onBlur={saveTestimonial}
                                     placeholder="Título del track"
-                                    className="flex-1 px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                                    className="flex-1 w-full px-3 py-2 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
                                   />
                                   <button
-                                    onClick={() => removeTrack(index, trackIdx)}
-                                    className="p-1.5 hover:bg-red-500/20 rounded text-red-400 transition-colors"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      removeTrack(index, trackIdx);
+                                    }}
+                                    type="button"
+                                    className="p-2 hover:bg-red-500/20 rounded text-red-400 transition-colors"
                                   >
-                                    <X className="w-3.5 h-3.5" />
+                                    <X className="w-4 h-4" />
                                   </button>
                                 </div>
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                   <input
                                     type="text"
                                     value={track.album || ""}
-                                    onChange={(e) => updateTrack(index, trackIdx, 'album', e.target.value)}
+                                    onChange={(e) => {
+                                      e.stopPropagation();
+                                      updateTrack(index, trackIdx, 'album', e.target.value);
+                                    }}
                                     onBlur={saveTestimonial}
                                     placeholder="Álbum"
-                                    className="px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-xs focus:outline-none focus:border-emerald-500"
+                                    className="px-3 py-2 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
                                   />
                                   <input
                                     type="text"
                                     value={track.duration || ""}
-                                    onChange={(e) => updateTrack(index, trackIdx, 'duration', e.target.value)}
+                                    onChange={(e) => {
+                                      e.stopPropagation();
+                                      updateTrack(index, trackIdx, 'duration', e.target.value);
+                                    }}
                                     onBlur={saveTestimonial}
                                     placeholder="3:45"
-                                    className="px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-xs focus:outline-none focus:border-emerald-500"
+                                    className="px-3 py-2 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
                                   />
                                 </div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                                   <input
                                     type="text"
                                     value={track.audio_url || ""}
-                                    onChange={(e) => updateTrack(index, trackIdx, 'audio_url', e.target.value)}
+                                    onChange={(e) => {
+                                      e.stopPropagation();
+                                      updateTrack(index, trackIdx, 'audio_url', e.target.value);
+                                    }}
                                     onBlur={saveTestimonial}
                                     placeholder="URL del audio"
-                                    className="flex-1 px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-xs focus:outline-none focus:border-emerald-500"
+                                    className="flex-1 px-3 py-2 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
                                   />
-                                  <label className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 rounded text-emerald-400 cursor-pointer text-xs transition-colors">
+                                  <label className="px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 rounded text-emerald-400 cursor-pointer text-sm transition-colors flex items-center justify-center gap-2">
                                     <input
                                       type="file"
                                       accept="audio/*"
                                       className="hidden"
-                                      onChange={(e) => handleAudioUpload(index, trackIdx, e.target.files?.[0])}
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        handleAudioUpload(index, trackIdx, e.target.files?.[0]);
+                                      }}
                                     />
-                                    <Upload className="w-3 h-3" />
+                                    <Upload className="w-4 h-4" />
+                                    <span>Subir Audio</span>
                                   </label>
                                 </div>
                               </div>
@@ -375,7 +386,7 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
 
                       {/* Clips Section */}
                       <div className="border-t border-white/10 pt-4 mt-4">
-                        <div className="flex items-center justify-between mb-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                           <div className="flex items-center gap-2">
                             <Film className="w-4 h-4 text-purple-400" />
                             <label className="text-xs text-gray-400 font-medium">
@@ -383,75 +394,101 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                             </label>
                           </div>
                           <button
-                            onClick={() => addClip(index)}
-                            className="px-3 py-1 bg-purple-500/20 hover:bg-purple-500/30 rounded text-purple-400 text-xs transition-colors"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              addClip(index);
+                            }}
+                            type="button"
+                            className="px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 rounded text-purple-400 text-xs transition-colors whitespace-nowrap"
                           >
                             + Clip
                           </button>
                         </div>
                         
                         {testimonial.clips?.length > 0 && (
-                          <div className="space-y-2">
+                          <div className="space-y-3">
                             {testimonial.clips.map((clip, clipIdx) => (
-                              <div key={clipIdx} className="p-3 bg-white/5 rounded-lg space-y-2">
-                                <div className="flex items-start gap-2">
+                              <div key={clipIdx} className="p-3 bg-zinc-800/50 rounded-lg space-y-2 border border-white/5">
+                                <div className="flex flex-col sm:flex-row items-start gap-2">
                                   <input
                                     type="text"
                                     value={clip.title}
-                                    onChange={(e) => updateClip(index, clipIdx, 'title', e.target.value)}
+                                    onChange={(e) => {
+                                      e.stopPropagation();
+                                      updateClip(index, clipIdx, 'title', e.target.value);
+                                    }}
                                     onBlur={saveTestimonial}
                                     placeholder="Título del clip"
-                                    className="flex-1 px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                                    className="flex-1 w-full px-3 py-2 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
                                   />
                                   <button
-                                    onClick={() => removeClip(index, clipIdx)}
-                                    className="p-1.5 hover:bg-red-500/20 rounded text-red-400 transition-colors"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      removeClip(index, clipIdx);
+                                    }}
+                                    type="button"
+                                    className="p-2 hover:bg-red-500/20 rounded text-red-400 transition-colors"
                                   >
-                                    <X className="w-3.5 h-3.5" />
+                                    <X className="w-4 h-4" />
                                   </button>
                                 </div>
                                 <input
                                   type="text"
                                   value={clip.thumbnail_url || ""}
-                                  onChange={(e) => updateClip(index, clipIdx, 'thumbnail_url', e.target.value)}
+                                  onChange={(e) => {
+                                    e.stopPropagation();
+                                    updateClip(index, clipIdx, 'thumbnail_url', e.target.value);
+                                  }}
                                   onBlur={saveTestimonial}
                                   placeholder="URL miniatura"
-                                  className="w-full px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-xs focus:outline-none focus:border-purple-500"
+                                  className="w-full px-3 py-2 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
                                 />
-                                <div className="flex items-center gap-2">
+                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                                   <input
                                     type="text"
                                     value={clip.video_url || ""}
-                                    onChange={(e) => updateClip(index, clipIdx, 'video_url', e.target.value)}
+                                    onChange={(e) => {
+                                      e.stopPropagation();
+                                      updateClip(index, clipIdx, 'video_url', e.target.value);
+                                    }}
                                     onBlur={saveTestimonial}
                                     placeholder="URL del video"
-                                    className="flex-1 px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-xs focus:outline-none focus:border-purple-500"
+                                    className="flex-1 px-3 py-2 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
                                   />
-                                  <label className="px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 rounded text-purple-400 cursor-pointer text-xs transition-colors flex items-center gap-1">
+                                  <label className="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 rounded text-purple-400 cursor-pointer text-sm transition-colors flex items-center justify-center gap-2">
                                     <input
                                       type="file"
                                       accept="video/*"
                                       className="hidden"
-                                      onChange={(e) => handleClipUpload(index, clipIdx, e.target.files?.[0])}
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        handleClipUpload(index, clipIdx, e.target.files?.[0]);
+                                      }}
                                       disabled={uploadingClip === `${index}-${clipIdx}`}
                                     />
                                     {uploadingClip === `${index}-${clipIdx}` ? (
-                                      <div className="w-3 h-3 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                                      <>
+                                        <div className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                                        <span>Subiendo...</span>
+                                      </>
                                     ) : (
-                                      <Upload className="w-3 h-3" />
+                                      <>
+                                        <Upload className="w-4 h-4" />
+                                        <span>Subir Video</span>
+                                      </>
                                     )}
                                   </label>
                                 </div>
-                                <p className="text-[10px] text-gray-500">Máx. 100MB</p>
+                                <p className="text-xs text-gray-500">Máx. 100MB</p>
                               </div>
                             ))}
                           </div>
                         )}
                       </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                </div>
+              </div>
             </motion.div>
           ))}
         </AnimatePresence>
