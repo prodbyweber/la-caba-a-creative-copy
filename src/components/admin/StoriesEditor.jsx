@@ -280,12 +280,15 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
 
                       {/* Tracks Section */}
                       <div className="border-t border-white/10 pt-4 mt-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                           <div className="flex items-center gap-2">
-                            <Music className="w-4 h-4 text-emerald-400" />
-                            <label className="text-xs text-gray-400 font-medium">
-                              Tracks & Álbumes ({testimonial.tracks?.length || 0})
-                            </label>
+                            <Music className="w-5 h-5 text-emerald-400" />
+                            <h4 className="text-sm text-white font-semibold">
+                              Tracks & Álbumes
+                            </h4>
+                            <span className="text-xs text-gray-500">
+                              ({testimonial.tracks?.length || 0})
+                            </span>
                           </div>
                           <button
                             onClick={(e) => {
@@ -294,41 +297,57 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                               addTrack(index);
                             }}
                             type="button"
-                            className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 rounded text-emerald-400 text-xs transition-colors whitespace-nowrap"
+                            className="px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-lg text-emerald-400 text-sm font-medium transition-colors whitespace-nowrap flex items-center gap-2"
                           >
-                            + Track
+                            <Plus className="w-4 h-4" />
+                            Añadir Track
                           </button>
                         </div>
                         
-                        {testimonial.tracks?.length > 0 && (
-                          <div className="space-y-3">
-                            {testimonial.tracks.map((track, trackIdx) => (
-                              <div key={trackIdx} className="p-3 bg-zinc-800/50 rounded-lg space-y-2 border border-white/5">
-                                <div className="flex flex-col sm:flex-row items-start gap-2">
+                        <div className="space-y-3">
+                          {(!testimonial.tracks || testimonial.tracks.length === 0) && (
+                            <div className="text-center py-6 border border-dashed border-white/10 rounded-lg">
+                              <Music className="w-8 h-8 text-gray-600 mx-auto mb-2" />
+                              <p className="text-sm text-gray-500">No hay tracks añadidos</p>
+                            </div>
+                          )}
+                          
+                          {testimonial.tracks?.map((track, trackIdx) => (
+                            <div key={trackIdx} className="p-4 bg-zinc-800/80 rounded-lg space-y-3 border border-white/10">
+                              {/* Título y botón eliminar */}
+                              <div className="flex items-start gap-2">
+                                <div className="flex-1">
+                                  <label className="text-xs text-gray-400 mb-1.5 block">Título del Track *</label>
                                   <input
                                     type="text"
-                                    value={track.title}
+                                    value={track.title || ""}
                                     onChange={(e) => {
                                       e.stopPropagation();
                                       updateTrack(index, trackIdx, 'title', e.target.value);
                                     }}
                                     onBlur={saveTestimonial}
-                                    placeholder="Título del track"
-                                    className="flex-1 w-full px-3 py-2 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                                    placeholder="Nombre de la canción"
+                                    className="w-full px-3 py-2.5 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-all"
                                   />
-                                  <button
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      removeTrack(index, trackIdx);
-                                    }}
-                                    type="button"
-                                    className="p-2 hover:bg-red-500/20 rounded text-red-400 transition-colors"
-                                  >
-                                    <X className="w-4 h-4" />
-                                  </button>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    removeTrack(index, trackIdx);
+                                  }}
+                                  type="button"
+                                  className="mt-6 p-2.5 hover:bg-red-500/20 rounded-lg text-red-400 transition-colors"
+                                  title="Eliminar track"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                              
+                              {/* Álbum y Duración */}
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                  <label className="text-xs text-gray-400 mb-1.5 block">Álbum</label>
                                   <input
                                     type="text"
                                     value={track.album || ""}
@@ -337,9 +356,12 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                                       updateTrack(index, trackIdx, 'album', e.target.value);
                                     }}
                                     onBlur={saveTestimonial}
-                                    placeholder="Álbum"
-                                    className="px-3 py-2 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                                    placeholder="Nombre del álbum"
+                                    className="w-full px-3 py-2.5 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-all"
                                   />
+                                </div>
+                                <div>
+                                  <label className="text-xs text-gray-400 mb-1.5 block">Duración</label>
                                   <input
                                     type="text"
                                     value={track.duration || ""}
@@ -349,10 +371,15 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                                     }}
                                     onBlur={saveTestimonial}
                                     placeholder="3:45"
-                                    className="px-3 py-2 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                                    className="w-full px-3 py-2.5 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-all"
                                   />
                                 </div>
-                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                              </div>
+                              
+                              {/* URL del audio y botón subir */}
+                              <div>
+                                <label className="text-xs text-gray-400 mb-1.5 block">Archivo de Audio</label>
+                                <div className="flex flex-col sm:flex-row gap-2">
                                   <input
                                     type="text"
                                     value={track.audio_url || ""}
@@ -361,10 +388,10 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                                       updateTrack(index, trackIdx, 'audio_url', e.target.value);
                                     }}
                                     onBlur={saveTestimonial}
-                                    placeholder="URL del audio"
-                                    className="flex-1 px-3 py-2 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                                    placeholder="https://... o sube un archivo"
+                                    className="flex-1 px-3 py-2.5 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-all"
                                   />
-                                  <label className="px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 rounded text-emerald-400 cursor-pointer text-sm transition-colors flex items-center justify-center gap-2">
+                                  <label className="px-4 py-2.5 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-lg text-emerald-400 cursor-pointer text-sm font-medium transition-colors flex items-center justify-center gap-2 whitespace-nowrap">
                                     <input
                                       type="file"
                                       accept="audio/*"
@@ -379,9 +406,9 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                                   </label>
                                 </div>
                               </div>
-                            ))}
-                          </div>
-                        )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
 
                       {/* Clips Section */}
