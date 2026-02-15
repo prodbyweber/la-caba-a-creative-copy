@@ -5,7 +5,6 @@ import { base44 } from "@/api/base44Client";
 import { toast } from "react-hot-toast";
 
 export default function StoriesEditor({ testimonials = [], onUpdate }) {
-  const [expandedIndex, setExpandedIndex] = useState(null);
   const [uploading, setUploading] = useState(null);
   const [uploadingClip, setUploadingClip] = useState(null);
   const [localTestimonials, setLocalTestimonials] = useState(testimonials);
@@ -177,13 +176,7 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
             >
               {/* Header */}
               <div className="flex items-center justify-between p-4 bg-white/5">
-                <div 
-                  className="flex items-center gap-3 flex-1 cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setExpandedIndex(expandedIndex === index ? null : index);
-                  }}
-                >
+                <div className="flex items-center gap-3 flex-1">
                   <div className="w-16 h-16 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
                     <img 
                       src={testimonial.image} 
@@ -194,13 +187,6 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                   <div className="flex-1">
                     <div className="text-white font-medium mb-1">{testimonial.name}</div>
                     <p className="text-gray-500 text-xs">{testimonial.role}</p>
-                  </div>
-                  <div className="text-gray-400">
-                    {expandedIndex === index ? (
-                      <ChevronUp className="w-5 h-5" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5" />
-                    )}
                   </div>
                 </div>
                 
@@ -215,10 +201,9 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                 </button>
               </div>
 
-              {/* Content - Visible cuando está expandido */}
-              {expandedIndex === index && (
-                <div className="border-t border-white/10">
-                  <div className="p-4 space-y-4" onClick={(e) => e.stopPropagation()}>
+              {/* Content - Siempre visible */}
+              <div className="border-t border-white/10">
+                <div className="p-4 space-y-4" onClick={(e) => e.stopPropagation()}>
                       {/* Name */}
                       <div>
                         <label className="text-xs text-gray-400 mb-2 block font-medium">
@@ -531,9 +516,8 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                           </div>
                         )}
                       </div>
-                  </div>
                 </div>
-              )}
+              </div>
             </motion.div>
           ))}
         </AnimatePresence>
