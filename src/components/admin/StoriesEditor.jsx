@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Upload, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, Upload, ChevronDown, ChevronUp, Music, Film, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { toast } from "react-hot-toast";
 
 export default function StoriesEditor({ testimonials = [], onUpdate }) {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [uploading, setUploading] = useState(null);
+  const [uploadingClip, setUploadingClip] = useState(null);
   const [localTestimonials, setLocalTestimonials] = useState(testimonials);
 
   React.useEffect(() => {
@@ -50,10 +52,101 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
       updated[index] = { ...updated[index], image: file_url };
       setLocalTestimonials(updated);
       onUpdate(updated);
+      toast.success('Imagen subida');
     } catch (error) {
-      console.error('Error uploading image:', error);
+      toast.error('Error al subir imagen');
     } finally {
       setUploading(null);
+    }
+  };
+
+  const addTrack = (index) => {
+    const updated = [...localTestimonials];
+    if (!updated[index].tracks) updated[index].tracks = [];
+    updated[index].tracks.push({
+      title: "Nuevo track",
+      album: "",
+      duration: "",
+      audio_url: ""
+    });
+    setLocalTestimonials(updated);
+    onUpdate(updated);
+  };
+
+  const updateTrack = (testimonialIndex, trackIndex, field, value) => {
+    const updated = [...localTestimonials];
+    updated[testimonialIndex].tracks[trackIndex][field] = value;
+    setLocalTestimonials(updated);
+  };
+
+  const removeTrack = (testimonialIndex, trackIndex) => {
+    const updated = [...localTestimonials];
+    updated[testimonialIndex].tracks.splice(trackIndex, 1);
+    setLocalTestimonials(updated);
+    onUpdate(updated);
+  };
+
+  const handleAudioUpload = async (testimonialIndex, trackIndex, file) => {
+    if (!file) return;
+    
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const updated = [...localTestimonials];
+      updated[testimonialIndex].tracks[trackIndex].audio_url = file_url;
+      setLocalTestimonials(updated);
+      onUpdate(updated);
+      toast.success('Audio subido');
+    } catch (error) {
+      toast.error('Error al subir audio');
+    }
+  };
+
+  const addClip = (index) => {
+    const updated = [...localTestimonials];
+    if (!updated[index].clips) updated[index].clips = [];
+    updated[index].clips.push({
+      title: "Nuevo clip",
+      video_url: "",
+      thumbnail_url: ""
+    });
+    setLocalTestimonials(updated);
+    onUpdate(updated);
+  };
+
+  const updateClip = (testimonialIndex, clipIndex, field, value) => {
+    const updated = [...localTestimonials];
+    updated[testimonialIndex].clips[clipIndex][field] = value;
+    setLocalTestimonials(updated);
+  };
+
+  const removeClip = (testimonialIndex, clipIndex) => {
+    const updated = [...localTestimonials];
+    updated[testimonialIndex].clips.splice(clipIndex, 1);
+    setLocalTestimonials(updated);
+    onUpdate(updated);
+  };
+
+  const handleClipUpload = async (testimonialIndex, clipIndex, file) => {
+    if (!file) return;
+    
+    // Validar tamaño máximo 100MB
+    if (file.size > 100 * 1024 * 1024) {
+      toast.error('El archivo no puede superar los 100MB');
+      return;
+    }
+    
+    setUploadingClip(`${testimonialIndex}-${clipIndex}`);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const updated = [...localTestimonials];
+      updated[testimonialIndex].clips[clipIndex].video_url = file_url;
+      setLocalTestimonials(updated);
+      onUpdate(updated);
+      toast.success('Video subido correctamente');
+    } catch (error) {
+      toast.error('Error al subir video');
+    } finally {
+      setUploadingClip(null);
     }
   };
 
@@ -198,6 +291,162 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
                             </span>
                           </label>
                         </div>
+                      </div>
+
+                      {/* Tracks Section */}
+                      <div className="border-t border-white/10 pt-4 mt-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Music className="w-4 h-4 text-emerald-400" />
+                            <label className="text-xs text-gray-400 font-medium">
+                              Tracks & Álbumes ({testimonial.tracks?.length || 0})
+                            </label>
+                          </div>
+                          <button
+                            onClick={() => addTrack(index)}
+                            className="px-3 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 rounded text-emerald-400 text-xs transition-colors"
+                          >
+                            + Track
+                          </button>
+                        </div>
+                        
+                        {testimonial.tracks?.length > 0 && (
+                          <div className="space-y-2">
+                            {testimonial.tracks.map((track, trackIdx) => (
+                              <div key={trackIdx} className="p-3 bg-white/5 rounded-lg space-y-2">
+                                <div className="flex items-start gap-2">
+                                  <input
+                                    type="text"
+                                    value={track.title}
+                                    onChange={(e) => updateTrack(index, trackIdx, 'title', e.target.value)}
+                                    onBlur={saveTestimonial}
+                                    placeholder="Título del track"
+                                    className="flex-1 px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                                  />
+                                  <button
+                                    onClick={() => removeTrack(index, trackIdx)}
+                                    className="p-1.5 hover:bg-red-500/20 rounded text-red-400 transition-colors"
+                                  >
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <input
+                                    type="text"
+                                    value={track.album || ""}
+                                    onChange={(e) => updateTrack(index, trackIdx, 'album', e.target.value)}
+                                    onBlur={saveTestimonial}
+                                    placeholder="Álbum"
+                                    className="px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-xs focus:outline-none focus:border-emerald-500"
+                                  />
+                                  <input
+                                    type="text"
+                                    value={track.duration || ""}
+                                    onChange={(e) => updateTrack(index, trackIdx, 'duration', e.target.value)}
+                                    onBlur={saveTestimonial}
+                                    placeholder="3:45"
+                                    className="px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-xs focus:outline-none focus:border-emerald-500"
+                                  />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    value={track.audio_url || ""}
+                                    onChange={(e) => updateTrack(index, trackIdx, 'audio_url', e.target.value)}
+                                    onBlur={saveTestimonial}
+                                    placeholder="URL del audio"
+                                    className="flex-1 px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-xs focus:outline-none focus:border-emerald-500"
+                                  />
+                                  <label className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 rounded text-emerald-400 cursor-pointer text-xs transition-colors">
+                                    <input
+                                      type="file"
+                                      accept="audio/*"
+                                      className="hidden"
+                                      onChange={(e) => handleAudioUpload(index, trackIdx, e.target.files?.[0])}
+                                    />
+                                    <Upload className="w-3 h-3" />
+                                  </label>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Clips Section */}
+                      <div className="border-t border-white/10 pt-4 mt-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <Film className="w-4 h-4 text-purple-400" />
+                            <label className="text-xs text-gray-400 font-medium">
+                              Video Clips ({testimonial.clips?.length || 0})
+                            </label>
+                          </div>
+                          <button
+                            onClick={() => addClip(index)}
+                            className="px-3 py-1 bg-purple-500/20 hover:bg-purple-500/30 rounded text-purple-400 text-xs transition-colors"
+                          >
+                            + Clip
+                          </button>
+                        </div>
+                        
+                        {testimonial.clips?.length > 0 && (
+                          <div className="space-y-2">
+                            {testimonial.clips.map((clip, clipIdx) => (
+                              <div key={clipIdx} className="p-3 bg-white/5 rounded-lg space-y-2">
+                                <div className="flex items-start gap-2">
+                                  <input
+                                    type="text"
+                                    value={clip.title}
+                                    onChange={(e) => updateClip(index, clipIdx, 'title', e.target.value)}
+                                    onBlur={saveTestimonial}
+                                    placeholder="Título del clip"
+                                    className="flex-1 px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                                  />
+                                  <button
+                                    onClick={() => removeClip(index, clipIdx)}
+                                    className="p-1.5 hover:bg-red-500/20 rounded text-red-400 transition-colors"
+                                  >
+                                    <X className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                                <input
+                                  type="text"
+                                  value={clip.thumbnail_url || ""}
+                                  onChange={(e) => updateClip(index, clipIdx, 'thumbnail_url', e.target.value)}
+                                  onBlur={saveTestimonial}
+                                  placeholder="URL miniatura"
+                                  className="w-full px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-xs focus:outline-none focus:border-purple-500"
+                                />
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    value={clip.video_url || ""}
+                                    onChange={(e) => updateClip(index, clipIdx, 'video_url', e.target.value)}
+                                    onBlur={saveTestimonial}
+                                    placeholder="URL del video"
+                                    className="flex-1 px-3 py-1.5 bg-white/5 rounded border border-white/10 text-white text-xs focus:outline-none focus:border-purple-500"
+                                  />
+                                  <label className="px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 rounded text-purple-400 cursor-pointer text-xs transition-colors flex items-center gap-1">
+                                    <input
+                                      type="file"
+                                      accept="video/*"
+                                      className="hidden"
+                                      onChange={(e) => handleClipUpload(index, clipIdx, e.target.files?.[0])}
+                                      disabled={uploadingClip === `${index}-${clipIdx}`}
+                                    />
+                                    {uploadingClip === `${index}-${clipIdx}` ? (
+                                      <div className="w-3 h-3 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                      <Upload className="w-3 h-3" />
+                                    )}
+                                  </label>
+                                </div>
+                                <p className="text-[10px] text-gray-500">Máx. 100MB</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </motion.div>

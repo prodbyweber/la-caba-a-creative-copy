@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
-import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Play, Music, Film, Eye } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
@@ -46,7 +46,11 @@ export default function StoriesSection() {
 
   const testimonials = config?.testimonials || defaultTestimonials;
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const [expandedMobile, setExpandedMobile] = useState(null);
+  const [playingAudio, setPlayingAudio] = useState(null);
   const scrollContainerRef = useRef(null);
+  const audioRef = useRef(null);
 
   const scrollToIndex = (index) => {
     if (scrollContainerRef.current) {
@@ -77,6 +81,19 @@ export default function StoriesSection() {
   const prevSlide = () => {
     const newIndex = currentIndex === 0 ? testimonials.length - 1 : currentIndex - 1;
     scrollToIndex(newIndex);
+  };
+
+  const handlePlayTrack = (trackUrl) => {
+    if (playingAudio === trackUrl) {
+      audioRef.current?.pause();
+      setPlayingAudio(null);
+    } else {
+      if (audioRef.current) {
+        audioRef.current.src = trackUrl;
+        audioRef.current.play();
+        setPlayingAudio(trackUrl);
+      }
+    }
   };
 
   return (
@@ -129,40 +146,138 @@ export default function StoriesSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="flex-shrink-0 w-[75vw] sm:w-[320px] lg:w-[340px] snap-center"
+                className="flex-shrink-0 w-[75vw] sm:w-[320px] lg:w-[340px] snap-center group"
+                onMouseEnter={() => setHoveredCard(index)}
+                onMouseLeave={() => setHoveredCard(null)}
               >
-                <div className="h-full bg-zinc-900 rounded-2xl lg:rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300">
-                  {/* Image - Más pequeña */}
-                  <div className="h-48 sm:h-52 lg:h-56 overflow-hidden">
-                    <img 
-                      src={testimonial.image} 
-                      alt={testimonial.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Content - Fondo oscuro */}
-                  <div className="p-5 sm:p-6">
-                    {/* Quote - Más compacta */}
-                    <div className="mb-5">
-                      <p className="text-white/90 text-sm sm:text-base leading-relaxed italic line-clamp-6">
-                        "{testimonial.quote}"
-                      </p>
+                <div className="relative h-full bg-zinc-900 rounded-2xl lg:rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500">
+                  {/* Tarjeta Normal */}
+                  <div className={`transition-all duration-500 ${hoveredCard === index ? 'lg:scale-110 lg:z-50' : ''}`}>
+                    {/* Image */}
+                    <div className="h-48 sm:h-52 lg:h-56 overflow-hidden relative">
+                      <img 
+                        src={testimonial.image} 
+                        alt={testimonial.name}
+                        className="w-full h-full object-cover"
+                      />
+                      {/* Mobile Preview Button */}
+                      {(testimonial.tracks?.length > 0 || testimonial.clips?.length > 0) && (
+                        <button
+                          onClick={() => setExpandedMobile(expandedMobile === index ? null : index)}
+                          className="lg:hidden absolute bottom-3 right-3 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-full text-white text-sm font-medium shadow-lg flex items-center gap-2 transition-all"
+                        >
+                          <Eye className="w-4 h-4" />
+                          Ver contenido
+                        </button>
+                      )}
                     </div>
 
-                    {/* Divider más sutil */}
-                    <div className="w-full h-px bg-white/10 mb-4" />
+                    {/* Content */}
+                    <div className="p-5 sm:p-6">
+                      <div className="mb-5">
+                        <p className="text-white/90 text-sm sm:text-base leading-relaxed italic line-clamp-6">
+                          "{testimonial.quote}"
+                        </p>
+                      </div>
 
-                    {/* Author */}
-                    <div>
-                      <h4 className="text-white font-bold text-base sm:text-lg mb-0.5">
-                        {testimonial.name}
-                      </h4>
-                      <p className="text-white/50 text-xs sm:text-sm">
-                        {testimonial.role}
-                      </p>
+                      <div className="w-full h-px bg-white/10 mb-4" />
+
+                      <div>
+                        <h4 className="text-white font-bold text-base sm:text-lg mb-0.5">
+                          {testimonial.name}
+                        </h4>
+                        <p className="text-white/50 text-xs sm:text-sm">
+                          {testimonial.role}
+                        </p>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Panel Interior - Desktop Hover */}
+                  <AnimatePresence>
+                    {hoveredCard === index && (testimonial.tracks?.length > 0 || testimonial.clips?.length > 0) && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="hidden lg:block absolute inset-0 bg-black/95 backdrop-blur-xl overflow-y-auto"
+                      >
+                        <div className="p-6 space-y-6">
+                          {/* Header */}
+                          <div className="flex items-center gap-4 border-b border-white/10 pb-4">
+                            <div className="w-16 h-16 rounded-full overflow-hidden">
+                              <img src={testimonial.image} alt={testimonial.name} className="w-full h-full object-cover" />
+                            </div>
+                            <div>
+                              <h3 className="text-white font-bold text-lg">{testimonial.name}</h3>
+                              <p className="text-white/50 text-sm">{testimonial.role}</p>
+                            </div>
+                          </div>
+
+                          {/* Tracks */}
+                          {testimonial.tracks?.length > 0 && (
+                            <div>
+                              <div className="flex items-center gap-2 mb-3">
+                                <Music className="w-4 h-4 text-emerald-400" />
+                                <h4 className="text-white font-semibold text-sm">Tracks & Álbumes</h4>
+                              </div>
+                              <div className="space-y-2">
+                                {testimonial.tracks.map((track, idx) => (
+                                  <div key={idx} className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 rounded-lg transition-all group/track">
+                                    <button
+                                      onClick={() => track.audio_url && handlePlayTrack(track.audio_url)}
+                                      className="w-10 h-10 flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 rounded-full transition-all"
+                                      disabled={!track.audio_url}
+                                    >
+                                      <Play className="w-4 h-4 text-white ml-0.5" />
+                                    </button>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-white text-sm font-medium truncate">{track.title}</p>
+                                      {track.album && (
+                                        <p className="text-white/40 text-xs truncate">{track.album}</p>
+                                      )}
+                                    </div>
+                                    {track.duration && (
+                                      <span className="text-white/40 text-xs">{track.duration}</span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Clips */}
+                          {testimonial.clips?.length > 0 && (
+                            <div>
+                              <div className="flex items-center gap-2 mb-3">
+                                <Film className="w-4 h-4 text-purple-400" />
+                                <h4 className="text-white font-semibold text-sm">Video Clips</h4>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                {testimonial.clips.map((clip, idx) => (
+                                  <div key={idx} className="relative aspect-video bg-white/5 rounded-lg overflow-hidden group/clip cursor-pointer">
+                                    {clip.thumbnail_url ? (
+                                      <img src={clip.thumbnail_url} alt={clip.title} className="w-full h-full object-cover" />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center">
+                                        <Film className="w-8 h-8 text-white/30" />
+                                      </div>
+                                    )}
+                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/clip:opacity-100 transition-opacity flex items-center justify-center">
+                                      <Play className="w-8 h-8 text-white" />
+                                    </div>
+                                    <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
+                                      <p className="text-white text-xs font-medium truncate">{clip.title}</p>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </motion.div>
             ))}
@@ -208,6 +323,111 @@ export default function StoriesSection() {
           display: none;
         }
       `}</style>
+
+      {/* Audio Element */}
+      <audio ref={audioRef} onEnded={() => setPlayingAudio(null)} />
+
+      {/* Mobile Expanded Panel */}
+      <AnimatePresence>
+        {expandedMobile !== null && testimonials[expandedMobile] && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="lg:hidden fixed inset-0 bg-black/95 backdrop-blur-xl z-50 overflow-y-auto"
+            onClick={() => setExpandedMobile(null)}
+          >
+            <div className="min-h-screen p-4" onClick={(e) => e.stopPropagation()}>
+              <motion.div
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 50, opacity: 0 }}
+                className="bg-zinc-900 rounded-2xl overflow-hidden"
+              >
+                {/* Close Button */}
+                <div className="sticky top-0 bg-zinc-900/95 backdrop-blur-lg z-10 p-4 border-b border-white/10">
+                  <button
+                    onClick={() => setExpandedMobile(null)}
+                    className="ml-auto block px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white text-sm transition-all"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+
+                <div className="p-6 space-y-6">
+                  {/* Header */}
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 rounded-full overflow-hidden">
+                      <img src={testimonials[expandedMobile].image} alt={testimonials[expandedMobile].name} className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold text-xl">{testimonials[expandedMobile].name}</h3>
+                      <p className="text-white/50">{testimonials[expandedMobile].role}</p>
+                    </div>
+                  </div>
+
+                  {/* Tracks */}
+                  {testimonials[expandedMobile].tracks?.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-4">
+                        <Music className="w-5 h-5 text-emerald-400" />
+                        <h4 className="text-white font-semibold">Tracks & Álbumes</h4>
+                      </div>
+                      <div className="space-y-3">
+                        {testimonials[expandedMobile].tracks.map((track, idx) => (
+                          <div key={idx} className="flex items-center gap-3 p-4 bg-white/5 rounded-lg">
+                            <button
+                              onClick={() => track.audio_url && handlePlayTrack(track.audio_url)}
+                              className="w-12 h-12 flex items-center justify-center bg-emerald-500 rounded-full"
+                              disabled={!track.audio_url}
+                            >
+                              <Play className="w-5 h-5 text-white ml-0.5" />
+                            </button>
+                            <div className="flex-1">
+                              <p className="text-white font-medium">{track.title}</p>
+                              {track.album && <p className="text-white/40 text-sm">{track.album}</p>}
+                            </div>
+                            {track.duration && <span className="text-white/40 text-sm">{track.duration}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Clips */}
+                  {testimonials[expandedMobile].clips?.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-4">
+                        <Film className="w-5 h-5 text-purple-400" />
+                        <h4 className="text-white font-semibold">Video Clips</h4>
+                      </div>
+                      <div className="space-y-3">
+                        {testimonials[expandedMobile].clips.map((clip, idx) => (
+                          <div key={idx} className="relative aspect-video bg-white/5 rounded-xl overflow-hidden">
+                            {clip.thumbnail_url ? (
+                              <img src={clip.thumbnail_url} alt={clip.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Film className="w-12 h-12 text-white/30" />
+                              </div>
+                            )}
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                              <Play className="w-12 h-12 text-white" />
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
+                              <p className="text-white font-medium">{clip.title}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
