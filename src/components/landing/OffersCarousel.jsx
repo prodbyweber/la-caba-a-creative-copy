@@ -77,6 +77,8 @@ const defaultOffers = [
 
 export default function OffersCarousel() {
   const [selectedOffer, setSelectedOffer] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollContainerRef = React.useRef(null);
 
   const { data: config } = useQuery({
     queryKey: ['landingConfig'],
@@ -88,9 +90,31 @@ export default function OffersCarousel() {
 
   const offers = config?.offers && config.offers.length > 0 ? config.offers : defaultOffers;
 
+  const scrollToIndex = (index) => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const cardWidth = container.scrollWidth / offers.length;
+      container.scrollTo({
+        left: cardWidth * index,
+        behavior: 'smooth'
+      });
+      setCurrentIndex(index);
+    }
+  };
+
+  const handleScroll = () => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const cardWidth = container.scrollWidth / offers.length;
+      const newIndex = Math.round(container.scrollLeft / cardWidth);
+      setCurrentIndex(newIndex);
+    }
+  };
+
   return (
-    <section id="ofertas" className="relative py-20 sm:py-32 overflow-hidden bg-[#0B0B0D]">
-      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8">
+    <section id="ofertas" className="relative py-20 sm:py-32 overflow-hidden bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950">
+      
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 sm:px-8">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -99,71 +123,121 @@ export default function OffersCarousel() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4 tracking-tight">
+          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-4">
             Formas de ayudarte
           </h2>
         </motion.div>
 
-        {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {offers.map((offer, index) => (
-            <motion.div
-              key={offer.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1, duration: 0.5 }}
-              className="flex"
-            >
-              <div className="group w-full bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-white/10 overflow-hidden hover:border-white/20 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 flex flex-col">
-                {/* Card Content */}
-                <div className="p-8 flex-1 flex flex-col">
-                  {/* Title */}
-                  <h3 className="text-2xl font-bold text-white mb-3 leading-tight">
-                    {offer.title}
-                  </h3>
+        {/* Carousel Container */}
+        <div className="relative">
+          {/* Left Arrow */}
+          <button
+            onClick={() => scrollToIndex(Math.max(0, currentIndex - 1))}
+            disabled={currentIndex === 0}
+            className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 z-20 w-12 h-12 items-center justify-center rounded-full bg-white hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-xl"
+          >
+            <ArrowRight className="w-5 h-5 text-black rotate-180" />
+          </button>
 
-                  {/* Price */}
-                  {offer.price && (
-                    <div className="text-3xl font-bold text-white mb-4">
-                      {offer.price}
-                    </div>
-                  )}
+          {/* Right Arrow */}
+          <button
+            onClick={() => scrollToIndex(Math.min(offers.length - 1, currentIndex + 1))}
+            disabled={currentIndex === offers.length - 1}
+            className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 z-20 w-12 h-12 items-center justify-center rounded-full bg-white hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-xl"
+          >
+            <ArrowRight className="w-5 h-5 text-black" />
+          </button>
 
-                  {/* Description */}
-                  <p className="text-gray-400 text-sm leading-relaxed mb-6">
-                    {offer.description}
-                  </p>
-
-                  {/* Divider */}
-                  <div className="h-px bg-white/10 mb-6" />
-
-                  {/* Bullet Points Section */}
-                  <div className="mb-6 flex-1">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-4 font-medium">
-                      Lo que incluye este plan
-                    </p>
-                    <ul className="space-y-3">
-                      {(offer.highlights || []).map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-3 text-sm text-gray-300">
-                          <Check className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+          {/* Horizontal Scroll Carousel */}
+          <div 
+            ref={scrollContainerRef}
+            onScroll={handleScroll}
+            className="flex gap-4 overflow-x-auto pb-8 snap-x snap-mandatory scroll-smooth px-4 sm:px-0"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
+            }}
+          >
+            {offers.map((offer, index) => (
+              <motion.div
+                key={offer.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                className="flex-shrink-0 w-[260px] sm:w-[300px] snap-center"
+              >
+                <div className="h-full bg-zinc-900/90 backdrop-blur-sm rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300 flex flex-col shadow-xl border border-zinc-800/50">
+                  
+                  {/* Top Section - Light background */}
+                  <div className="bg-zinc-200 h-[200px] overflow-hidden flex items-center justify-center">
+                    {offer.image_url ? (
+                      <img 
+                        src={offer.image_url} 
+                        alt={offer.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <h3 className="text-xl sm:text-2xl font-black text-zinc-900 text-center leading-tight px-6">
+                        {offer.title}
+                      </h3>
+                    )}
                   </div>
 
-                  {/* CTA Button */}
-                  <button
-                    onClick={() => setSelectedOffer(offer)}
-                    className="w-full py-3 px-6 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-medium text-sm transition-all flex items-center justify-center gap-2 group-hover:bg-emerald-500 group-hover:border-emerald-500 group-hover:text-black"
-                  >
-                    {offer.cta || 'Ver más'}
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+                  {/* Bottom Section - Dark background */}
+                  <div className="bg-zinc-900 p-5 flex flex-col">
+                    {/* Title (if image exists) */}
+                    {offer.image_url && (
+                      <h3 className="text-lg font-bold text-white mb-2 leading-tight">
+                        {offer.title}
+                      </h3>
+                    )}
+
+                    {/* Price */}
+                    {offer.price && (
+                      <div className="text-base font-semibold text-emerald-400 mb-3">
+                        {offer.price}
+                      </div>
+                    )}
+
+                    {/* Description */}
+                    <div className="text-gray-400 text-sm leading-relaxed mb-4 whitespace-pre-line line-clamp-3">
+                      {offer.description}
+                    </div>
+
+                    {/* Dual CTA Buttons */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setSelectedOffer(offer)}
+                        className="flex-1 py-2.5 px-4 rounded-xl bg-zinc-800 text-white hover:bg-zinc-700 font-semibold text-sm transition-all border border-zinc-700"
+                      >
+                        Ver más
+                      </button>
+                      <button
+                        className="flex-1 py-2.5 px-4 rounded-xl bg-white text-black hover:bg-gray-100 font-semibold text-sm transition-all"
+                      >
+                        Comprar
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Dots Indicators */}
+        <div className="flex items-center justify-center gap-2 mt-8">
+          {offers.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => scrollToIndex(index)}
+              className={`transition-all ${
+                index === currentIndex 
+                  ? 'w-8 h-2 bg-white rounded-full' 
+                  : 'w-2 h-2 bg-gray-600 rounded-full hover:bg-gray-500'
+              }`}
+            />
           ))}
         </div>
       </div>
@@ -173,6 +247,12 @@ export default function OffersCarousel() {
         isOpen={!!selectedOffer}
         onClose={() => setSelectedOffer(null)}
       />
+
+      <style jsx>{`
+        div::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </section>
   );
 }
