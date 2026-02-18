@@ -314,16 +314,16 @@ function OfferModal({ isOpen, offer, onSave, onClose }) {
             </div>
 
             <div>
-              <label className="block text-sm text-gray-400 mb-2">Enlace de Reserva (Opcional)</label>
+              <label className="block text-sm text-gray-400 mb-2">Enlace de Videollamada (Calendly)</label>
               <input
                 type="text"
                 value={formData.booking_link || ''}
                 onChange={(e) => setFormData({ ...formData, booking_link: e.target.value })}
-                placeholder="https://calendly.com/tu-enlace o cualquier URL externa"
+                placeholder="https://calendly.com/tu-usuario/30min"
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
               />
               <p className="text-xs text-gray-500 mt-2">
-                Si se configura, el botón "Aplicar ahora" redirigirá a este enlace en lugar de mostrar el formulario
+                El botón "Agendar Videollamada" se desbloqueará cuando el usuario termine de ver el trailer y redirigirá a este enlace
               </p>
             </div>
 
