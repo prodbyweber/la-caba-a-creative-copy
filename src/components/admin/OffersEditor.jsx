@@ -18,6 +18,8 @@ export default function OffersEditor({ offers = [], onUpdate }) {
     cta: "Ver más",
     form_id: "",
     booking_link: "",
+    payment_link: "",
+    pre_purchase_calendly_link: "",
     color: "emerald",
     featured: false,
     highlights: [],
@@ -324,6 +326,34 @@ function OfferModal({ isOpen, offer, onSave, onClose }) {
               />
               <p className="text-xs text-gray-500 mt-2">
                 El botón "Agendar Videollamada" se desbloqueará cuando el usuario termine de ver el trailer y redirigirá a este enlace
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Link de Pago de Stripe</label>
+              <input
+                type="text"
+                value={formData.payment_link || ''}
+                onChange={(e) => setFormData({ ...formData, payment_link: e.target.value })}
+                placeholder="https://buy.stripe.com/..."
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                Si se configura, se mostrará un botón de "Proceder al pago" con diseño premium
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Calendly Pre-Compra (Opcional)</label>
+              <input
+                type="text"
+                value={formData.pre_purchase_calendly_link || ''}
+                onChange={(e) => setFormData({ ...formData, pre_purchase_calendly_link: e.target.value })}
+                placeholder="https://calendly.com/tu-usuario/pre-compra"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                Permite agendar una videollamada antes de realizar la compra
               </p>
             </div>
 

@@ -278,6 +278,52 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                     )
                   )}
 
+                  {/* Payment Section - Premium Style */}
+                  {offer.payment_link && (
+                    <div className="mb-4 p-6 bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 backdrop-blur-sm rounded-2xl border border-zinc-700/50 shadow-2xl">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                        <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+                          Pago único
+                        </span>
+                      </div>
+                      
+                      <p className="text-sm text-gray-400 mb-4 leading-relaxed">
+                        Al proceder al pago, se redactará automáticamente tu contrato personalizado con los datos proporcionados. Podrás revisarlo y firmarlo digitalmente de forma segura.
+                      </p>
+
+                      {/* Pre-purchase consultation button */}
+                      {offer.pre_purchase_calendly_link && (
+                        <a
+                          href={offer.pre_purchase_calendly_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full mb-3 py-3 px-4 rounded-xl bg-zinc-700/50 hover:bg-zinc-700 text-white font-medium text-sm flex items-center justify-center gap-2 transition-all border border-zinc-600/50"
+                        >
+                          💬 Agendar videollamada antes de comprar
+                        </a>
+                      )}
+
+                      {/* Payment button */}
+                      <motion.a
+                        href={offer.payment_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-black font-bold text-lg flex items-center justify-center gap-3 transition-all shadow-lg shadow-emerald-500/30"
+                      >
+                        🔒 Proceder al pago
+                        <ArrowRight className="w-5 h-5" />
+                      </motion.a>
+
+                      <div className="flex items-center justify-center gap-2 mt-3 text-xs text-gray-500">
+                        <CheckCircle className="w-3 h-3" />
+                        <span>Pago seguro mediante Stripe</span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* CTA Button */}
                   <motion.button
                     whileHover={{ scale: 1.02 }}
