@@ -17,6 +17,7 @@ export default function OffersEditor({ offers = [], onUpdate }) {
     description: "",
     cta: "Ver más",
     form_id: "",
+    booking_link: "",
     color: "emerald",
     featured: false,
     highlights: [],
@@ -309,6 +310,20 @@ function OfferModal({ isOpen, offer, onSave, onClose }) {
               </select>
               <p className="text-xs text-gray-500 mt-2">
                 Selecciona el formulario que se mostrará al hacer clic en "Ver más"
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-400 mb-2">Enlace de Reserva (Opcional)</label>
+              <input
+                type="text"
+                value={formData.booking_link || ''}
+                onChange={(e) => setFormData({ ...formData, booking_link: e.target.value })}
+                placeholder="https://calendly.com/tu-enlace o cualquier URL externa"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                Si se configura, el botón "Aplicar ahora" redirigirá a este enlace en lugar de mostrar el formulario
               </p>
             </div>
 

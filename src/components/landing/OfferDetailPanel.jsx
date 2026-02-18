@@ -255,7 +255,13 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                       animate={{ opacity: 1, scale: 1 }}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => setShowApplicationForm(true)}
+                      onClick={() => {
+                        if (offer.booking_link) {
+                          window.open(offer.booking_link, '_blank', 'noopener,noreferrer');
+                        } else {
+                          setShowApplicationForm(true);
+                        }
+                      }}
                       className="w-full py-4 sm:py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 mb-4"
                     >
                       <CheckCircle className="w-5 h-5" />
