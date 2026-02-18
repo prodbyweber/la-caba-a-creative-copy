@@ -30,6 +30,14 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
       document.body.style.overflow = 'hidden';
       setVideoWatchTime(0);
       setIsVideoCompleted(false);
+      
+      // Load Calendly script only once
+      if (!document.querySelector('script[src*="calendly"]')) {
+        const script = document.createElement('script');
+        script.src = 'https://assets.calendly.com/assets/external/widget.js';
+        script.async = true;
+        document.body.appendChild(script);
+      }
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -248,20 +256,27 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                     </div>
                   )}
 
-                  {/* Application Button - Unlocked after video or for admins */}
+                  {/* Calendly Section - Shows when video is completed */}
                   {(isVideoCompleted || isAdmin) && (
-                    <motion.button
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => setShowApplicationForm(true)}
-                      className="w-full py-4 sm:py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 mb-4"
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="mb-8"
                     >
-                      <CheckCircle className="w-5 h-5" />
-                      Aplicar ahora - Agendar Meeting
-                      <ArrowRight className="w-5 h-5" />
-                    </motion.button>
+                      <h3 className="text-2xl font-bold text-white mb-6 text-center">
+                        Agendar videollamada
+                      </h3>
+                      
+                      {/* Calendly Embed */}
+                      <div className="bg-white/5 rounded-2xl overflow-hidden border border-white/10 p-2 sm:p-4">
+                        <div 
+                          className="calendly-inline-widget"
+                          data-url="https://calendly.com/prodweber/30min?hide_event_type_details=1&hide_gdpr_banner=1"
+                          style={{ minWidth: '320px', height: '700px', width: '100%' }}
+                        />
+                      </div>
+                    </motion.div>
                   )}
 
                   {/* CTA Button */}
