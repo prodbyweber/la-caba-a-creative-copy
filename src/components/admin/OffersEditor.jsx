@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Edit2, Trash2, GripVertical, X, Upload, Image as ImageIcon } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 export default function OffersEditor({ offers = [], onUpdate }) {
   const [editingIndex, setEditingIndex] = useState(null);
@@ -59,54 +60,96 @@ export default function OffersEditor({ offers = [], onUpdate }) {
     setEditingIndex(null);
   };
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    
+    const items = Array.from(offers);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    
+    onUpdate(items);
+  };
+
   return (
     <div className="space-y-4">
       {/* Offers List */}
-      <div className="space-y-3">
-        {offers.map((offer, index) => (
-          <div
-            key={offer.id || index}
-            className="bg-white/5 border border-white/10 rounded-xl p-4 hover:border-white/20 transition-colors"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <h4 className="font-semibold text-white truncate">{offer.title}</h4>
-                  {offer.featured && (
-                    <span className="px-2 py-0.5 rounded text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                      Destacado
-                    </span>
-                  )}
-                </div>
-                <p className="text-sm text-gray-400 line-clamp-2">{offer.description}</p>
-                <div className="flex items-center gap-3 mt-2">
-                  {offer.price && (
-                    <span className="text-sm font-semibold text-white">{offer.price}</span>
-                  )}
-                  {offer.tag && (
-                    <span className="text-xs text-gray-500">{offer.tag}</span>
-                  )}
-                </div>
-              </div>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="offers">
+          {(provided) => (
+            <div 
+              className="space-y-3"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {offers.map((offer, index) => (
+                <Draggable 
+                  key={offer.id || index} 
+                  draggableId={String(offer.id || index)} 
+                  index={index}
+                >
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      className={`bg-white/5 border border-white/10 rounded-xl p-4 transition-all ${
+                        snapshot.isDragging ? 'shadow-2xl shadow-emerald-500/20 border-emerald-500/50' : 'hover:border-white/20'
+                      }`}
+                    >
+                      <div className="flex items-start gap-4">
+                        {/* Drag Handle */}
+                        <div 
+                          {...provided.dragHandleProps}
+                          className="mt-1 cursor-grab active:cursor-grabbing text-gray-500 hover:text-gray-300 transition-colors"
+                        >
+                          <GripVertical className="w-5 h-5" />
+                        </div>
 
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <button
-                  onClick={() => handleEdit(index)}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                >
-                  <Edit2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDelete(index)}
-                  className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/5 rounded-lg transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h4 className="font-semibold text-white truncate">{offer.title}</h4>
+                            {offer.featured && (
+                              <span className="px-2 py-0.5 rounded text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                                Destacado
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-400 line-clamp-2">{offer.description}</p>
+                          <div className="flex items-center gap-3 mt-2">
+                            {offer.price && (
+                              <span className="text-sm font-semibold text-white">{offer.price}</span>
+                            )}
+                            {offer.tag && (
+                              <span className="text-xs text-gray-500">{offer.tag}</span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <button
+                            onClick={() => handleEdit(index)}
+                            className="p-2 text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(index)}
+                            className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/5 rounded-lg transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
             </div>
-          </div>
-        ))}
-      </div>
+          )}
+        </Droppable>
+      </DragDropContext>
 
       {/* Add Button */}
       <button
