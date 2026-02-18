@@ -213,11 +213,6 @@ export default function OffersCarousel() {
                       >
                         Ver más
                       </button>
-                      <button
-                        className="flex-1 py-2.5 px-4 rounded-xl bg-white text-black hover:bg-gray-100 font-semibold text-sm transition-all"
-                      >
-                        Comprar
-                      </button>
                     </div>
                   </div>
                 </div>
