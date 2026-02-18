@@ -292,18 +292,6 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                         Al proceder al pago, se redactará automáticamente tu contrato personalizado con los datos proporcionados. Podrás revisarlo y firmarlo digitalmente de forma segura.
                       </p>
 
-                      {/* Pre-purchase consultation button */}
-                      {offer.pre_purchase_calendly_link && (
-                        <a
-                          href={offer.pre_purchase_calendly_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full mb-3 py-3 px-4 rounded-xl bg-zinc-700/50 hover:bg-zinc-700 text-white font-medium text-sm flex items-center justify-center gap-2 transition-all border border-zinc-600/50"
-                        >
-                          💬 Agendar videollamada antes de comprar
-                        </a>
-                      )}
-
                       {/* Payment button */}
                       <motion.a
                         href={offer.payment_link}
@@ -317,9 +305,23 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                         <ArrowRight className="w-5 h-5" />
                       </motion.a>
 
-                      <div className="flex items-center justify-center gap-2 mt-3 text-xs text-gray-500">
-                        <CheckCircle className="w-3 h-3" />
-                        <span>Pago seguro mediante Stripe</span>
+                      <div className="flex flex-col items-center gap-2 mt-3">
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          <CheckCircle className="w-3 h-3" />
+                          <span>Pago seguro mediante Stripe</span>
+                        </div>
+                        
+                        {/* Pre-purchase consultation link */}
+                        {offer.pre_purchase_calendly_link && (
+                          <a
+                            href={offer.pre_purchase_calendly_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-gray-500 hover:text-gray-300 underline transition-colors"
+                          >
+                            Agendar videollamada antes de comprar
+                          </a>
+                        )}
                       </div>
                     </div>
                   )}
