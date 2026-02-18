@@ -261,19 +261,24 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="mb-8"
+                      transition={{ delay: 0.3 }}
+                      className="mb-8 pb-8"
                     >
-                      <h3 className="text-2xl font-bold text-white mb-6 text-center">
-                        Agendar videollamada
-                      </h3>
+                      <div className="text-center mb-6">
+                        <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                          Agendar videollamada
+                        </h3>
+                        <p className="text-gray-400">
+                          Reserva tu sesión de 30 minutos
+                        </p>
+                      </div>
                       
                       {/* Calendly Embed */}
-                      <div className="bg-white/5 rounded-2xl overflow-hidden border border-white/10 p-2 sm:p-4">
+                      <div className="bg-white rounded-2xl overflow-hidden shadow-2xl">
                         <div 
                           className="calendly-inline-widget"
                           data-url="https://calendly.com/prodweber/30min?hide_event_type_details=1&hide_gdpr_banner=1"
-                          style={{ minWidth: '320px', height: '700px', width: '100%' }}
+                          style={{ minWidth: '320px', height: '700px' }}
                         />
                       </div>
                     </motion.div>
