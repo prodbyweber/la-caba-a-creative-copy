@@ -248,26 +248,22 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                     </div>
                   )}
 
-                  {/* Application Button - Unlocked after video or for admins */}
-                  {(isVideoCompleted || isAdmin) && (
-                    <motion.button
+                  {/* Booking Button - Unlocked after video or for admins */}
+                  {(isVideoCompleted || isAdmin) && offer.booking_link && (
+                    <motion.a
+                      href={offer.booking_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => {
-                        if (offer.booking_link) {
-                          window.open(offer.booking_link, '_blank', 'noopener,noreferrer');
-                        } else {
-                          setShowApplicationForm(true);
-                        }
-                      }}
                       className="w-full py-4 sm:py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 mb-4"
                     >
                       <CheckCircle className="w-5 h-5" />
                       Aplicar ahora - Agendar Meeting
                       <ArrowRight className="w-5 h-5" />
-                    </motion.button>
+                    </motion.a>
                   )}
 
                   {/* CTA Button */}
