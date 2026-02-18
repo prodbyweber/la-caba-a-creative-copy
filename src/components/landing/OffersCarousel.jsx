@@ -206,28 +206,18 @@ export default function OffersCarousel() {
                     </div>
 
                     {/* CTA Buttons */}
-                    <div className="space-y-2">
-                      {offer.booking_link && (
-                        <button
-                          onClick={() => setSelectedOffer(offer)}
-                          className="w-full py-2.5 px-4 rounded-xl bg-emerald-500 text-black hover:bg-emerald-400 font-semibold text-sm transition-all flex items-center justify-center gap-2"
-                        >
-                          📞 Agendar Videollamada
-                        </button>
-                      )}
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setSelectedOffer(offer)}
-                          className="flex-1 py-2.5 px-4 rounded-xl bg-zinc-800 text-white hover:bg-zinc-700 font-semibold text-sm transition-all border border-zinc-700"
-                        >
-                          Ver más
-                        </button>
-                        <button
-                          className="flex-1 py-2.5 px-4 rounded-xl bg-white text-black hover:bg-gray-100 font-semibold text-sm transition-all"
-                        >
-                          Comprar
-                        </button>
-                      </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setSelectedOffer(offer)}
+                        className="flex-1 py-2.5 px-4 rounded-xl bg-zinc-800 text-white hover:bg-zinc-700 font-semibold text-sm transition-all border border-zinc-700"
+                      >
+                        Ver más
+                      </button>
+                      <button
+                        className="flex-1 py-2.5 px-4 rounded-xl bg-white text-black hover:bg-gray-100 font-semibold text-sm transition-all"
+                      >
+                        Comprar
+                      </button>
                     </div>
                   </div>
                 </div>
