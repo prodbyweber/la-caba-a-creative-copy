@@ -17,7 +17,7 @@ export default function BrandsCarousel({ logos }) {
   const duplicatedLogos = [...displayLogos, ...displayLogos, ...displayLogos];
 
   return (
-    <section className="relative pt-1 pb-2 lg:py-3 bg-zinc-950/50 border-t border-white/5">
+    <section className="relative pt-0 pb-2 lg:pt-1 lg:pb-3 bg-zinc-950/50 border-t border-white/5">
       <div className="max-w-full overflow-hidden">
         <div className="text-center mb-1 lg:mb-2">
           <span className="text-xs uppercase tracking-wider text-gray-500">Hemos colaborado con</span>
