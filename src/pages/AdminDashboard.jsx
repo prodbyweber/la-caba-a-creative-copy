@@ -22,6 +22,7 @@ import {
 import { format, isToday, parseISO } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import TeamEditor from "@/components/admin/TeamEditor";
 
 export default function AdminDashboard() {
   const [showSessionModal, setShowSessionModal] = useState(false);
