@@ -96,12 +96,12 @@ export default function AboutSection() {
           transition={{ duration: 0.5 }}
           className="max-w-3xl mx-auto space-y-4"
         >
-          <p className="text-base text-gray-300 leading-relaxed text-center" dangerouslySetInnerHTML={{ __html: mainText }} />
+          <p className="text-sm sm:text-base text-gray-300 leading-relaxed text-center px-4" dangerouslySetInnerHTML={{ __html: mainText }} />
           
-          <p className="text-sm text-gray-400 leading-relaxed text-center" dangerouslySetInnerHTML={{ __html: secondaryText }} />
+          <p className="text-xs sm:text-sm text-gray-400 leading-relaxed text-center px-4" dangerouslySetInnerHTML={{ __html: secondaryText }} />
 
           {/* Key Values */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 pt-6 max-w-4xl mx-auto px-2">
             {values.map((value, index) => (
               <motion.div
                 key={index}
@@ -109,11 +109,11 @@ export default function AboutSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 + (index * 0.05) }}
-                className="p-3 rounded-lg bg-white/5 border border-white/10 text-center"
+                className="p-2 sm:p-3 rounded-lg bg-white/5 border border-white/10 text-center"
               >
-                <value.icon className="w-6 h-6 text-emerald-400 mb-1.5 mx-auto" />
-                <h4 className="text-white font-semibold text-sm mb-0.5">{value.title}</h4>
-                <p className="text-xs text-gray-400">{value.desc}</p>
+                <value.icon className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mb-1 sm:mb-1.5 mx-auto" />
+                <h4 className="text-white font-semibold text-xs sm:text-sm mb-0.5 leading-tight">{value.title}</h4>
+                <p className="text-[10px] sm:text-xs text-gray-400 leading-tight">{value.desc}</p>
               </motion.div>
             ))}
           </div>
