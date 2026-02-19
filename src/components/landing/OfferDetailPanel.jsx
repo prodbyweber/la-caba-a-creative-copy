@@ -3,13 +3,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Play, CheckCircle, ArrowRight, Clock, Lock } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import ArtistApplicationForm from "./ArtistApplicationForm";
+import BasicDataForm from "./BasicDataForm";
+
+const HIGH_TICKET_SERVICES = ["Plan de Acción Artístico", "Creación + Dirección", "Artista Pro – Madrid"];
 
 export default function OfferDetailPanel({ offer, isOpen, onClose }) {
   const [videoWatchTime, setVideoWatchTime] = useState(0);
   const [isVideoCompleted, setIsVideoCompleted] = useState(false);
   const [showApplicationForm, setShowApplicationForm] = useState(false);
+  const [showBasicForm, setShowBasicForm] = useState(false);
+  const [userDataSubmitted, setUserDataSubmitted] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const VIDEO_DURATION = 240; // 4 minutes in seconds
+  const isHighTicket = HIGH_TICKET_SERVICES.includes(offer?.title);
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -30,6 +36,7 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
       document.body.style.overflow = 'hidden';
       setVideoWatchTime(0);
       setIsVideoCompleted(false);
+      setUserDataSubmitted(false);
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -87,14 +94,14 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className="fixed inset-0 z-50 overflow-y-auto"
           >
-            <div className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
-              <div className="max-w-5xl mx-auto">
+            <div className="min-h-screen px-4 py-6 sm:px-6 sm:py-10">
+              <div className="max-w-3xl mx-auto">
                 {/* Close Button */}
                 <button
                   onClick={onClose}
-                  className="absolute top-4 right-4 sm:top-8 sm:right-8 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center text-white transition-all z-10"
+                  className="absolute top-2 right-2 sm:top-4 sm:right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center text-white transition-all z-10"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5" />
                 </button>
 
                 {/* Trailer Section */}
@@ -103,7 +110,7 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.1 }}
-                    className="relative w-full aspect-video rounded-2xl overflow-hidden mb-8 bg-gradient-to-br from-zinc-900 to-black shadow-2xl"
+                    className="relative w-full aspect-video rounded-lg overflow-hidden mb-4 bg-gradient-to-br from-zinc-900 to-black shadow-lg"
                   >
                     <iframe
                       src={offer.trailer_url}
@@ -121,12 +128,12 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
-                  className="bg-zinc-900/50 backdrop-blur-xl rounded-2xl border border-white/10 p-6 sm:p-8 md:p-10"
+                  className="bg-zinc-900/50 backdrop-blur-xl rounded-xl border border-white/10 p-4 sm:p-5"
                 >
                   {/* Header */}
-                  <div className="mb-8">
+                  <div className="mb-5">
                     {offer.tag && (
-                      <span className={`inline-block mb-4 px-4 py-1.5 rounded-full text-sm font-semibold ${
+                      <span className={`inline-block mb-2 px-2.5 py-1 rounded-full text-xs font-semibold ${
                         offer.tag === "Gratis" 
                           ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
                           : 'bg-zinc-800 text-gray-400'
@@ -135,28 +142,28 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                       </span>
                     )}
                     
-                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
                       {offer.title}
                     </h2>
                     
                     {offer.price && (
-                      <div className="text-4xl sm:text-5xl font-bold text-white mb-4">
+                      <div className="text-3xl sm:text-4xl font-bold text-white mb-3">
                         {offer.price}
                       </div>
                     )}
                     
-                    <p className="text-lg sm:text-xl text-gray-400 leading-relaxed">
+                    <p className="text-sm sm:text-base text-gray-400 leading-relaxed">
                       {offer.full_description || offer.description}
                     </p>
                   </div>
 
                   {/* For Who Section */}
                   {offer.for_who && (
-                    <div className="mb-8 pb-8 border-b border-white/10">
-                      <h3 className="text-xl sm:text-2xl font-bold text-white mb-4">
+                    <div className="mb-4 pb-4 border-b border-white/10">
+                      <h3 className="text-sm font-bold text-white mb-2">
                         ¿Para quién es?
                       </h3>
-                      <p className="text-gray-400 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
                         {offer.for_who}
                       </p>
                     </div>
@@ -164,15 +171,15 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
 
                   {/* What You Gain Section */}
                   {offer.what_you_gain && offer.what_you_gain.length > 0 && (
-                    <div className="mb-8 pb-8 border-b border-white/10">
-                      <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">
+                    <div className="mb-4 pb-4 border-b border-white/10">
+                      <h3 className="text-sm font-bold text-white mb-3">
                         ¿Qué ganarás?
                       </h3>
-                      <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="grid sm:grid-cols-2 gap-2">
                         {offer.what_you_gain.map((item, i) => (
-                          <div key={i} className="flex items-start gap-3 bg-white/5 rounded-xl p-4">
-                            <CheckCircle className="w-6 h-6 text-emerald-400 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-300 leading-relaxed">{item}</span>
+                          <div key={i} className="flex items-start gap-2 bg-white/5 rounded-lg p-2.5">
+                            <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                            <span className="text-gray-300 text-xs leading-relaxed">{item}</span>
                           </div>
                         ))}
                       </div>
@@ -181,17 +188,17 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
 
                   {/* Key Content Section */}
                   {offer.key_content && offer.key_content.length > 0 && (
-                    <div className="mb-8">
-                      <h3 className="text-xl sm:text-2xl font-bold text-white mb-6">
+                    <div className="mb-4">
+                      <h3 className="text-sm font-bold text-white mb-3">
                         Contenido clave
                       </h3>
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         {offer.key_content.map((item, i) => (
-                          <div key={i} className="flex items-start gap-3 text-gray-300">
-                            <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 font-bold text-sm">
+                          <div key={i} className="flex items-start gap-2 text-gray-300">
+                            <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 font-bold text-[10px]">
                               {i + 1}
                             </div>
-                            <span className="leading-relaxed pt-1">{item}</span>
+                            <span className="text-xs leading-relaxed pt-0.5">{item}</span>
                           </div>
                         ))}
                       </div>
@@ -200,12 +207,12 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
 
                   {/* Highlights */}
                   {offer.highlights && offer.highlights.length > 0 && (
-                    <div className="mb-8 pb-8 border-b border-white/10">
-                      <h3 className="text-xl font-bold text-white mb-4">Incluye:</h3>
-                      <div className="space-y-3">
+                    <div className="mb-4 pb-4 border-b border-white/10">
+                      <h3 className="text-sm font-bold text-white mb-2">Incluye:</h3>
+                      <div className="space-y-2">
                         {offer.highlights.map((item, i) => (
-                          <div key={i} className="flex items-center gap-3 text-gray-300">
-                            <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                          <div key={i} className="flex items-center gap-2 text-xs sm:text-sm text-gray-300">
+                            <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                             <span>{item}</span>
                           </div>
                         ))}
@@ -215,17 +222,17 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
 
                   {/* Video Progress Indicator */}
                   {!isVideoCompleted && !isAdmin && (
-                    <div className="mb-6 p-4 bg-zinc-800/50 rounded-xl border border-zinc-700">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2 text-sm text-gray-400">
-                          <Clock className="w-4 h-4" />
-                          <span>Tiempo de visualización</span>
+                    <div className="mb-4 p-3 bg-zinc-800/50 rounded-lg border border-zinc-700">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                          <Clock className="w-3 h-3" />
+                          <span>Visualización</span>
                         </div>
-                        <span className="text-sm font-mono text-emerald-400">
+                        <span className="text-xs font-mono text-emerald-400">
                           {formatTime(videoWatchTime)} / {formatTime(VIDEO_DURATION)}
                         </span>
                       </div>
-                      <div className="h-2 bg-zinc-900 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-zinc-900 rounded-full overflow-hidden">
                         <motion.div
                           className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400"
                           initial={{ width: 0 }}
@@ -233,17 +240,17 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                           transition={{ duration: 0.3 }}
                         />
                       </div>
-                      <p className="text-xs text-gray-500 mt-2">
-                        Al finalizar el video se habilitará el botón para agendar tu meeting
+                      <p className="text-[10px] text-gray-500 mt-1.5">
+                        Al finalizar se habilitará el botón para agendar
                       </p>
                     </div>
                   )}
 
                   {/* Admin Badge */}
                   {isAdmin && !isVideoCompleted && (
-                    <div className="mb-4 p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/30">
-                      <p className="text-xs text-emerald-400 font-medium">
-                        ✓ Modo Admin: Acceso completo sin restricciones
+                    <div className="mb-3 p-2.5 bg-emerald-500/10 rounded-lg border border-emerald-500/30">
+                      <p className="text-[10px] text-emerald-400 font-medium">
+                        ✓ Modo Admin: Acceso completo
                       </p>
                     </div>
                   )}
@@ -259,55 +266,73 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                         animate={{ opacity: 1, scale: 1 }}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className="w-full py-4 sm:py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 mb-4"
+                        className="w-full py-2.5 sm:py-3 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all bg-emerald-500 text-black hover:bg-emerald-400 shadow-lg shadow-emerald-500/20 mb-3"
                       >
-                        <CheckCircle className="w-5 h-5" />
+                        <CheckCircle className="w-4 h-4" />
                         Agendar Videollamada
-                        <ArrowRight className="w-5 h-5" />
+                        <ArrowRight className="w-4 h-4" />
                       </motion.a>
                     ) : (
                       <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="w-full py-4 sm:py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 bg-zinc-800/50 text-gray-600 cursor-not-allowed mb-4 border border-zinc-700/50"
+                        className="w-full py-2.5 sm:py-3 rounded-lg font-bold text-sm flex items-center justify-center gap-2 bg-zinc-800/50 text-gray-600 cursor-not-allowed mb-3 border border-zinc-700/50"
                       >
-                        <Lock className="w-5 h-5" />
+                        <Lock className="w-4 h-4" />
                         Agendar Videollamada
-                        <Clock className="w-5 h-5" />
+                        <Clock className="w-4 h-4" />
                       </motion.div>
                     )
                   )}
 
-                  {/* Payment Section - Premium Style */}
+                  {/* Payment Section */}
                   {offer.payment_link && (
-                    <div className="mb-4 p-6 bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 backdrop-blur-sm rounded-2xl border border-zinc-700/50 shadow-2xl">
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-                        <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+                    <div className="mb-3 p-3 bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 backdrop-blur-sm rounded-lg border border-zinc-700/50">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                        <span className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
                           Pago único
                         </span>
                       </div>
                       
-                      <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-                        Al proceder al pago, se redactará automáticamente tu contrato personalizado con los datos proporcionados. Podrás revisarlo y firmarlo digitalmente de forma segura.
+                      <p className="text-[10px] sm:text-xs text-gray-400 mb-3 leading-relaxed">
+                        Se redactará automáticamente tu contrato personalizado. Podrás revisarlo y firmarlo digitalmente.
                       </p>
 
-                      {/* Payment button */}
-                      <motion.a
-                        href={offer.payment_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-black font-bold text-lg flex items-center justify-center gap-3 transition-all shadow-lg shadow-emerald-500/30"
-                      >
-                        🔒 Proceder al pago
-                        <ArrowRight className="w-5 h-5" />
-                      </motion.a>
+                      {/* Form for high ticket services */}
+                      {isHighTicket && !userDataSubmitted && (
+                        <button
+                          onClick={() => setShowBasicForm(true)}
+                          className="w-full py-2 mb-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 font-semibold text-xs rounded-lg transition-all border border-blue-500/30"
+                        >
+                          Completar datos
+                        </button>
+                      )}
 
-                      <div className="flex flex-col items-center gap-2 mt-3">
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <CheckCircle className="w-3 h-3" />
+                      {/* Payment button - Show conditions based on service type */}
+                      {(!isHighTicket || userDataSubmitted) && (
+                        <motion.a
+                          href={offer.payment_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-black font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-emerald-500/30"
+                        >
+                          🔒 Proceder al pago
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </motion.a>
+                      )}
+
+                      {isHighTicket && !userDataSubmitted && (
+                        <p className="text-[10px] text-gray-500 text-center mt-2">
+                          Completa tus datos para proceder al pago
+                        </p>
+                      )}
+
+                      <div className="flex flex-col items-center gap-1 mt-2">
+                        <div className="flex items-center gap-2 text-[9px] text-gray-500">
+                          <CheckCircle className="w-2.5 h-2.5" />
                           <span>Pago seguro mediante Stripe</span>
                         </div>
                         
@@ -317,9 +342,9 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                             href={offer.pre_purchase_calendly_link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs text-gray-500 hover:text-gray-300 underline transition-colors"
+                            className="text-[9px] text-gray-500 hover:text-gray-300 underline transition-colors"
                           >
-                            Agendar videollamada antes de comprar
+                            Videollamada antes de comprar
                           </a>
                         )}
                       </div>
@@ -327,18 +352,16 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                   )}
 
                   {/* CTA Button */}
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`w-full py-4 sm:py-5 rounded-xl font-bold text-lg flex items-center justify-center gap-3 transition-all ${
-                      offer.featured
-                        ? 'bg-white text-black hover:bg-gray-100'
-                        : 'bg-white text-black hover:bg-gray-100'
-                    }`}
-                  >
-                    {offer.cta}
-                    <ArrowRight className="w-5 h-5" />
-                  </motion.button>
+                  {!offer.payment_link && !offer.booking_link && (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="w-full py-2.5 sm:py-3 rounded-lg font-bold text-sm flex items-center justify-center gap-2 transition-all bg-white text-black hover:bg-gray-100"
+                    >
+                      {offer.cta}
+                      <ArrowRight className="w-4 h-4" />
+                    </motion.button>
+                  )}
                 </motion.div>
               </div>
             </div>
@@ -354,8 +377,18 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
             }}
             formId={offer?.form_id}
           />
-        </>
-      )}
-    </AnimatePresence>
-  );
-}
+
+          {/* Basic Data Form Modal */}
+          <BasicDataForm
+            isOpen={showBasicForm}
+            onClose={() => setShowBasicForm(false)}
+            onSubmit={(data) => {
+              setUserDataSubmitted(true);
+              setShowBasicForm(false);
+            }}
+          />
+          </>
+          )}
+          </AnimatePresence>
+          );
+          }
