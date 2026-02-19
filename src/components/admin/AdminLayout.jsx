@@ -43,8 +43,8 @@ export default function AdminLayout({ children, activePage }) {
     <div className="min-h-screen bg-[#0a0a0b] text-white">
       {/* Top Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5">
-        <div className="flex items-center justify-between px-3 sm:px-6 h-16">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between px-2 sm:px-4 h-14">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden p-2 text-gray-400 hover:text-white"
@@ -52,28 +52,28 @@ export default function AdminLayout({ children, activePage }) {
               {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
             
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Link to={createPageUrl("Landing")}>
-                <img 
-                  src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/2b10817bf_LOGOPNGTRANSPARENTCABANACREATIVE.png" 
-                  alt="La Cabaña Creative"
-                  className="h-7 sm:h-9 w-auto cursor-pointer hover:scale-105 transition-transform"
-                />
-              </Link>
-              <div className="hidden sm:block">
-                <div className="text-xs sm:text-sm font-bold">
-                  <span className="text-white">La Cabaña </span>
-                  <span className="text-orange-500">Creative</span>
-                </div>
-                <div className="text-[9px] sm:text-[10px] text-gray-500">Prod. by Weber</div>
-              </div>
-            </div>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+               <Link to={createPageUrl("Landing")}>
+                 <img 
+                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/2b10817bf_LOGOPNGTRANSPARENTCABANACREATIVE.png" 
+                   alt="La Cabaña Creative"
+                   className="h-6 sm:h-7 w-auto cursor-pointer hover:scale-105 transition-transform"
+                 />
+               </Link>
+               <div className="hidden sm:block">
+                 <div className="text-[11px] sm:text-xs font-bold">
+                   <span className="text-white">La Cabaña </span>
+                   <span className="text-orange-500">Creative</span>
+                 </div>
+                 <div className="text-[8px] text-gray-500">Prod. by Weber</div>
+               </div>
+             </div>
 
             {/* Homepage Button */}
             <Link to={createPageUrl("Landing")}>
-              <button className="hidden lg:flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs sm:text-sm font-medium transition-colors">
-                <Home className="w-3 sm:w-4 h-3 sm:h-4" />
-                <span className="hidden lg:inline">Homepage</span>
+              <button className="hidden lg:flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[11px] font-medium transition-colors">
+                <Home className="w-3 h-3" />
+                <span>Home</span>
               </button>
             </Link>
           </div>
@@ -93,8 +93,8 @@ export default function AdminLayout({ children, activePage }) {
           </div>
 
           {/* User Menu */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs sm:text-sm font-bold cursor-pointer">
+          <div className="flex items-center gap-1.5">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[10px] font-bold cursor-pointer">
               W
             </div>
           </div>
@@ -102,26 +102,26 @@ export default function AdminLayout({ children, activePage }) {
       </nav>
 
       {/* Sidebar */}
-      <aside className={`fixed left-0 top-16 bottom-0 w-64 bg-[#0a0a0b] border-r border-white/5 z-40 transition-transform lg:translate-x-0 ${
+      <aside className={`fixed left-0 top-14 bottom-0 w-56 bg-[#0a0a0b] border-r border-white/5 z-40 transition-transform lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex flex-col h-full">
-          <div className="flex-1 px-4 py-6 overflow-y-auto">
-            <nav className="space-y-1">
+          <div className="flex-1 px-3 py-3 overflow-y-auto">
+            <nav className="space-y-0.5">
               {navItems.map((item, i) => {
                 const isActive = activePage === item.page;
                 return (
                   <Link key={i} to={createPageUrl(item.page)} onClick={() => setSidebarOpen(false)}>
                     <motion.button
-                      whileHover={{ x: 4 }}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                      whileHover={{ x: 2 }}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                         isActive 
                           ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
                           : 'text-gray-400 hover:text-white hover:bg-white/5'
                       }`}
                     >
-                      <item.icon className="w-5 h-5" />
-                      {item.label}
+                      <item.icon className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate">{item.label}</span>
                     </motion.button>
                   </Link>
                 );
@@ -130,17 +130,17 @@ export default function AdminLayout({ children, activePage }) {
           </div>
 
           {/* Bottom Section */}
-          <div className="p-4 border-t border-white/5">
-            <div className="px-4 py-3 rounded-xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20">
-              <div className="text-xs font-semibold text-white mb-1">Admin Panel</div>
-              <div className="text-[10px] text-gray-400">Full Access Mode</div>
+          <div className="p-2.5 border-t border-white/5">
+            <div className="px-3 py-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20">
+              <div className="text-[10px] font-semibold text-white mb-0.5">Admin</div>
+              <div className="text-[8px] text-gray-400">Full Access</div>
             </div>
           </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="lg:pl-64 pt-16">
+      <main className="lg:pl-56 pt-14">
         {children}
       </main>
 

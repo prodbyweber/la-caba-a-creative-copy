@@ -269,67 +269,67 @@ export default function LandingEditor() {
 
   return (
     <AdminLayout activePage="Settings">
-      <div className="min-h-screen bg-[#0a0a0b] p-6">
-        {/* Header */}
-        <div className="max-w-7xl mx-auto mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Editor de Landing Page</h1>
-              <p className="text-gray-500">Personaliza y organiza las secciones de tu página principal</p>
-            </div>
+      <div className="min-h-screen bg-[#0a0a0b] p-3 sm:p-4">
+         {/* Header */}
+         <div className="max-w-7xl mx-auto mb-4 sm:mb-5">
+           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-3 sm:mb-4">
+             <div>
+               <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Editor de Landing</h1>
+               <p className="text-xs sm:text-sm text-gray-500">Personaliza tu página principal</p>
+             </div>
             
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setShowPreview(!showPreview)}
-                className="px-6 py-3 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-white font-medium flex items-center gap-2 transition-colors"
-              >
-                <Eye className="w-5 h-5" />
-                {showPreview ? 'Cerrar Preview' : 'Preview'}
-              </button>
-              
-              <button
-                onClick={() => updateMutation.mutate(config)}
-                disabled={updateMutation.isPending}
-                className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-xl text-white font-medium flex items-center gap-2 transition-colors"
-              >
-                <Save className="w-5 h-5" />
-                {updateMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
-              </button>
-            </div>
+            <div className="flex flex-wrap items-center gap-2">
+               <button
+                 onClick={() => setShowPreview(!showPreview)}
+                 className="px-3 sm:px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 text-white font-medium flex items-center gap-1.5 transition-colors text-xs sm:text-sm"
+               >
+                 <Eye className="w-4 h-4" />
+                 <span className="hidden sm:inline">{showPreview ? 'Cerrar' : 'Preview'}</span>
+               </button>
+
+               <button
+                 onClick={() => updateMutation.mutate(config)}
+                 disabled={updateMutation.isPending}
+                 className="px-3 sm:px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-white font-medium flex items-center gap-1.5 transition-colors text-xs sm:text-sm"
+               >
+                 <Save className="w-4 h-4" />
+                 <span className="hidden sm:inline">{updateMutation.isPending ? 'Guardando...' : 'Guardar'}</span>
+               </button>
+             </div>
           </div>
 
           {/* Device Toggle */}
-          <div className="flex items-center gap-2 bg-white/5 rounded-xl p-1 w-fit">
+          <div className="flex items-center gap-1 bg-white/5 rounded-lg p-0.5 w-fit">
             <button
               onClick={() => setPreviewMode("desktop")}
-              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-md flex items-center gap-1 transition-colors text-xs sm:text-sm ${
                 previewMode === "desktop" 
                   ? 'bg-emerald-500 text-white' 
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <Monitor className="w-4 h-4" />
-              Desktop
+              <Monitor className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Desktop</span>
             </button>
             <button
               onClick={() => setPreviewMode("mobile")}
-              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-md flex items-center gap-1 transition-colors text-xs sm:text-sm ${
                 previewMode === "mobile" 
                   ? 'bg-emerald-500 text-white' 
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <Smartphone className="w-4 h-4" />
-              Mobile
+              <Smartphone className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Mobile</span>
             </button>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-6">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-4">
           {/* Left Panel - Sections Editor */}
-          <div className="bg-[#111113] rounded-2xl border border-white/10 p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2 sticky top-0 bg-[#111113] pb-4 z-10">
+          <div className="lg:col-span-2 bg-[#111113] rounded-xl border border-white/10 p-4 sm:p-5 max-h-[calc(100vh-180px)] overflow-y-auto">
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2 sticky top-0 bg-[#111113] pb-3 z-10">
               <Settings className="w-5 h-5 text-emerald-400" />
               Editar Contenido de la Landing
             </h2>
@@ -710,8 +710,8 @@ export default function LandingEditor() {
           </div>
 
           {/* Right Panel - Preview */}
-          <div className="bg-[#111113] rounded-2xl border border-white/10 p-6 sticky top-6">
-            <h2 className="text-xl font-bold text-white mb-4">Vista Previa</h2>
+          <div className="bg-[#111113] rounded-xl border border-white/10 p-4 sticky top-6 max-h-[calc(100vh-180px)]">
+            <h2 className="text-lg font-bold text-white mb-3">Vista Previa</h2>
             
             <div className={`bg-black rounded-xl overflow-hidden border border-white/10 ${
               previewMode === "mobile" ? 'max-w-[375px] mx-auto' : 'w-full'

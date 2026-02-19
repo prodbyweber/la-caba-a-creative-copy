@@ -15,7 +15,7 @@ import LandingNav from "@/components/landing/LandingNav";
 import Footer from "@/components/landing/Footer";
 
 export default function Landing() {
-  const { data: config } = useQuery({
+  const { data: config, isLoading } = useQuery({
     queryKey: ['landingConfig'],
     queryFn: async () => {
       const configs = await base44.entities.LandingConfig.list();
@@ -27,8 +27,15 @@ export default function Landing() {
     <div className="min-h-screen bg-[#0a0a0b] text-white overflow-x-hidden">
       <LandingNav />
       
-      <main>
-        <Hero config={config} />
+      {isLoading && (
+        <div className="min-h-[500px] flex items-center justify-center bg-black">
+          <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+      
+      {!isLoading && (
+        <main>
+          <Hero config={config} />
         <BrandsCarousel logos={config?.brand_logos} />
         <AboutSection />
         <div id="team"><TeamSection /></div>
@@ -37,8 +44,9 @@ export default function Landing() {
         <DashboardPreview />
         <div id="exploracion"><ExploracionSection /></div>
         <div id="startups"><StartupsSection /></div>
-        <MemberBanner />
-      </main>
+          <MemberBanner />
+        </main>
+      )}
 
       <Footer />
     </div>
