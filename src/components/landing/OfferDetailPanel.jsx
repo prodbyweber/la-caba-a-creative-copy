@@ -305,8 +305,8 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                     )
                   )}
 
-                  {/* Payment Section */}
-                  {offer.payment_link && (
+                  {/* Payment Section - Only show when video is completed or admin view */}
+                  {offer.payment_link && (isVideoCompleted || !showRestrictions) && (
                     <div className="mb-3 p-3 bg-gradient-to-br from-zinc-800/80 to-zinc-900/80 backdrop-blur-sm rounded-lg border border-zinc-700/50">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
