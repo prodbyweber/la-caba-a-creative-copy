@@ -72,6 +72,31 @@ export default function Hero({ config }) {
         </motion.div>
       </div>
 
+      {/* Bottom bar with tags - visible on desktop */}
+      <div className="hidden lg:block absolute bottom-4 left-0 right-0 z-20">
+        <div className="max-w-[1400px] mx-auto px-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.5 }}
+            className="bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-xl px-6 py-3"
+          >
+            <div className="flex items-center gap-4 justify-center flex-wrap">
+              <span className="text-xs text-gray-400">Hemos ayudado a:</span>
+              <div className="flex items-center gap-3 flex-wrap">
+                {['Artistas Emergentes', 'Productores', 'Creadores de Contenido', 'Estudios'].map((tag, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-xs text-gray-300 transition-colors cursor-default border border-white/5"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
     </section>
   );
 }
