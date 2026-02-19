@@ -64,7 +64,7 @@ export default function Hero({ config }) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="max-w-2xl w-full px-2 pb-16 lg:pb-20 space-y-4"
+          className="max-w-2xl w-full px-2 pb-6 lg:pb-20 space-y-4"
         >
           <p className="text-sm sm:text-base lg:text-lg xl:text-xl text-gray-300 leading-relaxed">
             {heroSubtitle}
