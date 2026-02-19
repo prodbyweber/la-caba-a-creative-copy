@@ -41,12 +41,12 @@ export default function BrandsCarousel({ logos }) {
             {duplicatedLogos.map((logo, index) => (
               <div
                 key={index}
-                className="flex-shrink-0 w-24 h-12 flex items-center justify-center opacity-80 hover:opacity-100 transition-all duration-300 group"
+                className="flex-shrink-0 w-24 h-12 flex items-center justify-center transition-all duration-300 group"
               >
                 <img
                   src={logo}
                   alt="Brand logo"
-                  className="max-w-full max-h-full object-contain filter brightness-200 group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]"
+                  className="max-w-full max-h-full object-contain group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]"
                 />
               </div>
             ))}
