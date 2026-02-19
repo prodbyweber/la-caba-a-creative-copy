@@ -85,35 +85,12 @@ export default function TeamSection() {
           </p>
         </motion.div>
 
-        {/* Carousel */}
+        {/* Grid Container */}
         <div className="relative">
-          {/* Left Arrow */}
-          <button
-            onClick={() => scrollToIndex(Math.max(0, currentIndex - 1))}
-            disabled={currentIndex === 0}
-            className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 z-20 w-12 h-12 items-center justify-center rounded-full bg-white hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-xl"
-          >
-            <ArrowRight className="w-5 h-5 text-black rotate-180" />
-          </button>
-
-          {/* Right Arrow */}
-          <button
-            onClick={() => scrollToIndex(Math.min(teamMembers.length - 1, currentIndex + 1))}
-            disabled={currentIndex === teamMembers.length - 1}
-            className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 z-20 w-12 h-12 items-center justify-center rounded-full bg-white hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-xl"
-          >
-            <ArrowRight className="w-5 h-5 text-black" />
-          </button>
-
-          {/* Scroll Container */}
           <div 
             ref={scrollContainerRef}
             onScroll={handleScroll}
-            className="flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scroll-smooth px-4 sm:px-0"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none'
-            }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 overflow-x-visible pb-4"
           >
             {teamMembers.map((member, index) => (
               <motion.div
@@ -122,12 +99,12 @@ export default function TeamSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="flex-shrink-0 w-[320px] sm:w-[360px] snap-center"
+                className="w-full"
               >
                 <div className="relative h-full bg-gradient-to-b from-zinc-900/90 to-black backdrop-blur-sm rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300 shadow-2xl border border-white/10">
                   
                   {/* Image Section */}
-                  <div className="relative h-[280px] overflow-hidden bg-gradient-to-br from-purple-900/20 to-emerald-900/20">
+                  <div className="relative h-[220px] overflow-hidden bg-gradient-to-br from-purple-900/20 to-emerald-900/20">
                     {member.image_url ? (
                       <img 
                         src={member.image_url} 
@@ -143,21 +120,21 @@ export default function TeamSection() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
                     
                     {/* Name and role overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 p-5">
-                      <h3 className="text-2xl font-bold text-white mb-1">
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <h3 className="text-xl font-bold text-white mb-1">
                         {member.name}
                       </h3>
-                      <p className="text-sm text-emerald-400 font-semibold">
+                      <p className="text-xs text-emerald-400 font-semibold">
                         {member.role}
                       </p>
                     </div>
                   </div>
 
                   {/* Info Section */}
-                  <div className="p-5 space-y-3">
+                  <div className="p-4 space-y-2">
                     {/* Bio */}
                     {member.bio && (
-                      <p className="text-sm text-gray-400 italic">
+                      <p className="text-xs text-gray-400 italic">
                         {member.bio}
                       </p>
                     )}
@@ -165,8 +142,8 @@ export default function TeamSection() {
                     {/* Collaborations */}
                     {member.collaborations && (
                       <div className="pt-2 border-t border-white/10">
-                        <p className="text-xs text-gray-500 mb-1.5">Colaboraciones destacadas:</p>
-                        <p className="text-xs text-gray-300 leading-relaxed">
+                        <p className="text-[10px] text-gray-500 mb-1">Colaboraciones destacadas:</p>
+                        <p className="text-[11px] text-gray-300 leading-relaxed line-clamp-2">
                           {member.collaborations}
                         </p>
                       </div>
@@ -178,22 +155,7 @@ export default function TeamSection() {
           </div>
         </div>
 
-        {/* Dots Indicators */}
-        {teamMembers.length > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-6">
-            {teamMembers.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => scrollToIndex(index)}
-                className={`transition-all ${
-                  index === currentIndex 
-                    ? 'w-8 h-2 bg-purple-500 rounded-full' 
-                    : 'w-2 h-2 bg-gray-600 rounded-full hover:bg-gray-500'
-                }`}
-              />
-            ))}
-          </div>
-        )}
+
       </div>
 
       <style jsx>{`
