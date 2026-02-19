@@ -59,35 +59,31 @@ export default function Hero({ config }) {
           </div>
         </motion.div>
 
-        {/* Bottom: Subtitle Only */}
+        {/* Bottom: Subtitle + Bar */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="max-w-2xl w-full px-2 pb-2 lg:pb-20"
+          className="max-w-2xl w-full px-2 pb-16 lg:pb-20 space-y-4"
         >
           <p className="text-sm sm:text-base lg:text-lg xl:text-xl text-gray-300 leading-relaxed">
             {heroSubtitle}
           </p>
-        </motion.div>
-      </div>
 
-      {/* Bottom bar with tags - visible on all devices */}
-      <div className="absolute bottom-2 lg:bottom-4 left-0 right-0 z-20 px-3 lg:px-0">
-        <div className="max-w-[1400px] mx-auto lg:px-12">
+          {/* Bar "Hemos ayudado a" - inline */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
             className="bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-lg lg:rounded-xl px-3 py-2 lg:px-6 lg:py-3"
           >
-            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 justify-center">
-              <span className="text-[10px] sm:text-xs text-gray-400 font-medium">Hemos ayudado a:</span>
-              <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
+            <div className="flex items-center gap-2 lg:gap-4 justify-center overflow-x-auto">
+              <span className="text-[10px] sm:text-xs text-gray-400 font-medium whitespace-nowrap">Hemos ayudado a:</span>
+              <div className="flex items-center gap-2 lg:gap-3">
                 {['Artistas Emergentes', 'Productores', 'Creadores de Contenido', 'Estudios'].map((tag, i) => (
                   <span
                     key={i}
-                    className="px-2 py-1 sm:px-3 sm:py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-[10px] sm:text-xs text-gray-300 transition-colors cursor-default border border-white/5"
+                    className="px-2 py-1 lg:px-3 lg:py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-[10px] sm:text-xs text-gray-300 transition-colors cursor-default border border-white/5 whitespace-nowrap"
                   >
                     {tag}
                   </span>
@@ -95,7 +91,7 @@ export default function Hero({ config }) {
               </div>
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
