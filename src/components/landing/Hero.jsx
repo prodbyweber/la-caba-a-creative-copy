@@ -10,21 +10,21 @@ export default function Hero({ config }) {
   const heroImage = config?.hero_image_url || "";
 
   return (
-    <section className="relative h-screen flex items-center overflow-hidden bg-black pt-20">
+    <section className="relative min-h-screen flex items-start lg:items-center overflow-hidden bg-black pt-24 pb-4 lg:pt-20">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-black to-black" />
       
       {/* Main Container */}
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-12 py-8 flex flex-col items-center text-center justify-center gap-6">
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-4 lg:py-8 flex flex-col items-center text-center justify-start lg:justify-center gap-4 lg:gap-6">
         
         {/* Top: Title Only */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="max-w-4xl"
+          className="max-w-4xl w-full"
         >
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight px-2">
             {heroTitle}
           </h1>
         </motion.div>
@@ -38,10 +38,10 @@ export default function Hero({ config }) {
         >
           <div className="relative w-full aspect-video">
             {/* Background glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 via-transparent to-purple-500/20 rounded-2xl blur-2xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 via-transparent to-purple-500/20 rounded-xl lg:rounded-2xl blur-2xl" />
             
             {/* Image container */}
-            <div className="relative h-full rounded-2xl overflow-hidden bg-black">
+            <div className="relative h-full rounded-xl lg:rounded-2xl overflow-hidden bg-black">
               {heroImage && (
                 <img
                   src={heroImage}
@@ -64,30 +64,30 @@ export default function Hero({ config }) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="max-w-2xl pb-20"
+          className="max-w-2xl w-full px-2 pb-2 lg:pb-20"
         >
-          <p className="text-base sm:text-lg lg:text-xl text-gray-300 leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-lg xl:text-xl text-gray-300 leading-relaxed">
             {heroSubtitle}
           </p>
         </motion.div>
       </div>
 
-      {/* Bottom bar with tags - visible on desktop */}
-      <div className="hidden lg:block absolute bottom-4 left-0 right-0 z-20">
-        <div className="max-w-[1400px] mx-auto px-12">
+      {/* Bottom bar with tags - visible on all devices */}
+      <div className="absolute bottom-2 lg:bottom-4 left-0 right-0 z-20 px-3 lg:px-0">
+        <div className="max-w-[1400px] mx-auto lg:px-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5 }}
-            className="bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-xl px-6 py-3"
+            className="bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-lg lg:rounded-xl px-3 py-2 lg:px-6 lg:py-3"
           >
-            <div className="flex items-center gap-4 justify-center flex-wrap">
-              <span className="text-xs text-gray-400">Hemos ayudado a:</span>
-              <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 justify-center">
+              <span className="text-[10px] sm:text-xs text-gray-400 font-medium">Hemos ayudado a:</span>
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
                 {['Artistas Emergentes', 'Productores', 'Creadores de Contenido', 'Estudios'].map((tag, i) => (
                   <span
                     key={i}
-                    className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-xs text-gray-300 transition-colors cursor-default border border-white/5"
+                    className="px-2 py-1 sm:px-3 sm:py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-[10px] sm:text-xs text-gray-300 transition-colors cursor-default border border-white/5"
                   >
                     {tag}
                   </span>

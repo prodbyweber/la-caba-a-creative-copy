@@ -40,7 +40,7 @@ export default function AboutSection() {
   ];
 
   return (
-    <section className="relative py-16 overflow-hidden bg-zinc-950/50">
+    <section className="relative py-8 sm:py-12 lg:py-16 overflow-hidden bg-zinc-950/50">
       {/* Subtle decorative elements */}
       <div className="absolute inset-0 pointer-events-none opacity-20">
         <motion.div
