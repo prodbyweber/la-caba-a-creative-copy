@@ -10,7 +10,7 @@ export default function Hero({ config }) {
   const heroImage = config?.hero_image_url || "";
 
   return (
-    <section className="relative min-h-screen flex items-start lg:items-center overflow-hidden bg-black pt-24 pb-4 lg:pt-20">
+    <section className="relative min-h-screen flex items-start lg:items-center overflow-hidden bg-black pt-24 pb-0 lg:pt-20">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-black to-black" />
       
