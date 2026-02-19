@@ -4,18 +4,30 @@ import { ArrowRight } from "lucide-react";
 
 export default function Hero({ config }) {
   const [imageLoaded, setImageLoaded] = React.useState(false);
+  const [currentTagIndex, setCurrentTagIndex] = React.useState(0);
+  
   const heroTitle = config?.hero_title || "El estudio creativo definitivo para artistas que buscan conectar";
   const heroSubtitle = config?.hero_subtitle || "Producción por horas, visuales cinematográficos y digitalización artística para proyectos que van en serio.";
   const heroCTA = config?.hero_cta_text || "Aplicar a La Cabaña Creative";
   const heroImage = config?.hero_image_url || "";
 
+  const tags = ['Artistas Emergentes', 'Productores', 'Creadores de Contenido', 'Estudios'];
+
+  // Auto-scroll carrusel
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTagIndex((prev) => (prev + 1) % tags.length);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [tags.length]);
+
   return (
-    <section className="relative min-h-screen flex items-start lg:items-center overflow-hidden bg-black pt-24 pb-0 lg:pt-20">
+    <section className="relative min-h-screen flex items-start lg:items-center overflow-hidden bg-black pt-16 pb-0 lg:pt-20">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-black to-black" />
       
       {/* Main Container */}
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-4 lg:py-8 flex flex-col items-center text-center justify-start lg:justify-center gap-4 lg:gap-6">
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-4 lg:py-8 flex flex-col items-center text-center justify-start lg:justify-center gap-3 lg:gap-6">
         
         {/* Top: Title Only */}
         <motion.div
@@ -24,7 +36,7 @@ export default function Hero({ config }) {
           transition={{ duration: 0.7 }}
           className="max-w-4xl w-full"
         >
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight px-2">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight px-2">
             {heroTitle}
           </h1>
         </motion.div>
