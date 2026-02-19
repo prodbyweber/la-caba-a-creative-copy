@@ -1,8 +1,44 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Target, Heart, Zap, Music2, Calendar, Clock, Verified, Play } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
+import { Sparkles, Target, Heart, Zap } from "lucide-react";
 
 export default function AboutSection() {
+  const { data: config } = useQuery({
+    queryKey: ['landingConfig'],
+    queryFn: async () => {
+      const configs = await base44.entities.LandingConfig.list();
+      return configs.length > 0 ? configs[0] : null;
+    }
+  });
+
+  const mainText = config?.about_main_text || "La Cabaña Creative nace de la convicción de que cada artista merece un espacio donde su visión pueda materializarse sin límites.";
+  const secondaryText = config?.about_secondary_text || "No somos un estudio tradicional. Somos un refugio creativo donde la autenticidad y la identidad artística se encuentran. Buscamos dirección, claridad y una propuesta única.";
+  
+  const values = [
+    {
+      icon: Target,
+      title: config?.about_value1_title || "Enfoque Real",
+      desc: config?.about_value1_desc || "Estrategia sin humo"
+    },
+    {
+      icon: Heart,
+      title: config?.about_value2_title || "Pasión",
+      desc: config?.about_value2_desc || "Tu proyecto, nuestra misión"
+    },
+    {
+      icon: Zap,
+      title: config?.about_value3_title || "Innovación",
+      desc: config?.about_value3_desc || "Sonido único"
+    },
+    {
+      icon: Sparkles,
+      title: config?.about_value4_title || "Autenticidad",
+      desc: config?.about_value4_desc || "Tu identidad, amplificada"
+    }
+  ];
+
   return (
     <section className="relative py-16 overflow-hidden bg-zinc-950/50">
       {/* Subtle decorative elements */}
@@ -60,63 +96,26 @@ export default function AboutSection() {
           transition={{ duration: 0.5 }}
           className="max-w-3xl mx-auto space-y-4"
         >
-          <p className="text-base text-gray-300 leading-relaxed text-center">
-            La Cabaña Creative nace de la convicción de que <span className="text-emerald-400 font-semibold">cada artista merece un espacio donde su visión pueda materializarse sin límites</span>.
-          </p>
+          <p className="text-base text-gray-300 leading-relaxed text-center" dangerouslySetInnerHTML={{ __html: mainText }} />
           
-          <p className="text-sm text-gray-400 leading-relaxed text-center">
-            No somos un estudio tradicional. Somos un refugio creativo donde la autenticidad y la identidad artística se encuentran. <span className="text-white font-medium">Buscamos dirección, claridad y una propuesta única</span>.
-          </p>
+          <p className="text-sm text-gray-400 leading-relaxed text-center" dangerouslySetInnerHTML={{ __html: secondaryText }} />
 
           {/* Key Values */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-6 max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="p-3 rounded-lg bg-white/5 border border-white/10 text-center"
-            >
-              <Target className="w-6 h-6 text-emerald-400 mb-1.5 mx-auto" />
-              <h4 className="text-white font-semibold text-sm mb-0.5">Enfoque Real</h4>
-              <p className="text-xs text-gray-400">Estrategia sin humo</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.15 }}
-              className="p-3 rounded-lg bg-white/5 border border-white/10 text-center"
-            >
-              <Heart className="w-6 h-6 text-emerald-400 mb-1.5 mx-auto" />
-              <h4 className="text-white font-semibold text-sm mb-0.5">Pasión</h4>
-              <p className="text-xs text-gray-400">Tu proyecto, nuestra misión</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="p-3 rounded-lg bg-white/5 border border-white/10 text-center"
-            >
-              <Zap className="w-6 h-6 text-emerald-400 mb-1.5 mx-auto" />
-              <h4 className="text-white font-semibold text-sm mb-0.5">Innovación</h4>
-              <p className="text-xs text-gray-400">Sonido único</p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.25 }}
-              className="p-3 rounded-lg bg-white/5 border border-white/10 text-center"
-            >
-              <Sparkles className="w-6 h-6 text-emerald-400 mb-1.5 mx-auto" />
-              <h4 className="text-white font-semibold text-sm mb-0.5">Autenticidad</h4>
-              <p className="text-xs text-gray-400">Tu identidad, amplificada</p>
-            </motion.div>
+            {values.map((value, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 + (index * 0.05) }}
+                className="p-3 rounded-lg bg-white/5 border border-white/10 text-center"
+              >
+                <value.icon className="w-6 h-6 text-emerald-400 mb-1.5 mx-auto" />
+                <h4 className="text-white font-semibold text-sm mb-0.5">{value.title}</h4>
+                <p className="text-xs text-gray-400">{value.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </div>

@@ -43,7 +43,7 @@ export default function AdminLayout({ children, activePage }) {
     <div className="min-h-screen bg-[#0a0a0b] text-white">
       {/* Top Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5">
-        <div className="flex items-center justify-between px-6 h-16">
+        <div className="flex items-center justify-between px-3 sm:px-6 h-16">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -52,28 +52,28 @@ export default function AdminLayout({ children, activePage }) {
               {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Link to={createPageUrl("Landing")}>
                 <img 
                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/2b10817bf_LOGOPNGTRANSPARENTCABANACREATIVE.png" 
                   alt="La Cabaña Creative"
-                  className="h-9 w-auto cursor-pointer hover:scale-105 transition-transform"
+                  className="h-7 sm:h-9 w-auto cursor-pointer hover:scale-105 transition-transform"
                 />
               </Link>
               <div className="hidden sm:block">
-                <div className="text-sm font-bold">
+                <div className="text-xs sm:text-sm font-bold">
                   <span className="text-white">La Cabaña </span>
                   <span className="text-orange-500">Creative</span>
                 </div>
-                <div className="text-[10px] text-gray-500">Prod. by Weber</div>
+                <div className="text-[9px] sm:text-[10px] text-gray-500">Prod. by Weber</div>
               </div>
             </div>
 
             {/* Homepage Button */}
             <Link to={createPageUrl("Landing")}>
-              <button className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-sm font-medium transition-colors">
-                <Home className="w-4 h-4" />
-                <span>Homepage</span>
+              <button className="hidden lg:flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs sm:text-sm font-medium transition-colors">
+                <Home className="w-3 sm:w-4 h-3 sm:h-4" />
+                <span className="hidden lg:inline">Homepage</span>
               </button>
             </Link>
           </div>
@@ -93,8 +93,8 @@ export default function AdminLayout({ children, activePage }) {
           </div>
 
           {/* User Menu */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-sm font-bold cursor-pointer">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs sm:text-sm font-bold cursor-pointer">
               W
             </div>
           </div>

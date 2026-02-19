@@ -12,6 +12,7 @@ import StoriesEditor from "@/components/admin/StoriesEditor";
 import StartupsEditor from "@/components/admin/StartupsEditor";
 import FormsEditor from "@/components/admin/FormsEditor";
 import TeamEditor from "@/components/admin/TeamEditor";
+import AboutEditor from "@/components/admin/AboutEditor";
 import { 
   Eye, 
   GripVertical, 
@@ -356,6 +357,14 @@ export default function LandingEditor() {
             {/* Startups Section Editor */}
             <SectionEditor title="🚀 Nuestras Startups">
               <StartupsEditor />
+            </SectionEditor>
+
+            {/* About Section Editor */}
+            <SectionEditor title="📖 Acerca de Nosotros">
+              <AboutEditor 
+                config={config}
+                onUpdate={(data) => updateMutation.mutate(data)}
+              />
             </SectionEditor>
 
             {/* Team Section Editor */}
