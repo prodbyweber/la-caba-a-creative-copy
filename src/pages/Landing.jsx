@@ -31,7 +31,7 @@ export default function Landing() {
         <Hero config={config} />
         <BrandsCarousel logos={config?.brand_logos} />
         <AboutSection />
-        <TeamSection />
+        <div id="team"><TeamSection /></div>
         <div id="stories"><StoriesSection /></div>
         <div id="offers"><OffersCarousel /></div>
         <DashboardPreview />

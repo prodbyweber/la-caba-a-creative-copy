@@ -61,7 +61,7 @@ export default function LandingNav() {
   };
 
   const navItems = [
-    { label: "Quién Soy", id: "timeline" },
+    { label: "Quiénes Somos", id: "team" },
     { label: "Artistas", id: "stories" },
     { label: "ADN de Marca", page: "ADNdeMarca" },
     { label: "Exploración", id: "exploracion" },
