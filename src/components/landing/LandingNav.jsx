@@ -4,12 +4,21 @@ import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { Menu, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
 
 export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  const { data: config } = useQuery({
+    queryKey: ['landingConfig'],
+    queryFn: async () => {
+      const configs = await base44.entities.LandingConfig.list();
+      return configs.length > 0 ? configs[0] : null;
+    }
+  });
 
   useEffect(() => {
     const checkUser = async () => {
@@ -60,14 +69,25 @@ export default function LandingNav() {
     setMobileOpen(false);
   };
 
+  const visibleMenuButtons = config?.menu_buttons || {
+    quienes_somos: true,
+    artistas: true,
+    adn_marca: false,
+    exploracion: true,
+    startups: true,
+    comenzar: true
+  };
+
+  const adnMarcaLink = config?.adn_marca_link || createPageUrl("ADNdeMarca");
+
   const navItems = [
-    { label: "Quiénes Somos", id: "team" },
-    { label: "Artistas", id: "stories" },
-    { label: "ADN de Marca", page: "ADNdeMarca" },
-    { label: "Exploración", id: "exploracion" },
-    { label: "Startups", id: "startups" },
-    { label: "Comenzar", id: "offers", highlight: true }
-  ];
+    { label: "Quiénes Somos", id: "team", key: "quienes_somos" },
+    { label: "Artistas", id: "stories", key: "artistas" },
+    { label: "ADN de Marca", url: adnMarcaLink, key: "adn_marca" },
+    { label: "Exploración", id: "exploracion", key: "exploracion" },
+    { label: "Startups", id: "startups", key: "startups" },
+    { label: "Comenzar", id: "offers", highlight: true, key: "comenzar" }
+  ].filter(item => visibleMenuButtons[item.key] !== false);
 
   return (
     <>
@@ -96,23 +116,23 @@ export default function LandingNav() {
             {navItems.map((item) => (
               item.highlight ? (
                 <button
-                  key={item.id || item.page}
+                  key={item.key}
                   onClick={() => scrollToSection(item.id)}
                   className="px-5 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-medium hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
                 >
                   {item.label}
                 </button>
-              ) : item.page ? (
+              ) : item.url ? (
                 <Link
-                  key={item.page}
-                  to={createPageUrl(item.page)}
+                  key={item.key}
+                  to={item.url}
                   className="text-sm text-gray-400 hover:text-white transition-colors font-medium"
                 >
                   {item.label}
                 </Link>
               ) : (
                 <button
-                  key={item.id}
+                  key={item.key}
                   onClick={() => scrollToSection(item.id)}
                   className="text-sm text-gray-400 hover:text-white transition-colors font-medium"
                 >
@@ -183,10 +203,10 @@ export default function LandingNav() {
 
               <div className="flex flex-col gap-6">
                 {navItems.map((item) => (
-                  item.page ? (
+                  item.url ? (
                     <Link
-                      key={item.page}
-                      to={createPageUrl(item.page)}
+                      key={item.key}
+                      to={item.url}
                       onClick={() => setMobileOpen(false)}
                       className="text-2xl font-light text-left text-gray-300 hover:text-white transition-colors"
                     >
@@ -194,7 +214,7 @@ export default function LandingNav() {
                     </Link>
                   ) : (
                     <button
-                      key={item.id}
+                      key={item.key}
                       onClick={() => scrollToSection(item.id)}
                       className={`text-2xl font-light text-left transition-colors ${
                         item.highlight 
