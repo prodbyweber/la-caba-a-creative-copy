@@ -75,15 +75,15 @@ export default function Hero({ config }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="bg-zinc-900/90 backdrop-blur-xl border border-white/10 rounded-lg lg:rounded-xl px-3 py-2.5 lg:px-6 lg:py-3 shadow-xl"
+            className="bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-lg lg:rounded-xl px-3 py-2 lg:px-6 lg:py-3"
           >
-            <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 justify-center">
-              <span className="text-xs sm:text-sm text-gray-400 font-medium whitespace-nowrap">Hemos ayudado a:</span>
-              <div className="flex items-center gap-2 lg:gap-3 flex-wrap justify-center">
-                {['Artistas', 'Productores', 'Creadores de Contenido', 'Estudios'].map((tag, i) => (
+            <div className="flex items-center gap-2 lg:gap-4 justify-center overflow-x-auto">
+              <span className="text-[10px] sm:text-xs text-gray-400 font-medium whitespace-nowrap">Hemos ayudado a:</span>
+              <div className="flex items-center gap-2 lg:gap-3">
+                {['Artistas Emergentes', 'Productores', 'Creadores de Contenido', 'Estudios'].map((tag, i) => (
                   <span
                     key={i}
-                    className="px-2.5 py-1 lg:px-3 lg:py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-[11px] sm:text-xs text-gray-300 transition-colors cursor-default border border-white/5 whitespace-nowrap"
+                    className="px-2 py-1 lg:px-3 lg:py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-[10px] sm:text-xs text-gray-300 transition-colors cursor-default border border-white/5 whitespace-nowrap"
                   >
                     {tag}
                   </span>

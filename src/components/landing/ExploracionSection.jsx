@@ -21,7 +21,7 @@ export default function ExploracionSection() {
   const formLink = config?.exploracion_form_link || createPageUrl("ExploracionForm");
 
   return (
-    <section className="relative min-h-screen py-12 sm:py-16 lg:py-20 overflow-hidden bg-black">
+    <section className="relative min-h-screen py-20 overflow-hidden bg-black">
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-emerald-950/20 to-black" />
       
