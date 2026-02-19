@@ -195,24 +195,6 @@ export default function TeamSection() {
           </div>
         )}
 
-        {/* CTA Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="text-center mt-10"
-        >
-          <a href="#ofertas">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-6 py-3 bg-white text-black rounded-full font-semibold text-sm hover:bg-gray-100 transition-all shadow-lg inline-flex items-center gap-2"
-            >
-              Aplicar a La Cabaña
-            </motion.button>
-          </a>
-        </motion.div>
 
       </div>
 
