@@ -58,6 +58,7 @@ import Clips from './pages/Clips';
 import ClipsSettings from './pages/ClipsSettings';
 import ContentCalendar from './pages/ContentCalendar';
 import Dashboard from './pages/Dashboard';
+import ExploracionForm from './pages/ExploracionForm';
 import FinanceDashboard from './pages/FinanceDashboard';
 import InvestorDashboard from './pages/InvestorDashboard';
 import Landing from './pages/Landing';
@@ -72,7 +73,6 @@ import SocialAccounts from './pages/SocialAccounts';
 import TrackDetail from './pages/TrackDetail';
 import Tracks from './pages/Tracks';
 import UserProfile from './pages/UserProfile';
-import ExploracionForm from './pages/ExploracionForm';
 import __Layout from './Layout.jsx';
 
 
@@ -88,6 +88,7 @@ export const PAGES = {
     "ClipsSettings": ClipsSettings,
     "ContentCalendar": ContentCalendar,
     "Dashboard": Dashboard,
+    "ExploracionForm": ExploracionForm,
     "FinanceDashboard": FinanceDashboard,
     "InvestorDashboard": InvestorDashboard,
     "Landing": Landing,
@@ -102,7 +103,6 @@ export const PAGES = {
     "TrackDetail": TrackDetail,
     "Tracks": Tracks,
     "UserProfile": UserProfile,
-    "ExploracionForm": ExploracionForm,
 }
 
 export const pagesConfig = {

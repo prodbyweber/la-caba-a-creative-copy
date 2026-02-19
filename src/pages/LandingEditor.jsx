@@ -615,6 +615,53 @@ export default function LandingEditor() {
               />
             </SectionEditor>
 
+            {/* Menu Buttons Configuration */}
+            <SectionEditor title="🔗 Configuración del Menú" defaultOpen={false}>
+              <div className="space-y-4">
+                <div className="bg-white/5 rounded-lg p-4 space-y-3">
+                  <h3 className="text-sm font-medium text-white mb-4">Visibilidad de botones del menú:</h3>
+                  {[
+                    { key: 'quienes_somos', label: 'Quiénes Somos' },
+                    { key: 'artistas', label: 'Artistas' },
+                    { key: 'adn_marca', label: 'ADN de Marca' },
+                    { key: 'exploracion', label: 'Exploración' },
+                    { key: 'startups', label: 'Startups' },
+                    { key: 'comenzar', label: 'Comenzar' }
+                  ].map(btn => (
+                    <div key={btn.key} className="flex items-center justify-between p-2 bg-white/5 rounded-lg">
+                      <label className="text-sm text-gray-300">{btn.label}</label>
+                      <button
+                        onClick={() => {
+                          const newMenuButtons = { ...config.menu_buttons };
+                          newMenuButtons[btn.key] = !newMenuButtons[btn.key];
+                          updateField('menu_buttons', newMenuButtons);
+                        }}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                          config.menu_buttons?.[btn.key] 
+                            ? 'bg-emerald-500/20 text-emerald-400' 
+                            : 'bg-white/5 text-gray-500'
+                        }`}
+                      >
+                        {config.menu_buttons?.[btn.key] ? 'Visible' : 'Oculto'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-4 border-t border-white/10">
+                  <TextInput
+                    label="Enlace ADN de Marca"
+                    value={config.adn_marca_link || ''}
+                    onChange={(v) => updateField('adn_marca_link', v)}
+                    placeholder="/ADNdeMarca o URL personalizada"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">
+                    Este enlace se usa siempre que alguien acceda a ADN de Marca, aunque esté oculto del menú.
+                  </p>
+                </div>
+              </div>
+            </SectionEditor>
+
             {/* Draggable Sections */}
             <DragDropContext onDragEnd={handleDragEnd}>
               <Droppable droppableId="sections">
