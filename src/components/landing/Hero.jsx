@@ -59,53 +59,17 @@ export default function Hero({ config }) {
           </div>
         </motion.div>
 
-        {/* Bottom: Subtitle + CTA */}
+        {/* Bottom: Subtitle Only */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="max-w-2xl space-y-5"
+          className="max-w-2xl pb-20"
         >
           <p className="text-base sm:text-lg lg:text-xl text-gray-300 leading-relaxed">
             {heroSubtitle}
           </p>
-          
-          <a href="#ofertas">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-6 py-3 bg-white text-black rounded-full font-semibold text-sm sm:text-base hover:bg-gray-100 transition-all shadow-lg inline-flex items-center gap-2"
-            >
-              {heroCTA}
-            </motion.button>
-          </a>
         </motion.div>
-      </div>
-
-      {/* Bottom bar with tags - visible on desktop */}
-      <div className="hidden lg:block absolute bottom-4 left-0 right-0 z-20">
-        <div className="max-w-[1400px] mx-auto px-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.5 }}
-            className="bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-xl px-6 py-3"
-          >
-            <div className="flex items-center gap-4 justify-center flex-wrap">
-              <span className="text-xs text-gray-400">Hemos ayudado a:</span>
-              <div className="flex items-center gap-3 flex-wrap">
-                {['Artistas Emergentes', 'Productores', 'Creadores de Contenido', 'Estudios'].map((tag, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-xs text-gray-300 transition-colors cursor-default border border-white/5"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </div>
       </div>
 
     </section>
