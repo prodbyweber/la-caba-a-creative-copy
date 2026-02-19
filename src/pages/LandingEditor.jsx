@@ -11,6 +11,7 @@ import TimelineEditor from "@/components/admin/TimelineEditor";
 import StoriesEditor from "@/components/admin/StoriesEditor";
 import StartupsEditor from "@/components/admin/StartupsEditor";
 import FormsEditor from "@/components/admin/FormsEditor";
+import TeamEditor from "@/components/admin/TeamEditor";
 import { 
   Eye, 
   GripVertical, 
@@ -355,6 +356,14 @@ export default function LandingEditor() {
             {/* Startups Section Editor */}
             <SectionEditor title="🚀 Nuestras Startups">
               <StartupsEditor />
+            </SectionEditor>
+
+            {/* Team Section Editor */}
+            <SectionEditor title="👥 ¿Quiénes Somos? (Equipo)">
+              <TeamEditor 
+                config={config}
+                onUpdate={(data) => updateMutation.mutate(data)}
+              />
             </SectionEditor>
 
             {/* Timeline Section Editor */}
