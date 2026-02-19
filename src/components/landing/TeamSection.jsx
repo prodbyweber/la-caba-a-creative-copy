@@ -71,10 +71,10 @@ export default function TeamSection() {
             whileInView={{ scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, type: "spring" }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 mb-4"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 mb-4"
           >
-            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-            <span className="text-xs font-semibold text-purple-400">El Equipo</span>
+            <Sparkles className="w-3.5 h-3.5 text-orange-400" />
+            <span className="text-xs font-semibold text-orange-400">El Equipo</span>
           </motion.div>
           
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
@@ -127,7 +127,7 @@ export default function TeamSection() {
                 <div className="relative h-full bg-gradient-to-b from-zinc-900/90 to-black backdrop-blur-sm rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300 shadow-2xl border border-white/10">
                   
                   {/* Image Section */}
-                  <div className="relative h-[240px] overflow-hidden bg-gradient-to-br from-purple-900/20 to-emerald-900/20">
+                  <div className="relative h-[240px] overflow-hidden bg-gradient-to-br from-orange-900/20 to-emerald-900/20">
                     {member.image_url ? (
                       <img 
                         src={member.image_url} 
@@ -136,7 +136,7 @@ export default function TeamSection() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-purple-500 to-emerald-500 opacity-20" />
+                        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-orange-500 to-emerald-500 opacity-20" />
                       </div>
                     )}
                     {/* Gradient overlay */}
@@ -187,7 +187,7 @@ export default function TeamSection() {
                 onClick={() => scrollToIndex(index)}
                 className={`transition-all ${
                   index === currentIndex 
-                    ? 'w-8 h-2 bg-purple-500 rounded-full' 
+                    ? 'w-8 h-2 bg-orange-500 rounded-full' 
                     : 'w-2 h-2 bg-gray-600 rounded-full hover:bg-gray-500'
                 }`}
               />
@@ -195,6 +195,24 @@ export default function TeamSection() {
           </div>
         )}
 
+        {/* CTA Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="text-center mt-10"
+        >
+          <a href="#ofertas">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-6 py-3 bg-white text-black rounded-full font-semibold text-sm hover:bg-gray-100 transition-all shadow-lg inline-flex items-center gap-2"
+            >
+              Aplicar a La Cabaña
+            </motion.button>
+          </a>
+        </motion.div>
 
       </div>
 
