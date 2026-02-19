@@ -4,7 +4,6 @@ import { ArrowRight } from "lucide-react";
 
 export default function Hero({ config }) {
   const [imageLoaded, setImageLoaded] = React.useState(false);
-  const [currentTagIndex, setCurrentTagIndex] = React.useState(0);
   
   const heroTitle = config?.hero_title || "El estudio creativo definitivo para artistas que buscan conectar";
   const heroSubtitle = config?.hero_subtitle || "Producción por horas, visuales cinematográficos y digitalización artística para proyectos que van en serio.";
@@ -13,16 +12,8 @@ export default function Hero({ config }) {
 
   const tags = ['Artistas Emergentes', 'Productores', 'Creadores de Contenido', 'Estudios'];
 
-  // Auto-scroll carrusel
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTagIndex((prev) => (prev + 1) % tags.length);
-    }, 2500);
-    return () => clearInterval(interval);
-  }, [tags.length]);
-
   return (
-    <section className="relative min-h-screen flex items-start lg:items-center overflow-hidden bg-black pt-16 pb-0 lg:pt-20">
+    <section className="relative min-h-screen flex items-start lg:items-center overflow-hidden bg-black pt-16 pb-2 lg:pt-20">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-black to-black" />
       
@@ -82,12 +73,12 @@ export default function Hero({ config }) {
             {heroSubtitle}
           </p>
 
-          {/* Bar "Hemos ayudado a" - carrusel automático */}
+          {/* Bar "Hemos ayudado a" - carrusel horizontal automático */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-lg lg:rounded-xl px-3 py-2 lg:px-6 lg:py-3"
+            className="bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-lg lg:rounded-xl px-3 py-2 lg:px-6 lg:py-3 overflow-hidden"
           >
             <div className="flex items-center gap-2 lg:gap-4 justify-center">
               <span className="text-[10px] sm:text-xs text-gray-400 font-medium whitespace-nowrap">Hemos ayudado a:</span>
@@ -104,18 +95,31 @@ export default function Hero({ config }) {
                 ))}
               </div>
 
-              {/* Móvil - carrusel automático */}
-              <div className="lg:hidden overflow-hidden h-6 flex items-center">
-                <motion.span
-                  key={currentTagIndex}
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -20, opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="px-2 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs text-gray-300 border border-white/5 whitespace-nowrap inline-block"
+              {/* Móvil - carrusel horizontal infinito */}
+              <div className="lg:hidden relative overflow-hidden flex-1">
+                <motion.div
+                  className="flex items-center gap-2"
+                  animate={{
+                    x: [0, -100 * tags.length],
+                  }}
+                  transition={{
+                    x: {
+                      repeat: Infinity,
+                      repeatType: "loop",
+                      duration: tags.length * 3,
+                      ease: "linear",
+                    },
+                  }}
                 >
-                  {tags[currentTagIndex]}
-                </motion.span>
+                  {[...tags, ...tags, ...tags].map((tag, i) => (
+                    <span
+                      key={i}
+                      className="px-2 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs text-gray-300 border border-white/5 whitespace-nowrap inline-block"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </motion.div>
               </div>
             </div>
           </motion.div>
