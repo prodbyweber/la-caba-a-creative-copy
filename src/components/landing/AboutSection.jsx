@@ -123,7 +123,7 @@ export default function AboutSection() {
             </div>
           </motion.div>
 
-          {/* Right: Compact Visual Element */}
+          {/* Right: Dashboard Preview */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -131,47 +131,122 @@ export default function AboutSection() {
             transition={{ duration: 0.5 }}
             className="relative"
           >
-            <div className="relative aspect-square max-w-sm mx-auto rounded-2xl overflow-hidden border border-emerald-500/20 bg-gradient-to-br from-emerald-900/30 via-zinc-900 to-emerald-950/30 flex items-center justify-center">
+            <div className="relative max-w-sm mx-auto rounded-2xl overflow-hidden border border-emerald-500/20 bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 shadow-2xl shadow-emerald-500/10">
               
-              {/* Rotating pattern */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 opacity-10"
-              >
-                <svg className="w-full h-full" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-emerald-500" />
-                  <circle cx="50" cy="50" r="25" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-emerald-400" />
-                </svg>
-              </motion.div>
-
-              {/* Center cabin icon */}
-              <motion.div
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                className="relative z-10"
-              >
-                <div className="w-24 h-24 rounded-full bg-emerald-500/20 backdrop-blur-xl border border-emerald-500/30 flex items-center justify-center">
-                  <svg width="45" height="45" viewBox="0 0 100 100" fill="none" className="text-emerald-400">
-                    <path d="M50 10 L20 40 L30 40 L30 80 L70 80 L70 40 L80 40 Z" fill="currentColor" opacity="0.9"/>
-                    <path d="M35 50 L45 50 L45 75 L35 75 Z" fill="currentColor" opacity="0.7"/>
-                    <path d="M55 50 L65 50 L65 75 L55 75 Z" fill="currentColor" opacity="0.7"/>
-                  </svg>
+              {/* Dashboard Header */}
+              <div className="p-4 border-b border-white/5 bg-gradient-to-r from-emerald-500/10 to-purple-500/10">
+                <div className="flex items-center gap-3">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2, type: "spring" }}
+                    className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border-2 border-emerald-400/50 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-emerald-500/30"
+                  >
+                    AK
+                  </motion.div>
+                  <div>
+                    <h3 className="text-white font-bold text-sm">Artist Name</h3>
+                    <p className="text-xs text-gray-400">Dashboard</p>
+                  </div>
                 </div>
-              </motion.div>
+              </div>
 
-              {/* Minimal particles */}
-              {[...Array(4)].map((_, i) => (
+              {/* Stats Grid */}
+              <div className="p-4 space-y-3">
+                {/* Tracks & Albums */}
                 <motion.div
-                  key={i}
-                  animate={{ y: [0, -20, 0], opacity: [0.3, 0.7, 0.3] }}
-                  transition={{ duration: 2.5 + i * 0.4, repeat: Infinity, delay: i * 0.2 }}
-                  className="absolute w-1.5 h-1.5 rounded-full bg-emerald-400"
-                  style={{ left: `${30 + i * 15}%`, top: `${40 + (i % 2) * 20}%` }}
-                />
-              ))}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="grid grid-cols-2 gap-2"
+                >
+                  <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                    <div className="text-emerald-400 text-xl font-bold">12</div>
+                    <div className="text-xs text-gray-400">Tracks</div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                    <div className="text-purple-400 text-xl font-bold">3</div>
+                    <div className="text-xs text-gray-400">Albums</div>
+                  </div>
+                </motion.div>
+
+                {/* Dolby Atmos Badge */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 }}
+                  className="p-3 rounded-lg bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-500/20"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-blue-400 text-xs font-bold mb-1">DOLBY ATMOS</div>
+                      <div className="text-white text-sm font-semibold">Spatial Audio</div>
+                    </div>
+                    <div className="text-2xl">🎵</div>
+                  </div>
+                </motion.div>
+
+                {/* Studio Hours */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5 }}
+                  className="p-3 rounded-lg bg-white/5 border border-white/10"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-xs text-gray-400 mb-1">Horas de Estudio</div>
+                      <div className="text-white text-lg font-bold">48h</div>
+                    </div>
+                    <div className="text-emerald-400">
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Upcoming Sessions */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.6 }}
+                  className="p-3 rounded-lg bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-xs text-gray-400">Próximas Sesiones</div>
+                    <div className="w-2 h-2 rounded-full bg-orange-400 animate-pulse"></div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2 text-xs">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                      <span className="text-white">Lun 20:00 - Grabación</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <div className="w-1.5 h-1.5 rounded-full bg-purple-400"></div>
+                      <span className="text-white">Mié 18:00 - Mix</span>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Premium Badge */}
+              <div className="px-4 pb-4">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.7 }}
+                  className="p-2 rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 text-center"
+                >
+                  <div className="text-xs font-bold text-white">✨ Premium Dashboard</div>
+                </motion.div>
+              </div>
             </div>
           </motion.div>
 
