@@ -16,7 +16,7 @@ export default function ExploracionSection() {
 
   const title = config?.exploracion_title || "EXPLORACIÓN";
   const subtitle = config?.exploracion_subtitle || "con Prod. by Weber";
-  const description = config?.exploracion_description || "Antes de entrar al estudio, realizamos una sesión estratégica 1 a 1 donde revisamos tu propuesta completa: voz, contenido, estética, branding, sonido y calidad de audio. Analizamos tus perfiles de Spotify, Instagram, TikTok y YouTube, escuchamos tu música y te damos un veredicto claro con un plan de ejecución concreto.\n\nTe ayudamos a definir tu estilo musical, ordenar tu ecosistema creativo y construir una línea coherente para tu proyecto.\n\nLuego, aterrizamos esa visión en el estudio con una producción alineada a la nueva dirección definida.\n\nAdemás, incluye 2 horas en el estudio junto a Prod. by Weber donde producimos un tema desde cero para tu catálogo, alineado con la nueva dirección estratégica.\n\nSales con claridad, estrategia y una canción lista para avanzar con intención.";
+  const description = config?.exploracion_description || "Incluye 2 horas en estudio junto a Prod. by Weber para producir un tema desde cero y comenzar a construir un catálogo sólido y profesional.\n\nAntes de entrar al estudio, realizamos una sesión estratégica donde revisamos tu voz, contenido, estética, branding, sonido y calidad de audio. Analizamos tus perfiles, escuchamos tu música y te entregamos un plan claro para definir tu estilo y dirección creativa.";
   const imageUrl = config?.exploracion_image_url || "https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=400&h=400&fit=crop&q=80";
   const formLink = config?.exploracion_form_link || createPageUrl("ExploracionForm");
 
