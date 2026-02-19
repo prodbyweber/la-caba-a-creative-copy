@@ -25,11 +25,14 @@ export default function Hero({ config }) {
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="max-w-4xl w-full"
+          className="max-w-4xl w-full space-y-3 lg:space-y-4"
         >
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight px-2">
             {heroTitle}
           </h1>
+          <p className="text-base sm:text-lg lg:text-xl text-gray-400 leading-relaxed px-2">
+            Un lugar para crear y saber hacia dónde va tu música.
+          </p>
         </motion.div>
 
         {/* Center: Artist Image */}
