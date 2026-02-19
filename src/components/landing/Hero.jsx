@@ -3,10 +3,11 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
 export default function Hero({ config }) {
+  const [imageLoaded, setImageLoaded] = React.useState(false);
   const heroTitle = config?.hero_title || "El estudio creativo definitivo para artistas que buscan conectar";
   const heroSubtitle = config?.hero_subtitle || "Producción por horas, visuales cinematográficos y digitalización artística para proyectos que van en serio.";
   const heroCTA = config?.hero_cta_text || "Aplicar a La Cabaña Creative";
-  const heroImage = config?.hero_image_url || "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800";
+  const heroImage = config?.hero_image_url || "";
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-black">
@@ -54,12 +55,17 @@ export default function Hero({ config }) {
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 via-transparent to-purple-500/20 rounded-3xl blur-3xl" />
             
             {/* Image container */}
-            <div className="relative h-full rounded-3xl overflow-hidden">
-              <img
-                src={heroImage}
-                alt="Artist"
-                className="w-full h-full object-cover object-center"
-              />
+            <div className="relative h-full rounded-3xl overflow-hidden bg-black">
+              {heroImage && (
+                <img
+                  src={heroImage}
+                  alt="Artist"
+                  className={`w-full h-full object-cover object-center transition-opacity duration-500 ${
+                    imageLoaded ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  onLoad={() => setImageLoaded(true)}
+                />
+              )}
               
               {/* Gradient overlay at bottom */}
               <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
