@@ -6,7 +6,7 @@ import OffersCarousel from "@/components/landing/OffersCarousel";
 import BrandsCarousel from "@/components/landing/BrandsCarousel";
 import StoriesSection from "@/components/landing/StoriesSection";
 import StartupsSection from "@/components/landing/StartupsSection";
-import TimelineSection from "@/components/landing/TimelineSection";
+
 import ExploracionSection from "@/components/landing/ExploracionSection";
 import MemberBanner from "@/components/landing/MemberBanner";
 import LandingNav from "@/components/landing/LandingNav";
@@ -29,7 +29,6 @@ export default function Landing() {
         <Hero config={config} />
         <BrandsCarousel logos={config?.brand_logos} />
         <div id="stories"><StoriesSection /></div>
-        <div id="timeline"><TimelineSection /></div>
         <div id="offers"><OffersCarousel /></div>
         <div id="exploracion"><ExploracionSection /></div>
         <div id="startups"><StartupsSection /></div>
