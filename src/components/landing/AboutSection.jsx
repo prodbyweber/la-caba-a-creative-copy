@@ -208,19 +208,58 @@ export default function AboutSection() {
                     <Music2 className="w-3 h-3" />
                     <span>Tracks Recientes</span>
                   </div>
-                  {['Amanecer', 'Noctámbulo'].map((track, i) => (
-                    <div key={i} className="flex items-center gap-2 p-1.5 rounded-lg bg-white/5 border border-white/10">
-                      <div className="w-7 h-7 rounded bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
-                        <Play className="w-2.5 h-2.5 text-purple-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs text-white font-medium truncate">{track}</div>
-                      </div>
-                      <div className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold">
-                        ATMOS
-                      </div>
+                  
+                  {/* Track 1 - Dolby Atmos */}
+                  <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/5 border border-white/10">
+                    <div className="w-7 h-7 rounded bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
+                      <Play className="w-2.5 h-2.5 text-purple-400" />
                     </div>
-                  ))}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs text-white font-medium truncate">Amanecer</div>
+                    </div>
+                    <div className="text-[8px] px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-400 font-bold">
+                      Dolby Atmos
+                    </div>
+                  </div>
+
+                  {/* Track 2 - Master */}
+                  <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/5 border border-white/10">
+                    <div className="w-7 h-7 rounded bg-gradient-to-br from-emerald-500/20 to-blue-500/20 flex items-center justify-center flex-shrink-0">
+                      <Play className="w-2.5 h-2.5 text-emerald-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs text-white font-medium truncate">Noctámbulo</div>
+                    </div>
+                    <div className="text-[9px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold">
+                      Master
+                    </div>
+                  </div>
+
+                  {/* Track 3 - Mix */}
+                  <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/5 border border-white/10">
+                    <div className="w-7 h-7 rounded bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center flex-shrink-0">
+                      <Play className="w-2.5 h-2.5 text-blue-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs text-white font-medium truncate">Eclipse</div>
+                    </div>
+                    <div className="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 font-bold">
+                      Mix
+                    </div>
+                  </div>
+
+                  {/* Track 4 - Demo */}
+                  <div className="flex items-center gap-2 p-1.5 rounded-lg bg-white/5 border border-white/10">
+                    <div className="w-7 h-7 rounded bg-gradient-to-br from-yellow-500/20 to-orange-500/20 flex items-center justify-center flex-shrink-0">
+                      <Play className="w-2.5 h-2.5 text-yellow-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs text-white font-medium truncate">Vértigo</div>
+                    </div>
+                    <div className="text-[9px] px-1.5 py-0.5 rounded bg-yellow-500/10 text-yellow-400 font-bold">
+                      Demo
+                    </div>
+                  </div>
                 </motion.div>
 
                 {/* Calendar Preview */}
