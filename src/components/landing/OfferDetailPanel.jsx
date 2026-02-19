@@ -14,8 +14,10 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
   const [showBasicForm, setShowBasicForm] = useState(false);
   const [userDataSubmitted, setUserDataSubmitted] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [adminViewMode, setAdminViewMode] = useState(false);
   const VIDEO_DURATION = 240; // 4 minutes in seconds
   const isHighTicket = HIGH_TICKET_SERVICES.includes(offer?.title);
+  const showRestrictions = !adminViewMode;
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -37,6 +39,7 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
       setVideoWatchTime(0);
       setIsVideoCompleted(false);
       setUserDataSubmitted(false);
+      setAdminViewMode(false);
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -96,6 +99,23 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
           >
             <div className="min-h-screen px-4 py-6 sm:px-6 sm:py-10">
               <div className="max-w-3xl mx-auto">
+                {/* Admin View Toggle */}
+                {isAdmin && (
+                  <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-10">
+                    <button
+                      onClick={() => setAdminViewMode(!adminViewMode)}
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 transition-all"
+                    >
+                      <span className="text-[10px] font-semibold text-white uppercase">
+                        {adminViewMode ? "Admin" : "Usuario"}
+                      </span>
+                      <div className={`w-6 h-3.5 rounded-full transition-all ${adminViewMode ? 'bg-blue-500' : 'bg-gray-500'}`}>
+                        <div className={`w-3 h-3 rounded-full bg-white transition-transform duration-200 ${adminViewMode ? 'translate-x-3' : 'translate-x-0'} mt-0.25`} />
+                      </div>
+                    </button>
+                  </div>
+                )}
+
                 {/* Close Button */}
                 <button
                   onClick={onClose}
@@ -221,7 +241,7 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                   )}
 
                   {/* Video Progress Indicator */}
-                  {!isVideoCompleted && !isAdmin && (
+                  {!isVideoCompleted && showRestrictions && (
                     <div className="mb-4 p-3 bg-zinc-800/50 rounded-lg border border-zinc-700">
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-1.5 text-xs text-gray-400">
@@ -246,18 +266,18 @@ export default function OfferDetailPanel({ offer, isOpen, onClose }) {
                     </div>
                   )}
 
-                  {/* Admin Badge */}
-                  {isAdmin && !isVideoCompleted && (
-                    <div className="mb-3 p-2.5 bg-emerald-500/10 rounded-lg border border-emerald-500/30">
-                      <p className="text-[10px] text-emerald-400 font-medium">
-                        ✓ Modo Admin: Acceso completo
+                  {/* Admin Badge - Only show in admin view */}
+                  {adminViewMode && !isVideoCompleted && (
+                    <div className="mb-3 p-2.5 bg-blue-500/10 rounded-lg border border-blue-500/30">
+                      <p className="text-[10px] text-blue-400 font-medium">
+                        ✓ Vista Admin: Restricciones deshabilitadas
                       </p>
                     </div>
                   )}
 
                   {/* Booking Button - Always visible if link exists */}
                   {offer.booking_link && (
-                    (isVideoCompleted || isAdmin) ? (
+                    (isVideoCompleted || !showRestrictions) ? (
                       <motion.a
                         href={offer.booking_link}
                         target="_blank"
