@@ -76,30 +76,46 @@ export default function Hero({ config }) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="max-w-2xl w-full px-2 pb-6 lg:pb-20 space-y-4"
+          className="max-w-2xl w-full px-2 pb-0 lg:pb-20 space-y-3 lg:space-y-4"
         >
           <p className="text-sm sm:text-base lg:text-lg xl:text-xl text-gray-300 leading-relaxed">
             {heroSubtitle}
           </p>
 
-          {/* Bar "Hemos ayudado a" - inline */}
+          {/* Bar "Hemos ayudado a" - carrusel automático */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
             className="bg-zinc-900/80 backdrop-blur-xl border border-white/10 rounded-lg lg:rounded-xl px-3 py-2 lg:px-6 lg:py-3"
           >
-            <div className="flex items-center gap-2 lg:gap-4 justify-center overflow-x-auto">
+            <div className="flex items-center gap-2 lg:gap-4 justify-center">
               <span className="text-[10px] sm:text-xs text-gray-400 font-medium whitespace-nowrap">Hemos ayudado a:</span>
-              <div className="flex items-center gap-2 lg:gap-3">
-                {['Artistas Emergentes', 'Productores', 'Creadores de Contenido', 'Estudios'].map((tag, i) => (
+              
+              {/* Desktop - todos visibles */}
+              <div className="hidden lg:flex lg:items-center lg:gap-3">
+                {tags.map((tag, i) => (
                   <span
                     key={i}
-                    className="px-2 py-1 lg:px-3 lg:py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-[10px] sm:text-xs text-gray-300 transition-colors cursor-default border border-white/5 whitespace-nowrap"
+                    className="px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 text-xs text-gray-300 transition-colors cursor-default border border-white/5 whitespace-nowrap"
                   >
                     {tag}
                   </span>
                 ))}
+              </div>
+
+              {/* Móvil - carrusel automático */}
+              <div className="lg:hidden overflow-hidden h-6 flex items-center">
+                <motion.span
+                  key={currentTagIndex}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -20, opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="px-2 py-1 rounded-full bg-white/5 text-[10px] sm:text-xs text-gray-300 border border-white/5 whitespace-nowrap inline-block"
+                >
+                  {tags[currentTagIndex]}
+                </motion.span>
               </div>
             </div>
           </motion.div>
