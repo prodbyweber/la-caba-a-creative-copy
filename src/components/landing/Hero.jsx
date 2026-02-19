@@ -10,43 +10,29 @@ export default function Hero({ config }) {
   const heroImage = config?.hero_image_url || "";
 
   return (
-    <section className="relative h-screen flex items-center overflow-hidden bg-black">
+    <section className="relative h-screen flex items-center overflow-hidden bg-black pt-20">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-black to-black" />
       
       {/* Main Container */}
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-12 py-12 flex flex-col items-center text-center gap-6 lg:gap-8">
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-12 py-8 flex flex-col items-center text-center justify-center gap-6">
         
-        {/* Top: Text Content */}
+        {/* Top: Title Only */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
           className="max-w-4xl"
         >
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4 lg:mb-5">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
             {heroTitle}
           </h1>
-          
-          <p className="text-base sm:text-lg lg:text-xl text-gray-300 leading-relaxed mb-5 lg:mb-6 max-w-2xl mx-auto">
-            {heroSubtitle}
-          </p>
-          
-          <a href="#ofertas">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-6 py-3 bg-white text-black rounded-full font-semibold text-sm sm:text-base hover:bg-gray-100 transition-all shadow-lg inline-flex items-center gap-2"
-            >
-              {heroCTA}
-            </motion.button>
-          </a>
         </motion.div>
 
-        {/* Bottom: Artist Image */}
+        {/* Center: Artist Image */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7, delay: 0.2 }}
           className="relative w-full max-w-2xl lg:max-w-3xl"
         >
@@ -71,6 +57,28 @@ export default function Hero({ config }) {
               <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
             </div>
           </div>
+        </motion.div>
+
+        {/* Bottom: Subtitle + CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.4 }}
+          className="max-w-2xl space-y-5"
+        >
+          <p className="text-base sm:text-lg lg:text-xl text-gray-300 leading-relaxed">
+            {heroSubtitle}
+          </p>
+          
+          <a href="#ofertas">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-6 py-3 bg-white text-black rounded-full font-semibold text-sm sm:text-base hover:bg-gray-100 transition-all shadow-lg inline-flex items-center gap-2"
+            >
+              {heroCTA}
+            </motion.button>
+          </a>
         </motion.div>
       </div>
 
