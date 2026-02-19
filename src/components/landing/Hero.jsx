@@ -10,7 +10,7 @@ export default function Hero({ config }) {
   const heroCTA = config?.hero_cta_text || "Aplicar a La Cabaña Creative";
   const heroImage = config?.hero_image_url || "";
 
-  const tags = ['Artistas Emergentes', 'Productores', 'Creadores de Contenido', 'Estudios'];
+  const tags = ['Artistas', 'Productores', 'Creadores de Contenido', 'Estudios'];
 
   return (
     <section className="relative min-h-screen flex items-start lg:items-center overflow-hidden bg-black pt-16 pb-2 lg:pt-20">
