@@ -112,7 +112,7 @@ export default function OffersCarousel() {
   };
 
   return (
-    <section id="ofertas" className="relative py-20 sm:py-32 overflow-hidden bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950">
+    <section id="ofertas" className="relative py-8 sm:py-12 lg:py-20 overflow-hidden bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950">
       
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 sm:px-8">
         {/* Section Header */}

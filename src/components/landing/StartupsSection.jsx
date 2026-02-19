@@ -76,7 +76,7 @@ export default function StartupsSection() {
   };
 
   return (
-    <section className="relative py-12 sm:py-20 lg:py-32 overflow-hidden bg-gradient-to-b from-zinc-900 to-black">
+    <section className="relative py-8 sm:py-12 lg:py-20 overflow-hidden bg-gradient-to-b from-zinc-900 to-black">
       <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title */}
         <motion.div
