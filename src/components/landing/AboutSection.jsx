@@ -13,8 +13,8 @@ export default function AboutSection() {
     }
   });
 
-  const mainText = config?.about_main_text || "La Cabaña Creative nace de la convicción de que cada artista merece un espacio donde su visión pueda materializarse sin límites.";
-  const secondaryText = config?.about_secondary_text || "No somos un estudio tradicional. Somos un refugio creativo donde la autenticidad y la identidad artística se encuentran. Buscamos dirección, claridad y una propuesta única.";
+  const mainText = config?.about_main_text || 'La Cabaña Creative nace de la convicción de que <span class="text-emerald-400 font-semibold">cada artista merece un espacio donde su visión pueda materializarse sin límites</span>.';
+  const secondaryText = config?.about_secondary_text || 'No somos un estudio tradicional. Somos un refugio creativo donde la autenticidad y la identidad artística se encuentran. <span class="text-white font-medium">Buscamos dirección, claridad y una propuesta única</span>.';
   
   const values = [
     {

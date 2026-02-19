@@ -10,17 +10,17 @@ export default function AboutEditor({ config, onUpdate }) {
     <div className="space-y-4">
       <TextInput
         label="Párrafo Principal"
-        value={config?.about_main_text || "La Cabaña Creative nace de la convicción de que cada artista merece un espacio donde su visión pueda materializarse sin límites."}
+        value={config?.about_main_text || 'La Cabaña Creative nace de la convicción de que <span class="text-emerald-400 font-semibold">cada artista merece un espacio donde su visión pueda materializarse sin límites</span>.'}
         onChange={(v) => handleFieldUpdate('about_main_text', v)}
-        placeholder="Texto principal de la sección..."
+        placeholder="Texto principal (puedes usar HTML con <span class='text-emerald-400'>texto verde</span>)"
         multiline
       />
       
       <TextInput
         label="Párrafo Secundario"
-        value={config?.about_secondary_text || "No somos un estudio tradicional. Somos un refugio creativo donde la autenticidad y la identidad artística se encuentran. Buscamos dirección, claridad y una propuesta única."}
+        value={config?.about_secondary_text || 'No somos un estudio tradicional. Somos un refugio creativo donde la autenticidad y la identidad artística se encuentran. <span class="text-white font-medium">Buscamos dirección, claridad y una propuesta única</span>.'}
         onChange={(v) => handleFieldUpdate('about_secondary_text', v)}
-        placeholder="Texto secundario..."
+        placeholder="Texto secundario (puedes usar HTML con <span class='text-white font-medium'>texto resaltado</span>)"
         multiline
       />
 
