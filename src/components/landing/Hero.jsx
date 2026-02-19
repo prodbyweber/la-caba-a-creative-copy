@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Globe } from "lucide-react";
 
 export default function Hero({ config }) {
   const [imageLoaded, setImageLoaded] = React.useState(false);
@@ -121,6 +121,22 @@ export default function Hero({ config }) {
                 </motion.div>
               </div>
             </div>
+          </motion.div>
+        </motion.div>
+
+        {/* Mobile Divider - Global Symbol */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="lg:hidden flex justify-center py-6"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 rounded-full border-2 border-emerald-500/30 flex items-center justify-center"
+          >
+            <Globe className="w-6 h-6 text-emerald-500/60" />
           </motion.div>
         </motion.div>
       </div>
