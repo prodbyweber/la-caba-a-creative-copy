@@ -72,6 +72,7 @@ import SocialAccounts from './pages/SocialAccounts';
 import TrackDetail from './pages/TrackDetail';
 import Tracks from './pages/Tracks';
 import UserProfile from './pages/UserProfile';
+import ExploracionForm from './pages/ExploracionForm';
 import __Layout from './Layout.jsx';
 
 
@@ -101,6 +102,7 @@ export const PAGES = {
     "TrackDetail": TrackDetail,
     "Tracks": Tracks,
     "UserProfile": UserProfile,
+    "ExploracionForm": ExploracionForm,
 }
 
 export const pagesConfig = {
