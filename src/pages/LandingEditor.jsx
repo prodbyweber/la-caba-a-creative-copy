@@ -13,6 +13,7 @@ import StartupsEditor from "@/components/admin/StartupsEditor";
 import FormsEditor from "@/components/admin/FormsEditor";
 import TeamEditor from "@/components/admin/TeamEditor";
 import AboutEditor from "@/components/admin/AboutEditor";
+import ExploracionEditor from "@/components/admin/ExploracionEditor";
 import { 
   Eye, 
   GripVertical, 
@@ -380,6 +381,16 @@ export default function LandingEditor() {
               <TimelineEditor 
                 timeline={config.timeline_milestones || []}
                 onUpdate={(timeline) => updateField('timeline_milestones', timeline)}
+              />
+            </SectionEditor>
+
+            {/* Exploración Section Editor */}
+            <SectionEditor title="🎯 Exploración con Prod. by Weber">
+              <ExploracionEditor 
+                config={config}
+                onUpdate={(data) => updateMutation.mutate(data)}
+                isUploading={isUploading}
+                setIsUploading={setIsUploading}
               />
             </SectionEditor>
 
