@@ -89,6 +89,10 @@ export default function LandingNav() {
     { label: "Comenzar", id: "offers", highlight: true, key: "comenzar" }
   ].filter(item => visibleMenuButtons[item.key] !== false);
 
+  const adminNavItems = user?.role === 'admin' ? [
+    { label: "Panel de Artista", url: createPageUrl("ArtistDashboard"), key: "artist_panel" }
+  ] : [];
+
   return (
     <>
       <motion.nav
@@ -139,6 +143,15 @@ export default function LandingNav() {
                   {item.label}
                 </button>
               )
+            ))}
+            {adminNavItems.map((item) => (
+              <Link
+                key={item.key}
+                to={item.url}
+                className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors font-medium border border-emerald-500/30 px-3 py-1.5 rounded-lg hover:bg-emerald-500/10"
+              >
+                {item.label}
+              </Link>
             ))}
           </div>
 
@@ -225,6 +238,16 @@ export default function LandingNav() {
                       {item.label}
                     </button>
                   )
+                ))}
+                {adminNavItems.map((item) => (
+                  <Link
+                    key={item.key}
+                    to={item.url}
+                    onClick={() => setMobileOpen(false)}
+                    className="text-2xl font-light text-left text-emerald-400 hover:text-emerald-300 transition-colors border border-emerald-500/30 rounded-lg px-4 py-2"
+                  >
+                    {item.label}
+                  </Link>
                 ))}
                 <div className="pt-6 border-t border-white/10">
                   {user ? (
