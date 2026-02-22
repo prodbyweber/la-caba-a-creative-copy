@@ -73,6 +73,7 @@ import SocialAccounts from './pages/SocialAccounts';
 import TrackDetail from './pages/TrackDetail';
 import Tracks from './pages/Tracks';
 import UserProfile from './pages/UserProfile';
+import ArtistPanelList from './pages/ArtistPanelList';
 import __Layout from './Layout.jsx';
 
 
@@ -103,6 +104,7 @@ export const PAGES = {
     "TrackDetail": TrackDetail,
     "Tracks": Tracks,
     "UserProfile": UserProfile,
+    "ArtistPanelList": ArtistPanelList,
 }
 
 export const pagesConfig = {

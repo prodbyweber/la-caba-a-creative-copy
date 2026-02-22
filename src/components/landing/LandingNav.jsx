@@ -90,7 +90,7 @@ export default function LandingNav() {
   ].filter(item => visibleMenuButtons[item.key] !== false);
 
   const adminNavItems = user?.role === 'admin' ? [
-    { label: "Panel de Artista", url: createPageUrl("ArtistDashboard"), key: "artist_panel" }
+    { label: "Panel de Artista", url: createPageUrl("ArtistPanelList"), key: "artist_panel" }
   ] : [];
 
   return (
