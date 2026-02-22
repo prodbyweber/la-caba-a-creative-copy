@@ -22,7 +22,7 @@ import { createPageUrl } from "@/utils";
     { icon: LayoutDashboard, label: "Panel", active: true, page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
     { icon: BarChart3, label: "Análisis", page: artistId ? `Analytics?artistId=${artistId}` : "Analytics" },
     { icon: Film, label: "Clips", page: artistId ? `Clips?artistId=${artistId}` : "Clips" },
-    { icon: Music2, label: "Tracks", page: artistId ? `Tracks?artistId=${artistId}` : "Tracks" },
+    { icon: Music2, label: "Tracks", page: artistId ? `ArtistTracks?artistId=${artistId}` : "Tracks" },
     { icon: FolderKanban, label: "Proyectos", page: artistId ? `Projects?artistId=${artistId}` : "Projects" },
     { icon: Share2, label: "Redes Sociales", page: artistId ? `SocialAccounts?artistId=${artistId}` : "SocialAccounts" },
     { icon: Calendar, label: "Calendario", page: artistId ? `Calendars?artistId=${artistId}` : "Calendars" },
