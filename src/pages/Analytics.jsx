@@ -82,83 +82,17 @@ export default function Analytics() {
             ))}
           </div>
 
-          {/* KPI Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/20 rounded-2xl p-6"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                  <Play className="w-6 h-6 text-emerald-400" />
-                </div>
-                <div className="flex items-center gap-1 text-emerald-400 text-sm">
-                  <TrendingUp className="w-4 h-4" />
-                  +24%
-                </div>
-              </div>
-              <div className="text-3xl font-bold mb-1">847K</div>
-              <div className="text-sm text-gray-400">Reproducciones</div>
-            </motion.div>
+          {/* Overview Summary (Resumen Agregado) */}
+          <OverviewSummary />
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border border-purple-500/20 rounded-2xl p-6"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-purple-400" />
-                </div>
-                <div className="flex items-center gap-1 text-purple-400 text-sm">
-                  <TrendingUp className="w-4 h-4" />
-                  +18%
-                </div>
-              </div>
-              <div className="text-3xl font-bold mb-1">142K</div>
-              <div className="text-sm text-gray-400">Oyentes</div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-gradient-to-br from-pink-500/10 to-pink-600/5 border border-pink-500/20 rounded-2xl p-6"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center">
-                  <Heart className="w-6 h-6 text-pink-400" />
-                </div>
-                <div className="flex items-center gap-1 text-pink-400 text-sm">
-                  <TrendingUp className="w-4 h-4" />
-                  +32%
-                </div>
-              </div>
-              <div className="text-3xl font-bold mb-1">38.5K</div>
-              <div className="text-sm text-gray-400">Me Gusta</div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border border-orange-500/20 rounded-2xl p-6"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center">
-                  <Share2 className="w-6 h-6 text-orange-400" />
-                </div>
-                <div className="flex items-center gap-1 text-red-400 text-sm">
-                  <TrendingDown className="w-4 h-4" />
-                  -5%
-                </div>
-              </div>
-              <div className="text-3xl font-bold mb-1">12.3K</div>
-              <div className="text-sm text-gray-400">Compartidos</div>
-            </motion.div>
-          </div>
+          {/* Revenue Estimate */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <RevenueEstimate />
+          </motion.div>
 
           {/* Main Charts Row */}
           <div className="grid lg:grid-cols-3 gap-6 mb-6">
