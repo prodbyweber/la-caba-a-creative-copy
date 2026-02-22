@@ -55,27 +55,28 @@ export default function Dashboard() {
       <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main className="lg:pl-64 pt-16">
-        <div className="p-6 max-w-[1600px] mx-auto">
-          {/* Header */}
+      <main className="lg:pl-64 pt-14">
+        <div className="px-3 py-2 max-w-full">
+          {/* Header Compacto */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className="mb-3"
           >
-            <h1 className="text-3xl font-bold mb-2">Bienvenido de nuevo, <span className="text-emerald-400">JLY</span></h1>
-            <p className="text-gray-500">Esto es lo que está pasando con tu música hoy.</p>
+            <h1 className="text-xl font-bold">
+              <span className="text-emerald-400">JLY</span>
+            </h1>
           </motion.div>
 
           {/* Mobile Artist Profile (compact) */}
-          <div className="lg:hidden mb-6">
+          <div className="lg:hidden mb-3">
             <ArtistProfileCard compact={true} />
           </div>
 
           {/* Main Grid */}
-          <div className="grid lg:grid-cols-3 gap-6">
+          <div className="grid lg:grid-cols-12 gap-3">
             {/* Left Column */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-9 space-y-3">
               <ProjectsSection jlyArtistId={jlyArtistId} />
               <TracksSection jlyArtistId={jlyArtistId} />
               <PerformanceOverview />
@@ -84,7 +85,7 @@ export default function Dashboard() {
             </div>
 
             {/* Right Column - Desktop only profile */}
-            <div className="space-y-6">
+            <div className="lg:col-span-3 space-y-3">
               <div className="hidden lg:block">
                 <ArtistProfileCard />
               </div>
