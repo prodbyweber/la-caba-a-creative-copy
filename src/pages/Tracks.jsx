@@ -13,9 +13,12 @@ export default function TracksPage() {
   const [playingTrackId, setPlayingTrackId] = useState(null);
   const audioRefs = React.useRef({});
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const artistId = urlParams.get("artistId");
+
   const queryClient = useQueryClient();
 
-  const { data: tracks = [], isLoading } = useQuery({
+  const { data: allTracks = [], isLoading } = useQuery({
     queryKey: ['all-tracks'],
     queryFn: () => base44.entities.Track.list('-created_date'),
     initialData: [],
@@ -26,6 +29,14 @@ export default function TracksPage() {
     queryFn: () => base44.entities.Project.list(),
     initialData: [],
   });
+
+  // Filtrar tracks por artista si hay artistId en la URL
+  const tracks = artistId 
+    ? allTracks.filter(track => {
+        const project = projects.find(p => p.id === track.project_id);
+        return project && project.artist_id === artistId;
+      })
+    : allTracks;
 
   const filteredTracks = tracks.filter(track => 
     track.title?.toLowerCase().includes(searchQuery.toLowerCase())
