@@ -105,18 +105,18 @@ export default function ArtistDashboard() {
           {/* Grid Principal Compacto */}
           <div className="grid lg:grid-cols-12 gap-3 lg:gap-4">
             {/* Columna Izquierda - Wallet y Stats */}
-            <div className="lg:col-span-3 space-y-3 lg:space-y-4">
+            <div className="lg:col-span-3 space-y-2 lg:space-y-3">
               <WalletCard />
-              <PerformanceOverview />
               <UpcomingSessionsCard artistId={artist.id} />
             </div>
 
             {/* Columna Central - Proyectos y Tracks (PRIORIDAD) */}
             <div className="lg:col-span-9 space-y-3 lg:space-y-4">
+              <PerformanceOverview />
               <ProjectsSection jlyArtistId={artist.id} />
               <TracksSection jlyArtistId={artist.id} />
-              <SocialMetricsCard artist={artist} />
               <GrowthChart />
+              <SocialMetricsCard artist={artist} />
             </div>
           </div>
         </div>

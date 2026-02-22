@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Instagram, Youtube, Music2, TrendingUp, Users, Eye, Heart, ExternalLink } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
 export default function SocialMetricsCard({ artist }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const [extractingData, setExtractingData] = useState({});
   const queryClient = useQueryClient();
 
@@ -179,33 +180,46 @@ export default function SocialMetricsCard({ artist }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5 overflow-hidden"
+      className="bg-gradient-to-br from-[#141414] to-black rounded-lg border border-white/5 overflow-hidden"
     >
-      {/* Header con Total de Seguidores */}
-      <div className="p-4 lg:p-6 border-b border-white/5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-emerald-400" />
-            </div>
-            <div>
-              <h3 className="text-base lg:text-lg font-bold text-white">Redes Sociales</h3>
-              <p className="text-xs text-gray-500">Conecta y trackea tus perfiles</p>
-            </div>
+      {/* Header Colapsable */}
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full p-3 flex items-center justify-between hover:bg-white/5 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center">
+            <TrendingUp className="w-4 h-4 text-emerald-400" />
           </div>
-          
-          {/* Total Followers Badge */}
-          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-2">
-            <div className="text-xs text-gray-400">Total Seguidores</div>
-            <div className="text-xl lg:text-2xl font-bold text-emerald-400">
-              {formatNumber(getTotalFollowers())}
-            </div>
+          <div className="text-left">
+            <h3 className="text-sm font-bold text-white">Redes Sociales</h3>
+            <p className="text-[10px] text-gray-500">
+              {formatNumber(getTotalFollowers())} seguidores totales
+            </p>
           </div>
         </div>
-      </div>
+        <motion.div
+          animate={{ rotate: isExpanded ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="text-gray-400"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </motion.div>
+      </button>
 
-      {/* Platforms */}
-      <div className="p-4 lg:p-6 space-y-4">
+      {/* Platforms - Expandible */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="border-t border-white/5 overflow-hidden"
+          >
+            <div className="p-3 space-y-3">
         {socialPlatforms.map((platform) => {
           const currentUrl = artist.social_links?.[platform.id] || '';
           const metrics = artist.social_metrics?.[platform.id] || {};
@@ -214,19 +228,19 @@ export default function SocialMetricsCard({ artist }) {
           return (
             <div 
               key={platform.id}
-              className="bg-white/5 rounded-xl p-3 lg:p-4 border border-white/5 hover:border-white/10 transition-all"
+              className="bg-white/5 rounded-lg p-2 lg:p-3 border border-white/5 hover:border-white/10 transition-all"
             >
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
                 {/* Platform Header */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 lg:gap-3">
-                    <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-lg bg-gradient-to-br ${platform.color} flex items-center justify-center`}>
-                      <platform.icon className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
+                  <div className="flex items-center gap-2">
+                    <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${platform.color} flex items-center justify-center`}>
+                      <platform.icon className="w-3.5 h-3.5 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-sm lg:text-base text-white">{platform.name}</h4>
+                      <h4 className="font-semibold text-xs text-white">{platform.name}</h4>
                       {isConnected && metrics.last_updated && (
-                        <p className="text-[10px] lg:text-xs text-gray-500">
+                        <p className="text-[9px] text-gray-500">
                           Actualizado {new Date(metrics.last_updated).toLocaleDateString()}
                         </p>
                       )}
@@ -237,15 +251,15 @@ export default function SocialMetricsCard({ artist }) {
                       href={currentUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
                     >
-                      <ExternalLink className="w-4 h-4" />
+                      <ExternalLink className="w-3 h-3" />
                     </a>
                   )}
                 </div>
 
                 {/* URL Input */}
-                <div className="flex gap-2">
+                <div className="flex gap-1.5">
                   <input
                     type="url"
                     value={currentUrl}
@@ -258,12 +272,12 @@ export default function SocialMetricsCard({ artist }) {
                       });
                     }}
                     placeholder={platform.placeholder}
-                    className="flex-1 px-3 py-2 text-xs lg:text-sm bg-black/40 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50"
+                    className="flex-1 px-2 py-1.5 text-[10px] bg-black/40 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50"
                   />
                   <button
                     onClick={() => extractSocialData(platform.id, currentUrl)}
                     disabled={!currentUrl || extractingData[platform.id]}
-                    className="px-3 lg:px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:bg-white/5 disabled:text-gray-600 text-white text-xs lg:text-sm font-medium transition-colors whitespace-nowrap"
+                    className="px-2 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:bg-white/5 disabled:text-gray-600 text-white text-[10px] font-medium transition-colors whitespace-nowrap"
                   >
                     {extractingData[platform.id] ? 'Cargando...' : 'Conectar'}
                   </button>
@@ -379,7 +393,10 @@ export default function SocialMetricsCard({ artist }) {
             </div>
           );
         })}
-      </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

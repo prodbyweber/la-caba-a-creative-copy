@@ -42,35 +42,35 @@ export default function PerformanceOverview() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+      className="grid grid-cols-2 lg:grid-cols-4 gap-2"
     >
       {metrics.map((metric, i) => (
         <motion.div
           key={i}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.1 }}
+          transition={{ delay: i * 0.05 }}
           whileHover={{ scale: 1.02 }}
-          className="bg-[#111113] rounded-2xl p-5 border border-white/5 hover:border-white/10 transition-all cursor-pointer group"
+          className="bg-[#111113] rounded-lg p-3 border border-white/5 hover:border-white/10 transition-all cursor-pointer group"
         >
-          <div className="flex items-start justify-between mb-4">
-            <div className={`w-11 h-11 rounded-xl bg-${metric.color}-500/10 flex items-center justify-center group-hover:scale-110 transition-transform`}>
-              <metric.icon className={`w-5 h-5 text-${metric.color}-400`} />
+          <div className="flex items-center justify-between mb-2">
+            <div className={`w-8 h-8 rounded-lg bg-${metric.color}-500/10 flex items-center justify-center group-hover:scale-110 transition-transform`}>
+              <metric.icon className={`w-4 h-4 text-${metric.color}-400`} />
             </div>
-            <div className={`flex items-center gap-1 text-xs font-medium ${
+            <div className={`flex items-center gap-0.5 text-[10px] font-medium ${
               metric.trend === 'up' ? 'text-emerald-400' : 'text-red-400'
             }`}>
               {metric.trend === 'up' ? (
-                <TrendingUp className="w-3 h-3" />
+                <TrendingUp className="w-2.5 h-2.5" />
               ) : (
-                <TrendingDown className="w-3 h-3" />
+                <TrendingDown className="w-2.5 h-2.5" />
               )}
-              {metric.change}
+              <span className="whitespace-nowrap">{metric.change}</span>
             </div>
           </div>
           
-          <div className="text-2xl font-bold mb-1">{metric.value}</div>
-          <div className="text-xs text-gray-500">{metric.label}</div>
+          <div className="text-xl font-bold mb-0.5">{metric.value}</div>
+          <div className="text-[10px] text-gray-500 leading-tight">{metric.label}</div>
         </motion.div>
       ))}
     </motion.div>
