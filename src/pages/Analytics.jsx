@@ -4,6 +4,8 @@ import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, Cartesia
 import { TrendingUp, TrendingDown, Eye, Play, Users, Heart, Share2, Music2, Calendar } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
+import OverviewSummary from "@/components/analytics/OverviewSummary";
+import RevenueEstimate from "@/components/analytics/RevenueEstimate";
 
 const streamData = [
   { month: "Ene", streams: 45000, listeners: 12000, saves: 3200 },
