@@ -18,23 +18,23 @@ import {
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
-const menuItems = [
-  { icon: LayoutDashboard, label: "Panel", active: true, page: "Dashboard" },
-  { icon: BarChart3, label: "Análisis", page: "Analytics" },
-  { icon: Film, label: "Clips", page: "Clips" },
-  { icon: Music2, label: "Tracks", page: "Tracks" },
-  { icon: FolderKanban, label: "Proyectos", page: "Projects" },
-  { icon: Share2, label: "Redes Sociales", page: "SocialAccounts" },
-  { icon: Calendar, label: "Calendario", page: "Calendars" },
-  { icon: Palette, label: "ADN de Marca", page: "ADNdeMarca" },
-];
+  const menuItems = [
+    { icon: LayoutDashboard, label: "Panel", active: true, page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
+    { icon: BarChart3, label: "Análisis", page: artistId ? `Analytics?artistId=${artistId}` : "Analytics" },
+    { icon: Film, label: "Clips", page: artistId ? `Clips?artistId=${artistId}` : "Clips" },
+    { icon: Music2, label: "Tracks", page: artistId ? `Tracks?artistId=${artistId}` : "Tracks" },
+    { icon: FolderKanban, label: "Proyectos", page: artistId ? `Projects?artistId=${artistId}` : "Projects" },
+    { icon: Share2, label: "Redes Sociales", page: artistId ? `SocialAccounts?artistId=${artistId}` : "SocialAccounts" },
+    { icon: Calendar, label: "Calendario", page: artistId ? `Calendars?artistId=${artistId}` : "Calendars" },
+    { icon: Palette, label: "ADN de Marca", page: artistId ? `ADNdeMarca?artistId=${artistId}` : "ADNdeMarca" },
+  ];
 
 const bottomItems = [
   { icon: Settings, label: "Configuración" },
   { icon: HelpCircle, label: "Ayuda" },
 ];
 
-export default function DashboardSidebar({ isOpen, onClose }) {
+export default function DashboardSidebar({ isOpen, onClose, artistId }) {
   return (
     <>
       {/* Desktop Sidebar */}

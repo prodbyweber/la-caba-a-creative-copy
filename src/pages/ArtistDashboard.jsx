@@ -66,7 +66,7 @@ export default function ArtistDashboard() {
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
       <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} artistName={artist.stageName} />
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} artistId={artist.id} />
 
       <main className="lg:pl-64 pt-14">
         <div className="px-3 py-2 max-w-full">
