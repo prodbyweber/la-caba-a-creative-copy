@@ -18,6 +18,7 @@ import {
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
+export default function DashboardSidebar({ isOpen, onClose, artistId }) {
   const menuItems = [
     { icon: LayoutDashboard, label: "Panel", active: true, page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
     { icon: BarChart3, label: "Análisis", page: artistId ? `Analytics?artistId=${artistId}` : "Analytics" },
@@ -29,12 +30,11 @@ import { createPageUrl } from "@/utils";
     { icon: Palette, label: "ADN de Marca", page: artistId ? `ADNdeMarca?artistId=${artistId}` : "ADNdeMarca" },
   ];
 
-const bottomItems = [
-  { icon: Settings, label: "Configuración" },
-  { icon: HelpCircle, label: "Ayuda" },
-];
+  const bottomItems = [
+    { icon: Settings, label: "Configuración" },
+    { icon: HelpCircle, label: "Ayuda" },
+  ];
 
-export default function DashboardSidebar({ isOpen, onClose, artistId }) {
   return (
     <>
       {/* Desktop Sidebar */}
