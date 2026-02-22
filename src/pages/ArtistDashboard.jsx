@@ -21,7 +21,7 @@ export default function ArtistDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
-  const artistId = urlParams.get("id");
+  const artistId = urlParams.get("artistId") || urlParams.get("id");
 
   const { data: artist, isLoading } = useQuery({
     queryKey: ['artist', artistId],
