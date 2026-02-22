@@ -272,29 +272,28 @@ export default function Calendars() {
         <div className="mt-6">
           <ContentCalendar />
         </div>
-      </div>
-
-      <CreateSessionModal
-        isOpen={showSessionModal}
-        onClose={() => setShowSessionModal(false)}
-        artists={artists}
-        projects={projects}
-      />
-
-      <CreateDeliverableModal
-        isOpen={showDeliverableModal}
-        onClose={() => setShowDeliverableModal(false)}
-        artists={artists}
-        projects={projects}
-      />
-
-      {selectedSession && (
-        <SessionDetailModal
-          session={selectedSession}
-          onClose={() => setSelectedSession(null)}
+        
+        <CreateSessionModal
+          isOpen={showSessionModal}
+          onClose={() => setShowSessionModal(false)}
           artists={artists}
+          projects={projects}
         />
-      )}
+
+        <CreateDeliverableModal
+          isOpen={showDeliverableModal}
+          onClose={() => setShowDeliverableModal(false)}
+          artists={artists}
+          projects={projects}
+        />
+
+        {selectedSession && (
+          <SessionDetailModal
+            session={selectedSession}
+            onClose={() => setSelectedSession(null)}
+            artists={artists}
+          />
+        )}
       </div>
       </main>
     </div>
