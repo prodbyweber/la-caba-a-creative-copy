@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import SessionDetailModal from "@/components/sessions/SessionDetailModal";
-import { Plus, Calendar as CalendarIcon, Package, List, Clock, MapPin, User, CheckCircle2, AlertCircle, Archive, Trash2 } from "lucide-react";
+import { Plus, Calendar as CalendarIcon, Package, List, Clock, MapPin, User, CheckCircle2, AlertCircle, Archive, Trash2, Film } from "lucide-react";
+import ContentCalendar from "@/components/calendar/ContentCalendar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, isToday, differenceInHours } from "date-fns";
 
@@ -223,7 +224,7 @@ export default function Calendars() {
         </div>
         ) : (
           /* Agenda View */
-          <div className="space-y-6">
+          <div className="space-y-3">
             {activeTab === "sessions" ? (
               <AgendaView 
                 sessions={sessions} 
@@ -239,6 +240,11 @@ export default function Calendars() {
             )}
           </div>
         )}
+
+        {/* Content Calendar Section */}
+        <div className="mt-6">
+          <ContentCalendar />
+        </div>
       </div>
 
       <CreateSessionModal
