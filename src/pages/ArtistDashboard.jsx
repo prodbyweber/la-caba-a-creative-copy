@@ -70,49 +70,71 @@ export default function ArtistDashboard() {
 
       <main className="lg:pl-64 pt-14 px-3 pb-6 lg:px-4">
         <div className="max-w-7xl mx-auto">
-          {/* Header Compacto */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-between mb-3"
-          >
-            <div className="flex items-center gap-3">
-              {artist.avatar_url ? (
-                <img 
-                  src={artist.avatar_url}
-                  alt={artist.stageName}
-                  className="w-10 h-10 rounded-lg object-cover border border-emerald-500/30"
-                />
-              ) : (
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center border border-emerald-500/30">
-                  <span className="text-lg font-bold text-white">{artist.stageName[0]}</span>
-                </div>
-              )}
-              <div>
-                <h1 className="text-lg lg:text-xl font-bold text-white">{artist.stageName}</h1>
-                <p className="text-xs text-gray-500">{artist.genre || 'Artist'} • {artist.location || 'Location'}</p>
-              </div>
-            </div>
-            <Link 
-              to={createPageUrl("ArtistPanelList")} 
-              className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1"
-            >
-              <ArrowLeft className="w-3 h-3" />
-              <span className="hidden lg:inline">Volver</span>
-            </Link>
-          </motion.div>
-
-          {/* Grid Principal Compacto */}
+          {/* Grid Principal Optimizado */}
           <div className="grid lg:grid-cols-12 gap-3 lg:gap-4">
-            {/* Columna Izquierda - Wallet y Stats */}
+            {/* Columna Izquierda - Avatar + Wallet + Stats */}
             <div className="lg:col-span-3 space-y-2 lg:space-y-3">
-              <WalletCard />
+              {/* Avatar Grande Estilo Netflix */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-gradient-to-b from-[#141414] to-black rounded-lg border border-white/5 overflow-hidden"
+              >
+                <div className="relative">
+                  <div className="relative aspect-square overflow-hidden">
+                    {artist.avatar_url ? (
+                      <img 
+                        src={artist.avatar_url}
+                        alt={artist.stageName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20">
+                        <span className="text-6xl font-bold text-white/40">{artist.stageName[0]}</span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
+                  </div>
+
+                  <div className="relative px-3 pb-3 -mt-12 z-20">
+                    <div className="bg-black/80 backdrop-blur-md rounded-lg p-3 border border-white/10">
+                      <h3 className="text-lg font-black text-white uppercase tracking-tight mb-0.5">
+                        {artist.stageName}
+                      </h3>
+                      <span className="text-xs font-medium text-gray-400">{artist.genre || 'Artist'}</span>
+                      <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-xs">
+                        <div>
+                          <div className="text-gray-500 text-[10px]">Status</div>
+                          <div className="text-emerald-400 font-semibold text-xs">{artist.status}</div>
+                        </div>
+                        {artist.location && (
+                          <div className="text-right">
+                            <div className="text-gray-500 text-[10px]">Location</div>
+                            <div className="text-white font-semibold text-xs">{artist.location}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
               <UpcomingSessionsCard artistId={artist.id} />
+              <WalletCard />
+              <PerformanceOverview />
             </div>
 
-            {/* Columna Central - Proyectos y Tracks (PRIORIDAD) */}
+            {/* Columna Central - Proyectos y Tracks (PROTAGONISTAS) */}
             <div className="lg:col-span-9 space-y-3 lg:space-y-4">
-              <PerformanceOverview />
+              <div className="flex items-center justify-between mb-1">
+                <Link 
+                  to={createPageUrl("ArtistPanelList")} 
+                  className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1 ml-auto"
+                >
+                  <ArrowLeft className="w-3 h-3" />
+                  <span className="hidden lg:inline">Volver</span>
+                </Link>
+              </div>
               <ProjectsSection jlyArtistId={artist.id} />
               <TracksSection jlyArtistId={artist.id} />
               <GrowthChart />

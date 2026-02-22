@@ -119,70 +119,65 @@ export default function ProjectsSection({ jlyArtistId }) {
             <div className="overflow-hidden" ref={emblaRef}>
               <div className="flex gap-3">
                 {projects.map((project, i) => {
-                  const projectTracks = getProjectTracks(project.id);
-                  return (
-                    <div 
-                      key={project.id} 
-                      className="flex-[0_0_160px] sm:flex-[0_0_200px]"
+                const projectTracks = getProjectTracks(project.id);
+                return (
+                  <div 
+                    key={project.id} 
+                    className="flex-[0_0_130px] sm:flex-[0_0_160px]"
+                  >
+                    <motion.div
+                      onClick={() => setEditingProject(project)}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.05 }}
+                      className="group bg-white/5 rounded-lg p-2 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer h-full"
                     >
-                      <motion.div
-                        onClick={() => setEditingProject(project)}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.05 }}
-                        className="group bg-white/5 rounded-xl p-3 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer h-full"
-                      >
-                        {/* Project Cover */}
-                        <div className="relative aspect-square rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 mb-2 overflow-hidden">
-                          {project.cover_url ? (
-                            <img 
-                              src={project.cover_url} 
-                              alt={project.title}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : projectTracks[0]?.cover_url ? (
-                            <img 
-                              src={projectTracks[0].cover_url} 
-                              alt={project.title}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Music2 className="w-10 h-10 text-white/20" />
-                            </div>
-                          )}
-                          {/* Track Count Badge */}
-                          <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] font-medium">
-                            {projectTracks.length}
+                      {/* Project Cover */}
+                      <div className="relative aspect-square rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 mb-1.5 overflow-hidden">
+                        {project.cover_url ? (
+                          <img 
+                            src={project.cover_url} 
+                            alt={project.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : projectTracks[0]?.cover_url ? (
+                          <img 
+                            src={projectTracks[0].cover_url} 
+                            alt={project.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Music2 className="w-8 h-8 text-white/20" />
                           </div>
+                        )}
+                        {/* Track Count Badge */}
+                        <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[9px] font-medium">
+                          {projectTracks.length}
                         </div>
+                      </div>
 
-                        {/* Info - Estilo Netflix */}
-                        <div className="space-y-1">
-                          <h4 className="font-bold text-sm text-white group-hover:text-emerald-400 transition-colors truncate">
-                            {project.title}
-                          </h4>
-                          <div className="flex flex-wrap items-center gap-1 text-[10px] text-gray-400">
-                            <span className="font-medium text-white">{getProjectYear(project)}</span>
-                            {project.type && (
-                              <>
-                                <span>•</span>
-                                <span className="text-emerald-400 font-semibold">{project.type}</span>
-                              </>
-                            )}
-                          </div>
-                          <div className="text-[10px] text-gray-500 truncate">
-                            {getArtistName(project.artist_id)}{getCollaboratorNames(project.collaborator_artist_ids)}
-                          </div>
-                          {project.genre && (
-                            <div className="text-[10px] text-gray-600 truncate">
-                              {project.genre}
-                            </div>
+                      {/* Info - Estilo Netflix */}
+                      <div className="space-y-0.5">
+                        <h4 className="font-bold text-xs text-white group-hover:text-emerald-400 transition-colors truncate">
+                          {project.title}
+                        </h4>
+                        <div className="flex flex-wrap items-center gap-1 text-[9px] text-gray-400">
+                          <span className="font-medium text-white">{getProjectYear(project)}</span>
+                          {project.type && (
+                            <>
+                              <span>•</span>
+                              <span className="text-emerald-400 font-semibold">{project.type}</span>
+                            </>
                           )}
                         </div>
-                      </motion.div>
-                    </div>
-                  );
+                        <div className="text-[9px] text-gray-500 truncate">
+                          {getArtistName(project.artist_id)}{getCollaboratorNames(project.collaborator_artist_ids)}
+                        </div>
+                      </div>
+                    </motion.div>
+                  </div>
+                );
                 })}
               </div>
             </div>
