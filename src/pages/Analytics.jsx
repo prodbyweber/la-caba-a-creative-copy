@@ -55,6 +55,15 @@ const platformsLikesData = [
   { name: "Others", value: 3800, color: "#9CA3AF" },
 ];
 
+const topCountriesData = [
+  { name: "España", views: 245000, likes: 12400, comments: 3200, followers: 28500, score: 289100 },
+  { name: "México", views: 187000, likes: 9800, comments: 2100, followers: 22100, score: 221000 },
+  { name: "Argentina", views: 156000, likes: 7200, comments: 1800, followers: 18900, score: 183900 },
+  { name: "Colombia", views: 134000, likes: 6100, comments: 1400, followers: 15200, score: 156700 },
+  { name: "Chile", views: 98000, likes: 4500, comments: 900, followers: 11200, score: 114600 },
+  { name: "Perú", views: 87000, likes: 3800, comments: 750, followers: 9400, score: 100950 },
+];
+
 export default function Analytics() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [timeframe, setTimeframe] = useState("6M");
@@ -314,6 +323,37 @@ export default function Analytics() {
                   <Bar dataKey="percentage" fill="#a855f7" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+          </motion.div>
+
+          {/* Top Countries */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-[#111113] rounded-2xl border border-white/5 p-6 mb-6"
+          >
+            <h3 className="text-lg font-bold mb-4">Top Países por Interacción</h3>
+            <div className="space-y-3">
+              {topCountriesData.map((country, i) => (
+                <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center text-sm font-bold text-emerald-400">
+                    {i + 1}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold mb-1">{country.name}</div>
+                    <div className="grid grid-cols-4 gap-4 text-xs text-gray-400">
+                      <div>👁️ {(country.views / 1000).toFixed(0)}K vistas</div>
+                      <div>❤️ {country.likes.toLocaleString()} me gusta</div>
+                      <div>💬 {country.comments.toLocaleString()} comentarios</div>
+                      <div>👥 {(country.followers / 1000).toFixed(1)}K seguidores</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-bold text-emerald-400">{(country.score / 1000).toFixed(0)}K</div>
+                    <div className="text-xs text-gray-500">interacción</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </motion.div>
 
