@@ -54,71 +54,67 @@ export default function Calendars() {
 
   return (
     <AdminLayout activePage="Calendars">
-      <div className="p-6 max-w-[1600px] mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Calendars</h1>
-            <p className="text-gray-500">Manage sessions and deliverables</p>
-          </div>
+      <div className="px-3 py-2 max-w-full">
+        {/* Header Compacto */}
+        <div className="flex items-center justify-end gap-2 mb-3">
           <button
             onClick={() => activeTab === "sessions" ? setShowSessionModal(true) : setShowDeliverableModal(true)}
-            className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-medium flex items-center gap-2 transition-colors"
+            className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium flex items-center gap-2 transition-colors"
           >
-            <Plus className="w-5 h-5" />
-            {activeTab === "sessions" ? "New Session" : "New Deliverable"}
+            <Plus className="w-4 h-4" />
+            {activeTab === "sessions" ? "Nueva Sesión" : "Nuevo Entregable"}
           </button>
         </div>
 
         {/* Tabs & View Mode Toggle */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
           <div className="flex gap-2">
             <button
               onClick={() => setActiveTab("sessions")}
-              className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
                 activeTab === "sessions"
                   ? 'bg-emerald-500 text-white'
                   : 'bg-white/5 text-gray-400 hover:bg-white/10'
               }`}
             >
-              <CalendarIcon className="w-5 h-5" />
-              Sessions Calendar ({sessions.length})
+              <CalendarIcon className="w-4 h-4" />
+              Sesiones ({sessions.length})
             </button>
             <button
               onClick={() => setActiveTab("deliverables")}
-              className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
                 activeTab === "deliverables"
                   ? 'bg-emerald-500 text-white'
                   : 'bg-white/5 text-gray-400 hover:bg-white/10'
               }`}
             >
-              <Package className="w-5 h-5" />
-              Deliverables ({deliverables.length})
+              <Package className="w-4 h-4" />
+              Entregables ({deliverables.length})
             </button>
           </div>
 
           {/* View Mode Toggle */}
-          <div className="flex gap-2 bg-white/5 rounded-xl p-1">
+          <div className="flex gap-1 bg-white/5 rounded-lg p-0.5">
             <button
               onClick={() => setViewMode("calendar")}
-              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
+              className={`px-3 py-1.5 rounded-md font-medium text-xs transition-all flex items-center gap-1.5 ${
                 viewMode === "calendar"
                   ? 'bg-white/10 text-white'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <CalendarIcon className="w-4 h-4" />
+              <CalendarIcon className="w-3.5 h-3.5" />
               Calendario
             </button>
             <button
               onClick={() => setViewMode("agenda")}
-              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
+              className={`px-3 py-1.5 rounded-md font-medium text-xs transition-all flex items-center gap-1.5 ${
                 viewMode === "agenda"
                   ? 'bg-white/10 text-white'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <List className="w-4 h-4" />
+              <List className="w-3.5 h-3.5" />
               Agenda
             </button>
           </div>
@@ -126,25 +122,25 @@ export default function Calendars() {
 
         {/* Calendar/Agenda View */}
         {viewMode === "calendar" ? (
-        <div className="bg-[#141414] rounded-2xl border border-white/5 p-6 mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">{format(currentDate, 'MMMM yyyy')}</h2>
-            <div className="flex gap-2">
+        <div className="bg-[#141414] rounded-lg border border-white/5 p-3 mb-3">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold">{format(currentDate, 'MMMM yyyy')}</h2>
+            <div className="flex gap-1.5">
               <button
                 onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))}
-                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10"
+                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-sm"
               >
                 ←
               </button>
               <button
                 onClick={() => setCurrentDate(new Date())}
-                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10"
+                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs"
               >
-                Today
+                Hoy
               </button>
               <button
                 onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))}
-                className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10"
+                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-sm"
               >
                 →
               </button>
@@ -152,16 +148,16 @@ export default function Calendars() {
           </div>
 
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-2 md:gap-3">
+          <div className="grid grid-cols-7 gap-1.5 md:gap-2">
             {/* Desktop Headers */}
-            {['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'].map((day) => (
-              <div key={day} className="hidden md:block text-center text-sm font-semibold text-gray-400 py-3 border-b border-white/10">
+            {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
+              <div key={day} className="hidden md:block text-center text-xs font-semibold text-gray-400 py-2 border-b border-white/10">
                 {day}
               </div>
             ))}
             {/* Mobile Headers */}
             {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((day, idx) => (
-              <div key={idx} className="md:hidden text-center text-xs font-medium text-gray-500 py-1">
+              <div key={idx} className="md:hidden text-center text-[10px] font-medium text-gray-500 py-1">
                 {day}
               </div>
             ))}
@@ -175,36 +171,36 @@ export default function Calendars() {
               return (
                 <div
                   key={i}
-                  className={`min-h-20 md:min-h-32 lg:min-h-40 p-2 md:p-3 rounded-xl border transition-all cursor-pointer ${
+                  className={`min-h-16 md:min-h-24 p-1.5 md:p-2 rounded-lg border transition-all cursor-pointer ${
                     isTodayDate
-                      ? 'bg-emerald-500/10 border-emerald-500/30 shadow-lg shadow-emerald-500/10'
+                      ? 'bg-emerald-500/10 border-emerald-500/30'
                       : hasItems
                       ? 'bg-white/5 border-white/10 hover:border-emerald-500/30 hover:bg-white/10'
                       : 'bg-white/5 border-white/5 hover:bg-white/10'
                   }`}
                 >
-                  <div className={`text-sm md:text-lg font-bold mb-2 ${
+                  <div className={`text-xs md:text-sm font-bold mb-1 ${
                     isTodayDate ? 'text-emerald-400' : 'text-gray-400'
                   }`}>
                     {format(day, 'd')}
                   </div>
-                  <div className="space-y-1 md:space-y-2">
-                    {activeTab === "sessions" && daySessions.slice(0, 3).map((session) => (
+                  <div className="space-y-0.5 md:space-y-1">
+                    {activeTab === "sessions" && daySessions.slice(0, 2).map((session) => (
                       <button
                         key={session.id}
                         onClick={() => setSelectedSession(session)}
-                        className="w-full text-left text-[10px] md:text-xs lg:text-sm p-1.5 md:p-2 rounded-lg bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors border border-blue-500/20"
+                        className="w-full text-left text-[9px] md:text-[10px] p-1 md:p-1.5 rounded bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors border border-blue-500/20"
                       >
-                        <div className="font-bold truncate mb-0.5">
+                        <div className="font-bold truncate">
                           {format(parseISO(session.start_time), 'HH:mm')}
                         </div>
-                        <div className="truncate leading-tight font-medium opacity-90">{session.title}</div>
+                        <div className="truncate leading-tight opacity-90">{session.title}</div>
                       </button>
                     ))}
-                    {activeTab === "deliverables" && dayDeliverables.slice(0, 3).map((deliverable) => (
+                    {activeTab === "deliverables" && dayDeliverables.slice(0, 2).map((deliverable) => (
                       <div
                         key={deliverable.id}
-                        className={`text-[10px] md:text-xs lg:text-sm p-1.5 md:p-2 rounded-lg truncate font-medium border ${
+                        className={`text-[9px] md:text-[10px] p-1 md:p-1.5 rounded truncate font-medium border ${
                           deliverable.status === 'Overdue' 
                             ? 'bg-red-500/20 text-red-400 border-red-500/30'
                             : 'bg-purple-500/20 text-purple-400 border-purple-500/30'
@@ -213,10 +209,10 @@ export default function Calendars() {
                         {deliverable.title}
                       </div>
                     ))}
-                    {((activeTab === "sessions" && daySessions.length > 3) || 
-                      (activeTab === "deliverables" && dayDeliverables.length > 3)) && (
-                      <div className="text-[10px] md:text-xs text-gray-500 font-medium px-1">
-                        +{(activeTab === "sessions" ? daySessions : dayDeliverables).length - 3} más
+                    {((activeTab === "sessions" && daySessions.length > 2) || 
+                      (activeTab === "deliverables" && dayDeliverables.length > 2)) && (
+                      <div className="text-[8px] md:text-[9px] text-gray-500 font-medium px-1">
+                        +{(activeTab === "sessions" ? daySessions : dayDeliverables).length - 2}
                       </div>
                     )}
                   </div>
