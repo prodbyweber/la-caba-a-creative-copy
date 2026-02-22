@@ -17,16 +17,16 @@ export default function ArtistProfileCard({ compact = false }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-[#141414] to-black rounded-xl border border-white/5 p-3"
+        className="bg-gradient-to-r from-[#141414] to-black rounded-lg border border-white/5 p-2.5"
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            <div className="w-12 h-12 rounded-lg overflow-hidden border-2 border-red-500/30 bg-gradient-to-br from-red-500 to-red-700">
+            <div className="w-10 h-10 rounded-lg overflow-hidden border-2 border-red-500/30 bg-gradient-to-br from-red-500 to-red-700">
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6965118e2b17684fa124077e/5cdacd140_jlytransparente.png"
                 alt="JLY"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
               />
             </div>
           </div>
@@ -37,14 +37,14 @@ export default function ArtistProfileCard({ compact = false }) {
               <h3 className="font-bold text-white text-sm">JLY</h3>
               <Verified className="w-3 h-3 text-red-500" />
             </div>
-            <p className="text-xs text-gray-500">Urban / Trap</p>
+            <p className="text-[10px] text-gray-500">Urban / Trap</p>
           </div>
 
           {/* Rating & Pro Badge */}
           <div className="flex items-center gap-2">
-            <div className="flex flex-col items-center justify-center w-10 h-12 bg-gradient-to-b from-red-600 to-red-800 rounded-lg border border-red-500/50">
-              <div className="text-lg font-black text-white">92</div>
-              <div className="text-[8px] font-bold text-red-200 uppercase">Overall</div>
+            <div className="flex flex-col items-center justify-center w-9 h-11 bg-gradient-to-b from-red-600 to-red-800 rounded-lg border border-red-500/50">
+              <div className="text-base font-black text-white">92</div>
+              <div className="text-[7px] font-bold text-red-200 uppercase">Overall</div>
             </div>
           </div>
         </div>
@@ -57,70 +57,70 @@ export default function ArtistProfileCard({ compact = false }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1 }}
-      className="bg-gradient-to-b from-[#141414] to-black rounded-2xl border border-white/5 overflow-hidden shadow-2xl"
+      className="bg-gradient-to-b from-[#141414] to-black rounded-lg border border-white/5 overflow-hidden"
     >
       <div className="relative">
-        {/* Artist Image - Full Width */}
-        <div className="relative h-[450px] sm:h-[500px] overflow-visible pt-8">
+        {/* Artist Image - Reducido */}
+        <div className="relative h-[180px] overflow-hidden">
           <img 
             src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6965118e2b17684fa124077e/5cdacd140_jlytransparente.png"
             alt="JLY"
-            className="w-full h-full object-contain object-top scale-100"
+            className="w-full h-full object-contain object-top"
           />
         </div>
 
         {/* Content overlay */}
-        <div className="relative px-6 pb-6 z-20">
-          <div className="grid grid-cols-[1fr,auto] gap-4 items-start">
+        <div className="relative px-3 pb-3 z-20">
+          <div className="grid grid-cols-[1fr,auto] gap-2 items-start">
             {/* Left Section - Info */}
-            <div className="space-y-2 bg-black/40 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+            <div className="space-y-1.5 bg-black/40 backdrop-blur-sm rounded-lg p-2.5 border border-white/10">
               {/* Artist Info */}
               <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">JLY</h3>
-                  <Verified className="w-5 h-5 text-red-500" />
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <h3 className="text-lg font-black text-white uppercase tracking-tight">JLY</h3>
+                  <Verified className="w-3.5 h-3.5 text-red-500" />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-gray-400">Urban / Catalan Trap</span>
+                  <span className="text-[10px] font-medium text-gray-400">Urban / Trap</span>
                 </div>
               </div>
 
               {/* Stats Compact */}
-              <div className="flex items-center gap-3 pt-2">
+              <div className="flex items-center gap-2 pt-1">
                 <div>
-                  <div className="text-xl font-bold text-white">2.4M</div>
-                  <div className="text-[10px] text-gray-500">Streams</div>
+                  <div className="text-sm font-bold text-white">2.4M</div>
+                  <div className="text-[8px] text-gray-500">Streams</div>
                 </div>
-                <div className="w-px h-8 bg-white/10" />
+                <div className="w-px h-6 bg-white/10" />
                 <div>
-                  <div className="text-xl font-bold text-red-500">#24</div>
-                  <div className="text-[10px] text-gray-500">Ranking</div>
+                  <div className="text-sm font-bold text-red-500">#24</div>
+                  <div className="text-[8px] text-gray-500">Ranking</div>
                 </div>
               </div>
             </div>
 
             {/* Right Section - Rating Badge */}
-            <div className="flex flex-col items-end gap-2">
-              <div className="flex flex-col items-center justify-center w-16 h-20 bg-gradient-to-b from-red-600 to-red-800 rounded-lg shadow-2xl border-2 border-red-500/50">
-                <div className="text-3xl font-black text-white">92</div>
-                <div className="text-[9px] font-bold text-red-200 uppercase tracking-wider">Overall</div>
+            <div className="flex flex-col items-end gap-1.5">
+              <div className="flex flex-col items-center justify-center w-12 h-16 bg-gradient-to-b from-red-600 to-red-800 rounded-lg border-2 border-red-500/50">
+                <div className="text-2xl font-black text-white">92</div>
+                <div className="text-[7px] font-bold text-red-200 uppercase">Overall</div>
               </div>
               
               {/* Pro Badge */}
-              <div className="px-2.5 py-1 bg-red-600 rounded-lg flex items-center gap-1.5 shadow-lg">
-                <Star className="w-3 h-3 text-white" fill="white" />
-                <span className="text-[10px] font-bold text-white uppercase tracking-wide">Pro</span>
+              <div className="px-2 py-0.5 bg-red-600 rounded flex items-center gap-1">
+                <Star className="w-2.5 h-2.5 text-white" fill="white" />
+                <span className="text-[8px] font-bold text-white uppercase">Pro</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="mt-3 px-6 pb-6 grid grid-cols-3 gap-2">
+        <div className="mt-2 px-3 pb-3 grid grid-cols-3 gap-1.5">
           {stats.slice(0, 3).map((stat, i) => (
-            <div key={i} className="bg-black/40 backdrop-blur-sm rounded-lg p-2.5 border border-white/10">
-              <div className="text-[10px] text-gray-500 mb-0.5 uppercase">{stat.label}</div>
-              <div className="text-lg font-bold text-white">{stat.value}</div>
+            <div key={i} className="bg-black/40 backdrop-blur-sm rounded-lg p-2 border border-white/10">
+              <div className="text-[8px] text-gray-500 mb-0.5 uppercase">{stat.label}</div>
+              <div className="text-sm font-bold text-white">{stat.value}</div>
             </div>
           ))}
         </div>
