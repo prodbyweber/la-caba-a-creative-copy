@@ -51,13 +51,13 @@ export default function PerformanceOverview() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.05 }}
           whileHover={{ scale: 1.02 }}
-          className="bg-[#111113] rounded-lg p-3 border border-white/5 hover:border-white/10 transition-all cursor-pointer group"
+          className="bg-[#111113] rounded-lg p-2.5 border border-white/5 hover:border-white/10 transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-2">
-            <div className={`w-8 h-8 rounded-lg bg-${metric.color}-500/10 flex items-center justify-center group-hover:scale-110 transition-transform`}>
-              <metric.icon className={`w-4 h-4 text-${metric.color}-400`} />
+            <div className={`w-7 h-7 rounded-lg bg-${metric.color}-500/10 flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0`}>
+              <metric.icon className={`w-3.5 h-3.5 text-${metric.color}-400`} />
             </div>
-            <div className={`flex items-center gap-0.5 text-[10px] font-medium ${
+            <div className={`flex items-center gap-0.5 text-[9px] font-medium flex-shrink-0 ${
               metric.trend === 'up' ? 'text-emerald-400' : 'text-red-400'
             }`}>
               {metric.trend === 'up' ? (
@@ -69,8 +69,8 @@ export default function PerformanceOverview() {
             </div>
           </div>
           
-          <div className="text-xl font-bold mb-0.5">{metric.value}</div>
-          <div className="text-[10px] text-gray-500 leading-tight">{metric.label}</div>
+          <div className="text-lg font-bold mb-0.5 truncate">{metric.value}</div>
+          <div className="text-[9px] text-gray-500 leading-tight truncate">{metric.label}</div>
         </motion.div>
       ))}
     </motion.div>

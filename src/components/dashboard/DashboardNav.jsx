@@ -29,18 +29,6 @@ export default function DashboardNav({ onMenuClick, artistName }) {
           </Link>
         </div>
 
-        {/* Center - Search */}
-        <div className="hidden md:flex items-center flex-1 max-w-xl mx-8">
-          <div className="relative w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Buscar clips, pistas, análisis..."
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-sm placeholder:text-gray-500 focus:outline-none focus:border-emerald-500/50 transition-colors"
-            />
-          </div>
-        </div>
-
         {/* Right */}
         <div className="flex items-center gap-3">
           <Link to={createPageUrl("AdminDashboard")}>
