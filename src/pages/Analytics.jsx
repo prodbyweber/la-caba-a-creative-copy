@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp, TrendingDown, Eye, Play, Users, Heart, Share2, Music2, Calendar } from "lucide-react";
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { TrendingUp, TrendingDown, Music2, Heart } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import OverviewSummary from "@/components/analytics/OverviewSummary";
-import RevenueEstimate from "@/components/analytics/RevenueEstimate";
+import WalletCard from "@/components/dashboard/WalletCard";
 
 const streamData = [
   { month: "Ene", streams: 45000, listeners: 12000, saves: 3200 },
@@ -34,12 +34,25 @@ const topTracks = [
   { title: "Golden Hour", streams: 65400, trend: "+5%", trendUp: true },
 ];
 
-const platformsData = [
-  { name: "Spotify", streams: 345000, color: "#1DB954" },
-  { name: "Apple Music", streams: 187000, color: "#FC3C44" },
-  { name: "YouTube", streams: 156000, color: "#FF0000" },
-  { name: "Deezer", streams: 78000, color: "#FF6600" },
-  { name: "SoundCloud", streams: 45000, color: "#FF5500" },
+const platformsStreamsData = [
+  { name: "Spotify", value: 345000, color: "#1DB954" },
+  { name: "Apple Music", value: 187000, color: "#FC3C44" },
+  { name: "YouTube", value: 156000, color: "#FF0000" },
+  { name: "Deezer", value: 78000, color: "#FF6600" },
+  { name: "SoundCloud", value: 45000, color: "#FF5500" },
+];
+
+const platformsViewsData = [
+  { name: "Instagram Reels", value: 234100, color: "#E4405F" },
+  { name: "TikTok", value: 187500, color: "#000000" },
+  { name: "YouTube Shorts", value: 120700, color: "#FF0000" },
+];
+
+const platformsLikesData = [
+  { name: "Instagram", value: 28400, color: "#E4405F" },
+  { name: "TikTok", value: 15200, color: "#000000" },
+  { name: "YouTube", value: 8900, color: "#FF0000" },
+  { name: "Others", value: 3800, color: "#9CA3AF" },
 ];
 
 export default function Analytics() {
@@ -82,21 +95,11 @@ export default function Analytics() {
             ))}
           </div>
 
-          {/* Overview Summary (Resumen Agregado) */}
+          {/* Overview Summary */}
           <OverviewSummary />
 
-          {/* Revenue Estimate */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <RevenueEstimate />
-          </motion.div>
-
-          {/* Main Charts Row */}
+          {/* Streams Over Time + Top Tracks */}
           <div className="grid lg:grid-cols-3 gap-6 mb-6">
-            {/* Streams Over Time */}
             <div className="lg:col-span-2 bg-[#111113] rounded-2xl border border-white/5 p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -144,7 +147,6 @@ export default function Analytics() {
               </div>
             </div>
 
-            {/* Top Tracks */}
             <div className="bg-[#111113] rounded-2xl border border-white/5 p-6">
               <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
                 <Music2 className="w-5 h-5 text-purple-400" />
@@ -170,52 +172,25 @@ export default function Analytics() {
             </div>
           </div>
 
-          {/* Demographics & Platforms */}
-          <div className="grid lg:grid-cols-2 gap-6">
-            {/* Demographics */}
-            <div className="bg-[#111113] rounded-2xl border border-white/5 p-6">
-              <h3 className="text-lg font-bold mb-4">Demografía por Edad</h3>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={demographicsData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
-                    <XAxis 
-                      dataKey="age" 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fill: '#6b7280', fontSize: 12 }}
-                    />
-                    <YAxis 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fill: '#6b7280', fontSize: 12 }}
-                    />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: '#1a1a1d', 
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '12px'
-                      }}
-                    />
-                    <Bar dataKey="percentage" fill="#a855f7" radius={[8, 8, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Platforms */}
-            <div className="bg-[#111113] rounded-2xl border border-white/5 p-6">
+          {/* Streams, Views & Likes by Platform */}
+          <div className="grid lg:grid-cols-3 gap-6 mb-6">
+            {/* Streams by Platform */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-[#111113] rounded-2xl border border-white/5 p-6"
+            >
               <h3 className="text-lg font-bold mb-4">Streams por Plataforma</h3>
               <div className="space-y-4">
-                {platformsData.map((platform, i) => {
-                  const total = platformsData.reduce((sum, p) => sum + p.streams, 0);
-                  const percentage = ((platform.streams / total) * 100).toFixed(1);
+                {platformsStreamsData.map((platform, i) => {
+                  const total = platformsStreamsData.reduce((sum, p) => sum + p.value, 0);
+                  const percentage = ((platform.value / total) * 100).toFixed(1);
                   
                   return (
                     <div key={i}>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium">{platform.name}</span>
-                        <span className="text-sm text-gray-500">{platform.streams.toLocaleString()}</span>
+                        <span className="text-sm text-gray-500">{(platform.value / 1000).toFixed(0)}K</span>
                       </div>
                       <div className="h-2 bg-white/5 rounded-full overflow-hidden">
                         <div 
@@ -231,8 +206,124 @@ export default function Analytics() {
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
+
+            {/* Views by Platform */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-[#111113] rounded-2xl border border-white/5 p-6"
+            >
+              <h3 className="text-lg font-bold mb-4">Visualizaciones por Plataforma</h3>
+              <div className="space-y-4">
+                {platformsViewsData.map((platform, i) => {
+                  const total = platformsViewsData.reduce((sum, p) => sum + p.value, 0);
+                  const percentage = ((platform.value / total) * 100).toFixed(1);
+                  
+                  return (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">{platform.name}</span>
+                        <span className="text-sm text-gray-500">{(platform.value / 1000).toFixed(0)}K</span>
+                      </div>
+                      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full rounded-full transition-all"
+                          style={{ 
+                            width: `${percentage}%`,
+                            backgroundColor: platform.color
+                          }}
+                        />
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">{percentage}%</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+
+            {/* Likes by Platform */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-[#111113] rounded-2xl border border-white/5 p-6"
+            >
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <Heart className="w-5 h-5 text-red-400" />
+                Me Gusta por Plataforma
+              </h3>
+              <div className="space-y-4">
+                {platformsLikesData.map((platform, i) => {
+                  const total = platformsLikesData.reduce((sum, p) => sum + p.value, 0);
+                  const percentage = ((platform.value / total) * 100).toFixed(1);
+                  
+                  return (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium">{platform.name}</span>
+                        <span className="text-sm text-gray-500">{(platform.value / 1000).toFixed(1)}K</span>
+                      </div>
+                      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full rounded-full transition-all"
+                          style={{ 
+                            width: `${percentage}%`,
+                            backgroundColor: platform.color
+                          }}
+                        />
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">{percentage}%</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
           </div>
+
+          {/* Demographics */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-[#111113] rounded-2xl border border-white/5 p-6 mb-6"
+          >
+            <h3 className="text-lg font-bold mb-4">Demografía por Edad</h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={demographicsData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
+                  <XAxis 
+                    dataKey="age" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fill: '#6b7280', fontSize: 12 }}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1a1a1d', 
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '12px'
+                    }}
+                  />
+                  <Bar dataKey="percentage" fill="#a855f7" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </motion.div>
+
+          {/* Wallet Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <WalletCard />
+          </motion.div>
         </div>
       </main>
     </div>
