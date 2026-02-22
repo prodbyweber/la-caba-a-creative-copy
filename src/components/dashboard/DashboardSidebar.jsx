@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   LayoutDashboard, 
   Film, 
-  Archive, 
-  Wallet, 
   Calendar, 
   BarChart3,
   Settings,
@@ -14,7 +12,8 @@ import {
   Music2,
   Share2,
   Shield,
-  FolderKanban
+  FolderKanban,
+  Palette
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -26,9 +25,8 @@ const menuItems = [
   { icon: Music2, label: "Tracks", page: "Tracks" },
   { icon: FolderKanban, label: "Proyectos", page: "Projects" },
   { icon: Share2, label: "Redes Sociales", page: "SocialAccounts" },
-  { icon: Archive, label: "Bóveda", page: null },
-  { icon: Wallet, label: "Cartera", page: null },
-  { icon: Calendar, label: "Sesiones", page: "Sessions" },
+  { icon: Calendar, label: "Calendario", page: "Calendars" },
+  { icon: Palette, label: "ADN de Marca", page: "ADNdeMarca" },
 ];
 
 const bottomItems = [
