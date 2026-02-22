@@ -57,17 +57,6 @@ export default function Dashboard() {
 
       <main className="lg:pl-64 pt-14">
         <div className="px-3 py-2 max-w-full">
-          {/* Header Compacto */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-3"
-          >
-            <h1 className="text-xl font-bold">
-              <span className="text-emerald-400">JLY</span>
-            </h1>
-          </motion.div>
-
           {/* Mobile Artist Profile (compact) */}
           <div className="lg:hidden mb-3">
             <ArtistProfileCard compact={true} />

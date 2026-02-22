@@ -74,11 +74,8 @@ export default function ArtistDashboard() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-3 flex items-center justify-between"
+            className="mb-3 flex items-center justify-end"
           >
-            <h1 className="text-xl font-bold">
-              <span className="text-emerald-400">{artist.stageName}</span>
-            </h1>
             <Link 
               to={createPageUrl("ArtistPanelList")} 
               className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1.5"
