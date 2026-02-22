@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import SessionDetailModal from "@/components/sessions/SessionDetailModal";
+import DashboardNav from "@/components/dashboard/DashboardNav";
+import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import { Plus, Calendar as CalendarIcon, Package, List, Clock, MapPin, User, CheckCircle2, AlertCircle, Archive, Trash2, Film } from "lucide-react";
 import ContentCalendar from "@/components/calendar/ContentCalendar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,18 +13,22 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseIS
 
 export default function Calendars() {
   const [activeTab, setActiveTab] = useState("sessions");
-  const [viewMode, setViewMode] = useState("calendar"); // "calendar" or "agenda"
+  const [viewMode, setViewMode] = useState("calendar");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [showDeliverableModal, setShowDeliverableModal] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const { data: sessions = [] } = useQuery({
+  const urlParams = new URLSearchParams(window.location.search);
+  const artistId = urlParams.get("artistId");
+
+  const { data: allSessions = [] } = useQuery({
     queryKey: ['sessions'],
     queryFn: () => base44.entities.Session.list('-start_time')
   });
 
-  const { data: deliverables = [] } = useQuery({
+  const { data: allDeliverables = [] } = useQuery({
     queryKey: ['deliverables'],
     queryFn: () => base44.entities.Deliverable.list('-due_date_time')
   });
@@ -32,10 +38,28 @@ export default function Calendars() {
     queryFn: () => base44.entities.Artist.list()
   });
 
+  const { data: artist } = useQuery({
+    queryKey: ['artist', artistId],
+    queryFn: async () => {
+      const artists = await base44.entities.Artist.list();
+      return artists.find(a => a.id === artistId);
+    },
+    enabled: !!artistId
+  });
+
   const { data: projects = [] } = useQuery({
     queryKey: ['projects'],
     queryFn: () => base44.entities.Project.list()
   });
+
+  // Filtrar sesiones y entregables por artista si estamos en un dashboard de artista
+  const sessions = artistId 
+    ? allSessions.filter(session => session.artist_id === artistId)
+    : allSessions;
+
+  const deliverables = artistId 
+    ? allDeliverables.filter(deliverable => deliverable.artist_id === artistId)
+    : allDeliverables;
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -53,9 +77,12 @@ export default function Calendars() {
     );
   };
 
-  return (
-    <AdminLayout activePage="Calendars">
-      <div className="px-3 py-2 max-w-full">
+  return artistId ? (
+    <div className="min-h-screen bg-[#0a0a0b] text-white">
+      <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} artistName={artist?.stageName} />
+      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} artistId={artistId} />
+      <main className="lg:pl-64 pt-16">
+        <div className="px-3 py-2 max-w-full">
         {/* Header Compacto */}
         <div className="flex items-center justify-end gap-2 mb-3">
           <button
@@ -242,6 +269,217 @@ export default function Calendars() {
         )}
 
         {/* Content Calendar Section */}
+        <div className="mt-6">
+          <ContentCalendar />
+        </div>
+      </div>
+
+      <CreateSessionModal
+        isOpen={showSessionModal}
+        onClose={() => setShowSessionModal(false)}
+        artists={artists}
+        projects={projects}
+      />
+
+      <CreateDeliverableModal
+        isOpen={showDeliverableModal}
+        onClose={() => setShowDeliverableModal(false)}
+        artists={artists}
+        projects={projects}
+      />
+
+      {selectedSession && (
+        <SessionDetailModal
+          session={selectedSession}
+          onClose={() => setSelectedSession(null)}
+          artists={artists}
+        />
+      )}
+      </div>
+      </main>
+    </div>
+  ) : (
+    <AdminLayout activePage="Calendars">
+      <div className="px-3 py-2 max-w-full">
+        {/* Header Compacto */}
+        <div className="flex items-center justify-end gap-2 mb-3">
+          <button
+            onClick={() => activeTab === "sessions" ? setShowSessionModal(true) : setShowDeliverableModal(true)}
+            className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium flex items-center gap-2 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            {activeTab === "sessions" ? "Nueva Sesión" : "Nuevo Entregable"}
+          </button>
+        </div>
+
+        {/* Tabs & View Mode Toggle */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setActiveTab("sessions")}
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
+                activeTab === "sessions"
+                  ? 'bg-emerald-500 text-white'
+                  : 'bg-white/5 text-gray-400 hover:bg-white/10'
+              }`}
+            >
+              <CalendarIcon className="w-4 h-4" />
+              Sesiones ({sessions.length})
+            </button>
+            <button
+              onClick={() => setActiveTab("deliverables")}
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
+                activeTab === "deliverables"
+                  ? 'bg-emerald-500 text-white'
+                  : 'bg-white/5 text-gray-400 hover:bg-white/10'
+              }`}
+            >
+              <Package className="w-4 h-4" />
+              Entregables ({deliverables.length})
+            </button>
+          </div>
+
+          <div className="flex gap-1 bg-white/5 rounded-lg p-0.5">
+            <button
+              onClick={() => setViewMode("calendar")}
+              className={`px-3 py-1.5 rounded-md font-medium text-xs transition-all flex items-center gap-1.5 ${
+                viewMode === "calendar"
+                  ? 'bg-white/10 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <CalendarIcon className="w-3.5 h-3.5" />
+              Calendario
+            </button>
+            <button
+              onClick={() => setViewMode("agenda")}
+              className={`px-3 py-1.5 rounded-md font-medium text-xs transition-all flex items-center gap-1.5 ${
+                viewMode === "agenda"
+                  ? 'bg-white/10 text-white'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              Agenda
+            </button>
+          </div>
+        </div>
+
+        {viewMode === "calendar" ? (
+        <div className="bg-[#141414] rounded-lg border border-white/5 p-3 mb-3">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold">{format(currentDate, 'MMMM yyyy')}</h2>
+            <div className="flex gap-1.5">
+              <button
+                onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))}
+                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-sm"
+              >
+                ←
+              </button>
+              <button
+                onClick={() => setCurrentDate(new Date())}
+                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs"
+              >
+                Hoy
+              </button>
+              <button
+                onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))}
+                className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-sm"
+              >
+                →
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-7 gap-1.5 md:gap-2">
+            {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map((day) => (
+              <div key={day} className="hidden md:block text-center text-xs font-semibold text-gray-400 py-2 border-b border-white/10">
+                {day}
+              </div>
+            ))}
+            {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((day, idx) => (
+              <div key={idx} className="md:hidden text-center text-[10px] font-medium text-gray-500 py-1">
+                {day}
+              </div>
+            ))}
+            
+            {daysInMonth.map((day, i) => {
+              const daySessions = activeTab === "sessions" ? getSessionsForDay(day) : [];
+              const dayDeliverables = activeTab === "deliverables" ? getDeliverablesForDay(day) : [];
+              const hasItems = daySessions.length > 0 || dayDeliverables.length > 0;
+              const isTodayDate = isToday(day);
+
+              return (
+                <div
+                  key={i}
+                  className={`min-h-16 md:min-h-24 p-1.5 md:p-2 rounded-lg border transition-all cursor-pointer ${
+                    isTodayDate
+                      ? 'bg-emerald-500/10 border-emerald-500/30'
+                      : hasItems
+                      ? 'bg-white/5 border-white/10 hover:border-emerald-500/30 hover:bg-white/10'
+                      : 'bg-white/5 border-white/5 hover:bg-white/10'
+                  }`}
+                >
+                  <div className={`text-xs md:text-sm font-bold mb-1 ${
+                    isTodayDate ? 'text-emerald-400' : 'text-gray-400'
+                  }`}>
+                    {format(day, 'd')}
+                  </div>
+                  <div className="space-y-0.5 md:space-y-1">
+                    {activeTab === "sessions" && daySessions.slice(0, 2).map((session) => (
+                      <button
+                        key={session.id}
+                        onClick={() => setSelectedSession(session)}
+                        className="w-full text-left text-[9px] md:text-[10px] p-1 md:p-1.5 rounded bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors border border-blue-500/20"
+                      >
+                        <div className="font-bold truncate">
+                          {format(parseISO(session.start_time), 'HH:mm')}
+                        </div>
+                        <div className="truncate leading-tight opacity-90">{session.title}</div>
+                      </button>
+                    ))}
+                    {activeTab === "deliverables" && dayDeliverables.slice(0, 2).map((deliverable) => (
+                      <div
+                        key={deliverable.id}
+                        className={`text-[9px] md:text-[10px] p-1 md:p-1.5 rounded truncate font-medium border ${
+                          deliverable.status === 'Overdue' 
+                            ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                            : 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+                        }`}
+                      >
+                        {deliverable.title}
+                      </div>
+                    ))}
+                    {((activeTab === "sessions" && daySessions.length > 2) || 
+                      (activeTab === "deliverables" && dayDeliverables.length > 2)) && (
+                      <div className="text-[8px] md:text-[9px] text-gray-500 font-medium px-1">
+                        +{(activeTab === "sessions" ? daySessions : dayDeliverables).length - 2}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        ) : (
+          <div className="space-y-3">
+            {activeTab === "sessions" ? (
+              <AgendaView 
+                sessions={sessions} 
+                artists={artists}
+                onSessionClick={setSelectedSession}
+              />
+            ) : (
+              <DeliverablesAgendaView 
+                deliverables={deliverables}
+                artists={artists}
+                projects={projects}
+              />
+            )}
+          </div>
+        )}
+
         <div className="mt-6">
           <ContentCalendar />
         </div>

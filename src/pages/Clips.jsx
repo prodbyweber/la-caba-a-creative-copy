@@ -10,10 +10,14 @@ import { LayoutGrid, Calendar } from "lucide-react";
 export default function Clips() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("library");
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const artistId = urlParams.get("artistId");
+  
   const [filters, setFilters] = useState({
     status: "all",
     platform: [],
-    artist: "all",
+    artist: artistId || "all",
     dateRange: null,
     search: ""
   });
@@ -21,7 +25,7 @@ export default function Clips() {
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
       <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} artistId={artistId} />
 
       <main className="lg:pl-64 pt-16">
         <div className="p-6 max-w-[1800px] mx-auto">
