@@ -75,6 +75,7 @@ import TrackDetail from './pages/TrackDetail';
 import Tracks from './pages/Tracks';
 import UserProfile from './pages/UserProfile';
 import ArtistTracks from './pages/ArtistTracks';
+import ArtistProjects from './pages/ArtistProjects';
 import __Layout from './Layout.jsx';
 
 
@@ -107,6 +108,7 @@ export const PAGES = {
     "Tracks": Tracks,
     "UserProfile": UserProfile,
     "ArtistTracks": ArtistTracks,
+    "ArtistProjects": ArtistProjects,
 }
 
 export const pagesConfig = {
