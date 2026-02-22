@@ -5,12 +5,11 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import TrackCardExpanded from "./TrackCardExpanded";
 
 export default function TracksSection({ jlyArtistId }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTrack, setEditingTrack] = useState(null);
-  const [playingTrackId, setPlayingTrackId] = useState(null);
-  const audioRefs = React.useRef({});
 
   const queryClient = useQueryClient();
 
@@ -45,33 +44,6 @@ export default function TracksSection({ jlyArtistId }) {
       queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
     },
   });
-
-  const togglePlay = async (trackId) => {
-    const audio = audioRefs.current[trackId];
-    if (!audio) {
-      console.error('Audio element not found for track:', trackId);
-      return;
-    }
-
-    try {
-      if (playingTrackId === trackId) {
-        audio.pause();
-        setPlayingTrackId(null);
-      } else {
-        // Pause any other playing track
-        if (playingTrackId && audioRefs.current[playingTrackId]) {
-          audioRefs.current[playingTrackId].pause();
-        }
-        
-        // Play audio
-        setPlayingTrackId(trackId);
-        await audio.play();
-      }
-    } catch (err) {
-      console.error('Error playing audio:', err);
-      setPlayingTrackId(null);
-    }
-  };
 
   const statusColors = {
     idea: "bg-gray-500/10 text-gray-400",
@@ -108,147 +80,46 @@ export default function TracksSection({ jlyArtistId }) {
         className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5 overflow-hidden"
       >
         {/* Header */}
-        <div className="p-6 border-b border-white/5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-              <Music2 className="w-5 h-5 text-purple-400" />
+        <div className="p-3 lg:p-4 border-b border-white/5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+              <Music2 className="w-4 h-4 text-purple-400" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Tracks</h3>
-              <p className="text-sm text-gray-500">Gestiona tus tracks y metadata</p>
+              <h3 className="text-base font-bold text-white">Tracks</h3>
+              <p className="text-xs text-gray-500 hidden lg:block">Con metadata y versiones</p>
             </div>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-medium flex items-center gap-2 transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium flex items-center gap-1.5 transition-colors"
           >
-            <Plus className="w-4 h-4" />
-            Nuevo Track
+            <Plus className="w-3.5 h-3.5" />
+            <span className="hidden lg:inline">Nuevo</span>
           </button>
         </div>
 
         {/* Tracks List */}
-        <div className="p-6">
+        <div className="p-3 lg:p-4">
           {tracks.length === 0 ? (
-            <div className="text-center py-12">
-              <Music2 className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">No tienes tracks aún</p>
+            <div className="text-center py-8">
+              <Music2 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-500 text-sm mb-3">No tienes tracks aún</p>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium transition-colors"
+                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors"
               >
                 Crear tu primer track
               </button>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {tracks.map((track, index) => (
-                <motion.div
+                <TrackCardExpanded
                   key={track.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="bg-white/5 rounded-xl p-3 lg:p-4 border border-white/5 hover:border-purple-500/30 transition-all group"
-                >
-                  <div className="flex items-center gap-4 lg:gap-5">
-                    {/* Cover with Play Button Overlay */}
-                    <div className="relative group flex-shrink-0">
-                      {track.audio_file_url && (
-                        <audio
-                          ref={(el) => { if (el) audioRefs.current[track.id] = el; }}
-                          src={track.audio_file_url}
-                          preload="metadata"
-                          playsInline
-                          onEnded={() => setPlayingTrackId(null)}
-                          onPause={() => { if (playingTrackId === track.id) setPlayingTrackId(null); }}
-                          onPlay={() => setPlayingTrackId(track.id)}
-                          onError={(e) => console.error('Audio load error:', e, track.audio_file_url)}
-                        />
-                      )}
-                      
-                      <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center overflow-hidden relative">
-                        {track.cover_url ? (
-                          <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <Music2 className="w-6 h-6 lg:w-8 lg:h-8 text-white/40" />
-                        )}
-                        
-                        {/* Play Button Overlay */}
-                        {track.audio_file_url && (
-                          <>
-                            <div className={`absolute inset-0 bg-black/60 transition-opacity pointer-events-none ${playingTrackId === track.id ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-100'}`} />
-                            <button
-                              type="button"
-                              onTouchEnd={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                togglePlay(track.id);
-                              }}
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                togglePlay(track.id);
-                              }}
-                              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-black/70 hover:bg-black/90 active:scale-95 lg:hover:scale-110 flex items-center justify-center transition-all shadow-2xl z-10 touch-manipulation ${playingTrackId === track.id ? 'opacity-100' : 'opacity-100 lg:opacity-0 lg:group-hover:opacity-100'}`}
-                            >
-                              {playingTrackId === track.id ? (
-                                <Pause className="w-4 h-4 lg:w-5 lg:h-5 text-white" fill="white" />
-                              ) : (
-                                <Play className="w-4 h-4 lg:w-5 lg:h-5 text-white ml-0.5" fill="white" />
-                              )}
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    <Link to={createPageUrl(`TrackDetail?id=${track.id}`)} className="flex items-center gap-3 lg:gap-4 flex-1 min-w-0">
-
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-white mb-0.5 lg:mb-1 text-sm lg:text-base truncate group-hover:text-purple-400 transition-colors">{track.title}</h4>
-                        <div className="hidden lg:flex flex-wrap items-center gap-3 text-sm text-gray-500">
-                          {track.composers && track.composers.length > 0 && (
-                            <span className="text-xs">Compositores: {track.composers.join(', ')}</span>
-                          )}
-                          {track.mix_engineer && (
-                            <span className="text-xs">Mix: {track.mix_engineer}</span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1.5 lg:gap-2 mt-1 lg:mt-2 flex-wrap">
-                          <span className={`px-1.5 lg:px-2 py-0.5 rounded text-[10px] lg:text-xs font-medium ${statusColors[track.status]}`}>
-                            {statusLabels[track.status]}
-                          </span>
-                          {track.dolby_atmos && (
-                            <span className="px-1.5 lg:px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 text-[10px] lg:text-xs font-medium">
-                              Atmos
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </Link>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-1 lg:gap-2 lg:opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => setEditingTrack(track)}
-                        className="p-1.5 lg:p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-                      >
-                        <Edit className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (confirm('¿Eliminar esta pista?')) {
-                            deleteMutation.mutate(track.id);
-                          }
-                        }}
-                        className="p-1.5 lg:p-2 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-colors"
-                      >
-                        <Trash2 className="w-3.5 h-3.5 lg:w-4 lg:h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
+                  track={track}
+                  onEdit={setEditingTrack}
+                />
               ))}
             </div>
           )}

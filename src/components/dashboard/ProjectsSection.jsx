@@ -83,27 +83,27 @@ export default function ProjectsSection({ jlyArtistId }) {
         className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5 overflow-hidden"
       >
         {/* Header */}
-        <div className="p-6 border-b border-white/5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-              <FolderOpen className="w-5 h-5 text-emerald-400" />
+        <div className="p-3 lg:p-4 border-b border-white/5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+              <FolderOpen className="w-4 h-4 text-emerald-400" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Proyectos Activos</h3>
-              <p className="text-sm text-gray-500">Gestiona tus proyectos y tracks</p>
+              <h3 className="text-base font-bold text-white">Proyectos Activos</h3>
+              <p className="text-xs text-gray-500 hidden lg:block">Albums, EPs y Singles</p>
             </div>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-medium flex items-center gap-2 transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium flex items-center gap-1.5 transition-colors"
           >
-            <Plus className="w-4 h-4" />
-            Nuevo Proyecto
+            <Plus className="w-3.5 h-3.5" />
+            <span className="hidden lg:inline">Nuevo</span>
           </button>
         </div>
 
         {/* Projects Carousel */}
-        <div className="p-6">
+        <div className="p-3 lg:p-4">
           {projects.length === 0 ? (
             <div className="text-center py-12">
               <FolderOpen className="w-16 h-16 text-gray-600 mx-auto mb-4" />
