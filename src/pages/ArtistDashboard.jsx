@@ -65,92 +65,58 @@ export default function ArtistDashboard() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
-      <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+      <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} artistName={artist.stageName} />
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <main className="lg:pl-64 pt-16 p-6">
+      <main className="lg:pl-64 pt-14 px-3 pb-6 lg:px-4">
         <div className="max-w-7xl mx-auto">
-          {/* Back Button */}
-          <Link 
-            to={createPageUrl("AdminDashboard")} 
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver al Admin Panel
-          </Link>
-
-          {/* Header */}
+          {/* Header Compacto */}
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className="flex items-center justify-between mb-3"
           >
-            <h1 className="text-3xl font-bold mb-2">Dashboard de {artist.stageName}</h1>
-            <p className="text-gray-500">Vista completa del artista</p>
+            <div className="flex items-center gap-3">
+              {artist.avatar_url ? (
+                <img 
+                  src={artist.avatar_url}
+                  alt={artist.stageName}
+                  className="w-10 h-10 rounded-lg object-cover border border-emerald-500/30"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center border border-emerald-500/30">
+                  <span className="text-lg font-bold text-white">{artist.stageName[0]}</span>
+                </div>
+              )}
+              <div>
+                <h1 className="text-lg lg:text-xl font-bold text-white">{artist.stageName}</h1>
+                <p className="text-xs text-gray-500">{artist.genre || 'Artist'} • {artist.location || 'Location'}</p>
+              </div>
+            </div>
+            <Link 
+              to={createPageUrl("ArtistPanelList")} 
+              className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1"
+            >
+              <ArrowLeft className="w-3 h-3" />
+              <span className="hidden lg:inline">Volver</span>
+            </Link>
           </motion.div>
 
-          {/* Main Grid */}
-          <div className="grid lg:grid-cols-12 gap-6">
-            {/* Left Column */}
-            <div className="lg:col-span-4 space-y-6">
-              {/* Artist Profile Card - Compact */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="bg-gradient-to-b from-[#141414] to-black rounded-xl border border-white/5 overflow-hidden"
-              >
-                <div className="relative">
-                  <div className="relative h-[180px] overflow-hidden">
-                    {artist.avatar_url ? (
-                      <img 
-                        src={artist.avatar_url}
-                        alt={artist.stageName}
-                        className="w-full h-full object-cover object-top"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20">
-                        <span className="text-4xl font-bold text-white/40">{artist.stageName[0]}</span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
-                  </div>
-
-                  <div className="relative px-4 pb-4 -mt-8 z-20">
-                    <div className="bg-black/80 backdrop-blur-md rounded-xl p-4 border border-white/10">
-                      <h3 className="text-xl font-black text-white uppercase tracking-tight mb-1">
-                        {artist.stageName}
-                      </h3>
-                      <span className="text-xs font-medium text-gray-400">{artist.genre || 'Artist'}</span>
-                      <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
-                        <div>
-                          <div className="text-gray-500">Status</div>
-                          <div className="text-emerald-400 font-semibold">{artist.status}</div>
-                        </div>
-                        {artist.location && (
-                          <div className="text-right">
-                            <div className="text-gray-500">Location</div>
-                            <div className="text-white font-semibold">{artist.location}</div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              <UpcomingSessionsCard artistId={artist.id} />
+          {/* Grid Principal Compacto */}
+          <div className="grid lg:grid-cols-12 gap-3 lg:gap-4">
+            {/* Columna Izquierda - Wallet y Stats */}
+            <div className="lg:col-span-3 space-y-3 lg:space-y-4">
               <WalletCard />
+              <PerformanceOverview />
+              <UpcomingSessionsCard artistId={artist.id} />
             </div>
 
-            {/* Right Column */}
-            <div className="lg:col-span-8 space-y-6">
-              <PerformanceOverview />
+            {/* Columna Central - Proyectos y Tracks (PRIORIDAD) */}
+            <div className="lg:col-span-9 space-y-3 lg:space-y-4">
               <ProjectsSection jlyArtistId={artist.id} />
               <TracksSection jlyArtistId={artist.id} />
               <SocialMetricsCard artist={artist} />
               <GrowthChart />
-              <ClipActivityFeed />
             </div>
           </div>
         </div>

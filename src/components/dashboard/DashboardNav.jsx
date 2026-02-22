@@ -4,7 +4,7 @@ import { Menu, Bell, Search, Settings, Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
-export default function DashboardNav({ onMenuClick }) {
+export default function DashboardNav({ onMenuClick, artistName }) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5">
       <div className="flex items-center justify-between px-6 h-16">
