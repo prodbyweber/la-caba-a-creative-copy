@@ -6,11 +6,13 @@ import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import { 
   ArrowLeft, Plus, Music2, Palette, Edit, Trash2, 
-  Check, X, Image as ImageIcon, FileText, Sparkles, Play, Pause, GripVertical
+  Check, X, Image as ImageIcon, FileText, Sparkles, Play, Pause, GripVertical,
+  FolderPlus, Folder, Film
 } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import ProjectClipsSection from "@/components/project/ProjectClipsSection";
 
 export default function ProjectDetail() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -139,6 +141,7 @@ export default function ProjectDetail() {
 
   const tabs = [
     { id: "tracks", label: "Tracks", icon: Music2 },
+    { id: "clips", label: "Clips", icon: Play },
     { id: "branding", label: "Branding", icon: Palette },
   ];
 
@@ -293,7 +296,9 @@ export default function ProjectDetail() {
           </div>
 
           {/* Content */}
-          {activeTab === "tracks" ? (
+          {activeTab === "clips" ? (
+            <ProjectClipsSection projectId={projectId} tracks={tracks} />
+          ) : activeTab === "tracks" ? (
             <div className="space-y-4">
               {/* Add Track Button */}
               <button
