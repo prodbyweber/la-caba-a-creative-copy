@@ -86,7 +86,7 @@ export default function ArtistDashboard() {
                       <img 
                         src={artist.avatar_url}
                         alt={artist.stageName}
-                        className="w-full h-full object-cover object-center"
+                        className="w-full h-full object-cover object-top"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20">
@@ -119,8 +119,9 @@ export default function ArtistDashboard() {
                 </div>
               </motion.div>
 
-              <WalletCard />
               <UpcomingSessionsCard artistId={artist.id} />
+              <WalletCard />
+              <PerformanceOverview />
             </div>
 
             {/* Columna Central - Proyectos y Tracks (PROTAGONISTAS) */}
@@ -134,7 +135,6 @@ export default function ArtistDashboard() {
                   <span className="hidden lg:inline">Volver</span>
                 </Link>
               </div>
-              <PerformanceOverview />
               <ProjectsSection jlyArtistId={artist.id} />
               <TracksSection jlyArtistId={artist.id} />
               <GrowthChart />
