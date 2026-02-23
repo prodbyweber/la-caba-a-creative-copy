@@ -9,10 +9,6 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import ArtistProfileCard from "@/components/dashboard/ArtistProfileCard";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
-import PerformanceOverview from "@/components/dashboard/PerformanceOverview";
-import GrowthChart from "@/components/dashboard/GrowthChart";
-import ClipActivityFeed from "@/components/dashboard/ClipActivityFeed";
-import WalletCard from "@/components/dashboard/WalletCard";
 import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
 
 export default function Dashboard() {
@@ -68,9 +64,6 @@ export default function Dashboard() {
             <div className="lg:col-span-9 space-y-3">
               <ProjectsSection jlyArtistId={jlyArtistId} />
               <TracksSection jlyArtistId={jlyArtistId} />
-              <PerformanceOverview />
-              <GrowthChart />
-              <ClipActivityFeed />
             </div>
 
             {/* Right Column - Desktop only profile */}
@@ -78,8 +71,7 @@ export default function Dashboard() {
               <div className="hidden lg:block">
                 <ArtistProfileCard />
               </div>
-              <WalletCard />
-              <UpcomingSessionsCard />
+              <UpcomingSessionsCard artistId={jlyArtistId} />
             </div>
           </div>
         </div>
