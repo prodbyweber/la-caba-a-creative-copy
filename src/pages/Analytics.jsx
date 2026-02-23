@@ -95,19 +95,9 @@ export default function Analytics() {
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <main className="lg:pl-64 pt-16">
-        <div className="p-6 max-w-[1800px] mx-auto">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <h1 className="text-3xl font-bold mb-2">Analíticas</h1>
-            <p className="text-gray-500">Datos detallados de tu música y audiencia</p>
-          </motion.div>
-
+        <div className="p-4 max-w-full">
           {/* Timeframe Selector */}
-          <div className="flex items-center gap-2 mb-6">
+          <div className="flex items-center gap-2 mb-4">
             {timeframes.map((tf) => (
               <button
                 key={tf}
