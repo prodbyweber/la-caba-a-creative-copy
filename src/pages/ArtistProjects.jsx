@@ -6,11 +6,8 @@ import { FolderKanban, Music2, Calendar, TrendingUp, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import DashboardNav from "@/components/dashboard/DashboardNav";
-import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 
 export default function ArtistProjectsPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   const urlParams = new URLSearchParams(window.location.search);
   const artistId = urlParams.get("artistId");
 
@@ -56,11 +53,10 @@ export default function ArtistProjectsPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
-      <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} artistName={artist?.stageName} />
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} artistId={artistId} />
+      <DashboardNav artistName={artist?.stageName} artistId={artistId} />
 
-      <main className="lg:pl-64 pt-16">
-        <div className="px-3 py-4 max-w-full">
+      <main className="pt-14">
+        <div className="px-4 py-3 max-w-[1920px] mx-auto">
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-white mb-1">Mis Proyectos</h1>

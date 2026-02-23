@@ -1,14 +1,12 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import DashboardNav from "@/components/dashboard/DashboardNav";
-import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import ClipsLibrary from "@/components/clips/ClipsLibrary.jsx";
 import ClipsCalendar from "@/components/clips/ClipsCalendar.jsx";
 import ClipsHeader from "@/components/clips/ClipsHeader.jsx";
 import { LayoutGrid, Calendar } from "lucide-react";
 
 export default function Clips() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("library");
   
   const urlParams = new URLSearchParams(window.location.search);
@@ -24,11 +22,10 @@ export default function Clips() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
-      <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} artistId={artistId} />
+      <DashboardNav artistId={artistId} />
 
-      <main className="lg:pl-64 pt-16">
-        <div className="p-6 max-w-[1800px] mx-auto">
+      <main className="pt-14">
+        <div className="p-6 max-w-[1920px] mx-auto">
           {/* Page Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

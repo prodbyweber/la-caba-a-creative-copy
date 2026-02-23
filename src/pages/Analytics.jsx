@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, TrendingDown, Music2, Heart } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
-import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import OverviewSummary from "@/components/analytics/OverviewSummary";
 import WalletCard from "@/components/dashboard/WalletCard";
 
@@ -84,18 +83,19 @@ const topClips = [
 ];
 
 export default function Analytics() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [timeframe, setTimeframe] = useState("6M");
 
   const timeframes = ["7D", "1M", "3M", "6M", "1A", "TODO"];
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const artistId = urlParams.get("artistId");
+
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
-      <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <DashboardNav artistId={artistId} />
 
-      <main className="lg:pl-64 pt-16">
-        <div className="p-4 max-w-full">
+      <main className="pt-14">
+        <div className="p-4 max-w-[1920px] mx-auto">
           {/* Timeframe Selector */}
           <div className="flex items-center gap-2 mb-4">
             {timeframes.map((tf) => (
