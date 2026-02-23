@@ -48,31 +48,31 @@ export default function DashboardNav({ artistName, artistId }) {
               </span>
             </Link>
           
-          {/* Navigation Menu */}
-          <div className="hidden md:flex items-center gap-1">
-            {menuItems.map((item, i) => {
-              const Icon = item.icon;
-              const active = isActivePage(item.page);
-              return (
-                <Link key={i} to={createPageUrl(item.page)}>
-                  <button
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                      active 
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-                        : 'text-gray-400 hover:text-white hover:bg-white/5'
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    <span className="hidden lg:inline">{item.label}</span>
-                  </button>
-                </Link>
-              );
-            })}
+            {/* Navigation Menu */}
+            <div className="hidden md:flex items-center gap-1">
+              {menuItems.map((item, i) => {
+                const Icon = item.icon;
+                const active = isActivePage(item.page);
+                return (
+                  <Link key={i} to={createPageUrl(item.page)}>
+                    <button
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                        active 
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                          : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      <span className="hidden lg:inline">{item.label}</span>
+                    </button>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        {/* Right */}
-        <div className="flex items-center gap-2">
+          {/* Right */}
+          <div className="flex items-center gap-2">
           <Link to={createPageUrl("AdminDashboard")}>
             <button 
               className="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all flex items-center gap-1.5"
@@ -94,6 +94,7 @@ export default function DashboardNav({ artistName, artistId }) {
             JV
           </div>
         </div>
+      </div>
       </nav>
 
       {/* Mobile Menu */}
