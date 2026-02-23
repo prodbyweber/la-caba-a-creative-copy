@@ -30,9 +30,8 @@ export default function ArtistDashboard() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0b] text-white">
-        <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-        <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="lg:pl-64 pt-16 p-6">
+        <DashboardNav />
+        <main className="pt-16 p-6">
           <div className="max-w-7xl mx-auto">
             <div className="animate-pulse space-y-4">
               <div className="h-8 bg-white/5 rounded w-1/3" />
@@ -47,9 +46,8 @@ export default function ArtistDashboard() {
   if (!artist) {
     return (
       <div className="min-h-screen bg-[#0a0a0b] text-white">
-        <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-        <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="lg:pl-64 pt-16 p-6">
+        <DashboardNav />
+        <main className="pt-16 p-6">
           <div className="max-w-7xl mx-auto text-center py-20">
             <p className="text-gray-500">Artista no encontrado</p>
           </div>
@@ -60,11 +58,10 @@ export default function ArtistDashboard() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
-      <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} artistName={artist.stageName} />
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} artistId={artist.id} />
+      <DashboardNav artistName={artist.stageName} artistId={artist.id} />
 
-      <main className="lg:pl-64 pt-14">
-        <div className="px-3 py-2 max-w-full">
+      <main className="pt-14">
+        <div className="px-4 py-3 max-w-[1920px] mx-auto">
           {/* Header Compacto */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

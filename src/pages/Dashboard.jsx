@@ -48,11 +48,10 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
-      <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <DashboardNav artistId={jlyArtistId} />
 
-      <main className="lg:pl-64 pt-14">
-        <div className="px-3 py-2 max-w-full">
+      <main className="pt-14">
+        <div className="px-4 py-3 max-w-[1920px] mx-auto">
           {/* Mobile Artist Profile (compact) */}
           <div className="lg:hidden mb-3">
             <ArtistProfileCard compact={true} />
