@@ -56,12 +56,26 @@ const platformsLikesData = [
 ];
 
 const topCountriesData = [
-  { name: "España", views: 245000, likes: 12400, comments: 3200, followers: 28500, score: 289100 },
-  { name: "México", views: 187000, likes: 9800, comments: 2100, followers: 22100, score: 221000 },
-  { name: "Argentina", views: 156000, likes: 7200, comments: 1800, followers: 18900, score: 183900 },
-  { name: "Colombia", views: 134000, likes: 6100, comments: 1400, followers: 15200, score: 156700 },
-  { name: "Chile", views: 98000, likes: 4500, comments: 900, followers: 11200, score: 114600 },
-  { name: "Perú", views: 87000, likes: 3800, comments: 750, followers: 9400, score: 100950 },
+  { name: "España", flag: "🇪🇸", score: 289100 },
+  { name: "México", flag: "🇲🇽", score: 221000 },
+  { name: "Argentina", flag: "🇦🇷", score: 183900 },
+  { name: "Colombia", flag: "🇨🇴", score: 156700 },
+  { name: "Chile", flag: "🇨🇱", score: 114600 },
+  { name: "Perú", flag: "🇵🇪", score: 100950 },
+];
+
+const genderData = [
+  { gender: "Femenino", percentage: 58 },
+  { gender: "Masculino", percentage: 40 },
+  { gender: "Otro", percentage: 2 },
+];
+
+const topClips = [
+  { title: "Summer Vibes - Behind the Scenes", platform: "TikTok", views: 487000, engagement: 8.2 },
+  { title: "New Single Teaser", platform: "Instagram", views: 356000, engagement: 7.8 },
+  { title: "Studio Session Highlights", platform: "YouTube", views: 298000, engagement: 6.5 },
+  { title: "Fan Q&A", platform: "TikTok", views: 245000, engagement: 9.1 },
+  { title: "Live Performance Clip", platform: "Instagram", views: 189000, engagement: 7.2 },
 ];
 
 export default function Analytics() {
@@ -291,71 +305,128 @@ export default function Analytics() {
             </motion.div>
           </div>
 
-          {/* Demographics */}
+          {/* Top Clips */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-[#111113] rounded-2xl border border-white/5 p-6 mb-6"
           >
-            <h3 className="text-lg font-bold mb-4">Demografía por Edad</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={demographicsData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
-                  <XAxis 
-                    dataKey="age" 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: '#6b7280', fontSize: 12 }}
-                  />
-                  <YAxis 
-                    axisLine={false} 
-                    tickLine={false} 
-                    tick={{ fill: '#6b7280', fontSize: 12 }}
-                  />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1a1a1d', 
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '12px'
-                    }}
-                  />
-                  <Bar dataKey="percentage" fill="#a855f7" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </motion.div>
-
-          {/* Top Countries */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-[#111113] rounded-2xl border border-white/5 p-6 mb-6"
-          >
-            <h3 className="text-lg font-bold mb-4">Top Países por Interacción</h3>
-            <div className="space-y-3">
-              {topCountriesData.map((country, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center text-sm font-bold text-emerald-400">
+            <h3 className="text-lg font-bold mb-4">Top Clips</h3>
+            <div className="space-y-2">
+              {topClips.map((clip, i) => (
+                <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center text-xs font-bold text-pink-400">
                     {i + 1}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold mb-1">{country.name}</div>
-                    <div className="grid grid-cols-4 gap-4 text-xs text-gray-400">
-                      <div>👁️ {(country.views / 1000).toFixed(0)}K vistas</div>
-                      <div>❤️ {country.likes.toLocaleString()} me gusta</div>
-                      <div>💬 {country.comments.toLocaleString()} comentarios</div>
-                      <div>👥 {(country.followers / 1000).toFixed(1)}K seguidores</div>
+                    <div className="font-medium text-sm truncate">{clip.title}</div>
+                    <div className="flex items-center gap-3 text-xs text-gray-500 mt-0.5">
+                      <span>{clip.platform}</span>
+                      <span>•</span>
+                      <span>{(clip.views / 1000).toFixed(0)}K vistas</span>
+                      <span>•</span>
+                      <span className="text-emerald-400">{clip.engagement}% engagement</span>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-bold text-emerald-400">{(country.score / 1000).toFixed(0)}K</div>
-                    <div className="text-xs text-gray-500">interacción</div>
                   </div>
                 </div>
               ))}
             </div>
           </motion.div>
+
+          {/* Demographics & Top Countries */}
+          <div className="grid lg:grid-cols-2 gap-6 mb-6">
+            {/* Demographics */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-[#111113] rounded-2xl border border-white/5 p-6"
+            >
+              <h3 className="text-lg font-bold mb-4">Demografía</h3>
+              
+              {/* Age Demographics */}
+              <div className="mb-6">
+                <h4 className="text-sm font-semibold text-gray-400 mb-3">Por Edad</h4>
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={demographicsData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
+                      <XAxis 
+                        dataKey="age" 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: '#6b7280', fontSize: 11 }}
+                      />
+                      <YAxis 
+                        axisLine={false} 
+                        tickLine={false} 
+                        tick={{ fill: '#6b7280', fontSize: 11 }}
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#1a1a1d', 
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          borderRadius: '12px'
+                        }}
+                      />
+                      <Bar dataKey="percentage" fill="#a855f7" radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Gender Demographics */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-400 mb-3">Por Sexo</h4>
+                <div className="space-y-2">
+                  {genderData.map((item, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <span className="text-sm text-gray-300">{item.gender}</span>
+                      <div className="flex items-center gap-2 flex-1 max-w-xs ml-4">
+                        <div className="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all"
+                            style={{ width: `${item.percentage}%` }}
+                          />
+                        </div>
+                        <span className="text-sm font-semibold text-gray-300 w-10 text-right">{item.percentage}%</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Top Countries */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-[#111113] rounded-2xl border border-white/5 p-6"
+            >
+              <h3 className="text-lg font-bold mb-4">Top Países</h3>
+              <div className="space-y-2">
+                {topCountriesData.map((country, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center text-xs font-bold text-emerald-400">
+                        {i + 1}
+                      </div>
+                      <div>
+                        <div className="font-medium text-sm flex items-center gap-2">
+                          <span>{country.flag}</span>
+                          <span>{country.name}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-emerald-400">{(country.score / 1000).toFixed(0)}K</div>
+                      <div className="text-xs text-gray-500">interacción</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
 
           {/* Wallet Card */}
           <motion.div
