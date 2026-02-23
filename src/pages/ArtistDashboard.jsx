@@ -10,12 +10,7 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import ArtistProfileCard from "@/components/dashboard/ArtistProfileCard";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
-import PerformanceOverview from "@/components/dashboard/PerformanceOverview";
-import GrowthChart from "@/components/dashboard/GrowthChart";
-import ClipActivityFeed from "@/components/dashboard/ClipActivityFeed";
 import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
-import WalletCard from "@/components/dashboard/WalletCard";
-import SocialMetricsCard from "@/components/dashboard/SocialMetricsCard";
 
 export default function ArtistDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -96,9 +91,6 @@ export default function ArtistDashboard() {
             <div className="lg:col-span-9 space-y-3">
               <ProjectsSection jlyArtistId={artist.id} />
               <TracksSection jlyArtistId={artist.id} />
-              <PerformanceOverview />
-              <GrowthChart />
-              <ClipActivityFeed />
             </div>
 
             {/* Right Column - Desktop only profile */}
@@ -106,7 +98,6 @@ export default function ArtistDashboard() {
               <div className="hidden lg:block">
                 <ArtistProfileCard />
               </div>
-              <WalletCard />
               <UpcomingSessionsCard artistId={artist.id} />
             </div>
           </div>
