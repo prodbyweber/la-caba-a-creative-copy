@@ -9,6 +9,7 @@ export default function DashboardNav({ artistName, artistId }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const menuItems = [
+    { icon: Home, label: "Dashboard", page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
     { icon: BarChart3, label: "Análisis", page: artistId ? `Analytics?artistId=${artistId}` : "Analytics" },
     { icon: Film, label: "Clips", page: artistId ? `Clips?artistId=${artistId}` : "Clips" },
     { icon: Music2, label: "Tracks", page: artistId ? `ArtistTracks?artistId=${artistId}` : "Tracks" },
