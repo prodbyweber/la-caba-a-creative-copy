@@ -71,11 +71,16 @@ const genderData = [
 ];
 
 const topClips = [
-  { title: "Summer Vibes - Behind the Scenes", platform: "TikTok", views: 487000, engagement: 8.2 },
-  { title: "New Single Teaser", platform: "Instagram", views: 356000, engagement: 7.8 },
-  { title: "Studio Session Highlights", platform: "YouTube", views: 298000, engagement: 6.5 },
-  { title: "Fan Q&A", platform: "TikTok", views: 245000, engagement: 9.1 },
-  { title: "Live Performance Clip", platform: "Instagram", views: 189000, engagement: 7.2 },
+  { title: "Summer Vibes BTS", platform: "TikTok", views: 487000, engagement: 8.2, thumbnail: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=400&fit=crop" },
+  { title: "New Single Teaser", platform: "Instagram", views: 356000, engagement: 7.8, thumbnail: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&h=400&fit=crop" },
+  { title: "Studio Session", platform: "YouTube", views: 298000, engagement: 6.5, thumbnail: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=300&h=400&fit=crop" },
+  { title: "Fan Q&A", platform: "TikTok", views: 245000, engagement: 9.1, thumbnail: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300&h=400&fit=crop" },
+  { title: "Live Performance", platform: "Instagram", views: 189000, engagement: 7.2, thumbnail: "https://images.unsplash.com/photo-1501612780327-45045538702b?w=300&h=400&fit=crop" },
+  { title: "Recording Session", platform: "YouTube", views: 176000, engagement: 6.8, thumbnail: "https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=300&h=400&fit=crop" },
+  { title: "Concert Highlights", platform: "TikTok", views: 165000, engagement: 7.5, thumbnail: "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=300&h=400&fit=crop" },
+  { title: "Behind The Music", platform: "Instagram", views: 142000, engagement: 8.0, thumbnail: "https://images.unsplash.com/photo-1487180144351-b8472da7d491?w=300&h=400&fit=crop" },
+  { title: "Acoustic Version", platform: "YouTube", views: 128000, engagement: 7.9, thumbnail: "https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=300&h=400&fit=crop" },
+  { title: "Music Video Teaser", platform: "TikTok", views: 115000, engagement: 8.5, thumbnail: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=300&h=400&fit=crop" },
 ];
 
 export default function Analytics() {
@@ -196,26 +201,26 @@ export default function Analytics() {
           </div>
 
           {/* Streams, Views & Likes by Platform */}
-          <div className="grid lg:grid-cols-3 gap-6 mb-6">
+          <div className="grid lg:grid-cols-3 gap-4 mb-6">
             {/* Streams by Platform */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-[#111113] rounded-2xl border border-white/5 p-6"
+              className="bg-[#111113] rounded-xl border border-white/5 p-4"
             >
-              <h3 className="text-lg font-bold mb-4">Streams por Plataforma</h3>
-              <div className="space-y-4">
+              <h3 className="text-sm font-bold mb-3">Streams por Plataforma</h3>
+              <div className="space-y-2.5">
                 {platformsStreamsData.map((platform, i) => {
                   const total = platformsStreamsData.reduce((sum, p) => sum + p.value, 0);
                   const percentage = ((platform.value / total) * 100).toFixed(1);
                   
                   return (
                     <div key={i}>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">{platform.name}</span>
-                        <span className="text-sm text-gray-500">{(platform.value / 1000).toFixed(0)}K</span>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-medium">{platform.name}</span>
+                        <span className="text-xs text-gray-500">{(platform.value / 1000).toFixed(0)}K</span>
                       </div>
-                      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                         <div 
                           className="h-full rounded-full transition-all"
                           style={{ 
@@ -224,7 +229,6 @@ export default function Analytics() {
                           }}
                         />
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">{percentage}%</div>
                     </div>
                   );
                 })}
@@ -235,22 +239,22 @@ export default function Analytics() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-[#111113] rounded-2xl border border-white/5 p-6"
+              transition={{ delay: 0.05 }}
+              className="bg-[#111113] rounded-xl border border-white/5 p-4"
             >
-              <h3 className="text-lg font-bold mb-4">Visualizaciones por Plataforma</h3>
-              <div className="space-y-4">
+              <h3 className="text-sm font-bold mb-3">Visualizaciones</h3>
+              <div className="space-y-2.5">
                 {platformsViewsData.map((platform, i) => {
                   const total = platformsViewsData.reduce((sum, p) => sum + p.value, 0);
                   const percentage = ((platform.value / total) * 100).toFixed(1);
                   
                   return (
                     <div key={i}>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">{platform.name}</span>
-                        <span className="text-sm text-gray-500">{(platform.value / 1000).toFixed(0)}K</span>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-medium">{platform.name}</span>
+                        <span className="text-xs text-gray-500">{(platform.value / 1000).toFixed(0)}K</span>
                       </div>
-                      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                         <div 
                           className="h-full rounded-full transition-all"
                           style={{ 
@@ -259,7 +263,6 @@ export default function Analytics() {
                           }}
                         />
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">{percentage}%</div>
                     </div>
                   );
                 })}
@@ -270,25 +273,25 @@ export default function Analytics() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-[#111113] rounded-2xl border border-white/5 p-6"
+              transition={{ delay: 0.1 }}
+              className="bg-[#111113] rounded-xl border border-white/5 p-4"
             >
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <Heart className="w-5 h-5 text-red-400" />
-                Me Gusta por Plataforma
+              <h3 className="text-sm font-bold mb-3 flex items-center gap-1.5">
+                <Heart className="w-4 h-4 text-red-400" />
+                Me Gusta
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-2.5">
                 {platformsLikesData.map((platform, i) => {
                   const total = platformsLikesData.reduce((sum, p) => sum + p.value, 0);
                   const percentage = ((platform.value / total) * 100).toFixed(1);
                   
                   return (
                     <div key={i}>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">{platform.name}</span>
-                        <span className="text-sm text-gray-500">{(platform.value / 1000).toFixed(1)}K</span>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-medium">{platform.name}</span>
+                        <span className="text-xs text-gray-500">{(platform.value / 1000).toFixed(1)}K</span>
                       </div>
-                      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
                         <div 
                           className="h-full rounded-full transition-all"
                           style={{ 
@@ -297,7 +300,6 @@ export default function Analytics() {
                           }}
                         />
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">{percentage}%</div>
                     </div>
                   );
                 })}
@@ -305,30 +307,61 @@ export default function Analytics() {
             </motion.div>
           </div>
 
-          {/* Top Clips */}
+          {/* Top Clips - Netflix Style */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#111113] rounded-2xl border border-white/5 p-6 mb-6"
+            className="mb-6"
           >
-            <h3 className="text-lg font-bold mb-4">Top Clips</h3>
-            <div className="space-y-2">
+            <h3 className="text-2xl font-bold mb-4">Top Clips</h3>
+            <div className="grid grid-cols-5 gap-3">
               {topClips.map((clip, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center text-xs font-bold text-pink-400">
-                    {i + 1}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm truncate">{clip.title}</div>
-                    <div className="flex items-center gap-3 text-xs text-gray-500 mt-0.5">
-                      <span>{clip.platform}</span>
-                      <span>•</span>
-                      <span>{(clip.views / 1000).toFixed(0)}K vistas</span>
-                      <span>•</span>
-                      <span className="text-emerald-400">{clip.engagement}% engagement</span>
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="group relative aspect-[9/16] rounded-lg overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer"
+                >
+                  {/* Thumbnail */}
+                  <img 
+                    src={clip.thumbnail} 
+                    alt={clip.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                  
+                  {/* Content */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center text-xs font-bold text-emerald-400 border border-emerald-500/30">
+                      {i + 1}
+                    </div>
+                    
+                    <h4 className="font-bold text-sm mb-1 line-clamp-2 leading-tight">{clip.title}</h4>
+                    <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+                      <span className="px-1.5 py-0.5 rounded bg-white/10 text-[10px] font-medium">{clip.platform}</span>
+                      <span>{(clip.views / 1000).toFixed(0)}K</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs">
+                      <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-emerald-500 rounded-full"
+                          style={{ width: `${clip.engagement * 10}%` }}
+                        />
+                      </div>
+                      <span className="text-emerald-400 font-semibold text-[10px]">{clip.engagement}%</span>
                     </div>
                   </div>
-                </div>
+
+                  {/* Play Button Overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                      <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1" />
+                    </div>
+                  </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
