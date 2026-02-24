@@ -79,7 +79,7 @@ export default function ArtistDashboard() {
 
           {/* Mobile Artist Profile (compact) */}
           <div className="lg:hidden mb-3">
-            <ArtistProfileCard compact={true} />
+            <ArtistProfileCard compact={true} artist={artist} />
           </div>
 
           {/* Main Grid */}
@@ -93,7 +93,7 @@ export default function ArtistDashboard() {
             {/* Right Column - Desktop only profile */}
             <div className="lg:col-span-3 space-y-3">
               <div className="hidden lg:block">
-                <ArtistProfileCard />
+                <ArtistProfileCard artist={artist} />
               </div>
               <UpcomingSessionsCard artistId={artist.id} />
             </div>
