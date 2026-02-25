@@ -27,7 +27,7 @@ export default function Hero({ config }) {
           transition={{ duration: 0.7 }}
           className="max-w-4xl w-full space-y-2 sm:space-y-3 lg:space-y-4"
         >
-          <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-5xl xl:text-6xl font-bold text-white leading-snug sm:leading-tight px-2" style={{ WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', display: '-webkit-box' }}>
+          <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-5xl xl:text-6xl font-bold text-white leading-snug sm:leading-tight px-2 line-clamp-3">
             {heroTitle}
           </h1>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 leading-relaxed px-2 line-clamp-3">
