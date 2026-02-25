@@ -82,7 +82,7 @@ export default function Calendars() {
       <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} artistName={artist?.stageName} />
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} artistId={artistId} />
       <main className="lg:pl-64 pt-16">
-        <div className="px-3 py-2 max-w-full">
+        <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
         {/* Header Compacto */}
         <div className="flex items-center justify-end gap-2 mb-3">
           <button
@@ -299,7 +299,7 @@ export default function Calendars() {
     </div>
   ) : (
     <AdminLayout activePage="Calendars">
-      <div className="px-3 py-2 max-w-full">
+      <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
         {/* Header Compacto */}
         <div className="flex items-center justify-end gap-2 mb-3">
           <button

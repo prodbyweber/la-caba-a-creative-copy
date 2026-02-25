@@ -147,7 +147,7 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout activePage="AdminDashboard">
-      <div className="p-4 sm:p-6 max-w-[1600px] mx-auto">
+      <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
