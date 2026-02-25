@@ -77,7 +77,7 @@ export default function TrackCardExpanded({ track, onEdit }) {
   return (
     <motion.div
       layout
-      className="bg-white/5 rounded-lg border border-white/5 hover:border-purple-500/30 transition-all overflow-hidden"
+      className="group bg-white/5 rounded-lg border border-white/5 hover:border-purple-500/30 transition-all overflow-hidden"
     >
       {/* Header Compacto */}
       <div className="p-2 lg:p-3 flex items-center gap-2 lg:gap-3">
@@ -106,7 +106,7 @@ export default function TrackCardExpanded({ track, onEdit }) {
             <button
               type="button"
               onClick={toggleMainPlay}
-              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-white/95 hover:bg-white active:scale-95 hover:scale-110 flex items-center justify-center transition-all duration-200 shadow-[0_4px_20px_rgba(0,0,0,0.5)] backdrop-blur-sm z-10 ${playingMain ? 'opacity-100 scale-100' : 'opacity-0 scale-90 group-hover/cover:opacity-100 group-hover/cover:scale-100'}`}
+              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-white/95 hover:bg-white active:scale-95 hover:scale-110 flex items-center justify-center transition-all duration-200 shadow-[0_4px_20px_rgba(0,0,0,0.5)] backdrop-blur-sm z-10 ${playingMain ? 'opacity-100 scale-100' : 'opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100'}`}
             >
               {playingMain ? (
                 <Pause className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-black" fill="black" />
