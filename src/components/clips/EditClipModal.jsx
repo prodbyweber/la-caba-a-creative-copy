@@ -214,23 +214,16 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
                 />
               </div>
 
-              {/* Artist */}
+              {/* Artist - Fixed */}
               <div>
                 <label className="text-sm font-medium text-gray-400 mb-2 block">
-                  Artista *
+                  Artista
                 </label>
-                <select
-                  value={formData.artist_id}
-                  onChange={(e) => setFormData({ ...formData, artist_id: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
-                >
-                  <option value="">Seleccionar artista...</option>
-                  {artists.map(artist => (
-                    <option key={artist.id} value={artist.id}>
-                      {artist.name}
-                    </option>
-                  ))}
-                </select>
+                <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                  <p className="text-sm text-purple-300 font-medium">
+                    {artists.find(a => a.id === formData.artist_id)?.stageName || artists.find(a => a.id === formData.artist_id)?.name || "N/A"}
+                  </p>
+                </div>
               </div>
 
               {/* Project */}
