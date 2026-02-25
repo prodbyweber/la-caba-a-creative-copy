@@ -43,6 +43,25 @@ export default function UploadClipModal({ onClose, artistId }) {
     queryFn: () => base44.entities.Artist.list(),
   });
 
+  const { data: allProjects = [] } = useQuery({
+    queryKey: ['allProjects'],
+    queryFn: () => base44.entities.Project.list(),
+  });
+
+  const generateBriefId = () => {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 5; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
+  const getProjectTitle = (projectId) => {
+    const project = allProjects.find(p => p.id === projectId);
+    return project ? project.title : projectId;
+  };
+
   const handleTrackSelect = async (trackId) => {
     setSelectedTrack(trackId);
     const selectedTrackData = allTracks.find(t => t.id === trackId);
