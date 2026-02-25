@@ -12,7 +12,6 @@ import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
 import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
 import SocialLinksCard from "@/components/dashboard/SocialLinksCard";
-import SocialLinksCard from "@/components/dashboard/SocialLinksCard";
 
 export default function ArtistDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
