@@ -478,7 +478,7 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
                     />
                   </div>
                   <button
-                    onClick={captureFrameFromVideo}
+                    onClick={captureRandomFrame}
                     disabled={uploadingThumbnail}
                     className="w-full py-3 rounded-xl bg-purple-500 hover:bg-purple-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   >
@@ -490,7 +490,7 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
                     ) : (
                       <>
                         <Video className="w-4 h-4" />
-                        Capturar frame actual
+                        Capturar frame aleatorio
                       </>
                     )}
                   </button>
