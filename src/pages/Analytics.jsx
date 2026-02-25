@@ -378,7 +378,7 @@ export default function Analytics() {
 
 
 
-          {/* Top Clips - Desktop Grid, Mobile Horizontal Scroll */}
+          {/* Top Clips - Netflix Style Single Row */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -388,33 +388,33 @@ export default function Analytics() {
               <Play className="w-3 sm:w-4 h-3 sm:h-4 text-emerald-400" />
               Top Clips
             </h3>
-            {/* Desktop Grid */}
-            <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+            {/* Desktop Single Row - Netflix Style */}
+            <div className="hidden sm:flex gap-2 overflow-x-auto pb-2">
               {topClips.slice(0, 8).map((clip, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: i * 0.03 }}
-                  className="group relative aspect-[9/16] rounded-lg overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer"
+                  className="group relative aspect-[9/16] h-40 rounded-lg overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer flex-shrink-0"
                 >
                   <img 
                     src={clip.thumbnail} 
                     alt={clip.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
                   
-                  <div className="absolute bottom-0 left-0 right-0 p-1.5">
-                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-black/60 flex items-center justify-center text-[8px] font-bold text-emerald-400 border border-emerald-500/30">
+                  <div className="absolute bottom-0 left-0 right-0 p-2">
+                    <div className="absolute top-1.5 left-1.5 w-5 h-5 rounded bg-black/70 flex items-center justify-center text-[8px] font-bold text-emerald-400 border border-emerald-500/40">
                       {i + 1}
                     </div>
                     
-                    <h4 className="font-bold text-[9px] mb-0.5 line-clamp-2 leading-tight">{clip.title}</h4>
-                    <div className="flex items-center gap-1 text-[8px] text-gray-400">
+                    <h4 className="font-bold text-[10px] mb-0.5 line-clamp-1 leading-tight pr-6">{clip.title}</h4>
+                    <div className="flex items-center gap-1.5 text-[8px] text-gray-400">
                       <span className="px-1 py-0.5 rounded bg-white/10 text-[7px] font-medium">{clip.platform}</span>
-                      <span className="font-semibold">{(clip.views / 1000).toFixed(0)}K</span>
+                      <span className="font-semibold text-emerald-400">{(clip.views / 1000).toFixed(0)}K</span>
                     </div>
                   </div>
 
