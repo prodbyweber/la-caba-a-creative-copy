@@ -178,10 +178,9 @@ export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay }}
-        className="bg-[#111113] rounded-xl border border-white/5 overflow-hidden hover:border-white/10 transition-all group cursor-pointer"
-        onClick={() => setPreviewModalOpen(true)}
+        className="bg-[#111113] rounded-xl border border-white/5 overflow-hidden hover:border-white/10 transition-all group"
       >
-        {/* Thumbnail */}
+        {/* Thumbnail with Play Button */}
         <div className="relative aspect-[9/16] bg-[#0a0a0b]">
           {clip.thumbnail_url ? (
             <img src={clip.thumbnail_url} alt={clip.title} className="w-full h-full object-cover" />
@@ -191,19 +190,25 @@ export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
             </div>
           )}
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setPreviewModalOpen(true);
-            }}
-            className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+            onClick={() => setPreviewModalOpen(true)}
+            className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
           >
-            <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors">
+            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center hover:shadow-lg hover:shadow-purple-500/50 transition-all">
               <Play className="w-5 h-5 text-white" fill="white" />
             </div>
           </button>
-          <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-medium border ${statusConfig[clip.status]?.color}`}>
-            {statusConfig[clip.status]?.label}
-          </span>
+          
+          {/* Status & ID Badges */}
+          <div className="absolute inset-0 pointer-events-none p-2 flex flex-col justify-between">
+            <span className={`px-2 py-0.5 rounded text-xs font-medium border w-fit ${statusConfig[clip.status]?.color}`}>
+              {statusConfig[clip.status]?.label}
+            </span>
+            <div className="text-right">
+              <span className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-[10px] font-mono font-bold text-white shadow-lg shadow-purple-500/40">
+                {clip.clip_id || clip.id.slice(0, 5)}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Content - Compact */}
