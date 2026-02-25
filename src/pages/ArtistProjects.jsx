@@ -65,7 +65,7 @@ export default function ArtistProjectsPage() {
 
           {/* Projects Grid */}
           {isLoading ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="bg-white/5 rounded-xl p-4 animate-pulse">
                   <div className="h-6 bg-white/5 rounded w-2/3 mb-3" />
@@ -93,14 +93,14 @@ export default function ArtistProjectsPage() {
                     transition={{ delay: i * 0.05 }}
                   >
                     <Link to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
-                      <div className="bg-[#141414] rounded-2xl border border-white/5 hover:border-purple-500/30 transition-all overflow-hidden group cursor-pointer">
+                      <div className="bg-[#141414] rounded-lg border border-white/5 hover:border-purple-500/30 transition-all overflow-hidden group cursor-pointer">
                         {/* Cover */}
-                        <div className="relative aspect-video">
+                        <div className="relative aspect-square">
                           <div className="w-full h-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center overflow-hidden">
                             {project.cover_url ? (
                               <img src={project.cover_url} alt={project.title} className="w-full h-full object-cover" />
                             ) : (
-                              <FolderKanban className="w-20 h-20 text-white/20" />
+                              <FolderKanban className="w-10 h-10 text-white/20" />
                             )}
                           </div>
                           
@@ -108,47 +108,43 @@ export default function ArtistProjectsPage() {
                           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                           
                           {/* Status Badge */}
-                          <div className={`absolute top-4 right-4 px-4 py-1.5 rounded-xl border text-sm font-medium backdrop-blur-sm ${statusColors[project.status]}`}>
+                          <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-lg border text-[10px] font-medium backdrop-blur-sm ${statusColors[project.status]}`}>
                             {project.status}
                           </div>
                         </div>
 
                         {/* Content */}
-                        <div className="p-6">
-                          <div className="flex items-start justify-between mb-4">
+                        <div className="p-3">
+                          <div className="flex items-start justify-between mb-2">
                             <div className="flex-1 min-w-0">
-                              <h3 className="text-xl font-bold text-white mb-1.5 truncate group-hover:text-purple-400 transition-colors">
+                              <h3 className="text-sm font-bold text-white mb-0.5 truncate group-hover:text-purple-400 transition-colors">
                                 {project.title}
                               </h3>
-                              <p className="text-sm text-gray-500">{project.type}</p>
+                              <p className="text-[10px] text-gray-500">{project.type}</p>
                             </div>
                             {project.priority && (
-                              <span className={`px-3 py-1 rounded-lg text-xs font-medium ${priorityColors[project.priority]} ml-3 flex-shrink-0`}>
+                              <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${priorityColors[project.priority]} ml-2 flex-shrink-0`}>
                                 {project.priority}
                               </span>
                             )}
                           </div>
 
                           {/* Stats */}
-                          <div className="grid grid-cols-3 gap-3">
-                            <div className="bg-white/5 rounded-xl p-3">
-                              <div className="flex items-center gap-2 mb-1.5">
-                                <Music2 className="w-4 h-4 text-purple-400" />
-                                <span className="text-xs text-gray-500">Tracks</span>
-                              </div>
-                              <p className="text-lg font-bold">{projectTracks.length}</p>
+                          <div className="flex items-center gap-2 text-[10px]">
+                            <div className="flex items-center gap-1 text-gray-400">
+                              <Music2 className="w-3 h-3 text-purple-400" />
+                              <span>{projectTracks.length}</span>
                             </div>
-                            
                             {project.target_delivery_date && (
-                              <div className="bg-white/5 rounded-xl p-3 col-span-2">
-                                <div className="flex items-center gap-2 mb-1.5">
-                                  <Calendar className="w-4 h-4 text-orange-400" />
-                                  <span className="text-xs text-gray-500">Entrega</span>
+                              <>
+                                <span className="text-gray-600">•</span>
+                                <div className="flex items-center gap-1 text-gray-400">
+                                  <Calendar className="w-3 h-3 text-orange-400" />
+                                  <span className="truncate">
+                                    {new Date(project.target_delivery_date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}
+                                  </span>
                                 </div>
-                                <p className="text-sm font-medium truncate">
-                                  {new Date(project.target_delivery_date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
-                                </p>
-                              </div>
+                              </>
                             )}
                           </div>
                         </div>
