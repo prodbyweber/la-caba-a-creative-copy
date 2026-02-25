@@ -389,7 +389,7 @@ export default function Analytics() {
               Top Clips
             </h3>
             {/* Desktop Single Row - Netflix Style */}
-            <div className="hidden sm:grid grid-cols-8 gap-0.5 pb-2">
+            <div className="hidden sm:grid grid-cols-8 gap-0 pb-2">
               {topClips.slice(0, 8).map((clip, i) => (
                 <motion.div
                   key={i}
