@@ -467,17 +467,17 @@ export default function Analytics() {
                     
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
                     
-                    <div className="absolute bottom-0 left-0 right-0 p-1">
-                      <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-black/60 flex items-center justify-center text-[7px] font-bold text-emerald-400 border border-emerald-500/30">
-                        {i + 1}
-                      </div>
-                      
-                      <h4 className="font-bold text-[8px] line-clamp-1">{clip.title}</h4>
-                      <div className="flex items-center gap-0.5 text-[7px] text-gray-400">
-                        <span className="px-0.5 py-0.5 rounded bg-white/10 text-[6px] font-medium">{clip.platform}</span>
-                        <span className="font-semibold">{(clip.views / 1000).toFixed(0)}K</span>
-                      </div>
-                    </div>
+                    <div className="absolute top-2 left-2 w-5 h-5 rounded bg-black/70 flex items-center justify-center text-[8px] font-bold text-emerald-400 border border-emerald-500/40">
+                       {i + 1}
+                     </div>
+
+                     <div className="absolute bottom-0 left-0 right-0 p-2">
+                       <h4 className="font-bold text-[9px] mb-1 line-clamp-1 leading-tight">{clip.title}</h4>
+                       <div className="flex items-center gap-1.5 text-[8px] text-gray-300">
+                         <span className="px-1 py-0.5 rounded bg-white/10 text-[7px] font-medium">{clip.platform}</span>
+                         <span className="font-semibold text-emerald-400">{(clip.views / 1000).toFixed(0)}K</span>
+                       </div>
+                     </div>
                   </motion.div>
                 ))}
               </div>
