@@ -163,64 +163,120 @@ export default function Analytics() {
               </div>
 
               {/* Platform Stats Integrated */}
-              <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-white/5">
-                {/* Streams */}
-                <div>
-                  <h4 className="text-[9px] font-bold text-gray-400 mb-1.5">Streams</h4>
-                  <div className="space-y-1">
-                    {platformsStreamsData.slice(0, 3).map((platform, i) => {
-                      const total = platformsStreamsData.reduce((sum, p) => sum + p.value, 0);
-                      const percentage = ((platform.value / total) * 100).toFixed(0);
-                      
-                      return (
-                        <div key={i} className="flex items-center gap-1">
-                          <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
-                          <span className="text-[8px] text-gray-300 flex-1 truncate">{platform.name}</span>
-                          <span className="text-[8px] font-semibold text-gray-400">{percentage}%</span>
-                        </div>
-                      );
-                    })}
+              <div className="mt-4 pt-4 border-t border-white/5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {/* Streams */}
+                  <div className="bg-white/5 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-xs font-bold text-white">Streams</h4>
+                      <span className="text-xs font-bold text-emerald-400">
+                        {(platformsStreamsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      {platformsStreamsData.slice(0, 3).map((platform, i) => {
+                        const total = platformsStreamsData.reduce((sum, p) => sum + p.value, 0);
+                        const percentage = ((platform.value / total) * 100).toFixed(0);
+                        
+                        return (
+                          <div key={i}>
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center gap-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: platform.color }} />
+                                <span className="text-[10px] text-gray-300">{platform.name}</span>
+                              </div>
+                              <span className="text-[10px] font-semibold text-white">{(platform.value / 1000).toFixed(0)}K</span>
+                            </div>
+                            <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full rounded-full transition-all"
+                                style={{ 
+                                  width: `${percentage}%`,
+                                  backgroundColor: platform.color
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
 
-                {/* Views */}
-                <div>
-                  <h4 className="text-[9px] font-bold text-gray-400 mb-1.5">Views</h4>
-                  <div className="space-y-1">
-                    {platformsViewsData.map((platform, i) => {
-                      const total = platformsViewsData.reduce((sum, p) => sum + p.value, 0);
-                      const percentage = ((platform.value / total) * 100).toFixed(0);
-                      
-                      return (
-                        <div key={i} className="flex items-center gap-1">
-                          <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
-                          <span className="text-[8px] text-gray-300 flex-1 truncate">{platform.name}</span>
-                          <span className="text-[8px] font-semibold text-gray-400">{percentage}%</span>
-                        </div>
-                      );
-                    })}
+                  {/* Views */}
+                  <div className="bg-white/5 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-xs font-bold text-white">Views</h4>
+                      <span className="text-xs font-bold text-purple-400">
+                        {(platformsViewsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      {platformsViewsData.map((platform, i) => {
+                        const total = platformsViewsData.reduce((sum, p) => sum + p.value, 0);
+                        const percentage = ((platform.value / total) * 100).toFixed(0);
+                        
+                        return (
+                          <div key={i}>
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center gap-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: platform.color }} />
+                                <span className="text-[10px] text-gray-300">{platform.name}</span>
+                              </div>
+                              <span className="text-[10px] font-semibold text-white">{(platform.value / 1000).toFixed(0)}K</span>
+                            </div>
+                            <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full rounded-full transition-all"
+                                style={{ 
+                                  width: `${percentage}%`,
+                                  backgroundColor: platform.color
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
 
-                {/* Likes */}
-                <div>
-                  <h4 className="text-[9px] font-bold text-gray-400 mb-1.5 flex items-center gap-0.5">
-                    <Heart className="w-2.5 h-2.5 text-red-400" />
-                    Likes
-                  </h4>
-                  <div className="space-y-1">
-                    {platformsLikesData.map((platform, i) => {
-                      const total = platformsLikesData.reduce((sum, p) => sum + p.value, 0);
-                      const percentage = ((platform.value / total) * 100).toFixed(0);
-                      
-                      return (
-                        <div key={i} className="flex items-center gap-1">
-                          <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
-                          <span className="text-[8px] text-gray-300 flex-1 truncate">{platform.name}</span>
-                          <span className="text-[8px] font-semibold text-gray-400">{percentage}%</span>
-                        </div>
-                      );
-                    })}
+                  {/* Likes */}
+                  <div className="bg-white/5 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-xs font-bold text-white flex items-center gap-1">
+                        <Heart className="w-3 h-3 text-red-400" />
+                        Likes
+                      </h4>
+                      <span className="text-xs font-bold text-red-400">
+                        {(platformsLikesData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(1)}K
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      {platformsLikesData.map((platform, i) => {
+                        const total = platformsLikesData.reduce((sum, p) => sum + p.value, 0);
+                        const percentage = ((platform.value / total) * 100).toFixed(0);
+                        
+                        return (
+                          <div key={i}>
+                            <div className="flex items-center justify-between mb-1">
+                              <div className="flex items-center gap-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: platform.color }} />
+                                <span className="text-[10px] text-gray-300">{platform.name}</span>
+                              </div>
+                              <span className="text-[10px] font-semibold text-white">{(platform.value / 1000).toFixed(1)}K</span>
+                            </div>
+                            <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full rounded-full transition-all"
+                                style={{ 
+                                  width: `${percentage}%`,
+                                  backgroundColor: platform.color
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>
