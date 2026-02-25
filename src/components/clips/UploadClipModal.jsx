@@ -1,8 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Upload, Loader, Check, AlertCircle } from "lucide-react";
+import { X, Upload, Loader, Check, AlertCircle, ArrowLeft, Video } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
+
+const platformConfig = {
+  youtube: {
+    name: "YouTube Shorts",
+    icon: () => <span>▶</span>,
+    charLimit: 5000
+  },
+  instagram: {
+    name: "Instagram Reels",
+    icon: () => <span>📷</span>,
+    charLimit: 2200
+  },
+  tiktok: {
+    name: "TikTok",
+    icon: () => <span>♫</span>,
+    charLimit: 2200
+  }
+};
 
 export default function UploadClipModal({ onClose, artistId }) {
   const [files, setFiles] = useState([]);
@@ -12,6 +30,12 @@ export default function UploadClipModal({ onClose, artistId }) {
   const [selectedProject, setSelectedProject] = useState("");
   const [collaborators, setCollaborators] = useState([]);
   const [newCollaborator, setNewCollaborator] = useState("");
+  const [editingClipId, setEditingClipId] = useState(null);
+  const [activeTab, setActiveTab] = useState("general");
+  const [uploadedClips, setUploadedClips] = useState({});
+  const [formData, setFormData] = useState({});
+  const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
+  const videoRef = useRef(null);
 
   const { data: artist } = useQuery({
     queryKey: ['artist', artistId],
