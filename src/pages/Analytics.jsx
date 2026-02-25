@@ -378,22 +378,65 @@ export default function Analytics() {
 
 
 
-          {/* Top Clips - Netflix Style */}
+          {/* Top Clips - Desktop Grid, Mobile Horizontal Scroll */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-3 sm:mb-4"
           >
-            <h3 className="text-base sm:text-lg font-bold mb-2 sm:mb-3">Top Clips</h3>
-            <div className="overflow-x-auto pb-2 sm:pb-3 -mx-3 sm:-mx-0 px-3 sm:px-0">
-              <div className="flex gap-2 sm:gap-3 w-max sm:w-full sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <h3 className="text-xs sm:text-sm font-bold mb-2 sm:mb-3 flex items-center gap-2">
+              <Play className="w-3 sm:w-4 h-3 sm:h-4 text-emerald-400" />
+              Top Clips
+            </h3>
+            {/* Desktop Grid */}
+            <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+              {topClips.slice(0, 8).map((clip, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="group relative aspect-[9/16] rounded-lg overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer"
+                >
+                  <img 
+                    src={clip.thumbnail} 
+                    alt={clip.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                  
+                  <div className="absolute bottom-0 left-0 right-0 p-1.5">
+                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-black/60 flex items-center justify-center text-[8px] font-bold text-emerald-400 border border-emerald-500/30">
+                      {i + 1}
+                    </div>
+                    
+                    <h4 className="font-bold text-[9px] mb-0.5 line-clamp-2 leading-tight">{clip.title}</h4>
+                    <div className="flex items-center gap-1 text-[8px] text-gray-400">
+                      <span className="px-1 py-0.5 rounded bg-white/10 text-[7px] font-medium">{clip.platform}</span>
+                      <span className="font-semibold">{(clip.views / 1000).toFixed(0)}K</span>
+                    </div>
+                  </div>
+
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                      <div className="w-0 h-0 border-l-[8px] border-l-white border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent ml-0.5" />
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Mobile Horizontal Scroll */}
+            <div className="sm:hidden overflow-x-auto pb-2 -mx-4 px-4">
+              <div className="flex gap-2 w-max">
                 {topClips.slice(0, 4).map((clip, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.03 }}
-                    className="group relative aspect-[9/16] w-32 sm:w-full rounded-lg sm:rounded-xl overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer flex-shrink-0"
+                    className="group relative aspect-[9/16] w-24 rounded-lg overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer flex-shrink-0"
                   >
                     <img 
                       src={clip.thumbnail} 
@@ -403,21 +446,15 @@ export default function Analytics() {
                     
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
                     
-                    <div className="absolute bottom-0 left-0 right-0 p-1.5 sm:p-2">
-                      <div className="absolute top-1.5 right-1.5 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-black/60 flex items-center justify-center text-[9px] sm:text-[10px] font-bold text-emerald-400 border border-emerald-500/30">
+                    <div className="absolute bottom-0 left-0 right-0 p-1">
+                      <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-black/60 flex items-center justify-center text-[7px] font-bold text-emerald-400 border border-emerald-500/30">
                         {i + 1}
                       </div>
                       
-                      <h4 className="font-bold text-[10px] sm:text-sm mb-1 line-clamp-2 leading-tight">{clip.title}</h4>
-                      <div className="flex items-center gap-1.5 text-[8px] sm:text-xs text-gray-400">
-                        <span className="px-1.5 py-0.5 rounded bg-white/10 text-[7px] sm:text-[8px] font-medium">{clip.platform}</span>
+                      <h4 className="font-bold text-[8px] line-clamp-1">{clip.title}</h4>
+                      <div className="flex items-center gap-0.5 text-[7px] text-gray-400">
+                        <span className="px-0.5 py-0.5 rounded bg-white/10 text-[6px] font-medium">{clip.platform}</span>
                         <span className="font-semibold">{(clip.views / 1000).toFixed(0)}K</span>
-                      </div>
-                    </div>
-
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                        <div className="w-0 h-0 border-l-[10px] border-l-white border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent ml-1" />
                       </div>
                     </div>
                   </motion.div>
