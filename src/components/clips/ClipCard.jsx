@@ -171,83 +171,79 @@ export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
     );
   }
 
-  // Grid View
+  // Grid View - Compact
   return (
     <>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay }}
-        className="bg-[#111113] rounded-xl border border-white/5 overflow-hidden hover:border-white/10 transition-all group"
+        className="bg-[#111113] rounded-lg border border-white/5 overflow-hidden hover:border-white/10 transition-all group flex flex-col h-full"
       >
-        {/* Thumbnail with Play Button */}
-        <div className="relative aspect-[9/16] bg-[#0a0a0b]">
+        {/* Thumbnail with Play Button - Reduced */}
+        <div 
+          className="relative aspect-[9/16] bg-[#0a0a0b] cursor-pointer flex-1"
+          onClick={() => setPreviewModalOpen(true)}
+        >
           {clip.thumbnail_url ? (
             <img src={clip.thumbnail_url} alt={clip.title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Play className="w-8 h-8 text-gray-600" />
+              <Play className="w-4 h-4 text-gray-600" />
             </div>
           )}
-          <button
-            onClick={() => setPreviewModalOpen(true)}
-            className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
-          >
-            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center hover:shadow-lg hover:shadow-purple-500/50 transition-all">
-              <Play className="w-5 h-5 text-white" fill="white" />
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+              <Play className="w-3 h-3 text-white" fill="white" />
             </div>
-          </button>
+          </div>
           
           {/* Status & ID Badges */}
-          <div className="absolute inset-0 pointer-events-none p-2 flex flex-col justify-between">
-            <span className={`px-2 py-0.5 rounded text-xs font-medium border w-fit ${statusConfig[clip.status]?.color}`}>
+          <div className="absolute inset-0 pointer-events-none p-1.5 flex flex-col justify-between">
+            <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border w-fit ${statusConfig[clip.status]?.color}`}>
               {statusConfig[clip.status]?.label}
             </span>
-            <div className="text-right">
-              <span className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-[10px] font-mono font-bold text-white shadow-lg shadow-purple-500/40">
-                {clip.clip_id || clip.id.slice(0, 5)}
-              </span>
-            </div>
+            <span className="px-1.5 py-0.5 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-[8px] font-mono font-bold text-white shadow-lg shadow-purple-500/40 w-fit self-end">
+              {clip.clip_id || clip.id.slice(0, 5)}
+            </span>
           </div>
         </div>
 
-        {/* Content - Compact */}
-         <div className="p-2 h-16 flex flex-col justify-between">
-           <div className="min-w-0">
-             <h3 className="font-semibold text-xs line-clamp-1">{clip.title}</h3>
-             {artist && (
-               <p className="text-[9px] text-gray-500 line-clamp-1">{artist.stageName || artist.name}</p>
-             )}
-           </div>
+        {/* Content - Ultra Compact */}
+        <div className="px-2 py-1.5 space-y-1">
+          <h3 className="font-semibold text-[11px] line-clamp-1 leading-tight">{clip.title}</h3>
+          {artist && (
+            <p className="text-[9px] text-gray-500 line-clamp-1">{artist.stageName || artist.name}</p>
+          )}
 
-           {/* Platforms & Actions */}
-           <div className="flex items-center justify-between gap-1">
+          {/* Actions Row */}
+          <div className="flex items-center justify-between gap-1 pt-1">
             {clip.platforms && clip.platforms.length > 0 && (
               <div className="flex items-center gap-0.5">
                 {clip.platforms.slice(0, 2).map(platform => {
                   const Icon = platformIcons[platform];
                   return (
-                    <div key={platform} className="w-3.5 h-3.5 rounded bg-white/5 flex items-center justify-center">
-                      <Icon className="w-2 h-2" />
+                    <div key={platform} className="w-3 h-3 rounded bg-white/5 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-1.5 h-1.5" />
                     </div>
                   );
                 })}
               </div>
             )}
-            <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+            <div className="flex gap-0.5 ml-auto" onClick={(e) => e.stopPropagation()}>
               <button
                 onClick={() => setEditModalOpen(true)}
                 className="p-1 hover:bg-white/10 rounded transition-colors"
                 title="Editar"
               >
-                <Edit className="w-3 h-3 text-gray-400" />
+                <Edit className="w-2.5 h-2.5 text-gray-400" />
               </button>
               <div className="relative">
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
                   className="p-1 hover:bg-white/10 rounded transition-colors"
                 >
-                  <MoreVertical className="w-3 h-3 text-gray-400" />
+                  <MoreVertical className="w-2.5 h-2.5 text-gray-400" />
                 </button>
                 {menuOpen && (
                   <>
@@ -255,19 +251,19 @@ export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
                       className="fixed inset-0 z-10" 
                       onClick={() => setMenuOpen(false)}
                     />
-                    <div className="absolute right-0 top-full mt-1 w-40 bg-[#1a1a1d] border border-white/10 rounded-lg shadow-xl z-20 py-1">
+                    <div className="absolute right-0 top-full mt-1 w-32 bg-[#1a1a1d] border border-white/10 rounded-lg shadow-xl z-20 py-1">
                       <button
                         onClick={() => { handleDuplicate(); setMenuOpen(false); }}
-                        className="w-full px-3 py-1.5 text-left text-xs hover:bg-white/5 flex items-center gap-2"
+                        className="w-full px-2 py-1 text-left text-[10px] hover:bg-white/5 flex items-center gap-1.5"
                       >
-                        <Copy className="w-3 h-3" />
+                        <Copy className="w-2.5 h-2.5" />
                         Duplicar
                       </button>
                       <button
                         onClick={() => { handleDelete(); setMenuOpen(false); }}
-                        className="w-full px-3 py-1.5 text-left text-xs hover:bg-white/5 flex items-center gap-2 text-red-400"
+                        className="w-full px-2 py-1 text-left text-[10px] hover:bg-white/5 flex items-center gap-1.5 text-red-400"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-2.5 h-2.5" />
                         Eliminar
                       </button>
                     </div>
