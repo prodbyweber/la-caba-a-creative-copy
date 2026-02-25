@@ -251,6 +251,239 @@ export default function UploadClipModal({ onClose, artistId }) {
     ));
   };
 
+  if (editingClipId) {
+    const clip = uploadedClips[editingClipId];
+    const data = formData[editingClipId] || clip;
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="bg-[#111113] rounded-2xl border border-white/10 w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
+        >
+          {/* Header */}
+          <div className="p-6 border-b border-white/5">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => setEditingClipId(null)}
+                className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-300 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Atrás
+              </button>
+              <h2 className="text-2xl font-bold">{data.title}</h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex gap-2 px-6 pt-6 border-b border-white/5 overflow-x-auto">
+            {[
+              { id: "general", label: "General" },
+              { id: "thumbnail", label: "Portada" },
+              { id: "schedule", label: "Programar" }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-all ${
+                  activeTab === tab.id
+                    ? "text-white border-b-2 border-purple-500"
+                    : "text-gray-400 hover:text-gray-300"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto p-6">
+            {activeTab === "general" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-400 mb-2 block">Título</label>
+                  <input
+                    type="text"
+                    value={data.title || ""}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      [editingClipId]: { ...prev[editingClipId], title: e.target.value }
+                    }))}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-gray-400 mb-2 block">Canción</label>
+                  <select
+                    value={data.track_id || ""}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      [editingClipId]: { ...prev[editingClipId], track_id: e.target.value }
+                    }))}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50"
+                  >
+                    <option value="">Sin canción</option>
+                    {allTracks.map(track => (
+                      <option key={track.id} value={track.id}>{track.title}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "thumbnail" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-400 mb-2 block">Portada</label>
+                  {data.thumbnail_url && (
+                    <img src={data.thumbnail_url} alt="Portada" className="w-full aspect-[9/16] object-cover rounded-xl mb-4" />
+                  )}
+                  <button
+                    onClick={captureRandomFrame}
+                    disabled={uploadingThumbnail}
+                    className="w-full py-3 rounded-xl bg-purple-500 hover:bg-purple-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {uploadingThumbnail ? (
+                      <>
+                        <Loader className="w-4 h-4 animate-spin" />
+                        Capturando...
+                      </>
+                    ) : (
+                      <>
+                        <Video className="w-4 h-4" />
+                        Capturar frame aleatorio
+                      </>
+                    )}
+                  </button>
+                </div>
+                <video
+                  ref={videoRef}
+                  src={data.file_url}
+                  className="w-full rounded-xl hidden"
+                />
+              </div>
+            )}
+
+            {activeTab === "schedule" && (
+              <div className="space-y-4">
+                {/* Platforms */}
+                <div>
+                  <label className="text-sm font-medium text-gray-400 mb-2 block">Plataformas</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {Object.entries(platformConfig).map(([key, platform]) => (
+                      <button
+                        key={key}
+                        onClick={() => setFormData(prev => ({
+                          ...prev,
+                          [editingClipId]: {
+                            ...prev[editingClipId],
+                            platforms: (prev[editingClipId].platforms || []).includes(key)
+                              ? (prev[editingClipId].platforms || []).filter(p => p !== key)
+                              : [...(prev[editingClipId].platforms || []), key]
+                          }
+                        }))}
+                        className={`p-3 rounded-xl border-2 transition-all text-sm ${
+                          (data.platforms || []).includes(key)
+                            ? "bg-purple-500/10 border-purple-500/50 text-purple-400"
+                            : "bg-white/5 border-white/10 hover:border-white/20"
+                        }`}
+                      >
+                        {platform.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Schedule Date/Time */}
+                <div>
+                  <label className="text-sm font-medium text-gray-400 mb-2 block">Fecha y hora</label>
+                  <input
+                    type="datetime-local"
+                    value={data.scheduled_at ? new Date(data.scheduled_at).toISOString().slice(0, 16) : ''}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      [editingClipId]: { ...prev[editingClipId], scheduled_at: e.target.value ? new Date(e.target.value).toISOString() : '' }
+                    }))}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50"
+                  />
+                </div>
+
+                {/* Captions */}
+                <div>
+                  <label className="text-sm font-medium text-gray-400 mb-2 block">Caption Master</label>
+                  <textarea
+                    value={data.caption_master || ""}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      [editingClipId]: { ...prev[editingClipId], caption_master: e.target.value }
+                    }))}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 h-24 text-sm"
+                  />
+                </div>
+
+                {/* Tags & Hashtags */}
+                <div>
+                  <label className="text-sm font-medium text-gray-400 mb-2 block">Hashtags</label>
+                  <input
+                    type="text"
+                    value={(data.hashtags || []).join(" ")}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      [editingClipId]: { ...prev[editingClipId], hashtags: e.target.value.split(" ").filter(h => h) }
+                    }))}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 text-sm"
+                    placeholder="Separa por espacios"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="p-6 border-t border-white/5 flex items-center justify-between">
+            <button
+              onClick={() => setEditingClipId(null)}
+              className="px-6 py-2.5 rounded-xl border border-white/10 font-medium text-sm hover:bg-white/5 transition-all"
+            >
+              Atrás
+            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setEditingClipId(null)}
+                className="px-6 py-2.5 rounded-xl border border-white/10 font-medium text-sm hover:bg-white/5 transition-all"
+              >
+                Terminar
+              </button>
+              <button
+                onClick={() => {
+                  saveClipChanges();
+                  const allDone = files.every(f => f.status === 'success');
+                  if (allDone) {
+                    setTimeout(() => onClose(), 800);
+                  } else {
+                    setEditingClipId(null);
+                  }
+                }}
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 font-medium text-sm hover:shadow-lg hover:shadow-purple-500/25 transition-all"
+              >
+                Listo
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
       <motion.div
