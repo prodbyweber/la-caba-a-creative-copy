@@ -82,7 +82,7 @@ export default function UploadClipModal({ onClose, artistId }) {
 
     setFiles(prev => [...prev, ...validFiles.map(file => ({
       file,
-      id: Math.random().toString(36),
+      id: generateBriefId(),
       status: 'pending',
       title: file.name.replace(/\.[^/.]+$/, "")
     }))]);
