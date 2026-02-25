@@ -282,48 +282,66 @@ export default function Analytics() {
                    </div>
                 </div>
 
-                {/* Mobile Minimized Version */}
+                {/* Mobile Optimized Version - Clear Identification */}
                 <div className="sm:hidden grid grid-cols-3 gap-1">
-                  {/* Streams Mobile */}
-                  <div className="bg-white/5 rounded p-1.5">
-                    <div className="text-[7px] font-bold text-emerald-400 mb-1">
+                  {/* Streams - Audio Platform */}
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-2">
+                    <div className="flex items-center gap-1 mb-1.5">
+                      <div className="w-4 h-4 rounded bg-emerald-500/30 flex items-center justify-center">
+                        <Play className="w-2.5 h-2.5 text-emerald-400" />
+                      </div>
+                      <div className="text-[7px] font-bold text-emerald-300">Streams</div>
+                    </div>
+                    <div className="text-[9px] font-bold text-emerald-400 mb-1">
                       {(platformsStreamsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
                     </div>
                     <div className="space-y-0.5">
                       {platformsStreamsData.slice(0, 2).map((platform, i) => (
                         <div key={i} className="flex items-center justify-between">
-                          <span className="text-[6px] text-gray-400 truncate">{platform.name.split(' ')[0]}</span>
-                          <span className="text-[6px] font-semibold text-white ml-0.5">{(platform.value / 1000).toFixed(0)}K</span>
+                          <span className="text-[6px] text-emerald-200 truncate">{platform.name.split(' ')[0]}</span>
+                          <span className="text-[7px] font-semibold text-emerald-300 ml-0.5">{(platform.value / 1000).toFixed(0)}K</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Views Mobile */}
-                  <div className="bg-white/5 rounded p-1.5">
-                    <div className="text-[7px] font-bold text-purple-400 mb-1">
+                  {/* Views - Video Platform */}
+                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-2">
+                    <div className="flex items-center gap-1 mb-1.5">
+                      <div className="w-4 h-4 rounded bg-purple-500/30 flex items-center justify-center">
+                        <Eye className="w-2.5 h-2.5 text-purple-400" />
+                      </div>
+                      <div className="text-[7px] font-bold text-purple-300">Views</div>
+                    </div>
+                    <div className="text-[9px] font-bold text-purple-400 mb-1">
                       {(platformsViewsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
                     </div>
                     <div className="space-y-0.5">
                       {platformsViewsData.slice(0, 2).map((platform, i) => (
                         <div key={i} className="flex items-center justify-between">
-                          <span className="text-[6px] text-gray-400 truncate">{platform.name.split(' ')[0]}</span>
-                          <span className="text-[6px] font-semibold text-white ml-0.5">{(platform.value / 1000).toFixed(0)}K</span>
+                          <span className="text-[6px] text-purple-200 truncate">{platform.name.split(' ')[0]}</span>
+                          <span className="text-[7px] font-semibold text-purple-300 ml-0.5">{(platform.value / 1000).toFixed(0)}K</span>
                         </div>
                       ))}
                     </div>
                   </div>
 
-                  {/* Likes Mobile */}
-                  <div className="bg-white/5 rounded p-1.5">
-                    <div className="text-[7px] font-bold text-red-400 mb-1">
+                  {/* Likes - Engagement */}
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-2">
+                    <div className="flex items-center gap-1 mb-1.5">
+                      <div className="w-4 h-4 rounded bg-red-500/30 flex items-center justify-center">
+                        <Heart className="w-2.5 h-2.5 text-red-400" />
+                      </div>
+                      <div className="text-[7px] font-bold text-red-300">Likes</div>
+                    </div>
+                    <div className="text-[9px] font-bold text-red-400 mb-1">
                       {(platformsLikesData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(1)}K
                     </div>
                     <div className="space-y-0.5">
                       {platformsLikesData.slice(0, 2).map((platform, i) => (
                         <div key={i} className="flex items-center justify-between">
-                          <span className="text-[6px] text-gray-400 truncate">{platform.name.split(' ')[0]}</span>
-                          <span className="text-[6px] font-semibold text-white ml-0.5">{(platform.value / 1000).toFixed(1)}K</span>
+                          <span className="text-[6px] text-red-200 truncate">{platform.name.split(' ')[0]}</span>
+                          <span className="text-[7px] font-semibold text-red-300 ml-0.5">{(platform.value / 1000).toFixed(1)}K</span>
                         </div>
                       ))}
                     </div>
@@ -408,20 +426,20 @@ export default function Analytics() {
             </div>
           </motion.div>
 
-          {/* Demographics & Top Countries */}
-          <div className="grid lg:grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
-            {/* Demographics */}
+          {/* Demographics & Top Countries - Optimized */}
+          <div className="grid lg:grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-4">
+            {/* Demographics - Compact */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-[#111113] rounded-lg sm:rounded-xl border border-white/5 p-2 sm:p-3"
+              className="lg:col-span-1 bg-[#111113] rounded-lg sm:rounded-xl border border-white/5 p-2 sm:p-3"
             >
-              <h3 className="text-[10px] sm:text-[11px] font-bold mb-1.5 sm:mb-2">Demografía</h3>
+              <h3 className="text-[10px] sm:text-[11px] font-bold mb-1.5">Demografía</h3>
               
-              {/* Age Demographics */}
+              {/* Age Demographics - Compact */}
               <div className="mb-1.5 sm:mb-2">
-                <h4 className="text-[8px] sm:text-[9px] font-semibold text-gray-400 mb-1">Por Edad</h4>
-                <div className="h-16 sm:h-20">
+                <h4 className="text-[8px] sm:text-[9px] font-semibold text-gray-400 mb-1">Edad</h4>
+                <div className="h-12 sm:h-16">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={demographicsData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
@@ -429,12 +447,12 @@ export default function Analytics() {
                         dataKey="age" 
                         axisLine={false} 
                         tickLine={false} 
-                        tick={{ fill: '#6b7280', fontSize: 7 }}
+                        tick={{ fill: '#6b7280', fontSize: 6 }}
                       />
                       <YAxis 
                         axisLine={false} 
                         tickLine={false} 
-                        tick={{ fill: '#6b7280', fontSize: 7 }}
+                        tick={{ fill: '#6b7280', fontSize: 6 }}
                       />
                       <Tooltip 
                         contentStyle={{ 
@@ -450,13 +468,13 @@ export default function Analytics() {
                 </div>
               </div>
 
-              {/* Gender Demographics */}
+              {/* Gender Demographics - Simplified */}
               <div>
-                <h4 className="text-[8px] sm:text-[9px] font-semibold text-gray-400 mb-1">Por Sexo</h4>
+                <h4 className="text-[8px] sm:text-[9px] font-semibold text-gray-400 mb-1">Sexo</h4>
                 <div className="space-y-0.5">
                   {genderData.map((item, i) => (
                     <div key={i} className="flex items-center gap-1">
-                      <span className="text-[7px] sm:text-[8px] text-gray-300 w-10 sm:w-12">{item.gender}</span>
+                      <span className="text-[7px] sm:text-[8px] text-gray-300 w-9 sm:w-12 truncate">{item.gender}</span>
                       <div className="flex-1 h-0.5 sm:h-1 bg-white/5 rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all"
@@ -470,28 +488,27 @@ export default function Analytics() {
               </div>
             </motion.div>
 
-            {/* Top Countries */}
+            {/* Top Countries - Larger */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-[#111113] rounded-lg sm:rounded-xl border border-white/5 p-2 sm:p-2.5"
+              className="lg:col-span-2 bg-[#111113] rounded-lg sm:rounded-xl border border-white/5 p-2 sm:p-3"
             >
-              <h3 className="text-[10px] sm:text-[11px] font-bold mb-1 sm:mb-1.5">Top Países</h3>
-              <div className="grid grid-cols-2 gap-1">
+              <h3 className="text-[10px] sm:text-[11px] font-bold mb-1.5 sm:mb-2">Top Países</h3>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 sm:gap-2">
                 {topCountriesData.map((country, i) => (
-                  <div key={i} className="flex items-center gap-0.5 sm:gap-1 p-0.5 sm:p-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                    <div className="w-4 h-4 rounded bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center text-[7px] sm:text-[8px] font-bold text-emerald-400">
-                      {i + 1}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-[7px] sm:text-[8px] flex items-center gap-0.5 truncate">
-                        <span>{country.flag}</span>
-                        <span>{country.name}</span>
-                      </div>
-                      <div className="text-[6px] sm:text-[7px] font-bold text-emerald-400">{(country.score / 1000).toFixed(0)}K</div>
-                    </div>
-                  </div>
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="flex flex-col items-center gap-1 p-1.5 sm:p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-center"
+                  >
+                    <div className="text-base sm:text-lg">{country.flag}</div>
+                    <div className="text-[8px] sm:text-[9px] font-semibold text-white truncate">{country.name}</div>
+                    <div className="text-[10px] sm:text-xs font-bold text-emerald-400">{(country.score / 1000).toFixed(0)}K</div>
+                  </motion.div>
                 ))}
               </div>
             </motion.div>
