@@ -29,11 +29,11 @@ export default function OverviewSummary() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+      <div className="grid grid-cols-4 lg:grid-cols-4 gap-1.5 sm:gap-3 mb-4 sm:mb-8">
         {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="bg-white/5 border border-white/10 rounded-xl p-4 h-24 animate-pulse"
+            className="bg-white/5 border border-white/10 rounded-lg sm:rounded-xl p-2 sm:p-4 h-16 sm:h-24 animate-pulse"
           />
         ))}
       </div>
@@ -45,7 +45,7 @@ export default function OverviewSummary() {
   const cards = [
     {
       icon: Play,
-      label: "Streams (30d)",
+      label: "Streams",
       value: metrics.streams_30d_total,
       color: "emerald",
       trend: "+24%"
@@ -59,14 +59,14 @@ export default function OverviewSummary() {
     },
     {
       icon: Eye,
-      label: "Visualizaciones (30d)",
+      label: "Visualizaciones",
       value: metrics.views_30d_total,
       color: "pink",
       trend: "+32%"
     },
     {
       icon: Music2,
-      label: "Oyentes Spotify",
+      label: "Oyentes",
       value: metrics.spotify_monthly_listeners,
       color: "orange",
       trend: "+15%"
@@ -81,7 +81,7 @@ export default function OverviewSummary() {
   };
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
+    <div className="grid grid-cols-4 lg:grid-cols-4 gap-1.5 sm:gap-3 mb-4 sm:mb-8">
       {cards.map((card, i) => {
         const colors = colorMap[card.color];
         const Icon = card.icon;
@@ -91,19 +91,19 @@ export default function OverviewSummary() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
-            className={`bg-gradient-to-br ${colors.bg} ${colors.border} border rounded-xl p-4`}
+            className={`bg-gradient-to-br ${colors.bg} ${colors.border} border rounded-lg sm:rounded-xl p-2 sm:p-4`}
           >
-            <div className="flex items-center justify-between mb-3">
-              <div className={`w-10 h-10 rounded-lg ${colors.icon} flex items-center justify-center`}>
-                <Icon className={`w-5 h-5 ${colors.iconText}`} />
+            <div className="flex items-center justify-between mb-1.5 sm:mb-3">
+              <div className={`w-6 sm:w-10 h-6 sm:h-10 rounded-lg ${colors.icon} flex items-center justify-center flex-shrink-0`}>
+                <Icon className={`w-3 sm:w-5 h-3 sm:h-5 ${colors.iconText}`} />
               </div>
-              <span className={`text-xs font-semibold ${colors.trend} flex items-center gap-0.5`}>
-                <TrendingUp className="w-3 h-3" />
+              <span className={`text-[7px] sm:text-xs font-semibold ${colors.trend} flex items-center gap-0.5`}>
+                <TrendingUp className="w-2 sm:w-3 h-2 sm:h-3" />
                 {card.trend}
               </span>
             </div>
-            <div className="text-2xl font-bold mb-1">{formatNumber(card.value)}</div>
-            <div className="text-xs text-gray-400">{card.label}</div>
+            <div className="text-sm sm:text-2xl font-bold mb-0.5 sm:mb-1">{formatNumber(card.value)}</div>
+            <div className="text-[7px] sm:text-xs text-gray-400 line-clamp-1">{card.label}</div>
           </motion.div>
         );
       })}
