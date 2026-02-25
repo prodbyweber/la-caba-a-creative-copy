@@ -173,9 +173,8 @@ export default function Calendars() {
             ))}
             
             {daysInMonth.map((day, i) => {
-              const daySessions = activeTab === "sessions" ? getSessionsForDay(day) : [];
-              const dayDeliverables = activeTab === "deliverables" ? getDeliverablesForDay(day) : [];
-              const hasItems = daySessions.length > 0 || dayDeliverables.length > 0;
+              const daySessions = getSessionsForDay(day);
+              const hasItems = daySessions.length > 0;
               const isTodayDate = isToday(day);
 
               return (
@@ -195,7 +194,7 @@ export default function Calendars() {
                     {format(day, 'd')}
                   </div>
                   <div className="space-y-0.5 md:space-y-1">
-                    {activeTab === "sessions" && daySessions.slice(0, 2).map((session) => (
+                    {daySessions.slice(0, 2).map((session) => (
                       <button
                         key={session.id}
                         onClick={() => setSelectedSession(session)}
@@ -207,22 +206,9 @@ export default function Calendars() {
                         <div className="truncate leading-tight opacity-90">{session.title}</div>
                       </button>
                     ))}
-                    {activeTab === "deliverables" && dayDeliverables.slice(0, 2).map((deliverable) => (
-                      <div
-                        key={deliverable.id}
-                        className={`text-[9px] md:text-[10px] p-1 md:p-1.5 rounded truncate font-medium border ${
-                          deliverable.status === 'Overdue' 
-                            ? 'bg-red-500/20 text-red-400 border-red-500/30'
-                            : 'bg-purple-500/20 text-purple-400 border-purple-500/30'
-                        }`}
-                      >
-                        {deliverable.title}
-                      </div>
-                    ))}
-                    {((activeTab === "sessions" && daySessions.length > 2) || 
-                      (activeTab === "deliverables" && dayDeliverables.length > 2)) && (
+                    {daySessions.length > 2 && (
                       <div className="text-[8px] md:text-[9px] text-gray-500 font-medium px-1">
-                        +{(activeTab === "sessions" ? daySessions : dayDeliverables).length - 2}
+                        +{daySessions.length - 2}
                       </div>
                     )}
                   </div>
@@ -234,19 +220,11 @@ export default function Calendars() {
         ) : (
           /* Agenda View */
           <div className="space-y-3">
-            {activeTab === "sessions" ? (
-              <AgendaView 
-                sessions={sessions} 
-                artists={artists}
-                onSessionClick={setSelectedSession}
-              />
-            ) : (
-              <DeliverablesAgendaView 
-                deliverables={deliverables}
-                artists={artists}
-                projects={projects}
-              />
-            )}
+            <AgendaView 
+              sessions={sessions} 
+              artists={artists}
+              onSessionClick={setSelectedSession}
+            />
           </div>
         )}
 
@@ -262,12 +240,7 @@ export default function Calendars() {
           projects={projects}
         />
 
-        <CreateDeliverableModal
-          isOpen={showDeliverableModal}
-          onClose={() => setShowDeliverableModal(false)}
-          artists={artists}
-          projects={projects}
-        />
+
 
         {selectedSession && (
           <SessionDetailModal
