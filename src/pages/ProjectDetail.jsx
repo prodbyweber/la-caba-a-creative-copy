@@ -222,9 +222,9 @@ export default function ProjectDetail() {
                       <div
                         {...provided.droppableProps}
                         ref={provided.innerRef}
-                        className="grid gap-1.5 mb-2 auto-rows-[80px] sm:auto-rows-[100px] md:auto-rows-[120px]"
+                        className="grid gap-1 mb-2 auto-rows-[60px] sm:auto-rows-[80px] md:auto-rows-[100px]"
                         style={{
-                          gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(60px, 1fr))',
                         }}
                       >
                         {moodboardImages.map((url, index) => {
