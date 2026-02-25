@@ -58,8 +58,13 @@ const narratives = [
 ];
 
 export default function ADNdeMarca() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const artistId = urlParams.get("artistId");
+
   const [currentStep, setCurrentStep] = useState(1);
   const [showResult, setShowResult] = useState(false);
+  const [hasExistingDNA, setHasExistingDNA] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   const [selections, setSelections] = useState({
     firstName: "",
@@ -83,30 +88,64 @@ export default function ADNdeMarca() {
   });
 
   const [user, setUser] = React.useState(null);
+  const [artist, setArtist] = React.useState(null);
   const [hasPaid, setHasPaid] = React.useState(false);
   const [showPaymentGate, setShowPaymentGate] = React.useState(false);
   const [savedDnaId, setSavedDnaId] = React.useState(null);
 
   React.useEffect(() => {
-    const loadUser = async () => {
+    const loadData = async () => {
+      setIsLoading(true);
       try {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
         
-        // Cargar DNA guardado si existe
-        const dnas = await base44.entities.ArtistBrandDNA.filter({ user_id: currentUser.id });
-        if (dnas.length > 0) {
-          const dna = dnas[0];
-          setSelections(dna);
-          setSavedDnaId(dna.id);
-          setHasPaid(dna.has_paid || false);
+        // Si hay artistId, cargar datos del artista
+        if (artistId) {
+          const artists = await base44.entities.Artist.list();
+          const foundArtist = artists.find(a => a.id === artistId);
+          setArtist(foundArtist);
+          
+          // Buscar ADN de marca del artista específico
+          const dnas = await base44.entities.ArtistBrandDNA.filter({ artist_id: artistId });
+          if (dnas.length > 0) {
+            const dna = dnas[0];
+            setSelections(dna);
+            setSavedDnaId(dna.id);
+            setHasPaid(true);
+            setHasExistingDNA(true);
+            setShowResult(true);
+          } else {
+            // Pre-rellenar con datos del artista si no tiene ADN
+            if (foundArtist) {
+              setSelections(prev => ({
+                ...prev,
+                artistName: foundArtist.stageName || "",
+                firstName: foundArtist.legalName?.split(' ')[0] || "",
+                lastName: foundArtist.legalName?.split(' ').slice(1).join(' ') || "",
+              }));
+            }
+          }
+        } else {
+          // Cargar DNA del usuario actual si no hay artistId
+          const dnas = await base44.entities.ArtistBrandDNA.filter({ user_id: currentUser.id });
+          if (dnas.length > 0) {
+            const dna = dnas[0];
+            setSelections(dna);
+            setSavedDnaId(dna.id);
+            setHasPaid(dna.has_paid || false);
+            setHasExistingDNA(true);
+            setShowResult(true);
+          }
         }
       } catch (error) {
-        console.error("Error loading user:", error);
+        console.error("Error loading data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
-    loadUser();
-  }, []);
+    loadData();
+  }, [artistId]);
 
   const [tempInput, setTempInput] = useState("");
   const [limitWarning, setLimitWarning] = useState("");
@@ -291,6 +330,7 @@ export default function ADNdeMarca() {
       const dnaData = {
         ...selections,
         user_id: user.id,
+        artist_id: artistId || null,
         has_paid: hasPaid
       };
 
@@ -781,8 +821,19 @@ export default function ADNdeMarca() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#0B0B0D] text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-400">Cargando ADN de Marca...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (showResult) {
-    return <ResultView selections={selections} onReset={() => { setShowResult(false); setCurrentStep(1); }} saveDNA={saveDNA} />;
+    return <ResultView selections={selections} onReset={() => { setShowResult(false); setCurrentStep(1); }} saveDNA={saveDNA} artistId={artistId} hasExistingDNA={hasExistingDNA} />;
   }
 
   return (
@@ -794,11 +845,16 @@ export default function ADNdeMarca() {
         {/* Header */}
         <div className="border-b border-white/5 backdrop-blur-xl bg-black/20">
           <div className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
-            <Link to={createPageUrl("Landing")} className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+            <Link 
+              to={createPageUrl(artistId ? `ArtistDashboard?artistId=${artistId}` : "Landing")} 
+              className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
+            >
               <ArrowLeft className="w-5 h-5" />
               Volver
             </Link>
-            <h1 className="text-xl font-light tracking-wide">ADN de Marca</h1>
+            <h1 className="text-xl font-light tracking-wide">
+              ADN de Marca {artist && `- ${artist.stageName}`}
+            </h1>
             <div className="w-20" />
           </div>
         </div>
@@ -992,7 +1048,7 @@ function SelectionButton({ children, selected, onClick }) {
   );
 }
 
-function ResultView({ selections, onReset, saveDNA }) {
+function ResultView({ selections, onReset, saveDNA, artistId, hasExistingDNA }) {
   const aura = selections.emotions[0] || "Intenso";
   const identidad = `Un artista que transmite ${selections.emotions.join(', ')}. Su música combina ${selections.genres.join(', ')} con una textura ${selections.textures[0]?.toLowerCase()}, creando una experiencia ${selections.vibe?.toLowerCase()}.`;
 
@@ -1019,10 +1075,13 @@ function ResultView({ selections, onReset, saveDNA }) {
       <div className="relative z-10">
         <div className="border-b border-white/5 backdrop-blur-xl bg-black/20">
           <div className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
-            <button onClick={onReset} className="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+            <Link 
+              to={createPageUrl(artistId ? `ArtistDashboard?artistId=${artistId}` : "Landing")} 
+              className="text-gray-400 hover:text-white transition-colors flex items-center gap-2"
+            >
               <ArrowLeft className="w-5 h-5" />
               Volver
-            </button>
+            </Link>
             <h1 className="text-xl font-light tracking-wide">Tu ADN de Marca</h1>
             <div className="w-20" />
           </div>
@@ -1136,18 +1195,22 @@ function ResultView({ selections, onReset, saveDNA }) {
             >
               Descargar PDF
             </button>
-            <button 
-              onClick={saveDNA}
-              className="w-full px-8 py-4 bg-emerald-500 hover:bg-emerald-600 rounded-lg font-medium transition-all shadow-xl shadow-emerald-500/20 text-lg"
-            >
-              Actualizar ADN de Marca
-            </button>
-            <button 
-              onClick={onReset}
-              className="w-full px-8 py-4 bg-white/5 hover:bg-white/10 rounded-lg font-medium transition-all border border-white/10 text-lg"
-            >
-              Editar Respuestas
-            </button>
+            {hasExistingDNA && (
+              <button 
+                onClick={onReset}
+                className="w-full px-8 py-4 bg-white/5 hover:bg-white/10 rounded-lg font-medium transition-all border border-white/10 text-lg"
+              >
+                Editar ADN de Marca
+              </button>
+            )}
+            {!hasExistingDNA && (
+              <button 
+                onClick={saveDNA}
+                className="w-full px-8 py-4 bg-emerald-500 hover:bg-emerald-600 rounded-lg font-medium transition-all shadow-xl shadow-emerald-500/20 text-lg"
+              >
+                Actualizar ADN de Marca
+              </button>
+            )}
           </div>
         </div>
       </div>
