@@ -41,7 +41,7 @@ export default function DashboardNav({ artistName, artistId }) {
               <img 
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/4d692088b_Lacabanacreativelogooficial2026.png" 
                 alt="La Cabaña Creative"
-                className="h-8 w-auto"
+                className="h-12 w-auto"
               />
               <span className="text-base font-semibold tracking-tight hidden lg:block">
                 La Cabaña <span className="text-orange-500">Creative</span>
@@ -122,7 +122,7 @@ export default function DashboardNav({ artistName, artistId }) {
                   <img 
                     src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/4d692088b_Lacabanacreativelogooficial2026.png" 
                     alt="La Cabaña Creative"
-                    className="h-8 w-auto"
+                    className="h-10 w-auto"
                   />
                   <span className="text-sm font-semibold">
                     La Cabaña <span className="text-orange-500">Creative</span>

@@ -109,7 +109,7 @@ export default function LandingNav() {
             <img 
               src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/4d692088b_Lacabanacreativelogooficial2026.png" 
               alt="La Cabaña Creative"
-              className="h-12 w-auto"
+              className="h-16 w-auto"
             />
             <span className="text-xl font-semibold tracking-tight hidden sm:block">
               La Cabaña <span className="text-orange-500">Creative</span>
@@ -206,7 +206,7 @@ export default function LandingNav() {
                   <img 
                     src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/4d692088b_Lacabanacreativelogooficial2026.png" 
                     alt="La Cabaña Creative"
-                    className="h-10 w-auto"
+                    className="h-12 w-auto"
                   />
                 </div>
                 <button onClick={() => setMobileOpen(false)} className="p-2 text-gray-400">
