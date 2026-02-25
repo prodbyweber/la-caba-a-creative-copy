@@ -95,7 +95,7 @@ export default function Analytics() {
       <DashboardNav artistId={artistId} />
 
       <main className="pt-14">
-        <div className="p-3 max-w-[1920px] mx-auto">
+        <div className="px-8 py-4 max-w-[1800px] mx-auto">
           {/* Timeframe Selector */}
           <div className="flex items-center gap-2 mb-3">
             {timeframes.map((tf) => (
@@ -166,22 +166,22 @@ export default function Analytics() {
             </div>
 
             <div className="bg-[#111113] rounded-xl border border-white/5 p-3">
-              <h3 className="text-sm font-bold mb-2 flex items-center gap-1.5">
+              <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
                 <Music2 className="w-4 h-4 text-purple-400" />
                 Top Tracks
               </h3>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {topTracks.map((track, i) => (
-                  <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                    <div className="w-6 h-6 rounded bg-purple-500/20 flex items-center justify-center text-[10px] font-bold text-purple-400">
+                  <div key={i} className="flex items-center gap-3 p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                    <div className="w-7 h-7 rounded-lg bg-purple-500/20 flex items-center justify-center text-xs font-bold text-purple-400">
                       {i + 1}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-[10px] truncate">{track.title}</div>
-                      <div className="text-[9px] text-gray-500">{(track.streams / 1000).toFixed(0)}K</div>
+                      <div className="font-semibold text-xs truncate text-white">{track.title}</div>
+                      <div className="text-[10px] text-gray-500">{(track.streams / 1000).toFixed(0)}K streams</div>
                     </div>
-                    <div className={`flex items-center gap-0.5 text-[9px] ${track.trendUp ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {track.trendUp ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
+                    <div className={`flex items-center gap-0.5 text-[10px] font-medium ${track.trendUp ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {track.trendUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                       {track.trend}
                     </div>
                   </div>
@@ -354,9 +354,9 @@ export default function Analytics() {
               <h3 className="text-lg font-bold mb-4">Demografía</h3>
               
               {/* Age Demographics */}
-              <div className="mb-3">
-                <h4 className="text-[10px] font-semibold text-gray-400 mb-2">Por Edad</h4>
-                <div className="h-32">
+              <div className="mb-2">
+                <h4 className="text-[10px] font-semibold text-gray-400 mb-1.5">Por Edad</h4>
+                <div className="h-24">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={demographicsData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
@@ -364,22 +364,22 @@ export default function Analytics() {
                         dataKey="age" 
                         axisLine={false} 
                         tickLine={false} 
-                        tick={{ fill: '#6b7280', fontSize: 9 }}
+                        tick={{ fill: '#6b7280', fontSize: 8 }}
                       />
                       <YAxis 
                         axisLine={false} 
                         tickLine={false} 
-                        tick={{ fill: '#6b7280', fontSize: 9 }}
+                        tick={{ fill: '#6b7280', fontSize: 8 }}
                       />
                       <Tooltip 
                         contentStyle={{ 
                           backgroundColor: '#1a1a1d', 
                           border: '1px solid rgba(255,255,255,0.1)',
-                          borderRadius: '8px',
-                          fontSize: '10px'
+                          borderRadius: '6px',
+                          fontSize: '9px'
                         }}
                       />
-                      <Bar dataKey="percentage" fill="#a855f7" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="percentage" fill="#a855f7" radius={[3, 3, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -387,20 +387,18 @@ export default function Analytics() {
 
               {/* Gender Demographics */}
               <div>
-                <h4 className="text-[10px] font-semibold text-gray-400 mb-2">Por Sexo</h4>
-                <div className="space-y-1.5">
+                <h4 className="text-[10px] font-semibold text-gray-400 mb-1">Por Sexo</h4>
+                <div className="space-y-1">
                   {genderData.map((item, i) => (
-                    <div key={i} className="flex items-center justify-between">
-                      <span className="text-[10px] text-gray-300">{item.gender}</span>
-                      <div className="flex items-center gap-1.5 flex-1 max-w-[150px] ml-3">
-                        <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all"
-                            style={{ width: `${item.percentage}%` }}
-                          />
-                        </div>
-                        <span className="text-[10px] font-semibold text-gray-300 w-8 text-right">{item.percentage}%</span>
+                    <div key={i} className="flex items-center gap-2">
+                      <span className="text-[9px] text-gray-300 w-16">{item.gender}</span>
+                      <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all"
+                          style={{ width: `${item.percentage}%` }}
+                        />
                       </div>
+                      <span className="text-[9px] font-semibold text-gray-300 w-7 text-right">{item.percentage}%</span>
                     </div>
                   ))}
                 </div>
@@ -412,21 +410,21 @@ export default function Analytics() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-[#111113] rounded-xl border border-white/5 p-4"
+              className="bg-[#111113] rounded-xl border border-white/5 p-3"
             >
-              <h3 className="text-sm font-bold mb-3">Top Países</h3>
-              <div className="grid grid-cols-2 gap-2">
+              <h3 className="text-sm font-bold mb-2">Top Países</h3>
+              <div className="grid grid-cols-2 gap-1.5">
                 {topCountriesData.map((country, i) => (
-                  <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                    <div className="w-6 h-6 rounded bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center text-[10px] font-bold text-emerald-400">
+                  <div key={i} className="flex items-center gap-1.5 p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                    <div className="w-5 h-5 rounded bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center text-[9px] font-bold text-emerald-400">
                       {i + 1}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-[10px] flex items-center gap-1 truncate">
+                      <div className="font-medium text-[9px] flex items-center gap-1 truncate">
                         <span>{country.flag}</span>
                         <span>{country.name}</span>
                       </div>
-                      <div className="text-[9px] font-bold text-emerald-400">{(country.score / 1000).toFixed(0)}K</div>
+                      <div className="text-[8px] font-bold text-emerald-400">{(country.score / 1000).toFixed(0)}K</div>
                     </div>
                   </div>
                 ))}
