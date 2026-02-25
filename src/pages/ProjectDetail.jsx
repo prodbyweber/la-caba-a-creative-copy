@@ -13,7 +13,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import ProjectClipsSection from "@/components/project/ProjectClipsSection";
-import TrackVersions from "@/components/project/TrackVersions";
+import TrackFilesSection from "@/components/project/TrackFilesSection";
 
 export default function ProjectDetail() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -626,8 +626,8 @@ function TrackForm({ track, projectId, onSubmit, onCancel }) {
         />
       </div>
 
-      {/* Track Versions */}
-      <TrackVersions 
+      {/* Track Files Section - Expanded */}
+      <TrackFilesSection 
         versions={formData.versions || {}}
         onChange={(versions) => setFormData({ ...formData, versions })}
       />
