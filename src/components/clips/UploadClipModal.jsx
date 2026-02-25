@@ -330,8 +330,13 @@ export default function UploadClipModal({ onClose, artistId }) {
                   className="bg-[#0a0a0b] rounded-xl p-4 border border-white/5"
                 >
                   <div className="flex items-start gap-3">
-                    {/* Status Icon */}
-                    <div className="mt-1">
+                     {/* Brief ID Badge */}
+                     <div className="mt-0.5 px-2.5 py-1 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                       <p className="text-xs font-mono font-semibold text-purple-400">{fileObj.id}</p>
+                     </div>
+
+                     {/* Status Icon */}
+                     <div className="mt-1">
                       {fileObj.status === 'pending' && (
                         <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
                           <Upload className="w-5 h-5 text-purple-400" />
