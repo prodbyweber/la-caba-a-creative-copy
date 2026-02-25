@@ -14,7 +14,6 @@ export default function DashboardNav({ artistName, artistId }) {
     { icon: Film, label: "Clips", page: artistId ? `Clips?artistId=${artistId}` : "Clips" },
     { icon: Music2, label: "Tracks", page: artistId ? `ArtistTracks?artistId=${artistId}` : "Tracks" },
     { icon: FolderKanban, label: "Proyectos", page: artistId ? `ArtistProjects?artistId=${artistId}` : "Projects" },
-    { icon: Share2, label: "Redes", page: artistId ? `SocialAccounts?artistId=${artistId}` : "SocialAccounts" },
     { icon: Calendar, label: "Calendario", page: artistId ? `Calendars?artistId=${artistId}` : "Calendars" },
     { icon: Palette, label: "ADN", page: artistId ? `ADNdeMarca?artistId=${artistId}` : "ADNdeMarca" },
   ];
