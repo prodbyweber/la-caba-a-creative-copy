@@ -82,9 +82,7 @@ export default function DashboardNav({ artistName, artistId }) {
               <span className="text-xs font-medium hidden sm:inline">Admin</span>
             </button>
           </Link>
-          <button className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all">
-            <Bell className="w-4 h-4" />
-          </button>
+
           <button className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all hidden sm:block">
             <Settings className="w-4 h-4" />
           </button>
