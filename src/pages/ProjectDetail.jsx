@@ -195,71 +195,90 @@ export default function ProjectDetail() {
               </div>
             </div>
 
-            {/* Moodboard Banner - Horizontal Scrollable */}
+            {/* Moodboard Gallery - Pinterest Style Collage */}
             {moodboardImages.length > 0 && (
               <div className="mb-4">
-                <p className="text-xs text-gray-500 mb-2 flex items-center gap-2">
+                <p className="text-xs text-gray-500 mb-3 flex items-center gap-2">
                   <Palette className="w-3 h-3" />
                   Visual Moodboard
                 </p>
                 <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="moodboard" direction="horizontal">
+                  <Droppable droppableId="moodboard" type="moodboard">
                     {(provided) => (
                       <div
                         {...provided.droppableProps}
                         ref={provided.innerRef}
-                        className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin"
+                        className="grid gap-2 mb-2 auto-rows-[150px] sm:auto-rows-[180px] md:auto-rows-[200px]"
+                        style={{
+                          gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                        }}
                       >
-                        {moodboardImages.map((url, index) => (
-                          <Draggable key={`img-${index}`} draggableId={`img-${index}`} index={index}>
-                            {(provided, snapshot) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                className={`relative group flex-shrink-0 rounded-lg overflow-hidden ${
-                                  snapshot.isDragging ? 'opacity-50 ring-2 ring-emerald-500' : ''
-                                }`}
-                                style={{
-                                  width: index % 3 === 0 ? '200px' : index % 3 === 1 ? '140px' : '160px',
-                                  height: '120px',
-                                  ...provided.draggableProps.style
-                                }}
-                              >
-                                <img 
-                                  src={url} 
-                                  alt={`Ref ${index + 1}`}
-                                  className="w-full h-full object-cover"
-                                />
-                                <div {...provided.dragHandleProps} className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <GripVertical className="w-4 h-4 text-white drop-shadow-lg" />
-                                </div>
-                                <button
-                                  onClick={() => handleRemoveMoodboardSlot(index)}
-                                  className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                        {moodboardImages.map((url, index) => {
+                          const colSpan = index % 5 === 0 || index % 5 === 4 ? 2 : 1;
+                          const rowSpan = index % 7 === 0 ? 2 : 1;
+                          
+                          return (
+                            <Draggable key={`img-${index}`} draggableId={`img-${index}`} index={index}>
+                              {(provided, snapshot) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  className={`relative group rounded-lg overflow-hidden cursor-grab active:cursor-grabbing transition-all ${
+                                    snapshot.isDragging ? 'opacity-60 ring-2 ring-emerald-400 shadow-lg' : 'hover:shadow-lg'
+                                  }`}
+                                  style={{
+                                    gridColumn: `span ${colSpan}`,
+                                    gridRow: `span ${rowSpan}`,
+                                    ...provided.draggableProps.style
+                                  }}
                                 >
-                                  <X className="w-3 h-3 text-white" />
-                                </button>
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
+                                  <img 
+                                    src={url} 
+                                    alt={`Ref ${index + 1}`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                  
+                                  {/* Overlay */}
+                                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all" />
+                                  
+                                  {/* Drag Handle */}
+                                  <div {...provided.dragHandleProps} className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                    <div className="bg-black/70 backdrop-blur-sm p-1.5 rounded-lg">
+                                      <GripVertical className="w-4 h-4 text-white" />
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Remove Button */}
+                                  <button
+                                    onClick={() => handleRemoveMoodboardSlot(index)}
+                                    className="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-600 rounded-lg opacity-0 group-hover:opacity-100 transition-all z-10"
+                                  >
+                                    <X className="w-4 h-4 text-white" />
+                                  </button>
+                                </div>
+                              )}
+                            </Draggable>
+                          );
+                        })}
                         {provided.placeholder}
-                        
-                        {/* Add Image Button */}
-                        <label className="flex-shrink-0 w-32 h-[120px] border-2 border-dashed border-white/20 rounded-lg cursor-pointer hover:border-emerald-500/50 hover:bg-white/5 transition-all flex flex-col items-center justify-center gap-1">
-                          <input 
-                            type="file" 
-                            accept="image/*"
-                            onChange={(e) => e.target.files?.[0] && handleAddMoodboardSlot(e.target.files[0])}
-                            className="hidden"
-                          />
-                          <Plus className="w-5 h-5 text-gray-600" />
-                          <span className="text-[10px] text-gray-600">Añadir</span>
-                        </label>
                       </div>
                     )}
                   </Droppable>
                 </DragDropContext>
+
+                {/* Add Image Button */}
+                <label className="block w-full p-4 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-emerald-500/50 hover:bg-white/5 transition-all">
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => e.target.files?.[0] && handleAddMoodboardSlot(e.target.files[0])}
+                    className="hidden"
+                  />
+                  <div className="flex flex-col items-center gap-2 text-gray-400">
+                    <Plus className="w-5 h-5" />
+                    <span className="text-sm">Añadir más referencias</span>
+                  </div>
+                </label>
               </div>
             )}
 
