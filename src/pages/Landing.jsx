@@ -7,7 +7,7 @@ import BrandsCarousel from "@/components/landing/BrandsCarousel";
 import StoriesSection from "@/components/landing/StoriesSection";
 import StartupsSection from "@/components/landing/StartupsSection";
 import DashboardPreview from "@/components/landing/DashboardPreview";
-import ExploracionSection from "@/components/landing/ExploracionSection";
+
 import AboutSection from "@/components/landing/AboutSection";
 import TeamSection from "@/components/landing/TeamSection";
 import MemberBanner from "@/components/landing/MemberBanner";
@@ -42,7 +42,7 @@ export default function Landing() {
         <div id="stories"><StoriesSection /></div>
         <div id="offers"><OffersCarousel /></div>
         <DashboardPreview />
-        <div id="exploracion"><ExploracionSection /></div>
+
         <div id="startups"><StartupsSection /></div>
           <MemberBanner />
         </main>
