@@ -18,7 +18,6 @@ export default function Calendars() {
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [showDeliverableModal, setShowDeliverableModal] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
   const artistId = urlParams.get("artistId");
@@ -79,9 +78,8 @@ export default function Calendars() {
 
   return artistId ? (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
-      <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} artistName={artist?.stageName} />
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} artistId={artistId} />
-      <main className="lg:pl-64 pt-16">
+      <DashboardNav artistName={artist?.stageName} artistId={artistId} />
+      <main className="pt-16">
         <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
         {/* Header Compacto */}
         <div className="flex items-center justify-end gap-2 mb-3">
