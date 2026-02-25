@@ -501,7 +501,8 @@ function TrackForm({ track, projectId, onSubmit, onCancel }) {
     genre: "",
     status: "idea",
     notes: "",
-    audio_file_url: ""
+    audio_file_url: "",
+    versions: {}
   });
   const [uploadingAudio, setUploadingAudio] = useState(false);
 
@@ -623,6 +624,12 @@ function TrackForm({ track, projectId, onSubmit, onCancel }) {
           className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 resize-none"
         />
       </div>
+
+      {/* Track Versions */}
+      <TrackVersions 
+        versions={formData.versions || {}}
+        onChange={(versions) => setFormData({ ...formData, versions })}
+      />
 
       {/* Audio File Upload */}
       <div>
