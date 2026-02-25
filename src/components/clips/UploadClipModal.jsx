@@ -24,9 +24,14 @@ export default function UploadClipModal({ onClose, artistId }) {
 
   const { data: allTracks = [] } = useQuery({
     queryKey: ['allTracks', artistId],
-    queryFn: () => {
+    queryFn: async () => {
       if (!artistId) return [];
-      return base44.entities.Track.list();
+      const allProjectsData = await base44.entities.Project.list();
+      const artistProjects = allProjectsData.filter(p => p.artist_id === artistId);
+      const projectIds = artistProjects.map(p => p.id);
+      
+      const allTracksData = await base44.entities.Track.list();
+      return allTracksData.filter(t => projectIds.includes(t.project_id));
     },
     enabled: !!artistId,
   });
