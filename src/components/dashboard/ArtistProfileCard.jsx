@@ -19,12 +19,12 @@ export default function ArtistProfileCard({ compact = false, artist }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-[#141414] to-black rounded-lg border border-white/5 p-2.5"
+        className="bg-[#141414] rounded-xl border border-white/5 p-4"
       >
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-3">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            <div className="w-10 h-10 rounded-lg overflow-hidden border-2 border-emerald-500/30 bg-gradient-to-br from-emerald-500 to-emerald-700">
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-emerald-500/20 bg-gradient-to-br from-emerald-500 to-emerald-700">
               {artist.avatar_url ? (
                 <img 
                   src={artist.avatar_url}
@@ -32,7 +32,7 @@ export default function ArtistProfileCard({ compact = false, artist }) {
                   className="w-full h-full object-cover object-top"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-white font-bold text-sm">
+                <div className="w-full h-full flex items-center justify-center text-white font-bold text-lg">
                   {artist.stageName?.charAt(0).toUpperCase()}
                 </div>
               )}
@@ -41,19 +41,11 @@ export default function ArtistProfileCard({ compact = false, artist }) {
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5 mb-0.5">
-              <h3 className="font-bold text-white text-sm">{artist.stageName}</h3>
-              <Verified className="w-3 h-3 text-emerald-500" />
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-bold text-white text-base">{artist.stageName}</h3>
+              <Verified className="w-4 h-4 text-emerald-500" />
             </div>
-            <p className="text-[10px] text-gray-500">{artist.genre || 'Artista'}</p>
-          </div>
-
-          {/* Rating & Pro Badge */}
-          <div className="flex items-center gap-2">
-            <div className="flex flex-col items-center justify-center w-9 h-11 bg-gradient-to-b from-emerald-600 to-emerald-800 rounded-lg border border-emerald-500/50">
-              <div className="text-base font-black text-white">92</div>
-              <div className="text-[7px] font-bold text-emerald-200 uppercase">Overall</div>
-            </div>
+            <p className="text-xs text-gray-500">{artist.genre || 'Artista'}</p>
           </div>
         </div>
       </motion.div>
@@ -86,59 +78,25 @@ export default function ArtistProfileCard({ compact = false, artist }) {
         </div>
 
         {/* Content overlay */}
-        <div className="relative px-3 pb-3 z-20">
-          <div className="grid grid-cols-[1fr,auto] gap-2 items-start">
-            {/* Left Section - Info */}
-            <div className="space-y-1.5 bg-black/40 backdrop-blur-sm rounded-lg p-2.5 border border-white/10">
-              {/* Artist Info */}
-              <div>
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <h3 className="text-lg font-black text-white uppercase tracking-tight">{artist.stageName}</h3>
-                  <Verified className="w-3.5 h-3.5 text-emerald-500" />
+        <div className="relative px-4 pb-4 z-20">
+          <div className="bg-black/40 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+            {/* Artist Info */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-xl font-bold text-white">{artist.stageName}</h3>
+                  <Verified className="w-5 h-5 text-emerald-500" />
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-medium text-gray-400">{artist.genre || 'Artista'}</span>
-                </div>
-              </div>
-
-              {/* Stats Compact */}
-              <div className="flex items-center gap-2 pt-1">
-                <div>
-                  <div className="text-sm font-bold text-white">2.4M</div>
-                  <div className="text-[8px] text-gray-500">Streams</div>
-                </div>
-                <div className="w-px h-6 bg-white/10" />
-                <div>
-                  <div className="text-sm font-bold text-emerald-500">#24</div>
-                  <div className="text-[8px] text-gray-500">Ranking</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Section - Rating Badge */}
-            <div className="flex flex-col items-end gap-1.5">
-              <div className="flex flex-col items-center justify-center w-12 h-16 bg-gradient-to-b from-emerald-600 to-emerald-800 rounded-lg border-2 border-emerald-500/50">
-                <div className="text-2xl font-black text-white">92</div>
-                <div className="text-[7px] font-bold text-emerald-200 uppercase">Overall</div>
+                <span className="text-sm text-gray-400">{artist.genre || 'Artista'}</span>
               </div>
               
               {/* Pro Badge */}
-              <div className="px-2 py-0.5 bg-emerald-600 rounded flex items-center gap-1">
-                <Star className="w-2.5 h-2.5 text-white" fill="white" />
-                <span className="text-[8px] font-bold text-white uppercase">Pro</span>
+              <div className="px-3 py-1.5 bg-emerald-600 rounded-lg flex items-center gap-1.5">
+                <Star className="w-3.5 h-3.5 text-white" fill="white" />
+                <span className="text-xs font-bold text-white uppercase">Pro</span>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="mt-2 px-3 pb-3 grid grid-cols-3 gap-1.5">
-          {stats.slice(0, 3).map((stat, i) => (
-            <div key={i} className="bg-black/40 backdrop-blur-sm rounded-lg p-2 border border-white/10">
-              <div className="text-[8px] text-gray-500 mb-0.5 uppercase">{stat.label}</div>
-              <div className="text-sm font-bold text-white">{stat.value}</div>
-            </div>
-          ))}
         </div>
       </div>
     </motion.div>
