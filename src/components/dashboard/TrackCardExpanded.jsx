@@ -3,6 +3,26 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, Download, Edit, ChevronDown, ChevronUp, Music2 } from "lucide-react";
 
 export default function TrackCardExpanded({ track, onEdit }) {
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const audioRef = React.useRef(null);
+
+  const togglePlay = async (e) => {
+    e.stopPropagation();
+    if (!audioRef.current) return;
+
+    try {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      }
+    } catch (err) {
+      console.error('Error playing audio:', err);
+      setIsPlaying(false);
+    }
+  };
   const [isExpanded, setIsExpanded] = useState(false);
   const [playing, setPlaying] = useState(null);
   const audioRefs = useRef({});
