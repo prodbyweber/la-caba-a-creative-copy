@@ -448,7 +448,7 @@ export default function Analytics() {
               ))}
             </div>
 
-            {/* Mobile Horizontal Scroll - 2.5 Cards Visible */}
+            {/* Mobile Horizontal Scroll - Narrower Cards */}
             <div className="sm:hidden overflow-x-auto pb-2 -mx-4 px-4">
               <div className="flex gap-2 w-max">
                 {topClips.slice(0, 6).map((clip, i) => (
@@ -457,7 +457,7 @@ export default function Analytics() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.03 }}
-                    className="group relative aspect-[9/16] w-32 h-48 rounded-lg overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer flex-shrink-0"
+                    className="group relative aspect-[9/16] w-24 rounded-lg overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer flex-shrink-0"
                   >
                     <img 
                       src={clip.thumbnail} 
