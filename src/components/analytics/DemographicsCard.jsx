@@ -21,14 +21,14 @@ export default function DemographicsCard() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="lg:col-span-1 bg-[#111113] rounded-lg sm:rounded-xl border border-white/5 p-2 sm:p-3"
+      className="lg:col-span-1 bg-[#111113] rounded-lg border border-white/5 p-2"
     >
-      <h3 className="text-xs sm:text-[11px] font-bold mb-3 sm:mb-4">Demografía</h3>
+      <h3 className="text-[10px] font-bold mb-2">Demografía</h3>
 
       {/* Age Demographics */}
-      <div className="mb-4 sm:mb-5">
-        <h4 className="text-[8px] sm:text-[9px] font-semibold text-gray-400 mb-2">Edad</h4>
-        <div className="h-24 sm:h-20">
+      <div className="mb-2">
+        <h4 className="text-[8px] font-semibold text-gray-400 mb-1">Edad</h4>
+        <div className="h-16">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={demographicsData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
@@ -59,18 +59,18 @@ export default function DemographicsCard() {
 
       {/* Gender Demographics */}
       <div>
-        <h4 className="text-[8px] sm:text-[9px] font-semibold text-gray-400 mb-2.5">Sexo</h4>
-        <div className="space-y-2">
+        <h4 className="text-[8px] font-semibold text-gray-400 mb-1.5">Sexo</h4>
+        <div className="space-y-1">
           {genderData.map((item, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <span className="text-[8px] text-gray-300 w-12 truncate">{item.gender}</span>
-              <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+            <div key={i} className="flex items-center gap-1.5">
+              <span className="text-[7px] text-gray-300 w-10 truncate">{item.gender}</span>
+              <div className="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all"
                   style={{ width: `${item.percentage}%` }}
                 />
               </div>
-              <span className="text-[8px] font-semibold text-gray-300 w-6 text-right">{item.percentage}%</span>
+              <span className="text-[7px] font-semibold text-gray-300 w-5 text-right">{item.percentage}%</span>
             </div>
           ))}
         </div>
