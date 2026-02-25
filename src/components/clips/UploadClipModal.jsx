@@ -229,45 +229,80 @@ export default function UploadClipModal({ onClose, artistId }) {
               <label className="text-sm font-medium text-gray-400 mb-2 block">
                 Artistas Colaboradores
               </label>
-              <div className="space-y-2 mb-3 max-h-32 overflow-y-auto">
-                {allArtists.filter(a => a.id !== selectedArtist).map(artist => (
-                  <label key={artist.id} className="flex items-center gap-2 cursor-pointer">
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Seleccionar</label>
+                  <div className="space-y-1 max-h-24 overflow-y-auto bg-white/5 border border-white/10 rounded-lg p-2">
+                    {allArtists.filter(a => a.id !== selectedArtist).map(artist => (
+                      <label key={artist.id} className="flex items-center gap-2 cursor-pointer text-xs">
+                        <input
+                          type="checkbox"
+                          checked={collaborators.includes(artist.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setCollaborators([...collaborators, artist.id]);
+                            } else {
+                              setCollaborators(collaborators.filter(id => id !== artist.id));
+                            }
+                          }}
+                          className="w-3 h-3 rounded"
+                          disabled={uploading}
+                        />
+                        <span className="text-gray-400">{artist.stageName || artist.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Escribir nombre</label>
+                  <div className="flex gap-2">
                     <input
-                      type="checkbox"
-                      checked={collaborators.includes(artist.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setCollaborators([...collaborators, artist.id]);
-                        } else {
-                          setCollaborators(collaborators.filter(id => id !== artist.id));
+                      type="text"
+                      value={newCollaborator}
+                      onChange={(e) => setNewCollaborator(e.target.value)}
+                      className="flex-1 bg-white/5 border border-white/10 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-purple-500/50 transition-colors"
+                      placeholder="Nombre artista..."
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && newCollaborator.trim()) {
+                          setCollaborators([...collaborators, newCollaborator.trim()]);
+                          setNewCollaborator("");
                         }
                       }}
-                      className="w-4 h-4 rounded bg-white/5 border border-white/10"
                       disabled={uploading}
                     />
-                    <span className="text-sm text-gray-400">{artist.stageName || artist.name}</span>
-                  </label>
-                ))}
+                    <button
+                      onClick={() => {
+                        if (newCollaborator.trim()) {
+                          setCollaborators([...collaborators, newCollaborator.trim()]);
+                          setNewCollaborator("");
+                        }
+                      }}
+                      className="px-2 py-1.5 bg-purple-500/20 border border-purple-500/30 rounded-lg text-xs font-medium text-purple-400 hover:bg-purple-500/30 transition-colors"
+                      disabled={uploading}
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
               </div>
               {collaborators.length > 0 && (
-                <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-                  <div className="flex flex-wrap gap-2">
-                    {collaborators.map(collabId => {
-                      const artist = allArtists.find(a => a.id === collabId);
-                      return (
-                        <div key={collabId} className="bg-purple-500/20 border border-purple-500/30 rounded-lg px-3 py-1 text-xs flex items-center gap-2">
-                          <span>{artist?.stageName || artist?.name}</span>
-                          <button
-                            type="button"
-                            onClick={() => setCollaborators(collaborators.filter(id => id !== collabId))}
-                            className="text-purple-400 hover:text-purple-300"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
+                <div className="flex flex-wrap gap-2">
+                  {collaborators.map((collab, idx) => {
+                    const artist = typeof collab === 'string' && collab.includes('-') ? null : allArtists.find(a => a.id === collab);
+                    const displayName = artist ? (artist.stageName || artist.name) : collab;
+                    return (
+                      <div key={idx} className="bg-purple-500/20 border border-purple-500/30 rounded-lg px-2.5 py-1 text-xs flex items-center gap-1.5">
+                        <span>{displayName}</span>
+                        <button
+                          type="button"
+                          onClick={() => setCollaborators(collaborators.filter((_, i) => i !== idx))}
+                          className="text-purple-400 hover:text-purple-300 ml-0.5"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
