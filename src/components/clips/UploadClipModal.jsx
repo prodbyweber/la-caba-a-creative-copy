@@ -8,39 +8,50 @@ export default function UploadClipModal({ onClose, artistId }) {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
-  const [selectedArtist, setSelectedArtist] = useState(artistId || "");
-  const [selectedProject, setSelectedProject] = useState("");
   const [selectedTrack, setSelectedTrack] = useState("");
+  const [selectedProject, setSelectedProject] = useState("");
   const [collaborators, setCollaborators] = useState([]);
   const [newCollaborator, setNewCollaborator] = useState("");
 
-  const { data: artists = [] } = useQuery({
-    queryKey: ['artists'],
-    queryFn: () => base44.entities.Artist.list(),
+  const { data: artist } = useQuery({
+    queryKey: ['artist', artistId],
+    queryFn: () => {
+      if (!artistId) return null;
+      return base44.entities.Artist.filter({ id: artistId }).then(data => data[0]);
+    },
+    enabled: !!artistId,
   });
 
-  const { data: projects = [] } = useQuery({
-    queryKey: ['projects', selectedArtist],
+  const { data: allTracks = [] } = useQuery({
+    queryKey: ['allTracks', artistId],
     queryFn: () => {
-      if (!selectedArtist) return [];
-      return base44.entities.Project.filter({ artist_id: selectedArtist });
+      if (!artistId) return [];
+      return base44.entities.Track.list();
     },
-    enabled: !!selectedArtist,
+    enabled: !!artistId,
   });
 
-  const { data: tracks = [] } = useQuery({
-    queryKey: ['tracks', selectedProject],
-    queryFn: () => {
-      if (!selectedProject) return [];
-      return base44.entities.Track.filter({ project_id: selectedProject });
-    },
-    enabled: !!selectedProject,
+  const artistTracks = allTracks.filter(track => {
+    const trackArtistProject = allTracks.find(t => t.id === track.id)?.project_id;
+    if (!trackArtistProject) return false;
+    
+    return base44.entities.Project.filter({ id: trackArtistProject, artist_id: artistId }).then(data => data.length > 0);
   });
 
   const { data: allArtists = [] } = useQuery({
     queryKey: ['allArtists'],
     queryFn: () => base44.entities.Artist.list(),
   });
+
+  const handleTrackSelect = async (trackId) => {
+    setSelectedTrack(trackId);
+    const selectedTrackData = allTracks.find(t => t.id === trackId);
+    if (selectedTrackData && selectedTrackData.project_id) {
+      setSelectedProject(selectedTrackData.project_id);
+    } else {
+      setSelectedProject("");
+    }
+  };
 
   const handleFileSelect = (e) => {
     const selectedFiles = Array.from(e.target.files);
