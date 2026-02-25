@@ -178,7 +178,8 @@ export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay }}
-        className="bg-[#111113] rounded-2xl border border-white/5 overflow-hidden hover:border-white/10 transition-all group"
+        className="bg-[#111113] rounded-xl border border-white/5 overflow-hidden hover:border-white/10 transition-all group cursor-pointer"
+        onClick={() => setPreviewModalOpen(true)}
       >
         {/* Thumbnail */}
         <div className="relative aspect-[9/16] bg-[#0a0a0b]">
@@ -186,97 +187,91 @@ export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
             <img src={clip.thumbnail_url} alt={clip.title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Play className="w-12 h-12 text-gray-600" />
+              <Play className="w-8 h-8 text-gray-600" />
             </div>
           )}
           <button
-            onClick={() => setPreviewModalOpen(true)}
-            className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+            onClick={(e) => {
+              e.stopPropagation();
+              setPreviewModalOpen(true);
+            }}
+            className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
           >
-            <div className="p-4 bg-purple-500 rounded-full hover:bg-purple-600 transition-colors">
-              <Play className="w-6 h-6 text-white" fill="white" />
+            <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center hover:bg-purple-600 transition-colors">
+              <Play className="w-5 h-5 text-white" fill="white" />
             </div>
           </button>
-          {clip.duration && (
-            <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/80 rounded-lg text-xs font-medium">
-              {Math.floor(clip.duration / 60)}:{String(Math.floor(clip.duration % 60)).padStart(2, '0')}
-            </div>
-          )}
-          <span className={`absolute top-3 left-3 px-2 py-1 rounded-lg text-xs font-medium border ${statusConfig[clip.status]?.color}`}>
+          <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-medium border ${statusConfig[clip.status]?.color}`}>
             {statusConfig[clip.status]?.label}
           </span>
         </div>
 
-        {/* Content */}
-        <div className="p-4">
-          <div className="flex items-start justify-between mb-2">
-            <h3 className="font-semibold text-sm line-clamp-2 flex-1">{clip.title}</h3>
-            <div className="relative ml-2">
-              <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="p-1 hover:bg-white/5 rounded-lg transition-colors"
-              >
-                <MoreVertical className="w-4 h-4" />
-              </button>
-              {menuOpen && (
-                <>
-                  <div 
-                    className="fixed inset-0 z-10" 
-                    onClick={() => setMenuOpen(false)}
-                  />
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-[#1a1a1d] border border-white/10 rounded-xl shadow-xl z-20 py-2">
-                    <button
-                      onClick={() => { setEditModalOpen(true); setMenuOpen(false); }}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-white/5 flex items-center gap-2"
-                    >
-                      <Edit className="w-4 h-4" />
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => { handleDuplicate(); setMenuOpen(false); }}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-white/5 flex items-center gap-2"
-                    >
-                      <Copy className="w-4 h-4" />
-                      Duplicar
-                    </button>
-                    <button
-                      onClick={() => { handleDelete(); setMenuOpen(false); }}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-white/5 flex items-center gap-2 text-red-400"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Eliminar
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
+        {/* Content - Compact */}
+        <div className="p-2.5 h-20 flex flex-col justify-between">
+          <div className="min-w-0">
+            <h3 className="font-semibold text-xs line-clamp-1">{clip.title}</h3>
+            {artist && (
+              <p className="text-[10px] text-gray-500 line-clamp-1">{artist.stageName || artist.name}</p>
+            )}
+            <p className="text-[9px] text-gray-600 mt-0.5">{clip.id}</p>
           </div>
 
-          {artist && (
-            <p className="text-xs text-gray-500 mb-3">{artist.name}</p>
-          )}
-
-          {/* Platforms */}
-          {clip.platforms && clip.platforms.length > 0 && (
-            <div className="flex items-center gap-2 mb-3">
-              {clip.platforms.map(platform => {
-                const Icon = platformIcons[platform];
-                return (
-                  <div key={platform} className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center">
-                    <Icon className="w-4 h-4" />
-                  </div>
-                );
-              })}
+          {/* Platforms & Actions */}
+          <div className="flex items-center justify-between gap-2">
+            {clip.platforms && clip.platforms.length > 0 && (
+              <div className="flex items-center gap-1">
+                {clip.platforms.slice(0, 2).map(platform => {
+                  const Icon = platformIcons[platform];
+                  return (
+                    <div key={platform} className="w-4 h-4 rounded bg-white/5 flex items-center justify-center">
+                      <Icon className="w-2.5 h-2.5" />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+              <button
+                onClick={() => setEditModalOpen(true)}
+                className="p-1 hover:bg-white/10 rounded transition-colors"
+                title="Editar"
+              >
+                <Edit className="w-3 h-3 text-gray-400" />
+              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="p-1 hover:bg-white/10 rounded transition-colors"
+                >
+                  <MoreVertical className="w-3 h-3 text-gray-400" />
+                </button>
+                {menuOpen && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-10" 
+                      onClick={() => setMenuOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full mt-1 w-40 bg-[#1a1a1d] border border-white/10 rounded-lg shadow-xl z-20 py-1">
+                      <button
+                        onClick={() => { handleDuplicate(); setMenuOpen(false); }}
+                        className="w-full px-3 py-1.5 text-left text-xs hover:bg-white/5 flex items-center gap-2"
+                      >
+                        <Copy className="w-3 h-3" />
+                        Duplicar
+                      </button>
+                      <button
+                        onClick={() => { handleDelete(); setMenuOpen(false); }}
+                        className="w-full px-3 py-1.5 text-left text-xs hover:bg-white/5 flex items-center gap-2 text-red-400"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        Eliminar
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-          )}
-
-          {/* Scheduled Date */}
-          {clip.scheduled_at && (
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <Calendar className="w-3 h-3" />
-              {format(new Date(clip.scheduled_at), "d MMM, HH:mm", { locale: es })}
-            </div>
-          )}
+          </div>
         </div>
       </motion.div>
 
