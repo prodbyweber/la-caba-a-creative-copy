@@ -117,7 +117,7 @@ export default function Analytics() {
           <OverviewSummary />
 
           {/* Streams Over Time + Top Tracks */}
-          <div className="grid lg:grid-cols-3 gap-6 mb-6">
+          <div className="grid lg:grid-cols-3 gap-4 mb-4">
             <div className="lg:col-span-2 bg-[#111113] rounded-2xl border border-white/5 p-6">
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -301,54 +301,41 @@ export default function Analytics() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
+            className="mb-4"
           >
-            <h3 className="text-2xl font-bold mb-4">Top Clips</h3>
-            <div className="grid grid-cols-5 gap-3">
-              {topClips.map((clip, i) => (
+            <h3 className="text-lg font-bold mb-3">Top Clips</h3>
+            <div className="grid grid-cols-8 gap-2">
+              {topClips.slice(0, 8).map((clip, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="group relative aspect-[9/16] rounded-lg overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer"
+                  transition={{ delay: i * 0.03 }}
+                  className="group relative aspect-[9/16] rounded-md overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer"
                 >
-                  {/* Thumbnail */}
                   <img 
                     src={clip.thumbnail} 
                     alt={clip.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   
-                  {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
                   
-                  {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-3">
-                    <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center text-xs font-bold text-emerald-400 border border-emerald-500/30">
+                  <div className="absolute bottom-0 left-0 right-0 p-1.5">
+                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-black/60 flex items-center justify-center text-[9px] font-bold text-emerald-400 border border-emerald-500/30">
                       {i + 1}
                     </div>
                     
-                    <h4 className="font-bold text-sm mb-1 line-clamp-2 leading-tight">{clip.title}</h4>
-                    <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
-                      <span className="px-1.5 py-0.5 rounded bg-white/10 text-[10px] font-medium">{clip.platform}</span>
+                    <h4 className="font-bold text-[9px] mb-0.5 line-clamp-1 leading-tight">{clip.title}</h4>
+                    <div className="flex items-center gap-1 text-[8px] text-gray-400">
+                      <span className="px-1 py-0.5 rounded bg-white/10 text-[7px] font-medium">{clip.platform}</span>
                       <span>{(clip.views / 1000).toFixed(0)}K</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs">
-                      <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-emerald-500 rounded-full"
-                          style={{ width: `${clip.engagement * 10}%` }}
-                        />
-                      </div>
-                      <span className="text-emerald-400 font-semibold text-[10px]">{clip.engagement}%</span>
                     </div>
                   </div>
 
-                  {/* Play Button Overlay */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                      <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1" />
+                    <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                      <div className="w-0 h-0 border-l-[8px] border-l-white border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent ml-0.5" />
                     </div>
                   </div>
                 </motion.div>
@@ -357,7 +344,7 @@ export default function Analytics() {
           </motion.div>
 
           {/* Demographics & Top Countries */}
-          <div className="grid lg:grid-cols-2 gap-6 mb-6">
+          <div className="grid lg:grid-cols-2 gap-4 mb-4">
             {/* Demographics */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -424,26 +411,21 @@ export default function Analytics() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-[#111113] rounded-2xl border border-white/5 p-6"
+              className="bg-[#111113] rounded-xl border border-white/5 p-4"
             >
-              <h3 className="text-lg font-bold mb-4">Top Países</h3>
-              <div className="space-y-2">
+              <h3 className="text-sm font-bold mb-3">Top Países</h3>
+              <div className="grid grid-cols-2 gap-2">
                 {topCountriesData.map((country, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center text-xs font-bold text-emerald-400">
-                        {i + 1}
-                      </div>
-                      <div>
-                        <div className="font-medium text-sm flex items-center gap-2">
-                          <span>{country.flag}</span>
-                          <span>{country.name}</span>
-                        </div>
-                      </div>
+                  <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                    <div className="w-6 h-6 rounded bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center text-[10px] font-bold text-emerald-400">
+                      {i + 1}
                     </div>
-                    <div className="text-right">
-                      <div className="text-sm font-bold text-emerald-400">{(country.score / 1000).toFixed(0)}K</div>
-                      <div className="text-xs text-gray-500">interacción</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-[10px] flex items-center gap-1 truncate">
+                        <span>{country.flag}</span>
+                        <span>{country.name}</span>
+                      </div>
+                      <div className="text-[9px] font-bold text-emerald-400">{(country.score / 1000).toFixed(0)}K</div>
                     </div>
                   </div>
                 ))}
