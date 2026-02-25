@@ -236,20 +236,98 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
               {/* Project */}
               <div>
                 <label className="text-sm font-medium text-gray-400 mb-2 block">
-                  Proyecto / Campaña
+                  Proyecto
                 </label>
                 <select
                   value={formData.project_id}
-                  onChange={(e) => setFormData({ ...formData, project_id: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, project_id: e.target.value, track_id: "" });
+                  }}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
+                  disabled={!formData.artist_id}
                 >
-                  <option value="">Sin proyecto</option>
+                  <option value="">Seleccionar proyecto...</option>
                   {projects.map(project => (
                     <option key={project.id} value={project.id}>
-                      {project.name}
+                      {project.title}
                     </option>
                   ))}
                 </select>
+              </div>
+
+              {/* Track */}
+              {formData.project_id && (
+                <div>
+                  <label className="text-sm font-medium text-gray-400 mb-2 block">
+                    Canción
+                  </label>
+                  <select
+                    value={formData.track_id}
+                    onChange={(e) => setFormData({ ...formData, track_id: e.target.value })}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
+                  >
+                    <option value="">Seleccionar canción...</option>
+                    {tracks.map(track => (
+                      <option key={track.id} value={track.id}>
+                        {track.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Collaborators */}
+              <div>
+                <label className="text-sm font-medium text-gray-400 mb-2 block">
+                  Artistas Colaboradores
+                </label>
+                <div className="space-y-2 max-h-32 overflow-y-auto bg-white/5 border border-white/10 rounded-xl p-3">
+                  {artists.filter(a => a.id !== formData.artist_id).map(artist => (
+                    <label key={artist.id} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.featuring_artists.includes(artist.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData({
+                              ...formData,
+                              featuring_artists: [...formData.featuring_artists, artist.id]
+                            });
+                          } else {
+                            setFormData({
+                              ...formData,
+                              featuring_artists: formData.featuring_artists.filter(id => id !== artist.id)
+                            });
+                          }
+                        }}
+                        className="w-4 h-4 rounded"
+                      />
+                      <span className="text-sm">{artist.stageName || artist.name}</span>
+                    </label>
+                  ))}
+                </div>
+                {formData.featuring_artists.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {formData.featuring_artists.map(collabId => {
+                      const artist = artists.find(a => a.id === collabId);
+                      return (
+                        <span key={collabId} className="px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-xs flex items-center gap-2">
+                          {artist?.stageName || artist?.name}
+                          <button
+                            type="button"
+                            onClick={() => setFormData({
+                              ...formData,
+                              featuring_artists: formData.featuring_artists.filter(id => id !== collabId)
+                            })}
+                            className="hover:text-purple-300"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Platforms */}
