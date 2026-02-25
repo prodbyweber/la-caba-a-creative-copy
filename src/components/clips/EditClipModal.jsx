@@ -229,7 +229,7 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
               {/* Project */}
               <div>
                 <label className="text-sm font-medium text-gray-400 mb-2 block">
-                  Proyecto
+                  Proyecto (Opcional)
                 </label>
                 <select
                   value={formData.project_id}
@@ -239,7 +239,7 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
                   disabled={!formData.artist_id}
                 >
-                  <option value="">Seleccionar proyecto...</option>
+                  <option value="">Sin proyecto</option>
                   {projects.map(project => (
                     <option key={project.id} value={project.id}>
                       {project.title}
@@ -249,25 +249,24 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
               </div>
 
               {/* Track */}
-              {formData.project_id && (
-                <div>
-                  <label className="text-sm font-medium text-gray-400 mb-2 block">
-                    Canción
-                  </label>
-                  <select
-                    value={formData.track_id}
-                    onChange={(e) => setFormData({ ...formData, track_id: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
-                  >
-                    <option value="">Seleccionar canción...</option>
-                    {tracks.map(track => (
-                      <option key={track.id} value={track.id}>
-                        {track.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+              <div>
+                <label className="text-sm font-medium text-gray-400 mb-2 block">
+                  Canción (Opcional)
+                </label>
+                <select
+                  value={formData.track_id}
+                  onChange={(e) => setFormData({ ...formData, track_id: e.target.value })}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
+                  disabled={!formData.artist_id}
+                >
+                  <option value="">Sin canción</option>
+                  {tracks.map(track => (
+                    <option key={track.id} value={track.id}>
+                      {track.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               {/* Collaborators */}
               <div>
