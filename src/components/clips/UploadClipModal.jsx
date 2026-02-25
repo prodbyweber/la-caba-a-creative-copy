@@ -4,14 +4,40 @@ import { X, Upload, Loader, Check, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 
-export default function UploadClipModal({ onClose }) {
+export default function UploadClipModal({ onClose, artistId }) {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
-  const [selectedArtist, setSelectedArtist] = useState("");
+  const [selectedArtist, setSelectedArtist] = useState(artistId || "");
+  const [selectedProject, setSelectedProject] = useState("");
+  const [selectedTrack, setSelectedTrack] = useState("");
+  const [collaborators, setCollaborators] = useState([]);
 
   const { data: artists = [] } = useQuery({
     queryKey: ['artists'],
+    queryFn: () => base44.entities.Artist.list(),
+  });
+
+  const { data: projects = [] } = useQuery({
+    queryKey: ['projects', selectedArtist],
+    queryFn: () => {
+      if (!selectedArtist) return [];
+      return base44.entities.Project.filter({ artist_id: selectedArtist });
+    },
+    enabled: !!selectedArtist,
+  });
+
+  const { data: tracks = [] } = useQuery({
+    queryKey: ['tracks', selectedProject],
+    queryFn: () => {
+      if (!selectedProject) return [];
+      return base44.entities.Track.filter({ project_id: selectedProject });
+    },
+    enabled: !!selectedProject,
+  });
+
+  const { data: allArtists = [] } = useQuery({
+    queryKey: ['allArtists'],
     queryFn: () => base44.entities.Artist.list(),
   });
 
