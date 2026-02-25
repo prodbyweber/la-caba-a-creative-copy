@@ -203,10 +203,10 @@ export default function UploadClipModal({ onClose, artistId }) {
             >
               <option value="">Sin canción específica</option>
               {allTracks.map(track => {
-                const projectInfo = track.project_id ? ` • Proyecto: ${track.project_id}` : " • Sin proyecto";
+                const projectTitle = track.project_id ? getProjectTitle(track.project_id) : "Sin proyecto";
                 return (
                   <option key={track.id} value={track.id}>
-                    {track.title}{projectInfo}
+                    {track.title} • {projectTitle}
                   </option>
                 );
               })}
