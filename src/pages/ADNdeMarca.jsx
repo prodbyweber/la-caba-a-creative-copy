@@ -118,11 +118,38 @@ export default function ADNdeMarca() {
           } else {
             // Pre-rellenar con datos del artista si no tiene ADN
             if (foundArtist) {
+              const nameParts = foundArtist.legalName?.split(' ') || [];
+              const firstName = nameParts[0] || "";
+              const lastName = nameParts.slice(1).join(' ') || "";
+              
+              // Extraer código de país del teléfono si existe
+              let phoneCode = "+34";
+              let phoneNumber = "";
+              if (foundArtist.phone) {
+                const phoneMatch = foundArtist.phone.match(/^(\+\d+)\s*(.+)$/);
+                if (phoneMatch) {
+                  phoneCode = phoneMatch[1];
+                  phoneNumber = phoneMatch[2];
+                } else {
+                  phoneNumber = foundArtist.phone;
+                }
+              }
+              
+              // Pre-rellenar género musical si existe
+              let genres = [];
+              if (foundArtist.genre) {
+                genres = [foundArtist.genre];
+              }
+              
               setSelections(prev => ({
                 ...prev,
                 artistName: foundArtist.stageName || "",
-                firstName: foundArtist.legalName?.split(' ')[0] || "",
-                lastName: foundArtist.legalName?.split(' ').slice(1).join(' ') || "",
+                firstName: firstName,
+                lastName: lastName,
+                phoneCode: phoneCode,
+                phoneNumber: phoneNumber,
+                residenceCountry: foundArtist.location || "",
+                genres: genres,
               }));
             }
           }
