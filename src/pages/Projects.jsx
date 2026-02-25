@@ -51,7 +51,7 @@ export default function Projects() {
 
   return (
     <AdminLayout activePage="Projects">
-      <div className="p-6 max-w-[1600px] mx-auto">
+      <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
