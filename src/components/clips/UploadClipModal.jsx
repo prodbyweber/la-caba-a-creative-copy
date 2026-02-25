@@ -144,13 +144,10 @@ export default function UploadClipModal({ onClose, artistId }) {
 
     setUploading(false);
 
-    // If all successful, close after a moment
+    // If all successful, close
     const allSuccess = files.every(f => f.status === 'success');
     if (allSuccess) {
-      setTimeout(() => {
-        onClose();
-        window.location.reload();
-      }, 1500);
+      setTimeout(() => onClose(), 800);
     }
   };
 
