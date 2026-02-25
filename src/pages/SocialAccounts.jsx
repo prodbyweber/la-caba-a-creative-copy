@@ -45,8 +45,10 @@ const socialPlatforms = [
 ];
 
 export default function SocialAccounts() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [platforms, setPlatforms] = useState(socialPlatforms);
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  const artistId = urlParams.get("artistId");
 
   const handleConnect = (platformId) => {
     // Simulación de conexión - en producción esto abriría OAuth
@@ -67,10 +69,9 @@ export default function SocialAccounts() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
-      <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <DashboardNav artistId={artistId} />
 
-      <main className="lg:pl-64 pt-16">
+      <main className="pt-16">
         <div className="p-6 max-w-[1400px] mx-auto">
           {/* Header */}
           <motion.div
