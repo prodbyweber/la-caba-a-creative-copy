@@ -88,6 +88,7 @@ export default function Clips() {
             filters={filters} 
             setFilters={setFilters}
             activeTab={activeTab}
+            artistId={artistId}
           />
 
           {/* Content */}
