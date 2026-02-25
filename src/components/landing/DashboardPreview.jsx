@@ -263,7 +263,7 @@ export default function DashboardPreview() {
                 whileTap={{ scale: 0.95 }}
                 className="px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-bold text-lg shadow-lg shadow-emerald-500/40 transition-all"
               >
-                🎯 Acceder al Dashboard
+                Acceder al Dashboard
               </motion.button>
             </motion.div>
           </motion.div>
@@ -443,7 +443,7 @@ export default function DashboardPreview() {
                 whileTap={{ scale: 0.98 }}
                 className="w-full p-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/30 transition-all"
               >
-                🎯 Obtener Acceso
+                Obtener Acceso
               </motion.button>
             </div>
           </div>
