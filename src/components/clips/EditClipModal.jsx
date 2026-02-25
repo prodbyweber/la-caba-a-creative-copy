@@ -51,13 +51,25 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
     enabled: !!formData.artist_id,
   });
 
-  const { data: tracks = [] } = useQuery({
-    queryKey: ['tracks', formData.project_id],
-    queryFn: () => {
-      if (!formData.project_id) return [];
-      return base44.entities.Track.filter({ project_id: formData.project_id });
+  const { data: allProjectsForEdit = [] } = useQuery({
+    queryKey: ['allProjectsForEdit', formData.artist_id],
+    queryFn: async () => {
+      if (!formData.artist_id) return [];
+      return base44.entities.Project.filter({ artist_id: formData.artist_id });
     },
-    enabled: !!formData.project_id,
+    enabled: !!formData.artist_id,
+  });
+
+  const { data: tracks = [] } = useQuery({
+    queryKey: ['tracks', formData.artist_id],
+    queryFn: async () => {
+      if (!formData.artist_id) return [];
+      const projectsData = await base44.entities.Project.filter({ artist_id: formData.artist_id });
+      const projectIds = projectsData.map(p => p.id);
+      const allTracksData = await base44.entities.Track.list();
+      return allTracksData.filter(t => projectIds.includes(t.project_id));
+    },
+    enabled: !!formData.artist_id,
   });
 
   const handleSave = async () => {
