@@ -158,18 +158,119 @@ export default function UploadClipModal({ onClose, artistId }) {
             </label>
             <select
               value={selectedArtist}
-              onChange={(e) => setSelectedArtist(e.target.value)}
+              onChange={(e) => {
+                setSelectedArtist(e.target.value);
+                setSelectedProject("");
+                setSelectedTrack("");
+              }}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
               disabled={uploading}
             >
               <option value="">Seleccionar artista...</option>
               {artists.map(artist => (
                 <option key={artist.id} value={artist.id}>
-                  {artist.name}
+                  {artist.stageName || artist.name}
                 </option>
               ))}
             </select>
           </div>
+
+          {/* Project Selection */}
+          {selectedArtist && (
+            <div className="mb-6">
+              <label className="text-sm font-medium text-gray-400 mb-2 block">
+                Proyecto
+              </label>
+              <select
+                value={selectedProject}
+                onChange={(e) => {
+                  setSelectedProject(e.target.value);
+                  setSelectedTrack("");
+                }}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
+                disabled={uploading}
+              >
+                <option value="">Seleccionar proyecto...</option>
+                {projects.map(project => (
+                  <option key={project.id} value={project.id}>
+                    {project.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Track Selection */}
+          {selectedProject && (
+            <div className="mb-6">
+              <label className="text-sm font-medium text-gray-400 mb-2 block">
+                Canción
+              </label>
+              <select
+                value={selectedTrack}
+                onChange={(e) => setSelectedTrack(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
+                disabled={uploading}
+              >
+                <option value="">Seleccionar canción...</option>
+                {tracks.map(track => (
+                  <option key={track.id} value={track.id}>
+                    {track.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Collaborators Selection */}
+          {selectedArtist && (
+            <div className="mb-6">
+              <label className="text-sm font-medium text-gray-400 mb-2 block">
+                Artistas Colaboradores
+              </label>
+              <div className="space-y-2 mb-3 max-h-32 overflow-y-auto">
+                {allArtists.filter(a => a.id !== selectedArtist).map(artist => (
+                  <label key={artist.id} className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={collaborators.includes(artist.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setCollaborators([...collaborators, artist.id]);
+                        } else {
+                          setCollaborators(collaborators.filter(id => id !== artist.id));
+                        }
+                      }}
+                      className="w-4 h-4 rounded bg-white/5 border border-white/10"
+                      disabled={uploading}
+                    />
+                    <span className="text-sm text-gray-400">{artist.stageName || artist.name}</span>
+                  </label>
+                ))}
+              </div>
+              {collaborators.length > 0 && (
+                <div className="bg-white/5 border border-white/10 rounded-lg p-3">
+                  <div className="flex flex-wrap gap-2">
+                    {collaborators.map(collabId => {
+                      const artist = allArtists.find(a => a.id === collabId);
+                      return (
+                        <div key={collabId} className="bg-purple-500/20 border border-purple-500/30 rounded-lg px-3 py-1 text-xs flex items-center gap-2">
+                          <span>{artist?.stageName || artist?.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => setCollaborators(collaborators.filter(id => id !== collabId))}
+                            className="text-purple-400 hover:text-purple-300"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Upload Area */}
           {files.length === 0 ? (
