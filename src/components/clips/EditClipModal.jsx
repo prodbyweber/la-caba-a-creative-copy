@@ -19,6 +19,8 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
     artist_id: clip.artist_id || "",
     tags: clip.tags || [],
     project_id: clip.project_id || "",
+    track_id: clip.track_id || "",
+    featuring_artists: clip.featuring_artists || [],
     platforms: clip.platforms || [],
     caption_master: clip.caption_master || "",
     caption_youtube: clip.caption_youtube || "",
@@ -41,8 +43,21 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
   });
 
   const { data: projects = [] } = useQuery({
-    queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list(),
+    queryKey: ['projects', formData.artist_id],
+    queryFn: () => {
+      if (!formData.artist_id) return [];
+      return base44.entities.Project.filter({ artist_id: formData.artist_id });
+    },
+    enabled: !!formData.artist_id,
+  });
+
+  const { data: tracks = [] } = useQuery({
+    queryKey: ['tracks', formData.project_id],
+    queryFn: () => {
+      if (!formData.project_id) return [];
+      return base44.entities.Track.filter({ project_id: formData.project_id });
+    },
+    enabled: !!formData.project_id,
   });
 
   const handleSave = async () => {
