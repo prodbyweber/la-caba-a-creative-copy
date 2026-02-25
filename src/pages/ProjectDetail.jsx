@@ -299,7 +299,7 @@ export default function ProjectDetail() {
           </motion.div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-6 sticky top-16 bg-[#0a0a0b]/80 backdrop-blur-md -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 z-30">
+          <div className="flex gap-2 mb-4 sm:mb-6 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 sm:py-3 z-20">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
