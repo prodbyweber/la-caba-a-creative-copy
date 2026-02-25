@@ -61,7 +61,7 @@ export default function ArtistDashboard() {
       <DashboardNav artistName={artist.stageName} artistId={artist.id} />
 
       <main className="pt-14">
-        <div className="px-8 py-4 max-w-[1800px] mx-auto">
+        <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
           {/* Header Compacto */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
