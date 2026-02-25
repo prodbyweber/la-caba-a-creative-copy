@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Search, Settings, Home, BarChart3, Film, Music2, FolderKanban, Share2, Calendar, Palette, Menu, X } from "lucide-react";
+import { Bell, Search, Settings, Home, BarChart3, Film, Music2, FolderKanban, Share2, Calendar, Palette, Menu, X, LayoutDashboard } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -9,7 +9,7 @@ export default function DashboardNav({ artistName, artistId }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const menuItems = [
-    { icon: Home, label: "Dashboard", page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
+    { icon: LayoutDashboard, label: "Dashboard", page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
     { icon: BarChart3, label: "Análisis", page: artistId ? `Analytics?artistId=${artistId}` : "Analytics" },
     { icon: Film, label: "Clips", page: artistId ? `Clips?artistId=${artistId}` : "Clips" },
     { icon: Music2, label: "Tracks", page: artistId ? `ArtistTracks?artistId=${artistId}` : "Tracks" },
