@@ -480,8 +480,23 @@ function TrackForm({ track, projectId, onSubmit, onCancel }) {
     dolby_atmos: false,
     genre: "",
     status: "idea",
-    notes: ""
+    notes: "",
+    audio_file_url: ""
   });
+  const [uploadingAudio, setUploadingAudio] = useState(false);
+
+  const handleAudioUpload = async (file) => {
+    if (!file) return;
+    setUploadingAudio(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData({ ...formData, audio_file_url: file_url });
+    } catch (error) {
+      console.error('Error uploading audio:', error);
+    } finally {
+      setUploadingAudio(false);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -587,6 +602,51 @@ function TrackForm({ track, projectId, onSubmit, onCancel }) {
           rows={3}
           className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 resize-none"
         />
+      </div>
+
+      {/* Audio File Upload */}
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-2">Archivo de Audio</label>
+        {formData.audio_file_url ? (
+          <div className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-lg">
+            <Music2 className="w-5 h-5 text-emerald-400" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-white truncate">Audio cargado</p>
+              <audio controls src={formData.audio_file_url} className="w-full mt-2 h-8" />
+            </div>
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, audio_file_url: "" })}
+              className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm font-medium transition-colors"
+            >
+              Quitar
+            </button>
+          </div>
+        ) : (
+          <label className="block w-full p-4 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-emerald-500/50 hover:bg-white/5 transition-all">
+            <input
+              type="file"
+              accept="audio/*"
+              onChange={(e) => e.target.files?.[0] && handleAudioUpload(e.target.files[0])}
+              className="hidden"
+              disabled={uploadingAudio}
+            />
+            <div className="flex flex-col items-center gap-2 text-gray-400">
+              {uploadingAudio ? (
+                <>
+                  <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                  <span className="text-sm">Subiendo audio...</span>
+                </>
+              ) : (
+                <>
+                  <Music2 className="w-8 h-8" />
+                  <span className="text-sm">Haz clic para subir un archivo de audio</span>
+                  <span className="text-xs text-gray-500">MP3, WAV, M4A</span>
+                </>
+              )}
+            </div>
+          </label>
+        )}
       </div>
 
       <div className="flex gap-3">
