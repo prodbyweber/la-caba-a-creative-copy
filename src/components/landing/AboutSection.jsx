@@ -134,18 +134,12 @@ export default function AboutSection() {
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }
             }}
-            className="relative group"
+            className="group inline-flex items-center gap-3 px-10 py-4 bg-white text-black font-light tracking-wide text-lg hover:bg-gray-200 transition-colors duration-300"
           >
-            {/* Glow effect */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500 via-orange-500 to-emerald-500 rounded-full opacity-75 group-hover:opacity-100 blur-xl transition-all duration-500 animate-pulse" />
-            
-            {/* Button */}
-            <div className="relative px-10 py-5 bg-white text-black rounded-full font-bold text-lg hover:bg-gray-100 transition-all shadow-2xl flex items-center gap-3">
-              <span>Aplicar a La Cabaña</span>
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </div>
+            <span>Aplicar a La Cabaña</span>
+            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
           </button>
         </motion.div>
       </div>
