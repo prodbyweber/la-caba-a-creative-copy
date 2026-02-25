@@ -57,11 +57,25 @@ const narratives = [
   "Nostalgia del pasado", "Sueños y aspiraciones", "Crítica social"
 ];
 
-// Helper function for YouTube embed
+// Helper function for YouTube embed - soporta YouTube y YouTube Music
 const getYouTubeEmbedId = (url) => {
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  return (match && match[2].length === 11) ? match[2] : null;
+  if (!url) return null;
+  
+  // Patrones para YouTube y YouTube Music
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\?\/\s]{11})/,
+    /music\.youtube\.com\/watch\?v=([^&\?\/\s]{11})/,
+    /youtube\.com\/shorts\/([^&\?\/\s]{11})/
+  ];
+  
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+  
+  return null;
 };
 
 export default function ADNdeMarca() {
@@ -591,17 +605,22 @@ export default function ADNdeMarca() {
                           animate={{ opacity: 1, y: 0 }}
                           className="bg-white/5 rounded-xl overflow-hidden border border-white/10"
                         >
-                          {videoId && (
-                            <div className="aspect-video w-full">
+                          {videoId ? (
+                            <div className="aspect-video w-full bg-black">
                               <iframe
                                 width="100%"
                                 height="100%"
-                                src={`https://www.youtube.com/embed/${videoId}`}
+                                src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
                                 frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                 allowFullScreen
                                 className="w-full h-full"
+                                loading="lazy"
                               />
+                            </div>
+                          ) : (
+                            <div className="aspect-video w-full bg-white/5 flex items-center justify-center">
+                              <p className="text-gray-500 text-sm">URL de YouTube inválida</p>
                             </div>
                           )}
                           <div className="p-4">
@@ -1174,17 +1193,22 @@ function ResultView({ selections, onReset, saveDNA, artistId, hasExistingDNA }) 
                     const videoId = getYouTubeEmbedId(ref.url);
                     return (
                       <div key={idx} className="bg-white/5 rounded-lg overflow-hidden border border-white/10">
-                        {videoId && (
-                          <div className="aspect-video w-full">
+                        {videoId ? (
+                          <div className="aspect-video w-full bg-black">
                             <iframe
                               width="100%"
                               height="100%"
-                              src={`https://www.youtube.com/embed/${videoId}`}
+                              src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
                               frameBorder="0"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                               allowFullScreen
                               className="w-full h-full"
+                              loading="lazy"
                             />
+                          </div>
+                        ) : (
+                          <div className="aspect-video w-full bg-white/5 flex items-center justify-center">
+                            <p className="text-gray-500 text-sm">URL de YouTube inválida</p>
                           </div>
                         )}
                         {ref.note && (
