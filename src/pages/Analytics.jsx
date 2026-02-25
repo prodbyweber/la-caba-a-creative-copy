@@ -404,15 +404,15 @@ export default function Analytics() {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
+                  
+                  <div className="absolute top-2 left-2 w-5 h-5 rounded bg-black/70 flex items-center justify-center text-[8px] font-bold text-emerald-400 border border-emerald-500/40">
+                    {i + 1}
+                  </div>
                   
                   <div className="absolute bottom-0 left-0 right-0 p-2">
-                    <div className="absolute top-1.5 left-1.5 w-5 h-5 rounded bg-black/70 flex items-center justify-center text-[8px] font-bold text-emerald-400 border border-emerald-500/40">
-                      {i + 1}
-                    </div>
-                    
-                    <h4 className="font-bold text-[10px] mb-0.5 line-clamp-1 leading-tight pr-6">{clip.title}</h4>
-                    <div className="flex items-center gap-1.5 text-[8px] text-gray-400">
+                    <h4 className="font-bold text-[10px] mb-1 line-clamp-1 leading-tight">{clip.title}</h4>
+                    <div className="flex items-center gap-1.5 text-[8px] text-gray-300">
                       <span className="px-1 py-0.5 rounded bg-white/10 text-[7px] font-medium">{clip.platform}</span>
                       <span className="font-semibold text-emerald-400">{(clip.views / 1000).toFixed(0)}K</span>
                     </div>
