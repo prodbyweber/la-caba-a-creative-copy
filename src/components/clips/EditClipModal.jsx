@@ -340,32 +340,6 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
                 )}
               </div>
 
-              {/* Platforms */}
-              <div>
-                <label className="text-sm font-medium text-gray-400 mb-3 block">
-                  Plataformas de publicación
-                </label>
-                <div className="grid grid-cols-3 gap-3">
-                  {Object.entries(platformConfig).map(([key, platform]) => {
-                    const Icon = platform.icon;
-                    return (
-                      <button
-                        key={key}
-                        onClick={() => togglePlatform(key)}
-                        className={`p-4 rounded-xl border-2 transition-all ${
-                          formData.platforms.includes(key)
-                            ? "bg-purple-500/10 border-purple-500/50 text-purple-400"
-                            : "bg-white/5 border-white/10 hover:border-white/20 text-gray-400"
-                        }`}
-                      >
-                        <Icon className="w-6 h-6 mx-auto mb-2" />
-                        <div className="text-xs font-medium">{platform.name}</div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Tags */}
               <div>
                 <label className="text-sm font-medium text-gray-400 mb-2 block">
