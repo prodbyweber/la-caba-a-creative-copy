@@ -8,34 +8,43 @@ import OfferDetailPanel from "./OfferDetailPanel";
 const defaultOffers = [
   {
     id: 1,
-    tag: "Gratis",
-    title: "Empieza aquí",
-    price: null,
-    description: "Contenido educativo grabado para artistas que quieren entender la industria, la marca personal y el poder del sonido.",
-    cta: "Acceder",
+    title: "Producción Musical",
+    price: "desde 250 €",
+    description: "Creación y producción de música original. Definimos sonido, producimos beats y construimos tu identidad musical.",
+    cta: "Consultar",
     color: "emerald",
     featured: false
   },
   {
     id: 2,
-    title: "Marca Artística",
-    price: "27,99 €",
-    description: "Curso grabado paso a paso para definir tu identidad como artista, tu sonido, tu narrativa visual y producir música competitiva.",
-    cta: "Ver curso",
-    color: "purple",
-    featured: false
-  },
-  {
-    id: 3,
-    title: "Plan de Acción Artístico",
-    price: "99,99 €",
-    description: "Videollamada estratégica para diagnosticar tu proyecto y salir con un plan claro de qué hacer y en qué orden.",
-    cta: "Reservar sesión",
+    title: "Mix y Mastering",
+    price: "desde 150 €",
+    description: "Mezcla profesional y masterización de tu música. Optimizamos sonido para todas las plataformas.",
+    cta: "Consultar",
     color: "blue",
     featured: false
   },
   {
+    id: 3,
+    title: "Branding Artístico",
+    price: "desde 500 €",
+    description: "Construye tu identidad visual y sonora. Logo, paleta de colores, narrativa y dirección creativa.",
+    cta: "Consultar",
+    color: "purple",
+    featured: false
+  },
+  {
     id: 4,
+    title: "Estrategia de Contenido",
+    price: "desde 400 €",
+    description: "Plan de contenido para redes sociales. Clips, reels, TikToks y estrategia de distribución.",
+    cta: "Consultar",
+    color: "pink",
+    featured: false
+  },
+  {
+    id: 5,
+    tag: "Nuestro estrella",
     title: "Creación + Dirección",
     price: "750 €",
     description: "Programa híbrido donde creamos música contigo, te damos dirección creativa y construimos tu marca mientras produces.",
@@ -45,7 +54,7 @@ const defaultOffers = [
     featured: true
   },
   {
-    id: 5,
+    id: 6,
     tag: "Solo Madrid · Cupos limitados",
     title: "Artista Pro – Madrid",
     price: "1.200 €",
@@ -53,25 +62,6 @@ const defaultOffers = [
     cta: "Aplicar",
     color: "red",
     featured: true
-  },
-  {
-    id: 6,
-    title: "Producción Técnica",
-    price: null,
-    description: "Mix, master y Dolby Atmos para artistas que ya han pasado por nuestros procesos creativos.",
-    technical: ["Mix + Master 170 €", "Mix 120 €", "Dolby Atmos desde 450 €"],
-    cta: "Ver condiciones",
-    color: "zinc",
-    featured: false
-  },
-  {
-    id: 7,
-    title: "Workshops Grabados",
-    price: null,
-    description: "Formación especializada bajo demanda sobre marca artística, frecuencias, producción, contenido y carrera musical.",
-    cta: "Ver workshops",
-    color: "teal",
-    featured: false
   }
 ];
 
