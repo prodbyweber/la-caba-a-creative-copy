@@ -59,18 +59,24 @@ const narratives = [
 
 // Helper function for YouTube embed - soporta YouTube y YouTube Music
 const getYouTubeEmbedId = (url) => {
-  if (!url) return null;
+  if (!url || typeof url !== 'string') return null;
+  
+  // Limpiar la URL
+  url = url.trim();
   
   // Patrones para YouTube y YouTube Music
   const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\?\/\s]{11})/,
-    /music\.youtube\.com\/watch\?v=([^&\?\/\s]{11})/,
-    /youtube\.com\/shorts\/([^&\?\/\s]{11})/
+    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    /(?:music\.youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/
   ];
   
   for (const pattern of patterns) {
     const match = url.match(pattern);
-    if (match && match[1]) {
+    if (match && match[1] && match[1].length === 11) {
       return match[1];
     }
   }
@@ -605,24 +611,22 @@ export default function ADNdeMarca() {
                           animate={{ opacity: 1, y: 0 }}
                           className="bg-white/5 rounded-xl overflow-hidden border border-white/10"
                         >
-                          {videoId ? (
-                            <div className="aspect-video w-full bg-black">
+                          <div className="aspect-video w-full bg-black relative">
+                            {videoId ? (
                               <iframe
-                                width="100%"
-                                height="100%"
-                                src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
+                                src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+                                title={`YouTube video ${idx + 1}`}
                                 frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
-                                className="w-full h-full"
-                                loading="lazy"
+                                className="absolute inset-0 w-full h-full"
                               />
-                            </div>
-                          ) : (
-                            <div className="aspect-video w-full bg-white/5 flex items-center justify-center">
-                              <p className="text-gray-500 text-sm">URL de YouTube inválida</p>
-                            </div>
-                          )}
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <p className="text-gray-500 text-sm">URL de YouTube inválida</p>
+                              </div>
+                            )}
+                          </div>
                           <div className="p-4">
                             {ref.note && (
                               <p className="text-sm text-gray-400 mb-3 italic">"{ref.note}"</p>
@@ -1193,24 +1197,22 @@ function ResultView({ selections, onReset, saveDNA, artistId, hasExistingDNA }) 
                     const videoId = getYouTubeEmbedId(ref.url);
                     return (
                       <div key={idx} className="bg-white/5 rounded-lg overflow-hidden border border-white/10">
-                        {videoId ? (
-                          <div className="aspect-video w-full bg-black">
+                        <div className="aspect-video w-full bg-black relative">
+                          {videoId ? (
                             <iframe
-                              width="100%"
-                              height="100%"
-                              src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
+                              src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+                              title={`YouTube video ${idx + 1}`}
                               frameBorder="0"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                               allowFullScreen
-                              className="w-full h-full"
-                              loading="lazy"
+                              className="absolute inset-0 w-full h-full"
                             />
-                          </div>
-                        ) : (
-                          <div className="aspect-video w-full bg-white/5 flex items-center justify-center">
-                            <p className="text-gray-500 text-sm">URL de YouTube inválida</p>
-                          </div>
-                        )}
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <p className="text-gray-500 text-sm">URL de YouTube inválida</p>
+                            </div>
+                          )}
+                        </div>
                         {ref.note && (
                           <div className="p-2">
                             <p className="text-xs text-gray-400 italic">"{ref.note}"</p>
