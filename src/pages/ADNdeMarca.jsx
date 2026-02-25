@@ -611,22 +611,29 @@ export default function ADNdeMarca() {
                           animate={{ opacity: 1, y: 0 }}
                           className="bg-white/5 rounded-xl overflow-hidden border border-white/10"
                         >
-                          <div className="aspect-video w-full bg-black relative">
-                            {videoId ? (
+                          {videoId ? (
+                            <div className="aspect-video w-full bg-black relative">
                               <iframe
-                                src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+                                src={`https://www.youtube.com/embed/${videoId}?origin=${window.location.origin}`}
                                 title={`YouTube video ${idx + 1}`}
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
                                 className="absolute inset-0 w-full h-full"
                               />
-                            ) : (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <p className="text-gray-500 text-sm">URL de YouTube inválida</p>
-                              </div>
-                            )}
-                          </div>
+                            </div>
+                          ) : (
+                            <div className="aspect-video w-full bg-black flex items-center justify-center">
+                              <a 
+                                href={ref.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-emerald-400 hover:text-emerald-300 text-sm underline"
+                              >
+                                Ver en YouTube →
+                              </a>
+                            </div>
+                          )}
                           <div className="p-4">
                             {ref.note && (
                               <p className="text-sm text-gray-400 mb-3 italic">"{ref.note}"</p>
@@ -1197,22 +1204,29 @@ function ResultView({ selections, onReset, saveDNA, artistId, hasExistingDNA }) 
                     const videoId = getYouTubeEmbedId(ref.url);
                     return (
                       <div key={idx} className="bg-white/5 rounded-lg overflow-hidden border border-white/10">
-                        <div className="aspect-video w-full bg-black relative">
-                          {videoId ? (
+                        {videoId ? (
+                          <div className="aspect-video w-full bg-black relative">
                             <iframe
-                              src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+                              src={`https://www.youtube.com/embed/${videoId}?origin=${window.location.origin}`}
                               title={`YouTube video ${idx + 1}`}
                               frameBorder="0"
                               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                               allowFullScreen
                               className="absolute inset-0 w-full h-full"
                             />
-                          ) : (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <p className="text-gray-500 text-sm">URL de YouTube inválida</p>
-                            </div>
-                          )}
-                        </div>
+                          </div>
+                        ) : (
+                          <div className="aspect-video w-full bg-black flex items-center justify-center">
+                            <a 
+                              href={ref.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-emerald-400 hover:text-emerald-300 text-sm underline"
+                            >
+                              Ver en YouTube →
+                            </a>
+                          </div>
+                        )}
                         {ref.note && (
                           <div className="p-2">
                             <p className="text-xs text-gray-400 italic">"{ref.note}"</p>
