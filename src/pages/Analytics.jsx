@@ -308,66 +308,61 @@ export default function Analytics() {
                    </div>
                 </div>
 
-                {/* Mobile Optimized Version - Clear Identification */}
-                <div className="sm:hidden grid grid-cols-3 gap-1">
-                  {/* Streams - Audio Platform */}
-                  <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-2">
-                    <div className="flex items-center gap-1 mb-1.5">
-                      <div className="w-4 h-4 rounded bg-emerald-500/30 flex items-center justify-center">
-                        <Play className="w-2.5 h-2.5 text-emerald-400" />
+                {/* Mobile Optimized Version - Compact Summary */}
+                <div className="sm:hidden space-y-1.5">
+                  {/* Streams & Views Top Row */}
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-2">
+                      <div className="flex items-center gap-1 mb-1">
+                        <Play className="w-3 h-3 text-emerald-400" />
+                        <span className="text-[8px] font-bold text-emerald-300">Streams</span>
                       </div>
-                      <div className="text-[7px] font-bold text-emerald-300">Streams</div>
+                      <div className="text-[10px] font-bold text-emerald-400 mb-1">
+                        {(platformsStreamsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
+                      </div>
+                      <div className="space-y-0.5">
+                        {platformsStreamsData.slice(0, 2).map((platform, i) => (
+                          <div key={i} className="flex items-center justify-between text-[7px]">
+                            <span className="text-emerald-200">{platform.name === "Apple Music" ? "Apple" : platform.name}</span>
+                            <span className="text-emerald-300 font-semibold">{(platform.value / 1000).toFixed(0)}K</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <div className="text-[9px] font-bold text-emerald-400 mb-1">
-                      {(platformsStreamsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
-                    </div>
-                    <div className="space-y-0.5">
-                      {platformsStreamsData.slice(0, 2).map((platform, i) => (
-                        <div key={i} className="flex items-center justify-between">
-                          <span className="text-[6px] text-emerald-200 truncate">{platform.name.split(' ')[0]}</span>
-                          <span className="text-[7px] font-semibold text-emerald-300 ml-0.5">{(platform.value / 1000).toFixed(0)}K</span>
-                        </div>
-                      ))}
+
+                    <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-2">
+                      <div className="flex items-center gap-1 mb-1">
+                        <Eye className="w-3 h-3 text-purple-400" />
+                        <span className="text-[8px] font-bold text-purple-300">Views</span>
+                      </div>
+                      <div className="text-[10px] font-bold text-purple-400 mb-1">
+                        {(platformsViewsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
+                      </div>
+                      <div className="space-y-0.5">
+                        {platformsViewsData.slice(0, 2).map((platform, i) => (
+                          <div key={i} className="flex items-center justify-between text-[7px]">
+                            <span className="text-purple-200">{platform.name === "Instagram Reels" ? "Insta" : platform.name === "YouTube Shorts" ? "YT" : "TikTok"}</span>
+                            <span className="text-purple-300 font-semibold">{(platform.value / 1000).toFixed(0)}K</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Views - Video Platform */}
-                  <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-2">
-                    <div className="flex items-center gap-1 mb-1.5">
-                      <div className="w-4 h-4 rounded bg-purple-500/30 flex items-center justify-center">
-                        <Eye className="w-2.5 h-2.5 text-purple-400" />
-                      </div>
-                      <div className="text-[7px] font-bold text-purple-300">Views</div>
-                    </div>
-                    <div className="text-[9px] font-bold text-purple-400 mb-1">
-                      {(platformsViewsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
-                    </div>
-                    <div className="space-y-0.5">
-                      {platformsViewsData.slice(0, 2).map((platform, i) => (
-                        <div key={i} className="flex items-center justify-between">
-                          <span className="text-[6px] text-purple-200 truncate">{platform.name.split(' ')[0]}</span>
-                          <span className="text-[7px] font-semibold text-purple-300 ml-0.5">{(platform.value / 1000).toFixed(0)}K</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Likes - Engagement */}
+                  {/* Likes Bottom Row */}
                   <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-2">
-                    <div className="flex items-center gap-1 mb-1.5">
-                      <div className="w-4 h-4 rounded bg-red-500/30 flex items-center justify-center">
-                        <Heart className="w-2.5 h-2.5 text-red-400" />
-                      </div>
-                      <div className="text-[7px] font-bold text-red-300">Likes</div>
+                    <div className="flex items-center gap-1 mb-1">
+                      <Heart className="w-3 h-3 text-red-400" />
+                      <span className="text-[8px] font-bold text-red-300">Likes</span>
                     </div>
-                    <div className="text-[9px] font-bold text-red-400 mb-1">
+                    <div className="text-[10px] font-bold text-red-400 mb-1">
                       {(platformsLikesData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(1)}K
                     </div>
-                    <div className="space-y-0.5">
+                    <div className="grid grid-cols-2 gap-2">
                       {platformsLikesData.slice(0, 2).map((platform, i) => (
-                        <div key={i} className="flex items-center justify-between">
-                          <span className="text-[6px] text-red-200 truncate">{platform.name.split(' ')[0]}</span>
-                          <span className="text-[7px] font-semibold text-red-300 ml-0.5">{(platform.value / 1000).toFixed(1)}K</span>
+                        <div key={i} className="text-[7px]">
+                          <span className="text-red-200 block">{platform.name === "Instagram" ? "IG" : platform.name}</span>
+                          <span className="text-red-300 font-semibold">{(platform.value / 1000).toFixed(1)}K</span>
                         </div>
                       ))}
                     </div>
