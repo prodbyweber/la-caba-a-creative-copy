@@ -134,7 +134,7 @@ export default function AboutSection() {
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }
             }}
-            className="group inline-flex items-center gap-3 px-10 py-4 bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 text-lg font-light tracking-wide text-white hover:bg-white/10 transition-all duration-300"
+            className="group inline-flex items-center gap-3 px-10 py-4 bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 text-lg font-medium text-white hover:bg-white/10 transition-all duration-300"
           >
             <span>Aplicar a La Cabaña</span>
             <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
