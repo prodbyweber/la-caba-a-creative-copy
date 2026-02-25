@@ -112,7 +112,7 @@ export default function LandingNav() {
               className="h-16 w-auto"
             />
             <span className="text-xl font-semibold tracking-tight hidden sm:block">
-              La Cabaña <span className="text-orange-500">Creative</span>
+              Cabaña <span className="text-orange-500">Creative</span>
             </span>
           </Link>
 

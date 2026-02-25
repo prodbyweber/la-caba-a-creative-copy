@@ -44,7 +44,7 @@ export default function DashboardNav({ artistName, artistId }) {
                 className="h-12 w-auto"
               />
               <span className="text-base font-semibold tracking-tight hidden lg:block">
-                La Cabaña <span className="text-orange-500">Creative</span>
+                Cabaña <span className="text-orange-500">Creative</span>
               </span>
             </Link>
           
@@ -125,7 +125,7 @@ export default function DashboardNav({ artistName, artistId }) {
                     className="h-10 w-auto"
                   />
                   <span className="text-sm font-semibold">
-                    La Cabaña <span className="text-orange-500">Creative</span>
+                    Cabaña <span className="text-orange-500">Creative</span>
                   </span>
                 </div>
                 <button
