@@ -95,15 +95,15 @@ export default function Analytics() {
       <DashboardNav artistId={artistId} />
 
       <main className="pt-14">
-        <div className="px-6 sm:px-12 lg:px-16 xl:px-24 max-w-[1600px] mx-auto py-3">
+        <div className="px-3 sm:px-6 md:px-12 lg:px-16 xl:px-24 max-w-[1600px] mx-auto py-2 sm:py-3">
           {/* Timeframe Selector */}
-          <div className="flex justify-end mb-3">
+          <div className="flex justify-end mb-2 sm:mb-3">
             <div className="flex items-center gap-0.5">
               {timeframes.map((tf) => (
                 <button
                   key={tf}
                   onClick={() => setTimeframe(tf)}
-                  className={`px-2 py-1 rounded text-[9px] font-medium transition-all ${
+                  className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[8px] sm:text-[9px] font-medium transition-all ${
                     timeframe === tf
                       ? "bg-emerald-500/90 text-white"
                       : "bg-white/5 text-gray-500 hover:text-white hover:bg-white/10"
@@ -118,13 +118,13 @@ export default function Analytics() {
           {/* Overview Summary */}
           <OverviewSummary />
 
-          {/* Streams Over Time + Top Tracks */}
-          <div className="grid lg:grid-cols-3 gap-4 mb-4">
-            <div className="lg:col-span-2 bg-[#111113] rounded-xl border border-white/5 p-3">
+          {/* Streams Over Time + Top Tracks - Mobile Optimized */}
+          <div className="grid lg:grid-cols-3 gap-2 sm:gap-4 mb-3 sm:mb-4">
+            <div className="lg:col-span-2 bg-[#111113] rounded-lg sm:rounded-xl border border-white/5 p-2 sm:p-3">
               <div className="mb-1">
-                <h3 className="text-sm font-bold">Evolución de Reproducciones</h3>
+                <h3 className="text-xs sm:text-sm font-bold">Evolución de Reproducciones</h3>
               </div>
-              <div className="h-40">
+              <div className="h-32 sm:h-40">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={streamData}>
                     <defs>
@@ -165,31 +165,31 @@ export default function Analytics() {
               </div>
 
               {/* Platform Stats Integrated */}
-              <div className="mt-4 pt-4 border-t border-white/5">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-white/5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
                   {/* Streams */}
-                  <div className="bg-white/5 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-xs font-bold text-white">Streams</h4>
-                      <span className="text-xs font-bold text-emerald-400">
+                  <div className="bg-white/5 rounded-lg p-2 sm:p-3">
+                    <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                      <h4 className="text-[10px] sm:text-xs font-bold text-white">Streams</h4>
+                      <span className="text-[10px] sm:text-xs font-bold text-emerald-400">
                         {(platformsStreamsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
                       </span>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       {platformsStreamsData.slice(0, 3).map((platform, i) => {
                         const total = platformsStreamsData.reduce((sum, p) => sum + p.value, 0);
                         const percentage = ((platform.value / total) * 100).toFixed(0);
-                        
+
                         return (
                           <div key={i}>
-                            <div className="flex items-center justify-between mb-1">
-                              <div className="flex items-center gap-1.5">
-                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: platform.color }} />
-                                <span className="text-[10px] text-gray-300">{platform.name}</span>
+                            <div className="flex items-center justify-between mb-0.5">
+                              <div className="flex items-center gap-1">
+                                <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
+                                <span className="text-[9px] text-gray-300">{platform.name}</span>
                               </div>
-                              <span className="text-[10px] font-semibold text-white">{(platform.value / 1000).toFixed(0)}K</span>
+                              <span className="text-[9px] font-semibold text-white">{(platform.value / 1000).toFixed(0)}K</span>
                             </div>
-                            <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-0.5 bg-white/10 rounded-full overflow-hidden">
                               <div 
                                 className="h-full rounded-full transition-all"
                                 style={{ 
@@ -205,28 +205,28 @@ export default function Analytics() {
                   </div>
 
                   {/* Views */}
-                  <div className="bg-white/5 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-xs font-bold text-white">Views</h4>
-                      <span className="text-xs font-bold text-purple-400">
+                  <div className="bg-white/5 rounded-lg p-2 sm:p-3">
+                    <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                      <h4 className="text-[10px] sm:text-xs font-bold text-white">Views</h4>
+                      <span className="text-[10px] sm:text-xs font-bold text-purple-400">
                         {(platformsViewsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
                       </span>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       {platformsViewsData.map((platform, i) => {
                         const total = platformsViewsData.reduce((sum, p) => sum + p.value, 0);
                         const percentage = ((platform.value / total) * 100).toFixed(0);
-                        
+
                         return (
                           <div key={i}>
-                            <div className="flex items-center justify-between mb-1">
-                              <div className="flex items-center gap-1.5">
-                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: platform.color }} />
-                                <span className="text-[10px] text-gray-300">{platform.name}</span>
+                            <div className="flex items-center justify-between mb-0.5">
+                              <div className="flex items-center gap-1">
+                                <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
+                                <span className="text-[9px] text-gray-300">{platform.name}</span>
                               </div>
-                              <span className="text-[10px] font-semibold text-white">{(platform.value / 1000).toFixed(0)}K</span>
+                              <span className="text-[9px] font-semibold text-white">{(platform.value / 1000).toFixed(0)}K</span>
                             </div>
-                            <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-0.5 bg-white/10 rounded-full overflow-hidden">
                               <div 
                                 className="h-full rounded-full transition-all"
                                 style={{ 
@@ -242,31 +242,31 @@ export default function Analytics() {
                   </div>
 
                   {/* Likes */}
-                  <div className="bg-white/5 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-xs font-bold text-white flex items-center gap-1">
-                        <Heart className="w-3 h-3 text-red-400" />
+                  <div className="bg-white/5 rounded-lg p-2 sm:p-3">
+                    <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                      <h4 className="text-[10px] sm:text-xs font-bold text-white flex items-center gap-1">
+                        <Heart className="w-2.5 sm:w-3 h-2.5 sm:h-3 text-red-400" />
                         Likes
                       </h4>
-                      <span className="text-xs font-bold text-red-400">
+                      <span className="text-[10px] sm:text-xs font-bold text-red-400">
                         {(platformsLikesData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(1)}K
                       </span>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       {platformsLikesData.map((platform, i) => {
                         const total = platformsLikesData.reduce((sum, p) => sum + p.value, 0);
                         const percentage = ((platform.value / total) * 100).toFixed(0);
-                        
+
                         return (
                           <div key={i}>
-                            <div className="flex items-center justify-between mb-1">
-                              <div className="flex items-center gap-1.5">
-                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: platform.color }} />
-                                <span className="text-[10px] text-gray-300">{platform.name}</span>
+                            <div className="flex items-center justify-between mb-0.5">
+                              <div className="flex items-center gap-1">
+                                <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
+                                <span className="text-[9px] text-gray-300">{platform.name}</span>
                               </div>
-                              <span className="text-[10px] font-semibold text-white">{(platform.value / 1000).toFixed(1)}K</span>
+                              <span className="text-[9px] font-semibold text-white">{(platform.value / 1000).toFixed(1)}K</span>
                             </div>
-                            <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                            <div className="h-0.5 bg-white/10 rounded-full overflow-hidden">
                               <div 
                                 className="h-full rounded-full transition-all"
                                 style={{ 
@@ -284,23 +284,23 @@ export default function Analytics() {
               </div>
             </div>
 
-            <div className="bg-[#111113] rounded-xl border border-white/5 p-3">
-              <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
-                <Music2 className="w-4 h-4 text-purple-400" />
+            <div className="bg-[#111113] rounded-lg sm:rounded-xl border border-white/5 p-2 sm:p-3">
+              <h3 className="text-xs sm:text-sm font-bold mb-2 sm:mb-3 flex items-center gap-2">
+                <Music2 className="w-3 sm:w-4 h-3 sm:h-4 text-purple-400" />
                 Top Tracks
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-1 sm:space-y-2">
                 {topTracks.map((track, i) => (
-                  <div key={i} className="flex items-center gap-3 p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                    <div className="w-7 h-7 rounded-lg bg-purple-500/20 flex items-center justify-center text-xs font-bold text-purple-400">
+                  <div key={i} className="flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                    <div className="w-5 sm:w-7 h-5 sm:h-7 rounded-lg bg-purple-500/20 flex items-center justify-center text-[9px] sm:text-xs font-bold text-purple-400 flex-shrink-0">
                       {i + 1}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-xs truncate text-white">{track.title}</div>
-                      <div className="text-[10px] text-gray-500">{(track.streams / 1000).toFixed(0)}K streams</div>
+                      <div className="font-semibold text-[9px] sm:text-xs truncate text-white">{track.title}</div>
+                      <div className="text-[8px] sm:text-[10px] text-gray-500">{(track.streams / 1000).toFixed(0)}K streams</div>
                     </div>
-                    <div className={`flex items-center gap-0.5 text-[10px] font-medium ${track.trendUp ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {track.trendUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                    <div className={`flex items-center gap-0.5 text-[8px] sm:text-[10px] font-medium flex-shrink-0 ${track.trendUp ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {track.trendUp ? <TrendingUp className="w-2.5 sm:w-3 h-2.5 sm:h-3" /> : <TrendingDown className="w-2.5 sm:w-3 h-2.5 sm:h-3" />}
                       {track.trend}
                     </div>
                   </div>
@@ -315,62 +315,64 @@ export default function Analytics() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-4"
+            className="mb-3 sm:mb-4"
           >
-            <h3 className="text-lg font-bold mb-3">Top Clips</h3>
-            <div className="grid grid-cols-8 gap-2">
-              {topClips.slice(0, 8).map((clip, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.03 }}
-                  className="group relative aspect-[9/16] rounded-md overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer"
-                >
-                  <img 
-                    src={clip.thumbnail} 
-                    alt={clip.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-                  
-                  <div className="absolute bottom-0 left-0 right-0 p-1.5">
-                    <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-black/60 flex items-center justify-center text-[9px] font-bold text-emerald-400 border border-emerald-500/30">
-                      {i + 1}
-                    </div>
+            <h3 className="text-base sm:text-lg font-bold mb-2 sm:mb-3">Top Clips</h3>
+            <div className="overflow-x-auto pb-2 sm:pb-3 -mx-3 sm:-mx-0 px-3 sm:px-0">
+              <div className="flex gap-2 sm:gap-3 w-max sm:w-full sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {topClips.slice(0, 4).map((clip, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.03 }}
+                    className="group relative aspect-[9/16] w-32 sm:w-full rounded-lg sm:rounded-xl overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer flex-shrink-0"
+                  >
+                    <img 
+                      src={clip.thumbnail} 
+                      alt={clip.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                     
-                    <h4 className="font-bold text-[9px] mb-0.5 line-clamp-1 leading-tight">{clip.title}</h4>
-                    <div className="flex items-center gap-1 text-[8px] text-gray-400">
-                      <span className="px-1 py-0.5 rounded bg-white/10 text-[7px] font-medium">{clip.platform}</span>
-                      <span>{(clip.views / 1000).toFixed(0)}K</span>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                    
+                    <div className="absolute bottom-0 left-0 right-0 p-1.5 sm:p-2">
+                      <div className="absolute top-1.5 right-1.5 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-black/60 flex items-center justify-center text-[9px] sm:text-[10px] font-bold text-emerald-400 border border-emerald-500/30">
+                        {i + 1}
+                      </div>
+                      
+                      <h4 className="font-bold text-[10px] sm:text-sm mb-1 line-clamp-2 leading-tight">{clip.title}</h4>
+                      <div className="flex items-center gap-1.5 text-[8px] sm:text-xs text-gray-400">
+                        <span className="px-1.5 py-0.5 rounded bg-white/10 text-[7px] sm:text-[8px] font-medium">{clip.platform}</span>
+                        <span className="font-semibold">{(clip.views / 1000).toFixed(0)}K</span>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                      <div className="w-0 h-0 border-l-[8px] border-l-white border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent ml-0.5" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                        <div className="w-0 h-0 border-l-[10px] border-l-white border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent ml-1" />
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </motion.div>
 
           {/* Demographics & Top Countries */}
-          <div className="grid lg:grid-cols-2 gap-3 mb-4">
+          <div className="grid lg:grid-cols-2 gap-2 sm:gap-3 mb-3 sm:mb-4">
             {/* Demographics */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-[#111113] rounded-xl border border-white/5 p-3"
+              className="bg-[#111113] rounded-lg sm:rounded-xl border border-white/5 p-2 sm:p-3"
             >
-              <h3 className="text-[11px] font-bold mb-2">Demografía</h3>
+              <h3 className="text-[10px] sm:text-[11px] font-bold mb-1.5 sm:mb-2">Demografía</h3>
               
               {/* Age Demographics */}
-              <div className="mb-2">
-                <h4 className="text-[9px] font-semibold text-gray-400 mb-1">Por Edad</h4>
-                <div className="h-20">
+              <div className="mb-1.5 sm:mb-2">
+                <h4 className="text-[8px] sm:text-[9px] font-semibold text-gray-400 mb-1">Por Edad</h4>
+                <div className="h-16 sm:h-20">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={demographicsData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
@@ -401,18 +403,18 @@ export default function Analytics() {
 
               {/* Gender Demographics */}
               <div>
-                <h4 className="text-[9px] font-semibold text-gray-400 mb-1">Por Sexo</h4>
+                <h4 className="text-[8px] sm:text-[9px] font-semibold text-gray-400 mb-1">Por Sexo</h4>
                 <div className="space-y-0.5">
                   {genderData.map((item, i) => (
-                    <div key={i} className="flex items-center gap-1.5">
-                      <span className="text-[8px] text-gray-300 w-12">{item.gender}</span>
-                      <div className="flex-1 h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div key={i} className="flex items-center gap-1">
+                      <span className="text-[7px] sm:text-[8px] text-gray-300 w-10 sm:w-12">{item.gender}</span>
+                      <div className="flex-1 h-0.5 sm:h-1 bg-white/5 rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all"
                           style={{ width: `${item.percentage}%` }}
                         />
                       </div>
-                      <span className="text-[8px] font-semibold text-gray-300 w-6 text-right">{item.percentage}%</span>
+                      <span className="text-[7px] sm:text-[8px] font-semibold text-gray-300 w-5 sm:w-6 text-right">{item.percentage}%</span>
                     </div>
                   ))}
                 </div>
@@ -424,21 +426,21 @@ export default function Analytics() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-[#111113] rounded-xl border border-white/5 p-2.5"
+              className="bg-[#111113] rounded-lg sm:rounded-xl border border-white/5 p-2 sm:p-2.5"
             >
-              <h3 className="text-[11px] font-bold mb-1.5">Top Países</h3>
+              <h3 className="text-[10px] sm:text-[11px] font-bold mb-1 sm:mb-1.5">Top Países</h3>
               <div className="grid grid-cols-2 gap-1">
                 {topCountriesData.map((country, i) => (
-                  <div key={i} className="flex items-center gap-1 p-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                    <div className="w-4 h-4 rounded bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center text-[8px] font-bold text-emerald-400">
+                  <div key={i} className="flex items-center gap-0.5 sm:gap-1 p-0.5 sm:p-1 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                    <div className="w-4 h-4 rounded bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center text-[7px] sm:text-[8px] font-bold text-emerald-400">
                       {i + 1}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-[8px] flex items-center gap-0.5 truncate">
+                      <div className="font-medium text-[7px] sm:text-[8px] flex items-center gap-0.5 truncate">
                         <span>{country.flag}</span>
                         <span>{country.name}</span>
                       </div>
-                      <div className="text-[7px] font-bold text-emerald-400">{(country.score / 1000).toFixed(0)}K</div>
+                      <div className="text-[6px] sm:text-[7px] font-bold text-emerald-400">{(country.score / 1000).toFixed(0)}K</div>
                     </div>
                   </div>
                 ))}
