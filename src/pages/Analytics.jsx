@@ -95,14 +95,14 @@ export default function Analytics() {
       <DashboardNav artistId={artistId} />
 
       <main className="pt-14">
-        <div className="px-4 sm:px-8 lg:px-12 xl:px-16 py-3 max-w-[1600px] mx-auto">
+        <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
           {/* Timeframe Selector */}
-          <div className="flex items-center gap-1.5 mb-2">
+          <div className="flex items-center gap-2 mb-3">
             {timeframes.map((tf) => (
               <button
                 key={tf}
                 onClick={() => setTimeframe(tf)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                   timeframe === tf
                     ? "bg-emerald-500 text-white"
                     : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10"
@@ -117,44 +117,45 @@ export default function Analytics() {
           <OverviewSummary />
 
           {/* Streams Over Time + Top Tracks */}
-          <div className="grid lg:grid-cols-3 gap-3 mb-3">
-            <div className="lg:col-span-2 bg-[#111113] rounded-lg border border-white/5 p-2 pb-0 overflow-hidden">
-              <h3 className="text-xs font-bold mb-1.5">Evolución de Reproducciones</h3>
-              <div className="h-32 -mb-6">
+          <div className="grid lg:grid-cols-3 gap-4 mb-4">
+            <div className="lg:col-span-2 bg-[#111113] rounded-xl border border-white/5 p-3">
+              <div className="mb-1">
+                <h3 className="text-sm font-bold">Evolución de Reproducciones</h3>
+              </div>
+              <div className="h-40">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={streamData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                  <AreaChart data={streamData}>
                     <defs>
                       <linearGradient id="streamGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
                         <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff05" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
                     <XAxis 
                       dataKey="month" 
                       axisLine={false} 
                       tickLine={false} 
-                      tick={{ fill: '#6b7280', fontSize: 8 }}
+                      tick={{ fill: '#6b7280', fontSize: 9 }}
                     />
                     <YAxis 
                       axisLine={false} 
                       tickLine={false} 
-                      tick={{ fill: '#6b7280', fontSize: 8 }}
+                      tick={{ fill: '#6b7280', fontSize: 9 }}
                     />
                     <Tooltip 
                       contentStyle={{ 
                         backgroundColor: '#1a1a1d', 
                         border: '1px solid rgba(255,255,255,0.1)',
-                        borderRadius: '6px',
-                        fontSize: '9px',
-                        padding: '4px 8px'
+                        borderRadius: '8px',
+                        fontSize: '10px'
                       }}
                     />
                     <Area
                       type="monotone"
                       dataKey="streams"
                       stroke="#10b981"
-                      strokeWidth={1.5}
+                      strokeWidth={2}
                       fill="url(#streamGradient)"
                     />
                   </AreaChart>
@@ -162,23 +163,23 @@ export default function Analytics() {
               </div>
             </div>
 
-            <div className="bg-[#111113] rounded-lg border border-white/5 p-2">
-              <h3 className="text-xs font-bold mb-1.5 flex items-center gap-1.5">
-                <Music2 className="w-3 h-3 text-purple-400" />
+            <div className="bg-[#111113] rounded-xl border border-white/5 p-3">
+              <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
+                <Music2 className="w-4 h-4 text-purple-400" />
                 Top Tracks
               </h3>
-              <div className="space-y-1">
+              <div className="space-y-2">
                 {topTracks.map((track, i) => (
-                  <div key={i} className="flex items-center gap-2 p-1.5 rounded bg-white/5 hover:bg-white/10 transition-colors">
-                    <div className="w-5 h-5 rounded bg-purple-500/20 flex items-center justify-center text-[9px] font-bold text-purple-400">
+                  <div key={i} className="flex items-center gap-3 p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                    <div className="w-7 h-7 rounded-lg bg-purple-500/20 flex items-center justify-center text-xs font-bold text-purple-400">
                       {i + 1}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-[9px] truncate text-white">{track.title}</div>
-                      <div className="text-[8px] text-gray-500">{(track.streams / 1000).toFixed(0)}K</div>
+                      <div className="font-semibold text-xs truncate text-white">{track.title}</div>
+                      <div className="text-[10px] text-gray-500">{(track.streams / 1000).toFixed(0)}K streams</div>
                     </div>
-                    <div className={`flex items-center gap-0.5 text-[8px] font-medium ${track.trendUp ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {track.trendUp ? <TrendingUp className="w-2.5 h-2.5" /> : <TrendingDown className="w-2.5 h-2.5" />}
+                    <div className={`flex items-center gap-0.5 text-[10px] font-medium ${track.trendUp ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {track.trendUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                       {track.trend}
                     </div>
                   </div>
@@ -187,79 +188,112 @@ export default function Analytics() {
             </div>
           </div>
 
-          {/* Platforms Stats - Unified Vertical */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-[#111113] rounded-lg border border-white/5 p-2 mb-3"
-          >
-            <h3 className="text-xs font-bold mb-2">Plataformas</h3>
-            
-            <div className="space-y-2">
-              {/* Streams */}
-              <div>
-                <h4 className="text-[9px] font-semibold text-gray-400 mb-1">Streams</h4>
-                <div className="space-y-0.5">
-                  {platformsStreamsData.map((platform, i) => {
-                    const total = platformsStreamsData.reduce((sum, p) => sum + p.value, 0);
-                    const percentage = ((platform.value / total) * 100).toFixed(1);
-                    return (
-                      <div key={i} className="flex items-center gap-1.5">
-                        <span className="text-[8px] font-medium w-20 truncate">{platform.name}</span>
-                        <div className="flex-1 h-0.5 bg-white/5 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${percentage}%`, backgroundColor: platform.color }} />
-                        </div>
-                        <span className="text-[8px] text-gray-500 w-8 text-right">{(platform.value / 1000).toFixed(0)}K</span>
+          {/* Streams, Views & Likes by Platform */}
+          <div className="grid lg:grid-cols-3 gap-3 mb-4">
+            {/* Streams by Platform */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-[#111113] rounded-xl border border-white/5 p-2.5"
+            >
+              <h3 className="text-[11px] font-bold mb-2">Streams</h3>
+              <div className="space-y-1.5">
+                {platformsStreamsData.map((platform, i) => {
+                  const total = platformsStreamsData.reduce((sum, p) => sum + p.value, 0);
+                  const percentage = ((platform.value / total) * 100).toFixed(1);
+                  
+                  return (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-[9px] font-medium">{platform.name}</span>
+                        <span className="text-[9px] text-gray-500">{(platform.value / 1000).toFixed(0)}K</span>
                       </div>
-                    );
-                  })}
-                </div>
+                      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full rounded-full transition-all"
+                          style={{ 
+                            width: `${percentage}%`,
+                            backgroundColor: platform.color
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+            </motion.div>
 
-              {/* Views */}
-              <div>
-                <h4 className="text-[9px] font-semibold text-gray-400 mb-1">Visualizaciones</h4>
-                <div className="space-y-0.5">
-                  {platformsViewsData.map((platform, i) => {
-                    const total = platformsViewsData.reduce((sum, p) => sum + p.value, 0);
-                    const percentage = ((platform.value / total) * 100).toFixed(1);
-                    return (
-                      <div key={i} className="flex items-center gap-1.5">
-                        <span className="text-[8px] font-medium w-20 truncate">{platform.name}</span>
-                        <div className="flex-1 h-0.5 bg-white/5 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${percentage}%`, backgroundColor: platform.color }} />
-                        </div>
-                        <span className="text-[8px] text-gray-500 w-8 text-right">{(platform.value / 1000).toFixed(0)}K</span>
+            {/* Views by Platform */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+              className="bg-[#111113] rounded-xl border border-white/5 p-2.5"
+            >
+              <h3 className="text-[11px] font-bold mb-2">Visualizaciones</h3>
+              <div className="space-y-1.5">
+                {platformsViewsData.map((platform, i) => {
+                  const total = platformsViewsData.reduce((sum, p) => sum + p.value, 0);
+                  const percentage = ((platform.value / total) * 100).toFixed(1);
+                  
+                  return (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-[9px] font-medium">{platform.name}</span>
+                        <span className="text-[9px] text-gray-500">{(platform.value / 1000).toFixed(0)}K</span>
                       </div>
-                    );
-                  })}
-                </div>
+                      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full rounded-full transition-all"
+                          style={{ 
+                            width: `${percentage}%`,
+                            backgroundColor: platform.color
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+            </motion.div>
 
-              {/* Likes */}
-              <div>
-                <h4 className="text-[9px] font-semibold text-gray-400 mb-1 flex items-center gap-1">
-                  <Heart className="w-2.5 h-2.5 text-red-400" />
-                  Me Gusta
-                </h4>
-                <div className="space-y-0.5">
-                  {platformsLikesData.map((platform, i) => {
-                    const total = platformsLikesData.reduce((sum, p) => sum + p.value, 0);
-                    const percentage = ((platform.value / total) * 100).toFixed(1);
-                    return (
-                      <div key={i} className="flex items-center gap-1.5">
-                        <span className="text-[8px] font-medium w-20 truncate">{platform.name}</span>
-                        <div className="flex-1 h-0.5 bg-white/5 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: `${percentage}%`, backgroundColor: platform.color }} />
-                        </div>
-                        <span className="text-[8px] text-gray-500 w-8 text-right">{(platform.value / 1000).toFixed(1)}K</span>
+            {/* Likes by Platform */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-[#111113] rounded-xl border border-white/5 p-2.5"
+            >
+              <h3 className="text-[11px] font-bold mb-2 flex items-center gap-1">
+                <Heart className="w-3 h-3 text-red-400" />
+                Me Gusta
+              </h3>
+              <div className="space-y-1.5">
+                {platformsLikesData.map((platform, i) => {
+                  const total = platformsLikesData.reduce((sum, p) => sum + p.value, 0);
+                  const percentage = ((platform.value / total) * 100).toFixed(1);
+                  
+                  return (
+                    <div key={i}>
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-[9px] font-medium">{platform.name}</span>
+                        <span className="text-[9px] text-gray-500">{(platform.value / 1000).toFixed(1)}K</span>
                       </div>
-                    );
-                  })}
-                </div>
+                      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full rounded-full transition-all"
+                          style={{ 
+                            width: `${percentage}%`,
+                            backgroundColor: platform.color
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
 
           {/* Top Clips - Netflix Style */}
           <motion.div
@@ -308,7 +342,7 @@ export default function Analytics() {
           </motion.div>
 
           {/* Demographics & Top Countries */}
-          <div className="grid lg:grid-cols-2 gap-3 mb-3">
+          <div className="grid lg:grid-cols-2 gap-3 mb-4">
             {/* Demographics */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
