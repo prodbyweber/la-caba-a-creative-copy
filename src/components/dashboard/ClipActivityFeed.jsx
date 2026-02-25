@@ -130,7 +130,8 @@ export default function ClipActivityFeed() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 + i * 0.1 }}
-            className="p-4 hover:bg-white/[0.02] transition-colors group"
+            className="p-4 hover:bg-white/[0.02] transition-colors group cursor-pointer"
+            onClick={() => setSelectedClip(clip)}
           >
             <div className="flex items-center gap-4">
               {/* Thumbnail */}
