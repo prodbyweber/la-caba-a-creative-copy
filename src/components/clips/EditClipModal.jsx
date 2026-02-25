@@ -139,31 +139,37 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
     }
   };
 
-  const captureFrameFromVideo = () => {
-    if (!videoRef.current) return;
+  const captureRandomFrame = () => {
+   if (!videoRef.current) return;
 
-    const video = videoRef.current;
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    canvas.toBlob(async (blob) => {
-      if (!blob) return;
-      
-      setUploadingThumbnail(true);
-      try {
-        const file = new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' });
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        setFormData({ ...formData, thumbnail_url: file_url });
-      } catch (error) {
-        alert("Error al capturar el frame");
-      } finally {
-        setUploadingThumbnail(false);
-      }
-    }, 'image/jpeg', 0.9);
+   const video = videoRef.current;
+   // Set random time
+   const randomTime = Math.random() * video.duration;
+   video.currentTime = randomTime;
+
+   video.onloadeddata = () => {
+     const canvas = document.createElement('canvas');
+     canvas.width = video.videoWidth;
+     canvas.height = video.videoHeight;
+
+     const ctx = canvas.getContext('2d');
+     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+     canvas.toBlob(async (blob) => {
+       if (!blob) return;
+
+       setUploadingThumbnail(true);
+       try {
+         const file = new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' });
+         const { file_url } = await base44.integrations.Core.UploadFile({ file });
+         setFormData({ ...formData, thumbnail_url: file_url });
+       } catch (error) {
+         alert("Error al capturar el frame");
+       } finally {
+         setUploadingThumbnail(false);
+       }
+     }, 'image/jpeg', 0.9);
+   };
   };
 
   return (
