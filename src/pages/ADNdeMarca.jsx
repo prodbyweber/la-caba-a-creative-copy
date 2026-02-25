@@ -1114,7 +1114,7 @@ function ResultView({ selections, onReset, saveDNA, artistId, hasExistingDNA }) 
           </div>
         </div>
 
-        <div className="max-w-5xl mx-auto px-6 py-12 space-y-12">
+        <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
           <motion.div
             id="moodboard-content"
             initial={{ opacity: 0, y: 20 }}
@@ -1123,80 +1123,116 @@ function ResultView({ selections, onReset, saveDNA, artistId, hasExistingDNA }) 
           >
             {/* Hero Banner */}
             <div 
-              className="relative rounded-3xl overflow-hidden h-64 flex items-center justify-center p-8"
+              className="relative rounded-2xl overflow-hidden h-48 flex items-center justify-center p-6"
               style={{
                 background: `linear-gradient(135deg, ${selections.colors[0]} 0%, ${selections.colors[1]} 35%, ${selections.colors[2]} 65%, ${selections.colors[3]} 100%)`
               }}
             >
               <div className="relative z-10 text-center">
-                <h1 className="text-5xl font-bold text-white drop-shadow-2xl mb-3">{selections.artistName}</h1>
-                <p className="text-white/90 text-xl">{selections.firstName} {selections.lastName}</p>
+                <h1 className="text-3xl font-bold text-white drop-shadow-2xl mb-2">{selections.artistName}</h1>
+                <p className="text-white/90 text-base">{selections.firstName} {selections.lastName}</p>
               </div>
             </div>
             {/* Aura */}
             <div>
-              <h3 className="text-sm text-emerald-400 mb-2 font-medium">Aura</h3>
-              <p className="text-4xl font-light mb-2">{aura}</p>
-              <p className="text-gray-400">La esencia que transmites</p>
+              <h3 className="text-xs text-emerald-400 mb-1 font-medium uppercase tracking-wide">Aura</h3>
+              <p className="text-2xl font-light mb-1">{aura}</p>
+              <p className="text-gray-400 text-sm">La esencia que transmites</p>
             </div>
 
             {/* Identidad */}
             <div>
-              <h3 className="text-sm text-emerald-400 mb-3 font-medium">Identidad</h3>
-              <p className="text-gray-300 leading-relaxed">{identidad}</p>
+              <h3 className="text-xs text-emerald-400 mb-2 font-medium uppercase tracking-wide">Identidad</h3>
+              <p className="text-gray-300 leading-relaxed text-sm">{identidad}</p>
             </div>
 
             {/* Sonido */}
             <div>
-              <h3 className="text-sm text-emerald-400 mb-3 font-medium">Sonido</h3>
-              <div className="space-y-2">
-                <p className="text-gray-300">
+              <h3 className="text-xs text-emerald-400 mb-2 font-medium uppercase tracking-wide">Sonido</h3>
+              <div className="space-y-1.5">
+                <p className="text-gray-300 text-sm">
                   <span className="text-white font-medium">Géneros:</span> {selections.genres.join(', ')}
                 </p>
-                <p className="text-gray-300">
+                <p className="text-gray-300 text-sm">
                   <span className="text-white font-medium">Textura:</span> {selections.textures.join(', ')}
                 </p>
-                <p className="text-gray-300">
+                <p className="text-gray-300 text-sm">
                   <span className="text-white font-medium">Energía:</span> {selections.vibe}
                 </p>
               </div>
             </div>
 
+            {/* Referencias Musicales */}
+            {selections.musicReferences && selections.musicReferences.length > 0 && (
+              <div>
+                <h3 className="text-xs text-emerald-400 mb-3 font-medium uppercase tracking-wide">Referencias Musicales</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {selections.musicReferences.map((ref, idx) => {
+                    const videoId = getYouTubeEmbedId(ref.url);
+                    return (
+                      <div key={idx} className="bg-white/5 rounded-lg overflow-hidden border border-white/10">
+                        {videoId && (
+                          <div className="aspect-video w-full">
+                            <iframe
+                              width="100%"
+                              height="100%"
+                              src={`https://www.youtube.com/embed/${videoId}`}
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              className="w-full h-full"
+                            />
+                          </div>
+                        )}
+                        {ref.note && (
+                          <div className="p-2">
+                            <p className="text-xs text-gray-400 italic">"{ref.note}"</p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Visual */}
             <div>
-              <h3 className="text-sm text-emerald-400 mb-3 font-medium">Visual</h3>
-              <div className="flex gap-3">
+              <h3 className="text-xs text-emerald-400 mb-2 font-medium uppercase tracking-wide">Paleta de Color</h3>
+              <div className="flex gap-2">
                 {selections.colors.map((color, idx) => (
-                  <div
-                    key={idx}
-                    style={{ backgroundColor: color }}
-                    className="w-16 h-16 rounded-lg ring-1 ring-white/20"
-                  />
+                  <div key={idx} className="space-y-1">
+                    <div
+                      style={{ backgroundColor: color }}
+                      className="w-12 h-12 rounded-lg ring-1 ring-white/20"
+                    />
+                    <p className="text-[10px] text-gray-500 text-center">{color}</p>
+                  </div>
                 ))}
               </div>
               {selections.palette && (
-                <p className="text-sm text-gray-500 mt-3">Paleta: {selections.palette}</p>
+                <p className="text-xs text-gray-500 mt-2">Paleta: {selections.palette}</p>
               )}
             </div>
 
             {/* Narrativa */}
             <div>
-              <h3 className="text-sm text-emerald-400 mb-3 font-medium">Narrativa</h3>
-              <p className="text-gray-300 mb-3">{selections.narratives.join(', ')}</p>
+              <h3 className="text-xs text-emerald-400 mb-2 font-medium uppercase tracking-wide">Narrativa</h3>
+              <p className="text-gray-300 text-sm mb-2">{selections.narratives.join(', ')}</p>
               {selections.narrativeText && (
-                <p className="text-gray-400 italic">"{selections.narrativeText}"</p>
+                <p className="text-gray-400 text-sm italic">"{selections.narrativeText}"</p>
               )}
             </div>
 
             {/* Moodboard Visual */}
             {selections.visualLinks.length > 0 && (
               <div>
-                <h3 className="text-sm text-emerald-400 mb-4 font-medium">Moodboard Visual</h3>
-                <div className="grid grid-cols-4 gap-2">
-                  {selections.visualLinks.slice(0, 16).map((url, idx) => (
+                <h3 className="text-xs text-emerald-400 mb-3 font-medium uppercase tracking-wide">Moodboard Visual</h3>
+                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                  {selections.visualLinks.slice(0, 18).map((url, idx) => (
                     <div
                       key={idx}
-                      className="aspect-square bg-white/5 rounded-lg overflow-hidden"
+                      className="aspect-square bg-white/5 rounded-md overflow-hidden"
                     >
                       <img 
                         src={url} 
@@ -1215,27 +1251,27 @@ function ResultView({ selections, onReset, saveDNA, artistId, hasExistingDNA }) 
           </motion.div>
 
           {/* CTAs */}
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <button 
               onClick={handleDownloadPDF}
-              className="w-full px-8 py-4 bg-white/10 hover:bg-white/15 rounded-lg font-medium transition-all border border-white/20 text-lg"
+              className="px-4 py-3 bg-white/10 hover:bg-white/15 rounded-lg font-medium transition-all border border-white/20 text-sm"
             >
               Descargar PDF
             </button>
             {hasExistingDNA && (
               <button 
                 onClick={onReset}
-                className="w-full px-8 py-4 bg-white/5 hover:bg-white/10 rounded-lg font-medium transition-all border border-white/10 text-lg"
+                className="px-4 py-3 bg-white/5 hover:bg-white/10 rounded-lg font-medium transition-all border border-white/10 text-sm"
               >
-                Editar ADN de Marca
+                Editar ADN
               </button>
             )}
             {!hasExistingDNA && (
               <button 
                 onClick={saveDNA}
-                className="w-full px-8 py-4 bg-emerald-500 hover:bg-emerald-600 rounded-lg font-medium transition-all shadow-xl shadow-emerald-500/20 text-lg"
+                className="px-4 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-lg font-medium transition-all shadow-xl shadow-emerald-500/20 text-sm"
               >
-                Actualizar ADN de Marca
+                Actualizar ADN
               </button>
             )}
           </div>
