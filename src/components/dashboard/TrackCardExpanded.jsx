@@ -101,19 +101,19 @@ export default function TrackCardExpanded({ track, onEdit }) {
             <Music2 className="w-5 h-5 lg:w-6 lg:h-6 text-white/40 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
           )}
           
-          {/* Play Button Overlay - Cinematográfico */}
+          {/* Overlay negro cinematográfico */}
           {track.audio_file_url && (
             <>
-              <div className={`absolute inset-0 bg-black/60 backdrop-blur-[1px] transition-opacity ${playingMain ? 'opacity-100' : 'opacity-0 group-hover/cover:opacity-100'}`} />
+              <div className={`absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${playingMain ? 'opacity-100' : 'opacity-0 group-hover/cover:opacity-100'}`} />
               <button
                 type="button"
                 onClick={toggleMainPlay}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-white hover:bg-white/90 active:scale-95 hover:scale-110 flex items-center justify-center transition-all shadow-[0_8px_32px_rgba(0,0,0,0.9)] z-10"
+                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-white hover:bg-gray-100 active:scale-95 hover:scale-105 flex items-center justify-center transition-all duration-300 shadow-[0_8px_30px_rgba(0,0,0,0.8)] z-10 ${playingMain ? 'opacity-100' : 'opacity-0 group-hover/cover:opacity-100'}`}
               >
                 {playingMain ? (
-                  <Pause className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-black" fill="black" />
+                  <Pause className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-black" fill="black" />
                 ) : (
-                  <Play className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-black ml-0.5" fill="black" />
+                  <Play className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-black ml-0.5" fill="black" />
                 )}
               </button>
             </>
