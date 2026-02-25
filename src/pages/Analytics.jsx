@@ -115,8 +115,34 @@ export default function Analytics() {
             </div>
           </div>
 
-          {/* Overview Summary */}
-          <OverviewSummary />
+          {/* Overview Summary - Mobile Optimized */}
+          <div className="sm:block hidden mb-3">
+            <OverviewSummary />
+          </div>
+          
+          {/* Mobile Summary Cards - 2x2 Grid */}
+          <div className="sm:hidden grid grid-cols-2 gap-2 mb-3">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-[#111113] rounded-lg border border-white/5 p-3">
+              <div className="text-[9px] font-medium text-gray-400 mb-1">Reproducciones</div>
+              <div className="text-base font-bold text-emerald-400">582K</div>
+              <div className="text-[9px] text-emerald-500 mt-0.5">+8% mes</div>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="bg-[#111113] rounded-lg border border-white/5 p-3">
+              <div className="text-[9px] font-medium text-gray-400 mb-1">Seguidores</div>
+              <div className="text-base font-bold text-purple-400">45.2K</div>
+              <div className="text-[9px] text-purple-500 mt-0.5">+12% mes</div>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-[#111113] rounded-lg border border-white/5 p-3">
+              <div className="text-[9px] font-medium text-gray-400 mb-1">Visualizaciones</div>
+              <div className="text-base font-bold text-orange-400">1.2M</div>
+              <div className="text-[9px] text-orange-500 mt-0.5">+5% mes</div>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="bg-[#111113] rounded-lg border border-white/5 p-3">
+              <div className="text-[9px] font-medium text-gray-400 mb-1">Oyentes</div>
+              <div className="text-base font-bold text-pink-400">78K</div>
+              <div className="text-[9px] text-pink-500 mt-0.5">+15% mes</div>
+            </motion.div>
+          </div>
 
           {/* Streams Over Time + Top Tracks - Mobile Optimized */}
           <div className="grid lg:grid-cols-3 gap-2 sm:gap-4 mb-3 sm:mb-4">
