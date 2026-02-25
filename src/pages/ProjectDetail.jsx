@@ -13,6 +13,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import ProjectClipsSection from "@/components/project/ProjectClipsSection";
+import TrackVersions from "@/components/project/TrackVersions";
 
 export default function ProjectDetail() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
