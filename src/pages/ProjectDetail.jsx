@@ -159,16 +159,7 @@ export default function ProjectDetail() {
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <main className="lg:pl-64 pt-16">
-        <div className="p-6 max-w-[1600px] mx-auto">
-          {/* Back Button */}
-          <button 
-            onClick={() => window.history.back()} 
-            className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Volver
-          </button>
-
+        <div className="p-4 sm:p-6 max-w-[1600px] mx-auto">
           {/* Project Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -176,9 +167,19 @@ export default function ProjectDetail() {
             className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5 p-6 mb-6"
           >
             <div className="flex items-start justify-between mb-4">
-              <div>
-                <h1 className="text-4xl font-bold mb-2">{project.name}</h1>
-                <p className="text-gray-400 mb-3">{project.description}</p>
+              <div className="flex-1">
+                <button 
+                  onClick={() => window.history.back()} 
+                  className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 mb-3 transition-colors"
+                  title="Volver"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="hidden sm:inline">Volver</span>
+                </button>
+                <h1 className="text-3xl sm:text-4xl font-bold mb-2">{project.title}</h1>
+                {project.description && (
+                  <p className="text-gray-400 mb-3 text-sm sm:text-base">{project.description}</p>
+                )}
                 <div className="flex items-center gap-3">
                   <span className={`px-3 py-1 rounded-lg text-sm font-medium ${
                     project.status === 'active' 
@@ -191,6 +192,7 @@ export default function ProjectDetail() {
                     {tracks.length} tracks
                   </span>
                 </div>
+              </div>
               </div>
             </div>
 
@@ -279,7 +281,7 @@ export default function ProjectDetail() {
           </motion.div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-6">
+          <div className="flex gap-2 mb-6 sticky top-16 bg-[#0a0a0b]/80 backdrop-blur-md -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 z-30">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
