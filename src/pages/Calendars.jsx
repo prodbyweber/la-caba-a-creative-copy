@@ -84,11 +84,11 @@ export default function Calendars() {
         {/* Header Compacto */}
         <div className="flex items-center justify-end gap-2 mb-3">
           <button
-            onClick={() => activeTab === "sessions" ? setShowSessionModal(true) : setShowDeliverableModal(true)}
+            onClick={() => setShowSessionModal(true)}
             className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium flex items-center gap-2 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            {activeTab === "sessions" ? "Nueva Sesión" : "Nuevo Entregable"}
+            Nueva Sesión
           </button>
         </div>
 
@@ -96,26 +96,10 @@ export default function Calendars() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
           <div className="flex gap-2">
             <button
-              onClick={() => setActiveTab("sessions")}
-              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
-                activeTab === "sessions"
-                  ? 'bg-emerald-500 text-white'
-                  : 'bg-white/5 text-gray-400 hover:bg-white/10'
-              }`}
+              className="px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 bg-emerald-500 text-white"
             >
               <CalendarIcon className="w-4 h-4" />
               Sesiones ({sessions.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("deliverables")}
-              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
-                activeTab === "deliverables"
-                  ? 'bg-emerald-500 text-white'
-                  : 'bg-white/5 text-gray-400 hover:bg-white/10'
-              }`}
-            >
-              <Package className="w-4 h-4" />
-              Entregables ({deliverables.length})
             </button>
           </div>
 
