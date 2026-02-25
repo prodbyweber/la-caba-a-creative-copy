@@ -221,11 +221,43 @@ export default function UploadClipModal({ onClose, artistId }) {
             )}
           </div>
 
-          {/* Collaborators Selection */}
+          {/* Platforms Selection */}
           <div className="mb-6">
-            <label className="text-sm font-medium text-gray-400 mb-2 block">
-              Artistas Colaboradores (Opcional)
+            <label className="text-sm font-medium text-gray-400 mb-3 block">
+              Plataformas de Publicación (Opcional)
             </label>
+            <div className="grid grid-cols-3 gap-3">
+              {Object.entries({
+                youtube: { name: "YouTube Shorts", icon: "▶" },
+                instagram: { name: "Instagram Reels", icon: "📷" },
+                tiktok: { name: "TikTok", icon: "♫" }
+              }).map(([key, platform]) => (
+                <label
+                  key={key}
+                  className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                    selectedProject ? 'bg-white/5 border-white/10 hover:border-white/20' : 'bg-white/5 border-white/10 opacity-50 cursor-not-allowed'
+                  }`}
+                  title={selectedProject ? "" : "Selecciona una canción primero"}
+                >
+                  <input
+                    type="checkbox"
+                    className="hidden"
+                    disabled={!selectedProject}
+                  />
+                  <div className="text-center">
+                    <div className="text-2xl mb-2">{platform.icon}</div>
+                    <div className="text-xs font-medium">{platform.name}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Collaborators Selection */}
+           <div className="mb-6">
+             <label className="text-sm font-medium text-gray-400 mb-2 block">
+               Artistas Colaboradores (Opcional)
+             </label>
             <div className="grid grid-cols-2 gap-2 mb-3">
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Seleccionar</label>
