@@ -193,7 +193,6 @@ export default function ProjectDetail() {
                   </span>
                 </div>
               </div>
-              </div>
             </div>
 
             {/* Moodboard Banner - Horizontal Scrollable */}
