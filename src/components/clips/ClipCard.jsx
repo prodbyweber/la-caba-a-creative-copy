@@ -214,10 +214,7 @@ export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
         {/* Content - Compact */}
          <div className="p-2 h-16 flex flex-col justify-between">
            <div className="min-w-0">
-             <div className="flex items-baseline gap-1 mb-0.5">
-               <h3 className="font-semibold text-xs line-clamp-1 flex-1">{clip.title}</h3>
-               <span className="px-2 py-0.5 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-[9px] font-mono font-bold text-white flex-shrink-0 shadow-lg shadow-purple-500/30">{clip.clip_id || clip.id}</span>
-             </div>
+             <h3 className="font-semibold text-xs line-clamp-1">{clip.title}</h3>
              {artist && (
                <p className="text-[9px] text-gray-500 line-clamp-1">{artist.stageName || artist.name}</p>
              )}
