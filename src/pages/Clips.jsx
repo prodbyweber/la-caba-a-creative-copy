@@ -30,12 +30,12 @@ export default function Clips() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
+            className="mb-3 sm:mb-4"
           >
-            <h1 className="text-3xl font-bold mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">
               Gestión de <span className="text-purple-400">Clips</span>
             </h1>
-            <p className="text-gray-500">
+            <p className="text-xs sm:text-sm text-gray-500">
               Sube, programa y publica clips en YouTube Shorts, Instagram Reels y TikTok
             </p>
           </motion.div>
@@ -45,18 +45,19 @@ export default function Clips() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="flex items-center gap-2 mb-6 border-b border-white/5"
+            className="flex items-center gap-1 sm:gap-2 mb-3 sm:mb-4 border-b border-white/5"
           >
             <button
               onClick={() => setActiveTab("library")}
-              className={`flex items-center gap-2 px-6 py-3 font-medium transition-all relative ${
+              className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-base transition-all relative ${
                 activeTab === "library"
                   ? "text-purple-400"
                   : "text-gray-500 hover:text-white"
               }`}
             >
               <LayoutGrid className="w-4 h-4" />
-              Biblioteca
+              <span className="hidden sm:inline">Biblioteca</span>
+              <span className="sm:hidden">Lib</span>
               {activeTab === "library" && (
                 <motion.div
                   layoutId="activeTab"
@@ -66,14 +67,15 @@ export default function Clips() {
             </button>
             <button
               onClick={() => setActiveTab("calendar")}
-              className={`flex items-center gap-2 px-6 py-3 font-medium transition-all relative ${
+              className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 font-medium text-sm sm:text-base transition-all relative ${
                 activeTab === "calendar"
                   ? "text-purple-400"
                   : "text-gray-500 hover:text-white"
               }`}
             >
               <Calendar className="w-4 h-4" />
-              Calendario
+              <span className="hidden sm:inline">Calendario</span>
+              <span className="sm:hidden">Cal</span>
               {activeTab === "calendar" && (
                 <motion.div
                   layoutId="activeTab"
