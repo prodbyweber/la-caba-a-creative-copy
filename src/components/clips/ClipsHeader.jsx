@@ -109,7 +109,7 @@ export default function ClipsHeader({ filters, setFilters, activeTab, artistId }
 
       {/* Upload Modal */}
       {uploadModalOpen && (
-        <UploadClipModal onClose={() => setUploadModalOpen(false)} />
+        <UploadClipModal onClose={() => setUploadModalOpen(false)} artistId={artistId} />
       )}
     </>
   );
