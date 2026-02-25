@@ -35,23 +35,21 @@ const topTracks = [
 
 const platformsStreamsData = [
   { name: "Spotify", value: 345000, color: "#1DB954" },
-  { name: "Apple Music", value: 187000, color: "#FC3C44" },
-  { name: "YouTube", value: 156000, color: "#FF0000" },
-  { name: "Deezer", value: 78000, color: "#FF6600" },
-  { name: "SoundCloud", value: 45000, color: "#FF5500" },
+  { name: "YouTube Music", value: 156000, color: "#FF0000" },
 ];
 
 const platformsViewsData = [
   { name: "Instagram Reels", value: 234100, color: "#E4405F" },
   { name: "TikTok", value: 187500, color: "#000000" },
   { name: "YouTube Shorts", value: 120700, color: "#FF0000" },
+  { name: "YouTube", value: 98300, color: "#FF6B00" },
 ];
 
 const platformsLikesData = [
   { name: "Instagram", value: 28400, color: "#E4405F" },
   { name: "TikTok", value: 15200, color: "#000000" },
   { name: "YouTube", value: 8900, color: "#FF0000" },
-  { name: "Others", value: 3800, color: "#9CA3AF" },
+  { name: "YouTube Shorts", value: 6500, color: "#FF6B00" },
 ];
 
 const topCountriesData = [
