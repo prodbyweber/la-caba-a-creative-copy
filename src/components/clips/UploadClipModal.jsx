@@ -12,6 +12,7 @@ export default function UploadClipModal({ onClose, artistId }) {
   const [selectedProject, setSelectedProject] = useState("");
   const [selectedTrack, setSelectedTrack] = useState("");
   const [collaborators, setCollaborators] = useState([]);
+  const [newCollaborator, setNewCollaborator] = useState("");
 
   const { data: artists = [] } = useQuery({
     queryKey: ['artists'],
