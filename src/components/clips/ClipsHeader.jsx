@@ -13,7 +13,7 @@ import { createPageUrl } from "@/utils";
 import UploadClipModal from "./UploadClipModal.jsx";
 import ClipsFilters from "./ClipsFilters.jsx";
 
-export default function ClipsHeader({ filters, setFilters, activeTab }) {
+export default function ClipsHeader({ filters, setFilters, activeTab, artistId }) {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
 
