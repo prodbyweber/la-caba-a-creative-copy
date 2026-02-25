@@ -597,6 +597,32 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
 
           {activeTab === "schedule" && (
             <div className="space-y-6">
+              {/* Platforms */}
+              <div>
+                <label className="text-sm font-medium text-gray-400 mb-3 block">
+                  Plataformas de publicación
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  {Object.entries(platformConfig).map(([key, platform]) => {
+                    const Icon = platform.icon;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => togglePlatform(key)}
+                        className={`p-4 rounded-xl border-2 transition-all ${
+                          formData.platforms.includes(key)
+                            ? "bg-purple-500/10 border-purple-500/50 text-purple-400"
+                            : "bg-white/5 border-white/10 hover:border-white/20 text-gray-400"
+                        }`}
+                      >
+                        <Icon className="w-6 h-6 mx-auto mb-2" />
+                        <div className="text-xs font-medium">{platform.name}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Schedule Date/Time */}
               <div>
                 <label className="text-sm font-medium text-gray-400 mb-2 block">
@@ -611,51 +637,6 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
                 <p className="text-xs text-gray-500 mt-2">
                   Deja vacío para publicar manualmente
                 </p>
-              </div>
-
-              {/* Quick Schedule Buttons */}
-              <div>
-                <label className="text-sm font-medium text-gray-400 mb-2 block">
-                  Programación rápida
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => {
-                      const date = new Date();
-                      date.setHours(date.getHours() + 1);
-                      setFormData({ ...formData, scheduled_at: date.toISOString() });
-                    }}
-                    className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/50 text-sm transition-colors"
-                  >
-                    En 1 hora
-                  </button>
-                  <button
-                    onClick={() => {
-                      const date = new Date();
-                      date.setDate(date.getDate() + 1);
-                      setFormData({ ...formData, scheduled_at: date.toISOString() });
-                    }}
-                    className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/50 text-sm transition-colors"
-                  >
-                    Mañana
-                  </button>
-                  <button
-                    onClick={() => {
-                      const date = new Date();
-                      date.setDate(date.getDate() + 7);
-                      setFormData({ ...formData, scheduled_at: date.toISOString() });
-                    }}
-                    className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/50 text-sm transition-colors"
-                  >
-                    En 1 semana
-                  </button>
-                  <button
-                    onClick={() => setFormData({ ...formData, scheduled_at: '' })}
-                    className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-red-500/50 text-sm transition-colors"
-                  >
-                    Limpiar
-                  </button>
-                </div>
               </div>
 
               {/* Info */}
