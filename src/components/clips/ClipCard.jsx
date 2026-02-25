@@ -207,17 +207,19 @@ export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
         </div>
 
         {/* Content - Compact */}
-        <div className="p-2.5 h-20 flex flex-col justify-between">
-          <div className="min-w-0">
-            <h3 className="font-semibold text-xs line-clamp-1">{clip.title}</h3>
-            {artist && (
-              <p className="text-[10px] text-gray-500 line-clamp-1">{artist.stageName || artist.name}</p>
-            )}
-            <p className="text-[9px] text-gray-600 mt-0.5">{clip.id}</p>
-          </div>
+         <div className="p-2 h-16 flex flex-col justify-between">
+           <div className="min-w-0">
+             <div className="flex items-baseline gap-1 mb-0.5">
+               <h3 className="font-semibold text-xs line-clamp-1 flex-1">{clip.title}</h3>
+               <span className="px-1.5 py-0.5 rounded bg-purple-500/20 border border-purple-500/30 text-[9px] font-mono text-purple-300 flex-shrink-0">{clip.id}</span>
+             </div>
+             {artist && (
+               <p className="text-[9px] text-gray-500 line-clamp-1">{artist.stageName || artist.name}</p>
+             )}
+           </div>
 
-          {/* Platforms & Actions */}
-          <div className="flex items-center justify-between gap-2">
+           {/* Platforms & Actions */}
+           <div className="flex items-center justify-between gap-1">
             {clip.platforms && clip.platforms.length > 0 && (
               <div className="flex items-center gap-1">
                 {clip.platforms.slice(0, 2).map(platform => {
