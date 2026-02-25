@@ -221,12 +221,12 @@ export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
            {/* Platforms & Actions */}
            <div className="flex items-center justify-between gap-1">
             {clip.platforms && clip.platforms.length > 0 && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-0.5">
                 {clip.platforms.slice(0, 2).map(platform => {
                   const Icon = platformIcons[platform];
                   return (
-                    <div key={platform} className="w-4 h-4 rounded bg-white/5 flex items-center justify-center">
-                      <Icon className="w-2.5 h-2.5" />
+                    <div key={platform} className="w-3.5 h-3.5 rounded bg-white/5 flex items-center justify-center">
+                      <Icon className="w-2 h-2" />
                     </div>
                   );
                 })}
