@@ -139,25 +139,41 @@ export default function UploadClipModal({ onClose, artistId }) {
         setUploadProgress(prev => ({ ...prev, [fileObj.id]: 50 }));
 
         // Create clip record
-         await base44.entities.Clip.create({
-           title: fileObj.title,
-           artist_id: artistId,
-           project_id: selectedProject || null,
-           track_id: selectedTrack || null,
-           file_url: uploadResponse.file_url,
-           thumbnail_url: uploadResponse.file_url,
-           clip_id: fileObj.id,
-           status: "draft",
-           platforms: [],
-           hashtags: [],
-           tags: [],
-           featuring_artists: collaborators
-         });
+        const clip = await base44.entities.Clip.create({
+          title: fileObj.title,
+          artist_id: artistId,
+          project_id: selectedProject || null,
+          track_id: selectedTrack || null,
+          file_url: uploadResponse.file_url,
+          thumbnail_url: uploadResponse.file_url,
+          clip_id: fileObj.id,
+          status: "draft",
+          platforms: [],
+          hashtags: [],
+          tags: [],
+          featuring_artists: collaborators
+        });
 
         setUploadProgress(prev => ({ ...prev, [fileObj.id]: 100 }));
         setFiles(prev => prev.map(f => 
-          f.id === fileObj.id ? { ...f, status: 'success' } : f
+          f.id === fileObj.id ? { ...f, status: 'success', clipId: clip.id } : f
         ));
+        
+        setUploadedClips(prev => ({
+          ...prev,
+          [clip.id]: clip
+        }));
+        
+        setFormData(prev => ({
+          ...prev,
+          [clip.id]: {
+            ...clip,
+            caption_master: "",
+            caption_youtube: "",
+            caption_instagram: "",
+            caption_tiktok: ""
+          }
+        }));
       } catch (error) {
         console.error("Upload error:", error);
         setFiles(prev => prev.map(f => 
@@ -168,11 +184,61 @@ export default function UploadClipModal({ onClose, artistId }) {
 
     setUploading(false);
 
-    // If all successful, close
-    const allSuccess = files.every(f => f.status === 'success');
-    if (allSuccess) {
-      setTimeout(() => onClose(), 800);
+    // Show editing interface for first uploaded clip
+    const firstSuccessful = files.find(f => f.status === 'success');
+    if (firstSuccessful && firstSuccessful.clipId) {
+      setEditingClipId(firstSuccessful.clipId);
+      setActiveTab("general");
     }
+  };
+
+  const saveClipChanges = async () => {
+    if (!editingClipId) return;
+    const data = formData[editingClipId];
+    const { caption_master, caption_youtube, caption_instagram, caption_tiktok, ...updateData } = data;
+    
+    await base44.entities.Clip.update(editingClipId, {
+      ...updateData,
+      caption_master: caption_master || "",
+      caption_youtube: caption_youtube || "",
+      caption_instagram: caption_instagram || "",
+      caption_tiktok: caption_tiktok || ""
+    });
+  };
+
+  const captureRandomFrame = () => {
+    if (!videoRef.current) return;
+
+    const video = videoRef.current;
+    const randomTime = Math.random() * video.duration;
+    video.currentTime = randomTime;
+
+    video.onloadeddata = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+        
+        setUploadingThumbnail(true);
+        try {
+          const file = new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' });
+          const { file_url } = await base44.integrations.Core.UploadFile({ file });
+          setFormData(prev => ({
+            ...prev,
+            [editingClipId]: { ...prev[editingClipId], thumbnail_url: file_url }
+          }));
+        } catch (error) {
+          alert("Error al capturar el frame");
+        } finally {
+          setUploadingThumbnail(false);
+        }
+      }, 'image/jpeg', 0.9);
+    };
   };
 
   const removeFile = (id) => {
