@@ -8,6 +8,7 @@ import SessionDetailModal from "@/components/sessions/SessionDetailModal";
 
 export default function UpcomingSessionsCard({ artistId }) {
   const [selectedSession, setSelectedSession] = useState(null);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
   const queryClient = useQueryClient();
 
   const updateSessionMutation = useMutation({
@@ -98,14 +99,23 @@ export default function UpcomingSessionsCard({ artistId }) {
       className="bg-[#111113] rounded-lg border border-white/5"
     >
       {/* Header Compacto */}
-      <div className="p-2.5 border-b border-white/5 flex items-center gap-2">
-        <div className="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center">
-          <Calendar className="w-3.5 h-3.5 text-purple-400" />
+      <div className="p-2.5 border-b border-white/5 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center">
+            <Calendar className="w-3.5 h-3.5 text-purple-400" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold">Próximas Sesiones</h3>
+            <p className="text-[9px] text-gray-500">{sessions.length} programadas</p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-sm font-semibold">Próximas Sesiones</h3>
-          <p className="text-[9px] text-gray-500">{sessions.length} programadas</p>
-        </div>
+        <button
+          onClick={() => setShowScheduleModal(true)}
+          className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white text-[9px] font-medium transition-all flex items-center gap-1"
+        >
+          <Plus className="w-2.5 h-2.5" />
+          Agendar
+        </button>
       </div>
 
       {/* Sessions List Compacta */}
@@ -185,6 +195,224 @@ export default function UpcomingSessionsCard({ artistId }) {
           readOnly={true}
         />
       )}
+
+      {showScheduleModal && (
+        <ScheduleSessionModal
+          artistId={artistId}
+          onClose={() => setShowScheduleModal(false)}
+          onSuccess={() => {
+            setShowScheduleModal(false);
+            queryClient.invalidateQueries({ queryKey: ['artist-sessions', artistId] });
+          }}
+        />
+      )}
     </motion.div>
+  );
+}
+
+function ScheduleSessionModal({ artistId, onClose, onSuccess }) {
+  const [formData, setFormData] = useState({
+    type: 'Session',
+    title: '',
+    start_time: '',
+    end_time: '',
+    location: 'Studio',
+    description: ''
+  });
+
+  const createSessionMutation = useMutation({
+    mutationFn: (data) => base44.entities.Session.create(data),
+    onSuccess: () => {
+      onSuccess();
+    }
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    createSessionMutation.mutate({
+      ...formData,
+      artist_id: artistId,
+      status: 'Pending'
+    });
+  };
+
+  const sessionTypes = [
+    { value: 'Session', label: 'Sesión', icon: '🎵' },
+    { value: 'Meeting', label: 'Reunión', icon: '💼' },
+    { value: 'StudioWork', label: 'Estudio', icon: '🎙️' }
+  ];
+
+  const locations = [
+    { value: 'Studio', label: 'Estudio' },
+    { value: 'Online', label: 'Online' },
+    { value: 'External', label: 'Externo' }
+  ];
+
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-[#111113] rounded-2xl border border-white/10 max-w-md w-full max-h-[90vh] overflow-y-auto"
+      >
+        <div className="p-4 border-b border-white/10 flex items-center justify-between">
+          <h3 className="text-base font-semibold">Agendar Sesión</h3>
+          <button
+            onClick={onClose}
+            className="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
+          >
+            ×
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          {/* Tipo de Sesión */}
+          <div>
+            <label className="block text-xs text-gray-400 mb-2">Tipo de Sesión</label>
+            <div className="grid grid-cols-3 gap-2">
+              {sessionTypes.map((type) => (
+                <button
+                  key={type.value}
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, type: type.value }))}
+                  className={`p-2 rounded-lg text-xs font-medium transition-all ${
+                    formData.type === type.value
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50'
+                      : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                  }`}
+                >
+                  <div className="text-base mb-0.5">{type.icon}</div>
+                  {type.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Título */}
+          <div>
+            <label className="block text-xs text-gray-400 mb-2">Título</label>
+            <input
+              type="text"
+              required
+              value={formData.title}
+              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-emerald-500/50 transition-colors"
+              placeholder="Ej: Grabación de voces"
+            />
+          </div>
+
+          {/* Fecha y Hora Inicio */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-gray-400 mb-2">Fecha Inicio</label>
+              <input
+                type="date"
+                required
+                value={formData.start_time ? formData.start_time.split('T')[0] : ''}
+                onChange={(e) => {
+                  const time = formData.start_time ? formData.start_time.split('T')[1] : '09:00';
+                  setFormData(prev => ({ ...prev, start_time: `${e.target.value}T${time}` }));
+                }}
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-emerald-500/50 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-2">Hora Inicio</label>
+              <input
+                type="time"
+                required
+                value={formData.start_time ? formData.start_time.split('T')[1] : ''}
+                onChange={(e) => {
+                  const date = formData.start_time ? formData.start_time.split('T')[0] : format(new Date(), 'yyyy-MM-dd');
+                  setFormData(prev => ({ ...prev, start_time: `${date}T${e.target.value}` }));
+                }}
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-emerald-500/50 transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* Fecha y Hora Fin */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-gray-400 mb-2">Fecha Fin</label>
+              <input
+                type="date"
+                required
+                value={formData.end_time ? formData.end_time.split('T')[0] : ''}
+                onChange={(e) => {
+                  const time = formData.end_time ? formData.end_time.split('T')[1] : '10:00';
+                  setFormData(prev => ({ ...prev, end_time: `${e.target.value}T${time}` }));
+                }}
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-emerald-500/50 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-2">Hora Fin</label>
+              <input
+                type="time"
+                required
+                value={formData.end_time ? formData.end_time.split('T')[1] : ''}
+                onChange={(e) => {
+                  const date = formData.end_time ? formData.end_time.split('T')[0] : format(new Date(), 'yyyy-MM-dd');
+                  setFormData(prev => ({ ...prev, end_time: `${date}T${e.target.value}` }));
+                }}
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-emerald-500/50 transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* Ubicación */}
+          <div>
+            <label className="block text-xs text-gray-400 mb-2">Ubicación</label>
+            <div className="grid grid-cols-3 gap-2">
+              {locations.map((loc) => (
+                <button
+                  key={loc.value}
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, location: loc.value }))}
+                  className={`p-2 rounded-lg text-xs font-medium transition-all ${
+                    formData.location === loc.value
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50'
+                      : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                  }`}
+                >
+                  {loc.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Descripción */}
+          <div>
+            <label className="block text-xs text-gray-400 mb-2">Descripción (opcional)</label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              rows={3}
+              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-emerald-500/50 transition-colors resize-none"
+              placeholder="Detalles adicionales..."
+            />
+          </div>
+
+          {/* Botones */}
+          <div className="flex gap-2 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-4 py-2.5 bg-white/5 hover:bg-white/10 rounded-lg text-sm font-medium transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={createSessionMutation.isPending}
+              className="flex-1 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+            >
+              {createSessionMutation.isPending ? 'Agendando...' : 'Agendar'}
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
   );
 }
