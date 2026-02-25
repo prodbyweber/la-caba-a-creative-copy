@@ -161,6 +161,69 @@ export default function Analytics() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
+
+              {/* Platform Stats Integrated */}
+              <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-white/5">
+                {/* Streams */}
+                <div>
+                  <h4 className="text-[9px] font-bold text-gray-400 mb-1.5">Streams</h4>
+                  <div className="space-y-1">
+                    {platformsStreamsData.slice(0, 3).map((platform, i) => {
+                      const total = platformsStreamsData.reduce((sum, p) => sum + p.value, 0);
+                      const percentage = ((platform.value / total) * 100).toFixed(0);
+                      
+                      return (
+                        <div key={i} className="flex items-center gap-1">
+                          <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
+                          <span className="text-[8px] text-gray-300 flex-1 truncate">{platform.name}</span>
+                          <span className="text-[8px] font-semibold text-gray-400">{percentage}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Views */}
+                <div>
+                  <h4 className="text-[9px] font-bold text-gray-400 mb-1.5">Views</h4>
+                  <div className="space-y-1">
+                    {platformsViewsData.map((platform, i) => {
+                      const total = platformsViewsData.reduce((sum, p) => sum + p.value, 0);
+                      const percentage = ((platform.value / total) * 100).toFixed(0);
+                      
+                      return (
+                        <div key={i} className="flex items-center gap-1">
+                          <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
+                          <span className="text-[8px] text-gray-300 flex-1 truncate">{platform.name}</span>
+                          <span className="text-[8px] font-semibold text-gray-400">{percentage}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Likes */}
+                <div>
+                  <h4 className="text-[9px] font-bold text-gray-400 mb-1.5 flex items-center gap-0.5">
+                    <Heart className="w-2.5 h-2.5 text-red-400" />
+                    Likes
+                  </h4>
+                  <div className="space-y-1">
+                    {platformsLikesData.map((platform, i) => {
+                      const total = platformsLikesData.reduce((sum, p) => sum + p.value, 0);
+                      const percentage = ((platform.value / total) * 100).toFixed(0);
+                      
+                      return (
+                        <div key={i} className="flex items-center gap-1">
+                          <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
+                          <span className="text-[8px] text-gray-300 flex-1 truncate">{platform.name}</span>
+                          <span className="text-[8px] font-semibold text-gray-400">{percentage}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="bg-[#111113] rounded-xl border border-white/5 p-3">
@@ -188,112 +251,7 @@ export default function Analytics() {
             </div>
           </div>
 
-          {/* Streams, Views & Likes by Platform */}
-          <div className="grid lg:grid-cols-3 gap-3 mb-4">
-            {/* Streams by Platform */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-[#111113] rounded-xl border border-white/5 p-2.5"
-            >
-              <h3 className="text-[11px] font-bold mb-2">Streams</h3>
-              <div className="space-y-1.5">
-                {platformsStreamsData.map((platform, i) => {
-                  const total = platformsStreamsData.reduce((sum, p) => sum + p.value, 0);
-                  const percentage = ((platform.value / total) * 100).toFixed(1);
-                  
-                  return (
-                    <div key={i}>
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-[9px] font-medium">{platform.name}</span>
-                        <span className="text-[9px] text-gray-500">{(platform.value / 1000).toFixed(0)}K</span>
-                      </div>
-                      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full rounded-full transition-all"
-                          style={{ 
-                            width: `${percentage}%`,
-                            backgroundColor: platform.color
-                          }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </motion.div>
 
-            {/* Views by Platform */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05 }}
-              className="bg-[#111113] rounded-xl border border-white/5 p-2.5"
-            >
-              <h3 className="text-[11px] font-bold mb-2">Visualizaciones</h3>
-              <div className="space-y-1.5">
-                {platformsViewsData.map((platform, i) => {
-                  const total = platformsViewsData.reduce((sum, p) => sum + p.value, 0);
-                  const percentage = ((platform.value / total) * 100).toFixed(1);
-                  
-                  return (
-                    <div key={i}>
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-[9px] font-medium">{platform.name}</span>
-                        <span className="text-[9px] text-gray-500">{(platform.value / 1000).toFixed(0)}K</span>
-                      </div>
-                      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full rounded-full transition-all"
-                          style={{ 
-                            width: `${percentage}%`,
-                            backgroundColor: platform.color
-                          }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </motion.div>
-
-            {/* Likes by Platform */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-[#111113] rounded-xl border border-white/5 p-2.5"
-            >
-              <h3 className="text-[11px] font-bold mb-2 flex items-center gap-1">
-                <Heart className="w-3 h-3 text-red-400" />
-                Me Gusta
-              </h3>
-              <div className="space-y-1.5">
-                {platformsLikesData.map((platform, i) => {
-                  const total = platformsLikesData.reduce((sum, p) => sum + p.value, 0);
-                  const percentage = ((platform.value / total) * 100).toFixed(1);
-                  
-                  return (
-                    <div key={i}>
-                      <div className="flex items-center justify-between mb-0.5">
-                        <span className="text-[9px] font-medium">{platform.name}</span>
-                        <span className="text-[9px] text-gray-500">{(platform.value / 1000).toFixed(1)}K</span>
-                      </div>
-                      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full rounded-full transition-all"
-                          style={{ 
-                            width: `${percentage}%`,
-                            backgroundColor: platform.color
-                          }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </motion.div>
-          </div>
 
           {/* Top Clips - Netflix Style */}
           <motion.div

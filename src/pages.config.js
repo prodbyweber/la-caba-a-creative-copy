@@ -50,7 +50,6 @@
 import ADNdeMarca from './pages/ADNdeMarca';
 import Accounting from './pages/Accounting';
 import AdminDashboard from './pages/AdminDashboard';
-import Analytics from './pages/Analytics';
 import ArtistDashboard from './pages/ArtistDashboard';
 import ArtistPanelList from './pages/ArtistPanelList';
 import ArtistProjects from './pages/ArtistProjects';
@@ -76,6 +75,7 @@ import SocialAccounts from './pages/SocialAccounts';
 import TrackDetail from './pages/TrackDetail';
 import Tracks from './pages/Tracks';
 import UserProfile from './pages/UserProfile';
+import Analytics from './pages/Analytics';
 import __Layout from './Layout.jsx';
 
 
@@ -83,7 +83,6 @@ export const PAGES = {
     "ADNdeMarca": ADNdeMarca,
     "Accounting": Accounting,
     "AdminDashboard": AdminDashboard,
-    "Analytics": Analytics,
     "ArtistDashboard": ArtistDashboard,
     "ArtistPanelList": ArtistPanelList,
     "ArtistProjects": ArtistProjects,
@@ -109,6 +108,7 @@ export const PAGES = {
     "TrackDetail": TrackDetail,
     "Tracks": Tracks,
     "UserProfile": UserProfile,
+    "Analytics": Analytics,
 }
 
 export const pagesConfig = {
