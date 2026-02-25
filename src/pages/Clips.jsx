@@ -25,7 +25,7 @@ export default function Clips() {
       <DashboardNav artistId={artistId} />
 
       <main className="pt-14">
-        <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
+        <div className="px-3 sm:px-6 lg:px-8 xl:px-12 py-3 sm:py-4 max-w-[1600px] mx-auto">
           {/* Page Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
