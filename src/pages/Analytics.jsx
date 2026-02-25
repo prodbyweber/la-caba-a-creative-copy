@@ -95,11 +95,11 @@ export default function Analytics() {
       <DashboardNav artistId={artistId} />
 
       <main className="pt-14">
-        <div className="px-6 sm:px-12 lg:px-16 xl:px-24 max-w-[1600px] mx-auto">
+        <div className="px-6 sm:px-12 lg:px-16 xl:px-24 max-w-[1600px] mx-auto py-3">
           {/* Overview Summary with Timeframe */}
           <div className="relative">
-            {/* Timeframe Selector - Top Left */}
-            <div className="absolute top-0 left-0 z-10 flex items-center gap-0.5">
+            {/* Timeframe Selector - Top Right */}
+            <div className="absolute top-0 right-0 z-10 flex items-center gap-0.5">
               {timeframes.map((tf) => (
                 <button
                   key={tf}
