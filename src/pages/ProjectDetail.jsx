@@ -208,14 +208,14 @@ export default function ProjectDetail() {
                       <div
                         {...provided.droppableProps}
                         ref={provided.innerRef}
-                        className="grid gap-2 mb-2 auto-rows-[150px] sm:auto-rows-[180px] md:auto-rows-[200px]"
+                        className="grid gap-1.5 mb-2 auto-rows-[80px] sm:auto-rows-[100px] md:auto-rows-[120px]"
                         style={{
-                          gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+                          gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
                         }}
                       >
                         {moodboardImages.map((url, index) => {
-                          const colSpan = index % 5 === 0 || index % 5 === 4 ? 2 : 1;
-                          const rowSpan = index % 7 === 0 ? 2 : 1;
+                          const colSpan = 1;
+                          const rowSpan = 1;
                           
                           return (
                             <Draggable key={`img-${index}`} draggableId={`img-${index}`} index={index}>
