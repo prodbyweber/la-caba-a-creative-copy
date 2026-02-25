@@ -176,50 +176,49 @@ export default function UploadClipModal({ onClose, artistId }) {
             </select>
           </div>
 
-          {/* Project Selection */}
+          {/* Project & Track Selection */}
           {selectedArtist && (
-            <div className="mb-6">
-              <label className="text-sm font-medium text-gray-400 mb-2 block">
-                Proyecto
-              </label>
-              <select
-                value={selectedProject}
-                onChange={(e) => {
-                  setSelectedProject(e.target.value);
-                  setSelectedTrack("");
-                }}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
-                disabled={uploading}
-              >
-                <option value="">Seleccionar proyecto...</option>
-                {projects.map(project => (
-                  <option key={project.id} value={project.id}>
-                    {project.title}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div>
+                <label className="text-sm font-medium text-gray-400 mb-2 block">
+                  Proyecto (Opcional)
+                </label>
+                <select
+                  value={selectedProject}
+                  onChange={(e) => {
+                    setSelectedProject(e.target.value);
+                    setSelectedTrack("");
+                  }}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
+                  disabled={uploading}
+                >
+                  <option value="">Sin proyecto</option>
+                  {projects.map(project => (
+                    <option key={project.id} value={project.id}>
+                      {project.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          {/* Track Selection */}
-          {selectedProject && (
-            <div className="mb-6">
-              <label className="text-sm font-medium text-gray-400 mb-2 block">
-                Canción
-              </label>
-              <select
-                value={selectedTrack}
-                onChange={(e) => setSelectedTrack(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
-                disabled={uploading}
-              >
-                <option value="">Seleccionar canción...</option>
-                {tracks.map(track => (
-                  <option key={track.id} value={track.id}>
-                    {track.title}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <label className="text-sm font-medium text-gray-400 mb-2 block">
+                  Canción (Opcional)
+                </label>
+                <select
+                  value={selectedTrack}
+                  onChange={(e) => setSelectedTrack(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
+                  disabled={uploading || !selectedProject}
+                >
+                  <option value="">Sin canción</option>
+                  {tracks.map(track => (
+                    <option key={track.id} value={track.id}>
+                      {track.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           )}
 
