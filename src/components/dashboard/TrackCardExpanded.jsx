@@ -18,10 +18,8 @@ export default function TrackCardExpanded({ track, onEdit }) {
         mainAudioRef.current.pause();
         setPlayingMain(false);
       } else {
-        // Pausar otras versiones
         Object.values(audioRefs.current).forEach(audio => audio?.pause());
         setPlaying(null);
-        
         await mainAudioRef.current.play();
         setPlayingMain(true);
       }
@@ -31,7 +29,7 @@ export default function TrackCardExpanded({ track, onEdit }) {
     }
   };
 
-  const togglePlay = async (versionKey) => {
+  const toggleVersionPlay = async (versionKey) => {
     const audio = audioRefs.current[versionKey];
     if (!audio) return;
 
@@ -40,7 +38,6 @@ export default function TrackCardExpanded({ track, onEdit }) {
         audio.pause();
         setPlaying(null);
       } else {
-        // Pausar audio principal y otras versiones
         mainAudioRef.current?.pause();
         setPlayingMain(false);
         
@@ -104,14 +101,14 @@ export default function TrackCardExpanded({ track, onEdit }) {
             <Music2 className="w-5 h-5 lg:w-6 lg:h-6 text-white/40 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
           )}
           
-          {/* Play Button Overlay */}
+          {/* Play Button Overlay - Cinematográfico */}
           {track.audio_file_url && (
             <>
               <div className={`absolute inset-0 bg-black/60 backdrop-blur-[1px] transition-opacity ${playingMain ? 'opacity-100' : 'opacity-0 group-hover/cover:opacity-100'}`} />
               <button
                 type="button"
                 onClick={toggleMainPlay}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-white hover:bg-white/90 active:scale-95 hover:scale-110 flex items-center justify-center transition-all shadow-2xl z-10"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-white hover:bg-white/90 active:scale-95 hover:scale-110 flex items-center justify-center transition-all shadow-[0_8px_32px_rgba(0,0,0,0.9)] z-10"
               >
                 {playingMain ? (
                   <Pause className="w-3 h-3 lg:w-3.5 lg:h-3.5 text-black" fill="black" />
@@ -233,7 +230,7 @@ export default function TrackCardExpanded({ track, onEdit }) {
                         />
                         <div className="flex items-center gap-2 flex-1">
                           <button
-                            onClick={() => togglePlay(version.key)}
+                            onClick={() => toggleVersionPlay(version.key)}
                             className={`p-1.5 rounded-lg bg-${version.color}-500/10 hover:bg-${version.color}-500/20 transition-colors flex-shrink-0`}
                           >
                             {playing === version.key ? (
