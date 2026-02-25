@@ -123,17 +123,17 @@ export default function ProjectsSection({ jlyArtistId }) {
                 return (
                   <div 
                     key={project.id} 
-                    className="flex-[0_0_130px] sm:flex-[0_0_160px]"
+                    className="flex-[0_0_110px] sm:flex-[0_0_130px]"
                   >
                     <motion.div
                       onClick={() => setEditingProject(project)}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: i * 0.05 }}
-                      className="group bg-white/5 rounded-lg p-2 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer h-full"
+                      className="group bg-white/5 rounded-lg p-1.5 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer h-full"
                     >
                       {/* Project Cover */}
-                      <div className="relative aspect-square rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 mb-1.5 overflow-hidden">
+                      <div className="relative aspect-square rounded-md bg-gradient-to-br from-emerald-500/20 to-purple-500/20 mb-1 overflow-hidden">
                         {project.cover_url ? (
                           <img 
                             src={project.cover_url} 
@@ -148,21 +148,21 @@ export default function ProjectsSection({ jlyArtistId }) {
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <Music2 className="w-8 h-8 text-white/20" />
+                            <Music2 className="w-6 h-6 text-white/20" />
                           </div>
                         )}
                         {/* Track Count Badge */}
-                        <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[9px] font-medium">
+                        <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[8px] font-medium">
                           {projectTracks.length}
                         </div>
                       </div>
 
                       {/* Info - Estilo Netflix */}
                       <div className="space-y-0.5">
-                        <h4 className="font-bold text-xs text-white group-hover:text-emerald-400 transition-colors truncate">
+                        <h4 className="font-semibold text-[10px] text-white group-hover:text-emerald-400 transition-colors truncate">
                           {project.title}
                         </h4>
-                        <div className="flex flex-wrap items-center gap-1 text-[9px] text-gray-400">
+                        <div className="flex flex-wrap items-center gap-1 text-[8px] text-gray-400">
                           <span className="font-medium text-white">{getProjectYear(project)}</span>
                           {project.type && (
                             <>
@@ -171,7 +171,7 @@ export default function ProjectsSection({ jlyArtistId }) {
                             </>
                           )}
                         </div>
-                        <div className="text-[9px] text-gray-500 truncate">
+                        <div className="text-[8px] text-gray-500 truncate">
                           {getArtistName(project.artist_id)}{getCollaboratorNames(project.collaborator_artist_ids)}
                         </div>
                       </div>

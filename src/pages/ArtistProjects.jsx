@@ -65,7 +65,7 @@ export default function ArtistProjectsPage() {
 
           {/* Projects Grid */}
           {isLoading ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
                 <div key={i} className="bg-white/5 rounded-xl p-4 animate-pulse">
                   <div className="h-6 bg-white/5 rounded w-2/3 mb-3" />
