@@ -42,9 +42,9 @@ export default function FinalCTA({ config }) {
           {/* CTA Button */}
           <Link to={createPageUrl("AdminDashboard")}>
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="group inline-flex items-center gap-3 px-10 py-5 rounded-full bg-gradient-to-r from-emerald-500 via-emerald-600 to-emerald-500 bg-[length:200%_100%] text-lg font-medium shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:bg-right transition-all duration-500"
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              className="group inline-flex items-center gap-3 px-10 py-4 bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 text-lg font-light tracking-wide text-white hover:bg-white/10 transition-all duration-300"
             >
               {config?.final_cta_button || 'Aplicar ahora'}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
