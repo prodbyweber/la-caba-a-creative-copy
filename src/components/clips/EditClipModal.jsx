@@ -591,22 +591,6 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
 
           {activeTab === "schedule" && (
             <div className="space-y-6">
-              {/* Status */}
-              <div>
-                <label className="text-sm font-medium text-gray-400 mb-2 block">
-                  Estado
-                </label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
-                >
-                  <option value="draft">Borrador</option>
-                  <option value="scheduled">Programado</option>
-                  <option value="published">Publicado</option>
-                </select>
-              </div>
-
               {/* Schedule Date/Time */}
               <div>
                 <label className="text-sm font-medium text-gray-400 mb-2 block">
