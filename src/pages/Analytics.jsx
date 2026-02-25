@@ -96,10 +96,9 @@ export default function Analytics() {
 
       <main className="pt-14">
         <div className="px-6 sm:px-12 lg:px-16 xl:px-24 max-w-[1600px] mx-auto py-3">
-          {/* Overview Summary with Timeframe */}
-          <div className="relative">
-            {/* Timeframe Selector - Top Right */}
-            <div className="absolute top-0 right-0 z-10 flex items-center gap-0.5">
+          {/* Timeframe Selector */}
+          <div className="flex justify-end mb-3">
+            <div className="flex items-center gap-0.5">
               {timeframes.map((tf) => (
                 <button
                   key={tf}
@@ -114,8 +113,10 @@ export default function Analytics() {
                 </button>
               ))}
             </div>
-            <OverviewSummary />
           </div>
+
+          {/* Overview Summary */}
+          <OverviewSummary />
 
           {/* Streams Over Time + Top Tracks */}
           <div className="grid lg:grid-cols-3 gap-4 mb-4">
