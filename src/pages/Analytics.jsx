@@ -95,7 +95,7 @@ export default function Analytics() {
       <DashboardNav artistId={artistId} />
 
       <main className="pt-14">
-        <div className="px-8 py-4 max-w-[1800px] mx-auto">
+        <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
           {/* Timeframe Selector */}
           <div className="flex items-center gap-2 mb-3">
             {timeframes.map((tf) => (

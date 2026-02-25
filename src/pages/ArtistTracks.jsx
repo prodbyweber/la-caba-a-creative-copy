@@ -90,7 +90,7 @@ export default function ArtistTracksPage() {
       <DashboardNav artistName={artist?.stageName} artistId={artistId} />
 
       <main className="pt-14">
-        <div className="px-8 py-4 max-w-[1800px] mx-auto">
+        <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-white mb-1">Mis Tracks</h1>
