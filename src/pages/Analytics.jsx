@@ -164,143 +164,192 @@ export default function Analytics() {
                 </ResponsiveContainer>
               </div>
 
-              {/* Platform Stats Integrated */}
+              {/* Platform Stats Integrated - Mobile Minimized */}
               <div className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-white/5">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4">
-                  {/* Streams */}
-                  <div className="bg-white/5 rounded-lg p-2 sm:p-3">
-                    <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                      <h4 className="text-[10px] sm:text-xs font-bold text-white">Streams</h4>
-                      <span className="text-[10px] sm:text-xs font-bold text-emerald-400">
-                        {(platformsStreamsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
-                      </span>
-                    </div>
-                    <div className="space-y-1">
-                      {platformsStreamsData.slice(0, 3).map((platform, i) => {
-                        const total = platformsStreamsData.reduce((sum, p) => sum + p.value, 0);
-                        const percentage = ((platform.value / total) * 100).toFixed(0);
+                <div className="hidden sm:grid sm:grid-cols-3 gap-4">
+                   {/* Streams */}
+                   <div className="bg-white/5 rounded-lg p-3">
+                     <div className="flex items-center justify-between mb-2">
+                       <h4 className="text-xs font-bold text-white">Streams</h4>
+                       <span className="text-xs font-bold text-emerald-400">
+                         {(platformsStreamsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
+                       </span>
+                     </div>
+                     <div className="space-y-1">
+                       {platformsStreamsData.slice(0, 3).map((platform, i) => {
+                         const total = platformsStreamsData.reduce((sum, p) => sum + p.value, 0);
+                         const percentage = ((platform.value / total) * 100).toFixed(0);
 
-                        return (
-                          <div key={i}>
-                            <div className="flex items-center justify-between mb-0.5">
-                              <div className="flex items-center gap-1">
-                                <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
-                                <span className="text-[9px] text-gray-300">{platform.name}</span>
-                              </div>
-                              <span className="text-[9px] font-semibold text-white">{(platform.value / 1000).toFixed(0)}K</span>
-                            </div>
-                            <div className="h-0.5 bg-white/10 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full rounded-full transition-all"
-                                style={{ 
-                                  width: `${percentage}%`,
-                                  backgroundColor: platform.color
-                                }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
+                         return (
+                           <div key={i}>
+                             <div className="flex items-center justify-between mb-0.5">
+                               <div className="flex items-center gap-1">
+                                 <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
+                                 <span className="text-[9px] text-gray-300">{platform.name}</span>
+                               </div>
+                               <span className="text-[9px] font-semibold text-white">{(platform.value / 1000).toFixed(0)}K</span>
+                             </div>
+                             <div className="h-0.5 bg-white/10 rounded-full overflow-hidden">
+                               <div 
+                                 className="h-full rounded-full transition-all"
+                                 style={{ 
+                                   width: `${percentage}%`,
+                                   backgroundColor: platform.color
+                                 }}
+                               />
+                             </div>
+                           </div>
+                         );
+                       })}
+                     </div>
+                   </div>
+
+                   {/* Views */}
+                   <div className="bg-white/5 rounded-lg p-3">
+                     <div className="flex items-center justify-between mb-2">
+                       <h4 className="text-xs font-bold text-white">Views</h4>
+                       <span className="text-xs font-bold text-purple-400">
+                         {(platformsViewsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
+                       </span>
+                     </div>
+                     <div className="space-y-1">
+                       {platformsViewsData.map((platform, i) => {
+                         const total = platformsViewsData.reduce((sum, p) => sum + p.value, 0);
+                         const percentage = ((platform.value / total) * 100).toFixed(0);
+
+                         return (
+                           <div key={i}>
+                             <div className="flex items-center justify-between mb-0.5">
+                               <div className="flex items-center gap-1">
+                                 <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
+                                 <span className="text-[9px] text-gray-300">{platform.name}</span>
+                               </div>
+                               <span className="text-[9px] font-semibold text-white">{(platform.value / 1000).toFixed(0)}K</span>
+                             </div>
+                             <div className="h-0.5 bg-white/10 rounded-full overflow-hidden">
+                               <div 
+                                 className="h-full rounded-full transition-all"
+                                 style={{ 
+                                   width: `${percentage}%`,
+                                   backgroundColor: platform.color
+                                 }}
+                               />
+                             </div>
+                           </div>
+                         );
+                       })}
+                     </div>
+                   </div>
+
+                   {/* Likes */}
+                   <div className="bg-white/5 rounded-lg p-3">
+                     <div className="flex items-center justify-between mb-2">
+                       <h4 className="text-xs font-bold text-white flex items-center gap-1">
+                         <Heart className="w-3 h-3 text-red-400" />
+                         Likes
+                       </h4>
+                       <span className="text-xs font-bold text-red-400">
+                         {(platformsLikesData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(1)}K
+                       </span>
+                     </div>
+                     <div className="space-y-1">
+                       {platformsLikesData.map((platform, i) => {
+                         const total = platformsLikesData.reduce((sum, p) => sum + p.value, 0);
+                         const percentage = ((platform.value / total) * 100).toFixed(0);
+
+                         return (
+                           <div key={i}>
+                             <div className="flex items-center justify-between mb-0.5">
+                               <div className="flex items-center gap-1">
+                                 <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
+                                 <span className="text-[9px] text-gray-300">{platform.name}</span>
+                               </div>
+                               <span className="text-[9px] font-semibold text-white">{(platform.value / 1000).toFixed(1)}K</span>
+                             </div>
+                             <div className="h-0.5 bg-white/10 rounded-full overflow-hidden">
+                               <div 
+                                 className="h-full rounded-full transition-all"
+                                 style={{ 
+                                   width: `${percentage}%`,
+                                   backgroundColor: platform.color
+                                 }}
+                               />
+                             </div>
+                           </div>
+                         );
+                       })}
+                     </div>
+                   </div>
+                </div>
+
+                {/* Mobile Minimized Version */}
+                <div className="sm:hidden grid grid-cols-3 gap-1">
+                  {/* Streams Mobile */}
+                  <div className="bg-white/5 rounded p-1.5">
+                    <div className="text-[7px] font-bold text-emerald-400 mb-1">
+                      {(platformsStreamsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
+                    </div>
+                    <div className="space-y-0.5">
+                      {platformsStreamsData.slice(0, 2).map((platform, i) => (
+                        <div key={i} className="flex items-center justify-between">
+                          <span className="text-[6px] text-gray-400 truncate">{platform.name.split(' ')[0]}</span>
+                          <span className="text-[6px] font-semibold text-white ml-0.5">{(platform.value / 1000).toFixed(0)}K</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Views */}
-                  <div className="bg-white/5 rounded-lg p-2 sm:p-3">
-                    <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                      <h4 className="text-[10px] sm:text-xs font-bold text-white">Views</h4>
-                      <span className="text-[10px] sm:text-xs font-bold text-purple-400">
-                        {(platformsViewsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
-                      </span>
+                  {/* Views Mobile */}
+                  <div className="bg-white/5 rounded p-1.5">
+                    <div className="text-[7px] font-bold text-purple-400 mb-1">
+                      {(platformsViewsData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(0)}K
                     </div>
-                    <div className="space-y-1">
-                      {platformsViewsData.map((platform, i) => {
-                        const total = platformsViewsData.reduce((sum, p) => sum + p.value, 0);
-                        const percentage = ((platform.value / total) * 100).toFixed(0);
-
-                        return (
-                          <div key={i}>
-                            <div className="flex items-center justify-between mb-0.5">
-                              <div className="flex items-center gap-1">
-                                <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
-                                <span className="text-[9px] text-gray-300">{platform.name}</span>
-                              </div>
-                              <span className="text-[9px] font-semibold text-white">{(platform.value / 1000).toFixed(0)}K</span>
-                            </div>
-                            <div className="h-0.5 bg-white/10 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full rounded-full transition-all"
-                                style={{ 
-                                  width: `${percentage}%`,
-                                  backgroundColor: platform.color
-                                }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
+                    <div className="space-y-0.5">
+                      {platformsViewsData.slice(0, 2).map((platform, i) => (
+                        <div key={i} className="flex items-center justify-between">
+                          <span className="text-[6px] text-gray-400 truncate">{platform.name.split(' ')[0]}</span>
+                          <span className="text-[6px] font-semibold text-white ml-0.5">{(platform.value / 1000).toFixed(0)}K</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Likes */}
-                  <div className="bg-white/5 rounded-lg p-2 sm:p-3">
-                    <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                      <h4 className="text-[10px] sm:text-xs font-bold text-white flex items-center gap-1">
-                        <Heart className="w-2.5 sm:w-3 h-2.5 sm:h-3 text-red-400" />
-                        Likes
-                      </h4>
-                      <span className="text-[10px] sm:text-xs font-bold text-red-400">
-                        {(platformsLikesData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(1)}K
-                      </span>
+                  {/* Likes Mobile */}
+                  <div className="bg-white/5 rounded p-1.5">
+                    <div className="text-[7px] font-bold text-red-400 mb-1">
+                      {(platformsLikesData.reduce((sum, p) => sum + p.value, 0) / 1000).toFixed(1)}K
                     </div>
-                    <div className="space-y-1">
-                      {platformsLikesData.map((platform, i) => {
-                        const total = platformsLikesData.reduce((sum, p) => sum + p.value, 0);
-                        const percentage = ((platform.value / total) * 100).toFixed(0);
-
-                        return (
-                          <div key={i}>
-                            <div className="flex items-center justify-between mb-0.5">
-                              <div className="flex items-center gap-1">
-                                <div className="w-1 h-1 rounded-full" style={{ backgroundColor: platform.color }} />
-                                <span className="text-[9px] text-gray-300">{platform.name}</span>
-                              </div>
-                              <span className="text-[9px] font-semibold text-white">{(platform.value / 1000).toFixed(1)}K</span>
-                            </div>
-                            <div className="h-0.5 bg-white/10 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full rounded-full transition-all"
-                                style={{ 
-                                  width: `${percentage}%`,
-                                  backgroundColor: platform.color
-                                }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
+                    <div className="space-y-0.5">
+                      {platformsLikesData.slice(0, 2).map((platform, i) => (
+                        <div key={i} className="flex items-center justify-between">
+                          <span className="text-[6px] text-gray-400 truncate">{platform.name.split(' ')[0]}</span>
+                          <span className="text-[6px] font-semibold text-white ml-0.5">{(platform.value / 1000).toFixed(1)}K</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
+            {/* Top Tracks - Desktop normal, Mobile larger */}
             <div className="bg-[#111113] rounded-lg sm:rounded-xl border border-white/5 p-2 sm:p-3">
               <h3 className="text-xs sm:text-sm font-bold mb-2 sm:mb-3 flex items-center gap-2">
                 <Music2 className="w-3 sm:w-4 h-3 sm:h-4 text-purple-400" />
                 Top Tracks
               </h3>
-              <div className="space-y-1 sm:space-y-2">
+              <div className="sm:space-y-2 space-y-3">
                 {topTracks.map((track, i) => (
-                  <div key={i} className="flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-                    <div className="w-5 sm:w-7 h-5 sm:h-7 rounded-lg bg-purple-500/20 flex items-center justify-center text-[9px] sm:text-xs font-bold text-purple-400 flex-shrink-0">
+                  <div key={i} className="flex items-center gap-3 sm:gap-3 p-2.5 sm:p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                    <div className="w-8 sm:w-7 h-8 sm:h-7 rounded-lg bg-purple-500/20 flex items-center justify-center text-[10px] sm:text-xs font-bold text-purple-400 flex-shrink-0">
                       {i + 1}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-[9px] sm:text-xs truncate text-white">{track.title}</div>
-                      <div className="text-[8px] sm:text-[10px] text-gray-500">{(track.streams / 1000).toFixed(0)}K streams</div>
+                      <div className="font-semibold text-[10px] sm:text-xs truncate text-white">{track.title}</div>
+                      <div className="text-[9px] sm:text-[10px] text-gray-500">{(track.streams / 1000).toFixed(0)}K streams</div>
                     </div>
-                    <div className={`flex items-center gap-0.5 text-[8px] sm:text-[10px] font-medium flex-shrink-0 ${track.trendUp ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {track.trendUp ? <TrendingUp className="w-2.5 sm:w-3 h-2.5 sm:h-3" /> : <TrendingDown className="w-2.5 sm:w-3 h-2.5 sm:h-3" />}
+                    <div className={`flex items-center gap-0.5 text-[9px] sm:text-[10px] font-medium flex-shrink-0 ${track.trendUp ? 'text-emerald-400' : 'text-red-400'}`}>
+                      {track.trendUp ? <TrendingUp className="w-3 sm:w-3 h-3 sm:h-3" /> : <TrendingDown className="w-3 sm:w-3 h-3 sm:h-3" />}
                       {track.trend}
                     </div>
                   </div>
