@@ -395,7 +395,7 @@ export default function LandingEditor() {
             </SectionEditor>
 
             {/* Hero Section Editor */}
-            <SectionEditor title="🎬 Hero Principal">
+            <SectionEditor title="🎬 Hero Principal" defaultOpen={false}>
               <TextInput
                 label="Título"
                 value={config.hero_title}

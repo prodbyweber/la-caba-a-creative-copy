@@ -39,6 +39,23 @@ export function SectionEditor({ title, children, defaultOpen = false }) {
 }
 
 export function TextInput({ label, value, onChange, placeholder, multiline = false }) {
+  const [localValue, setLocalValue] = React.useState(value || "");
+  
+  React.useEffect(() => {
+    setLocalValue(value || "");
+  }, [value]);
+  
+  const handleChange = (e) => {
+    const newValue = e.target.value;
+    setLocalValue(newValue);
+  };
+  
+  const handleBlur = () => {
+    if (localValue !== value) {
+      onChange(localValue);
+    }
+  };
+  
   const Component = multiline ? "textarea" : "input";
   
   return (
@@ -46,8 +63,9 @@ export function TextInput({ label, value, onChange, placeholder, multiline = fal
       <label className="text-sm text-gray-400 mb-2 block">{label}</label>
       <Component
         type={multiline ? undefined : "text"}
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
+        value={localValue}
+        onChange={handleChange}
+        onBlur={handleBlur}
         placeholder={placeholder}
         rows={multiline ? 3 : undefined}
         className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white resize-none focus:outline-none focus:border-emerald-500/50"
