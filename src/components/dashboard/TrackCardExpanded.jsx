@@ -101,22 +101,19 @@ export default function TrackCardExpanded({ track, onEdit }) {
             <Music2 className="w-5 h-5 lg:w-6 lg:h-6 text-white/40 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
           )}
           
-          {/* Overlay negro cinematográfico */}
+          {/* Botón Play Cinematográfico */}
           {track.audio_file_url && (
-            <>
-              <div className={`absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 ${playingMain ? 'opacity-100' : 'opacity-0 group-hover/cover:opacity-100'}`} />
-              <button
-                type="button"
-                onClick={toggleMainPlay}
-                className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-white hover:bg-gray-100 active:scale-95 hover:scale-105 flex items-center justify-center transition-all duration-300 shadow-[0_8px_30px_rgba(0,0,0,0.8)] z-10 ${playingMain ? 'opacity-100' : 'opacity-0 group-hover/cover:opacity-100'}`}
-              >
-                {playingMain ? (
-                  <Pause className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-black" fill="black" />
-                ) : (
-                  <Play className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-black ml-0.5" fill="black" />
-                )}
-              </button>
-            </>
+            <button
+              type="button"
+              onClick={toggleMainPlay}
+              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 lg:w-9 lg:h-9 rounded-full bg-white/95 hover:bg-white active:scale-95 hover:scale-110 flex items-center justify-center transition-all duration-200 shadow-[0_4px_20px_rgba(0,0,0,0.5)] backdrop-blur-sm z-10 ${playingMain ? 'opacity-100 scale-100' : 'opacity-0 scale-90 group-hover/cover:opacity-100 group-hover/cover:scale-100'}`}
+            >
+              {playingMain ? (
+                <Pause className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-black" fill="black" />
+              ) : (
+                <Play className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-black ml-0.5" fill="black" />
+              )}
+            </button>
           )}
         </div>
 
