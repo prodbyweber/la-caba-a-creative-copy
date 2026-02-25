@@ -389,14 +389,14 @@ export default function Analytics() {
               Top Clips
             </h3>
             {/* Desktop Single Row - Netflix Style */}
-            <div className="hidden sm:grid grid-cols-8 gap-1 pb-2">
+            <div className="hidden sm:grid grid-cols-8 gap-0.5 pb-2">
               {topClips.slice(0, 8).map((clip, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: i * 0.03 }}
-                  className="group relative aspect-[9/16] h-64 rounded-lg overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer"
+                  className="group relative aspect-[9/16] h-60 rounded-lg overflow-hidden bg-[#111113] border border-white/10 hover:border-emerald-500/30 transition-all cursor-pointer"
                 >
                   <img 
                     src={clip.thumbnail} 
