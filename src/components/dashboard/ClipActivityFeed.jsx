@@ -180,6 +180,14 @@ export default function ClipActivityFeed() {
           </motion.div>
         ))}
       </div>
-    </motion.div>
+      </motion.div>
+
+      {/* Insights Panel */}
+      <ClipInsightsPanel 
+        clip={selectedClip} 
+        isOpen={!!selectedClip} 
+        onClose={() => setSelectedClip(null)} 
+      />
+    </>
   );
 }
