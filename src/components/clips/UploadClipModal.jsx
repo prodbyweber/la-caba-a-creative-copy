@@ -79,16 +79,19 @@ export default function UploadClipModal({ onClose, artistId }) {
         setUploadProgress(prev => ({ ...prev, [fileObj.id]: 50 }));
 
         // Create clip record
-        await base44.entities.Clip.create({
-          title: fileObj.title,
-          artist_id: selectedArtist,
-          file_url: uploadResponse.file_url,
-          thumbnail_url: uploadResponse.file_url, // In production, generate thumbnail
-          status: "draft",
-          platforms: [],
-          hashtags: [],
-          tags: []
-        });
+         await base44.entities.Clip.create({
+           title: fileObj.title,
+           artist_id: selectedArtist,
+           project_id: selectedProject || null,
+           track_id: selectedTrack || null,
+           file_url: uploadResponse.file_url,
+           thumbnail_url: uploadResponse.file_url,
+           status: "draft",
+           platforms: [],
+           hashtags: [],
+           tags: [],
+           featuring_artists: collaborators
+         });
 
         setUploadProgress(prev => ({ ...prev, [fileObj.id]: 100 }));
         setFiles(prev => prev.map(f => 
