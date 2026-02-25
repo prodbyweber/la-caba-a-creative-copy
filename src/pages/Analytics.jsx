@@ -486,18 +486,18 @@ export default function Analytics() {
 
           {/* Demographics & Top Countries - Optimized */}
           <div className="grid lg:grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-4">
-            {/* Demographics - Compact */}
+            {/* Demographics - Responsive */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="lg:col-span-1 bg-[#111113] rounded-lg sm:rounded-xl border border-white/5 p-2 sm:p-3"
             >
-              <h3 className="text-[10px] sm:text-[11px] font-bold mb-1.5">Demografía</h3>
-              
-              {/* Age Demographics - Compact */}
-              <div className="mb-1.5 sm:mb-2">
-                <h4 className="text-[8px] sm:text-[9px] font-semibold text-gray-400 mb-1">Edad</h4>
-                <div className="h-12 sm:h-16">
+              <h3 className="text-xs sm:text-[11px] font-bold mb-2 sm:mb-2">Demografía</h3>
+
+              {/* Age Demographics */}
+              <div className="mb-2 sm:mb-3">
+                <h4 className="text-[8px] sm:text-[9px] font-semibold text-gray-400 mb-1.5">Edad</h4>
+                <div className="h-24 sm:h-16">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={demographicsData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
@@ -526,20 +526,20 @@ export default function Analytics() {
                 </div>
               </div>
 
-              {/* Gender Demographics - Simplified */}
+              {/* Gender Demographics */}
               <div>
-                <h4 className="text-[8px] sm:text-[9px] font-semibold text-gray-400 mb-1">Sexo</h4>
-                <div className="space-y-0.5">
+                <h4 className="text-[8px] sm:text-[9px] font-semibold text-gray-400 mb-2">Sexo</h4>
+                <div className="space-y-1">
                   {genderData.map((item, i) => (
-                    <div key={i} className="flex items-center gap-1">
-                      <span className="text-[7px] sm:text-[8px] text-gray-300 w-9 sm:w-12 truncate">{item.gender}</span>
-                      <div className="flex-1 h-0.5 sm:h-1 bg-white/5 rounded-full overflow-hidden">
+                    <div key={i} className="flex items-center gap-1.5">
+                      <span className="text-[8px] sm:text-[8px] text-gray-300 w-11 sm:w-12 truncate">{item.gender}</span>
+                      <div className="flex-1 h-1 sm:h-1 bg-white/5 rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all"
                           style={{ width: `${item.percentage}%` }}
                         />
                       </div>
-                      <span className="text-[7px] sm:text-[8px] font-semibold text-gray-300 w-5 sm:w-6 text-right">{item.percentage}%</span>
+                      <span className="text-[8px] sm:text-[8px] font-semibold text-gray-300 w-6 sm:w-6 text-right">{item.percentage}%</span>
                     </div>
                   ))}
                 </div>
