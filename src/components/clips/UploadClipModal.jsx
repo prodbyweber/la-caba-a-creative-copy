@@ -163,75 +163,41 @@ export default function UploadClipModal({ onClose, artistId }) {
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
-          {/* Artist Selection */}
+          {/* Artist Info */}
+          {artist && (
+            <div className="mb-6 p-4 bg-purple-500/10 border border-purple-500/20 rounded-xl">
+              <p className="text-xs text-gray-500 mb-1">Artista</p>
+              <p className="text-sm font-semibold text-purple-400">{artist.stageName || artist.name}</p>
+            </div>
+          )}
+
+          {/* Track Selection */}
           <div className="mb-6">
             <label className="text-sm font-medium text-gray-400 mb-2 block">
-              Artista *
+              Seleccionar Canción (Opcional)
             </label>
             <select
-              value={selectedArtist}
-              onChange={(e) => {
-                setSelectedArtist(e.target.value);
-                setSelectedProject("");
-                setSelectedTrack("");
-              }}
+              value={selectedTrack}
+              onChange={(e) => handleTrackSelect(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
               disabled={uploading}
             >
-              <option value="">Seleccionar artista...</option>
-              {artists.map(artist => (
-                <option key={artist.id} value={artist.id}>
-                  {artist.stageName || artist.name}
-                </option>
-              ))}
+              <option value="">Sin canción específica</option>
+              {allTracks.map(track => {
+                const projectInfo = track.project_id ? ` • Proyecto: ${track.project_id}` : " • Sin proyecto";
+                return (
+                  <option key={track.id} value={track.id}>
+                    {track.title}{projectInfo}
+                  </option>
+                );
+              })}
             </select>
+            {selectedTrack && selectedProject && (
+              <p className="text-xs text-green-400 mt-2 flex items-center gap-1">
+                ✓ Proyecto asociado automáticamente
+              </p>
+            )}
           </div>
-
-          {/* Project & Track Selection */}
-          {selectedArtist && (
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div>
-                <label className="text-sm font-medium text-gray-400 mb-2 block">
-                  Proyecto (Opcional)
-                </label>
-                <select
-                  value={selectedProject}
-                  onChange={(e) => {
-                    setSelectedProject(e.target.value);
-                    setSelectedTrack("");
-                  }}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
-                  disabled={uploading}
-                >
-                  <option value="">Sin proyecto</option>
-                  {projects.map(project => (
-                    <option key={project.id} value={project.id}>
-                      {project.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-400 mb-2 block">
-                  Canción (Opcional)
-                </label>
-                <select
-                  value={selectedTrack}
-                  onChange={(e) => setSelectedTrack(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-colors"
-                  disabled={uploading || !selectedProject}
-                >
-                  <option value="">Sin canción</option>
-                  {tracks.map(track => (
-                    <option key={track.id} value={track.id}>
-                      {track.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          )}
 
           {/* Collaborators Selection */}
           {selectedArtist && (
