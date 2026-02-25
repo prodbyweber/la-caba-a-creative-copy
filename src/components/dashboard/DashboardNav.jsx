@@ -39,7 +39,7 @@ export default function DashboardNav({ artistName, artistId }) {
 
             <Link to={createPageUrl("Landing")} className="flex items-center gap-2">
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/2b10817bf_LOGOPNGTRANSPARENTCABANACREATIVE.png" 
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/4d692088b_Lacabanacreativelogooficial2026.png" 
                 alt="La Cabaña Creative"
                 className="h-8 w-auto"
               />
@@ -120,7 +120,7 @@ export default function DashboardNav({ artistName, artistId }) {
               <div className="flex items-center justify-between p-4 border-b border-white/5">
                 <div className="flex items-center gap-2">
                   <img 
-                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/2b10817bf_LOGOPNGTRANSPARENTCABANACREATIVE.png" 
+                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/4d692088b_Lacabanacreativelogooficial2026.png" 
                     alt="La Cabaña Creative"
                     className="h-8 w-auto"
                   />
