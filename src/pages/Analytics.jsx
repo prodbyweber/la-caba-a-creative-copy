@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp, TrendingDown, Music2, Heart } from "lucide-react";
+import { TrendingUp, TrendingDown, Music2, Heart, Play, Eye } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import OverviewSummary from "@/components/analytics/OverviewSummary";
 import WalletCard from "@/components/dashboard/WalletCard";
