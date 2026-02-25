@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Play, TrendingUp, TrendingDown, ExternalLink, MoreHorizontal } from "lucide-react";
+import ClipInsightsPanel from "./ClipInsightsPanel";
 
 const clips = [
   {
@@ -11,7 +12,19 @@ const clips = [
     change: "+42%",
     trend: "up",
     thumbnail: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=120&h=80&fit=crop",
-    time: "2h ago"
+    time: "2h ago",
+    metrics: {
+      views: 124000,
+      engagement_rate: 8.5,
+      likes: 10540,
+      comments: 342,
+      shares: 1250,
+      saves: 2100,
+      watch_time: 89.5,
+      completion_rate: 72,
+      new_followers: 234,
+      growth_trend: "+42%"
+    }
   },
   {
     id: 2,
@@ -21,7 +34,19 @@ const clips = [
     change: "+18%",
     trend: "up",
     thumbnail: "https://images.unsplash.com/photo-1598653222000-6b7b7a552625?w=120&h=80&fit=crop",
-    time: "5h ago"
+    time: "5h ago",
+    metrics: {
+      views: 89000,
+      engagement_rate: 12.3,
+      likes: 10920,
+      comments: 456,
+      shares: 890,
+      saves: 3400,
+      watch_time: 92,
+      completion_rate: 85,
+      new_followers: 156,
+      growth_trend: "+18%"
+    }
   },
   {
     id: 3,
@@ -31,7 +56,19 @@ const clips = [
     change: "-3%",
     trend: "down",
     thumbnail: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120&h=80&fit=crop",
-    time: "1d ago"
+    time: "1d ago",
+    metrics: {
+      views: 234000,
+      engagement_rate: 5.2,
+      likes: 12156,
+      comments: 678,
+      shares: 2340,
+      saves: 4500,
+      watch_time: 78,
+      completion_rate: 65,
+      new_followers: 412,
+      growth_trend: "-3%"
+    }
   },
   {
     id: 4,
@@ -41,7 +78,19 @@ const clips = [
     change: "+28%",
     trend: "up",
     thumbnail: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=120&h=80&fit=crop",
-    time: "2d ago"
+    time: "2d ago",
+    metrics: {
+      views: 67000,
+      engagement_rate: 10.8,
+      likes: 7236,
+      comments: 289,
+      shares: 1050,
+      saves: 1890,
+      watch_time: 85,
+      completion_rate: 78,
+      new_followers: 198,
+      growth_trend: "+28%"
+    }
   }
 ];
 
