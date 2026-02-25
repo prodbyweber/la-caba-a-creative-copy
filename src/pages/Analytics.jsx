@@ -95,26 +95,27 @@ export default function Analytics() {
       <DashboardNav artistId={artistId} />
 
       <main className="pt-14">
-        <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
-          {/* Timeframe Selector */}
-          <div className="flex items-center gap-2 mb-3">
-            {timeframes.map((tf) => (
-              <button
-                key={tf}
-                onClick={() => setTimeframe(tf)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                  timeframe === tf
-                    ? "bg-emerald-500 text-white"
-                    : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10"
-                }`}
-              >
-                {tf}
-              </button>
-            ))}
+        <div className="px-6 sm:px-12 lg:px-16 xl:px-24 max-w-[1600px] mx-auto">
+          {/* Overview Summary with Timeframe */}
+          <div className="relative">
+            {/* Timeframe Selector - Top Left */}
+            <div className="absolute top-0 left-0 z-10 flex items-center gap-0.5">
+              {timeframes.map((tf) => (
+                <button
+                  key={tf}
+                  onClick={() => setTimeframe(tf)}
+                  className={`px-2 py-1 rounded text-[9px] font-medium transition-all ${
+                    timeframe === tf
+                      ? "bg-emerald-500/90 text-white"
+                      : "bg-white/5 text-gray-500 hover:text-white hover:bg-white/10"
+                  }`}
+                >
+                  {tf}
+                </button>
+              ))}
+            </div>
+            <OverviewSummary />
           </div>
-
-          {/* Overview Summary */}
-          <OverviewSummary />
 
           {/* Streams Over Time + Top Tracks */}
           <div className="grid lg:grid-cols-3 gap-4 mb-4">
