@@ -412,7 +412,7 @@ export default function UploadClipModal({ onClose, artistId }) {
               </button>
               <button
                 onClick={handleUpload}
-                disabled={uploading || !selectedArtist || files.length === 0}
+                disabled={uploading || !artistId || files.length === 0}
                 className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 font-medium text-sm hover:shadow-lg hover:shadow-purple-500/25 transition-all disabled:opacity-50 flex items-center gap-2"
               >
                 {uploading ? (
