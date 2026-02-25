@@ -56,7 +56,7 @@ export default function ArtistProjectsPage() {
       <DashboardNav artistName={artist?.stageName} artistId={artistId} />
 
       <main className="pt-14">
-        <div className="px-4 py-3 max-w-[1920px] mx-auto">
+        <div className="px-8 py-4 max-w-[1800px] mx-auto">
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-white mb-1">Mis Proyectos</h1>
