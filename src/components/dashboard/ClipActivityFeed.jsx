@@ -101,13 +101,16 @@ const platformColors = {
 };
 
 export default function ClipActivityFeed() {
+  const [selectedClip, setSelectedClip] = useState(null);
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3 }}
-      className="bg-[#111113] rounded-2xl border border-white/5"
-    >
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="bg-[#111113] rounded-2xl border border-white/5"
+      >
       {/* Header */}
       <div className="p-6 border-b border-white/5 flex items-center justify-between">
         <div>
