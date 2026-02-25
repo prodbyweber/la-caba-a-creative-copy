@@ -125,13 +125,13 @@ export default function ProjectsSection({ jlyArtistId }) {
                     key={project.id} 
                     className="flex-[0_0_110px] sm:flex-[0_0_130px]"
                   >
-                    <motion.div
-                      onClick={() => setEditingProject(project)}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: i * 0.05 }}
-                      className="group bg-white/5 rounded-lg p-1.5 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer h-full"
-                    >
+                    <Link to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="group bg-white/5 rounded-lg p-1.5 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer h-full"
+                      >
                       {/* Project Cover */}
                       <div className="relative aspect-square rounded-md bg-gradient-to-br from-emerald-500/20 to-purple-500/20 mb-1 overflow-hidden">
                         {project.cover_url ? (
@@ -176,6 +176,7 @@ export default function ProjectsSection({ jlyArtistId }) {
                         </div>
                       </div>
                     </motion.div>
+                    </Link>
                   </div>
                 );
                 })}

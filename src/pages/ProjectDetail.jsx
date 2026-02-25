@@ -161,12 +161,13 @@ export default function ProjectDetail() {
       <main className="lg:pl-64 pt-16">
         <div className="p-6 max-w-[1600px] mx-auto">
           {/* Back Button */}
-          <Link to={createPageUrl("Dashboard")}>
-            <button className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-              Volver al Dashboard
-            </button>
-          </Link>
+          <button 
+            onClick={() => window.history.back()} 
+            className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Volver
+          </button>
 
           {/* Project Header */}
           <motion.div
