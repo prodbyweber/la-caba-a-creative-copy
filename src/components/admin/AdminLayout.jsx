@@ -55,7 +55,7 @@ export default function AdminLayout({ children, activePage }) {
             <div className="flex items-center gap-1.5 sm:gap-2">
                <Link to={createPageUrl("Landing")}>
                  <img 
-                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/2b10817bf_LOGOPNGTRANSPARENTCABANACREATIVE.png" 
+                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/d93ba7d4d_Lacabanacreativelogooficial2026.png" 
                    alt="Cabaña Creative"
                    className="h-6 sm:h-7 w-auto cursor-pointer hover:scale-105 transition-transform"
                  />
