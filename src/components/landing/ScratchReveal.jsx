@@ -218,28 +218,13 @@ export default function ScratchReveal({
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
             initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
+            animate={{ opacity: isRevealed ? 0 : 1 }}
+            transition={{ duration: 0.5 }}
           />
         )}
       </AnimatePresence>
 
-      {/* Scratch Instruction */}
-      {!isRevealed && scratchPercentage < 5 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
-        >
-          <div className="px-6 py-3 bg-black/60 backdrop-blur-xl rounded-xl border border-white/10">
-            <p className="text-sm text-white/90 font-medium">
-              <span className="hidden lg:inline">Pasa el mouse para revelar</span>
-              <span className="lg:hidden">Rasca con el dedo para revelar</span>
-            </p>
-          </div>
-        </motion.div>
-      )}
+
 
       {/* Audio Player Section */}
       <AnimatePresence>
