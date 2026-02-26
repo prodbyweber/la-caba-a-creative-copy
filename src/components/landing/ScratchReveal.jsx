@@ -202,10 +202,44 @@ export default function ScratchReveal({
         // Fade out animation
         setShowAudioPlayer(false);
         setTimeout(() => {
-          // Burn out transition effect
+          // Burn out + image change happens simultaneously
           setIsTransitioning(true);
+          setIsRevealed(false);
+          
+          const canvas = canvasRef.current;
+          if (canvas) {
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              ctx.globalCompositeOperation = 'source-over';
+              
+              const img = new Image();
+              img.crossOrigin = "anonymous";
+              img.src = topImage;
+              img.onload = () => {
+                const imgRatio = img.width / img.height;
+                const canvasRatio = canvas.width / canvas.height;
+                
+                let drawWidth, drawHeight, offsetX, offsetY;
+                
+                if (imgRatio > canvasRatio) {
+                  drawHeight = canvas.height;
+                  drawWidth = img.width * (canvas.height / img.height);
+                  offsetX = (canvas.width - drawWidth) / 2;
+                  offsetY = 0;
+                } else {
+                  drawWidth = canvas.width;
+                  drawHeight = img.height * (canvas.width / img.width);
+                  offsetX = 0;
+                  offsetY = (canvas.height - drawHeight) / 2;
+                }
+                
+                ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+              };
+            }
+          }
+          
           setTimeout(() => {
-            resetScratch();
             setIsTransitioning(false);
             setCanScratch(true);
           }, 800); // Duration of burnout transition
@@ -214,7 +248,7 @@ export default function ScratchReveal({
       
       return () => clearTimeout(timer);
     }
-  }, [isRevealed]);
+  }, [isRevealed, topImage]);
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
