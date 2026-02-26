@@ -18,14 +18,14 @@ export default function Hero({ config }) {
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-black to-black" />
       
       {/* Main Container */}
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-0 sm:py-4 lg:py-8 flex flex-col items-center text-center justify-start lg:justify-center gap-3 lg:gap-6">
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-0 sm:py-4 lg:py-8 flex flex-col items-center text-center justify-start lg:justify-center gap-2 sm:gap-3 lg:gap-6">
         
         {/* Top: Title Only */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="max-w-4xl w-full space-y-2 sm:space-y-3 lg:space-y-4"
+          className="max-w-4xl w-full space-y-1 sm:space-y-3 lg:space-y-4"
         >
           <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-5xl xl:text-6xl font-bold text-white leading-snug sm:leading-tight px-2 line-clamp-3">
             {heroTitle}
@@ -70,7 +70,7 @@ export default function Hero({ config }) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
-          className="max-w-2xl w-full px-2 pb-0 lg:pb-8"
+          className="max-w-2xl w-full px-2 pb-0 sm:pb-0 lg:pb-8"
         >
           {/* Bar "Hemos ayudado a" - carrusel horizontal automático */}
           <motion.div
@@ -129,14 +129,14 @@ export default function Hero({ config }) {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="lg:hidden flex justify-center py-6"
+          className="lg:hidden flex justify-center py-3"
         >
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 rounded-full border-2 border-emerald-500/30 flex items-center justify-center"
+            className="w-10 h-10 rounded-full border-2 border-emerald-500/30 flex items-center justify-center"
           >
-            <Globe className="w-6 h-6 text-emerald-500/60" />
+            <Globe className="w-5 h-5 text-emerald-500/60" />
           </motion.div>
         </motion.div>
       </div>
