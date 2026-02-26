@@ -194,8 +194,12 @@ export default function ScratchReveal({
   useEffect(() => {
     if (isRevealed) {
       const timer = setTimeout(() => {
-        resetScratch();
-      }, 60000); // Reset after 1 minute
+        // Fade out animation
+        setShowAudioPlayer(false);
+        setTimeout(() => {
+          resetScratch();
+        }, 500);
+      }, 2000); // Reset after 2 seconds
       
       return () => clearTimeout(timer);
     }
