@@ -238,118 +238,118 @@ export default function ScratchReveal({
             />
           </div>
 
-      {/* Scratch Canvas - Only render after image loads */}
-      <AnimatePresence>
-        {!isRevealed && imageLoaded && (
-          <motion.canvas
-            ref={canvasRef}
-            className="absolute inset-0 cursor-pointer touch-none"
-            style={{ width: '100%', height: '100%' }}
-            onMouseMove={handleMouseMove}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            initial={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 0.6, ease: "easeInOut" }}
-          />
-        )}
-      </AnimatePresence>
+          {/* Scratch Canvas - Only render after image loads */}
+          <AnimatePresence>
+            {!isRevealed && imageLoaded && (
+              <motion.canvas
+                ref={canvasRef}
+                className="absolute inset-0 cursor-pointer touch-none"
+                style={{ width: '100%', height: '100%' }}
+                onMouseMove={handleMouseMove}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                initial={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                transition={{ duration: 0.6, ease: "easeInOut" }}
+              />
+            )}
+          </AnimatePresence>
 
-      {/* Burnout Transition Effect */}
-      <AnimatePresence>
-        {isTransitioning && (
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-t from-yellow-500 via-orange-500 to-red-500 mix-blend-screen pointer-events-none"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-          />
-        )}
-      </AnimatePresence>
+          {/* Burnout Transition Effect */}
+          <AnimatePresence>
+            {isTransitioning && (
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-t from-yellow-500 via-orange-500 to-red-500 mix-blend-screen pointer-events-none"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+              />
+            )}
+          </AnimatePresence>
 
-      {/* Audio Player Section */}
-      <AnimatePresence>
-        {showAudioPlayer && (audioUrl || youtubeLink) && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/90 to-transparent p-4 lg:p-6"
-          >
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="max-w-md mx-auto"
-            >
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
+          {/* Audio Player Section */}
+          <AnimatePresence>
+            {showAudioPlayer && (audioUrl || youtubeLink) && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="text-xs lg:text-sm text-white/80 mb-3 text-center font-medium"
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/90 to-transparent p-4 lg:p-6"
               >
-                ¿Quieres escuchar cómo sonaría esta escena?
-              </motion.p>
-              
-              {audioUrl && (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.7 }}
-                  className="flex items-center gap-3 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-3"
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                  className="max-w-md mx-auto"
                 >
-                  <button
-                    onClick={toggleAudio}
-                    className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gradient-to-r from-emerald-500 to-purple-500 flex items-center justify-center hover:scale-105 transition-transform"
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-xs lg:text-sm text-white/80 mb-3 text-center font-medium"
                   >
-                    {isPlaying ? (
-                      <Pause className="w-4 h-4 lg:w-5 lg:h-5 text-white" fill="white" />
-                    ) : (
-                      <Play className="w-4 h-4 lg:w-5 lg:h-5 text-white" fill="white" />
-                    )}
-                  </button>
-                  
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <Volume2 className="w-4 h-4 text-emerald-400" />
-                      <span className="text-xs text-white/70">Dale play</span>
-                    </div>
-                  </div>
+                    ¿Quieres escuchar cómo sonaría esta escena?
+                  </motion.p>
 
-                  <audio
-                    ref={audioRef}
-                    src={audioUrl}
-                    onEnded={() => setIsPlaying(false)}
-                  />
-                </motion.div>
-              )}
+                  {audioUrl && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.7 }}
+                      className="flex items-center gap-3 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-3"
+                    >
+                      <button
+                        onClick={toggleAudio}
+                        className="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-gradient-to-r from-emerald-500 to-purple-500 flex items-center justify-center hover:scale-105 transition-transform"
+                      >
+                        {isPlaying ? (
+                          <Pause className="w-4 h-4 lg:w-5 lg:h-5 text-white" fill="white" />
+                        ) : (
+                          <Play className="w-4 h-4 lg:w-5 lg:h-5 text-white" fill="white" />
+                        )}
+                      </button>
 
-              {youtubeLink && !audioUrl && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.7 }}
-                  className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden"
-                >
-                  <iframe
-                    src={`https://www.youtube.com/embed/${extractYouTubeID(youtubeLink)}?autoplay=0`}
-                    className="w-full h-16 lg:h-20"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <Volume2 className="w-4 h-4 text-emerald-400" />
+                          <span className="text-xs text-white/70">Dale play</span>
+                        </div>
+                      </div>
+
+                      <audio
+                        ref={audioRef}
+                        src={audioUrl}
+                        onEnded={() => setIsPlaying(false)}
+                      />
+                    </motion.div>
+                  )}
+
+                  {youtubeLink && !audioUrl && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.7 }}
+                      className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden"
+                    >
+                      <iframe
+                        src={`https://www.youtube.com/embed/${extractYouTubeID(youtubeLink)}?autoplay=0`}
+                        className="w-full h-16 lg:h-20"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </motion.div>
+                  )}
                 </motion.div>
-              )}
-            </motion.div>
-            </motion.div>
+              </motion.div>
             )}
-            </AnimatePresence>
-            </>
-            )}
-            </div>
-            );
+          </AnimatePresence>
+          </>
+          )}
+          </div>
+          );
             }
 
 function extractYouTubeID(url) {
