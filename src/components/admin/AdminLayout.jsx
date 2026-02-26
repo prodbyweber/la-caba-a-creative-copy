@@ -56,14 +56,13 @@ export default function AdminLayout({ children, activePage }) {
                <Link to={createPageUrl("Landing")}>
                  <img 
                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/2b10817bf_LOGOPNGTRANSPARENTCABANACREATIVE.png" 
-                   alt="La Cabaña Creative"
+                   alt="Cabaña Creative"
                    className="h-6 sm:h-7 w-auto cursor-pointer hover:scale-105 transition-transform"
                  />
                </Link>
                <div className="hidden sm:block">
-                 <div className="text-[11px] sm:text-xs font-bold">
-                   <span className="text-white">La Cabaña </span>
-                   <span className="text-orange-500">Creative</span>
+                 <div className="text-[11px] sm:text-xs font-bold text-white">
+                   Cabaña Creative
                  </div>
                  <div className="text-[8px] text-gray-500">Prod. by Weber</div>
                </div>
