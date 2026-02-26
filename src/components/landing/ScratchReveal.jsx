@@ -343,12 +343,14 @@ export default function ScratchReveal({
                 </motion.div>
               )}
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
+            </motion.div>
+            )}
+            </AnimatePresence>
+            </>
+            )}
+            </div>
+            );
+            }
 
 function extractYouTubeID(url) {
   if (!url) return '';
