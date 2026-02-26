@@ -40,12 +40,29 @@ export default function ScratchReveal({
     canvas.width = dimensions.width;
     canvas.height = dimensions.height;
 
-    // Fill with top image
+    // Fill with top image respecting aspect ratio
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = topImage;
     img.onload = () => {
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const canvasRatio = canvas.width / canvas.height;
+      const imgRatio = img.width / img.height;
+      
+      let drawWidth, drawHeight, x, y;
+      
+      if (canvasRatio > imgRatio) {
+        drawHeight = canvas.height;
+        drawWidth = drawHeight * imgRatio;
+        x = (canvas.width - drawWidth) / 2;
+        y = 0;
+      } else {
+        drawWidth = canvas.width;
+        drawHeight = drawWidth / imgRatio;
+        x = 0;
+        y = (canvas.height - drawHeight) / 2;
+      }
+      
+      ctx.drawImage(img, x, y, drawWidth, drawHeight);
     };
   }, [topImage, dimensions]);
 
@@ -144,7 +161,24 @@ export default function ScratchReveal({
     img.src = topImage;
     img.onload = () => {
       ctx.globalCompositeOperation = 'source-over';
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const canvasRatio = canvas.width / canvas.height;
+      const imgRatio = img.width / img.height;
+      
+      let drawWidth, drawHeight, x, y;
+      
+      if (canvasRatio > imgRatio) {
+        drawHeight = canvas.height;
+        drawWidth = drawHeight * imgRatio;
+        x = (canvas.width - drawWidth) / 2;
+        y = 0;
+      } else {
+        drawWidth = canvas.width;
+        drawHeight = drawWidth / imgRatio;
+        x = 0;
+        y = (canvas.height - drawHeight) / 2;
+      }
+      
+      ctx.drawImage(img, x, y, drawWidth, drawHeight);
     };
   };
 
