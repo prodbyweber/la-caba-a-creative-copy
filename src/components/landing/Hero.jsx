@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Globe } from "lucide-react";
+import ScratchReveal from "./ScratchReveal";
 
 export default function Hero({ config }) {
   const [imageLoaded, setImageLoaded] = React.useState(false);
@@ -9,6 +10,9 @@ export default function Hero({ config }) {
   const heroSubtitle = config?.hero_subtitle || "Producción por horas, visuales cinematográficos y digitalización artística para proyectos que van en serio.";
   const heroCTA = config?.hero_cta_text || "Aplicar a La Cabaña Creative";
   const heroImage = config?.hero_image_url || "";
+  const heroRevealImage = config?.hero_reveal_image_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/93423d3b8_image.png";
+  const heroAudioUrl = config?.hero_audio_url || "";
+  const heroYoutubeLink = config?.hero_youtube_music_link || "";
 
   const tags = ['Artistas', 'Productores', 'Creadores de Contenido', 'Estudios'];
 
@@ -46,21 +50,28 @@ export default function Hero({ config }) {
             {/* Background glow effect */}
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 via-transparent to-purple-500/20 rounded-xl lg:rounded-2xl blur-2xl" />
             
-            {/* Image container */}
+            {/* Image container with Scratch Reveal */}
             <div className="relative h-full rounded-xl lg:rounded-2xl overflow-hidden bg-black">
-              {heroImage && (
-                <img
-                  src={heroImage}
-                  alt="Artist"
-                  className={`w-full h-full object-cover object-center transition-opacity duration-500 ${
-                    imageLoaded ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  onLoad={() => setImageLoaded(true)}
+              {heroImage && heroRevealImage ? (
+                <ScratchReveal 
+                  topImage={heroImage}
+                  revealImage={heroRevealImage}
+                  audioUrl={heroAudioUrl}
+                  youtubeLink={heroYoutubeLink}
                 />
-              )}
-              
-              {/* Gradient overlay at bottom */}
-              <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+              ) : heroImage ? (
+                <>
+                  <img
+                    src={heroImage}
+                    alt="Artist"
+                    className={`w-full h-full object-cover object-center transition-opacity duration-500 ${
+                      imageLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    onLoad={() => setImageLoaded(true)}
+                  />
+                  <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
+                </>
+              ) : null}
             </div>
           </div>
         </motion.div>
