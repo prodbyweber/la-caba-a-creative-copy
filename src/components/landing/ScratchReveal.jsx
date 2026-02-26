@@ -15,6 +15,7 @@ export default function ScratchReveal({
   const [isRevealed, setIsRevealed] = useState(false);
   const [showAudioPlayer, setShowAudioPlayer] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const audioRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -163,31 +164,35 @@ export default function ScratchReveal({
    if (!canvas) return;
    const ctx = canvas.getContext('2d');
    if (!ctx) return;
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = topImage;
-    img.onload = () => {
-      ctx.globalCompositeOperation = 'source-over';
-      
-      const imgRatio = img.width / img.height;
-      const canvasRatio = canvas.width / canvas.height;
-      
-      let drawWidth, drawHeight, offsetX, offsetY;
-      
-      if (imgRatio > canvasRatio) {
-        drawHeight = canvas.height;
-        drawWidth = img.width * (canvas.height / img.height);
-        offsetX = (canvas.width - drawWidth) / 2;
-        offsetY = 0;
-      } else {
-        drawWidth = canvas.width;
-        drawHeight = img.height * (canvas.width / img.width);
-        offsetX = 0;
-        offsetY = (canvas.height - drawHeight) / 2;
-      }
-      
-      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-    };
+
+   // Clear canvas completely
+   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+   const img = new Image();
+   img.crossOrigin = "anonymous";
+   img.src = topImage;
+   img.onload = () => {
+     ctx.globalCompositeOperation = 'source-over';
+
+     const imgRatio = img.width / img.height;
+     const canvasRatio = canvas.width / canvas.height;
+
+     let drawWidth, drawHeight, offsetX, offsetY;
+
+     if (imgRatio > canvasRatio) {
+       drawHeight = canvas.height;
+       drawWidth = img.width * (canvas.height / img.height);
+       offsetX = (canvas.width - drawWidth) / 2;
+       offsetY = 0;
+     } else {
+       drawWidth = canvas.width;
+       drawHeight = img.height * (canvas.width / img.width);
+       offsetX = 0;
+       offsetY = (canvas.height - drawHeight) / 2;
+     }
+
+     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+   };
   };
 
   useEffect(() => {
@@ -196,9 +201,14 @@ export default function ScratchReveal({
         // Fade out animation
         setShowAudioPlayer(false);
         setTimeout(() => {
-          resetScratch();
+          // Burn out transition effect
+          setIsTransitioning(true);
+          setTimeout(() => {
+            resetScratch();
+            setIsTransitioning(false);
+          }, 800); // Duration of burnout transition
         }, 500);
-      }, 2000); // Reset after 2 seconds
+      }, 1000); // Show revealed image for 1 second
       
       return () => clearTimeout(timer);
     }
@@ -229,6 +239,19 @@ export default function ScratchReveal({
             initial={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.05 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Burnout Transition Effect */}
+      <AnimatePresence>
+        {isTransitioning && (
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-t from-yellow-500 via-orange-500 to-red-500 mix-blend-screen pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
           />
         )}
       </AnimatePresence>
