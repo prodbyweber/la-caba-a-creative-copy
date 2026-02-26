@@ -28,9 +28,17 @@ export default function ScratchReveal({
       }
     };
 
+    // Call immediately
     updateDimensions();
+    
+    // Also call after a tick to ensure container is mounted
+    const initTimer = setTimeout(updateDimensions, 0);
+    
     window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
+    return () => {
+      clearTimeout(initTimer);
+      window.removeEventListener('resize', updateDimensions);
+    };
   }, []);
 
   useEffect(() => {
@@ -43,33 +51,40 @@ export default function ScratchReveal({
    canvas.width = dimensions.width;
    canvas.height = dimensions.height;
 
-   // Fill with top image maintaining aspect ratio (cover)
-   const img = new Image();
-   img.crossOrigin = "anonymous";
-   img.src = topImage;
-   img.onload = () => {
-     const imgRatio = img.width / img.height;
+   // Preload and cache image
+   const drawImage = (imgElement) => {
+     const imgRatio = imgElement.width / imgElement.height;
      const canvasRatio = canvas.width / canvas.height;
 
      let drawWidth, drawHeight, offsetX, offsetY;
 
      if (imgRatio > canvasRatio) {
-       // Image is wider than canvas
        drawHeight = canvas.height;
-       drawWidth = img.width * (canvas.height / img.height);
+       drawWidth = imgElement.width * (canvas.height / imgElement.height);
        offsetX = (canvas.width - drawWidth) / 2;
        offsetY = 0;
      } else {
-       // Image is taller than canvas
        drawWidth = canvas.width;
-       drawHeight = img.height * (canvas.width / img.width);
+       drawHeight = imgElement.height * (canvas.width / imgElement.width);
        offsetX = 0;
        offsetY = (canvas.height - drawHeight) / 2;
      }
 
      ctx.globalCompositeOperation = 'source-over';
-     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+     ctx.drawImage(imgElement, offsetX, offsetY, drawWidth, drawHeight);
    };
+
+   const img = new Image();
+   img.crossOrigin = "anonymous";
+   img.src = topImage;
+
+   if (img.complete) {
+     // If already cached, draw immediately
+     drawImage(img);
+   } else {
+     // Otherwise wait for load
+     img.onload = () => drawImage(img);
+   }
   }, [topImage, dimensions]);
 
   const scratch = (e) => {
@@ -252,12 +267,13 @@ export default function ScratchReveal({
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
-      {/* Reveal Image (Behind) */}
-      <div className="absolute inset-0 bg-black">
+      {/* Reveal Image (Behind) - Only visible after reveal */}
+      <div className={`absolute inset-0 bg-black transition-opacity duration-300 ${isRevealed ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <img
           src={revealImage}
           alt="Revealed"
           className="w-full h-full object-contain object-center"
+          style={{ visibility: isRevealed ? 'visible' : 'hidden' }}
         />
       </div>
 
