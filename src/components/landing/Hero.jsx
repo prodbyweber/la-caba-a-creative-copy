@@ -13,7 +13,7 @@ export default function Hero({ config }) {
   const tags = ['Artistas', 'Productores', 'Creadores de Contenido', 'Estudios'];
 
   return (
-    <section className="relative min-h-screen flex items-start lg:items-center overflow-hidden bg-black pt-16 pb-0 sm:pb-0 lg:pt-20">
+    <section className="relative min-h-screen flex items-start lg:items-center overflow-hidden bg-black pt-20 pb-0 sm:pb-0 lg:pt-20">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-black to-black" />
       
