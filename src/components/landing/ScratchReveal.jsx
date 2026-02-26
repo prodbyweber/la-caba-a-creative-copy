@@ -40,12 +40,31 @@ export default function ScratchReveal({
     canvas.width = dimensions.width;
     canvas.height = dimensions.height;
 
-    // Fill with top image
+    // Fill with top image maintaining aspect ratio (cover)
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = topImage;
     img.onload = () => {
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const imgRatio = img.width / img.height;
+      const canvasRatio = canvas.width / canvas.height;
+      
+      let drawWidth, drawHeight, offsetX, offsetY;
+      
+      if (imgRatio > canvasRatio) {
+        // Image is wider than canvas
+        drawHeight = canvas.height;
+        drawWidth = img.width * (canvas.height / img.height);
+        offsetX = (canvas.width - drawWidth) / 2;
+        offsetY = 0;
+      } else {
+        // Image is taller than canvas
+        drawWidth = canvas.width;
+        drawHeight = img.height * (canvas.width / img.width);
+        offsetX = 0;
+        offsetY = (canvas.height - drawHeight) / 2;
+      }
+      
+      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
     };
   }, [topImage, dimensions]);
 
@@ -144,7 +163,25 @@ export default function ScratchReveal({
     img.src = topImage;
     img.onload = () => {
       ctx.globalCompositeOperation = 'source-over';
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      
+      const imgRatio = img.width / img.height;
+      const canvasRatio = canvas.width / canvas.height;
+      
+      let drawWidth, drawHeight, offsetX, offsetY;
+      
+      if (imgRatio > canvasRatio) {
+        drawHeight = canvas.height;
+        drawWidth = img.width * (canvas.height / img.height);
+        offsetX = (canvas.width - drawWidth) / 2;
+        offsetY = 0;
+      } else {
+        drawWidth = canvas.width;
+        drawHeight = img.height * (canvas.width / img.width);
+        offsetX = 0;
+        offsetY = (canvas.height - drawHeight) / 2;
+      }
+      
+      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
     };
   };
 
@@ -165,7 +202,7 @@ export default function ScratchReveal({
         <img
           src={revealImage}
           alt="Revealed"
-          className="w-full h-full object-contain object-center"
+          className="w-full h-full object-cover object-center"
         />
       </div>
 
