@@ -27,6 +27,10 @@ export default function LandingNav() {
       try {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
+        // Mostrar modal de artista si el usuario está logueado pero no tiene perfil
+        if (currentUser && !currentUser.artist_id) {
+          setShowArtistSignup(true);
+        }
       } catch (error) {
         setUser(null);
       }
@@ -34,23 +38,9 @@ export default function LandingNav() {
     checkUser();
   }, []);
 
-  const handleBeginClick = async () => {
-    try {
-      const currentUser = await base44.auth.me();
-      // Si el usuario ya está logueado y no tiene perfil de artista, mostrar modal
-      if (currentUser && !currentUser.artist_id) {
-        setShowArtistSignup(true);
-      } else if (currentUser && currentUser.artist_id) {
-        // Si ya tiene perfil, ir al dashboard
-        navigate(createPageUrl("Dashboard"));
-      } else {
-        // Si no está logueado, redirigir a login
-        base44.auth.redirectToLogin(window.location.href);
-      }
-    } catch (error) {
-      // No está logueado, redirigir a login
-      base44.auth.redirectToLogin(window.location.href);
-    }
+  const handleBeginClick = () => {
+    // Redirigir a login de Google
+    base44.auth.redirectToLogin(window.location.href);
   };
 
   const handleLogin = async () => {
