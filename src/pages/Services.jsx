@@ -92,12 +92,11 @@ function ServiceSection({ service, index }) {
     offset: ["start end", "end start"]
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], [80, -80]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.9, 1, 1, 0.9]);
+  const y = useTransform(scrollYProgress, [0, 1], [60, -60]);
+  const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.95, 1, 1, 0.95]);
 
   const Icon = service.icon;
-  const isEven = index % 2 === 0;
 
   return (
     <motion.section
@@ -105,135 +104,94 @@ function ServiceSection({ service, index }) {
       style={{ opacity }}
       className="relative min-h-screen flex items-center justify-center px-6 py-20"
     >
-      {/* Wood texture background */}
-      <div className="absolute inset-0 opacity-20 mix-blend-soft-light pointer-events-none"
+      {/* Cinematic gradient background */}
+      <div className="absolute inset-0"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4a574' fill-opacity='0.3'%3E%3Cpath d='M0 0h200v2H0zM0 10h200v2H0zM0 20h200v1H0zM0 25h200v1H0zM0 30h200v2H0zM0 40h200v1H0zM0 50h200v2H0zM0 60h200v1H0zM0 70h200v2H0zM0 80h200v1H0zM0 90h200v2H0zM0 100h200v1H0zM0 110h200v2H0zM0 120h200v1H0zM0 130h200v2H0zM0 140h200v1H0zM0 150h200v2H0zM0 160h200v1H0zM0 170h200v2H0zM0 180h200v1H0zM0 190h200v2H0z'/%3E%3C/g%3E%3C/svg%3E")`,
+          background: "linear-gradient(180deg, rgba(10, 10, 11, 0.5) 0%, rgba(26, 20, 16, 0.3) 50%, rgba(10, 10, 11, 0.5) 100%)"
+        }}
+      />
+
+      {/* Subtle texture overlay */}
+      <div className="absolute inset-0 opacity-[0.02] pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4a574'%3E%3Cpath d='M0 0h200v1H0zM0 20h200v1H0zM0 40h200v1H0zM0 60h200v1H0zM0 80h200v1H0zM0 100h200v1H0zM0 120h200v1H0zM0 140h200v1H0zM0 160h200v1H0zM0 180h200v1H0z'/%3E%3C/g%3E%3C/svg%3E")`,
           backgroundSize: "100px 100px"
         }}
       />
 
-      {/* Film grain overlay */}
-      <div className="absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-          backgroundSize: "200px 200px"
-        }}
-      />
-
-      {/* Warm gradient blobs */}
+      {/* Warm cinematic light */}
       <motion.div
         style={{ y }}
-        className={`absolute ${isEven ? '-left-1/4' : '-right-1/4'} top-1/4 w-96 h-96 bg-gradient-to-br ${service.color} rounded-full blur-3xl opacity-30`}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-orange-600/10 via-amber-600/5 to-transparent rounded-full blur-3xl"
       />
 
-      <div className="relative z-10 max-w-7xl mx-auto w-full">
+      <div className="relative z-10 max-w-6xl mx-auto w-full">
         <motion.div
           style={{ scale }}
-          className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12 lg:gap-20`}
+          className="flex flex-col items-center text-center"
         >
-          {/* Icon with vintage 3D effect */}
+          {/* Icon centered */}
           <motion.div
-            whileInView={{ rotateY: 360 }}
-            transition={{ duration: 2, ease: "easeInOut" }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
-            className="relative flex-shrink-0"
-            style={{ transformStyle: "preserve-3d" }}
+            className="relative mb-12"
           >
-            {/* Wooden frame effect */}
-            <div className="absolute -inset-2 rounded-3xl"
+            <div className={`w-24 h-24 lg:w-32 lg:h-32 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center`}
               style={{
-                background: "linear-gradient(135deg, #8b6f47 0%, #5d4e37 50%, #8b6f47 100%)",
-                boxShadow: "inset 0 2px 10px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.5)"
-              }}
-            />
-            
-            <div className={`relative w-32 h-32 lg:w-48 lg:h-48 rounded-3xl bg-gradient-to-br ${service.color} flex items-center justify-center`}
-              style={{
-                boxShadow: `0 20px 60px -10px rgba(139, 111, 71, 0.6), inset 0 2px 20px rgba(255,255,255,0.2)`,
+                boxShadow: `0 20px 40px -10px rgba(255, 140, 0, 0.3)`,
               }}
             >
-              <Icon className="w-16 h-16 lg:w-24 lg:h-24 text-[#f4e4c1]" />
-              
-              {/* Vintage texture overlay */}
-              <div className="absolute inset-0 rounded-3xl opacity-20"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.7' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.5'/%3E%3C/svg%3E")`
-                }}
-              />
+              <Icon className="w-12 h-12 lg:w-16 lg:h-16 text-white" />
             </div>
 
-            {/* Warm glow effect */}
-            <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${service.color} blur-3xl opacity-40 -z-10`} />
+            {/* Subtle glow */}
+            <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${service.color} blur-2xl opacity-30 -z-10`} />
           </motion.div>
 
           {/* Content */}
-          <div className={`flex-1 ${isEven ? 'lg:text-left' : 'lg:text-right'} text-center`}>
-            <motion.div
-              initial={{ opacity: 0, x: isEven ? -100 : 100 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-              viewport={{ once: true }}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            viewport={{ once: true }}
+            className="space-y-8"
+          >
+            {/* Title - same typography as SERVICIOS */}
+            <h2 
+              className="text-6xl md:text-8xl lg:text-9xl font-black leading-none tracking-tighter"
+              style={{
+                background: "linear-gradient(135deg, #f4e4c1 0%, #d4a574 25%, #f4e4c1 50%, #d4a574 75%, #f4e4c1 100%)",
+                backgroundSize: "200% auto",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                textShadow: "0 4px 30px rgba(212, 165, 116, 0.4)",
+                fontFamily: "'Impact', 'Arial Black', sans-serif",
+              }}
             >
-              {/* Number with vintage style */}
-              <div className={`text-9xl lg:text-[14rem] font-black mb-6 leading-none bg-gradient-to-br ${service.color} bg-clip-text text-transparent opacity-25`}
-                style={{
-                  textShadow: "0 0 60px rgba(212, 165, 116, 0.4)",
-                  fontFamily: "'Impact', 'Arial Black', sans-serif",
-                  letterSpacing: "-0.05em",
-                  filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.6))"
-                }}
-              >
-                {String(index + 1).padStart(2, '0')}
-              </div>
+              {service.title}
+            </h2>
 
-              {/* Title with luxury cabin style */}
-              <h2 
-                className="text-6xl lg:text-9xl font-black mb-8 leading-none tracking-tighter"
-                style={{
-                  background: `linear-gradient(135deg, #f4e4c1 0%, #d4a574 30%, #f4e4c1 50%, #d4a574 70%, #f4e4c1 100%)`,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  textShadow: "0 4px 30px rgba(212, 165, 116, 0.5)",
-                  fontFamily: "'Impact', 'Arial Black', sans-serif",
-                  filter: "drop-shadow(0 6px 20px rgba(0,0,0,0.7))"
-                }}
-              >
-                {service.title}
-              </h2>
-
-              {/* Description */}
-              <p className="text-xl lg:text-3xl text-[#d4a574]/90 font-light leading-relaxed max-w-2xl mx-auto lg:mx-0"
-                style={{
-                  fontFamily: "'Georgia', 'Times New Roman', serif",
-                  letterSpacing: "0.01em",
-                  textShadow: "0 2px 12px rgba(0,0,0,0.8)"
-                }}
-              >
-                {service.description}
-              </p>
-
-              {/* Decorative line with vintage style */}
-              <motion.div
-                initial={{ width: 0 }}
-                whileInView={{ width: "100%" }}
-                transition={{ duration: 1.5, delay: 0.5, ease: "easeInOut" }}
-                viewport={{ once: true }}
-                className={`h-0.5 bg-gradient-to-r ${isEven ? 'from-amber-600 via-orange-600 to-transparent' : 'from-transparent via-orange-600 to-amber-600'} mt-10 max-w-md mx-auto lg:mx-0`}
-                style={{
-                  boxShadow: "0 0 10px rgba(212, 165, 116, 0.6)"
-                }}
-              />
-            </motion.div>
-          </div>
+            {/* Description - same typography as subtitle */}
+            <p className="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto"
+              style={{
+                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                fontWeight: "300",
+                letterSpacing: "0.01em"
+              }}
+            >
+              {service.description}
+            </p>
+          </motion.div>
         </motion.div>
       </div>
 
-      {/* Warm vignette effect */}
+      {/* Cinematic vignette */}
       <div className="absolute inset-0 pointer-events-none"
         style={{
-          background: "radial-gradient(circle at center, transparent 30%, rgba(26, 22, 18, 0.7) 100%)"
+          background: "radial-gradient(circle at center, transparent 40%, rgba(10, 10, 11, 0.8) 100%)"
         }}
       />
     </motion.section>
@@ -252,45 +210,59 @@ export default function Services() {
   const y = useTransform(scrollYProgress, [0, 0.2], [0, -100]);
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-[#1a1612] text-white overflow-hidden">
+    <div ref={containerRef} className="min-h-screen bg-[#0a0a0b] text-white overflow-hidden">
       {/* Hero Section */}
       <motion.section 
         className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden"
         style={{ opacity, scale }}
       >
-        {/* Wood texture background */}
-        <div className="absolute inset-0 opacity-30"
+        {/* Cinematic gradient background */}
+        <div className="absolute inset-0"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d4a574' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E")`,
+            background: "linear-gradient(180deg, #0a0a0b 0%, #1a1410 50%, #0a0a0b 100%)"
+          }}
+        />
+
+        {/* Subtle wood texture overlay */}
+        <div className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23d4a574' fill-opacity='0.8'%3E%3Cpath d='M0 0h200v1H0zM0 10h200v1H0zM0 20h200v1H0zM0 30h200v1H0zM0 40h200v1H0zM0 50h200v1H0zM0 60h200v1H0zM0 70h200v1H0zM0 80h200v1H0zM0 90h200v1H0zM0 100h200v1H0zM0 110h200v1H0zM0 120h200v1H0zM0 130h200v1H0zM0 140h200v1H0zM0 150h200v1H0zM0 160h200v1H0zM0 170h200v1H0zM0 180h200v1H0zM0 190h200v1H0z'/%3E%3C/g%3E%3C/svg%3E")`,
             backgroundSize: "150px 150px"
           }}
         />
 
-        {/* Warm gradient overlays */}
-        <div className="absolute inset-0">
+        {/* Cinematic light rays */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
             animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 45, 0],
+              opacity: [0.3, 0.5, 0.3],
+              scale: [1, 1.1, 1],
             }}
             transition={{
-              duration: 25,
+              duration: 8,
               repeat: Infinity,
-              ease: "linear"
+              ease: "easeInOut"
             }}
-            className="absolute top-1/4 -left-1/4 w-1/2 h-1/2 bg-gradient-to-br from-amber-700/20 to-orange-700/20 rounded-full blur-3xl"
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px]"
+            style={{
+              background: "radial-gradient(ellipse at center, rgba(255, 140, 0, 0.15) 0%, transparent 70%)",
+            }}
           />
           <motion.div
             animate={{
-              scale: [1.2, 1, 1.2],
-              rotate: [45, 0, 45],
+              opacity: [0.2, 0.4, 0.2],
+              scale: [1.1, 1, 1.1],
             }}
             transition={{
-              duration: 25,
+              duration: 10,
               repeat: Infinity,
-              ease: "linear"
+              ease: "easeInOut",
+              delay: 1
             }}
-            className="absolute bottom-1/4 -right-1/4 w-1/2 h-1/2 bg-gradient-to-br from-orange-600/20 to-amber-600/20 rounded-full blur-3xl"
+            className="absolute bottom-0 right-1/4 w-[600px] h-[500px]"
+            style={{
+              background: "radial-gradient(circle, rgba(212, 165, 116, 0.1) 0%, transparent 60%)",
+            }}
           />
         </div>
 
@@ -332,7 +304,12 @@ export default function Services() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5, duration: 1 }}
-              className="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto font-light"
+              className="text-xl md:text-2xl text-gray-400 max-w-3xl mx-auto"
+              style={{
+                fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                fontWeight: "300",
+                letterSpacing: "0.01em"
+              }}
             >
               Soluciones integrales para artistas y creadores que buscan elevar su proyecto al siguiente nivel
             </motion.p>
