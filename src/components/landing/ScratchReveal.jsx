@@ -238,9 +238,9 @@ export default function ScratchReveal({
             />
           </div>
 
-      {/* Scratch Canvas */}
+      {/* Scratch Canvas - Only render after image loads */}
       <AnimatePresence>
-        {!isRevealed && (
+        {!isRevealed && imageLoaded && (
           <motion.canvas
             ref={canvasRef}
             className="absolute inset-0 cursor-pointer touch-none"
