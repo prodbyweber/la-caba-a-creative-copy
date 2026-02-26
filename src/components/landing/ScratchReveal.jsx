@@ -17,6 +17,7 @@ export default function ScratchReveal({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [canScratch, setCanScratch] = useState(true);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const audioRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const topImageRef = useRef(new Image());
