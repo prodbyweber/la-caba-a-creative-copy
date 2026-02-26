@@ -39,8 +39,8 @@ export default function LandingNav() {
   }, []);
 
   const handleBeginClick = () => {
-    // Redirigir a login de Google
-    base44.auth.redirectToLogin(window.location.href);
+    // Redirigir a login de Google, volviendo a Landing después
+    base44.auth.redirectToLogin(createPageUrl("Landing"));
   };
 
   const handleLogin = async () => {
