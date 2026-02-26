@@ -20,7 +20,7 @@ export default function BrandsCarousel({ logos }) {
   const totalWidth = displayLogos.length * (96 + 64); // 96px (w-24) + 64px (gap-16)
 
   return (
-    <section className="relative -mt-2 sm:-mt-4 lg:-mt-4 pt-0 pb-1 lg:pb-2 bg-zinc-950/50 border-t border-white/5">
+    <section className="relative -mt-2 sm:-mt-2 lg:-mt-4 pt-0 pb-1 lg:pb-2 bg-zinc-950/50 border-t border-white/5">
       <div className="max-w-full overflow-hidden">
         <div className="text-center mb-0.5 lg:mb-1">
           <span className="text-xs uppercase tracking-wider text-gray-500">Hemos colaborado con</span>
