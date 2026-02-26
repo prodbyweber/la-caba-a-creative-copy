@@ -129,7 +129,7 @@ export default function Hero({ config }) {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="lg:hidden flex justify-center py-3"
+          className="lg:hidden flex justify-center py-0"
         >
           <motion.div
             animate={{ rotate: 360 }}
