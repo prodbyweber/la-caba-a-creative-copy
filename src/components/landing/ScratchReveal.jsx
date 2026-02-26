@@ -184,88 +184,37 @@ export default function ScratchReveal({
    const ctx = canvas.getContext('2d');
    if (!ctx) return;
 
-   // Reset canvas with initial image
    ctx.clearRect(0, 0, canvas.width, canvas.height);
-   ctx.globalCompositeOperation = 'source-over';
-
-   const img = new Image();
-   img.crossOrigin = "anonymous";
-   img.src = topImage;
-   img.onload = () => {
-     const imgRatio = img.width / img.height;
-     const canvasRatio = canvas.width / canvas.height;
-
-     let drawWidth, drawHeight, offsetX, offsetY;
-
-     if (imgRatio > canvasRatio) {
-       drawHeight = canvas.height;
-       drawWidth = img.width * (canvas.height / img.height);
-       offsetX = (canvas.width - drawWidth) / 2;
-       offsetY = 0;
-     } else {
-       drawWidth = canvas.width;
-       drawHeight = img.height * (canvas.width / img.width);
-       offsetX = 0;
-       offsetY = (canvas.height - drawHeight) / 2;
-     }
-
-     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-   };
+   drawTopImage(canvas, ctx, topImageRef.current);
   };
 
   useEffect(() => {
     if (isRevealed) {
       const timer = setTimeout(() => {
-        // Fade out animation
         setShowAudioPlayer(false);
         setTimeout(() => {
-          // Burn out + image change happens simultaneously
           setIsTransitioning(true);
           setIsRevealed(false);
-          
+
           const canvas = canvasRef.current;
           if (canvas) {
             const ctx = canvas.getContext('2d');
             if (ctx) {
               ctx.clearRect(0, 0, canvas.width, canvas.height);
-              ctx.globalCompositeOperation = 'source-over';
-              
-              const img = new Image();
-              img.crossOrigin = "anonymous";
-              img.src = topImage;
-              img.onload = () => {
-                const imgRatio = img.width / img.height;
-                const canvasRatio = canvas.width / canvas.height;
-                
-                let drawWidth, drawHeight, offsetX, offsetY;
-                
-                if (imgRatio > canvasRatio) {
-                  drawHeight = canvas.height;
-                  drawWidth = img.width * (canvas.height / img.height);
-                  offsetX = (canvas.width - drawWidth) / 2;
-                  offsetY = 0;
-                } else {
-                  drawWidth = canvas.width;
-                  drawHeight = img.height * (canvas.width / img.width);
-                  offsetX = 0;
-                  offsetY = (canvas.height - drawHeight) / 2;
-                }
-                
-                ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-              };
+              drawTopImage(canvas, ctx, topImageRef.current);
             }
           }
-          
+
           setTimeout(() => {
             setIsTransitioning(false);
             setCanScratch(true);
-          }, 800); // Duration of burnout transition
+          }, 800);
         }, 500);
-      }, 2000); // Show revealed image for 2 seconds
-      
+      }, 2000);
+
       return () => clearTimeout(timer);
     }
-  }, [isRevealed, topImage]);
+  }, [isRevealed]);
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
