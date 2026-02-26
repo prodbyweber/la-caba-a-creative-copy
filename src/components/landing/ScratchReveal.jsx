@@ -188,12 +188,11 @@ export default function ScratchReveal({
   useEffect(() => {
     if (isRevealed) {
       const timer = setTimeout(() => {
-        // Fade out animation
         setShowAudioPlayer(false);
         setTimeout(() => {
           resetScratch();
-        }, 500);
-      }, 2000); // Reset after 2 seconds
+        }, 800);
+      }, 1000); // Reset after 1 second
       
       return () => clearTimeout(timer);
     }
@@ -221,9 +220,9 @@ export default function ScratchReveal({
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            initial={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 0.6, ease: "easeInOut" }}
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
           />
         )}
       </AnimatePresence>
@@ -234,22 +233,22 @@ export default function ScratchReveal({
       <AnimatePresence>
         {showAudioPlayer && (audioUrl || youtubeLink) && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
             className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/90 to-transparent p-4 lg:p-6"
           >
             <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
               className="max-w-md mx-auto"
             >
               <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
                 className="text-xs lg:text-sm text-white/80 mb-3 text-center font-medium"
               >
                 ¿Quieres escuchar cómo sonaría esta escena?
@@ -259,7 +258,7 @@ export default function ScratchReveal({
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.7 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
                   className="flex items-center gap-3 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-3"
                 >
                   <button
@@ -292,7 +291,7 @@ export default function ScratchReveal({
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.7 }}
+                  transition={{ delay: 0.4, duration: 0.5 }}
                   className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden"
                 >
                   <iframe
