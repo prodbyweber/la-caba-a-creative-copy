@@ -224,14 +224,19 @@ export default function ScratchReveal({
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
-      {/* Reveal Image (Behind) */}
-      <div className="absolute inset-0 bg-black">
-        <img
-          src={revealImage}
-          alt="Revealed"
-          className="w-full h-full object-contain object-center"
-        />
-      </div>
+      {/* Hide everything until main image loads */}
+      {!imageLoaded ? (
+        <div className="absolute inset-0 bg-black" />
+      ) : (
+        <>
+          {/* Reveal Image (Behind) - Only show after main loads */}
+          <div className="absolute inset-0 bg-black">
+            <img
+              src={revealImage}
+              alt="Revealed"
+              className="w-full h-full object-contain object-center"
+            />
+          </div>
 
       {/* Scratch Canvas */}
       <AnimatePresence>
