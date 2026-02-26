@@ -51,23 +51,26 @@ export default function Projects() {
 
   return (
     <AdminLayout activePage="Projects">
-      <div className="flex h-[calc(100vh-3.5rem)]">
-        {/* Main Content - Projects */}
-        <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-4">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-2xl font-bold">Projects</h1>
-              <p className="text-sm text-gray-500">Music production projects</p>
-            </div>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium flex items-center gap-2 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              New
-            </button>
+      <div className="overflow-y-auto px-4 sm:px-6 lg:px-8 py-4">
+        {/* Total */}
+        <div className="text-xs text-gray-500 mb-3">
+          Total: {projects.length}
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-2xl font-bold">Projects</h1>
+            <p className="text-sm text-gray-500">Music production projects</p>
           </div>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium flex items-center gap-2 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            New
+          </button>
+        </div>
 
           {/* Search */}
           <div className="relative mb-4">
@@ -176,28 +179,6 @@ export default function Projects() {
               })}
             </div>
           )}
-        </div>
-
-        {/* Sidebar - Stats */}
-        <div className="w-48 border-l border-white/5 overflow-y-auto p-3 bg-white/[0.02]">
-          <h3 className="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wider">Status</h3>
-          <div className="space-y-2">
-            {Object.entries(statusCounts).map(([status, count]) => (
-              <button
-                key={status}
-                onClick={() => setStatusFilter(status)}
-                className={`w-full text-left px-2.5 py-2 rounded-lg border transition-all ${
-                  statusFilter === status
-                    ? statusColors[status] || 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                    : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10'
-                }`}
-              >
-                <div className="text-lg font-bold">{count}</div>
-                <div className="text-[10px] uppercase">{status}</div>
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
       <CreateProjectModal
