@@ -17,6 +17,8 @@ export default function ScratchReveal({
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [currentImage, setCurrentImage] = useState('top'); // 'top' or 'reveal'
+  const [canScratch, setCanScratch] = useState(true);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -40,10 +42,10 @@ export default function ScratchReveal({
     canvas.width = dimensions.width;
     canvas.height = dimensions.height;
 
-    // Fill with top image maintaining aspect ratio (cover)
+    // Fill with current image maintaining aspect ratio (cover)
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = topImage;
+    img.src = currentImage === 'top' ? topImage : revealImage;
     img.onload = () => {
       const imgRatio = img.width / img.height;
       const canvasRatio = canvas.width / canvas.height;
@@ -66,10 +68,10 @@ export default function ScratchReveal({
       
       ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
     };
-  }, [topImage, dimensions]);
+  }, [topImage, revealImage, dimensions, currentImage]);
 
   const scratch = (e) => {
-    if (!canvasRef.current || isRevealed) return;
+    if (!canvasRef.current || !canScratch) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -108,11 +110,21 @@ export default function ScratchReveal({
     const percentage = (transparent / (pixels.length / 4)) * 100;
     setScratchPercentage(percentage);
 
-    if (percentage > 50 && !isRevealed) {
+    if (percentage > 50) {
+      setCanScratch(false);
       setIsRevealed(true);
+      
+      // Show audio player only on first reveal (when showing revealImage)
+      if (currentImage === 'top') {
+        setTimeout(() => {
+          setShowAudioPlayer(true);
+        }, 1000);
+      }
+      
+      // Reset for next scratch after a delay
       setTimeout(() => {
-        setShowAudioPlayer(true);
-      }, 1000);
+        prepareNextImage();
+      }, 2000);
     }
   };
 
@@ -145,22 +157,22 @@ export default function ScratchReveal({
     setIsPlaying(!isPlaying);
   };
 
-  const resetScratch = () => {
+  const prepareNextImage = () => {
     setIsRevealed(false);
-    setShowAudioPlayer(false);
     setScratchPercentage(0);
-    setIsPlaying(false);
     
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-
+    // Toggle to the opposite image
+    setCurrentImage(prev => prev === 'top' ? 'reveal' : 'top');
+    
     const canvas = canvasRef.current;
+    if (!canvas) return;
+    
     const ctx = canvas.getContext('2d');
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = topImage;
+    
+    // Draw the next image to be scratched
+    img.src = currentImage === 'top' ? revealImage : topImage;
     img.onload = () => {
       ctx.globalCompositeOperation = 'source-over';
       
@@ -182,50 +194,36 @@ export default function ScratchReveal({
       }
       
       ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+      
+      // Re-enable scratching
+      setCanScratch(true);
     };
   };
 
-  useEffect(() => {
-    if (isRevealed) {
-      const timer = setTimeout(() => {
-        resetScratch();
-      }, 60000); // Reset after 1 minute
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isRevealed]);
-
   return (
     <div ref={containerRef} className="relative w-full h-full">
-      {/* Reveal Image (Behind) */}
+      {/* Background Image (the one being revealed) */}
       <div className="absolute inset-0">
         <img
-          src={revealImage}
-          alt="Revealed"
+          src={currentImage === 'top' ? revealImage : topImage}
+          alt="Background"
           className="w-full h-full object-cover object-center"
         />
       </div>
 
-      {/* Scratch Canvas */}
-      <AnimatePresence>
-        {!isRevealed && (
-          <motion.canvas
-            ref={canvasRef}
-            className="absolute inset-0 cursor-pointer touch-none"
-            style={{ width: '100%', height: '100%' }}
-            onMouseMove={handleMouseMove}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
-          />
-        )}
-      </AnimatePresence>
+      {/* Scratch Canvas - Always present */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 cursor-pointer touch-none"
+        style={{ width: '100%', height: '100%' }}
+        onMouseMove={handleMouseMove}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      />
 
       {/* Scratch Instruction */}
-      {!isRevealed && scratchPercentage < 5 && (
+      {canScratch && scratchPercentage < 5 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -241,9 +239,9 @@ export default function ScratchReveal({
         </motion.div>
       )}
 
-      {/* Audio Player Section */}
+      {/* Audio Player Section - Only show on first reveal */}
       <AnimatePresence>
-        {showAudioPlayer && (audioUrl || youtubeLink) && (
+        {showAudioPlayer && currentImage === 'reveal' && (audioUrl || youtubeLink) && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
