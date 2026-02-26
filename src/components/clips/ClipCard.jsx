@@ -210,14 +210,14 @@ export default function ClipCard({ clip, viewMode, delay, onUpdate }) {
         </div>
 
         {/* Content - Ultra Compact */}
-        <div className="px-2 py-1.5 space-y-1">
-          <h3 className="font-semibold text-[11px] line-clamp-1 leading-tight">{clip.title}</h3>
+        <div className="px-1.5 py-1 space-y-0.5">
+          <h3 className="font-semibold text-[10px] line-clamp-1 leading-tight">{clip.title}</h3>
           {artist && (
-            <p className="text-[9px] text-gray-500 line-clamp-1">{artist.stageName || artist.name}</p>
+            <p className="text-[8px] text-gray-500 line-clamp-1">{artist.stageName || artist.name}</p>
           )}
 
           {/* Actions Row */}
-          <div className="flex items-center justify-between gap-1 pt-1">
+          <div className="flex items-center justify-between gap-1 pt-0.5">
             {clip.platforms && clip.platforms.length > 0 && (
               <div className="flex items-center gap-0.5">
                 {clip.platforms.slice(0, 2).map(platform => {

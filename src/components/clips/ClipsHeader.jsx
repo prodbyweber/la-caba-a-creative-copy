@@ -37,34 +37,6 @@ export default function ClipsHeader({ filters, setFilters, activeTab, artistId }
               <Upload className="w-4 h-4" />
               Subir Clips
             </motion.button>
-
-            <Link to={createPageUrl("SocialAccounts")}>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 font-medium text-sm flex items-center gap-2 hover:bg-white/10 transition-all"
-              >
-                <LinkIcon className="w-4 h-4" />
-                Conectar Cuentas
-              </motion.button>
-            </Link>
-
-            <button
-              onClick={() => setFiltersOpen(!filtersOpen)}
-              className={`px-4 py-2.5 rounded-xl font-medium text-sm flex items-center gap-2 transition-all ${
-                filtersOpen || filters.status !== "all" || filters.platform.length > 0
-                  ? "bg-purple-500/10 border border-purple-500/20 text-purple-400"
-                  : "bg-white/5 border border-white/10 hover:bg-white/10"
-              }`}
-            >
-              <Filter className="w-4 h-4" />
-              Filtros
-              {(filters.status !== "all" || filters.platform.length > 0) && (
-                <span className="w-5 h-5 rounded-full bg-purple-500 text-white text-xs flex items-center justify-center">
-                  {(filters.status !== "all" ? 1 : 0) + filters.platform.length}
-                </span>
-              )}
-            </button>
           </div>
 
           {/* Right Actions */}
