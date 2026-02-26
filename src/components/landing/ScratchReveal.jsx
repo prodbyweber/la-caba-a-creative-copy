@@ -40,31 +40,12 @@ export default function ScratchReveal({
     canvas.width = dimensions.width;
     canvas.height = dimensions.height;
 
-    // Fill with top image maintaining aspect ratio (cover)
+    // Fill with top image
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = topImage;
     img.onload = () => {
-      const imgRatio = img.width / img.height;
-      const canvasRatio = canvas.width / canvas.height;
-      
-      let drawWidth, drawHeight, offsetX, offsetY;
-      
-      if (imgRatio > canvasRatio) {
-        // Image is wider than canvas
-        drawHeight = canvas.height;
-        drawWidth = img.width * (canvas.height / img.height);
-        offsetX = (canvas.width - drawWidth) / 2;
-        offsetY = 0;
-      } else {
-        // Image is taller than canvas
-        drawWidth = canvas.width;
-        drawHeight = img.height * (canvas.width / img.width);
-        offsetX = 0;
-        offsetY = (canvas.height - drawHeight) / 2;
-      }
-      
-      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     };
   }, [topImage, dimensions]);
 
@@ -146,11 +127,6 @@ export default function ScratchReveal({
   };
 
   const resetScratch = () => {
-    // Play reset sound effect
-    const resetSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjKH0fPTgjMGHm7A7+OZTR8PU6vm9LdnHgU7k9r0y3omBSp6zPLaizsIGGS56+ihUBELTKXh8bllHAU7jtv0yXgmBSh2yPDekzoIFmW56+mfTRAOUKXi8rVmHQQ7kdnzzXgmBSh2yO/dkjoJFmW46+mfTBEOT6Tj8rVmHQQ7k9rzznckBSt6yO/dkjoIF2S56+mhURENT6Ti87VnHgU7kdry0HkmBSp7yO/dkjoIF2S46+ieTRENT6Ph87FjHAQ7ldryz3smBSh3xvDekToIGGS56umfTRENT6Ph8rFiHAQ7k9ryz3omByt6xvDdkjkIF2S56+mfThAOTqPi87RlHQU7k9rx0HgmBSp6ye/dkjoIF2O56uihUREOTaPi8rVmHgU7jtry0XgmBSl5yO/dkjoIF2S46+mfThANT6Lh87RlHAU7k9ryz3klBSt7x+/dkjoIGGS46+mfThEOTqPh8rVmHQU7k9ryznklBSt6yO/dkjoIGGS46+meTRAOTqPh8rNkHAU7k9ryz3klBSp6yO/dkjoIGGS46+mfTRENT6Lh8rVmHQU8k9ryz3klBSp6yO/dkjoIF2S46+mfTRENT6Ph8rVmHQU7k9ryz3klBSp6yO/dkjoIF2S46+mfThAOTqPh8rVlHQU7ktryz3klBSp6ye/dkjoIFmS46+mfThAOTqPh8rVlHQU7ktryz3klBSp6yO/dkjoIF2S46+mfTRENTqPi8rVlHQU7ktryz3klBSp6yO/dkjoIFmS46+mfThAOTqPh8rVlHQQ7k9ryz3klBSp6yO/dkjoIF2S56+mfThAOTqLh8rVmHQU7k9ryz3kmBSp6yO/dkjoIF2S56+meTRANT6Lh8rVmHQU7k9ryz3klBSp6yO/dkjoIF2S56+mfThAOTqLh8rRlHQU7ktryz3gmBSp6ye/dkjoIF2S56+mfTRAOTqLh8rRlHQU7k9ryz3gmBSp6ye/dkjoIF2S46+mfTRAOTqLh8rRlHQU7k9ryz3gmBSp6ye/dkjoIFmS46+mfTRAOTqLh8rRlHQU7k9ryznklBSp6yO/dkjoIF2S46+mfTRAOTqLh8rRlHQU7k9ryz3gmBSp6ye/dkjoIFmS46+mfTRAOTqLh8rRlHQU7k9ryz3gmBSp6ye/dkjoIF2S46+mfTRAOTqLh8rRlHQU7k9ryz3gmBSp6ye/dkToIFmS46+mfTRAOTqLh8rRlHQU7k9ryz3gmBSp6ye/dkToIF2S46+mfTRAOTqLh8rRlHQU7ktryz3gmBSp6ye/dkToIF2S46+mfTRAOTqLh8rRlHQU7ktryz3gmBSp6ye/dkToIF2S46+mfTRAOTqLh8rRlHQU7ktryz3gmBSp6ye/dkToIF2S46+mfTRAOTqLh8rRlHQU7ktryz3gmBSp6ye/dkToIF2S46+mfTRAOTqLh8rRlHQU7ktryz3gmBSp6ye/dkToIF2S46+mfTRAOTqLh8rRlHQU7ktryz3gmBQ==');
-    resetSound.volume = 0.3;
-    resetSound.play().catch(() => {});
-
     setIsRevealed(false);
     setShowAudioPlayer(false);
     setScratchPercentage(0);
@@ -161,47 +137,22 @@ export default function ScratchReveal({
       audioRef.current.currentTime = 0;
     }
 
-    // Cinematic fade animation
-    setTimeout(() => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.src = topImage;
-      img.onload = () => {
-        ctx.globalCompositeOperation = 'source-over';
-        
-        const imgRatio = img.width / img.height;
-        const canvasRatio = canvas.width / canvas.height;
-        
-        let drawWidth, drawHeight, offsetX, offsetY;
-        
-        if (imgRatio > canvasRatio) {
-          drawHeight = canvas.height;
-          drawWidth = img.width * (canvas.height / img.height);
-          offsetX = (canvas.width - drawWidth) / 2;
-          offsetY = 0;
-        } else {
-          drawWidth = canvas.width;
-          drawHeight = img.height * (canvas.width / img.width);
-          offsetX = 0;
-          offsetY = (canvas.height - drawHeight) / 2;
-        }
-        
-        ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-      };
-    }, 300);
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = topImage;
+    img.onload = () => {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
   };
 
   useEffect(() => {
     if (isRevealed) {
       const timer = setTimeout(() => {
         resetScratch();
-      }, 2000); // Reset after 2 seconds
+      }, 60000); // Reset after 1 minute
       
       return () => clearTimeout(timer);
     }
@@ -214,7 +165,7 @@ export default function ScratchReveal({
         <img
           src={revealImage}
           alt="Revealed"
-          className="w-full h-full object-cover object-center"
+          className="w-full h-full object-contain object-center"
         />
       </div>
 
@@ -230,13 +181,28 @@ export default function ScratchReveal({
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
             initial={{ opacity: 1 }}
-            animate={{ opacity: isRevealed ? 0 : 1 }}
-            transition={{ duration: 0.5 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
           />
         )}
       </AnimatePresence>
 
-
+      {/* Scratch Instruction */}
+      {!isRevealed && scratchPercentage < 5 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        >
+          <div className="px-6 py-3 bg-black/60 backdrop-blur-xl rounded-xl border border-white/10">
+            <p className="text-sm text-white/90 font-medium">
+              <span className="hidden lg:inline">Pasa el mouse para revelar</span>
+              <span className="lg:hidden">Rasca con el dedo para revelar</span>
+            </p>
+          </div>
+        </motion.div>
+      )}
 
       {/* Audio Player Section */}
       <AnimatePresence>
