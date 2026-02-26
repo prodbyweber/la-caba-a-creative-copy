@@ -44,7 +44,6 @@ export default function Landing() {
         <DashboardPreview />
 
         <div id="startups"><StartupsSection /></div>
-          <MemberBanner />
         </main>
       )}
 
