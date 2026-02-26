@@ -74,7 +74,7 @@ export default function ScratchReveal({
 
     ctx.globalCompositeOperation = 'destination-out';
     ctx.beginPath();
-    ctx.arc(x, y, 40, 0, Math.PI * 2);
+    ctx.arc(x, y, 80, 0, Math.PI * 2);
     ctx.fill();
 
     // Calculate scratch percentage
@@ -89,7 +89,7 @@ export default function ScratchReveal({
     const percentage = (transparent / (pixels.length / 4)) * 100;
     setScratchPercentage(percentage);
 
-    if (percentage > 70 && !isRevealed) {
+    if (percentage > 50 && !isRevealed) {
       setIsRevealed(true);
       setTimeout(() => {
         setShowAudioPlayer(true);
@@ -97,19 +97,8 @@ export default function ScratchReveal({
     }
   };
 
-  const handleMouseDown = (e) => {
-    setIsScratching(true);
-    scratch(e);
-  };
-
   const handleMouseMove = (e) => {
-    if (isScratching) {
-      scratch(e);
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsScratching(false);
+    scratch(e);
   };
 
   const handleTouchStart = (e) => {
@@ -176,7 +165,7 @@ export default function ScratchReveal({
         <img
           src={revealImage}
           alt="Revealed"
-          className="w-full h-full object-cover object-center"
+          className="w-full h-full object-contain object-center"
         />
       </div>
 
@@ -187,10 +176,7 @@ export default function ScratchReveal({
             ref={canvasRef}
             className="absolute inset-0 cursor-pointer touch-none"
             style={{ width: '100%', height: '100%' }}
-            onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
@@ -202,7 +188,7 @@ export default function ScratchReveal({
       </AnimatePresence>
 
       {/* Scratch Instruction */}
-      {!isRevealed && scratchPercentage < 10 && (
+      {!isRevealed && scratchPercentage < 5 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -211,7 +197,7 @@ export default function ScratchReveal({
         >
           <div className="px-6 py-3 bg-black/60 backdrop-blur-xl rounded-xl border border-white/10">
             <p className="text-sm text-white/90 font-medium">
-              <span className="hidden lg:inline">Rasca con el mouse para revelar</span>
+              <span className="hidden lg:inline">Pasa el mouse para revelar</span>
               <span className="lg:hidden">Rasca con el dedo para revelar</span>
             </p>
           </div>
