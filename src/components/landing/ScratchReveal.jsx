@@ -15,7 +15,6 @@ export default function ScratchReveal({
   const [isRevealed, setIsRevealed] = useState(false);
   const [showAudioPlayer, setShowAudioPlayer] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [revealImageOpacity, setRevealImageOpacity] = useState(1);
   const audioRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -149,76 +148,72 @@ export default function ScratchReveal({
     setIsPlaying(!isPlaying);
   };
 
-  const resetCanvasOnly = () => {
+  const resetScratch = () => {
+   setIsRevealed(false);
+   setShowAudioPlayer(false);
+   setScratchPercentage(0);
+   setIsPlaying(false);
+
+   if (audioRef.current) {
+     audioRef.current.pause();
+     audioRef.current.currentTime = 0;
+   }
+
    const canvas = canvasRef.current;
    if (!canvas) return;
    const ctx = canvas.getContext('2d');
    if (!ctx) return;
-   const img = new Image();
-   img.crossOrigin = "anonymous";
-   img.src = topImage;
-   img.onload = () => {
-     ctx.globalCompositeOperation = 'source-over';
-
-     const imgRatio = img.width / img.height;
-     const canvasRatio = canvas.width / canvas.height;
-
-     let drawWidth, drawHeight, offsetX, offsetY;
-
-     if (imgRatio > canvasRatio) {
-       drawHeight = canvas.height;
-       drawWidth = img.width * (canvas.height / img.height);
-       offsetX = (canvas.width - drawWidth) / 2;
-       offsetY = 0;
-     } else {
-       drawWidth = canvas.width;
-       drawHeight = img.height * (canvas.width / img.width);
-       offsetX = 0;
-       offsetY = (canvas.height - drawHeight) / 2;
-     }
-
-     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-   };
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = topImage;
+    img.onload = () => {
+      ctx.globalCompositeOperation = 'source-over';
+      
+      const imgRatio = img.width / img.height;
+      const canvasRatio = canvas.width / canvas.height;
+      
+      let drawWidth, drawHeight, offsetX, offsetY;
+      
+      if (imgRatio > canvasRatio) {
+        drawHeight = canvas.height;
+        drawWidth = img.width * (canvas.height / img.height);
+        offsetX = (canvas.width - drawWidth) / 2;
+        offsetY = 0;
+      } else {
+        drawWidth = canvas.width;
+        drawHeight = img.height * (canvas.width / img.width);
+        offsetX = 0;
+        offsetY = (canvas.height - drawHeight) / 2;
+      }
+      
+      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+    };
   };
 
   useEffect(() => {
     if (isRevealed) {
-      // Fade out revealed image after 0.8 seconds
-      const fadeOutTimer = setTimeout(() => {
-        setRevealImageOpacity(0);
-        // Reset everything after fade out
+      const timer = setTimeout(() => {
+        // Fade out animation
+        setShowAudioPlayer(false);
         setTimeout(() => {
-          setIsRevealed(false);
-          setShowAudioPlayer(false);
-          setScratchPercentage(0);
-          setRevealImageOpacity(1);
-          setIsPlaying(false);
-          if (audioRef.current) {
-            audioRef.current.pause();
-            audioRef.current.currentTime = 0;
-          }
-          resetCanvasOnly();
-        }, 500); // Fade out duration
-      }, 800);
+          resetScratch();
+        }, 500);
+      }, 2000); // Reset after 2 seconds
       
-      return () => clearTimeout(fadeOutTimer);
+      return () => clearTimeout(timer);
     }
   }, [isRevealed]);
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
       {/* Reveal Image (Behind) */}
-      <motion.div 
-        className="absolute inset-0 bg-black"
-        animate={{ opacity: revealImageOpacity }}
-        transition={{ duration: 0.5, ease: "easeInOut" }}
-      >
+      <div className="absolute inset-0 bg-black">
         <img
           src={revealImage}
           alt="Revealed"
           className="w-full h-full object-contain object-center"
         />
-      </motion.div>
+      </div>
 
       {/* Scratch Canvas */}
       <AnimatePresence>
