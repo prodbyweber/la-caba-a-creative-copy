@@ -70,13 +70,13 @@ import Notes from './pages/Notes';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
 import Revisions from './pages/Revisions';
+import Services from './pages/Services';
 import Sessions from './pages/Sessions';
 import Settings from './pages/Settings';
 import SocialAccounts from './pages/SocialAccounts';
 import TrackDetail from './pages/TrackDetail';
 import Tracks from './pages/Tracks';
 import UserProfile from './pages/UserProfile';
-import Services from './pages/Services';
 import __Layout from './Layout.jsx';
 
 
@@ -104,13 +104,13 @@ export const PAGES = {
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
     "Revisions": Revisions,
+    "Services": Services,
     "Sessions": Sessions,
     "Settings": Settings,
     "SocialAccounts": SocialAccounts,
     "TrackDetail": TrackDetail,
     "Tracks": Tracks,
     "UserProfile": UserProfile,
-    "Services": Services,
 }
 
 export const pagesConfig = {
