@@ -110,6 +110,12 @@ export default function ScratchReveal({
 
     if (percentage > 50 && !isRevealed) {
       setIsRevealed(true);
+      
+      // Play reveal sound effect
+      const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjGL0/LPdisMHm7A7+OZSA0PVKvn77BdGA5EnePxwGciB0CO1PDOeS4FKIDS+NiQRQoRY7jo7qxXFg1Ho+HytGQcB0qM0/HRey8FJHjD8N6PRgwUYLTs7aVSEg5Nr+L2t2AfBzSH0fDLfC0FKXvG8OGRRQoQYbXs7KhUFA5IrOPyuWIbB0OIz/HKdysEJnXE8N+PQwsVYbnv7qVSEw5QreL1uWQcBjiK0O/MeywGJXfF8N2RQwoTYbXq7KlUEw5NruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPwoTYLbq7KlUEw5OruHzuGQcBzaH0PDLeSwFJ3fF8N6RPw==');
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+      
       setTimeout(() => {
         setShowAudioPlayer(true);
       }, 1000);
@@ -217,29 +223,14 @@ export default function ScratchReveal({
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.05 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
           />
         )}
       </AnimatePresence>
 
-      {/* Scratch Instruction */}
-      {!isRevealed && scratchPercentage < 5 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
-        >
-          <div className="px-6 py-3 bg-black/60 backdrop-blur-xl rounded-xl border border-white/10">
-            <p className="text-sm text-white/90 font-medium">
-              <span className="hidden lg:inline">Pasa el mouse para revelar</span>
-              <span className="lg:hidden">Rasca con el dedo para revelar</span>
-            </p>
-          </div>
-        </motion.div>
-      )}
+
 
       {/* Audio Player Section */}
       <AnimatePresence>
