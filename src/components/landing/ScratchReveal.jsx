@@ -32,48 +32,51 @@ export default function ScratchReveal({
   }, []);
 
   useEffect(() => {
-    if (!canvasRef.current || dimensions.width === 0) return;
+   if (!canvasRef.current || dimensions.width === 0 || !topImage) return;
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    
-    canvas.width = dimensions.width;
-    canvas.height = dimensions.height;
+   const canvas = canvasRef.current;
+   const ctx = canvas.getContext('2d');
+   if (!ctx) return;
 
-    // Fill with top image maintaining aspect ratio (cover)
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = topImage;
-    img.onload = () => {
-      const imgRatio = img.width / img.height;
-      const canvasRatio = canvas.width / canvas.height;
-      
-      let drawWidth, drawHeight, offsetX, offsetY;
-      
-      if (imgRatio > canvasRatio) {
-        // Image is wider than canvas
-        drawHeight = canvas.height;
-        drawWidth = img.width * (canvas.height / img.height);
-        offsetX = (canvas.width - drawWidth) / 2;
-        offsetY = 0;
-      } else {
-        // Image is taller than canvas
-        drawWidth = canvas.width;
-        drawHeight = img.height * (canvas.width / img.width);
-        offsetX = 0;
-        offsetY = (canvas.height - drawHeight) / 2;
-      }
-      
-      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-    };
+   canvas.width = dimensions.width;
+   canvas.height = dimensions.height;
+
+   // Fill with top image maintaining aspect ratio (cover)
+   const img = new Image();
+   img.crossOrigin = "anonymous";
+   img.src = topImage;
+   img.onload = () => {
+     const imgRatio = img.width / img.height;
+     const canvasRatio = canvas.width / canvas.height;
+
+     let drawWidth, drawHeight, offsetX, offsetY;
+
+     if (imgRatio > canvasRatio) {
+       // Image is wider than canvas
+       drawHeight = canvas.height;
+       drawWidth = img.width * (canvas.height / img.height);
+       offsetX = (canvas.width - drawWidth) / 2;
+       offsetY = 0;
+     } else {
+       // Image is taller than canvas
+       drawWidth = canvas.width;
+       drawHeight = img.height * (canvas.width / img.width);
+       offsetX = 0;
+       offsetY = (canvas.height - drawHeight) / 2;
+     }
+
+     ctx.globalCompositeOperation = 'source-over';
+     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+   };
   }, [topImage, dimensions]);
 
   const scratch = (e) => {
-    if (!canvasRef.current || isRevealed) return;
+   if (!canvasRef.current || isRevealed) return;
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
+   const canvas = canvasRef.current;
+   const ctx = canvas.getContext('2d');
+   if (!ctx) return;
+   const rect = canvas.getBoundingClientRect();
     
     let x, y;
     
@@ -146,18 +149,20 @@ export default function ScratchReveal({
   };
 
   const resetScratch = () => {
-    setIsRevealed(false);
-    setShowAudioPlayer(false);
-    setScratchPercentage(0);
-    setIsPlaying(false);
-    
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
+   setIsRevealed(false);
+   setShowAudioPlayer(false);
+   setScratchPercentage(0);
+   setIsPlaying(false);
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+   if (audioRef.current) {
+     audioRef.current.pause();
+     audioRef.current.currentTime = 0;
+   }
+
+   const canvas = canvasRef.current;
+   if (!canvas) return;
+   const ctx = canvas.getContext('2d');
+   if (!ctx) return;
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = topImage;
@@ -202,11 +207,11 @@ export default function ScratchReveal({
   return (
     <div ref={containerRef} className="relative w-full h-full">
       {/* Reveal Image (Behind) */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 bg-black">
         <img
           src={revealImage}
           alt="Revealed"
-          className="w-full h-full object-cover object-center"
+          className="w-full h-full object-contain object-center"
         />
       </div>
 
