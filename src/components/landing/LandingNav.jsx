@@ -5,13 +5,11 @@ import { createPageUrl } from "@/utils";
 import { Menu, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import ArtistSignupModal from "./ArtistSignupModal";
 
 export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [showArtistSignup, setShowArtistSignup] = useState(false);
   const navigate = useNavigate();
 
   const { data: config } = useQuery({
@@ -27,10 +25,6 @@ export default function LandingNav() {
       try {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
-        // Mostrar modal de artista si el usuario está logueado pero no tiene perfil
-        if (currentUser && !currentUser.artist_id) {
-          setShowArtistSignup(true);
-        }
       } catch (error) {
         setUser(null);
       }
@@ -38,21 +32,13 @@ export default function LandingNav() {
     checkUser();
   }, []);
 
-  const handleBeginClick = () => {
-    // Redirigir a login de Google, volviendo a Landing después
-    base44.auth.redirectToLogin(createPageUrl("Landing"));
-  };
-
   const handleLogin = async () => {
     try {
       const currentUser = await base44.auth.me();
       if (currentUser?.role === 'admin') {
         navigate(createPageUrl("AdminDashboard"));
       } else {
-        // Después de login, mostrar signup modal si no tiene perfil de artista
-        if (!currentUser?.artist_id) {
-          setShowArtistSignup(true);
-        }
+        alert("Acceso restringido: Solo administradores pueden acceder");
       }
     } catch (error) {
       base44.auth.redirectToLogin(window.location.href);
@@ -135,12 +121,12 @@ export default function LandingNav() {
             {navItems.map((item) => (
               item.highlight ? (
                 <button
-                   key={item.key}
-                   onClick={item.label === "Comenzar" ? handleBeginClick : () => scrollToSection(item.id)}
-                   className="px-5 py-2 rounded-full bg-gradient-to-r from-purple-600 to-purple-500 text-white text-sm font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-all"
-                 >
-                   {item.label}
-                 </button>
+                  key={item.key}
+                  onClick={() => scrollToSection(item.id)}
+                  className="px-5 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-medium hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
+                >
+                  {item.label}
+                </button>
               ) : item.url ? (
                 <Link
                   key={item.key}
@@ -242,16 +228,16 @@ export default function LandingNav() {
                     </Link>
                   ) : (
                     <button
-                       key={item.key}
-                       onClick={item.label === "Comenzar" ? handleBeginClick : () => scrollToSection(item.id)}
-                       className={`text-2xl font-light text-left transition-colors ${
-                         item.highlight 
-                           ? 'text-purple-400 font-medium' 
-                           : 'text-gray-300 hover:text-white'
-                       }`}
-                     >
-                       {item.label}
-                     </button>
+                      key={item.key}
+                      onClick={() => scrollToSection(item.id)}
+                      className={`text-2xl font-light text-left transition-colors ${
+                        item.highlight 
+                          ? 'text-emerald-400 font-medium' 
+                          : 'text-gray-300 hover:text-white'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
                   )
                 ))}
                 {adminNavItems.map((item) => (
@@ -295,15 +281,6 @@ export default function LandingNav() {
               </div>
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {showArtistSignup && (
-          <ArtistSignupModal 
-            onClose={() => setShowArtistSignup(false)} 
-            user={user}
-          />
         )}
       </AnimatePresence>
     </>
