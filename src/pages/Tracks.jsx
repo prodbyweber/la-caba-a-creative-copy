@@ -582,6 +582,125 @@ function TrackEditModal({ track, projects, onClose }) {
             </label>
           </div>
 
+          {/* Versions Section */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-white">Versiones del Track</h4>
+            
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">MP3</label>
+                <input
+                  type="url"
+                  value={formData.versions?.mp3 || ""}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    versions: { ...formData.versions, mp3: e.target.value }
+                  })}
+                  placeholder="https://drive.google.com/..."
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">WAV 24bit</label>
+                <input
+                  type="url"
+                  value={formData.versions?.wav_24bit || ""}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    versions: { ...formData.versions, wav_24bit: e.target.value }
+                  })}
+                  placeholder="https://drive.google.com/..."
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Stems</label>
+                <input
+                  type="url"
+                  value={formData.versions?.stems || ""}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    versions: { ...formData.versions, stems: e.target.value }
+                  })}
+                  placeholder="https://drive.google.com/..."
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Mix</label>
+                <input
+                  type="url"
+                  value={formData.versions?.mix || ""}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    versions: { ...formData.versions, mix: e.target.value }
+                  })}
+                  placeholder="https://drive.google.com/..."
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Master 24bit</label>
+                <input
+                  type="url"
+                  value={formData.versions?.master_24bit || ""}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    versions: { ...formData.versions, master_24bit: e.target.value }
+                  })}
+                  placeholder="https://drive.google.com/..."
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Show</label>
+                <input
+                  type="url"
+                  value={formData.versions?.show || ""}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    versions: { ...formData.versions, show: e.target.value }
+                  })}
+                  placeholder="https://drive.google.com/..."
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Acapella</label>
+                <input
+                  type="url"
+                  value={formData.versions?.acapella || ""}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    versions: { ...formData.versions, acapella: e.target.value }
+                  })}
+                  placeholder="https://drive.google.com/..."
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Beat WAV</label>
+                <input
+                  type="url"
+                  value={formData.versions?.beat_wav || ""}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    versions: { ...formData.versions, beat_wav: e.target.value }
+                  })}
+                  placeholder="https://drive.google.com/..."
+                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Actions */}
           <div className="flex gap-3 pt-4">
             <button type="button" onClick={onClose} className="flex-1 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium">
