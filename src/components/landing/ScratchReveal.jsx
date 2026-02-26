@@ -288,9 +288,14 @@ export default function ScratchReveal({
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
-            initial={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.98, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 0.6, ease: "easeInOut" }}
+            transition={{ 
+              opacity: { duration: 0.4, ease: "easeOut" },
+              scale: { duration: 0.6, ease: "easeOut" },
+              y: { duration: 0.6, ease: "easeOut" }
+            }}
           />
         )}
       </AnimatePresence>
