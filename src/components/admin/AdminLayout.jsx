@@ -22,17 +22,13 @@ import { createPageUrl } from "@/utils";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", page: "AdminDashboard" },
-  { icon: TrendingUp, label: "Inversor", page: "InvestorDashboard" },
-  { icon: DollarSign, label: "Contabilidad Pro", page: "FinanceDashboard" },
   { icon: Users, label: "Artists", page: "Artists" },
   { icon: FolderKanban, label: "Projects", page: "Projects" },
   { icon: Music2, label: "Tracks", page: "Tracks" },
   { icon: Calendar, label: "Calendars", page: "Calendars" },
-  { icon: GitPullRequest, label: "Revisions", page: "Revisions" },
-  { icon: MessageSquare, label: "Notes", page: "Notes" },
-  { icon: Video, label: "Content", page: "ContentCalendar" },
-  { icon: Settings, label: "Landing Editor", page: "LandingEditor" },
-  { icon: Settings, label: "Settings", page: "Settings" }
+  { icon: DollarSign, label: "Contabilidad Pro", page: "FinanceDashboard" },
+  { icon: TrendingUp, label: "Inversor", page: "InvestorDashboard" },
+  { icon: Settings, label: "Landing Editor", page: "LandingEditor" }
 ];
 
 export default function AdminLayout({ children, activePage }) {
@@ -92,7 +88,12 @@ export default function AdminLayout({ children, activePage }) {
           </div>
 
           {/* User Menu */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
+            <Link to={createPageUrl("Settings")}>
+              <button className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white transition-all">
+                <Settings className="w-4 h-4" />
+              </button>
+            </Link>
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[10px] font-bold cursor-pointer">
               W
             </div>
