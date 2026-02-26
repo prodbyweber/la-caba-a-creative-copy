@@ -13,8 +13,11 @@ export default function BrandsCarousel({ logos }) {
   
   const displayLogos = (logos && logos.length > 0) ? logos : defaultLogos;
   
-  // Duplicar logos para loop infinito suave
-  const duplicatedLogos = [...displayLogos, ...displayLogos, ...displayLogos];
+  // Duplicar logos múltiples veces para loop infinito continuo
+  const duplicatedLogos = [...displayLogos, ...displayLogos, ...displayLogos, ...displayLogos];
+  
+  // Calcular el ancho total de un conjunto de logos (ancho + gap)
+  const totalWidth = displayLogos.length * (96 + 64); // 96px (w-24) + 64px (gap-16)
 
   return (
     <section className="relative -mt-14 sm:-mt-4 lg:-mt-4 pt-0 pb-1 lg:pb-2 bg-zinc-950/50 border-t border-white/5">
@@ -27,13 +30,13 @@ export default function BrandsCarousel({ logos }) {
           <motion.div
             className="flex gap-16 items-center"
             animate={{
-              x: [0, -100 * displayLogos.length],
+              x: [-totalWidth, 0],
             }}
             transition={{
               x: {
                 repeat: Infinity,
                 repeatType: "loop",
-                duration: displayLogos.length * 3,
+                duration: displayLogos.length * 4,
                 ease: "linear",
               },
             }}
