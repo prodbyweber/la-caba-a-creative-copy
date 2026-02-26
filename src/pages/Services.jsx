@@ -85,56 +85,138 @@ const services = [
   }
 ];
 
-function ServiceCard({ service, index }) {
+function ServiceSection({ service, index }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.8, 1, 1, 0.8]);
+
   const Icon = service.icon;
+  const isEven = index % 2 === 0;
 
   return (
-    <motion.div
+    <motion.section
       ref={ref}
-      initial={{ opacity: 0, y: 100, rotateX: -15 }}
-      animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
-      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-      className="group relative"
+      style={{ opacity }}
+      className="relative min-h-screen flex items-center justify-center px-6 py-20"
     >
+      {/* Film grain texture overlay */}
+      <div className="absolute inset-0 opacity-20 mix-blend-overlay pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          backgroundSize: "200px 200px"
+        }}
+      />
+
+      {/* Animated gradient blobs */}
       <motion.div
-        whileHover={{ scale: 1.05, z: 50 }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="relative h-full bg-gradient-to-br from-white/5 to-white/[0.02] rounded-3xl p-8 border border-white/10 backdrop-blur-sm overflow-hidden"
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        {/* Background gradient on hover */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${service.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
-        
-        {/* Icon */}
+        style={{ y }}
+        className={`absolute ${isEven ? '-left-1/4' : '-right-1/4'} top-1/4 w-96 h-96 bg-gradient-to-br ${service.color} rounded-full blur-3xl opacity-20`}
+      />
+
+      <div className="relative z-10 max-w-7xl mx-auto w-full">
         <motion.div
-          whileHover={{ rotate: 360, scale: 1.2 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
-          className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${service.color} flex items-center justify-center mb-6 relative z-10`}
+          style={{ scale }}
+          className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12 lg:gap-20`}
         >
-          <Icon className="w-8 h-8 text-white" />
+          {/* Icon with 3D effect */}
+          <motion.div
+            whileInView={{ rotateY: 360 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+            viewport={{ once: true }}
+            className="relative flex-shrink-0"
+            style={{ transformStyle: "preserve-3d" }}
+          >
+            <div className={`w-32 h-32 lg:w-48 lg:h-48 rounded-3xl bg-gradient-to-br ${service.color} flex items-center justify-center relative`}
+              style={{
+                boxShadow: `0 20px 60px -10px rgba(0,0,0,0.5), 0 0 100px rgba(255,255,255,0.1)`,
+              }}
+            >
+              <Icon className="w-16 h-16 lg:w-24 lg:h-24 text-white" />
+              
+              {/* Retro scan lines */}
+              <div className="absolute inset-0 rounded-3xl opacity-30"
+                style={{
+                  backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.3) 2px, rgba(0,0,0,0.3) 4px)"
+                }}
+              />
+            </div>
+
+            {/* Glow effect */}
+            <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${service.color} blur-2xl opacity-50 -z-10`} />
+          </motion.div>
+
+          {/* Content */}
+          <div className={`flex-1 ${isEven ? 'lg:text-left' : 'lg:text-right'} text-center`}>
+            <motion.div
+              initial={{ opacity: 0, x: isEven ? -100 : 100 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+              viewport={{ once: true }}
+            >
+              {/* Number */}
+              <div className={`text-9xl lg:text-[12rem] font-black mb-4 leading-none bg-gradient-to-br ${service.color} bg-clip-text text-transparent opacity-20`}
+                style={{
+                  textShadow: "0 0 80px rgba(255,255,255,0.2)",
+                  fontFamily: "'Impact', sans-serif",
+                  letterSpacing: "-0.05em"
+                }}
+              >
+                {String(index + 1).padStart(2, '0')}
+              </div>
+
+              {/* Title with texture */}
+              <h2 
+                className="text-5xl lg:text-8xl font-black mb-8 leading-none"
+                style={{
+                  background: `linear-gradient(135deg, #fff 0%, #ddd 50%, #fff 100%)`,
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  textShadow: "0 2px 20px rgba(255,255,255,0.1)",
+                  fontFamily: "'Impact', 'Arial Black', sans-serif",
+                  letterSpacing: "-0.02em",
+                  filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.5))"
+                }}
+              >
+                {service.title}
+              </h2>
+
+              {/* Description */}
+              <p className="text-xl lg:text-2xl text-gray-400 font-light leading-relaxed max-w-2xl mx-auto lg:mx-0"
+                style={{
+                  fontFamily: "'Helvetica Neue', sans-serif",
+                  letterSpacing: "0.02em"
+                }}
+              >
+                {service.description}
+              </p>
+
+              {/* Decorative line */}
+              <motion.div
+                initial={{ width: 0 }}
+                whileInView={{ width: "100%" }}
+                transition={{ duration: 1, delay: 0.5 }}
+                viewport={{ once: true }}
+                className={`h-px bg-gradient-to-r ${isEven ? 'from-white/50 to-transparent' : 'from-transparent to-white/50'} mt-8 max-w-md mx-auto lg:mx-0`}
+              />
+            </motion.div>
+          </div>
         </motion.div>
+      </div>
 
-        {/* Title */}
-        <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent relative z-10">
-          {service.title}
-        </h3>
-
-        {/* Description */}
-        <p className="text-gray-400 leading-relaxed relative z-10">
-          {service.description}
-        </p>
-
-        {/* Decorative element */}
-        <motion.div
-          initial={{ scale: 0, rotate: 0 }}
-          whileHover={{ scale: 1, rotate: 180 }}
-          transition={{ duration: 0.5 }}
-          className={`absolute -right-10 -bottom-10 w-40 h-40 bg-gradient-to-br ${service.color} rounded-full blur-3xl opacity-0 group-hover:opacity-20`}
-        />
-      </motion.div>
-    </motion.div>
+      {/* Vignette effect */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{
+          background: "radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.5) 100%)"
+        }}
+      />
+    </motion.section>
   );
 }
 
@@ -248,58 +330,57 @@ export default function Services() {
         </div>
       </motion.section>
 
-      {/* Services Grid */}
-      <section className="relative py-32 px-6">
-        <div className="max-w-7xl mx-auto">
+      {/* Services Sections */}
+      <div className="relative">
+        {services.map((service, index) => (
+          <ServiceSection key={index} service={service} index={index} />
+        ))}
+
+        {/* Bottom CTA */}
+        <section className="relative min-h-screen flex items-center justify-center px-6">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-20"
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="text-center relative z-10"
           >
-            <h2 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                Nuestro Ecosistema
-              </span>
-            </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Un conjunto completo de servicios diseñados para impulsar tu carrera artística
+            <h3 className="text-6xl md:text-8xl font-black mb-6"
+              style={{
+                background: "linear-gradient(135deg, #fff 0%, #aaa 50%, #fff 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                fontFamily: "'Impact', sans-serif",
+                letterSpacing: "-0.02em"
+              }}
+            >
+              ¿Listo para comenzar?
+            </h3>
+            <p className="text-xl md:text-2xl text-gray-400 mb-10 max-w-2xl mx-auto font-light">
+              Agenda una consulta gratuita y descubre cómo podemos ayudarte a alcanzar tus objetivos
             </p>
+            <Link to={createPageUrl("Landing")}>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-10 py-5 rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-lg font-semibold hover:shadow-2xl hover:shadow-emerald-500/50 transition-all"
+              >
+                Contactar
+              </motion.button>
+            </Link>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service, index) => (
-              <ServiceCard key={index} service={service} index={index} />
-            ))}
+          {/* Background elements */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 rounded-full blur-3xl"
+            />
           </div>
-        </div>
-
-        {/* Bottom CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="text-center mt-32"
-        >
-          <h3 className="text-4xl md:text-5xl font-bold mb-6">
-            ¿Listo para comenzar?
-          </h3>
-          <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-            Agenda una consulta gratuita y descubre cómo podemos ayudarte a alcanzar tus objetivos
-          </p>
-          <Link to={createPageUrl("Landing")}>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-10 py-5 rounded-full bg-gradient-to-r from-emerald-500 to-cyan-500 text-white text-lg font-semibold hover:shadow-2xl hover:shadow-emerald-500/50 transition-all"
-            >
-              Contactar
-            </motion.button>
-          </Link>
-        </motion.div>
-      </section>
+        </section>
+      </div>
 
       {/* Footer gradient */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
