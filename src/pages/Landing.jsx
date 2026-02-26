@@ -7,6 +7,7 @@ import BrandsCarousel from "@/components/landing/BrandsCarousel";
 import StoriesSection from "@/components/landing/StoriesSection";
 import StartupsSection from "@/components/landing/StartupsSection";
 import DashboardPreview from "@/components/landing/DashboardPreview";
+import CatalogShowcase from "@/components/landing/CatalogShowcase";
 
 import AboutSection from "@/components/landing/AboutSection";
 import TeamSection from "@/components/landing/TeamSection";
@@ -37,6 +38,7 @@ export default function Landing() {
         <main>
           <Hero config={config} />
         <BrandsCarousel logos={config?.brand_logos} />
+        <CatalogShowcase />
         <AboutSection />
         <div id="team"><TeamSection /></div>
         <div id="stories"><StoriesSection /></div>
