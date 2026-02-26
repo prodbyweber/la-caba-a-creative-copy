@@ -81,6 +81,7 @@ export default function LandingNav() {
   const adnMarcaLink = config?.adn_marca_link || createPageUrl("ADNdeMarca");
 
   const navItems = [
+    { label: "Servicios", url: createPageUrl("Services"), key: "servicios" },
     { label: "Quiénes Somos", id: "team", key: "quienes_somos" },
     { label: "Artistas", id: "stories", key: "artistas" },
     { label: "ADN de Marca", url: adnMarcaLink, key: "adn_marca" },
