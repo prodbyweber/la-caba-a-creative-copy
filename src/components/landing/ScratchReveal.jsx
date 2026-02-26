@@ -19,6 +19,17 @@ export default function ScratchReveal({
   const [canScratch, setCanScratch] = useState(true);
   const audioRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const topImageRef = useRef(new Image());
+  const revealImageRef = useRef(new Image());
+
+  // Preload images immediately
+  useEffect(() => {
+    topImageRef.current.crossOrigin = "anonymous";
+    topImageRef.current.src = topImage;
+    
+    revealImageRef.current.crossOrigin = "anonymous";
+    revealImageRef.current.src = revealImage;
+  }, [topImage, revealImage]);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -33,8 +44,32 @@ export default function ScratchReveal({
     return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
+  const drawTopImage = (canvas, ctx, img) => {
+    if (!canvas || !ctx || !img || !img.width) return;
+
+    const imgRatio = img.width / img.height;
+    const canvasRatio = canvas.width / canvas.height;
+
+    let drawWidth, drawHeight, offsetX, offsetY;
+
+    if (imgRatio > canvasRatio) {
+      drawHeight = canvas.height;
+      drawWidth = img.width * (canvas.height / img.height);
+      offsetX = (canvas.width - drawWidth) / 2;
+      offsetY = 0;
+    } else {
+      drawWidth = canvas.width;
+      drawHeight = img.height * (canvas.width / img.width);
+      offsetX = 0;
+      offsetY = (canvas.height - drawHeight) / 2;
+    }
+
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+  };
+
   useEffect(() => {
-   if (!canvasRef.current || dimensions.width === 0 || !topImage) return;
+   if (!canvasRef.current || dimensions.width === 0) return;
 
    const canvas = canvasRef.current;
    const ctx = canvas.getContext('2d');
@@ -43,34 +78,16 @@ export default function ScratchReveal({
    canvas.width = dimensions.width;
    canvas.height = dimensions.height;
 
-   // Fill with top image maintaining aspect ratio (cover)
-   const img = new Image();
-   img.crossOrigin = "anonymous";
-   img.src = topImage;
-   img.onload = () => {
-     const imgRatio = img.width / img.height;
-     const canvasRatio = canvas.width / canvas.height;
-
-     let drawWidth, drawHeight, offsetX, offsetY;
-
-     if (imgRatio > canvasRatio) {
-       // Image is wider than canvas
-       drawHeight = canvas.height;
-       drawWidth = img.width * (canvas.height / img.height);
-       offsetX = (canvas.width - drawWidth) / 2;
-       offsetY = 0;
-     } else {
-       // Image is taller than canvas
-       drawWidth = canvas.width;
-       drawHeight = img.height * (canvas.width / img.width);
-       offsetX = 0;
-       offsetY = (canvas.height - drawHeight) / 2;
-     }
-
-     ctx.globalCompositeOperation = 'source-over';
-     ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-   };
-  }, [topImage, dimensions]);
+   // Draw immediately if image is cached
+   if (topImageRef.current && topImageRef.current.width) {
+     drawTopImage(canvas, ctx, topImageRef.current);
+   } else {
+     // Wait for image to load
+     topImageRef.current.onload = () => {
+       drawTopImage(canvas, ctx, topImageRef.current);
+     };
+   }
+   }, [dimensions]);
 
   const scratch = (e) => {
    if (!canvasRef.current || isRevealed || !canScratch) return;
