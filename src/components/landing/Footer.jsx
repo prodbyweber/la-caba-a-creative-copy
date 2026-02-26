@@ -134,12 +134,12 @@ export default function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/2b10817bf_LOGOPNGTRANSPARENTCABANACREATIVE.png" 
-                alt="La Cabaña Creative"
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/e6c31f5fb_Logocabanacreativefondonegro2026.png" 
+                alt="Cabaña Creative"
                 className="h-12 w-auto"
               />
               <span className="text-xl font-semibold tracking-tight">
-                La Cabaña <span className="text-orange-500">Creative</span>
+                Cabaña <span className="text-orange-500">Creative</span>
               </span>
             </div>
             <p className="text-gray-500 text-sm max-w-sm leading-relaxed mb-3">
@@ -174,7 +174,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-gray-600">
-            © {new Date().getFullYear()} La Cabaña Creative. All rights reserved.
+            © {new Date().getFullYear()} Cabaña Creative. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a href="#" className="text-sm text-gray-600 hover:text-white transition-colors">Privacidad</a>
