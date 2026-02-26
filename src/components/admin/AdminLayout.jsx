@@ -57,7 +57,7 @@ export default function AdminLayout({ children, activePage }) {
                  <img 
                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/d93ba7d4d_Lacabanacreativelogooficial2026.png" 
                    alt="Cabaña Creative"
-                   className="h-6 sm:h-7 w-auto cursor-pointer hover:scale-105 transition-transform"
+                   className="h-12 w-auto cursor-pointer hover:scale-105 transition-transform"
                  />
                </Link>
                <div className="hidden sm:block">
