@@ -16,6 +16,7 @@ export default function ScratchReveal({
   const [showAudioPlayer, setShowAudioPlayer] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [canScratch, setCanScratch] = useState(true);
   const audioRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -72,7 +73,7 @@ export default function ScratchReveal({
   }, [topImage, dimensions]);
 
   const scratch = (e) => {
-   if (!canvasRef.current || isRevealed) return;
+   if (!canvasRef.current || isRevealed || !canScratch) return;
 
    const canvas = canvasRef.current;
    const ctx = canvas.getContext('2d');
@@ -113,6 +114,7 @@ export default function ScratchReveal({
     setScratchPercentage(percentage);
 
     if (percentage > 50 && !isRevealed) {
+      setCanScratch(false);
       setIsRevealed(true);
       setTimeout(() => {
         setShowAudioPlayer(true);
@@ -165,15 +167,14 @@ export default function ScratchReveal({
    const ctx = canvas.getContext('2d');
    if (!ctx) return;
 
-   // Clear canvas completely
+   // Reset canvas with initial image
    ctx.clearRect(0, 0, canvas.width, canvas.height);
+   ctx.globalCompositeOperation = 'source-over';
 
    const img = new Image();
    img.crossOrigin = "anonymous";
    img.src = topImage;
    img.onload = () => {
-     ctx.globalCompositeOperation = 'source-over';
-
      const imgRatio = img.width / img.height;
      const canvasRatio = canvas.width / canvas.height;
 
@@ -206,9 +207,10 @@ export default function ScratchReveal({
           setTimeout(() => {
             resetScratch();
             setIsTransitioning(false);
+            setCanScratch(true);
           }, 800); // Duration of burnout transition
         }, 500);
-      }, 1000); // Show revealed image for 1 second
+      }, 2000); // Show revealed image for 2 seconds
       
       return () => clearTimeout(timer);
     }
