@@ -269,8 +269,6 @@ export default function ScratchReveal({
         )}
       </AnimatePresence>
 
-
-
       {/* Audio Player Section */}
       <AnimatePresence>
         {showAudioPlayer && (audioUrl || youtubeLink) && (
