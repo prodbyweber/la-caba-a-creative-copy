@@ -17,7 +17,6 @@ export default function ScratchReveal({
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [showingTop, setShowingTop] = useState(true);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -70,7 +69,7 @@ export default function ScratchReveal({
   }, [topImage, dimensions]);
 
   const scratch = (e) => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current || isRevealed) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -109,99 +108,16 @@ export default function ScratchReveal({
     const percentage = (transparent / (pixels.length / 4)) * 100;
     setScratchPercentage(percentage);
 
-    if (showingTop && percentage > 50 && !isRevealed) {
+    if (percentage > 50 && !isRevealed) {
       setIsRevealed(true);
-      setShowingTop(false);
       setTimeout(() => {
         setShowAudioPlayer(true);
       }, 1000);
-    } else if (!showingTop && percentage < 50) {
-      setIsRevealed(false);
-      setShowingTop(true);
-      setShowAudioPlayer(false);
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
-      setIsPlaying(false);
     }
   };
 
   const handleMouseMove = (e) => {
-    if (showingTop) {
-      scratch(e);
-    } else {
-      paint(e);
-    }
-  };
-
-  const paint = (e) => {
-    if (!canvasRef.current) return;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const rect = canvas.getBoundingClientRect();
-    
-    let x, y;
-    
-    if (e.type.includes('touch')) {
-      x = e.touches[0].clientX - rect.left;
-      y = e.touches[0].clientY - rect.top;
-    } else {
-      x = e.clientX - rect.left;
-      y = e.clientY - rect.top;
-    }
-
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    x *= scaleX;
-    y *= scaleY;
-
-    ctx.globalCompositeOperation = 'source-over';
-    
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = topImage;
-    img.onload = () => {
-      const imgRatio = img.width / img.height;
-      const canvasRatio = canvas.width / canvas.height;
-      
-      let drawWidth, drawHeight, offsetX, offsetY;
-      
-      if (imgRatio > canvasRatio) {
-        drawHeight = canvas.height;
-        drawWidth = img.width * (canvas.height / img.height);
-        offsetX = (canvas.width - drawWidth) / 2;
-        offsetY = 0;
-      } else {
-        drawWidth = canvas.width;
-        drawHeight = img.height * (canvas.width / img.width);
-        offsetX = 0;
-        offsetY = (canvas.height - drawHeight) / 2;
-      }
-      
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(x, y, 80, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-      ctx.restore();
-    };
-
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const pixels = imageData.data;
-    let transparent = 0;
-    
-    for (let i = 3; i < pixels.length; i += 4) {
-      if (pixels[i] === 0) transparent++;
-    }
-    
-    const percentage = (transparent / (pixels.length / 4)) * 100;
-    setScratchPercentage(percentage);
-
-    if (percentage < 50) {
-      scratch(e);
-    }
+    scratch(e);
   };
 
   const handleTouchStart = (e) => {
@@ -269,7 +185,15 @@ export default function ScratchReveal({
     };
   };
 
-
+  useEffect(() => {
+    if (isRevealed) {
+      const timer = setTimeout(() => {
+        resetScratch();
+      }, 60000); // Reset after 1 minute
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isRevealed]);
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
@@ -283,18 +207,25 @@ export default function ScratchReveal({
       </div>
 
       {/* Scratch Canvas */}
-      <motion.canvas
-        ref={canvasRef}
-        className="absolute inset-0 cursor-pointer touch-none"
-        style={{ width: '100%', height: '100%', opacity: showingTop ? 1 : 0.99 }}
-        onMouseMove={handleMouseMove}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      />
+      <AnimatePresence>
+        {!isRevealed && (
+          <motion.canvas
+            ref={canvasRef}
+            className="absolute inset-0 cursor-pointer touch-none"
+            style={{ width: '100%', height: '100%' }}
+            onMouseMove={handleMouseMove}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8 }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Scratch Instruction */}
-      {scratchPercentage < 5 && (
+      {!isRevealed && scratchPercentage < 5 && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -303,8 +234,8 @@ export default function ScratchReveal({
         >
           <div className="px-6 py-3 bg-black/60 backdrop-blur-xl rounded-xl border border-white/10">
             <p className="text-sm text-white/90 font-medium">
-              <span className="hidden lg:inline">{showingTop ? 'Pasa el mouse para revelar' : 'Pasa el mouse para volver'}</span>
-              <span className="lg:hidden">{showingTop ? 'Rasca con el dedo para revelar' : 'Pinta con el dedo para volver'}</span>
+              <span className="hidden lg:inline">Pasa el mouse para revelar</span>
+              <span className="lg:hidden">Rasca con el dedo para revelar</span>
             </p>
           </div>
         </motion.div>
