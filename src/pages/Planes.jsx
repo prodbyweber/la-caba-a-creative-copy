@@ -37,7 +37,7 @@ const plans = [
       { text: "Hasta 25GB de almacenamiento" },
       { text: "Gestión avanzada de catálogo" },
       { text: "Programación ilimitada de clips" },
-      { text: "Motor IA de reclipping automático" },
+      { text: "Demo gratis del motor IA de clipping", note: "Incluye una prueba gratuita del motor de IA de clipping automático para que puedas experimentar el sistema antes de comprometerte." },
       {
         text: "Métricas completas por plataforma",
         note: "Incluye visualizaciones individuales detalladas por cada plataforma (Spotify, Instagram, TikTok, YouTube, etc.)."
