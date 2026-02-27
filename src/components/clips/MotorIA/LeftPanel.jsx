@@ -67,6 +67,97 @@ export default function LeftPanel({ settings, updateSettings }) {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4">
+        {/* ─── SUBTITLES TAB ─── */}
+        {section === "subtitles" && (
+          <div className="space-y-5">
+            {/* Subtitle text input */}
+            <div>
+              <SectionTitle icon={Type}>Texto de subtítulos</SectionTitle>
+              <textarea
+                value={settings.subtitleText || ""}
+                onChange={(e) => updateSettings({ subtitleText: e.target.value })}
+                placeholder={"Cada palabra que dices\ncuenta una historia"}
+                rows={4}
+                className="w-full bg-[#1a1a1a] border border-white/[0.08] rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-[#FF6A00]/40 transition-colors resize-none"
+              />
+              <p className="text-[10px] text-white/25 mt-1">Una frase por línea. Se anima palabra a palabra.</p>
+            </div>
+
+            {/* Subtitle style gallery */}
+            <div>
+              <SectionTitle icon={Film}>Estilo de subtítulo</SectionTitle>
+
+              {/* Category filter pills */}
+              {["All", "Basic", "Contemporary", "Hollywood"].map((cat) => (
+                <span key={cat} className="hidden" />
+              ))}
+
+              <div className="grid grid-cols-2 gap-2.5">
+                {Object.values(SUBTITLE_TEMPLATES).map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => updateSettings({ subtitleTemplate: t.id, mode: "subtitles" })}
+                    className={`relative rounded-2xl overflow-hidden border-2 transition-all text-left ${
+                      settings.subtitleTemplate === t.id
+                        ? "border-[#FF6A00] shadow-[0_0_16px_rgba(255,106,0,0.3)]"
+                        : "border-transparent hover:border-white/20"
+                    }`}
+                    style={{ aspectRatio: "9/13" }}
+                  >
+                    {/* bg */}
+                    <div className="absolute inset-0" style={{ background: t.previewBg }} />
+
+                    {/* Simulated subtitle text */}
+                    <div className="absolute inset-0 flex flex-col justify-end pb-4 px-2 items-center">
+                      <div style={{ textAlign: "center" }}>
+                        <span style={{
+                          fontFamily: t.fontFamily,
+                          fontWeight: t.fontWeight,
+                          fontSize: "10px",
+                          textTransform: t.textTransform,
+                          color: t.color,
+                          textShadow: t.shadow !== "none" ? "0 1px 6px rgba(0,0,0,0.9)" : "none",
+                          WebkitTextStroke: t.stroke || undefined,
+                          display: "block",
+                          lineHeight: 1.4,
+                          background: t.bgStyle === "box" ? "rgba(255,255,255,0.9)" : "none",
+                          padding: t.bgStyle === "box" ? "1px 4px" : "0",
+                          borderRadius: t.bgStyle === "box" ? "3px" : "0",
+                        }}>
+                          {t.bgStyle === "box" ? (
+                            <span style={{ color: t.color }}>cada <span style={{ color: t.highlightColor || t.color }}>palabra</span></span>
+                          ) : (
+                            <>cada <span style={{ color: t.highlightColor || t.color }}>palabra</span></>
+                          )}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Category badge */}
+                    <div className="absolute top-1.5 left-1.5">
+                      <span className="text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-black/50 text-white/50">
+                        {t.category}
+                      </span>
+                    </div>
+
+                    {/* Selected */}
+                    {settings.subtitleTemplate === t.id && (
+                      <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-[#FF6A00] flex items-center justify-center">
+                        <span className="text-[8px] text-black font-black">✓</span>
+                      </div>
+                    )}
+
+                    {/* Name */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent px-2 py-1.5">
+                      <p className="text-[9px] font-bold text-white uppercase tracking-wide leading-tight">{t.name}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ─── TEMPLATES TAB ─── */}
         {section === "templates" && (
           <div className="space-y-5">
