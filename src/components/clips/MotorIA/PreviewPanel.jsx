@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, RefreshCw, Smartphone, Monitor } from "lucide-react";
-import { TEMPLATES, STOCK_VIDEOS } from "./templates";
+import { TEMPLATES, STOCK_VIDEOS, SUBTITLE_TEMPLATES } from "./templates";
+import SubtitlePreview from "./SubtitlePreview";
 
 const SPEED_MAP = { slow: 1.2, normal: 0.7, fast: 0.35 };
 
