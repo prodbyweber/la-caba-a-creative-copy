@@ -55,7 +55,7 @@ const plans = [
     popular: false,
     features: [
       { text: "Hasta 100GB de almacenamiento" },
-      { text: "Motor IA completo" },
+      { text: "Motor IA de clipping completo — 5.000 créditos/mes", note: "Equivalente a más de 100 clips al mes. Acceso total al sistema de reclipping automático con inteligencia artificial." },
       { text: "Métricas completas por plataforma" },
       { text: "Perfil destacado en el ecosistema" },
       { text: "Revisión estratégica trimestral" },
