@@ -12,10 +12,13 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import UploadClipModal from "./UploadClipModal.jsx";
 import ClipsFilters from "./ClipsFilters.jsx";
+import MotorIAModal from "./MotorIA/MotorIAModal.jsx";
+import { AnimatePresence } from "framer-motion";
 
 export default function ClipsHeader({ filters, setFilters, activeTab, artistId }) {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [motorIAOpen, setMotorIAOpen] = useState(false);
 
   return (
     <>
@@ -38,6 +41,17 @@ export default function ClipsHeader({ filters, setFilters, activeTab, artistId }
               Subir Clips
             </motion.button>
           </div>
+
+          {/* Motor IA Button */}
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setMotorIAOpen(true)}
+            className="px-4 py-2.5 rounded-xl border border-[#FF6A00]/50 bg-[#FF6A00]/5 text-[#FF6A00] font-medium text-sm flex items-center gap-2 hover:shadow-[0_0_16px_rgba(255,106,0,0.2)] hover:bg-[#FF6A00]/10 transition-all"
+            style={{ borderRadius: 12 }}
+          >
+            🎬 Motor de IA
+          </motion.button>
 
           {/* Right Actions */}
           <div className="flex gap-3 w-full lg:w-auto">
