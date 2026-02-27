@@ -178,9 +178,22 @@ export default function PreviewPanel({ settings, updateSettings }) {
               }} />
             )}
 
+            {/* Title overlay (titles mode) */}
             <AnimatePresence mode="wait">
-              {playing && <AnimatedText settings={settings} playing={playing} fontSize={fontSize} />}
+              {playing && settings.mode !== "subtitles" && (
+                <AnimatedText settings={settings} playing={playing} fontSize={fontSize} />
+              )}
             </AnimatePresence>
+
+            {/* Subtitle overlay (subtitles mode) */}
+            {settings.mode === "subtitles" && (
+              <SubtitlePreview
+                subtitleTemplateId={settings.subtitleTemplate}
+                playing={playing}
+                isVertical={isVertical}
+                customText={settings.subtitleText}
+              />
+            )}
 
             {/* Play/Pause overlay */}
             <div className="absolute bottom-3 left-3 right-3 flex items-center gap-2">
