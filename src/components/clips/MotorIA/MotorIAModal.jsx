@@ -32,6 +32,9 @@ export default function MotorIAModal({ onClose, artistId }) {
     textLine3: "2026",
     videoUrl: null,
     stockIndex: null,
+    subtitleTemplate: "impact_highlight",
+    subtitleText: "Cada palabra que dices\ncuenta una historia\nque el mundo necesita escuchar",
+    mode: "subtitles", // "subtitles" | "titles"
   });
   const [mobileTab, setMobileTab] = useState("estilo");
 
