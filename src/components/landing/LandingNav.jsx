@@ -82,6 +82,7 @@ export default function LandingNav() {
 
   const navItems = [
     { label: "Servicios", url: createPageUrl("Services"), key: "servicios" },
+    { label: "Planes", url: createPageUrl("Planes"), key: "planes" },
     { label: "Quiénes Somos", id: "team", key: "quienes_somos" },
     { label: "Artistas", id: "stories", key: "artistas" },
     { label: "ADN de Marca", url: adnMarcaLink, key: "adn_marca" },
