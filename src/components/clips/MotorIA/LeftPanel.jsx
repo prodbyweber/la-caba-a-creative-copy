@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Upload, ChevronDown, Film, Sliders, Palette, Type } from "lucide-react";
+import { Upload, Film, Sliders, Palette, Type, Captions } from "lucide-react";
 import { TEMPLATES, SUBTITLE_TEMPLATES } from "./templates";
 
 const SectionTitle = ({ icon: Icon, children }) => (
