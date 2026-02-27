@@ -1,460 +1,309 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import { Music2, Calendar, Clock, Verified, Play, TrendingUp, Zap, Award, BarChart3, Users, Eye, Heart, MessageCircle, Share2, Sparkles, Flame } from "lucide-react";
+import { Music2, Calendar, Clock, Verified, Play, TrendingUp, Award, BarChart3, Users, Eye, Heart, Share2, DollarSign, ArrowUpRight, Layers } from "lucide-react";
 
-const mockArtist = {
+const artist = {
   name: "SOPHY",
   genre: "Trap / Electrónica",
   location: "Madrid, España",
-  score: 87,
   avatar: "https://images.unsplash.com/photo-1611339555312-e607c25352ca?w=500&h=500&fit=crop",
   stats: [
-    { icon: Music2, label: "Tracks", value: "16", color: "emerald" },
-    { icon: Award, label: "Proyectos", value: "5", color: "purple" },
-    { icon: TrendingUp, label: "Horas Studio", value: "156h", color: "orange" }
+    { label: "Tracks", value: "16", icon: Music2 },
+    { label: "Proyectos", value: "5", icon: Layers },
+    { label: "Horas Studio", value: "156h", icon: TrendingUp }
   ],
   tracks: [
-    { name: "Neon Nights", cover: "from-pink-500 to-purple-500" },
-    { name: "Echoes", cover: "from-blue-500 to-cyan-500" },
-    { name: "Velocity", cover: "from-emerald-500 to-teal-500" },
-    { name: "Cipher", cover: "from-orange-500 to-red-500" }
+    { name: "Neon Nights", status: "Master" },
+    { name: "Echoes", status: "Mix" },
+    { name: "Velocity", status: "Dolby Atmos" },
+    { name: "Cipher", status: "Demo" }
   ],
   projects: [
-    { title: "EP Distopia", status: "Mixing", progress: 70, color: "emerald" },
-    { title: "Album Resonance", status: "Production", progress: 45, color: "purple" },
-    { title: "Collab Project", status: "Preproduction", progress: 20, color: "blue" }
+    { title: "EP Distopia", status: "Mixing", progress: 70 },
+    { title: "Album Resonance", status: "Production", progress: 45 }
   ],
   metrics: [
-    { icon: Eye, label: "Vistas", value: "128.4K", change: "+32%", color: "blue" },
-    { icon: Heart, label: "Likes", value: "24.8K", change: "+47%", color: "pink" },
-    { icon: Users, label: "Seguidores", value: "34.2K", change: "+28%", color: "purple" },
-    { icon: Share2, label: "Shares", value: "3.6K", change: "+56%", color: "emerald" }
+    { icon: Eye, label: "Vistas", value: "128.4K", change: "+32%" },
+    { icon: Heart, label: "Likes", value: "24.8K", change: "+47%" },
+    { icon: Users, label: "Seguidores", value: "34.2K", change: "+28%" },
+    { icon: Share2, label: "Shares", value: "3.6K", change: "+56%" }
   ],
+  wallet: {
+    balance: "€2,840",
+    pending: "€640",
+    last: [
+      { label: "Royalties Q1", amount: "+€1,200" },
+      { label: "Sync License", amount: "+€840" },
+      { label: "Live Session", amount: "+€800" }
+    ]
+  },
   sessions: [
-    { day: "Lun 14:00", task: "Grabación Vocal", color: "emerald" },
-    { day: "Mié 19:00", task: "Mezcla Pistas", color: "purple" },
-    { day: "Vie 16:00", task: "Masterización", color: "orange" }
+    { day: "Lun 14:00", task: "Grabación Vocal" },
+    { day: "Mié 19:00", task: "Mezcla Pistas" },
+    { day: "Vie 16:00", task: "Masterización" }
   ]
 };
 
-export default function DashboardPreview() {
-  const [hoveredTrack, setHoveredTrack] = useState(null);
+const Card = ({ children, className = "", delay = 0 }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 16 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5, delay }}
+    className={`rounded-2xl border border-white/[0.07] bg-white/[0.03] backdrop-blur-sm ${className}`}
+  >
+    {children}
+  </motion.div>
+);
 
+const Label = ({ children }) => (
+  <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/25 mb-3">{children}</p>
+);
+
+export default function DashboardPreview() {
   return (
-    <section className="relative py-20 overflow-hidden bg-zinc-950">
-      <div className="absolute inset-0 hidden lg:block">
-        <motion.div
-          animate={{ opacity: [0.1, 0.2, 0.1] }}
-          transition={{ duration: 4, repeat: Infinity }}
-          className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{ opacity: [0.05, 0.15, 0.05] }}
-          transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-          className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"
-        />
+    <section className="relative py-28 overflow-hidden bg-[#09090b]">
+      {/* Subtle ambient glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[400px] bg-white/[0.02] rounded-full blur-3xl" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8">
-        
+      <div className="relative z-10 max-w-6xl mx-auto px-6">
+
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-emerald-500/10 to-purple-500/10 border border-emerald-500/20 mb-4">
-            <Flame className="w-4 h-4 text-emerald-400" />
-            <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wide">Dashboard Pro</span>
-          </div>
-          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-4">
-            Control Total de tu Carrera
+          <p className="text-xs font-semibold text-white/30 uppercase tracking-[0.2em] mb-4">
+            Tu panel profesional
+          </p>
+          <h2 className="text-4xl lg:text-5xl font-bold text-white tracking-tight mb-4">
+            Todo tu proyecto.<br />En un solo lugar.
           </h2>
-          <p className="text-lg text-gray-400 max-w-3xl mx-auto">
-            Administra proyectos, catálogo, métricas y crecimiento con herramientas profesionales en tiempo real
+          <p className="text-base text-white/35 max-w-xl mx-auto">
+            Catálogo, analíticas, wallet y agenda en una plataforma diseñada para artistas serios.
           </p>
         </motion.div>
 
-        {/* Desktop View */}
-        <div className="hidden lg:block">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="relative"
-          >
-            {/* Main Dashboard Container */}
-            <div className="grid grid-cols-12 gap-4">
-              
-              {/* Left Sidebar - Artist Profile */}
+        {/* DESKTOP GRID */}
+        <div className="hidden lg:grid grid-cols-12 gap-3">
+
+          {/* Artist Profile */}
+          <Card delay={0.1} className="col-span-3 p-5 flex flex-col gap-5">
+            <div>
               <motion.div
-                whileHover={{ y: -4 }}
-                transition={{ duration: 0.3 }}
-                className="col-span-3 rounded-2xl overflow-hidden border border-purple-500/30 bg-gradient-to-b from-[#0f0f10] to-[#0a0a0b] shadow-2xl"
+                initial={{ scale: 0.9, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="w-full aspect-square rounded-xl overflow-hidden mb-4"
               >
-                <div className="p-4 space-y-4">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    whileInView={{ scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.2, type: "spring" }}
-                    className="w-full aspect-square rounded-xl overflow-hidden border-2 border-purple-500/40 shadow-xl"
-                  >
-                    <img 
-                      src={mockArtist.avatar}
-                      alt={mockArtist.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </motion.div>
-
-                  <div className="text-center space-y-2">
-                    <div className="flex items-center justify-center gap-2">
-                      <h3 className="text-xl font-black text-white uppercase tracking-wide">{mockArtist.name}</h3>
-                      <Verified className="w-5 h-5 text-purple-500" />
-                    </div>
-                    <p className="text-xs text-gray-300 font-medium">{mockArtist.genre}</p>
-                    <p className="text-[11px] text-gray-500 flex items-center justify-center gap-1">
-                      📍 {mockArtist.location}
-                    </p>
-                  </div>
-
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="p-3.5 rounded-xl bg-gradient-to-br from-purple-600/25 to-purple-800/25 border border-purple-500/40 shadow-lg"
-                  >
-                    <div className="text-center">
-                      <div className="text-3xl font-black text-purple-400">{mockArtist.score}</div>
-                      <div className="text-[9px] font-bold text-purple-200 uppercase tracking-wider mt-0.5">Artist Score</div>
-                    </div>
-                  </motion.div>
-
-                  <div className="space-y-1.5">
-                    {mockArtist.stats.map((stat, i) => (
-                      <motion.div
-                        key={i}
-                        whileHover={{ x: 3, backgroundColor: "rgba(255,255,255,0.08)" }}
-                        className="p-2 rounded-lg bg-white/5 border border-white/10 flex items-center justify-between transition-all"
-                      >
-                        <div className="flex items-center gap-2">
-                          <stat.icon className={`w-3.5 h-3.5 text-${stat.color}-400`} />
-                          <span className="text-[10px] text-gray-300 font-medium">{stat.label}</span>
-                        </div>
-                        <span className={`font-bold text-${stat.color}-400 text-xs`}>{stat.value}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
+                <img src={artist.avatar} alt={artist.name} className="w-full h-full object-cover" />
               </motion.div>
-
-              {/* Main Content Area */}
-              <div className="col-span-6 space-y-3">
-                {/* Catálogo de Tracks */}
-                <motion.div
-                  whileHover={{ y: -4 }}
-                  transition={{ duration: 0.3 }}
-                  className="rounded-xl overflow-hidden border border-purple-500/20 bg-gradient-to-b from-[#0f0f10] to-[#0a0a0b] shadow-2xl"
-                >
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <Music2 className="w-4 h-4 text-purple-400" />
-                        <h3 className="text-sm font-bold text-white">Catálogo</h3>
-                      </div>
-                      <span className="text-[10px] text-gray-500">12 tracks</span>
-                    </div>
-
-                    <div className="grid grid-cols-4 gap-2">
-                       {mockArtist.tracks.map((track, idx) => (
-                        <motion.div
-                          key={idx}
-                          whileHover={{ scale: 1.05, y: -2 }}
-                          className="group cursor-pointer"
-                        >
-                          <div className={`aspect-square rounded-lg bg-gradient-to-br ${track.cover} mb-1.5 relative overflow-hidden`}>
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                              <Play className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </div>
-                          </div>
-                          <p className="text-[9px] text-gray-400 truncate group-hover:text-white transition-colors">{track.name}</p>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Proyectos Activos */}
-                <motion.div
-                  whileHover={{ y: -4 }}
-                  transition={{ duration: 0.3 }}
-                  className="rounded-xl overflow-hidden border border-emerald-500/20 bg-gradient-to-b from-[#0f0f10] to-[#0a0a0b] shadow-2xl"
-                >
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <Award className="w-4 h-4 text-emerald-400" />
-                        <h3 className="text-sm font-bold text-white">Proyectos</h3>
-                      </div>
-                      <span className="text-[10px] text-gray-500">3 activos</span>
-                    </div>
-
-                    <div className="space-y-2">
-                       {mockArtist.projects.slice(0, 2).map((project, i) => (
-                        <motion.div
-                          key={i}
-                          whileHover={{ x: 2 }}
-                          className="p-2.5 rounded-lg bg-white/5 border border-white/10 hover:border-emerald-500/30 transition-all"
-                        >
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-xs font-semibold text-white">{project.title}</span>
-                            <span className={`text-[9px] px-2 py-0.5 rounded-full bg-${project.color}-500/10 text-${project.color}-400`}>
-                              {project.status}
-                            </span>
-                          </div>
-                          <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              whileInView={{ width: `${project.progress}%` }}
-                              viewport={{ once: true }}
-                              transition={{ delay: 0.3 + i * 0.1, duration: 0.8 }}
-                              className={`h-full bg-gradient-to-r from-${project.color}-400 to-${project.color}-500`}
-                            />
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
+              <div className="flex items-center gap-1.5 mb-1">
+                <h3 className="text-base font-black text-white uppercase tracking-wide">{artist.name}</h3>
+                <Verified className="w-4 h-4 text-white/50 flex-shrink-0" />
               </div>
-
-              {/* Right Sidebar - Analytics & Calendar */}
-              <div className="col-span-3 space-y-3">
-                {/* Analytics Card */}
-                <motion.div
-                  whileHover={{ y: -4 }}
-                  transition={{ duration: 0.3 }}
-                  className="rounded-xl overflow-hidden border border-blue-500/20 bg-gradient-to-b from-[#0f0f10] to-[#0a0a0b] shadow-2xl"
-                >
-                  <div className="p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <BarChart3 className="w-4 h-4 text-blue-400" />
-                      <h3 className="text-sm font-bold text-white">Análisis</h3>
-                    </div>
-
-                    <div className="space-y-2">
-                       {mockArtist.metrics.map((metric, i) => (
-                        <motion.div
-                          key={i}
-                          whileHover={{ x: 2 }}
-                          className="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <metric.icon className={`w-3 h-3 text-${metric.color}-400`} />
-                              <span className="text-[10px] text-gray-400">{metric.label}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs font-bold text-white">{metric.value}</span>
-                              <span className={`text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400`}>
-                                {metric.change}
-                              </span>
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Calendar Card */}
-                <motion.div
-                  whileHover={{ y: -4 }}
-                  transition={{ duration: 0.3 }}
-                  className="rounded-xl overflow-hidden border border-orange-500/20 bg-gradient-to-b from-[#0f0f10] to-[#0a0a0b] shadow-2xl"
-                >
-                  <div className="p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Calendar className="w-4 h-4 text-orange-400" />
-                      <h3 className="text-sm font-bold text-white">Calendario</h3>
-                      <motion.div
-                        animate={{ scale: [1, 1.3, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="w-1.5 h-1.5 rounded-full bg-orange-400 ml-auto"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                       {mockArtist.sessions.map((session, i) => (
-                        <motion.div
-                          key={i}
-                          whileHover={{ x: 2 }}
-                          className="p-2 rounded-lg bg-white/5 border border-white/10 hover:border-orange-500/30 transition-all"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Clock className={`w-3 h-3 text-${session.color}-400 flex-shrink-0`} />
-                            <div className="flex-1 min-w-0">
-                              <div className="text-[9px] text-gray-500">{session.day}</div>
-                              <div className="text-xs text-white font-medium truncate">{session.task}</div>
-                            </div>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
+              <p className="text-xs text-white/35">{artist.genre}</p>
+              <p className="text-[11px] text-white/20 mt-0.5">{artist.location}</p>
             </div>
 
-            {/* CTA Button */}
-             <motion.div
-               initial={{ opacity: 0, y: 20 }}
-               whileInView={{ opacity: 1, y: 0 }}
-               viewport={{ once: true }}
-               transition={{ delay: 0.7 }}
-               className="flex justify-center mt-12"
-             >
-               <motion.button
-                 whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(139, 92, 246, 0.4)" }}
-                 whileTap={{ scale: 0.95 }}
-                 className="px-10 py-4 rounded-xl bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold text-lg shadow-lg shadow-purple-500/40 transition-all"
-               >
-                 Inicia tu Dashboard
-               </motion.button>
-             </motion.div>
-          </motion.div>
-        </div>
+            <div className="border-t border-white/[0.06]" />
 
-        {/* Mobile View - Compact Version */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="lg:hidden relative max-w-md mx-auto"
-        >
-          <div className="relative rounded-2xl overflow-hidden border border-emerald-500/20 bg-gradient-to-b from-[#141414] to-black shadow-2xl">
-            
-            {/* Artist Info */}
-             <div className="p-5">
-               <div className="flex items-center gap-3 mb-4">
-                 <motion.div
-                   initial={{ scale: 0 }}
-                   whileInView={{ scale: 1 }}
-                   viewport={{ once: true }}
-                   transition={{ delay: 0.2, type: "spring" }}
-                   className="w-16 h-16 rounded-xl overflow-hidden border-2 border-purple-500/60 shadow-lg flex-shrink-0"
-                 >
-                   <img 
-                     src={mockArtist.avatar}
-                     alt={mockArtist.name}
-                     className="w-full h-full object-cover"
-                   />
-                 </motion.div>
-                 <div className="flex-1 min-w-0">
-                   <div className="flex items-center gap-1.5 mb-0.5">
-                     <h3 className="text-white font-black text-base uppercase tracking-wide">{mockArtist.name}</h3>
-                     <Verified className="w-3.5 h-3.5 text-purple-500 flex-shrink-0" />
-                   </div>
-                   <p className="text-xs text-gray-400 font-medium">{mockArtist.genre}</p>
-                 </div>
-                 <div className="flex flex-col items-center justify-center px-3 py-2 bg-gradient-to-b from-purple-600/60 to-purple-800/60 rounded-lg border border-purple-500/50 shadow-lg flex-shrink-0">
-                   <div className="text-xl font-black text-white">{mockArtist.score}</div>
-                   <div className="text-[8px] font-bold text-purple-200 uppercase tracking-wider">Score</div>
-                 </div>
-               </div>
+            <div className="space-y-2">
+              {artist.stats.map((s, i) => (
+                <div key={i} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <s.icon className="w-3.5 h-3.5 text-white/25" />
+                    <span className="text-[11px] text-white/40">{s.label}</span>
+                  </div>
+                  <span className="text-sm font-bold text-white/80">{s.value}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
 
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                {mockArtist.stats.map((stat, i) => (
+          {/* Center: Tracks + Projects */}
+          <div className="col-span-6 flex flex-col gap-3">
+
+            {/* Tracks */}
+            <Card delay={0.15} className="p-5">
+              <Label>Catálogo</Label>
+              <div className="space-y-2">
+                {artist.tracks.map((t, i) => (
                   <motion.div
                     key={i}
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.3 + i * 0.05 }}
-                    className="p-2.5 rounded-lg bg-white/5 border border-white/10"
+                    whileHover={{ x: 3 }}
+                    className="flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:border-white/[0.1] transition-all cursor-default"
                   >
-                    <div className={`text-${stat.color}-400 text-sm font-bold`}>{stat.value}</div>
-                    <div className="text-[10px] text-gray-500">{stat.label}</div>
+                    <div className="w-7 h-7 rounded-lg bg-white/[0.06] border border-white/[0.08] flex items-center justify-center flex-shrink-0">
+                      <Play className="w-3 h-3 text-white/40" />
+                    </div>
+                    <span className="flex-1 text-xs font-medium text-white/70 truncate">{t.name}</span>
+                    <span className="text-[10px] text-white/25 font-medium">{t.status}</span>
                   </motion.div>
                 ))}
               </div>
+            </Card>
 
-              {/* Tracks List Preview */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.45 }}
-                className="space-y-1.5 mb-3"
-              >
-                <div className="text-xs text-gray-500 mb-1.5 flex items-center gap-2">
-                  <Music2 className="w-3 h-3" />
-                  <span>Tracks Recientes</span>
-                </div>
-                
-                {mockArtist.tracks.map((track, idx) => {
-                  const trackStatuses = ["Dolby Atmos", "Master", "Mix", "Demo"];
-                  const statusColors = ["orange", "emerald", "blue", "yellow"];
-                  return (
-                    <div key={idx} className="flex items-center gap-2 p-2 rounded-lg bg-white/5 border border-white/10 hover:border-white/20 transition-colors">
-                      <div className={`w-7 h-7 rounded bg-gradient-to-br ${track.cover} opacity-40 flex items-center justify-center flex-shrink-0`}>
-                        <Play className="w-2.5 h-2.5 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs text-white font-medium truncate">{track.name}</div>
-                      </div>
-                      <div className={`text-[8px] px-2 py-0.5 rounded bg-${statusColors[idx]}-500/10 text-${statusColors[idx]}-400 font-bold whitespace-nowrap`}>
-                        {trackStatuses[idx]}
-                      </div>
+            {/* Projects */}
+            <Card delay={0.2} className="p-5">
+              <Label>Proyectos Activos</Label>
+              <div className="space-y-3">
+                {artist.projects.map((p, i) => (
+                  <div key={i}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-xs font-semibold text-white/70">{p.title}</span>
+                      <span className="text-[10px] text-white/30">{p.status} · {p.progress}%</span>
                     </div>
-                  );
-                })}
-              </motion.div>
-
-              {/* Calendar Preview */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.5 }}
-                className="p-2.5 rounded-lg bg-gradient-to-r from-orange-500/10 to-emerald-500/10 border border-orange-500/20 mb-3"
-              >
-                <div className="flex items-center gap-2 mb-1.5">
-                  <Calendar className="w-3 h-3 text-orange-400" />
-                  <span className="text-xs text-gray-400">Próximas Sesiones</span>
-                  <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse ml-auto"></div>
-                </div>
-                <div className="space-y-1">
-                  {mockArtist.sessions.slice(0, 2).map((session, i) => {
-                    const sessionColors = ["emerald", "purple", "orange"];
-                    return (
-                      <div key={i} className="flex items-center gap-2 text-[11px]">
-                        <Clock className={`w-3 h-3 text-${sessionColors[i]}-400`} />
-                        <span className="text-white">{session.day} - {session.task}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </motion.div>
-
-              {/* CTA Button */}
-              <motion.button
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.55 }}
-                whileHover={{ scale: 1.03, boxShadow: "0 0 20px rgba(139, 92, 246, 0.3)" }}
-                whileTap={{ scale: 0.97 }}
-                className="w-full p-3 rounded-xl bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white font-bold text-sm shadow-lg shadow-purple-500/30 transition-all"
-              >
-                Inicia tu Dashboard
-              </motion.button>
-            </div>
+                    <div className="h-[3px] bg-white/[0.06] rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${p.progress}%` }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.4 + i * 0.1, duration: 1, ease: "easeOut" }}
+                        className="h-full bg-white/40 rounded-full"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
           </div>
-        </motion.div>
 
+          {/* Right: Analytics + Wallet */}
+          <div className="col-span-3 flex flex-col gap-3">
+
+            {/* Analytics */}
+            <Card delay={0.25} className="p-5">
+              <Label>Analíticas</Label>
+              <div className="space-y-2.5">
+                {artist.metrics.map((m, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <m.icon className="w-3.5 h-3.5 text-white/25" />
+                      <span className="text-[11px] text-white/40">{m.label}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-white/70">{m.value}</span>
+                      <span className="text-[9px] text-emerald-400/70 font-semibold">{m.change}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Wallet */}
+            <Card delay={0.3} className="p-5">
+              <Label>Wallet</Label>
+              <div className="mb-4">
+                <p className="text-2xl font-black text-white tracking-tight">{artist.wallet.balance}</p>
+                <p className="text-[11px] text-white/30 mt-0.5">Pendiente: {artist.wallet.pending}</p>
+              </div>
+              <div className="space-y-2">
+                {artist.wallet.last.map((tx, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <span className="text-[11px] text-white/35 truncate">{tx.label}</span>
+                    <span className="text-[11px] font-semibold text-emerald-400/70 whitespace-nowrap ml-2">{tx.amount}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Sessions */}
+            <Card delay={0.35} className="p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Label>Agenda</Label>
+                <motion.div
+                  animate={{ opacity: [1, 0.3, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="w-1.5 h-1.5 rounded-full bg-emerald-400/60 ml-auto mb-3"
+                />
+              </div>
+              <div className="space-y-2">
+                {artist.sessions.map((s, i) => (
+                  <div key={i} className="flex items-center gap-2.5">
+                    <Clock className="w-3 h-3 text-white/20 flex-shrink-0" />
+                    <div>
+                      <p className="text-[10px] text-white/25">{s.day}</p>
+                      <p className="text-[11px] font-medium text-white/60">{s.task}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        </div>
+
+        {/* MOBILE */}
+        <div className="lg:hidden space-y-3">
+          <Card delay={0.1} className="p-5">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+                <img src={artist.avatar} alt={artist.name} className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <h3 className="font-black text-white uppercase tracking-wide">{artist.name}</h3>
+                  <Verified className="w-3.5 h-3.5 text-white/40" />
+                </div>
+                <p className="text-xs text-white/35">{artist.genre}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 mt-4">
+              {artist.stats.map((s, i) => (
+                <div key={i} className="p-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-center">
+                  <p className="text-sm font-bold text-white/80">{s.value}</p>
+                  <p className="text-[10px] text-white/30">{s.label}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card delay={0.15} className="p-5">
+            <Label>Analíticas</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {artist.metrics.map((m, i) => (
+                <div key={i} className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <p className="text-sm font-bold text-white/80">{m.value}</p>
+                  <div className="flex items-center justify-between mt-0.5">
+                    <p className="text-[10px] text-white/30">{m.label}</p>
+                    <p className="text-[10px] text-emerald-400/70">{m.change}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card delay={0.2} className="p-5">
+            <Label>Wallet</Label>
+            <p className="text-2xl font-black text-white">{artist.wallet.balance}</p>
+            <p className="text-xs text-white/30 mb-3">Pendiente: {artist.wallet.pending}</p>
+            {artist.wallet.last.map((tx, i) => (
+              <div key={i} className="flex justify-between py-1.5 border-b border-white/[0.04] last:border-0">
+                <span className="text-xs text-white/40">{tx.label}</span>
+                <span className="text-xs font-semibold text-emerald-400/70">{tx.amount}</span>
+              </div>
+            ))}
+          </Card>
+        </div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="flex justify-center mt-12"
+        >
+          <button className="px-8 py-3.5 rounded-xl bg-white text-black font-bold text-sm hover:bg-white/90 transition-all hover:scale-[1.02]">
+            Ver tu Dashboard
+          </button>
+        </motion.div>
       </div>
     </section>
   );
