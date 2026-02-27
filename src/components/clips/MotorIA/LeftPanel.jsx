@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Upload, ChevronDown, Film, Sliders, Palette, Type } from "lucide-react";
-import { TEMPLATES, TEMPLATE_PREVIEWS } from "./templates";
+import { TEMPLATES } from "./templates";
 
 const SectionTitle = ({ icon: Icon, children }) => (
   <div className="flex items-center gap-2 mb-3">
