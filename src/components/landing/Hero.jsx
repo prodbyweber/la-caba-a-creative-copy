@@ -9,7 +9,7 @@ export default function Hero({ config }) {
   const heroTitle = config?.hero_title || "El estudio creativo definitivo para artistas que buscan conectar";
   const heroSubtitle = config?.hero_subtitle || "Producción por horas, visuales cinematográficos y digitalización artística para proyectos que van en serio.";
   const heroCTA = config?.hero_cta_text || "Aplicar a La Cabaña Creative";
-  const heroImage = config?.hero_image_url || "https://images.unsplash.com/photo-1598387993441-a364f854cfa4?w=1200&h=675&fit=crop";
+  const heroImage = config?.hero_image_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/93423d3b8_image.png";
   const heroRevealImage = config?.hero_reveal_image_url || "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/93423d3b8_image.png";
   const heroAudioUrl = config?.hero_audio_url || "";
   const heroYoutubeLink = config?.hero_youtube_music_link || "";
@@ -52,26 +52,12 @@ export default function Hero({ config }) {
             
             {/* Image container with Scratch Reveal */}
             <div className="relative h-full rounded-xl lg:rounded-2xl overflow-hidden bg-black">
-              {heroImage && heroRevealImage ? (
-                <ScratchReveal 
-                  topImage={heroImage}
-                  revealImage={heroRevealImage}
-                  audioUrl={heroAudioUrl}
-                  youtubeLink={heroYoutubeLink}
-                />
-              ) : heroImage ? (
-                <>
-                  <img
-                    src={heroImage}
-                    alt="Artist"
-                    className={`w-full h-full object-cover object-center transition-opacity duration-500 ${
-                      imageLoaded ? 'opacity-100' : 'opacity-0'
-                    }`}
-                    onLoad={() => setImageLoaded(true)}
-                  />
-                  <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
-                </>
-              ) : null}
+              <ScratchReveal 
+                topImage={heroImage}
+                revealImage={heroRevealImage}
+                audioUrl={heroAudioUrl}
+                youtubeLink={heroYoutubeLink}
+              />
             </div>
           </div>
         </motion.div>
