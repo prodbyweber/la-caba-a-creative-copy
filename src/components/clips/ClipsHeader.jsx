@@ -97,6 +97,13 @@ export default function ClipsHeader({ filters, setFilters, activeTab, artistId }
       {uploadModalOpen && (
         <UploadClipModal onClose={() => setUploadModalOpen(false)} artistId={artistId} />
       )}
+
+      {/* Motor IA Modal */}
+      <AnimatePresence>
+        {motorIAOpen && (
+          <MotorIAModal onClose={() => setMotorIAOpen(false)} artistId={artistId} />
+        )}
+      </AnimatePresence>
     </>
   );
 }
