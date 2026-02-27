@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Upload, Film, Sliders, Palette, Type, Captions } from "lucide-react";
+import { Upload, Film, Sliders, Palette, Type } from "lucide-react";
 import { TEMPLATES, SUBTITLE_TEMPLATES } from "./templates";
 
 const SectionTitle = ({ icon: Icon, children }) => (
@@ -53,7 +53,7 @@ export default function LeftPanel({ settings, updateSettings }) {
     <div className="flex flex-col h-full">
       {/* Sub-nav */}
       <div className="flex border-b border-white/[0.06] px-3 pt-3">
-        {[["templates", "Estilos"], ["text", "Texto"], ["effects", "Efectos"]].map(([id, label]) => (
+        {[["subtitles", "Subtítulos"], ["templates", "Títulos"], ["text", "Texto"], ["effects", "Efectos"]].map(([id, label]) => (
           <button
             key={id}
             onClick={() => setSection(id)}
