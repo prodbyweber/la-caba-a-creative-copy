@@ -6,7 +6,6 @@ export default function ScratchReveal({ topImage, revealImage, audioUrl, youtube
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const audioRef = useRef(null);
-  const isMouseDownRef = useRef(false);
   const topImgRef = useRef(null);
   const cycleRef = useRef(0);
 
