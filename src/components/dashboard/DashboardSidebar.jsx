@@ -48,7 +48,7 @@ export default function DashboardSidebar({ isOpen, onClose, artistId }) {
                     whileHover={{ x: 4 }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                       item.active 
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                        ? 'bg-white/8 text-white border border-white/15' 
                         : 'text-gray-400 hover:text-white hover:bg-white/5'
                     }`}
                   >
@@ -62,8 +62,8 @@ export default function DashboardSidebar({ isOpen, onClose, artistId }) {
                   whileHover={{ x: 4 }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                     item.active 
-                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        ? 'bg-white/8 text-white border border-white/15' 
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   <item.icon className="w-5 h-5" />
@@ -105,11 +105,11 @@ export default function DashboardSidebar({ isOpen, onClose, artistId }) {
         </div>
 
         {/* Pro Badge */}
-        <div className="mx-4 mb-6 p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20">
+        <div className="mx-4 mb-6 p-4 rounded-2xl bg-white/[0.04] border border-white/[0.08]">
           <div className="text-sm font-semibold text-white mb-1">Miembro Pro</div>
           <div className="text-xs text-gray-400 mb-3">Renueva 15 Ene, 2025</div>
           <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-            <div className="h-full w-3/4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" />
+            <div className="h-full w-3/4 bg-white/40 rounded-full" />
           </div>
         </div>
       </aside>
@@ -134,7 +134,7 @@ export default function DashboardSidebar({ isOpen, onClose, artistId }) {
             >
               <div className="flex items-center justify-between p-6 border-b border-white/5">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-purple-600 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center">
                     <span className="text-white font-bold">LC</span>
                   </div>
                   <span className="text-lg font-semibold">La Cabaña</span>
