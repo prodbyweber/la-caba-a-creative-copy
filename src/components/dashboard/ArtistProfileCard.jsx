@@ -24,7 +24,7 @@ export default function ArtistProfileCard({ compact = false, artist }) {
         <div className="flex items-center gap-3">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-emerald-500/20 bg-gradient-to-br from-emerald-500 to-emerald-700">
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/10 bg-white/10">
               {artist.avatar_url ? (
                 <img 
                   src={artist.avatar_url}
