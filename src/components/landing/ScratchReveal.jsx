@@ -174,10 +174,7 @@ export default function ScratchReveal({ topImage, revealImage, audioUrl, youtube
           ref={canvasRef}
           className="absolute inset-0 touch-none"
           style={{ width: "100%", height: "100%", cursor: "crosshair" }}
-          onMouseDown={() => { isMouseDownRef.current = true; }}
-          onMouseUp={() => { isMouseDownRef.current = false; }}
-          onMouseLeave={() => { isMouseDownRef.current = false; }}
-          onMouseMove={(e) => { if (isMouseDownRef.current) doScratch(e); }}
+          onMouseMove={(e) => doScratch(e)}
           onTouchStart={(e) => doScratch(e)}
           onTouchMove={(e) => { e.preventDefault(); doScratch(e); }}
         />
