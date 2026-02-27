@@ -41,7 +41,7 @@ const Toggle = ({ label, value, onChange }) => (
 
 export default function LeftPanel({ settings, updateSettings }) {
   const fileRef = useRef();
-  const [section, setSection] = useState("templates"); // templates | text | effects
+  const [section, setSection] = useState("subtitles"); // subtitles | templates | text | effects
 
   const handleFile = (file) => {
     if (!file) return;
