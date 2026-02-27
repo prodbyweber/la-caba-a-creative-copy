@@ -16,19 +16,26 @@ export default function ScratchReveal({
   const [showAudioPlayer, setShowAudioPlayer] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [canScratch, setCanScratch] = useState(true);
+  const [canScratch, setCanScratch] = useState(false);
+  const [topImageReady, setTopImageReady] = useState(false);
   const audioRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const topImageRef = useRef(new Image());
   const revealImageRef = useRef(new Image());
 
-  // Preload images immediately
+  // Load top image first, only preload reveal image after top is ready
   useEffect(() => {
-    topImageRef.current.crossOrigin = "anonymous";
-    topImageRef.current.src = topImage;
-    
-    revealImageRef.current.crossOrigin = "anonymous";
-    revealImageRef.current.src = revealImage;
+    const topImg = topImageRef.current;
+    topImg.crossOrigin = "anonymous";
+    topImg.onload = () => {
+      setTopImageReady(true);
+      setCanScratch(true);
+      // Only now load reveal image
+      const revealImg = revealImageRef.current;
+      revealImg.crossOrigin = "anonymous";
+      revealImg.src = revealImage;
+    };
+    topImg.src = topImage;
   }, [topImage, revealImage]);
 
   useEffect(() => {
