@@ -89,7 +89,7 @@ export default function Planes() {
       </div>
 
       {/* HERO */}
-      <section className="pt-20 pb-8 px-6 text-center relative overflow-hidden">
+      <section className="pt-36 pb-16 px-6 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(16,185,129,0.08),transparent)]" />
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -129,7 +129,7 @@ export default function Planes() {
       </section>
 
       {/* PRICING TABLE */}
-      <section className="px-6 pb-16">
+      <section className="px-6 pb-24">
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {plans.map((plan, i) => (

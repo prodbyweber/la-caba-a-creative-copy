@@ -24,7 +24,7 @@ export default function ArtistProfileCard({ compact = false, artist }) {
         <div className="flex items-center gap-3">
           {/* Avatar */}
           <div className="relative flex-shrink-0">
-            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/10 bg-white/10">
+            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-emerald-500/20 bg-gradient-to-br from-emerald-500 to-emerald-700">
               {artist.avatar_url ? (
                 <img 
                   src={artist.avatar_url}
@@ -43,7 +43,7 @@ export default function ArtistProfileCard({ compact = false, artist }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <h3 className="font-bold text-white text-base">{artist.stageName}</h3>
-              <Verified className="w-4 h-4 text-white/40" />
+              <Verified className="w-4 h-4 text-emerald-500" />
             </div>
             <p className="text-xs text-gray-500">{artist.genre || 'Artista'}</p>
           </div>
@@ -69,7 +69,7 @@ export default function ArtistProfileCard({ compact = false, artist }) {
               className="w-full h-full object-contain object-top"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-white/10">
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-700">
               <span className="text-6xl font-black text-white/30">
                 {artist.stageName?.charAt(0).toUpperCase()}
               </span>
@@ -85,13 +85,13 @@ export default function ArtistProfileCard({ compact = false, artist }) {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-xl font-bold text-white">{artist.stageName}</h3>
-                  <Verified className="w-5 h-5 text-white/40" />
+                  <Verified className="w-5 h-5 text-emerald-500" />
                 </div>
                 <span className="text-sm text-gray-400">{artist.genre || 'Artista'}</span>
               </div>
               
               {/* Pro Badge */}
-              <div className="px-3 py-1.5 bg-white/10 border border-white/10 rounded-lg flex items-center gap-1.5">
+              <div className="px-3 py-1.5 bg-emerald-600 rounded-lg flex items-center gap-1.5">
                 <Star className="w-3.5 h-3.5 text-white" fill="white" />
                 <span className="text-xs font-bold text-white uppercase">Pro</span>
               </div>

@@ -58,7 +58,7 @@ export default function DashboardNav({ artistName, artistId }) {
                     <button
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                         active 
-                          ? 'bg-white/8 text-white border border-white/15' 
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
                           : 'text-gray-400 hover:text-white hover:bg-white/5'
                       }`}
                     >
@@ -75,7 +75,7 @@ export default function DashboardNav({ artistName, artistId }) {
           <div className="flex items-center gap-2">
           <Link to={createPageUrl("AdminDashboard")}>
             <button 
-              className="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white transition-all flex items-center gap-1.5"
+              className="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all flex items-center gap-1.5"
               title="Panel Admin"
             >
               <Home className="w-3.5 h-3.5" />
@@ -88,7 +88,7 @@ export default function DashboardNav({ artistName, artistId }) {
           </button>
           
           {/* Avatar */}
-          <div className="w-8 h-8 rounded-lg bg-white/10 border border-white/10 flex items-center justify-center text-xs font-bold text-white/70 cursor-pointer hover:scale-105 transition-transform">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-bold cursor-pointer hover:scale-105 transition-transform">
             JV
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function DashboardNav({ artistName, artistId }) {
                           onClick={() => setMobileMenuOpen(false)}
                           className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                             active 
-                              ? 'bg-white/8 text-white border border-white/15' 
+                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
                               : 'text-gray-400 hover:text-white hover:bg-white/5'
                           }`}
                         >
@@ -167,7 +167,7 @@ export default function DashboardNav({ artistName, artistId }) {
                 <Link to={createPageUrl("AdminDashboard")}>
                   <button 
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white transition-all text-sm font-medium"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all text-sm font-medium"
                   >
                     <Home className="w-5 h-5" />
                     Panel Admin
