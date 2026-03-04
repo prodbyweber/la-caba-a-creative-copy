@@ -86,7 +86,7 @@ export default function LandingNav() {
     { label: "Quiénes Somos", id: "team", key: "quienes_somos" },
     { label: "Artistas", id: "stories", key: "artistas" },
     { label: "ADN de Marca", url: adnMarcaLink, key: "adn_marca" },
-    { label: "Exploración", id: "exploracion", key: "exploracion" },
+
     { label: "Comenzar", id: "offers", highlight: true, key: "comenzar" }
   ].filter(item => visibleMenuButtons[item.key] !== false);
 
