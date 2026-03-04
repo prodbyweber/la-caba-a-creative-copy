@@ -224,8 +224,13 @@ export default function ScratchReveal({
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
-      {/* Reveal Image (Behind) */}
-      <div className="absolute inset-0 bg-black">
+      {/* Black placeholder while top image loads */}
+      {!topImageReady && (
+        <div className="absolute inset-0 bg-black z-20" />
+      )}
+
+      {/* Reveal Image (Behind) - only visible after top image is ready */}
+      <div className={`absolute inset-0 bg-black transition-opacity duration-300 ${topImageReady ? 'opacity-100' : 'opacity-0'}`}>
         <img
           src={revealImage}
           alt="Revealed"
