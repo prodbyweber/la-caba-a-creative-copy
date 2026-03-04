@@ -67,6 +67,7 @@ import InvestorDashboard from './pages/InvestorDashboard';
 import Landing from './pages/Landing';
 import LandingEditor from './pages/LandingEditor';
 import Notes from './pages/Notes';
+import Planes from './pages/Planes';
 import ProjectDetail from './pages/ProjectDetail';
 import Projects from './pages/Projects';
 import Revisions from './pages/Revisions';
@@ -77,7 +78,6 @@ import SocialAccounts from './pages/SocialAccounts';
 import TrackDetail from './pages/TrackDetail';
 import Tracks from './pages/Tracks';
 import UserProfile from './pages/UserProfile';
-import Planes from './pages/Planes';
 import __Layout from './Layout.jsx';
 
 
@@ -102,6 +102,7 @@ export const PAGES = {
     "Landing": Landing,
     "LandingEditor": LandingEditor,
     "Notes": Notes,
+    "Planes": Planes,
     "ProjectDetail": ProjectDetail,
     "Projects": Projects,
     "Revisions": Revisions,
@@ -112,7 +113,6 @@ export const PAGES = {
     "TrackDetail": TrackDetail,
     "Tracks": Tracks,
     "UserProfile": UserProfile,
-    "Planes": Planes,
 }
 
 export const pagesConfig = {
