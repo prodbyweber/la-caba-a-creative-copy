@@ -187,7 +187,7 @@ export default function TeamSection() {
                 onClick={() => scrollToIndex(index)}
                 className={`transition-all ${
                   index === currentIndex 
-                    ? 'w-8 h-2 bg-orange-500 rounded-full' 
+                    ? 'w-8 h-2 bg-[#e8c84a] rounded-full' 
                     : 'w-2 h-2 bg-gray-600 rounded-full hover:bg-gray-500'
                 }`}
               />
