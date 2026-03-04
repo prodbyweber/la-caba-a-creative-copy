@@ -107,7 +107,7 @@ export default function StoriesSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8 sm:mb-12 lg:mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-black mb-2">
+          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black text-black tracking-tight leading-[0.95] mb-2">
             Historias que hemos contado
           </h2>
         </motion.div>

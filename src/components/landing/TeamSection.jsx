@@ -77,7 +77,7 @@ export default function TeamSection() {
             <span className="text-xs font-semibold text-[#e8c84a]">El Equipo</span>
           </motion.div>
           
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
+          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[0.95] mb-3">
             ¿Quiénes Somos?
           </h2>
           <p className="text-sm text-gray-400 max-w-2xl mx-auto">

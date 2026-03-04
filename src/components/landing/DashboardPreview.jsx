@@ -78,7 +78,7 @@ export default function DashboardPreview() {
           <p className="text-[11px] font-semibold text-white/25 uppercase tracking-[0.3em] mb-5">
             Infraestructura Artística
           </p>
-          <h2 className="text-4xl lg:text-6xl font-black text-white tracking-tight leading-[1.05] mb-5">
+          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[0.95] mb-5">
             Tu carrera.<br className="hidden lg:block" /> Centralizada.
           </h2>
           <p className="text-base text-white/30 max-w-lg mx-auto leading-relaxed">
