@@ -97,7 +97,7 @@ export default function StoriesSection() {
   };
 
   return (
-    <section className="relative py-8 sm:py-12 lg:py-20 overflow-hidden bg-gradient-to-b from-zinc-100 to-zinc-50">
+    <section className="relative py-8 sm:py-12 lg:py-20 overflow-hidden bg-[#e8c84a]">
       <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title */}
         <motion.div
@@ -107,7 +107,7 @@ export default function StoriesSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8 sm:mb-12 lg:mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-900 mb-2">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-black mb-2">
             Historias que hemos contado
           </h2>
         </motion.div>
