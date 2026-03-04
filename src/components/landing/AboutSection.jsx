@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { Sparkles, Target, Heart, Zap } from "lucide-react";
 
 export default function AboutSection() {
   const { data: config } = useQuery({
@@ -13,135 +12,133 @@ export default function AboutSection() {
     }
   });
 
-  const mainText = config?.about_main_text || 'La Cabaña Creative nace de la convicción de que <span class="text-emerald-400 font-semibold">cada artista merece un espacio donde su visión pueda materializarse sin límites</span>.';
+  const mainText = config?.about_main_text || 'La Cabaña Creative nace de la convicción de que <span class="text-[#e8c84a] font-semibold">cada artista merece un espacio donde su visión pueda materializarse sin límites</span>.';
   const secondaryText = config?.about_secondary_text || 'No somos un estudio tradicional. Somos un refugio creativo donde la autenticidad y la identidad artística se encuentran. <span class="text-white font-medium">Buscamos dirección, claridad y una propuesta única</span>.';
-  
+
   const values = [
     {
-      icon: Target,
+      number: "01",
       title: config?.about_value1_title || "Enfoque Real",
       desc: config?.about_value1_desc || "Estrategia sin humo"
     },
     {
-      icon: Heart,
+      number: "02",
       title: config?.about_value2_title || "Pasión",
       desc: config?.about_value2_desc || "Tu proyecto, nuestra misión"
     },
     {
-      icon: Zap,
+      number: "03",
       title: config?.about_value3_title || "Innovación",
       desc: config?.about_value3_desc || "Sonido único"
     },
     {
-      icon: Sparkles,
+      number: "04",
       title: config?.about_value4_title || "Autenticidad",
       desc: config?.about_value4_desc || "Tu identidad, amplificada"
     }
   ];
 
   return (
-    <section className="relative py-8 sm:py-12 lg:py-16 overflow-hidden bg-zinc-950/50">
-      {/* Subtle decorative elements */}
-      <div className="absolute inset-0 pointer-events-none opacity-20">
-        <motion.div
-          animate={{ y: [0, -10, 0], rotate: [0, 3, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-10 left-10 text-emerald-500/30"
-        >
-          <svg width="40" height="40" viewBox="0 0 100 100" fill="currentColor">
-            <path d="M50 10 Q20 30 25 60 Q30 50 50 55 Q70 50 75 60 Q80 30 50 10Z" />
-          </svg>
-        </motion.div>
-        <motion.div
-          animate={{ y: [0, 10, 0], rotate: [0, -3, 0] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute top-10 right-10 text-emerald-500/20"
-        >
-          <svg width="35" height="35" viewBox="0 0 100 100" fill="currentColor">
-            <path d="M50 15 Q25 35 30 65 Q35 55 50 58 Q65 55 70 65 Q75 35 50 15Z" />
-          </svg>
-        </motion.div>
-      </div>
+    <section className="relative py-24 lg:py-36 overflow-hidden bg-[#080809]">
+      {/* Minimal ambient line */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8">
-        {/* Compact Header */}
+      {/* Subtle yellow glow — very restrained */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-[#e8c84a]/[0.03] rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-10 lg:px-16">
+
+        {/* Label */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-10"
+          className="mb-16 lg:mb-24"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            whileInView={{ scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, type: "spring" }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-xs font-semibold text-emerald-400">Nuestra Esencia</span>
-          </motion.div>
-          
-          <h2 className="text-3xl sm:text-4xl font-bold text-white">
-            Acerca de nosotros
+          <div className="flex items-center gap-3 mb-8">
+            <span className="text-[10px] font-bold text-[#e8c84a] uppercase tracking-[0.35em]">Nuestra Esencia</span>
+            <div className="flex-1 h-px bg-[#e8c84a]/20 max-w-[80px]" />
+          </div>
+
+          {/* Big heading */}
+          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[0.95] max-w-2xl">
+            Acerca<br />
+            <span className="text-white/20">de nosotros</span>
           </h2>
         </motion.div>
 
-        {/* Content centered */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="max-w-3xl mx-auto space-y-4"
-        >
-          <p className="text-sm sm:text-base text-gray-300 leading-relaxed text-center px-4" dangerouslySetInnerHTML={{ __html: mainText }} />
-          
-          <p className="text-xs sm:text-sm text-gray-400 leading-relaxed text-center px-4" dangerouslySetInnerHTML={{ __html: secondaryText }} />
+        {/* Two-column layout */}
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start mb-20 lg:mb-28">
 
-          {/* Key Values */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 pt-6 max-w-4xl mx-auto px-2">
+          {/* Left — main text */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="space-y-6"
+          >
+            <p
+              className="text-lg sm:text-xl text-white/70 leading-relaxed font-light"
+              dangerouslySetInnerHTML={{ __html: mainText }}
+            />
+            <p
+              className="text-sm sm:text-base text-white/35 leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: secondaryText }}
+            />
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                const section = document.getElementById('offers');
+                if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className="mt-4 inline-flex items-center gap-3 text-sm font-semibold text-white border border-white/20 px-7 py-3.5 rounded-full hover:bg-white hover:text-black transition-all duration-300"
+            >
+              Aplicar a La Cabaña
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </motion.button>
+          </motion.div>
+
+          {/* Right — values list */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="space-y-0 divide-y divide-white/[0.05]"
+          >
             {values.map((value, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.1 + (index * 0.05) }}
-                className="p-2 sm:p-3 rounded-lg bg-white/5 border border-white/10 text-center"
+                transition={{ delay: 0.1 + index * 0.07 }}
+                className="group flex items-start gap-6 py-6 cursor-default"
               >
-                <value.icon className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400 mb-1 sm:mb-1.5 mx-auto" />
-                <h4 className="text-white font-semibold text-xs sm:text-sm mb-0.5 leading-tight">{value.title}</h4>
-                <p className="text-[10px] sm:text-xs text-gray-400 leading-tight">{value.desc}</p>
+                <span className="text-[11px] font-bold text-[#e8c84a]/50 tracking-widest mt-1 group-hover:text-[#e8c84a] transition-colors duration-300">
+                  {value.number}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-base font-bold text-white/80 mb-0.5 group-hover:text-white transition-colors duration-300">
+                    {value.title}
+                  </h4>
+                  <p className="text-sm text-white/30 leading-relaxed">
+                    {value.desc}
+                  </p>
+                </div>
+                <div className="w-4 h-px bg-[#e8c84a]/0 group-hover:bg-[#e8c84a]/40 group-hover:w-8 transition-all duration-500 mt-3 flex-shrink-0" />
               </motion.div>
             ))}
-          </div>
-        </motion.div>
+          </motion.div>
 
-        {/* Cinematic CTA Button */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5, duration: 0.6, type: "spring" }}
-          className="text-center mt-12"
-        >
-          <button
-            onClick={() => {
-              const section = document.getElementById('offers');
-              if (section) {
-                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }
-            }}
-            className="group inline-flex items-center gap-3 px-10 py-4 bg-white text-black rounded-full text-lg font-medium hover:bg-gray-100 transition-all duration-300"
-          >
-            <span>Aplicar a La Cabaña</span>
-            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </button>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
