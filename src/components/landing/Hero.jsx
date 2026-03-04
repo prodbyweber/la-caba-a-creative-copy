@@ -48,7 +48,7 @@ export default function Hero({ config }) {
         >
           <div className="relative w-full aspect-video">
             {/* Background glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 via-transparent to-purple-500/20 rounded-xl lg:rounded-2xl blur-2xl" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 rounded-xl lg:rounded-2xl blur-2xl" />
             
             {/* Image container with Scratch Reveal */}
             <div className="relative h-full rounded-xl lg:rounded-2xl overflow-hidden bg-black">
@@ -145,9 +145,9 @@ export default function Hero({ config }) {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="w-10 h-10 rounded-full border-2 border-emerald-500/30 flex items-center justify-center"
+            className="w-10 h-10 rounded-full border-2 border-white/10 flex items-center justify-center"
           >
-            <Globe className="w-5 h-5 text-emerald-500/60" />
+            <Globe className="w-5 h-5 text-white/25" />
           </motion.div>
         </motion.div>
       </div>
