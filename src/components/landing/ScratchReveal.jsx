@@ -116,7 +116,6 @@ export default function ScratchReveal({ topImage, revealImage, audioUrl, youtube
   }, [isRevealed, canScratch]);
 
   const handleMouseMove = (e) => {
-    if (e.buttons !== 1) return;
     scratch(e.clientX, e.clientY);
   };
 
