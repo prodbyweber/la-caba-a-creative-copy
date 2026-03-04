@@ -117,14 +117,14 @@ export default function StoriesSection() {
           {/* Navigation Arrows - Desktop */}
           <button
             onClick={prevSlide}
-            className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-14 z-20 w-10 h-10 items-center justify-center rounded-full bg-white hover:bg-zinc-200 shadow-lg transition-all"
+            className="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-14 z-20 w-10 h-10 items-center justify-center rounded-full bg-black/10 hover:bg-black/20 shadow-lg transition-all"
           >
             <ChevronLeft className="w-5 h-5 text-zinc-900" />
           </button>
 
           <button
             onClick={nextSlide}
-            className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 z-20 w-10 h-10 items-center justify-center rounded-full bg-white hover:bg-zinc-200 shadow-lg transition-all"
+            className="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-14 z-20 w-10 h-10 items-center justify-center rounded-full bg-black/10 hover:bg-black/20 shadow-lg transition-all"
           >
             <ChevronRight className="w-5 h-5 text-zinc-900" />
           </button>
