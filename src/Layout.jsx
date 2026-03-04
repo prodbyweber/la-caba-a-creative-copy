@@ -51,59 +51,10 @@ export default function Layout({ children, currentPageName }) {
           background: rgba(255,255,255,0.2);
         }
         
-        /* ── Clash Display (headings) + Cabinet Grotesk (body) ── */
-        @import url('https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&f[]=cabinet-grotesk@100,200,300,400,500,700,800,900&display=swap');
-
         body {
           background: #0a0a0b;
           color: white;
-          font-family: 'Cabinet Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
-          font-weight: 400;
-          letter-spacing: -0.01em;
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-        }
-
-        /* Clash Display for all headings */
-        h1, h2, h3 {
-          font-family: 'Clash Display', sans-serif;
-          letter-spacing: -0.03em;
-          line-height: 1.0;
-        }
-
-        h1 {
-          font-weight: 600;
-          letter-spacing: -0.04em;
-          line-height: 0.96;
-        }
-
-        h2 {
-          font-weight: 600;
-          letter-spacing: -0.03em;
-        }
-
-        h3 {
-          font-weight: 500;
-          letter-spacing: -0.025em;
-        }
-
-        h4, h5, h6 {
-          font-family: 'Clash Display', sans-serif;
-          font-weight: 500;
-          letter-spacing: -0.02em;
-        }
-
-        p, button, input, textarea, select, label, span, a, li {
-          font-family: 'Cabinet Grotesk', sans-serif;
-          -webkit-font-smoothing: antialiased;
-        }
-
-        .tracking-cinematic {
-          font-family: 'Cabinet Grotesk', sans-serif;
-          letter-spacing: 0.22em;
-          text-transform: uppercase;
-          font-size: 0.62rem;
-          font-weight: 500;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
         ::selection {
