@@ -31,7 +31,7 @@ export default function Hero({ config }) {
           transition={{ duration: 0.7 }}
           className="max-w-4xl w-full space-y-1 sm:space-y-3 lg:space-y-4"
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white tracking-tight leading-[0.95] px-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight leading-[1.1] px-2 line-clamp-2">
             {heroTitle}
           </h1>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 leading-relaxed px-2 line-clamp-3">
