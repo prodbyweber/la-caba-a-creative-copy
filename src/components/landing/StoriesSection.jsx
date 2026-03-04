@@ -287,14 +287,14 @@ export default function StoriesSection() {
           <div className="flex lg:hidden items-center justify-center gap-3 mt-6">
             <button
               onClick={prevSlide}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-zinc-900 hover:bg-zinc-800 text-white shadow-lg transition-all"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/30 text-black shadow-lg transition-all"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
 
             <button
               onClick={nextSlide}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-zinc-900 hover:bg-zinc-800 text-white shadow-lg transition-all"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/30 text-black shadow-lg transition-all"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -309,8 +309,8 @@ export default function StoriesSection() {
               onClick={() => scrollToIndex(index)}
               className={`h-1.5 sm:h-2 rounded-full transition-all ${
                 index === currentIndex 
-                  ? 'w-6 sm:w-8 bg-zinc-900' 
-                  : 'w-1.5 sm:w-2 bg-zinc-400 hover:bg-zinc-600'
+                  ? 'w-6 sm:w-8 bg-black' 
+                  : 'w-1.5 sm:w-2 bg-black/30 hover:bg-black/50'
               }`}
               aria-label={`Ver testimonio ${index + 1}`}
             />
