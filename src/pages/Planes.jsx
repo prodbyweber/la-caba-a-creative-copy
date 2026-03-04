@@ -90,14 +90,14 @@ export default function Planes() {
 
       {/* HERO */}
       <section className="pt-36 pb-16 px-6 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(16,185,129,0.08),transparent)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(255,255,255,0.03),transparent)]" />
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="relative z-10 max-w-2xl mx-auto"
         >
-          <p className="text-xs font-semibold text-emerald-400 uppercase tracking-[0.2em] mb-5">
+          <p className="text-xs font-semibold text-white/40 uppercase tracking-[0.2em] mb-5">
             Planes y Precios
           </p>
           <h1 className="text-4xl sm:text-5xl font-bold leading-tight tracking-tight mb-5">
@@ -111,16 +111,16 @@ export default function Planes() {
           <div className="mt-10 inline-flex items-center gap-4 bg-white/[0.04] border border-white/[0.08] rounded-full px-2 py-1.5">
             <button
               onClick={() => setAnnual(false)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${!annual ? "bg-emerald-500 text-black" : "text-white/40 hover:text-white"}`}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${!annual ? "bg-white text-black" : "text-white/40 hover:text-white"}`}
             >
               Mensual
             </button>
             <button
               onClick={() => setAnnual(true)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${annual ? "bg-emerald-500 text-black" : "text-white/40 hover:text-white"}`}
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${annual ? "bg-white text-black" : "text-white/40 hover:text-white"}`}
             >
               Anual
-              <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20">
+              <span className="text-[10px] font-bold bg-white/10 text-white/60 px-2 py-0.5 rounded-full border border-white/10">
                 −2 meses
               </span>
             </button>
@@ -140,16 +140,16 @@ export default function Planes() {
                 transition={{ duration: 0.5, delay: i * 0.08 }}
                 className={`relative flex flex-col rounded-2xl border p-7 transition-all ${
                   plan.popular
-                    ? "bg-[#0f1a14] border-emerald-500/40 shadow-[0_0_60px_rgba(16,185,129,0.08)]"
+                    ? "bg-[#141416] border-white/[0.18] shadow-[0_0_60px_rgba(255,255,255,0.03)]"
                     : "bg-[#0e0e10] border-white/[0.07] hover:border-white/[0.12]"
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-px left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/80 to-transparent" />
+                  <div className="absolute -top-px left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
                 )}
                 {plan.popular && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500 text-black text-[11px] font-bold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-black text-[11px] font-bold uppercase tracking-wider">
                       <Zap className="w-2.5 h-2.5" />
                       Más Popular
                     </span>
@@ -158,7 +158,7 @@ export default function Planes() {
 
                 {/* Plan name */}
                 <div className="mb-6">
-                  <p className={`text-xs font-semibold uppercase tracking-[0.15em] mb-2 ${plan.popular ? "text-emerald-400" : "text-white/30"}`}>
+                  <p className={`text-xs font-semibold uppercase tracking-[0.15em] mb-2 ${plan.popular ? "text-white/70" : "text-white/30"}`}>
                     {plan.name}
                   </p>
                   <div className="flex items-baseline gap-1.5 mb-3">
@@ -181,7 +181,7 @@ export default function Planes() {
                 <button
                   className={`w-full py-3 rounded-xl text-sm font-semibold transition-all mb-7 ${
                     plan.popular
-                      ? "bg-emerald-500 text-black hover:bg-emerald-400"
+                      ? "bg-white text-black hover:bg-white/90"
                       : "bg-white/[0.06] text-white hover:bg-white/[0.1] border border-white/[0.08]"
                   }`}
                 >
@@ -199,7 +199,7 @@ export default function Planes() {
                         {feat.excluded ? (
                           <X className="w-4 h-4 flex-shrink-0 mt-0.5 text-white/20" />
                         ) : (
-                          <Check className={`w-4 h-4 flex-shrink-0 mt-0.5 ${plan.popular ? "text-emerald-400" : "text-white/50"}`} />
+                          <Check className="w-4 h-4 flex-shrink-0 mt-0.5 text-white/50" />
                         )}
                         <span className={`text-sm leading-snug ${feat.excluded ? "text-white/20" : "text-white/70"}`}>
                           {feat.text}
@@ -236,7 +236,7 @@ export default function Planes() {
               ¿Listo para construir<br />un proyecto sólido?
             </h2>
             <p className="text-white/35 text-sm mb-8">Únete a los artistas que ya están creciendo con Cabaña Creative.</p>
-            <button className="px-8 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-sm transition-all hover:scale-[1.02]">
+            <button className="px-8 py-3.5 rounded-xl bg-white hover:bg-white/90 text-black font-bold text-sm transition-all hover:scale-[1.02]">
               Unirme a Cabaña Creative
             </button>
           </div>
