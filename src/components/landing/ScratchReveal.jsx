@@ -26,6 +26,11 @@ export default function ScratchReveal({
   // Preload images immediately
   useEffect(() => {
     topImageRef.current.crossOrigin = "anonymous";
+    if (topImageRef.current.complete && topImageRef.current.naturalWidth > 0) {
+      setTopImageReady(true);
+    } else {
+      topImageRef.current.onload = () => setTopImageReady(true);
+    }
     topImageRef.current.src = topImage;
     
     revealImageRef.current.crossOrigin = "anonymous";
