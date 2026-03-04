@@ -5,7 +5,6 @@ import Hero from "@/components/landing/Hero";
 import OffersCarousel from "@/components/landing/OffersCarousel";
 import BrandsCarousel from "@/components/landing/BrandsCarousel";
 import StoriesSection from "@/components/landing/StoriesSection";
-import StartupsSection from "@/components/landing/StartupsSection";
 import DashboardPreview from "@/components/landing/DashboardPreview";
 
 import AboutSection from "@/components/landing/AboutSection";
@@ -43,7 +42,6 @@ export default function Landing() {
         <div id="offers"><OffersCarousel /></div>
         <DashboardPreview />
 
-        <div id="startups"><StartupsSection /></div>
         </main>
       )}
 
