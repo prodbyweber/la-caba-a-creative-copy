@@ -124,7 +124,7 @@ export default function LandingNav() {
                 <button
                   key={item.key}
                   onClick={() => scrollToSection(item.id)}
-                  className="px-5 py-2 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-medium hover:shadow-lg hover:shadow-emerald-500/20 transition-all"
+                  className="px-5 py-2 rounded-full bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
                 >
                   {item.label}
                 </button>
@@ -150,7 +150,7 @@ export default function LandingNav() {
               <Link
                 key={item.key}
                 to={item.url}
-                className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors font-medium border border-emerald-500/30 px-3 py-1.5 rounded-lg hover:bg-emerald-500/10"
+                className="text-sm text-white/60 hover:text-white transition-colors font-medium border border-white/20 px-3 py-1.5 rounded-lg hover:bg-white/10"
               >
                 {item.label}
               </Link>
@@ -170,7 +170,7 @@ export default function LandingNav() {
                     className="w-8 h-8 rounded-full object-cover border-2 border-emerald-500"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold text-sm">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm">
                     {user.full_name?.[0]?.toUpperCase() || "U"}
                   </div>
                 )}
@@ -233,7 +233,7 @@ export default function LandingNav() {
                       onClick={() => scrollToSection(item.id)}
                       className={`text-2xl font-light text-left transition-colors ${
                         item.highlight 
-                          ? 'text-emerald-400 font-medium' 
+                          ? 'text-white font-semibold' 
                           : 'text-gray-300 hover:text-white'
                       }`}
                     >
@@ -246,7 +246,7 @@ export default function LandingNav() {
                     key={item.key}
                     to={item.url}
                     onClick={() => setMobileOpen(false)}
-                    className="text-2xl font-light text-left text-emerald-400 hover:text-emerald-300 transition-colors border border-emerald-500/30 rounded-lg px-4 py-2"
+                    className="text-2xl font-light text-left text-white/70 hover:text-white transition-colors border border-white/20 rounded-lg px-4 py-2"
                   >
                     {item.label}
                   </Link>
@@ -261,10 +261,10 @@ export default function LandingNav() {
                         <img
                           src={user.avatar_url}
                           alt={user.full_name}
-                          className="w-10 h-10 rounded-full object-cover border-2 border-emerald-500"
+                          className="w-10 h-10 rounded-full object-cover border-2 border-white/30"
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white font-bold">
+                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold">
                           {user.full_name?.[0]?.toUpperCase() || "U"}
                         </div>
                       )}
