@@ -71,10 +71,10 @@ export default function TeamSection() {
             whileInView={{ scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, type: "spring" }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 mb-4"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#e8c84a]/10 border border-[#e8c84a]/20 mb-4"
           >
-            <Sparkles className="w-3.5 h-3.5 text-orange-400" />
-            <span className="text-xs font-semibold text-orange-400">El Equipo</span>
+            <Sparkles className="w-3.5 h-3.5 text-[#e8c84a]" />
+            <span className="text-xs font-semibold text-[#e8c84a]">El Equipo</span>
           </motion.div>
           
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">
@@ -147,7 +147,7 @@ export default function TeamSection() {
                       <h3 className="text-xl font-bold text-white mb-1">
                         {member.name}
                       </h3>
-                      <p className="text-xs text-emerald-400 font-semibold">
+                      <p className="text-xs text-orange-400 font-semibold">
                         {member.role}
                       </p>
                     </div>
