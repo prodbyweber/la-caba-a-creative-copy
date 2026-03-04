@@ -33,62 +33,58 @@ const navItems = [
 
 export default function AdminLayout({ children, activePage }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
       {/* Top Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0b]/90 backdrop-blur-xl border-b border-white/5">
+        {/* First row: logo + actions */}
         <div className="flex items-center justify-between px-2 sm:px-4 h-14">
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Mobile hamburger */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="lg:hidden p-2 text-gray-400 hover:text-white"
             >
               {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
-            
-            <div className="flex items-center gap-1.5 sm:gap-2">
-               <Link to={createPageUrl("Landing")}>
-                 <img 
-                   src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/d93ba7d4d_Lacabanacreativelogooficial2026.png" 
-                   alt="Cabaña Creative"
-                   className="h-12 w-auto cursor-pointer hover:scale-105 transition-transform"
-                 />
-               </Link>
-               <div className="hidden sm:block">
-                 <div className="text-[11px] sm:text-xs font-bold text-white">
-                   Cabaña Creative
-                 </div>
-                 <div className="text-[8px] text-gray-500">Prod. by Weber</div>
-               </div>
-             </div>
 
-            {/* Homepage Button */}
             <Link to={createPageUrl("Landing")}>
-              <button className="hidden lg:flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[11px] font-medium transition-colors">
-                <Home className="w-3 h-3" />
-                <span>Home</span>
-              </button>
-            </Link>
-          </div>
-
-          {/* Global Search */}
-          <div className="hidden md:flex items-center flex-1 max-w-xl mx-8">
-            <div className="relative w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search artists, projects, tracks..."
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-sm placeholder:text-gray-500 focus:outline-none focus:border-emerald-500/50"
+              <img
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/d93ba7d4d_Lacabanacreativelogooficial2026.png"
+                alt="Cabaña Creative"
+                className="h-12 w-auto cursor-pointer hover:scale-105 transition-transform"
               />
+            </Link>
+            <div className="hidden sm:block">
+              <div className="text-[11px] font-bold text-white">Cabaña Creative</div>
+              <div className="text-[8px] text-gray-500">Prod. by Weber</div>
             </div>
           </div>
 
-          {/* User Menu */}
-          <div className="flex items-center gap-2">
+          {/* Desktop nav links — horizontal */}
+          <div className="hidden lg:flex items-center gap-0.5 flex-1 mx-6 overflow-x-auto">
+            {navItems.map((item, i) => {
+              const isActive = activePage === item.page;
+              return (
+                <Link key={i} to={createPageUrl(item.page)}>
+                  <button
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all ${
+                      isActive
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <item.icon className="w-3.5 h-3.5 flex-shrink-0" />
+                    <span>{item.label}</span>
+                  </button>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Right actions */}
+          <div className="flex items-center gap-2 flex-shrink-0">
             <Link to={createPageUrl("Settings")}>
               <button className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white transition-all">
                 <Settings className="w-4 h-4" />
@@ -101,8 +97,8 @@ export default function AdminLayout({ children, activePage }) {
         </div>
       </nav>
 
-      {/* Sidebar */}
-      <aside className={`fixed left-0 top-14 bottom-0 w-56 bg-[#0a0a0b] border-r border-white/5 z-40 transition-transform lg:translate-x-0 ${
+      {/* Mobile Sidebar */}
+      <aside className={`fixed left-0 top-14 bottom-0 w-56 bg-[#0a0a0b] border-r border-white/5 z-40 transition-transform lg:hidden ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         <div className="flex flex-col h-full">
@@ -112,24 +108,21 @@ export default function AdminLayout({ children, activePage }) {
                 const isActive = activePage === item.page;
                 return (
                   <Link key={i} to={createPageUrl(item.page)} onClick={() => setSidebarOpen(false)}>
-                    <motion.button
-                      whileHover={{ x: 2 }}
+                    <button
                       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                        isActive 
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                        isActive
+                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                           : 'text-gray-400 hover:text-white hover:bg-white/5'
                       }`}
                     >
                       <item.icon className="w-4 h-4 flex-shrink-0" />
                       <span className="truncate">{item.label}</span>
-                    </motion.button>
+                    </button>
                   </Link>
                 );
               })}
             </nav>
           </div>
-
-          {/* Bottom Section */}
           <div className="p-2.5 border-t border-white/5">
             <div className="px-3 py-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20">
               <div className="text-[10px] font-semibold text-white mb-0.5">Admin</div>
@@ -139,14 +132,14 @@ export default function AdminLayout({ children, activePage }) {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="lg:pl-56 pt-14">
+      {/* Main Content — no left padding on desktop */}
+      <main className="pt-14">
         {children}
       </main>
 
       {/* Mobile Overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
