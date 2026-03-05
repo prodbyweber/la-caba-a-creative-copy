@@ -229,50 +229,53 @@ export default function AdminDashboard() {
               )}
             </div>
 
-            {/* Entregables */}
+            {/* Próximas Sesiones */}
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Clock className="w-4 h-4 text-blue-400" />
-                <h3 className="text-sm font-semibold text-white">Entregables Pendientes</h3>
-                {dueDeliverables.length > 0 && (
+                <h3 className="text-sm font-semibold text-white">Próximas Sesiones</h3>
+                {upcomingSessions.length > 0 && (
                   <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                    {dueDeliverables.length}
+                    {upcomingSessions.length}
                   </span>
                 )}
               </div>
-              {dueDeliverables.length === 0 ? (
+              {upcomingSessions.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-10 rounded-xl border border-white/[0.05] bg-white/[0.02]">
-                  <CheckCircle2 className="w-10 h-10 text-white/10 mb-2" />
-                  <p className="text-sm text-white/25">¡Todos los entregables al día!</p>
+                  <Calendar className="w-10 h-10 text-white/10 mb-2" />
+                  <p className="text-sm text-white/25">No hay sesiones próximas</p>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {dueDeliverables.slice(0, 5).map((d) => {
-                    const isOverdue = new Date(d.due_date_time) < new Date();
-                    return (
-                      <div key={d.id} className={`group p-3.5 rounded-xl border transition-all ${isOverdue ? 'bg-red-500/[0.04] border-red-500/20 hover:border-red-500/35' : 'bg-white/[0.03] border-white/[0.06] hover:border-white/[0.12]'}`}>
+                  {upcomingSessions.slice(0, 5).map((s) => (
+                    <div key={s.id} className="group flex items-start gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-1.5">
-                          <h4 className="font-semibold text-white text-sm truncate flex-1">{d.title}</h4>
+                          <h4 className="font-semibold text-white text-sm truncate">{s.title}</h4>
                           <div className="flex items-center gap-1.5 flex-shrink-0">
-                            {isOverdue && <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/15 text-red-400 font-medium">Atrasado</span>}
+                            <span className="text-[10px] text-white/30">{format(parseISO(s.start_time), 'MMM d, HH:mm')}</span>
                             <ItemMenu
-                              onEdit={() => openEditDeliverable(d)}
-                              onDelete={() => deleteDeliverable.mutate(d.id)}
-                              onArchive={() => archiveDeliverable.mutate(d.id)}
+                              onEdit={() => openEditSession(s)}
+                              onDelete={() => deleteSession.mutate(s.id)}
+                              onArchive={() => archiveSession.mutate(s.id)}
                               showArchive
                             />
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-medium">{d.deliverable_type}</span>
-                          <span className="text-[10px] text-white/30">{format(parseISO(d.due_date_time), 'MMM d, HH:mm')}</span>
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                            s.type === 'Session' ? 'bg-emerald-500/10 text-emerald-400' :
+                            s.type === 'Meeting' ? 'bg-blue-500/10 text-blue-400' :
+                            'bg-purple-500/10 text-purple-400'
+                          }`}>{s.type === 'StudioWork' ? 'Studio Work' : s.type}</span>
+                          <span className="text-[10px] text-white/30 truncate">{s.location}</span>
                           <div className="ml-auto">
-                            <StatusButton status={d.status} onStatusChange={(id, status) => updateDeliverableStatus.mutate({ id, status })} entity="deliverable" id={d.id} />
+                            <StatusButton status={s.status} onStatusChange={(id, status) => updateSessionStatus.mutate({ id, status })} entity="session" id={s.id} />
                           </div>
                         </div>
                       </div>
-                    );
-                  })}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
