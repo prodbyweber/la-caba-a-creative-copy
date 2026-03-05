@@ -112,10 +112,31 @@ export default function AdminDashboard() {
       <div className="px-4 sm:px-8 lg:px-14 xl:px-20 py-6 max-w-[1600px] mx-auto">
 
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Admin Dashboard</h1>
           <p className="text-sm text-white/30">Actividades prioritarias de hoy</p>
         </motion.div>
+
+        {/* KPI Cards - arriba */}
+        <div className="mb-6">
+          <p className="text-[11px] font-semibold text-white/20 uppercase tracking-widest mb-3">Resumen General</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {kpis.map((kpi, i) => (
+              <Link key={i} to={kpi.link}>
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.04 }}
+                  className="bg-[#111113] border border-white/[0.06] rounded-xl p-4 hover:border-white/[0.14] hover:bg-white/[0.04] transition-all cursor-pointer"
+                >
+                  <kpi.icon className="w-4 h-4 text-white/25 mb-3" />
+                  <div className="text-2xl font-black text-white mb-0.5">{kpi.value}</div>
+                  <div className="text-[10px] text-white/25 font-medium">{kpi.label}</div>
+                </motion.div>
+              </Link>
+            ))}
+          </div>
+        </div>
 
         {/* Task Management Panel */}
         <motion.div
