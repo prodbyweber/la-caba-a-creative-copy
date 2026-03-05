@@ -420,17 +420,23 @@ export default function Calendars() {
               const dayDeliverables = activeTab === "deliverables" ? getDeliverablesForDay(day) : [];
               const hasItems = daySessions.length > 0 || dayDeliverables.length > 0;
               const isTodayDate = isToday(day);
+              const isDragOver = dragOverDay && isSameDay(dragOverDay, day);
 
               return (
                 <div
                   key={i}
                   className={`min-h-16 md:min-h-24 p-1.5 md:p-2 rounded-lg border transition-all cursor-pointer ${
-                    isTodayDate
+                    isDragOver
+                      ? 'bg-emerald-500/20 border-emerald-500/50'
+                      : isTodayDate
                       ? 'bg-emerald-500/10 border-emerald-500/30'
                       : hasItems
                       ? 'bg-white/5 border-white/10 hover:border-emerald-500/30 hover:bg-white/10'
                       : 'bg-white/5 border-white/5 hover:bg-white/10'
                   }`}
+                  onDragOver={(e) => { e.preventDefault(); setDragOverDay(day); }}
+                  onDragLeave={() => setDragOverDay(null)}
+                  onDrop={() => handleDrop(day)}
                 >
                   <div className={`text-xs md:text-sm font-bold mb-1 ${
                     isTodayDate ? 'text-emerald-400' : 'text-gray-400'
@@ -441,8 +447,11 @@ export default function Calendars() {
                     {activeTab === "sessions" && daySessions.slice(0, 2).map((session) => (
                       <button
                         key={session.id}
+                        draggable
+                        onDragStart={(e) => { e.stopPropagation(); setDragItem({ id: session.id, type: 'session', data: session }); }}
+                        onDragEnd={() => setDragItem(null)}
                         onClick={() => setSelectedSession(session)}
-                        className="w-full text-left text-[9px] md:text-[10px] p-1 md:p-1.5 rounded bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors border border-blue-500/20"
+                        className="w-full text-left text-[9px] md:text-[10px] p-1 md:p-1.5 rounded bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 transition-colors border border-blue-500/20 cursor-grab active:cursor-grabbing"
                       >
                         <div className="font-bold truncate">
                           {format(parseISO(session.start_time), 'HH:mm')}
@@ -453,7 +462,10 @@ export default function Calendars() {
                     {activeTab === "deliverables" && dayDeliverables.slice(0, 2).map((deliverable) => (
                       <div
                         key={deliverable.id}
-                        className={`text-[9px] md:text-[10px] p-1 md:p-1.5 rounded truncate font-medium border ${
+                        draggable
+                        onDragStart={(e) => { e.stopPropagation(); setDragItem({ id: deliverable.id, type: 'deliverable', data: deliverable }); }}
+                        onDragEnd={() => setDragItem(null)}
+                        className={`text-[9px] md:text-[10px] p-1 md:p-1.5 rounded truncate font-medium border cursor-grab active:cursor-grabbing ${
                           deliverable.status === 'Overdue' 
                             ? 'bg-red-500/20 text-red-400 border-red-500/30'
                             : 'bg-purple-500/20 text-purple-400 border-purple-500/30'
