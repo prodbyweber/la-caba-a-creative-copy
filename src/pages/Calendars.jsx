@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -9,7 +9,7 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import { Plus, Calendar as CalendarIcon, Package, List, Clock, MapPin, User, CheckCircle2, AlertCircle, Archive, Trash2, Film } from "lucide-react";
 import ContentCalendar from "@/components/calendar/ContentCalendar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, isToday, differenceInHours } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, isToday, differenceInHours, set } from "date-fns";
 
 export default function Calendars() {
   const [activeTab, setActiveTab] = useState("sessions");
