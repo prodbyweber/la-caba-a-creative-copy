@@ -62,6 +62,53 @@ export default function Calendars() {
     ? allDeliverables.filter(deliverable => deliverable.artist_id === artistId)
     : allDeliverables;
 
+  const queryClient = useQueryClient();
+
+  const moveSessionMutation = useMutation({
+    mutationFn: ({ id, newDate, originalData }) => {
+      const original = parseISO(originalData.start_time);
+      const originalEnd = parseISO(originalData.end_time);
+      const duration = originalEnd - original;
+      const newStart = set(parseISO(originalData.start_time), {
+        year: newDate.getFullYear(),
+        month: newDate.getMonth(),
+        date: newDate.getDate()
+      });
+      const newEnd = new Date(newStart.getTime() + duration);
+      return base44.entities.Session.update(id, {
+        start_time: newStart.toISOString(),
+        end_time: newEnd.toISOString()
+      });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] })
+  });
+
+  const moveDeliverableMutation = useMutation({
+    mutationFn: ({ id, newDate, originalData }) => {
+      const original = parseISO(originalData.due_date_time);
+      const newDue = set(original, {
+        year: newDate.getFullYear(),
+        month: newDate.getMonth(),
+        date: newDate.getDate()
+      });
+      return base44.entities.Deliverable.update(id, {
+        due_date_time: newDue.toISOString()
+      });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['deliverables'] })
+  });
+
+  const handleDrop = (day) => {
+    if (!dragItem) return;
+    if (dragItem.type === 'session') {
+      moveSessionMutation.mutate({ id: dragItem.id, newDate: day, originalData: dragItem.data });
+    } else {
+      moveDeliverableMutation.mutate({ id: dragItem.id, newDate: day, originalData: dragItem.data });
+    }
+    setDragItem(null);
+    setDragOverDay(null);
+  };
+
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
