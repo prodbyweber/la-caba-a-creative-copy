@@ -69,6 +69,7 @@ export default function AdminDashboard() {
 
   // KPI calculations
   const todaySessions = sessions.filter(s => s.start_time && isToday(parseISO(s.start_time)));
+  const upcomingSessions = sessions.filter(s => s.start_time && new Date(s.start_time) >= new Date() && s.status !== 'Done' && s.status !== 'Cancelled').sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
   const dueDeliverables = deliverables.filter(d => d.status === 'Pending' || d.status === 'Overdue');
   const overdueDeliverables = deliverables.filter(d => d.status === 'Overdue' || (d.due_date_time && new Date(d.due_date_time) < new Date() && d.status === 'Pending'));
   const openRevisions = revisions.filter(r => r.status === 'Open' || r.status === 'InProgress');
