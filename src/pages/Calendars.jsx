@@ -18,6 +18,8 @@ export default function Calendars() {
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [showDeliverableModal, setShowDeliverableModal] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
+  const [dragItem, setDragItem] = useState(null); // { id, type: 'session'|'deliverable', data }
+  const [dragOverDay, setDragOverDay] = useState(null);
 
   const urlParams = new URLSearchParams(window.location.search);
   const artistId = urlParams.get("artistId");
