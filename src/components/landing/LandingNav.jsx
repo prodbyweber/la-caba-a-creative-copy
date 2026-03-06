@@ -113,8 +113,8 @@ export default function LandingNav() {
               className="h-16 w-auto"
             />
             <div className="flex flex-col leading-none" style={{ fontFamily: "'Pragmatica', 'Franklin Gothic Heavy', 'Arial Black', sans-serif", fontWeight: 900 }}>
-              <span className="text-white text-xl tracking-tight uppercase">Cabaña</span>
-              <span className="text-orange-500 text-xl tracking-tight uppercase">Creative</span>
+              <span className="text-white text-xl uppercase" style={{ letterSpacing: '-0.06em', fontStretch: 'condensed' }}>Cabaña</span>
+              <span className="text-orange-500 text-xl uppercase" style={{ letterSpacing: '-0.06em', fontStretch: 'condensed' }}>Creative</span>
             </div>
           </Link>
 
