@@ -112,9 +112,9 @@ export default function LandingNav() {
               alt="La Cabaña Creative"
               className="h-16 w-auto"
             />
-            <div className="flex flex-col" style={{ fontFamily: "'Pragmatica', 'Franklin Gothic Heavy', 'Arial Black', sans-serif", fontWeight: 900, lineHeight: 0.85, gap: 0 }}>
-              <span className="text-white text-xl uppercase" style={{ letterSpacing: '-0.08em' }}>Cabaña</span>
-              <span className="text-orange-500 text-xl uppercase" style={{ letterSpacing: '-0.08em' }}>Creative</span>
+            <div style={{ fontFamily: "'Pragmatica', 'Franklin Gothic Heavy', 'Arial Black', sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column', gap: 0, margin: 0, padding: 0 }}>
+              <span className="text-white text-xl uppercase" style={{ letterSpacing: '-0.08em', display: 'block', lineHeight: 1, margin: 0, padding: 0 }}>Cabaña</span>
+              <span className="text-orange-500 text-xl uppercase" style={{ letterSpacing: '-0.08em', display: 'block', lineHeight: 1, margin: 0, padding: 0 }}>Creative</span>
             </div>
           </Link>
 
