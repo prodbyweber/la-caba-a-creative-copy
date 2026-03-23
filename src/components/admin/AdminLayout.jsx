@@ -51,7 +51,7 @@ export default function AdminLayout({ children, activePage }) {
 
             <Link to={createPageUrl("Landing")}>
               <img
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/d93ba7d4d_Lacabanacreativelogooficial2026.png"
+                src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
                 alt="Cabaña Creative"
                 className="h-12 w-auto cursor-pointer hover:scale-105 transition-transform"
               />
