@@ -39,7 +39,7 @@ export default function AboutSection() {
   ];
 
   return (
-    <section className="relative pt-10 pb-8 lg:pt-32 lg:pb-4 overflow-hidden bg-[#080809]">
+    <section className="relative pt-24 pb-8 lg:pt-32 lg:pb-4 overflow-hidden bg-[#080809]">
       {/* Minimal ambient line */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
