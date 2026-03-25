@@ -915,14 +915,36 @@ function CreateSessionModal({ isOpen, onClose, artists, projects }) {
     description: "",
     status: "Scheduled"
   });
+  const [syncingGCal, setSyncingGCal] = useState(false);
+  const [gcalStatus, setGcalStatus] = useState(null); // 'success' | 'error' | null
 
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Session.create(data),
+    mutationFn: async (data) => {
+      // 1. Create session in DB
+      const session = await base44.entities.Session.create({ ...data, source: 'cabana' });
+      // 2. Sync to Google Calendar
+      setSyncingGCal(true);
+      try {
+        const res = await base44.functions.invoke('createGoogleCalendarEvent', { session });
+        if (res.data?.google_event_id) {
+          await base44.entities.Session.update(session.id, {
+            google_event_id: res.data.google_event_id,
+            google_event_link: res.data.google_event_link
+          });
+          setGcalStatus('success');
+        }
+      } catch (e) {
+        setGcalStatus('error');
+      } finally {
+        setSyncingGCal(false);
+      }
+      return session;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sessions'] });
-      onClose();
+      setTimeout(() => { onClose(); setGcalStatus(null); }, gcalStatus === 'error' ? 1500 : 800);
     }
   });
 
@@ -936,11 +958,17 @@ function CreateSessionModal({ isOpen, onClose, artists, projects }) {
         animate={{ opacity: 1, scale: 1 }}
         className="relative w-full max-w-lg bg-[#141414] rounded-2xl border border-white/10 p-6"
       >
-        <h3 className="text-xl font-bold mb-6">New Session</h3>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-bold">Nueva Sesión</h3>
+          <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-3 py-1">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            Google Calendar activo
+          </div>
+        </div>
         <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate(formData); }} className="space-y-4">
           <input
             type="text"
-            placeholder="Session Title *"
+            placeholder="Título de la sesión *"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             required
@@ -952,18 +980,18 @@ function CreateSessionModal({ isOpen, onClose, artists, projects }) {
               onChange={(e) => setFormData({ ...formData, type: e.target.value })}
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
             >
-              <option value="Session">Session</option>
-              <option value="Meeting">Meeting</option>
-              <option value="StudioWork">Studio Work</option>
+              <option value="Session">Sesión</option>
+              <option value="Meeting">Reunión</option>
+              <option value="StudioWork">Trabajo Estudio</option>
             </select>
             <select
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
             >
-              <option value="Studio">Studio</option>
+              <option value="Studio">Estudio</option>
               <option value="Online">Online</option>
-              <option value="External">External</option>
+              <option value="External">Externo</option>
             </select>
           </div>
           <select
@@ -971,7 +999,7 @@ function CreateSessionModal({ isOpen, onClose, artists, projects }) {
             onChange={(e) => setFormData({ ...formData, artist_id: e.target.value })}
             className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50"
           >
-            <option value="">Select Artist</option>
+            <option value="">Seleccionar Artista</option>
             {artists.map((artist) => (
               <option key={artist.id} value={artist.id}>{artist.stageName}</option>
             ))}
@@ -993,15 +1021,42 @@ function CreateSessionModal({ isOpen, onClose, artists, projects }) {
             />
           </div>
           <textarea
-            placeholder="Description..."
+            placeholder="Descripción..."
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             rows={3}
             className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 resize-none"
           />
+
+          {/* GCal status feedback */}
+          {syncingGCal && (
+            <div className="flex items-center gap-2 text-xs text-emerald-400 bg-emerald-500/10 rounded-lg px-3 py-2">
+              <div className="w-3 h-3 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
+              Sincronizando con Google Calendar...
+            </div>
+          )}
+          {gcalStatus === 'success' && (
+            <div className="text-xs text-emerald-400 bg-emerald-500/10 rounded-lg px-3 py-2">
+              ✓ Evento creado en Google Calendar
+            </div>
+          )}
+          {gcalStatus === 'error' && (
+            <div className="text-xs text-yellow-400 bg-yellow-500/10 rounded-lg px-3 py-2">
+              ⚠ Sesión guardada, pero no se pudo sincronizar con Google Calendar
+            </div>
+          )}
+
           <div className="flex gap-3">
-            <button type="button" onClick={onClose} className="flex-1 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10">Cancel</button>
-            <button type="submit" className="flex-1 px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600">Create</button>
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10">Cancelar</button>
+            <button
+              type="submit"
+              disabled={createMutation.isPending}
+              className="flex-1 px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 flex items-center justify-center gap-2"
+            >
+              {createMutation.isPending ? (
+                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Guardando...</>
+              ) : 'Crear Sesión'}
+            </button>
           </div>
         </form>
       </motion.div>
