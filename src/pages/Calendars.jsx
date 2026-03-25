@@ -686,9 +686,23 @@ function AgendaView({ sessions, artists, onSessionClick }) {
                       {session.description && (
                         <p className="mt-2 sm:mt-3 text-xs sm:text-sm text-gray-400 line-clamp-2">{session.description}</p>
                       )}
-                    </div>
 
-                    {/* Type Badge */}
+                      {/* Google Calendar link */}
+                      {session.google_event_link && (
+                        <a
+                          href={session.google_event_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="mt-2 inline-flex items-center gap-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          Ver en Google Calendar
+                        </a>
+                      )}
+                      </div>
+
+                      {/* Type Badge */}
                     <span className={`px-2 sm:px-3 py-1 rounded-lg text-xs font-semibold shrink-0 self-start ${
                       session.type === 'Session' ? 'bg-emerald-500/10 text-emerald-400' :
                       session.type === 'Meeting' ? 'bg-blue-500/10 text-blue-400' :
