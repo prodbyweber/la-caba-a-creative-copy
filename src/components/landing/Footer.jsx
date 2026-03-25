@@ -134,12 +134,12 @@ export default function Footer() {
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/e6c31f5fb_Logocabanacreativefondonegro2026.png" 
+                src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png" 
                 alt="Cabaña Creative"
                 className="h-12 w-auto"
               />
               <span className="text-xl font-semibold tracking-tight">
-                Cabaña <span className="text-orange-500">Creative</span>
+                Cabaña <span style={{ color: '#f4502a' }}>Creative</span>
               </span>
             </div>
             <p className="text-gray-500 text-sm max-w-sm leading-relaxed mb-3">
