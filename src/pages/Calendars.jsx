@@ -6,7 +6,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import SessionDetailModal from "@/components/sessions/SessionDetailModal";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
-import { Plus, Calendar as CalendarIcon, Package, List, Clock, MapPin, User, CheckCircle2, AlertCircle, Archive, Trash2, Film } from "lucide-react";
+import { Plus, Calendar as CalendarIcon, Package, List, Clock, MapPin, User, CheckCircle2, AlertCircle, Archive, Trash2, Film, ExternalLink } from "lucide-react";
 import ContentCalendar from "@/components/calendar/ContentCalendar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO, isToday, differenceInHours, set } from "date-fns";
