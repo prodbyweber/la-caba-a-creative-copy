@@ -112,9 +112,9 @@ export default function LandingNav() {
               alt="La Cabaña Creative"
               className="h-16 w-auto"
             />
-            <div style={{ fontFamily: "'Pragmatica', 'Franklin Gothic Heavy', 'Arial Black', sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column', gap: 0, margin: 0, padding: 0 }}>
-              <span className="text-white text-xl uppercase" style={{ letterSpacing: '-0.08em', display: 'block', lineHeight: 1, margin: 0, padding: 0 }}>Cabaña</span>
-              <span className="text-xl uppercase" style={{ letterSpacing: '-0.08em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: '#f4502a', fontFamily: "'Helvetica Neue', 'Helvetica', Arial, sans-serif", fontWeight: 900 }}>Creative</span>
+            <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column', gap: 0, margin: 0, padding: 0 }}>
+              <span className="text-white text-xl uppercase" style={{ letterSpacing: '-0.08em', display: 'block', lineHeight: 1, margin: 0, padding: 0, fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900 }}>Cabaña</span>
+              <span className="text-xl uppercase" style={{ letterSpacing: '-0.08em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: '#ff5833', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900 }}>Creative</span>
             </div>
           </Link>
 

@@ -185,7 +185,7 @@ export default function OffersCarousel() {
 
                     {/* Price */}
                     {offer.price && (
-                      <div className="text-base font-semibold text-[#f4502a] mb-3">
+                      <div className="text-base font-semibold text-[#ff5833] mb-3">
                         {offer.price}
                       </div>
                     )}

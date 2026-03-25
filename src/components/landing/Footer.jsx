@@ -139,7 +139,7 @@ export default function Footer() {
                 className="h-12 w-auto"
               />
               <span className="text-xl font-semibold tracking-tight">
-                Cabaña <span style={{ color: '#f4502a' }}>Creative</span>
+                Cabaña <span style={{ color: '#ff5833' }}>Creative</span>
               </span>
             </div>
             <p className="text-gray-500 text-sm max-w-sm leading-relaxed mb-3">
