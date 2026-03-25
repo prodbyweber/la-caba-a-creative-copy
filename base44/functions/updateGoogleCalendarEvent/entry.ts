@@ -10,21 +10,52 @@ Deno.serve(async (req) => {
 
   const { accessToken } = await base44.asServiceRole.connectors.getConnection('googlecalendar');
 
+  // Build rich description
+  const descParts = [];
+  if (session.type) descParts.push(`Tipo: ${session.type === 'Session' ? 'Sesión de Estudio' : session.type === 'Meeting' ? 'Reunión' : 'Trabajo en Estudio'}`);
+  if (session.location) descParts.push(`Ubicación: ${session.location === 'Studio' ? 'Estudio' : session.location === 'Online' ? 'Online' : 'Externo'}`);
+  if (session.status) descParts.push(`Estado: ${session.status}`);
+  if (session.artist_name) descParts.push(`Artista: ${session.artist_name}`);
+  if (session.project_name) descParts.push(`Proyecto: ${session.project_name}`);
+  if (session.description) descParts.push(`\nNotas:\n${session.description}`);
+  descParts.push('\n—\nActualizado desde Cabaña Creative');
+
+  const toMadridISO = (dtStr) => {
+    if (!dtStr) return null;
+    if (dtStr.includes('+') || dtStr.includes('Z') || (dtStr.length > 19 && dtStr[19] !== '.')) {
+      return new Date(dtStr).toISOString();
+    }
+    return dtStr.length === 16 ? dtStr + ':00' : dtStr;
+  };
+
+  const attendees = (session.attendees || [])
+    .filter(email => email && email.trim())
+    .map(email => ({ email: email.trim() }));
+
   const event = {
     summary: session.title,
-    description: session.description || '',
-    location: session.location || '',
+    description: descParts.join('\n'),
+    location: session.location === 'Studio' ? 'Estudio Cabaña Creative, Madrid' : session.location === 'Online' ? 'Online (Google Meet)' : session.location || '',
     start: {
-      dateTime: new Date(session.start_time).toISOString(),
+      dateTime: toMadridISO(session.start_time),
       timeZone: 'Europe/Madrid'
     },
     end: {
-      dateTime: new Date(session.end_time).toISOString(),
+      dateTime: toMadridISO(session.end_time),
       timeZone: 'Europe/Madrid'
+    },
+    attendees: attendees,
+    reminders: {
+      useDefault: false,
+      overrides: [
+        { method: 'popup', minutes: 30 },
+        { method: 'popup', minutes: 10 },
+        { method: 'email', minutes: 60 * 24 }
+      ]
     }
   };
 
-  const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${google_event_id}`, {
+  const res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${google_event_id}?sendUpdates=all`, {
     method: 'PATCH',
     headers: {
       Authorization: `Bearer ${accessToken}`,
