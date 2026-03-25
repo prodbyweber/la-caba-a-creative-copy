@@ -17,12 +17,12 @@ export default function Hero({ config }) {
   const tags = ['Artistas', 'Productores', 'Creadores de Contenido', 'Estudios'];
 
   return (
-    <section className="relative min-h-screen flex items-start lg:items-center overflow-hidden bg-black pt-20 pb-0 sm:pb-0 lg:pt-20">
+    <section className="relative min-h-screen flex items-center overflow-hidden bg-black pt-20 pb-0">
       {/* Background gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-black to-black" />
       
       {/* Main Container */}
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-0 sm:py-4 lg:py-8 flex flex-col items-center text-center justify-start lg:justify-center gap-2 sm:gap-3 lg:gap-6">
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-16 sm:py-20 lg:py-24 flex flex-col items-center text-center justify-center gap-2 sm:gap-3 lg:gap-6">
         
         {/* Top: Title Only */}
         <motion.div
