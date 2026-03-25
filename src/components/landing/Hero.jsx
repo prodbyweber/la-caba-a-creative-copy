@@ -22,7 +22,7 @@ export default function Hero({ config }) {
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-black to-black" />
       
       {/* Main Container */}
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-0 sm:py-4 lg:py-8 flex flex-col items-center text-center justify-start lg:justify-center gap-2 sm:gap-3 lg:gap-6">
+      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 py-0 sm:py-4 lg:py-8 mt-12 sm:mt-16 lg:mt-20 flex flex-col items-center text-center justify-start lg:justify-center gap-2 sm:gap-3 lg:gap-6">
         
         {/* Top: Title Only */}
         <motion.div
