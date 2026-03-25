@@ -147,7 +147,7 @@ export default function TeamSection() {
                       <h3 className="text-xl font-bold text-white mb-1">
                         {member.name}
                       </h3>
-                      <p className="text-xs text-orange-400 font-semibold">
+                      <p className="text-xs font-semibold" style={{ color: '#ff5833' }}>
                         {member.role}
                       </p>
                     </div>
