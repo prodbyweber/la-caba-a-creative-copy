@@ -35,7 +35,7 @@ export default function Hero({ config }) {
             {heroTitle}
           </h1>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 leading-relaxed px-2 line-clamp-3">
-            Un lugar para crear y saber hacia dónde va tu música.
+            Detrás de cada canción hay una historia.
           </p>
         </motion.div>
 
