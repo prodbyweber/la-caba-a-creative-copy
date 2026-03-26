@@ -4,15 +4,20 @@ import Stripe from 'npm:stripe';
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
 const PLANS = {
-  pro: {
-    name: 'Pro',
-    priceId: 'price_XXXXX', // REEMPLAZA CON TU PRICE ID
-    description: 'Acceso completo a todas las funcionalidades'
+  explorador: {
+    name: 'Explorador',
+    priceId: 'price_1TFJCM2cunznauNixSZVbGIw',
+    description: 'Plan básico para empezar'
   },
-  enterprise: {
-    name: 'Enterprise',
-    priceId: 'price_YYYYY', // REEMPLAZA CON TU PRICE ID
-    description: 'Soporte prioritario y funcionalidades avanzadas'
+  pionero: {
+    name: 'Pionero',
+    priceId: 'price_1TFJBH2cunznauNiFhO2vvL3',
+    description: 'Plan intermedio con funcionalidades avanzadas'
+  },
+  independiente: {
+    name: 'Independiente',
+    priceId: 'price_1TFJCM2cunznauNixSZVbGIw',
+    description: 'Plan profesional completo'
   }
 };
 

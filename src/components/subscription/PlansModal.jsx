@@ -26,37 +26,53 @@ export default function PlansModal({ isOpen, onClose }) {
       disabled: true
     },
     {
-      id: 'pro',
-      name: 'Pro',
-      price: '€29,99',
+      id: 'explorador',
+      name: 'Explorador',
+      price: 'Consultar',
       period: '/mes',
-      description: 'Perfecto para productores independientes',
+      description: 'Plan básico para empezar',
       features: [
-        'Todo de Prueba Gratuita',
-        'Sincronización Google Calendar',
-        'Integración Stripe',
-        'Análisis avanzados',
+        'Gestión de artistas',
+        'Proyectos y tracks',
+        'Calendario básico',
         'Soporte por email'
+      ],
+      cta: 'Empezar Ahora',
+      highlighted: false,
+      disabled: false
+    },
+    {
+      id: 'pionero',
+      name: 'Pionero',
+      price: 'Consultar',
+      period: '/mes',
+      description: 'Plan intermedio con funcionalidades avanzadas',
+      features: [
+        'Todo de Explorador',
+        'Sincronización Google Calendar',
+        'Clips y contenido',
+        'Análisis avanzados',
+        'Soporte prioritario'
       ],
       cta: 'Empezar Ahora',
       highlighted: true,
       disabled: false
     },
     {
-      id: 'enterprise',
-      name: 'Enterprise',
-      price: '€99,99',
+      id: 'independiente',
+      name: 'Independiente',
+      price: 'Consultar',
       period: '/mes',
-      description: 'Para estudios y productoras profesionales',
+      description: 'Plan profesional completo',
       features: [
-        'Todo de Pro',
+        'Todo de Pionero',
         'Usuarios ilimitados',
         'API personalizada',
-        'Soporte prioritario 24/7',
         'Integraciones custom',
+        'Soporte 24/7',
         'Reportes personalizados'
       ],
-      cta: 'Contáctanos',
+      cta: 'Empezar Ahora',
       highlighted: false,
       disabled: false
     }
