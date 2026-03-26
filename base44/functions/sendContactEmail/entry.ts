@@ -8,38 +8,53 @@ Deno.serve(async (req) => {
     return Response.json({ error: 'Faltan campos requeridos' }, { status: 400 });
   }
 
-  const STUDIO_EMAIL = 'hola@lacabanacreative.com';
+  // Separar nombre y apellido (primer token = nombre, resto = apellido)
+  const parts = name.trim().split(' ');
+  const nombre = parts[0] || name;
+  const apellido = parts.slice(1).join(' ') || '-';
 
-  // 1. Email a La Cabaña Creative con todos los datos del lead
-  await base44.asServiceRole.integrations.Core.SendEmail({
-    to: STUDIO_EMAIL,
-    from_name: `${name} (Formulario Web)`,
-    subject: `📩 Nuevo mensaje de contacto de ${name}`,
-    body: `
-<h2>Nuevo mensaje de contacto</h2>
+  // Guardar el contacto en la base de datos como lead
+  await base44.asServiceRole.entities.ExploracionLead.create({
+    nombre,
+    apellido,
+    nombre_artistico: name,
+    email,
+    telefono: phone || '-',
+    pais_nacimiento: '-',
+    pais_residencia: '-',
+    direccion: '-',
+    instagram: '-',
+    tiktok: '-',
+    spotify: '-',
+    youtube: '-',
+    nivel_actual: 'Estoy empezando',
+    que_frena_crecimiento: message,
+    que_espera_resolver: message,
+    compromiso_inversion: 'Me interesa, pero quiero más información antes de confirmar',
+    status: 'Interesado'
+  });
+
+  // Notificar al admin (usuario registrado en la app) vía email interno
+  const users = await base44.asServiceRole.entities.User.list();
+  const adminUser = users.find(u => u.role === 'admin');
+
+  if (adminUser) {
+    await base44.asServiceRole.integrations.Core.SendEmail({
+      to: adminUser.email,
+      from_name: 'Cabaña Creative - Formulario Web',
+      subject: `📩 Nuevo mensaje de ${name}`,
+      body: `
+<h2>Nuevo mensaje de contacto desde la web</h2>
 <p><strong>Nombre:</strong> ${name}</p>
 <p><strong>Email:</strong> ${email}</p>
 ${phone ? `<p><strong>Teléfono:</strong> ${phone}</p>` : ''}
 <p><strong>Mensaje:</strong></p>
-<p style="white-space: pre-line;">${message}</p>
+<p style="white-space: pre-line; background: #f5f5f5; padding: 12px; border-radius: 8px;">${message}</p>
 <hr/>
 <p style="color: #888; font-size: 12px;">Enviado desde el formulario de contacto de lacabanacreative.com</p>
-    `.trim()
-  });
-
-  // 2. Email de confirmación al remitente
-  await base44.asServiceRole.integrations.Core.SendEmail({
-    to: email,
-    from_name: 'Cabaña Creative',
-    subject: '¡Hemos recibido tu mensaje! ✉️',
-    body: `
-<p>Hola ${name},</p>
-<p>Gracias por ponerte en contacto con nosotros. Hemos recibido tu mensaje y te responderemos lo antes posible.</p>
-<p>Si tienes cualquier duda urgente, puedes escribirnos directamente a <a href="mailto:${STUDIO_EMAIL}">${STUDIO_EMAIL}</a>.</p>
-<br/>
-<p>El equipo de <strong>Cabaña Creative</strong></p>
-    `.trim()
-  });
+      `.trim()
+    });
+  }
 
   return Response.json({ success: true });
 });
