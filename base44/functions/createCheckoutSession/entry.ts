@@ -52,6 +52,8 @@ Deno.serve(async (req) => {
       ],
       success_url: successUrl,
       cancel_url: cancelUrl,
+      locale: 'es',
+      billing_address_collection: 'auto',
       metadata: {
         plan_type: planType,
         user_email: user.email
