@@ -1,70 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Check, Star, Zap, Crown } from "lucide-react";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
-
-const plans = [
-  {
-    name: "Iniciador",
-    price: "299",
-    period: "/mes",
-    description: "Para empezar con estructura y dirección clara",
-    icon: Zap,
-    color: "emerald",
-    features: [
-      "Acceso al Dashboard",
-      "4 horas de estudio/mes",
-      "Dirección creativa básica",
-      "Gestión de clips y calendario",
-      "Almacenamiento 10GB",
-      "Soporte por email"
-    ],
-    cta: "Solicitar acceso",
-    popular: false
-  },
-  {
-    name: "Pro",
-    price: "599",
-    period: "/mes",
-    description: "Para artistas con visión que van en serio",
-    icon: Star,
-    color: "purple",
-    features: [
-      "Todo en Iniciador",
-      "12 horas de estudio/mes",
-      "Producción visual cinematográfica",
-      "Identidad y branding completo",
-      "Almacenamiento 50GB",
-      "Atmos disponible según proyecto",
-      "Soporte prioritario"
-    ],
-    cta: "Ver planes disponibles",
-    popular: true
-  },
-  {
-    name: "Elite",
-    price: "1,299",
-    period: "/mes",
-    description: "Para proyectos profesionales sin límites",
-    icon: Crown,
-    color: "orange",
-    features: [
-      "Todo en Pro",
-      "Horas ilimitadas",
-      "Avatar 3D y universo visual",
-      "Digitalización completa",
-      "Almacenamiento ilimitado",
-      "Dirección artística dedicada",
-      "Acceso preferente",
-      "Soporte 24/7"
-    ],
-    cta: "Solicitar acceso",
-    popular: false
-  }
-];
+import { Check, Loader } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 
 export default function MembershipPlans({ config }) {
+  const { data: plans = [], isLoading } = useQuery({
+    queryKey: ['plans'],
+    queryFn: () => base44.entities.Plan.list('order')
+  });
+  const [loadingPlanId, setLoadingPlanId] = useState(null);
+  const handleCheckout = async (plan) => {
+    setLoadingPlanId(plan.id);
+    try {
+      const res = await base44.functions.invoke('createCheckoutSession', {
+        planType: plan.name.toLowerCase().replace(/\s+/g, '_'),
+        successUrl: `${window.location.origin}/Pricing?success=true`,
+        cancelUrl: window.location.href
+      });
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        alert('Error al crear sesión de pago');
+      }
+    } catch (error) {
+      alert('Error: ' + error.message);
+    } finally {
+      setLoadingPlanId(null);
+    }
+  };
+
   return (
     <section id="pricing" className="relative py-32 overflow-hidden">
       {/* Background */}
@@ -79,88 +44,95 @@ export default function MembershipPlans({ config }) {
           className="text-center mb-16"
         >
           <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-            {config?.membership_title || 'Trabajamos por membresía.'}
+            {config?.membership_title || 'Planes Simples y Transparentes'}
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-            {config?.membership_subtitle || 'No cobramos por canción. Trabajamos por tiempo, foco y proceso creativo. Así protegemos la calidad del proyecto y del trabajo.'}
+            {config?.membership_subtitle || 'Comienza con 14 días gratis. Sin tarjeta de crédito. Cancela en cualquier momento.'}
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {plans.map((plan, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className={`relative ${plan.popular ? 'md:-mt-4 md:mb-4' : ''}`}
-            >
-              {/* Popular Badge */}
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-xs font-bold z-10">
-                  Más Popular
-                </div>
-              )}
-
-              <div className={`bg-[#111113] rounded-3xl p-8 border ${plan.popular ? 'border-purple-500/30' : 'border-white/5'} hover:border-white/10 transition-all duration-500 h-full flex flex-col`}>
-                {/* Header */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-12 h-12 rounded-xl bg-${plan.color}-500/10 flex items-center justify-center`}>
-                    <plan.icon className={`w-6 h-6 text-${plan.color}-400`} />
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader className="w-8 h-8 animate-spin text-purple-400" />
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-3 gap-8">
+            {plans.map((plan, i) => (
+              <motion.div
+                key={plan.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className={`relative ${plan.highlighted ? 'md:-mt-4 md:mb-4' : ''}`}
+              >
+                {/* Popular Badge */}
+                {plan.highlighted && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-xs font-bold z-10">
+                    Recomendado
                   </div>
-                  <div>
-                    <h3 className="text-xl font-bold">{plan.name}</h3>
-                    <p className="text-xs text-gray-500">{plan.description}</p>
+                )}
+
+                <div className={`bg-[#111113] rounded-3xl p-8 border ${plan.highlighted ? 'border-purple-500/30' : 'border-white/5'} hover:border-white/10 transition-all duration-500 h-full flex flex-col`}>
+                  {/* Header */}
+                  <div className="mb-4">
+                    <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                    <p className="text-sm text-gray-500">{plan.description}</p>
                   </div>
-                </div>
 
-                {/* Price */}
-                <div className="mb-6">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-sm text-gray-500">$</span>
-                    <span className="text-5xl font-bold">{plan.price}</span>
-                    <span className="text-gray-500">{plan.period}</span>
+                  {/* Price */}
+                  <div className="mb-6">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-4xl font-bold">{plan.price}</span>
+                      <span className="text-gray-400">/mes</span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Features */}
-                <div className="flex-1 mb-8">
-                  <ul className="space-y-3">
-                    {plan.features.map((feature, j) => (
-                      <li key={j} className="flex items-start gap-3">
-                        <div className={`w-5 h-5 rounded-full bg-${plan.color}-500/10 flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                          <Check className={`w-3 h-3 text-${plan.color}-400`} />
-                        </div>
-                        <span className="text-sm text-gray-300">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                  {/* Features */}
+                  <div className="flex-1 mb-8">
+                    <ul className="space-y-3">
+                      {plan.features && plan.features.map((feature, j) => (
+                        <li key={j} className="flex items-start gap-3">
+                          <div className="w-5 h-5 rounded-full bg-purple-500/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check className="w-3 h-3 text-purple-400" />
+                          </div>
+                          <span className="text-sm text-gray-300">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-                {/* CTA */}
-                <Link to={createPageUrl("Dashboard")}>
+                  {/* CTA */}
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className={`w-full py-4 rounded-xl font-medium transition-all duration-300 ${
-                      plan.popular
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40'
-                        : 'bg-white/5 border border-white/10 text-white hover:bg-white/10'
+                    onClick={() => handleCheckout(plan)}
+                    disabled={loadingPlanId === plan.id}
+                    className={`w-full py-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                      plan.highlighted
+                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 disabled:opacity-50'
+                        : 'bg-white/5 border border-white/10 text-white hover:bg-white/10 disabled:opacity-50'
                     }`}
                   >
-                    {plan.cta}
+                    {loadingPlanId === plan.id ? (
+                      <>
+                        <Loader className="w-4 h-4 animate-spin" />
+                        Procesando...
+                      </>
+                    ) : (
+                      'Empezar Ahora'
+                    )}
                   </motion.button>
-                </Link>
-              </div>
+                </div>
 
-              {/* Background Glow for Popular */}
-              {plan.popular && (
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-3xl blur-2xl -z-10" />
-              )}
-            </motion.div>
-          ))}
-        </div>
+                {/* Background Glow for Popular */}
+                {plan.highlighted && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-3xl blur-2xl -z-10" />
+                )}
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         {/* Note */}
         <motion.div
@@ -170,7 +142,7 @@ export default function MembershipPlans({ config }) {
           className="text-center mt-12"
         >
           <p className="text-gray-500 text-sm">
-            Plazas limitadas. Proceso de selección aplicado.
+            Todos los planes incluyen una prueba gratuita de 14 días.
           </p>
         </motion.div>
       </div>
