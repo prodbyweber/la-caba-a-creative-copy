@@ -110,7 +110,7 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout activePage="AdminDashboard">
-      <div className="px-3 sm:px-8 lg:px-14 xl:px-20 py-6 max-w-[1600px] mx-auto overflow-x-hidden">
+      <div className="px-3 sm:px-8 lg:px-14 xl:px-20 py-6 max-w-[1600px] mx-auto">
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
@@ -143,7 +143,7 @@ export default function AdminDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#111113] border border-white/[0.07] rounded-2xl p-4 sm:p-7 mb-6 overflow-hidden"
+          className="bg-[#111113] border border-white/[0.07] rounded-2xl p-4 sm:p-7 mb-6"
         >
           {/* Panel Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7">
@@ -178,9 +178,9 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-5 sm:gap-7">
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-7 w-full min-w-0">
             {/* Sesiones */}
-            <div>
+            <div className="min-w-0 w-full">
               <div className="flex items-center gap-2 mb-4">
                 <Calendar className="w-4 h-4 text-emerald-400" />
                 <h3 className="text-sm font-semibold text-white">Sesiones de Hoy</h3>
@@ -229,7 +229,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Próximas Sesiones */}
-            <div>
+            <div className="min-w-0 w-full">
               <div className="flex items-center gap-2 mb-4">
                 <Clock className="w-4 h-4 text-blue-400" />
                 <h3 className="text-sm font-semibold text-white">Próximas Sesiones</h3>
@@ -284,7 +284,7 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-[#111113] border border-white/[0.07] rounded-2xl p-4 sm:p-7 mb-8 overflow-hidden"
+          className="bg-[#111113] border border-white/[0.07] rounded-2xl p-4 sm:p-7 mb-8"
         >
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
