@@ -114,10 +114,11 @@ export default function LandingNav() {
             />
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 0 }}>
               <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column', gap: 0, margin: 0, padding: 0 }}>
-                <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: '#ff5833', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>Cabaña</span>
+                <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, margin: 0, padding: 0, color: '#ff5833', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>
+                  Cabaña<sup style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.6rem', fontWeight: 400, lineHeight: 1, marginLeft: '1px', verticalAlign: 'super' }}>®</sup>
+                </span>
                 <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: 'white', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>Creative</span>
               </div>
-              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', fontWeight: 400, lineHeight: 1, marginLeft: '1px', marginTop: '4px' }}>®</span>
             </div>
           </Link>
 
