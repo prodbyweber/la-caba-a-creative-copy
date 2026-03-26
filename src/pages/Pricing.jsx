@@ -1,7 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
-import { Check, X, Loader, ArrowLeft } from "lucide-react";
+import { Check, X, Loader, ArrowLeft, LogOut, Menu, Home } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
@@ -9,6 +9,37 @@ import { createPageUrl } from "@/utils";
 export default function Pricing() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+      } catch (error) {
+        setUser(null);
+      }
+    };
+    checkUser();
+  }, []);
+
+  const handleLogout = async () => {
+    await base44.auth.logout(createPageUrl("Landing"));
+  };
+
+  const handleAccountClick = async () => {
+    try {
+      const currentUser = await base44.auth.me();
+      if (currentUser?.role === 'admin') {
+        navigate(createPageUrl("AdminDashboard"));
+      } else {
+        navigate(createPageUrl("Dashboard"));
+      }
+    } catch (error) {
+      base44.auth.redirectToLogin(window.location.href);
+    }
+  };
 
   const { data: plans = [], isLoading } = useQuery({
     queryKey: ['plans'],
@@ -63,7 +94,72 @@ export default function Pricing() {
               <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, color: 'white', fontWeight: 900, fontSize: '1rem' }}>Creative</span>
             </div>
           </Link>
+          
+          <div className="flex items-center gap-4">
+            {/* Desktop Account Actions */}
+            {user && (
+              <div className="hidden sm:flex items-center gap-3">
+                <button
+                  onClick={handleAccountClick}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-sm"
+                >
+                  <Home className="w-4 h-4" />
+                  Dashboard
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors text-sm"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Cerrar Sesión
+                </button>
+              </div>
+            )}
+            {!user && (
+              <button
+                onClick={() => base44.auth.redirectToLogin(window.location.href)}
+                className="hidden sm:block text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                Iniciar Sesión
+              </button>
+            )}
+
+            {/* Mobile Menu Button */}
+            {user && (
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="sm:hidden p-2 rounded-lg hover:bg-white/10 transition-colors"
+              >
+                <Menu className="w-5 h-5 text-gray-400" />
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && user && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="border-t border-white/5 bg-black/40 px-6 py-4 space-y-2"
+          >
+            <button
+              onClick={() => { handleAccountClick(); setMobileMenuOpen(false); }}
+              className="w-full flex items-center gap-2 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-sm text-left"
+            >
+              <Home className="w-4 h-4" />
+              Dashboard
+            </button>
+            <button
+              onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+              className="w-full flex items-center gap-2 px-4 py-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors text-sm text-left"
+            >
+              <LogOut className="w-4 h-4" />
+              Cerrar Sesión
+            </button>
+          </motion.div>
+        )}
       </header>
 
       <main className="pt-0">
