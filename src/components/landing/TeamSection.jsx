@@ -66,6 +66,7 @@ export default function TeamSection() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
+          <div className="mb-4 h-6" />
           <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[0.95] mb-3">
             ¿Quiénes Somos?
           </h2>
