@@ -16,14 +16,18 @@ export default function Footer() {
     
     setIsSubmitting(true);
     try {
-      // Aquí enviarías los datos del formulario
-      console.log("Contacto:", contactForm);
+      await base44.functions.invoke('sendContactEmail', {
+        name: contactForm.name,
+        email: contactForm.email,
+        phone: contactForm.phone,
+        message: contactForm.message
+      });
       setSubmitStatus("success");
       setContactForm({ name: "", email: "", phone: "", message: "" });
-      setTimeout(() => setSubmitStatus(null), 3000);
+      setTimeout(() => setSubmitStatus(null), 4000);
     } catch (error) {
       setSubmitStatus("error");
-      setTimeout(() => setSubmitStatus(null), 3000);
+      setTimeout(() => setSubmitStatus(null), 4000);
     } finally {
       setIsSubmitting(false);
     }
@@ -49,8 +53,8 @@ export default function Footer() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Mail className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                  <a href="mailto:contacto@lacabanacreative.com" className="text-gray-300 hover:text-white transition-colors">
-                    contacto@lacabanacreative.com
+                  <a href="mailto:hola@lacabanacreative.com" className="text-gray-300 hover:text-white transition-colors">
+                    hola@lacabanacreative.com
                   </a>
                 </div>
                 <div className="flex items-center gap-3">
@@ -112,7 +116,7 @@ export default function Footer() {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 py-3 bg-[#ff5833] hover:bg-[#e84d2a] text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="w-4 h-4" />
                 {isSubmitting ? "Enviando..." : "Enviar mensaje"}
