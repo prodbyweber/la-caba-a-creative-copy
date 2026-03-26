@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
@@ -66,17 +66,6 @@ export default function TeamSection() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            whileInView={{ scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, type: "spring" }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#e8c84a]/10 border border-[#e8c84a]/20 mb-4"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-[#e8c84a]" />
-            <span className="text-xs font-semibold text-[#e8c84a]">El Equipo</span>
-          </motion.div>
-          
           <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[0.95] mb-3">
             ¿Quiénes Somos?
           </h2>
@@ -187,7 +176,7 @@ export default function TeamSection() {
                 onClick={() => scrollToIndex(index)}
                 className={`transition-all ${
                   index === currentIndex 
-                    ? 'w-8 h-2 bg-[#e8c84a] rounded-full' 
+                    ? 'w-8 h-2 bg-[#ff5833] rounded-full' 
                     : 'w-2 h-2 bg-gray-600 rounded-full hover:bg-gray-500'
                 }`}
               />
