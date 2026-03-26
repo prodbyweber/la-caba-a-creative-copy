@@ -97,22 +97,27 @@ export default function PlansModal({ isOpen, onClose, selectedPlanId }) {
     setIsLoading(true);
 
     try {
+      const currentUrl = window.location.href;
       const res = await base44.functions.invoke('createCheckoutSession', {
         planType: planId,
-        successUrl: `${window.location.origin}/pricing?success=true`,
-        cancelUrl: `${window.location.origin}/pricing?cancelled=true`
+        successUrl: `${window.location.origin}/Pricing?success=true`,
+        cancelUrl: currentUrl
       });
 
       if (res.data?.url) {
-        window.location.href = res.data.url;
+        // Redirige a Stripe - usar target="_blank" para seguridad
+        window.open(res.data.url, '_blank', 'noopener,noreferrer');
+        setIsLoading(false);
+        setSelectedPlan(null);
       } else {
-        alert('Error: No se recibió URL de Stripe');
+        console.error('Response data:', res.data);
+        throw new Error('No se recibió URL de Stripe');
       }
     } catch (error) {
       console.error('Error creating checkout:', error);
-      alert('Error al crear sesión de pago: ' + error.message);
       setIsLoading(false);
       setSelectedPlan(null);
+      alert('Error: ' + (error.message || 'No se pudo crear la sesión de pago'));
     }
   };
 

@@ -2,23 +2,25 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Check, X } from "lucide-react";
-import PlansModal from "@/components/subscription/PlansModal";
+
 import DashboardNav from "@/components/dashboard/DashboardNav";
 
 export default function Pricing() {
-  const [showModal, setShowModal] = useState(false);
-  const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (searchParams.get('success')) {
-      alert('¡Suscripción creada exitosamente!');
-      navigate('/pricing');
+      setTimeout(() => {
+        alert('¡Suscripción creada exitosamente!');
+        navigate('/Pricing');
+      }, 500);
     }
     if (searchParams.get('cancelled')) {
-      alert('Operación cancelada');
-      navigate('/pricing');
+      setTimeout(() => {
+        alert('Operación cancelada');
+        navigate('/Pricing');
+      }, 500);
     }
   }, [searchParams, navigate]);
 
@@ -128,15 +130,26 @@ export default function Pricing() {
                 </div>
 
                 <button
-                   onClick={() => {
+                   onClick={async () => {
                      if (plan.name !== 'Prueba Gratuita') {
                        const planMap = {
                          'Explorador': 'explorador',
                          'Pionero': 'pionero',
                          'Independiente': 'independiente'
                        };
-                       setSelectedPlanId(planMap[plan.name]);
-                       setShowModal(true);
+                       const planType = planMap[plan.name];
+                       try {
+                         const res = await base44.functions.invoke('createCheckoutSession', {
+                           planType,
+                           successUrl: `${window.location.origin}/Pricing?success=true`,
+                           cancelUrl: window.location.href
+                         });
+                         if (res.data?.url) {
+                           window.open(res.data.url, '_blank', 'noopener,noreferrer');
+                         }
+                       } catch (error) {
+                         alert('Error al crear sesión de pago: ' + error.message);
+                       }
                      }
                    }}
                    className={`w-full py-3 rounded-lg font-medium mb-6 transition-all ${
@@ -258,8 +271,7 @@ export default function Pricing() {
         </div>
       </main>
 
-      {/* Plans Modal */}
-      <PlansModal isOpen={showModal} onClose={() => { setShowModal(false); setSelectedPlanId(null); }} selectedPlanId={selectedPlanId} />
+
     </div>
   );
 }
