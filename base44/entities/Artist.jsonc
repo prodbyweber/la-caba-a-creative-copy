@@ -1,0 +1,92 @@
+{
+  "name": "Artist",
+  "type": "object",
+  "properties": {
+    "stageName": {
+      "type": "string",
+      "description": "Nombre art\u00edstico"
+    },
+    "legalName": {
+      "type": "string",
+      "description": "Nombre legal"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email de contacto"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Tel\u00e9fono"
+    },
+    "location": {
+      "type": "string",
+      "description": "Ubicaci\u00f3n"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Lead",
+        "Active",
+        "Inactive"
+      ],
+      "default": "Lead",
+      "description": "Estado del artista"
+    },
+    "genre": {
+      "type": "string",
+      "description": "G\u00e9nero musical principal"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags de categorizaci\u00f3n"
+    },
+    "avatar_url": {
+      "type": "string",
+      "description": "URL del avatar del artista"
+    },
+    "bio": {
+      "type": "string",
+      "description": "Biograf\u00eda del artista"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario vinculado (para usuarios que se auto-registran)"
+    },
+    "social_links": {
+      "type": "object",
+      "properties": {
+        "instagram": {
+          "type": "string"
+        },
+        "youtube": {
+          "type": "string"
+        },
+        "tiktok": {
+          "type": "string"
+        },
+        "spotify": {
+          "type": "string"
+        },
+        "applemusic": {
+          "type": "string"
+        }
+      },
+      "description": "Enlaces a redes sociales"
+    },
+    "social_metrics": {
+      "type": "object",
+      "description": "M\u00e9tricas extra\u00eddas de redes sociales",
+      "additionalProperties": true
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas internas sobre el artista"
+    }
+  },
+  "required": [
+    "stageName"
+  ]
+}

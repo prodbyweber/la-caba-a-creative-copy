@@ -8,6 +8,7 @@ import { createPageUrl } from "@/utils";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import ArtistProfileCard from "@/components/dashboard/ArtistProfileCard";
+import ArtistProfileEditor from "@/components/dashboard/ArtistProfileEditor";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
 import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
@@ -15,6 +16,7 @@ import SocialLinksCard from "@/components/dashboard/SocialLinksCard";
 
 export default function ArtistDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
   const artistId = urlParams.get("artistId") || urlParams.get("id");
@@ -79,29 +81,44 @@ export default function ArtistDashboard() {
           </motion.div>
 
           {/* Mobile Artist Profile (compact) */}
-          <div className="lg:hidden mb-3">
-            <ArtistProfileCard compact={true} artist={artist} />
-          </div>
+           <div className="lg:hidden mb-3">
+             <ArtistProfileCard 
+               compact={true} 
+               artist={artist} 
+               onEditProfile={() => setIsEditingProfile(true)}
+             />
+           </div>
 
-          {/* Main Grid */}
-          <div className="grid lg:grid-cols-12 gap-3">
-            {/* Left Column */}
-            <div className="lg:col-span-9 space-y-3">
-              <ProjectsSection jlyArtistId={artist.id} />
-              <TracksSection jlyArtistId={artist.id} />
-            </div>
+           {/* Main Grid */}
+           <div className="grid lg:grid-cols-12 gap-3">
+             {/* Left Column */}
+             <div className="lg:col-span-9 space-y-3">
+               <ProjectsSection jlyArtistId={artist.id} />
+               <TracksSection jlyArtistId={artist.id} />
+             </div>
 
-            {/* Right Column - Desktop only profile */}
-            <div className="lg:col-span-3 space-y-3">
-              <div className="hidden lg:block">
-                <ArtistProfileCard artist={artist} />
-              </div>
-              <UpcomingSessionsCard artistId={artist.id} />
-              <SocialLinksCard />
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
-  );
-}
+             {/* Right Column - Desktop only profile */}
+             <div className="lg:col-span-3 space-y-3">
+               <div className="hidden lg:block">
+                 <ArtistProfileCard 
+                   artist={artist} 
+                   onEditProfile={() => setIsEditingProfile(true)}
+                 />
+               </div>
+               <UpcomingSessionsCard artistId={artist.id} />
+               <SocialLinksCard />
+             </div>
+           </div>
+           </div>
+           </main>
+           </div>
+
+           {/* Profile Editor Modal */}
+           <ArtistProfileEditor 
+           artist={artist} 
+           isOpen={isEditingProfile} 
+           onClose={() => setIsEditingProfile(false)} 
+           />
+           </div>
+           );
+           }

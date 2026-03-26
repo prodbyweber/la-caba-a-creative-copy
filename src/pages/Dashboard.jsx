@@ -13,26 +13,65 @@ import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [jlyArtistId, setJlyArtistId] = useState(null);
   const [user, setUser] = useState(null);
+  const [artistId, setArtistId] = useState(null);
   const navigate = useNavigate();
 
-  // Obtener usuario actual
+  // Obtener usuario actual y su artista
   useEffect(() => {
-    base44.auth.me().then(userData => {
-      setUser(userData);
-      // NO redirigir automáticamente al AdminDashboard
-      // El admin puede estar viendo el dashboard de un artista
-    }).catch(err => {
-      console.error('Error al obtener usuario:', err);
-    });
+    const loadUserAndArtist = async () => {
+      try {
+        const userData = await base44.auth.me();
+        setUser(userData);
+
+        if (userData.role === 'admin') {
+          return; // Admins permanecen en Dashboard general
+        }
+
+        // Para usuarios normales, buscar su perfil de artista
+        const artists = await base44.entities.Artist.list();
+        const userArtist = artists.find(a => a.user_id === userData.id);
+
+        if (userArtist) {
+          // Si existe, redirigir a su Artist Dashboard
+          setArtistId(userArtist.id);
+          navigate(`${createPageUrl('ArtistDashboard')}?artistId=${userArtist.id}`);
+        } else {
+          // Crear perfil de artista automáticamente
+          try {
+            const response = await base44.functions.invoke('createArtistProfileForNewUser', {});
+            if (response.data?.artistId) {
+              setArtistId(response.data.artistId);
+              navigate(`${createPageUrl('ArtistDashboard')}?artistId=${response.data.artistId}`);
+            }
+          } catch (err) {
+            console.error('Error creating artist profile:', err);
+          }
+        }
+      } catch (err) {
+        console.error('Error al obtener usuario:', err);
+      }
+    };
+    loadUserAndArtist();
   }, [navigate]);
 
-  // Obtener el artista JLY de la base de datos
+  // No mostrar nada mientras se verifica el usuario
+  if (!user) {
+    return null;
+  }
+
+  // Si es admin, mostrar dashboard general
+  if (user.role !== 'admin') {
+    return null; // Los usuarios normales serán redirigidos
+  }
+
+  // Obtener el artista JLY de la base de datos (solo para admin)
   const { data: artists = [] } = useQuery({
     queryKey: ['artists'],
     queryFn: () => base44.entities.Artist.list()
   });
+
+  const [jlyArtistId, setJlyArtistId] = useState(null);
 
   useEffect(() => {
     const jlyArtist = artists.find(artist => artist.stageName === "JLY");
@@ -40,11 +79,6 @@ export default function Dashboard() {
       setJlyArtistId(jlyArtist.id);
     }
   }, [artists]);
-
-  // No mostrar nada mientras se verifica el usuario
-  if (!user) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">

@@ -1,8 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Star, TrendingUp, Award, Verified } from "lucide-react";
+import { Star, TrendingUp, Award, Verified, Edit } from "lucide-react";
 
-export default function ArtistProfileCard({ compact = false, artist }) {
+export default function ArtistProfileCard({ compact = false, artist, onEditProfile }) {
   if (!artist) return null;
 
   const stats = [
@@ -47,6 +47,16 @@ export default function ArtistProfileCard({ compact = false, artist }) {
             </div>
             <p className="text-xs text-gray-500">{artist.genre || 'Artista'}</p>
           </div>
+
+          {/* Edit Button */}
+          {onEditProfile && (
+            <button
+              onClick={onEditProfile}
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0"
+            >
+              <Edit className="w-4 h-4 text-gray-400 hover:text-white" />
+            </button>
+          )}
         </div>
       </motion.div>
     );
@@ -95,6 +105,16 @@ export default function ArtistProfileCard({ compact = false, artist }) {
                 <Star className="w-3.5 h-3.5 text-white" fill="white" />
                 <span className="text-xs font-bold text-white uppercase">Pro</span>
               </div>
+
+              {/* Edit Button */}
+              {onEditProfile && (
+                <button
+                  onClick={onEditProfile}
+                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  <Edit className="w-4 h-4 text-gray-400 hover:text-white" />
+                </button>
+              )}
             </div>
           </div>
         </div>
