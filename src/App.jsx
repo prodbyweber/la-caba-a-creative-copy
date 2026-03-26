@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ContactLeads from './pages/ContactLeads';
 import Pricing from './pages/Pricing';
+import AdminDashboard from './pages/AdminDashboard';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -17,6 +18,38 @@ const MainPage = mainPageKey ? Pages[mainPageKey] : <></>;
 const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   <Layout currentPageName={currentPageName}>{children}</Layout>
   : <>{children}</>;
+
+const ProtectedAdminRoute = ({ element }) => {
+  const [user, setUser] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const checkAdmin = async () => {
+      try {
+        const currentUser = await base44.auth.me();
+        if (currentUser?.role !== 'admin') {
+          window.location.href = '/';
+        }
+        setUser(currentUser);
+      } catch (e) {
+        window.location.href = '/';
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAdmin();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  return user?.role === 'admin' ? element : null;
+};
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -62,6 +95,7 @@ const AuthenticatedApp = () => {
       ))}
       <Route path="/ContactLeads" element={<ContactLeads />} />
       <Route path="/Pricing" element={<Pricing />} />
+      <Route path="/AdminDashboard" element={<ProtectedAdminRoute element={<AdminDashboard />} />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

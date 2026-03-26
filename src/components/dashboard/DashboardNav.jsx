@@ -1,8 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Search, Settings, Home, BarChart3, Film, Music2, FolderKanban, Share2, Calendar, Palette, Menu, X, LayoutDashboard } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { base44 } from "@/api/base44Client";
+
+function AdminButtonCheck() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      try {
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+      } catch (e) {
+        setUser(null);
+      }
+    };
+    checkAdmin();
+  }, []);
+
+  if (!user || user.role !== 'admin') return null;
+
+  return (
+    <Link to={createPageUrl("AdminDashboard")}>
+      <button 
+        className="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all flex items-center gap-1.5"
+        title="Panel Admin"
+      >
+        <Home className="w-3.5 h-3.5" />
+        <span className="text-xs font-medium hidden sm:inline">Admin</span>
+      </button>
+    </Link>
+  );
+}
 
 export default function DashboardNav({ artistName, artistId }) {
   const location = useLocation();
@@ -76,15 +107,12 @@ export default function DashboardNav({ artistName, artistId }) {
 
           {/* Right */}
           <div className="flex items-center gap-2">
-          <Link to={createPageUrl("AdminDashboard")}>
-            <button 
-              className="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all flex items-center gap-1.5"
-              title="Panel Admin"
-            >
-              <Home className="w-3.5 h-3.5" />
-              <span className="text-xs font-medium hidden sm:inline">Admin</span>
-            </button>
-          </Link>
+          {/* Admin button only visible for admin users */}
+          {typeof window !== 'undefined' && (
+            <React.Suspense fallback={null}>
+              <AdminButtonCheck />
+            </React.Suspense>
+          )}
 
           <button className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all hidden sm:block">
             <Settings className="w-4 h-4" />
