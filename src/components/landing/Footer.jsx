@@ -136,9 +136,10 @@ export default function Footer() {
                 alt="Cabaña Creative"
                 className="h-12 w-auto"
               />
-              <span className="text-xl font-semibold tracking-tight">
-                Cabaña <span style={{ color: '#ff5833' }}>Creative</span>
-              </span>
+              <div className="flex flex-col leading-tight">
+                <span className="text-xl font-semibold tracking-tight" style={{ color: '#ff5833' }}>Cabaña</span>
+                <span className="text-xl font-semibold tracking-tight text-white">Creative</span>
+              </div>
             </div>
             <p className="text-gray-500 text-sm max-w-sm leading-relaxed mb-3">
               Formación, dirección creativa y producción musical para artistas que quieren ir en serio.
