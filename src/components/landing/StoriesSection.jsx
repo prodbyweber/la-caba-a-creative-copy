@@ -97,7 +97,7 @@ export default function StoriesSection() {
   };
 
   return (
-    <section className="relative py-8 sm:py-12 lg:py-20 overflow-hidden bg-[#e8c84a]">
+    <section className="relative py-4 sm:py-12 lg:py-20 overflow-hidden bg-[#e8c84a]">
       <div className="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Title */}
         <motion.div

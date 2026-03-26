@@ -53,7 +53,7 @@ export default function TeamSection() {
   };
 
   return (
-    <section className="relative pt-4 pb-8 sm:pt-6 sm:pb-10 lg:pt-8 lg:pb-14 overflow-hidden bg-black">
+    <section className="relative pt-2 pb-4 sm:pt-6 sm:pb-10 lg:pt-8 lg:pb-14 overflow-hidden bg-black">
       {/* Decorative gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 via-black to-zinc-950 opacity-50" />
       

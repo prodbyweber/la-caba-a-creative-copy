@@ -39,7 +39,7 @@ export default function AboutSection() {
   ];
 
   return (
-    <section className="relative pt-24 pb-8 lg:pt-32 lg:pb-4 overflow-hidden bg-[#080809]">
+    <section className="relative pt-8 pb-4 lg:pt-32 lg:pb-4 overflow-hidden bg-[#080809]">
       {/* Minimal ambient line */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
@@ -55,7 +55,7 @@ export default function AboutSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-16 lg:mb-24"
+          className="mb-6 lg:mb-24"
         >
           <div className="flex items-center gap-3 mb-8">
             <span className="text-[10px] font-bold text-[#e8c84a] uppercase tracking-[0.35em]">Nuestra Esencia</span>
@@ -70,7 +70,7 @@ export default function AboutSection() {
         </motion.div>
 
         {/* Two-column layout */}
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start mb-20 lg:mb-28">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-24 items-start mb-8 lg:mb-28">
 
           {/* Left — main text */}
           <motion.div
