@@ -137,7 +137,9 @@ export default function Footer() {
                 className="h-12 w-auto"
               />
               <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column', gap: 0, margin: 0, padding: 0 }}>
-                <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: '#ff5833', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>Cabaña</span>
+                <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, margin: 0, padding: 0, color: '#ff5833', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>
+                  Cabaña<sup style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.6rem', fontWeight: 400, lineHeight: 1, marginLeft: '3px', verticalAlign: 'top', position: 'relative', top: '2px' }}>®</sup>
+                </span>
                 <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: 'white', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>Creative</span>
               </div>
             </div>
