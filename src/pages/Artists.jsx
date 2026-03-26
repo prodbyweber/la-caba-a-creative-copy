@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Plus, Search, Filter, User, Mail, Phone, MapPin, Tag, X } from "lucide-react";
+import { Plus, Search, Filter, User, Mail, Phone, MapPin, Tag, X, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import ArtistProfilePanel from "@/components/admin/ArtistProfilePanel";
 
 export default function Artists() {
@@ -11,8 +11,14 @@ export default function Artists() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedArtist, setSelectedArtist] = useState(null);
+  const [editArtist, setEditArtist] = useState(null);
 
   const queryClient = useQueryClient();
+
+  const deleteArtistMutation = useMutation({
+    mutationFn: (id) => base44.entities.Artist.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['artists'] })
+  });
 
   const { data: artists = [], isLoading } = useQuery({
     queryKey: ['artists'],
@@ -131,9 +137,18 @@ export default function Artists() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                onClick={() => setSelectedArtist(artist)}
-                className="bg-white/5 rounded-2xl p-6 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer group"
+                className="bg-white/5 rounded-2xl p-6 border border-white/5 hover:border-emerald-500/30 transition-all group relative"
               >
+                {/* 3-dot menu */}
+                <ArtistCardMenu
+                  onView={() => setSelectedArtist(artist)}
+                  onEdit={() => setEditArtist(artist)}
+                  onDelete={() => {
+                    if (confirm(`¿Eliminar a ${artist.stageName}?`)) deleteArtistMutation.mutate(artist.id);
+                  }}
+                />
+                {/* Clickable area */}
+                <div onClick={() => setSelectedArtist(artist)} className="cursor-pointer">
                 {/* Avatar */}
                 <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-emerald-500/20 to-purple-500/20 mx-auto mb-4 overflow-hidden">
                   {artist.avatar_url ? (
@@ -170,6 +185,7 @@ export default function Artists() {
                     </span>
                   ))}
                 </div>
+                </div>{/* end clickable */}
               </motion.div>
             ))}
           </div>
@@ -182,6 +198,14 @@ export default function Artists() {
         onClose={() => setShowCreateModal(false)}
       />
 
+      {/* Edit Artist Modal */}
+      {editArtist && (
+        <EditArtistModal
+          artist={editArtist}
+          onClose={() => setEditArtist(null)}
+        />
+      )}
+
       {/* Artist Profile Panel */}
       {selectedArtist && (
         <ArtistProfilePanel
@@ -190,6 +214,151 @@ export default function Artists() {
         />
       )}
     </AdminLayout>
+  );
+}
+
+function ArtistCardMenu({ onView, onEdit, onDelete }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="absolute top-3 right-3 z-10" onClick={(e) => e.stopPropagation()}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-7 h-7 rounded-lg bg-white/0 hover:bg-white/10 flex items-center justify-center transition-colors"
+      >
+        <MoreHorizontal className="w-4 h-4 text-white/30 hover:text-white/70" />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-8 z-20 bg-[#1a1a1c] border border-white/10 rounded-xl shadow-2xl overflow-hidden min-w-[130px]">
+            <button onClick={() => { setOpen(false); onView(); }}
+              className="flex items-center gap-2.5 w-full px-3.5 py-2.5 text-sm text-white/70 hover:bg-white/[0.07] hover:text-white transition-colors">
+              <User className="w-3.5 h-3.5" /> Ver Perfil
+            </button>
+            <button onClick={() => { setOpen(false); onEdit(); }}
+              className="flex items-center gap-2.5 w-full px-3.5 py-2.5 text-sm text-white/70 hover:bg-white/[0.07] hover:text-white transition-colors">
+              <Pencil className="w-3.5 h-3.5" /> Editar
+            </button>
+            <button onClick={() => { setOpen(false); onDelete(); }}
+              className="flex items-center gap-2.5 w-full px-3.5 py-2.5 text-sm text-red-400/80 hover:bg-red-500/10 hover:text-red-400 transition-colors">
+              <Trash2 className="w-3.5 h-3.5" /> Eliminar
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function EditArtistModal({ artist, onClose }) {
+  const [formData, setFormData] = useState({
+    stageName: artist.stageName || "",
+    legalName: artist.legalName || "",
+    email: artist.email || "",
+    phone: artist.phone || "",
+    location: artist.location || "",
+    status: artist.status || "Lead",
+    genre: artist.genre || "",
+    tags: artist.tags || [],
+    notes: artist.notes || ""
+  });
+  const [tagInput, setTagInput] = useState("");
+  const queryClient = useQueryClient();
+
+  const updateMutation = useMutation({
+    mutationFn: (data) => base44.entities.Artist.update(artist.id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['artists'] });
+      onClose();
+    }
+  });
+
+  const addTag = () => {
+    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
+      setFormData({ ...formData, tags: [...formData.tags, tagInput.trim()] });
+      setTagInput("");
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="relative w-full max-w-2xl bg-[#141414] rounded-2xl border border-white/10 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+      >
+        <div className="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-[#141414] z-10">
+          <h3 className="text-xl font-bold">Editar Artista</h3>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-white/5"><X className="w-5 h-5" /></button>
+        </div>
+        <form onSubmit={(e) => { e.preventDefault(); updateMutation.mutate(formData); }} className="p-6 space-y-6">
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Stage Name *</label>
+              <input type="text" value={formData.stageName} onChange={(e) => setFormData({ ...formData, stageName: e.target.value })} required className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Legal Name</label>
+              <input type="text" value={formData.legalName} onChange={(e) => setFormData({ ...formData, legalName: e.target.value })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50" />
+            </div>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+              <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Phone</label>
+              <input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50" />
+            </div>
+          </div>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Status</label>
+              <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50">
+                <option value="Lead">Lead</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Genre</label>
+              <input type="text" value={formData.genre} onChange={(e) => setFormData({ ...formData, genre: e.target.value })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Location</label>
+              <input type="text" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Tags</label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formData.tags.map((tag, i) => (
+                <span key={i} className="px-3 py-1 rounded-lg bg-purple-500/10 text-purple-400 text-sm flex items-center gap-2">
+                  {tag}
+                  <button type="button" onClick={() => setFormData({ ...formData, tags: formData.tags.filter(t => t !== tag) })}><X className="w-3 h-3" /></button>
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input type="text" value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())} placeholder="Add tag..." className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50" />
+              <button type="button" onClick={addTag} className="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 rounded-xl text-purple-400">Add</button>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Notes</label>
+            <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} rows={3} className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 resize-none" />
+          </div>
+          <div className="flex gap-3 pt-4">
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium">Cancelar</button>
+            <button type="submit" disabled={updateMutation.isPending} className="flex-1 px-4 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-medium disabled:opacity-50">
+              {updateMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
   );
 }
 

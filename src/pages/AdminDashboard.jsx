@@ -82,7 +82,18 @@ export default function AdminDashboard() {
   const updateRevisionStatus = useMutation({ mutationFn: ({ id, status }) => base44.entities.Revision.update(id, { status }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['revisions'] }) });
 
   // Mutations - delete
-  const deleteSession = useMutation({ mutationFn: (id) => base44.entities.Session.delete(id), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] }) });
+  const deleteSession = useMutation({
+    mutationFn: async (session) => {
+      // Delete from Google Calendar first if linked
+      if (session.google_event_id) {
+        try {
+          await base44.functions.invoke('deleteGoogleCalendarEvent', { google_event_id: session.google_event_id });
+        } catch (e) { /* continue even if GCal fails */ }
+      }
+      return base44.entities.Session.delete(session.id);
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] })
+  });
   const deleteDeliverable = useMutation({ mutationFn: (id) => base44.entities.Deliverable.delete(id), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['deliverables'] }) });
   const deleteRevision = useMutation({ mutationFn: (id) => base44.entities.Revision.delete(id), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['revisions'] }) });
 
@@ -205,7 +216,7 @@ export default function AdminDashboard() {
                           <span className="text-[10px] text-white/30">{format(parseISO(s.start_time), 'HH:mm')}</span>
                           <ItemMenu
                             onEdit={() => openEditSession(s)}
-                            onDelete={() => deleteSession.mutate(s.id)}
+                            onDelete={() => deleteSession.mutate(s)}
                             onArchive={() => archiveSession.mutate(s.id)}
                             showArchive
                           />
@@ -254,7 +265,7 @@ export default function AdminDashboard() {
                           <span className="text-[10px] text-white/30">{format(parseISO(s.start_time), 'MMM d, HH:mm')}</span>
                           <ItemMenu
                             onEdit={() => openEditSession(s)}
-                            onDelete={() => deleteSession.mutate(s.id)}
+                            onDelete={() => deleteSession.mutate(s)}
                             onArchive={() => archiveSession.mutate(s.id)}
                             showArchive
                           />

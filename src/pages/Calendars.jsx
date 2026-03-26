@@ -65,20 +65,30 @@ export default function Calendars() {
   const queryClient = useQueryClient();
 
   const moveSessionMutation = useMutation({
-    mutationFn: ({ id, newDate, originalData }) => {
+    mutationFn: async ({ id, newDate, originalData }) => {
       const original = parseISO(originalData.start_time);
       const originalEnd = parseISO(originalData.end_time);
       const duration = originalEnd - original;
-      const newStart = set(parseISO(originalData.start_time), {
+      const newStart = set(original, {
         year: newDate.getFullYear(),
         month: newDate.getMonth(),
         date: newDate.getDate()
       });
       const newEnd = new Date(newStart.getTime() + duration);
-      return base44.entities.Session.update(id, {
+      const updated = await base44.entities.Session.update(id, {
         start_time: newStart.toISOString(),
         end_time: newEnd.toISOString()
       });
+      // Sync to Google Calendar if linked
+      if (originalData.google_event_id) {
+        try {
+          await base44.functions.invoke('updateGoogleCalendarEvent', {
+            session: { ...originalData, start_time: newStart.toISOString(), end_time: newEnd.toISOString() },
+            google_event_id: originalData.google_event_id
+          });
+        } catch (e) { /* continue */ }
+      }
+      return updated;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] })
   });
@@ -539,7 +549,14 @@ function AgendaView({ sessions, artists, onSessionClick }) {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Session.delete(id),
+    mutationFn: async (session) => {
+      if (session.google_event_id) {
+        try {
+          await base44.functions.invoke('deleteGoogleCalendarEvent', { google_event_id: session.google_event_id });
+        } catch (e) { /* continue */ }
+      }
+      return base44.entities.Session.delete(session.id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sessions'] });
     },
@@ -582,9 +599,9 @@ function AgendaView({ sessions, artists, onSessionClick }) {
     return acc;
   }, {});
 
-  const handleDelete = (sessionId, sessionTitle) => {
-    if (window.confirm(`¿Eliminar permanentemente "${sessionTitle}"?`)) {
-      deleteMutation.mutate(sessionId);
+  const handleDelete = (session) => {
+    if (window.confirm(`¿Eliminar permanentemente "${session.title}"?`)) {
+      deleteMutation.mutate(session);
     }
   };
 
@@ -813,7 +830,7 @@ function AgendaView({ sessions, artists, onSessionClick }) {
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDelete(session.id, session.title);
+                                handleDelete(session);
                               }}
                               className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium transition-colors flex items-center gap-1.5 self-start sm:self-center"
                             >

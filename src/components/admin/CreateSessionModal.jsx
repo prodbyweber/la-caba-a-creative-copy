@@ -49,6 +49,25 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
     setNewAttendee("");
   }, [editData, isOpen]);
 
+  // Auto-add artist email when artist is selected
+  const handleArtistChange = (artistId) => {
+    const artist = artists.find(a => a.id === artistId);
+    setFormData(prev => {
+      const newAttendees = [...prev.attendees];
+      // Remove previous artist email if any
+      const prevArtist = artists.find(a => a.id === prev.artist_id);
+      if (prevArtist?.email) {
+        const idx = newAttendees.indexOf(prevArtist.email);
+        if (idx !== -1) newAttendees.splice(idx, 1);
+      }
+      // Add new artist email if exists and not already present
+      if (artist?.email && !newAttendees.includes(artist.email)) {
+        newAttendees.unshift(artist.email);
+      }
+      return { ...prev, artist_id: artistId, attendees: newAttendees };
+    });
+  };
+
   const addAttendee = () => {
     const email = newAttendee.trim().toLowerCase();
     if (!email || !email.includes('@')) return;
@@ -173,7 +192,7 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className={labelCls}>Artista</label>
-                <select value={formData.artist_id} onChange={(e) => setFormData({ ...formData, artist_id: e.target.value })} className={inputCls} style={{ colorScheme: 'dark' }}>
+                <select value={formData.artist_id} onChange={(e) => handleArtistChange(e.target.value)} className={inputCls} style={{ colorScheme: 'dark' }}>
                   <option value="">Sin asignar</option>
                   {artists.map(a => <option key={a.id} value={a.id}>{a.stageName}</option>)}
                 </select>
@@ -250,14 +269,19 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
               </div>
               {formData.attendees.length > 0 && (
                 <div className="mt-2 space-y-1.5">
-                  {formData.attendees.map(email => (
-                    <div key={email} className="flex items-center justify-between px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                      <span className="text-xs text-blue-300">{email}</span>
-                      <button type="button" onClick={() => removeAttendee(email)} className="text-white/30 hover:text-red-400 transition-colors">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
+                  {formData.attendees.map(email => {
+                    const isArtistEmail = artists.find(a => a.id === formData.artist_id)?.email === email;
+                    return (
+                      <div key={email} className={`flex items-center justify-between px-3 py-2 rounded-lg border ${isArtistEmail ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-blue-500/10 border-blue-500/20'}`}>
+                        <span className={`text-xs ${isArtistEmail ? 'text-emerald-300' : 'text-blue-300'}`}>
+                          {email} {isArtistEmail && <span className="text-emerald-500/70">(artista)</span>}
+                        </span>
+                        <button type="button" onClick={() => removeAttendee(email)} className="text-white/30 hover:text-red-400 transition-colors">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
