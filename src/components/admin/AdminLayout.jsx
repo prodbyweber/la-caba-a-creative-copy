@@ -15,7 +15,8 @@ import {
   Music2,
   TrendingUp,
   Home,
-  DollarSign
+  DollarSign,
+  Inbox
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -28,7 +29,8 @@ const navItems = [
   { icon: Calendar, label: "Calendars", page: "Calendars" },
   { icon: DollarSign, label: "Contabilidad Pro", page: "FinanceDashboard" },
   { icon: TrendingUp, label: "Inversor", page: "InvestorDashboard" },
-  { icon: Settings, label: "Landing Editor", page: "LandingEditor" }
+  { icon: Settings, label: "Landing Editor", page: "LandingEditor" },
+  { icon: Inbox, label: "Solicitudes", page: "ContactLeads" }
 ];
 
 export default function AdminLayout({ children, activePage }) {

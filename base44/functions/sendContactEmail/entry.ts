@@ -8,33 +8,16 @@ Deno.serve(async (req) => {
     return Response.json({ error: 'Faltan campos requeridos' }, { status: 400 });
   }
 
-  // Separar nombre y apellido (primer token = nombre, resto = apellido)
-  const parts = name.trim().split(' ');
-  const nombre = parts[0] || name;
-  const apellido = parts.slice(1).join(' ') || '-';
-
-  // Guardar el contacto en la base de datos como lead
-  await base44.asServiceRole.entities.ExploracionLead.create({
-    nombre,
-    apellido,
-    nombre_artistico: name,
+  // Guardar el contacto en la base de datos
+  await base44.asServiceRole.entities.ContactLead.create({
+    name,
     email,
-    telefono: phone || '-',
-    pais_nacimiento: '-',
-    pais_residencia: '-',
-    direccion: '-',
-    instagram: '-',
-    tiktok: '-',
-    spotify: '-',
-    youtube: '-',
-    nivel_actual: 'Estoy empezando',
-    que_frena_crecimiento: message,
-    que_espera_resolver: message,
-    compromiso_inversion: 'Me interesa, pero quiero más información antes de confirmar',
-    status: 'Interesado'
+    phone: phone || '',
+    message,
+    status: 'Nuevo'
   });
 
-  // Notificar al admin (usuario registrado en la app) vía email interno
+  // Notificar al admin vía email interno
   const users = await base44.asServiceRole.entities.User.list();
   const adminUser = users.find(u => u.role === 'admin');
 
