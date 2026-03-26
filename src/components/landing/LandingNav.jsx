@@ -117,7 +117,7 @@ export default function LandingNav() {
                 <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: '#ff5833', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>Cabaña</span>
                 <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: 'white', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>Creative</span>
               </div>
-              <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.55rem', fontWeight: 400, lineHeight: 1, marginLeft: '2px', marginTop: '1px' }}>®</span>
+              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', fontWeight: 400, lineHeight: 1, marginLeft: '3px', marginTop: '4px' }}>®</span>
             </div>
           </Link>
 
