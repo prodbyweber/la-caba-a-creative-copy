@@ -112,9 +112,12 @@ export default function LandingNav() {
               alt="La Cabaña Creative"
               className="h-16 w-auto"
             />
-            <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column', gap: 0, margin: 0, padding: 0 }}>
-              <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: '#ff5833', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>Cabaña</span>
-              <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: 'white', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>Creative</span>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 0 }}>
+              <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column', gap: 0, margin: 0, padding: 0 }}>
+                <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: '#ff5833', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>Cabaña</span>
+                <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: 'white', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>Creative</span>
+              </div>
+              <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.55rem', fontWeight: 400, lineHeight: 1, marginLeft: '2px', marginTop: '1px' }}>®</span>
             </div>
           </Link>
 
