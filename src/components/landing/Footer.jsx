@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, MapPin, Send } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import PhoneInput from "./PhoneInput";
 
 export default function Footer() {
   const [contactForm, setContactForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [phoneValue, setPhoneValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
 
@@ -19,11 +21,12 @@ export default function Footer() {
       await base44.functions.invoke('sendContactEmail', {
         name: contactForm.name,
         email: contactForm.email,
-        phone: contactForm.phone,
+        phone: phoneValue,
         message: contactForm.message
       });
       setSubmitStatus("success");
       setContactForm({ name: "", email: "", phone: "", message: "" });
+      setPhoneValue("");
       setTimeout(() => setSubmitStatus(null), 4000);
     } catch (error) {
       setSubmitStatus("error");
@@ -87,12 +90,9 @@ export default function Footer() {
                 />
               </div>
               <div>
-                <input
-                  type="tel"
-                  placeholder="Tu teléfono (opcional)"
-                  value={contactForm.phone}
-                  onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
-                  className="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none transition-colors"
+                <PhoneInput
+                  value={phoneValue}
+                  onChange={setPhoneValue}
                 />
               </div>
               <div>
