@@ -47,9 +47,7 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
-      <DashboardNav />
-
-      <main className="pt-14">
+      <main className="pt-0">
         {/* Hero Section */}
         <div className="text-center py-8 sm:py-16 px-4 sm:px-6">
           <motion.div
