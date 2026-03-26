@@ -32,21 +32,17 @@ export default function LandingNav() {
     checkUser();
   }, []);
 
-  const handleLogin = async () => {
+  const handleAccountClick = async () => {
     try {
       const currentUser = await base44.auth.me();
       if (currentUser?.role === 'admin') {
         navigate(createPageUrl("AdminDashboard"));
       } else {
-        alert("Acceso restringido: Solo administradores pueden acceder");
+        navigate(createPageUrl("Dashboard"));
       }
     } catch (error) {
       base44.auth.redirectToLogin(window.location.href);
     }
-  };
-
-  const handleAccountClick = () => {
-    navigate(createPageUrl("UserProfile"));
   };
 
   useEffect(() => {
@@ -89,10 +85,6 @@ export default function LandingNav() {
     { label: "Exploración", id: "exploracion", key: "exploracion" },
     { label: "Comenzar", id: "offers", highlight: true, key: "comenzar" }
   ].filter(item => visibleMenuButtons[item.key] !== false);
-
-  const adminNavItems = user?.role === 'admin' ? [
-    { label: "Panel de Artista", url: createPageUrl("ArtistPanelList"), key: "artist_panel" }
-  ] : [];
 
   return (
     <>
@@ -150,15 +142,6 @@ export default function LandingNav() {
                 </button>
               )
             ))}
-            {adminNavItems.map((item) => (
-              <Link
-                key={item.key}
-                to={item.url}
-                className="text-sm text-white/60 hover:text-white transition-colors font-medium border border-white/20 px-3 py-1.5 rounded-lg hover:bg-white/10"
-              >
-                {item.label}
-              </Link>
-            ))}
           </div>
 
           <div className="flex items-center gap-4">
@@ -178,11 +161,11 @@ export default function LandingNav() {
                     {user.full_name?.[0]?.toUpperCase() || "U"}
                   </div>
                 )}
-                <span className="text-gray-400">Mi Cuenta</span>
+                <span className="text-gray-400">Dashboard</span>
               </button>
             ) : (
               <button
-                onClick={handleLogin}
+                onClick={() => base44.auth.redirectToLogin(window.location.href)}
                 className="hidden sm:block text-sm text-gray-400 hover:text-white transition-colors"
               >
                 Iniciar Sesión
@@ -245,16 +228,6 @@ export default function LandingNav() {
                     </button>
                   )
                 ))}
-                {adminNavItems.map((item) => (
-                  <Link
-                    key={item.key}
-                    to={item.url}
-                    onClick={() => setMobileOpen(false)}
-                    className="text-2xl font-light text-left text-white/70 hover:text-white transition-colors border border-white/20 rounded-lg px-4 py-2"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
                 <div className="pt-6 border-t border-white/10">
                   {user ? (
                     <button
@@ -272,11 +245,11 @@ export default function LandingNav() {
                           {user.full_name?.[0]?.toUpperCase() || "U"}
                         </div>
                       )}
-                      <span>Mi Cuenta</span>
+                      <span>Dashboard</span>
                     </button>
                   ) : (
                     <button
-                      onClick={handleLogin}
+                      onClick={() => base44.auth.redirectToLogin(window.location.href)}
                       className="block w-full py-4 rounded-full bg-white text-black text-center font-medium hover:bg-gray-100 transition-colors"
                     >
                       Iniciar Sesión
