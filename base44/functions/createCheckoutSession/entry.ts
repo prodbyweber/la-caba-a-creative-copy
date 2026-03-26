@@ -3,24 +3,6 @@ import Stripe from 'npm:stripe';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 
-const PLANS = {
-  explorador: {
-    name: 'Explorador',
-    priceId: 'price_1TFJCM2cunznauNixSZVbGIw',
-    description: 'Plan básico para empezar'
-  },
-  pionero: {
-    name: 'Pionero',
-    priceId: 'price_1TFJBH2cunznauNiFhO2vvL3',
-    description: 'Plan intermedio con funcionalidades avanzadas'
-  },
-  independiente: {
-    name: 'Independiente',
-    priceId: 'price_1TFJCM2cunznauNixSZVbGIw',
-    description: 'Plan profesional completo'
-  }
-};
-
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -32,8 +14,12 @@ Deno.serve(async (req) => {
 
     const { planType, successUrl, cancelUrl } = await req.json();
 
-    if (!PLANS[planType]) {
-      return Response.json({ error: 'Plan inválido' }, { status: 400 });
+    // Fetch plan from database
+    const plans = await base44.asServiceRole.entities.Plan.list();
+    const plan = plans.find(p => p.name.toLowerCase() === planType.toLowerCase());
+
+    if (!plan || !plan.price_id) {
+      return Response.json({ error: 'Plan no configurado o sin Price ID' }, { status: 400 });
     }
 
     // Buscar o crear cliente Stripe
@@ -60,7 +46,7 @@ Deno.serve(async (req) => {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: PLANS[planType].priceId,
+          price: plan.price_id,
           quantity: 1
         }
       ],

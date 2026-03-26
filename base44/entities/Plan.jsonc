@@ -1,0 +1,43 @@
+{
+  "name": "Plan",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre del plan (Explorador, Pionero, Independiente)"
+    },
+    "price_id": {
+      "type": "string",
+      "description": "Price ID de Stripe (price_...)"
+    },
+    "price": {
+      "type": "string",
+      "description": "Precio a mostrar (ej: Consultar, \u20ac49)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n corta del plan"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de caracter\u00edsticas"
+    },
+    "highlighted": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si es el plan destacado"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de visualizaci\u00f3n"
+    }
+  },
+  "required": [
+    "name",
+    "price_id"
+  ]
+}

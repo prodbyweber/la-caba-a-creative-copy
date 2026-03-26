@@ -14,6 +14,7 @@ import FormsEditor from "@/components/admin/FormsEditor";
 import TeamEditor from "@/components/admin/TeamEditor";
 import AboutEditor from "@/components/admin/AboutEditor";
 import ExploracionEditor from "@/components/admin/ExploracionEditor";
+import PlansEditor from "@/components/admin/PlansEditor";
 import { 
   Eye, 
   GripVertical, 
@@ -333,6 +334,11 @@ export default function LandingEditor() {
               <Settings className="w-5 h-5 text-emerald-400" />
               Editar Contenido de la Landing
             </h2>
+
+            {/* Plans Management */}
+            <SectionEditor title="💰 Planes de Suscripción" defaultOpen={false}>
+              <PlansEditor />
+            </SectionEditor>
 
             {/* Forms Management */}
             <SectionEditor title="📋 Gestión de Formularios" defaultOpen={false}>
