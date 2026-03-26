@@ -130,7 +130,12 @@ export default function Pricing() {
                 <button
                    onClick={() => {
                      if (plan.name !== 'Prueba Gratuita') {
-                       setSelectedPlanId(plan.name.toLowerCase());
+                       const planMap = {
+                         'Explorador': 'explorador',
+                         'Pionero': 'pionero',
+                         'Independiente': 'independiente'
+                       };
+                       setSelectedPlanId(planMap[plan.name]);
                        setShowModal(true);
                      }
                    }}
