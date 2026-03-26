@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { Check, X, Loader } from "lucide-react";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
+import { Check, X, Loader, ArrowLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-
-import DashboardNav from "@/components/dashboard/DashboardNav";
+import { createPageUrl } from "@/utils";
 
 export default function Pricing() {
   const [searchParams] = useSearchParams();
@@ -47,6 +46,26 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
+      {/* Header */}
+      <header className="border-b border-white/5 backdrop-blur-xl bg-black/20">
+        <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+          <Link to={createPageUrl("Landing")} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <ArrowLeft className="w-5 h-5 text-gray-400" />
+            <img 
+              src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png" 
+              alt="La Cabaña Creative"
+              className="h-12 w-auto"
+            />
+            <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column' }}>
+              <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, color: '#ff5833', fontWeight: 900, fontSize: '1rem' }}>
+                Cabaña<sup style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.5rem', fontWeight: 400, lineHeight: 1, marginLeft: '3px', verticalAlign: 'top', position: 'relative', top: '2px' }}>®</sup>
+              </span>
+              <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, color: 'white', fontWeight: 900, fontSize: '1rem' }}>Creative</span>
+            </div>
+          </Link>
+        </div>
+      </header>
+
       <main className="pt-0">
         {/* Hero Section */}
         <div className="text-center py-8 sm:py-16 px-4 sm:px-6">
