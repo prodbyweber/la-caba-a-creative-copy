@@ -198,31 +198,29 @@ export default function AdminDashboard() {
               ) : (
                 <div className="space-y-2">
                   {todaySessions.slice(0, 5).map((s) => (
-                    <div key={s.id} className="group flex items-start gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2 mb-1.5">
-                          <h4 className="font-semibold text-white text-sm truncate">{s.title}</h4>
-                          <div className="flex items-center gap-1.5 flex-shrink-0">
-                            <span className="text-[10px] text-white/30">{format(parseISO(s.start_time), 'HH:mm')}</span>
-                            <ItemMenu
-                              onEdit={() => openEditSession(s)}
-                              onDelete={() => deleteSession.mutate(s.id)}
-                              onArchive={() => archiveSession.mutate(s.id)}
-                              showArchive
-                            />
-                          </div>
+                    <div key={s.id} className="group p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all">
+                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                        <h4 className="font-semibold text-white text-sm truncate flex-1 min-w-0">{s.title}</h4>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <span className="text-[10px] text-white/30">{format(parseISO(s.start_time), 'HH:mm')}</span>
+                          <ItemMenu
+                            onEdit={() => openEditSession(s)}
+                            onDelete={() => deleteSession.mutate(s.id)}
+                            onArchive={() => archiveSession.mutate(s.id)}
+                            showArchive
+                          />
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${
                             s.type === 'Session' ? 'bg-emerald-500/10 text-emerald-400' :
                             s.type === 'Meeting' ? 'bg-blue-500/10 text-blue-400' :
                             'bg-purple-500/10 text-purple-400'
                           }`}>{s.type}</span>
                           <span className="text-[10px] text-white/30 truncate">{s.location}</span>
-                          <div className="ml-auto">
-                            <StatusButton status={s.status} onStatusChange={(id, status) => updateSessionStatus.mutate({ id, status })} entity="session" id={s.id} />
-                          </div>
                         </div>
+                        <StatusButton status={s.status} onStatusChange={(id, status) => updateSessionStatus.mutate({ id, status })} entity="session" id={s.id} />
                       </div>
                     </div>
                   ))}
@@ -249,31 +247,29 @@ export default function AdminDashboard() {
               ) : (
                 <div className="space-y-2">
                   {upcomingSessions.slice(0, 5).map((s) => (
-                    <div key={s.id} className="group flex items-start gap-3 p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2 mb-1.5">
-                          <h4 className="font-semibold text-white text-sm truncate">{s.title}</h4>
-                          <div className="flex items-center gap-1.5 flex-shrink-0">
-                            <span className="text-[10px] text-white/30">{format(parseISO(s.start_time), 'MMM d, HH:mm')}</span>
-                            <ItemMenu
-                              onEdit={() => openEditSession(s)}
-                              onDelete={() => deleteSession.mutate(s.id)}
-                              onArchive={() => archiveSession.mutate(s.id)}
-                              showArchive
-                            />
-                          </div>
+                    <div key={s.id} className="group p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all">
+                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                        <h4 className="font-semibold text-white text-sm truncate flex-1 min-w-0">{s.title}</h4>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <span className="text-[10px] text-white/30">{format(parseISO(s.start_time), 'MMM d, HH:mm')}</span>
+                          <ItemMenu
+                            onEdit={() => openEditSession(s)}
+                            onDelete={() => deleteSession.mutate(s.id)}
+                            onArchive={() => archiveSession.mutate(s.id)}
+                            showArchive
+                          />
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${
                             s.type === 'Session' ? 'bg-emerald-500/10 text-emerald-400' :
                             s.type === 'Meeting' ? 'bg-blue-500/10 text-blue-400' :
                             'bg-purple-500/10 text-purple-400'
                           }`}>{s.type === 'StudioWork' ? 'Studio Work' : s.type}</span>
                           <span className="text-[10px] text-white/30 truncate">{s.location}</span>
-                          <div className="ml-auto">
-                            <StatusButton status={s.status} onStatusChange={(id, status) => updateSessionStatus.mutate({ id, status })} entity="session" id={s.id} />
-                          </div>
                         </div>
+                        <StatusButton status={s.status} onStatusChange={(id, status) => updateSessionStatus.mutate({ id, status })} entity="session" id={s.id} />
                       </div>
                     </div>
                   ))}
