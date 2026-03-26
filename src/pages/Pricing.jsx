@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { Check, X, Loader, ArrowLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -8,6 +8,7 @@ import { createPageUrl } from "@/utils";
 
 export default function Pricing() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const { data: plans = [], isLoading } = useQuery({
     queryKey: ['plans'],
