@@ -19,7 +19,40 @@ Deno.serve(async (req) => {
 
     const base44 = createClientFromRequest(req);
 
-    // Procesar eventos
+    // Procesar pagos exitosos
+    if (event.type === 'invoice.payment_succeeded') {
+      const invoice = event.data.object;
+      const customer = await stripe.customers.retrieve(invoice.customer);
+
+      // Buscar la suscripción y actualizar estado
+      if (invoice.subscription) {
+        const subs = await base44.asServiceRole.entities.Subscription.filter({
+          stripe_subscription_id: invoice.subscription
+        });
+
+        if (subs.length > 0) {
+          await base44.asServiceRole.entities.Subscription.update(subs[0].id, {
+            status: 'active',
+            current_period_start: new Date(invoice.period_start * 1000).toISOString(),
+            current_period_end: new Date(invoice.period_end * 1000).toISOString(),
+            amount_monthly: invoice.amount_paid
+          });
+
+          // Enviar email de confirmación
+          try {
+            await base44.integrations.Core.SendEmail({
+              to: customer.email,
+              subject: '✓ Pago de suscripción recibido',
+              body: `Hola,\n\nTu pago de €${(invoice.amount_paid / 100).toFixed(2)} ha sido procesado exitosamente.\n\nTu suscripción estará activa hasta ${new Date(invoice.period_end * 1000).toLocaleDateString('es-ES')}.\n\nGracias por ser parte de Cabaña Creative.\n\nSaludos,\nEl equipo de Cabaña`
+            });
+          } catch (e) {
+            console.error('Error sending payment email:', e);
+          }
+        }
+      }
+    }
+
+    // Procesar eventos de suscripción
     if (event.type === 'customer.subscription.created' || event.type === 'customer.subscription.updated') {
       const subscription = event.data.object;
       const customer = await stripe.customers.retrieve(subscription.customer);
@@ -68,9 +101,50 @@ Deno.serve(async (req) => {
       });
 
       if (existingSubs.length > 0) {
+        const customer = await stripe.customers.retrieve(subscription.customer);
         await base44.asServiceRole.entities.Subscription.update(existingSubs[0].id, {
           status: 'canceled'
         });
+
+        // Enviar email de cancelación
+        try {
+          await base44.integrations.Core.SendEmail({
+            to: customer.email,
+            subject: 'Suscripción cancelada',
+            body: `Hola,\n\nTu suscripción a Cabaña Creative ha sido cancelada.\n\nSi cambias de idea, puedes reactivarla en cualquier momento.\n\nSaludos,\nEl equipo de Cabaña`
+          });
+        } catch (e) {
+          console.error('Error sending cancellation email:', e);
+        }
+      }
+    }
+
+    // Procesar fallos de pago
+    if (event.type === 'invoice.payment_failed') {
+      const invoice = event.data.object;
+      const customer = await stripe.customers.retrieve(invoice.customer);
+
+      if (invoice.subscription) {
+        const subs = await base44.asServiceRole.entities.Subscription.filter({
+          stripe_subscription_id: invoice.subscription
+        });
+
+        if (subs.length > 0) {
+          await base44.asServiceRole.entities.Subscription.update(subs[0].id, {
+            status: 'past_due'
+          });
+
+          // Enviar email de alerta de pago fallido
+          try {
+            await base44.integrations.Core.SendEmail({
+              to: customer.email,
+              subject: '⚠ Pago fallido - Acción requerida',
+              body: `Hola,\n\nNo pudimos procesar tu pago de €${(invoice.amount_due / 100).toFixed(2)}.\n\nPor favor, actualiza tu método de pago para mantener tu suscripción activa.\n\nSaludos,\nEl equipo de Cabaña`
+            });
+          } catch (e) {
+            console.error('Error sending payment failed email:', e);
+          }
+        }
       }
     }
 
