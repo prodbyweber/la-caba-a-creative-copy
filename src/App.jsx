@@ -61,7 +61,7 @@ const AuthenticatedApp = () => {
         />
       ))}
       <Route path="/ContactLeads" element={<ContactLeads />} />
-      <Route path="/pricing" element={<Pricing />} />
+      <Route path="/Pricing" element={<Pricing />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
