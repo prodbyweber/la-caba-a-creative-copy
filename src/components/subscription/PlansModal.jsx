@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Loader } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 export default function PlansModal({ isOpen, onClose }) {
   const [selectedPlan, setSelectedPlan] = useState(null);
