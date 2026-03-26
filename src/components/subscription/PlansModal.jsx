@@ -1,11 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Loader } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
-export default function PlansModal({ isOpen, onClose }) {
+export default function PlansModal({ isOpen, onClose, selectedPlanId }) {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Auto-select plan if passed from parent
+  useEffect(() => {
+    if (selectedPlanId && isOpen) {
+      const planMap = {
+        'explorador': 'explorador',
+        'pionero': 'pionero',
+        'independiente': 'independiente'
+      };
+      setSelectedPlan(planMap[selectedPlanId]);
+    }
+  }, [selectedPlanId, isOpen]);
 
   const plans = [
     {

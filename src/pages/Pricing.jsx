@@ -7,6 +7,7 @@ import DashboardNav from "@/components/dashboard/DashboardNav";
 
 export default function Pricing() {
   const [showModal, setShowModal] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -127,7 +128,12 @@ export default function Pricing() {
                 </div>
 
                 <button
-                   onClick={() => plan.name !== 'Prueba Gratuita' && setShowModal(true)}
+                   onClick={() => {
+                     if (plan.name !== 'Prueba Gratuita') {
+                       setSelectedPlanId(plan.name.toLowerCase());
+                       setShowModal(true);
+                     }
+                   }}
                    className={`w-full py-3 rounded-lg font-medium mb-6 transition-all ${
                      plan.name === 'Prueba Gratuita' 
                        ? 'bg-white/5 text-white/30 cursor-not-allowed'
@@ -248,7 +254,7 @@ export default function Pricing() {
       </main>
 
       {/* Plans Modal */}
-      <PlansModal isOpen={showModal} onClose={() => setShowModal(false)} />
+      <PlansModal isOpen={showModal} onClose={() => { setShowModal(false); setSelectedPlanId(null); }} selectedPlanId={selectedPlanId} />
     </div>
   );
 }
