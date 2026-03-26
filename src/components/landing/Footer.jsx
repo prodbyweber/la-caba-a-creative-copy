@@ -68,7 +68,7 @@ export default function Footer() {
             </div>
 
             {/* Contact Form */}
-            <form onSubmit={handleContactSubmit} className="space-y-4">
+            <form onSubmit={handleContactSubmit} className="space-y-4 min-w-0 w-full overflow-hidden">
               <div>
                 <input
                   type="text"

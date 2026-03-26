@@ -257,16 +257,17 @@ export default function PhoneInput({ value, onChange }) {
   };
 
   return (
-    <div className="relative flex gap-0" ref={dropdownRef}>
+    <div className="relative w-full min-w-0 flex" ref={dropdownRef}>
       {/* Country selector button */}
       <button
         type="button"
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-1.5 px-3 py-3 bg-zinc-900 border border-white/10 border-r-0 rounded-l-lg text-white hover:bg-zinc-800 transition-colors min-w-[90px] focus:outline-none"
+        className="flex-shrink-0 flex items-center gap-1 px-2.5 py-3 bg-zinc-900 border border-white/10 border-r-0 rounded-l-lg text-white hover:bg-zinc-800 transition-colors focus:outline-none"
+        style={{ minWidth: 0 }}
       >
-        <span className="text-lg leading-none">{selectedCountry.flag}</span>
-        <span className="text-sm text-gray-300">{selectedCountry.dial}</span>
-        <ChevronDown className={`w-3 h-3 text-gray-500 transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
+        <span className="text-base leading-none">{selectedCountry.flag}</span>
+        <span className="text-xs text-gray-300 whitespace-nowrap">{selectedCountry.dial}</span>
+        <ChevronDown className={`w-3 h-3 text-gray-500 flex-shrink-0 transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
       </button>
 
       {/* Number input */}
@@ -275,12 +276,14 @@ export default function PhoneInput({ value, onChange }) {
         placeholder="Tu teléfono"
         value={localNumber}
         onChange={handleNumberChange}
-        className="flex-1 px-4 py-3 bg-zinc-900 border border-white/10 rounded-r-lg text-white placeholder-gray-500 focus:border-[#ff5833] focus:outline-none transition-colors"
+        className="flex-1 min-w-0 w-full px-3 py-3 bg-zinc-900 border border-white/10 rounded-r-lg text-white placeholder-gray-500 focus:border-[#ff5833] focus:outline-none transition-colors"
       />
 
-      {/* Dropdown */}
+      {/* Dropdown — se ancla a la izquierda y limita su ancho al viewport */}
       {dropdownOpen && (
-        <div className="absolute top-full left-0 z-50 mt-1 w-72 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden">
+        <div className="absolute top-full left-0 z-50 mt-1 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden"
+          style={{ width: 'min(288px, calc(100vw - 48px))' }}
+        >
           {/* Search */}
           <div className="flex items-center gap-2 px-3 py-2 border-b border-white/10">
             <Search className="w-4 h-4 text-gray-500 flex-shrink-0" />
@@ -289,7 +292,7 @@ export default function PhoneInput({ value, onChange }) {
               placeholder="Buscar país..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none"
+              className="flex-1 min-w-0 bg-transparent text-sm text-white placeholder-gray-500 focus:outline-none"
               autoFocus
             />
           </div>
@@ -303,12 +306,12 @@ export default function PhoneInput({ value, onChange }) {
                   key={country.code}
                   type="button"
                   onClick={() => selectCountry(country)}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-white/5 transition-colors text-left ${
+                  className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm hover:bg-white/5 transition-colors text-left ${
                     selectedCountry.code === country.code ? "bg-white/5 text-[#ff5833]" : "text-gray-300"
                   }`}
                 >
-                  <span className="text-base">{country.flag}</span>
-                  <span className="flex-1 truncate">{country.name}</span>
+                  <span className="text-base flex-shrink-0">{country.flag}</span>
+                  <span className="flex-1 truncate min-w-0">{country.name}</span>
                   <span className="text-gray-500 text-xs flex-shrink-0">{country.dial}</span>
                 </button>
               ))
