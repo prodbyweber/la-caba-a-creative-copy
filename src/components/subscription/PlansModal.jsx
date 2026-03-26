@@ -85,17 +85,24 @@ export default function PlansModal({ isOpen, onClose }) {
     setIsLoading(true);
 
     try {
+      console.log('Iniciando checkout para plan:', planId);
       const res = await base44.functions.invoke('createCheckoutSession', {
         planType: planId,
         successUrl: `${window.location.origin}/pricing?success=true`,
         cancelUrl: `${window.location.origin}/pricing?cancelled=true`
       });
 
-      if (res.data.url) {
+      console.log('Respuesta de checkout:', res);
+      if (res.data?.url) {
+        console.log('Redirigiendo a:', res.data.url);
         window.location.href = res.data.url;
+      } else {
+        alert('Error: No se recibió URL de Stripe');
+        console.error('No URL en respuesta:', res);
       }
     } catch (error) {
       console.error('Error creating checkout:', error);
+      alert('Error: ' + error.message);
       setIsLoading(false);
       setSelectedPlan(null);
     }
