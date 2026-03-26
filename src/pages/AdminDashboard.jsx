@@ -110,7 +110,7 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout activePage="AdminDashboard">
-      <div className="px-4 sm:px-8 lg:px-14 xl:px-20 py-6 max-w-[1600px] mx-auto">
+      <div className="px-3 sm:px-8 lg:px-14 xl:px-20 py-6 max-w-[1600px] mx-auto overflow-x-hidden">
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
@@ -143,7 +143,7 @@ export default function AdminDashboard() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#111113] border border-white/[0.07] rounded-2xl p-5 sm:p-7 mb-6"
+          className="bg-[#111113] border border-white/[0.07] rounded-2xl p-4 sm:p-7 mb-6 overflow-hidden"
         >
           {/* Panel Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7">
@@ -284,7 +284,7 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-[#111113] border border-white/[0.07] rounded-2xl p-5 sm:p-7 mb-8"
+          className="bg-[#111113] border border-white/[0.07] rounded-2xl p-4 sm:p-7 mb-8 overflow-hidden"
         >
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
