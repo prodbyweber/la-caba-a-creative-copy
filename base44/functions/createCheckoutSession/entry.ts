@@ -6,17 +6,17 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 const PLANS = {
   explorador: {
     name: 'Explorador',
-    priceId: 'prod_UDkgwFqTMrWzq0',
+    priceId: 'price_1TFJCM2cunznauNixSZVbGIw',
     description: 'Plan básico para empezar'
   },
   pionero: {
     name: 'Pionero',
-    priceId: 'prod_UDkgwZYQl0F2Kx',
+    priceId: 'price_1TFJBH2cunznauNiFhO2vvL3',
     description: 'Plan intermedio con funcionalidades avanzadas'
   },
   independiente: {
     name: 'Independiente',
-    priceId: 'prod_UDkhD6mlNBPZwG',
+    priceId: 'price_1TFJCM2cunznauNixSZVbGIw',
     description: 'Plan profesional completo'
   }
 };
