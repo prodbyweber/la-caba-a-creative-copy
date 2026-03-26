@@ -57,7 +57,7 @@ export default function Pricing() {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-5xl font-bold mb-4"
           >
-            Planes Simples y Transparentes
+            Elige tu nivel dentro de<br />Cabaña Creative
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: -10 }}
@@ -65,7 +65,7 @@ export default function Pricing() {
             transition={{ delay: 0.1 }}
             className="text-lg text-gray-400 max-w-2xl mx-auto"
           >
-            Comienza con 14 días gratis. Sin tarjeta de crédito. Cancela en cualquier momento.
+            Infraestructura profesional, automatización y crecimiento estratégico para artistas que quieren construir un proyecto sólido.
           </motion.p>
         </div>
 
