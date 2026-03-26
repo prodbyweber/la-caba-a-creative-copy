@@ -22,17 +22,17 @@ export default function Pricing() {
   }, [searchParams, navigate]);
 
   const features = [
-    { name: 'Gestión de Artistas', free: true, pro: true, enterprise: true },
-    { name: 'Proyectos y Tracks', free: true, pro: true, enterprise: true },
-    { name: 'Calendario de Sesiones', free: true, pro: true, enterprise: true },
-    { name: 'Sincronización Google Calendar', free: false, pro: true, enterprise: true },
-    { name: 'Clip Management', free: false, pro: true, enterprise: true },
-    { name: 'Análisis Avanzados', free: false, pro: true, enterprise: true },
-    { name: 'Integración Stripe', free: false, pro: true, enterprise: true },
-    { name: 'Usuarios Ilimitados', free: false, pro: false, enterprise: true },
-    { name: 'API Personalizada', free: false, pro: false, enterprise: true },
-    { name: 'Soporte 24/7', free: false, pro: false, enterprise: true },
-    { name: 'Integraciones Custom', free: false, pro: false, enterprise: true },
+    { name: 'Gestión de Artistas', free: true, explorador: true, pionero: true, independiente: true },
+    { name: 'Proyectos y Tracks', free: true, explorador: true, pionero: true, independiente: true },
+    { name: 'Calendario de Sesiones', free: true, explorador: true, pionero: true, independiente: true },
+    { name: 'Sincronización Google Calendar', free: false, explorador: false, pionero: true, independiente: true },
+    { name: 'Clip Management', free: false, explorador: false, pionero: true, independiente: true },
+    { name: 'Análisis Avanzados', free: false, explorador: false, pionero: true, independiente: true },
+    { name: 'Integración Stripe', free: false, explorador: false, pionero: true, independiente: true },
+    { name: 'Usuarios Ilimitados', free: false, explorador: false, pionero: false, independiente: true },
+    { name: 'API Personalizada', free: false, explorador: false, pionero: false, independiente: true },
+    { name: 'Soporte 24/7', free: false, explorador: false, pionero: false, independiente: true },
+    { name: 'Integraciones Custom', free: false, explorador: false, pionero: false, independiente: true },
   ];
 
   return (
@@ -73,22 +73,31 @@ export default function Pricing() {
                 features: ['Todas las funcionalidades básicas', 'Acceso 14 días', 'Soporte por email']
               },
               {
-                name: 'Pro',
-                price: '€29,99',
+                name: 'Explorador',
+                price: 'Consultar',
                 period: '/mes',
-                description: 'Para productores independientes',
+                description: 'Plan básico para empezar',
                 cta: 'Empezar Ahora',
-                highlight: true,
-                features: ['Google Calendar Sync', 'Clip Management', 'Análisis avanzados', 'Soporte prioritario']
+                highlight: false,
+                features: ['Gestión de artistas', 'Proyectos y tracks', 'Calendario básico', 'Soporte por email']
               },
               {
-                name: 'Enterprise',
-                price: '€99,99',
+                name: 'Pionero',
+                price: 'Consultar',
                 period: '/mes',
-                description: 'Para estudios profesionales',
-                cta: 'Contáctanos',
+                description: 'Plan intermedio con funcionalidades avanzadas',
+                cta: 'Empezar Ahora',
+                highlight: true,
+                features: ['Todo de Explorador', 'Google Calendar Sync', 'Clips y contenido', 'Análisis avanzados']
+              },
+              {
+                name: 'Independiente',
+                price: 'Consultar',
+                period: '/mes',
+                description: 'Plan profesional completo',
+                cta: 'Empezar Ahora',
                 highlight: false,
-                features: ['Usuarios ilimitados', 'API personalizada', 'Soporte 24/7', 'Integraciones custom']
+                features: ['Todo de Pionero', 'Usuarios ilimitados', 'API personalizada', 'Soporte 24/7']
               }
             ].map((plan, i) => (
               <motion.div
@@ -118,15 +127,18 @@ export default function Pricing() {
                 </div>
 
                 <button
-                  onClick={() => setShowModal(true)}
-                  className={`w-full py-3 rounded-lg font-medium mb-6 transition-all ${
-                    plan.highlight
-                      ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                      : 'bg-white/10 hover:bg-white/20 text-white'
-                  }`}
-                >
-                  {plan.cta}
-                </button>
+                   onClick={() => plan.name !== 'Prueba Gratuita' && setShowModal(true)}
+                   className={`w-full py-3 rounded-lg font-medium mb-6 transition-all ${
+                     plan.name === 'Prueba Gratuita' 
+                       ? 'bg-white/5 text-white/30 cursor-not-allowed'
+                       : plan.highlight
+                       ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                       : 'bg-white/10 hover:bg-white/20 text-white'
+                   }`}
+                   disabled={plan.name === 'Prueba Gratuita'}
+                 >
+                   {plan.cta}
+                 </button>
 
                 <div className="space-y-3">
                   {plan.features.map((feature, idx) => (
@@ -153,8 +165,9 @@ export default function Pricing() {
                   <tr className="border-b border-white/10">
                     <th className="text-left px-6 py-4 font-semibold">Funcionalidad</th>
                     <th className="text-center px-6 py-4 font-semibold">Prueba</th>
-                    <th className="text-center px-6 py-4 font-semibold">Pro</th>
-                    <th className="text-center px-6 py-4 font-semibold">Enterprise</th>
+                    <th className="text-center px-6 py-4 font-semibold">Explorador</th>
+                    <th className="text-center px-6 py-4 font-semibold">Pionero</th>
+                    <th className="text-center px-6 py-4 font-semibold">Independiente</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -169,14 +182,21 @@ export default function Pricing() {
                         )}
                       </td>
                       <td className="px-6 py-4 text-center">
-                        {feature.pro ? (
+                        {feature.explorador ? (
                           <Check className="w-5 h-5 text-emerald-400 mx-auto" />
                         ) : (
                           <X className="w-5 h-5 text-gray-600 mx-auto" />
                         )}
                       </td>
                       <td className="px-6 py-4 text-center">
-                        {feature.enterprise ? (
+                        {feature.pionero ? (
+                          <Check className="w-5 h-5 text-emerald-400 mx-auto" />
+                        ) : (
+                          <X className="w-5 h-5 text-gray-600 mx-auto" />
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        {feature.independiente ? (
                           <Check className="w-5 h-5 text-emerald-400 mx-auto" />
                         ) : (
                           <X className="w-5 h-5 text-gray-600 mx-auto" />
