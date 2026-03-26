@@ -52,19 +52,13 @@ export default function Footer() {
               
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                  <Mail className="w-5 h-5 flex-shrink-0" style={{ color: '#ff5833' }} />
                   <a href="mailto:hola@lacabanacreative.com" className="text-gray-300 hover:text-white transition-colors">
                     hola@lacabanacreative.com
                   </a>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                  <a href="tel:+34000000000" className="text-gray-300 hover:text-white transition-colors">
-                    +34 000 000 000
-                  </a>
-                </div>
-                <div className="flex items-center gap-3">
-                  <MapPin className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                  <MapPin className="w-5 h-5 flex-shrink-0" style={{ color: '#ff5833' }} />
                   <p className="text-gray-300">Madrid, España</p>
                 </div>
               </div>
