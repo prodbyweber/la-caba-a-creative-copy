@@ -19,13 +19,14 @@ export default function MembershipPlans({ config }) {
         cancelUrl: window.location.href
       });
       if (res.data?.url) {
-        window.location.href = res.data.url;
+        window.open(res.data.url, '_blank', 'noopener,noreferrer');
+        setLoadingPlanId(null);
       } else {
         alert('Error al crear sesión de pago');
+        setLoadingPlanId(null);
       }
     } catch (error) {
       alert('Error: ' + error.message);
-    } finally {
       setLoadingPlanId(null);
     }
   };
