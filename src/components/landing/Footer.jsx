@@ -136,9 +136,9 @@ export default function Footer() {
                 alt="Cabaña Creative"
                 className="h-12 w-auto"
               />
-              <div className="flex flex-col leading-tight">
-                <span className="text-xl font-semibold tracking-tight" style={{ color: '#ff5833' }}>Cabaña</span>
-                <span className="text-xl font-semibold tracking-tight text-white">Creative</span>
+              <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column', gap: 0, margin: 0, padding: 0 }}>
+                <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: '#ff5833', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>Cabaña</span>
+                <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, margin: 0, padding: 0, color: 'white', fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: '1.25rem' }}>Creative</span>
               </div>
             </div>
             <p className="text-gray-500 text-sm max-w-sm leading-relaxed mb-3">
