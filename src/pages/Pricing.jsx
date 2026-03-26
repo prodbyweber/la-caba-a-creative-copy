@@ -109,16 +109,29 @@ export default function Pricing() {
                       onClick={async () => {
                         const planKey = plan.name.toLowerCase().replace(/\s+/g, '_');
                         try {
+                          // Obtener email del usuario autenticado o solicitarlo
+                          let userEmail = '';
+                          try {
+                            const user = await base44.auth.me();
+                            userEmail = user?.email || '';
+                          } catch (e) {
+                            userEmail = prompt('Por favor ingresa tu email para continuar:');
+                            if (!userEmail) return;
+                          }
+
                           const res = await base44.functions.invoke('createCheckoutSession', {
                             planType: planKey,
+                            email: userEmail,
                             successUrl: `${window.location.origin}/Pricing?success=true`,
                             cancelUrl: window.location.href
                           });
                           if (res.data?.url) {
                             window.open(res.data.url, '_blank', 'noopener,noreferrer');
+                          } else {
+                            alert('Error: No se pudo obtener la URL de pago');
                           }
                         } catch (error) {
-                          alert('Error al crear sesión de pago: ' + error.message);
+                          alert('Error al crear sesión de pago: ' + (error.response?.data?.error || error.message));
                         }
                       }}
                       className={`w-full py-3.5 px-4 rounded-xl font-semibold mb-8 transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base ${

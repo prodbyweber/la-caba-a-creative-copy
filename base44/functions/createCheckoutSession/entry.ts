@@ -6,26 +6,30 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    
-    // Intentar obtener usuario autenticado
-    let user;
-    try {
-      user = await base44.auth.me();
-    } catch (e) {
-      return Response.json({ error: 'Usuario no autenticado. Por favor inicia sesión.' }, { status: 401 });
-    }
-
-    if (!user) {
-      return Response.json({ error: 'Usuario no autenticado' }, { status: 401 });
-    }
-
-    const { planType, successUrl, cancelUrl } = await req.json();
+    const { planType, successUrl, cancelUrl, email } = await req.json();
 
     if (!planType || !successUrl || !cancelUrl) {
       return Response.json({ error: 'Parámetros incompletos' }, { status: 400 });
     }
 
-    // Fetch plan from database (usando service role para mayor confiabilidad)
+    // Obtener usuario si está autenticado, sino usar email proporcionado
+    let userEmail = email;
+    let userId = null;
+    
+    try {
+      const user = await base44.auth.me();
+      if (user) {
+        userEmail = user.email;
+        userId = user.id;
+      }
+    } catch (e) {
+      // Usuario no autenticado, continuar con email proporcionado
+      if (!userEmail) {
+        return Response.json({ error: 'Email requerido para usuarios no autenticados' }, { status: 400 });
+      }
+    }
+
+    // Fetch plan from database
     let plan;
     try {
       const plans = await base44.asServiceRole.entities.Plan.list();
@@ -43,7 +47,7 @@ Deno.serve(async (req) => {
     let customerId;
     try {
       const customers = await stripe.customers.list({
-        email: user.email,
+        email: userEmail,
         limit: 1
       });
 
@@ -51,8 +55,8 @@ Deno.serve(async (req) => {
         customerId = customers.data[0].id;
       } else {
         const customer = await stripe.customers.create({
-          email: user.email,
-          metadata: { user_id: user.id }
+          email: userEmail,
+          metadata: { user_id: userId || 'anonymous' }
         });
         customerId = customer.id;
       }
@@ -78,14 +82,17 @@ Deno.serve(async (req) => {
         cancel_url: cancelUrl,
         locale: 'es',
         billing_address_collection: 'auto',
+        customer_update: {
+          address: 'auto'
+        },
         metadata: {
           plan_type: planType,
-          user_email: user.email
+          user_email: userEmail
         }
       });
     } catch (e) {
       console.error('Error creating checkout session:', e);
-      return Response.json({ error: 'Error al crear sesión de pago' }, { status: 500 });
+      return Response.json({ error: 'Error al crear sesión de pago: ' + e.message }, { status: 500 });
     }
 
     return Response.json({ sessionId: session.id, url: session.url });
