@@ -132,12 +132,19 @@ export default function DashboardSidebar({ isOpen, onClose, artistId }) {
               transition={{ type: "spring", damping: 25, stiffness: 250 }}
               className="fixed left-0 top-0 bottom-0 w-72 bg-[#0a0a0b] border-r border-white/5 z-50 lg:hidden"
             >
-              <div className="flex items-center justify-between p-6 border-b border-white/5">
+              <div className="flex items-center justify-between p-4 border-b border-white/5">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-purple-600 flex items-center justify-center">
-                    <span className="text-white font-bold">LC</span>
+                  <img
+                    src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
+                    alt="La Cabaña Creative"
+                    className="h-10 w-auto"
+                  />
+                  <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, color: '#ff5833', fontWeight: 900, fontSize: '1rem' }}>
+                      Cabaña<sup style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.5rem', fontWeight: 400, lineHeight: 1, marginLeft: '3px', verticalAlign: 'top', position: 'relative', top: '2px' }}>®</sup>
+                    </span>
+                    <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, color: 'white', fontWeight: 900, fontSize: '1rem' }}>Creative</span>
                   </div>
-                  <span className="text-lg font-semibold">La Cabaña</span>
                 </div>
                 <button onClick={onClose} className="p-2 text-gray-400 hover:text-white">
                   <X className="w-5 h-5" />

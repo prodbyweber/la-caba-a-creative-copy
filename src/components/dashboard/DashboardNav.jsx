@@ -37,15 +37,18 @@ export default function DashboardNav({ artistName, artistId }) {
               <Menu className="w-5 h-5 text-gray-400" />
             </button>
 
-            <Link to={createPageUrl("Landing")} className="flex items-center gap-2">
+            <Link to={createPageUrl("Landing")} className="flex items-center gap-3">
               <img 
-                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/d93ba7d4d_Lacabanacreativelogooficial2026.png" 
-                alt="Cabaña Creative"
+                src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png" 
+                alt="La Cabaña Creative"
                 className="h-12 w-auto"
               />
-              <span className="text-base font-semibold tracking-tight hidden lg:block">
-                Cabaña <span className="text-orange-500">Creative</span>
-              </span>
+              <div className="hidden lg:flex items-start gap-0" style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, flexDirection: 'column' }}>
+                <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, color: '#ff5833', fontWeight: 900, fontSize: '1.1rem' }}>
+                  Cabaña<sup style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.55rem', fontWeight: 400, lineHeight: 1, marginLeft: '3px', verticalAlign: 'top', position: 'relative', top: '2px' }}>®</sup>
+                </span>
+                <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, color: 'white', fontWeight: 900, fontSize: '1.1rem' }}>Creative</span>
+              </div>
             </Link>
           
             {/* Navigation Menu */}
@@ -118,15 +121,18 @@ export default function DashboardNav({ artistName, artistId }) {
             >
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-white/5">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <img 
-                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6966ddf48947f217e81ea27c/d93ba7d4d_Lacabanacreativelogooficial2026.png" 
-                    alt="Cabaña Creative"
+                    src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png" 
+                    alt="La Cabaña Creative"
                     className="h-10 w-auto"
                   />
-                  <span className="text-sm font-semibold">
-                    Cabaña <span className="text-orange-500">Creative</span>
-                  </span>
+                  <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, color: '#ff5833', fontWeight: 900, fontSize: '1rem' }}>
+                      Cabaña<sup style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.5rem', fontWeight: 400, lineHeight: 1, marginLeft: '3px', verticalAlign: 'top', position: 'relative', top: '2px' }}>®</sup>
+                    </span>
+                    <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, color: 'white', fontWeight: 900, fontSize: '1rem' }}>Creative</span>
+                  </div>
                 </div>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
