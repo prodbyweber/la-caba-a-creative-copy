@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Check, Loader } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -10,7 +10,27 @@ export default function MembershipPlans({ config }) {
     queryFn: () => base44.entities.Plan.list('order')
   });
   const [loadingPlanId, setLoadingPlanId] = useState(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+      } catch (error) {
+        setUser(null);
+      }
+    };
+    checkUser();
+  }, []);
+
   const handleCheckout = async (plan) => {
+    // Si no hay usuario, redirigir a login
+    if (!user) {
+      base44.auth.redirectToLogin(window.location.href);
+      return;
+    }
+
     setLoadingPlanId(plan.id);
     try {
       const res = await base44.functions.invoke('createCheckoutSession', {
@@ -44,11 +64,12 @@ export default function MembershipPlans({ config }) {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
+          <p className="text-sm font-semibold text-purple-400 mb-4 tracking-widest">PLANES Y PRECIOS</p>
           <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-            {config?.membership_title || 'Planes Simples y Transparentes'}
+            Elige tu nivel dentro de Cabaña Creative
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-            {config?.membership_subtitle || 'Comienza con 14 días gratis. Sin tarjeta de crédito. Cancela en cualquier momento.'}
+            Infraestructura profesional, automatización y crecimiento estratégico para artistas que quieren construir un proyecto sólido.
           </p>
         </motion.div>
 
@@ -109,10 +130,10 @@ export default function MembershipPlans({ config }) {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleCheckout(plan)}
                     disabled={loadingPlanId === plan.id}
-                    className={`w-full py-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                    className={`w-full py-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 text-sm ${
                       plan.highlighted
-                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 disabled:opacity-50'
-                        : 'bg-white/5 border border-white/10 text-white hover:bg-white/10 disabled:opacity-50'
+                        ? 'bg-white text-black hover:bg-gray-100 disabled:opacity-50'
+                        : 'bg-white/10 border border-white/20 text-white hover:bg-white/20 disabled:opacity-50'
                     }`}
                   >
                     {loadingPlanId === plan.id ? (
@@ -120,8 +141,10 @@ export default function MembershipPlans({ config }) {
                         <Loader className="w-4 h-4 animate-spin" />
                         Procesando...
                       </>
+                    ) : user ? (
+                      plan.highlighted ? 'Elegir Pionero' : plan.name === 'Explorador' ? 'Comenzar' : 'Acceder a Pro'
                     ) : (
-                      'Empezar Ahora'
+                      'Iniciar Sesión'
                     )}
                   </motion.button>
                 </div>
@@ -135,17 +158,7 @@ export default function MembershipPlans({ config }) {
           </div>
         )}
 
-        {/* Note */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-center mt-12"
-        >
-          <p className="text-gray-500 text-sm">
-            Todos los planes incluyen una prueba gratuita de 14 días.
-          </p>
-        </motion.div>
+
       </div>
     </section>
   );
