@@ -6,16 +6,12 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
 const PLANS = {
   pro: {
     name: 'Pro',
-    amount: 2999,
-    currency: 'eur',
-    interval: 'month',
+    priceId: 'price_XXXXX', // REEMPLAZA CON TU PRICE ID
     description: 'Acceso completo a todas las funcionalidades'
   },
   enterprise: {
     name: 'Enterprise',
-    amount: 9999,
-    currency: 'eur',
-    interval: 'month',
+    priceId: 'price_YYYYY', // REEMPLAZA CON TU PRICE ID
     description: 'Soporte prioritario y funcionalidades avanzadas'
   }
 };
@@ -59,18 +55,7 @@ Deno.serve(async (req) => {
       payment_method_types: ['card'],
       line_items: [
         {
-          price_data: {
-            currency: PLANS[planType].currency,
-            product_data: {
-              name: PLANS[planType].name,
-              description: PLANS[planType].description
-            },
-            unit_amount: PLANS[planType].amount,
-            recurring: {
-              interval: PLANS[planType].interval,
-              trial_period_days: 14
-            }
-          },
+          price: PLANS[planType].priceId,
           quantity: 1
         }
       ],
