@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Music2, Calendar, Clock, CheckCircle2, Play, TrendingUp, Award, BarChart3, Users, Eye, Heart, Share2, Verified } from "lucide-react";
+import { Music2, Calendar, Clock, Play, TrendingUp, Award, BarChart3, Users, Eye, Heart, Share2, Verified, UserCircle2 } from "lucide-react";
 
 const mockArtist = {
   name: "SOPHY",
@@ -98,8 +98,8 @@ export default function DashboardPreview() {
 
             {/* LEFT — Artist */}
             <Card className="col-span-3 p-5">
-              <div className="w-full aspect-square rounded-xl overflow-hidden mb-5 bg-white/5">
-                <img src={mockArtist.avatar} alt={mockArtist.name} className="w-full h-full object-cover opacity-90" />
+              <div className="w-full aspect-square rounded-xl overflow-hidden mb-5 bg-white/[0.04] border border-white/[0.07] flex items-center justify-center">
+                <UserCircle2 className="w-20 h-20 text-white/20" />
               </div>
 
               <div className="text-center mb-5">
@@ -245,8 +245,8 @@ export default function DashboardPreview() {
 
             {/* Profile */}
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-white/5">
-                <img src={mockArtist.avatar} alt={mockArtist.name} className="w-full h-full object-cover opacity-90" />
+              <div className="w-14 h-14 rounded-xl flex-shrink-0 bg-white/[0.04] border border-white/[0.07] flex items-center justify-center">
+                <UserCircle2 className="w-8 h-8 text-white/20" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
