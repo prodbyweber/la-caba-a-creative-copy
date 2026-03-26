@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, Home } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 
 export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
@@ -43,6 +44,10 @@ export default function LandingNav() {
     } catch (error) {
       base44.auth.redirectToLogin(window.location.href);
     }
+  };
+
+  const handleLogout = async () => {
+    await base44.auth.logout(createPageUrl("Landing"));
   };
 
   useEffect(() => {
@@ -145,28 +150,58 @@ export default function LandingNav() {
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Desktop Account Menu */}
             {user ? (
-              <button
-                onClick={handleAccountClick}
-                className="hidden sm:flex items-center gap-2 text-sm hover:text-white transition-colors"
-              >
-                {user.avatar_url ? (
-                  <img
-                    src={user.avatar_url}
-                    alt={user.full_name}
-                    className="w-8 h-8 rounded-full object-cover border-2 border-emerald-500"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm">
-                    {user.full_name?.[0]?.toUpperCase() || "U"}
-                  </div>
-                )}
-                <span className="text-gray-400">Dashboard</span>
-              </button>
+              <div className="hidden sm:relative sm:flex sm:items-center">
+                <button
+                  onClick={() => setAccountMenuOpen(!accountMenuOpen)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  {user.avatar_url ? (
+                    <img
+                      src={user.avatar_url}
+                      alt={user.full_name}
+                      className="w-8 h-8 rounded-full object-cover border-2 border-emerald-500"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold text-sm">
+                      {user.full_name?.[0]?.toUpperCase() || "U"}
+                    </div>
+                  )}
+                  <span className="text-gray-400 text-sm">{user.full_name?.split(' ')[0]}</span>
+                </button>
+
+                <AnimatePresence>
+                  {accountMenuOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute right-0 top-12 bg-[#1a1a1c] border border-white/10 rounded-xl shadow-xl overflow-hidden z-50 min-w-[180px]"
+                    >
+                      <button
+                        onClick={() => { handleAccountClick(); setAccountMenuOpen(false); }}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-400 hover:bg-white/10 hover:text-white transition-colors text-left"
+                      >
+                        <Home className="w-4 h-4" />
+                        Dashboard
+                      </button>
+                      <div className="border-t border-white/5" />
+                      <button
+                        onClick={() => { handleLogout(); setAccountMenuOpen(false); }}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-left"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Cerrar Sesión
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             ) : (
               <button
                 onClick={() => base44.auth.redirectToLogin(window.location.href)}
-                className="hidden sm:block text-sm text-gray-400 hover:text-white transition-colors"
+                className="hidden sm:block px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-gray-100 transition-colors"
               >
                 Iniciar Sesión
               </button>
@@ -228,29 +263,28 @@ export default function LandingNav() {
                     </button>
                   )
                 ))}
-                <div className="pt-6 border-t border-white/10">
+                <div className="pt-6 border-t border-white/10 space-y-2">
                   {user ? (
-                    <button
-                      onClick={handleAccountClick}
-                      className="flex items-center gap-3 w-full py-4 px-5 rounded-full bg-white text-black font-medium hover:bg-gray-100 transition-colors"
-                    >
-                      {user.avatar_url ? (
-                        <img
-                          src={user.avatar_url}
-                          alt={user.full_name}
-                          className="w-10 h-10 rounded-full object-cover border-2 border-white/30"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold">
-                          {user.full_name?.[0]?.toUpperCase() || "U"}
-                        </div>
-                      )}
-                      <span>Dashboard</span>
-                    </button>
+                    <>
+                      <button
+                        onClick={handleAccountClick}
+                        className="flex items-center gap-3 w-full py-3 px-4 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition-colors"
+                      >
+                        <Home className="w-4 h-4" />
+                        Dashboard
+                      </button>
+                      <button
+                        onClick={() => { handleLogout(); setMobileOpen(false); }}
+                        className="flex items-center gap-3 w-full py-3 px-4 rounded-lg bg-red-500/10 text-red-400 font-medium hover:bg-red-500/20 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Cerrar Sesión
+                      </button>
+                    </>
                   ) : (
                     <button
                       onClick={() => base44.auth.redirectToLogin(window.location.href)}
-                      className="block w-full py-4 rounded-full bg-white text-black text-center font-medium hover:bg-gray-100 transition-colors"
+                      className="block w-full py-3 rounded-lg bg-white text-black text-center font-medium hover:bg-gray-100 transition-colors"
                     >
                       Iniciar Sesión
                     </button>

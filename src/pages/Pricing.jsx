@@ -1,45 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import { useSearchParams, useNavigate, Link } from "react-router-dom";
-import { Check, X, Loader, ArrowLeft, LogOut, Menu, Home } from "lucide-react";
+import { useSearchParams, Link } from "react-router-dom";
+import { Check, X, Loader, ArrowLeft } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 
 export default function Pricing() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const currentUser = await base44.auth.me();
-        setUser(currentUser);
-      } catch (error) {
-        setUser(null);
-      }
-    };
-    checkUser();
-  }, []);
-
-  const handleLogout = async () => {
-    await base44.auth.logout(createPageUrl("Landing"));
-  };
-
-  const handleAccountClick = async () => {
-    try {
-      const currentUser = await base44.auth.me();
-      if (currentUser?.role === 'admin') {
-        navigate(createPageUrl("AdminDashboard"));
-      } else {
-        navigate(createPageUrl("Dashboard"));
-      }
-    } catch (error) {
-      base44.auth.redirectToLogin(window.location.href);
-    }
-  };
 
   const { data: plans = [], isLoading } = useQuery({
     queryKey: ['plans'],
@@ -95,41 +63,7 @@ export default function Pricing() {
             </div>
           </Link>
           
-          {/* Account Menu - Only show if user is logged in */}
-          {user && (
-            <div className="relative">
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-bold cursor-pointer hover:scale-105 transition-transform"
-              >
-                {user.full_name?.[0]?.toUpperCase() || "U"}
-              </button>
 
-              {mobileMenuOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute right-0 top-12 bg-[#1a1a1c] border border-white/10 rounded-lg shadow-xl overflow-hidden z-50 min-w-[160px]"
-                >
-                  <button
-                    onClick={() => { handleAccountClick(); setMobileMenuOpen(false); }}
-                    className="w-full flex items-center gap-2 px-4 py-3 text-sm text-gray-400 hover:bg-white/10 hover:text-white transition-colors text-left"
-                  >
-                    <Home className="w-4 h-4" />
-                    Dashboard
-                  </button>
-                  <div className="border-t border-white/5" />
-                  <button
-                    onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
-                    className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-left"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    Cerrar Sesión
-                  </button>
-                </motion.div>
-              )}
-            </div>
-          )}
         </div>
       </header>
 
