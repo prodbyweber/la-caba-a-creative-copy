@@ -29,18 +29,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Fetch plan from database
-    let plan;
-    try {
-      const plans = await base44.asServiceRole.entities.Plan.list();
-      plan = plans.find(p => p.name.toLowerCase() === planType.toLowerCase());
-    } catch (e) {
-      console.error('Error fetching plans:', e);
-      return Response.json({ error: 'Error al obtener planes' }, { status: 500 });
-    }
+    // Map plan types directly to Stripe price IDs
+    const planPriceMap = {
+      'explorador': 'price_1TFJAu2cunznauNiggK0VNsU',
+      'pionero': process.env.STRIPE_PRICE_PIONERO || 'price_1TFJAu2cunznauNiggK0VNsU',
+      'independiente': process.env.STRIPE_PRICE_INDEPENDIENTE || 'price_1TFJAu2cunznauNiggK0VNsU'
+    };
 
-    if (!plan || !plan.price_id) {
-      return Response.json({ error: 'Plan no configurado o sin Price ID' }, { status: 400 });
+    const priceId = planPriceMap[planType.toLowerCase()];
+    if (!priceId) {
+      return Response.json({ error: 'Plan no válido' }, { status: 400 });
     }
 
     // Buscar o crear cliente Stripe
@@ -74,7 +72,7 @@ Deno.serve(async (req) => {
         payment_method_types: ['card'],
         line_items: [
           {
-            price: plan.price_id,
+            price: priceId,
             quantity: 1
           }
         ],
