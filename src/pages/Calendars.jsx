@@ -91,36 +91,42 @@ export default function Calendars() {
 
   const content = (
     <div className="flex flex-col h-[calc(100vh-56px)]">
-      {/* Top Bar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/5 bg-[#0a0a0b] flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <button onClick={prevMonth} className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"><ChevronLeft className="w-5 h-5" /></button>
-          <h2 className="text-lg font-bold text-white min-w-[180px] text-center">
-            {format(currentDate, 'MMMM yyyy', { locale: es }).replace(/^\w/, c => c.toUpperCase())}
-          </h2>
-          <button onClick={nextMonth} className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"><ChevronRight className="w-5 h-5" /></button>
-          <button onClick={() => setCurrentDate(new Date())} className="px-3 py-1.5 rounded-lg border border-white/10 text-xs font-medium text-gray-300 hover:bg-white/10 transition-colors">Hoy</button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* View toggle */}
-          <div className="flex gap-1 bg-white/5 rounded-lg p-0.5">
-            <button onClick={() => setViewMode("month")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${viewMode === "month" ? "bg-white/15 text-white" : "text-gray-400 hover:text-white"}`}>
-              <CalendarIcon className="w-3.5 h-3.5" />Mes
-            </button>
-            <button onClick={() => setViewMode("agenda")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${viewMode === "agenda" ? "bg-white/15 text-white" : "text-gray-400 hover:text-white"}`}>
-              <List className="w-3.5 h-3.5" />Agenda
-            </button>
+      {/* Top Bar — fila única en desktop, dos filas en móvil */}
+      <div className="border-b border-white/5 bg-[#0a0a0b] flex-shrink-0">
+        {/* Fila 1: nav mes + acciones */}
+        <div className="flex items-center justify-between px-2 sm:px-4 py-2">
+          {/* Izquierda: navegación mes */}
+          <div className="flex items-center gap-1">
+            <button onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"><ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" /></button>
+            <h2 className="text-sm sm:text-lg font-bold text-white px-1 text-center">
+              {format(currentDate, 'MMMM yyyy', { locale: es }).replace(/^\w/, c => c.toUpperCase())}
+            </h2>
+            <button onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"><ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" /></button>
           </div>
 
-          <button onClick={() => setShowSessionModal(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium transition-colors">
-            <Plus className="w-4 h-4" />Sesión
-          </button>
-          {!artistId && (
-            <button onClick={() => setShowDeliverableModal(true)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 hover:bg-amber-500/30 text-xs font-medium transition-colors">
-              <Plus className="w-4 h-4" />Entregable
+          {/* Derecha: view toggle + botones */}
+          <div className="flex items-center gap-1.5">
+            <button onClick={() => setCurrentDate(new Date())} className="px-2 py-1 rounded-lg border border-white/10 text-[11px] font-medium text-gray-300 hover:bg-white/10 transition-colors hidden sm:block">Hoy</button>
+
+            {/* View toggle */}
+            <div className="flex gap-0.5 bg-white/5 rounded-lg p-0.5">
+              <button onClick={() => setViewMode("month")} className={`flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium transition-all ${viewMode === "month" ? "bg-white/15 text-white" : "text-gray-400 hover:text-white"}`}>
+                <CalendarIcon className="w-3 h-3" /><span className="hidden sm:inline">Mes</span>
+              </button>
+              <button onClick={() => setViewMode("agenda")} className={`flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium transition-all ${viewMode === "agenda" ? "bg-white/15 text-white" : "text-gray-400 hover:text-white"}`}>
+                <List className="w-3 h-3" /><span className="hidden sm:inline">Agenda</span>
+              </button>
+            </div>
+
+            <button onClick={() => setShowSessionModal(true)} className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-medium transition-colors">
+              <Plus className="w-3.5 h-3.5" /><span className="hidden sm:inline">Sesión</span>
             </button>
-          )}
+            {!artistId && (
+              <button onClick={() => setShowDeliverableModal(true)} className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 hover:bg-amber-500/30 text-[11px] font-medium transition-colors">
+                <Plus className="w-3.5 h-3.5" /><span className="hidden sm:inline">Entregable</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -129,9 +135,10 @@ export default function Calendars() {
         <div className="flex flex-col flex-1 overflow-hidden">
           {/* Day headers */}
           <div className="grid grid-cols-7 border-b border-white/5 flex-shrink-0">
-            {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(d => (
-              <div key={d} className="py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                {d}
+            {[['D','Dom'], ['L','Lun'], ['M','Mar'], ['M','Mié'], ['J','Jue'], ['V','Vie'], ['S','Sáb']].map(([short, full], i) => (
+              <div key={i} className="py-1.5 text-center text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <span className="sm:hidden">{short}</span>
+                <span className="hidden sm:inline">{full}</span>
               </div>
             ))}
           </div>
@@ -153,7 +160,7 @@ export default function Calendars() {
               return (
                 <div
                   key={i}
-                  className={`border-b border-r border-white/[0.06] p-1 flex flex-col min-h-0 cursor-pointer transition-colors ${
+                  className={`border-b border-r border-white/[0.06] p-0.5 sm:p-1 flex flex-col min-h-0 cursor-pointer transition-colors ${
                     isDragOver ? 'bg-emerald-500/10' : isCurrentMonth ? 'bg-transparent hover:bg-white/[0.02]' : 'bg-white/[0.01]'
                   }`}
                   onDragOver={(e) => { e.preventDefault(); setDragOverDay(day); }}
@@ -161,8 +168,8 @@ export default function Calendars() {
                   onDrop={() => handleDrop(day)}
                 >
                   {/* Day number */}
-                  <div className="flex items-center justify-start mb-1 px-0.5">
-                    <span className={`text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full ${
+                  <div className="flex items-center justify-center sm:justify-start mb-0.5 sm:mb-1 px-0.5">
+                    <span className={`text-[10px] sm:text-xs font-bold w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full ${
                       isTodayDate ? 'bg-blue-500 text-white' : isCurrentMonth ? 'text-gray-200' : 'text-gray-600'
                     }`}>
                       {format(day, 'd')}
@@ -181,12 +188,12 @@ export default function Calendars() {
                           onDragStart={isSession ? (e) => { e.stopPropagation(); setDragItem({ id: item.id, type: 'session', data: item }); } : undefined}
                           onDragEnd={isSession ? () => setDragItem(null) : undefined}
                           onClick={(e) => { e.stopPropagation(); if (isSession) setSelectedSession(item); }}
-                          className="w-full text-left px-1.5 py-0.5 rounded text-[10px] font-medium truncate transition-opacity hover:opacity-80"
-                          style={{ backgroundColor: colors.light, color: colors.text, borderLeft: `2px solid ${colors.bg}` }}
+                          className="w-full text-left px-1 py-px rounded text-[9px] sm:text-[10px] font-medium truncate transition-opacity hover:opacity-80"
+                          style={{ backgroundColor: colors.bg, color: '#fff', borderLeft: `2px solid ${colors.bg}` }}
                         >
-                          {isSession && item.start_time ? (
-                            <span className="opacity-75 mr-1">{format(parseISO(item.start_time), 'HH:mm')}</span>
-                          ) : null}
+                          <span className="hidden sm:inline opacity-80 mr-0.5">
+                            {isSession && item.start_time ? format(parseISO(item.start_time), 'HH:mm') : ''}
+                          </span>
                           {item.title}
                         </button>
                       );
