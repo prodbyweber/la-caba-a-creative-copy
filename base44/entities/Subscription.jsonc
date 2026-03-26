@@ -1,0 +1,72 @@
+{
+  "name": "Subscription",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "description": "Email del usuario"
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "description": "ID del cliente en Stripe"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "description": "ID de la suscripci\u00f3n en Stripe"
+    },
+    "plan_type": {
+      "type": "string",
+      "enum": [
+        "free_trial",
+        "pro",
+        "enterprise"
+      ],
+      "default": "free_trial",
+      "description": "Tipo de plan"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "canceled",
+        "past_due",
+        "incomplete",
+        "paused"
+      ],
+      "default": "active",
+      "description": "Estado de la suscripci\u00f3n"
+    },
+    "trial_ends_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha final de la prueba gratuita"
+    },
+    "current_period_start": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Inicio del per\u00edodo de facturaci\u00f3n actual"
+    },
+    "current_period_end": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fin del per\u00edodo de facturaci\u00f3n actual"
+    },
+    "cancel_at_period_end": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si se cancelar\u00e1 al final del per\u00edodo"
+    },
+    "amount_monthly": {
+      "type": "number",
+      "description": "Monto mensual en centavos"
+    },
+    "currency": {
+      "type": "string",
+      "default": "eur",
+      "description": "Moneda"
+    }
+  },
+  "required": [
+    "user_email"
+  ]
+}

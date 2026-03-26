@@ -8,6 +8,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ContactLeads from './pages/ContactLeads';
+import Pricing from './pages/Pricing';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -60,6 +61,7 @@ const AuthenticatedApp = () => {
         />
       ))}
       <Route path="/ContactLeads" element={<ContactLeads />} />
+      <Route path="/pricing" element={<Pricing />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

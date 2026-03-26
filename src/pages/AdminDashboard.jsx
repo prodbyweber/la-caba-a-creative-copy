@@ -8,6 +8,8 @@ import CreateSessionModal from "@/components/admin/CreateSessionModal";
 import CreateDeliverableModal from "@/components/admin/CreateDeliverableModal";
 import CreateRevisionModal from "@/components/admin/CreateRevisionModal";
 import StatusButton from "@/components/admin/StatusButton";
+import SubscriptionStatus from "@/components/subscription/SubscriptionStatus";
+import PlansModal from "@/components/subscription/PlansModal";
 import {
   Calendar, Clock, AlertCircle, GitPullRequest, FolderKanban,
   TrendingUp, Users, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal
@@ -58,6 +60,7 @@ export default function AdminDashboard() {
   const [editSession, setEditSession] = useState(null);
   const [editDeliverable, setEditDeliverable] = useState(null);
   const [editRevision, setEditRevision] = useState(null);
+  const [showPlansModal, setShowPlansModal] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -122,6 +125,9 @@ export default function AdminDashboard() {
   return (
     <AdminLayout activePage="AdminDashboard">
       <div className="px-3 sm:px-8 lg:px-14 xl:px-20 py-6 max-w-[1600px] mx-auto">
+
+        {/* Subscription Status */}
+        <SubscriptionStatus onUpgradeClick={() => setShowPlansModal(true)} />
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
@@ -355,6 +361,7 @@ export default function AdminDashboard() {
       <CreateSessionModal isOpen={showSessionModal} onClose={handleCloseSession} editData={editSession} />
       <CreateDeliverableModal isOpen={showDeliverableModal} onClose={handleCloseDeliverable} editData={editDeliverable} />
       <CreateRevisionModal isOpen={showRevisionModal} onClose={handleCloseRevision} editData={editRevision} />
+      <PlansModal isOpen={showPlansModal} onClose={() => setShowPlansModal(false)} />
 
       <VoiceAssistant />
     </AdminLayout>
