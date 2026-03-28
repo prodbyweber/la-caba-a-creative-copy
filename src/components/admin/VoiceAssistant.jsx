@@ -213,6 +213,16 @@ Responde SOLO JSON válido:
     }
   };
 
+  // Invalida todas las queries que usa el AdminDashboard y el panel del artista
+  const invalidateAll = (resolvedArtist) => {
+    queryClient.invalidateQueries({ queryKey: ['sessions'] });
+    queryClient.invalidateQueries({ queryKey: ['deliverables'] });
+    queryClient.invalidateQueries({ queryKey: ['revisions'] });
+    if (resolvedArtist?.id) {
+      queryClient.invalidateQueries({ queryKey: ['artist-sessions', resolvedArtist.id] });
+    }
+  };
+
   const handleConfirm = async () => {
     if (!pendingAction) return;
     const { ai, resolvedArtist, resolvedProject, startDate, endDate } = pendingAction;
@@ -223,7 +233,6 @@ Responde SOLO JSON válido:
 
     try {
       if (ai.type === 'session' || ai.type === 'meeting') {
-        // Construir attendees igual que el modal manual: email del artista primero
         const attendees = [];
         if (resolvedArtist?.email) attendees.push(resolvedArtist.email);
 
@@ -235,70 +244,58 @@ Responde SOLO JSON válido:
           end_time: endDate.toISOString(),
           status: 'Pending',
           location: ai.location || 'Studio',
-          source: 'cabana',
           attendees,
+          artist_name: resolvedArtist?.stageName || null,
+          project_name: resolvedProject?.title || null,
           ...(resolvedArtist && { artist_id: resolvedArtist.id }),
           ...(resolvedProject && { project_id: resolvedProject.id }),
         };
 
-        // 1. Guardar en BD (igual que modal manual)
-        const created = await base44.entities.Session.create(sessionData);
-        // Invalidar todas las queries relevantes: admin panel + panel del artista
-        queryClient.invalidateQueries({ queryKey: ['sessions'] });
-        if (resolvedArtist) {
-          queryClient.invalidateQueries({ queryKey: ['artist-sessions', resolvedArtist.id] });
-        }
+        // Una sola llamada backend que hace: crear en BD + Google Calendar + correos
+        const res = await base44.functions.invoke('assistantCreateActivity', {
+          activityType: 'session',
+          sessionData,
+        });
 
-        // 2. Sincronizar con Google Calendar (igual que syncToGCal del modal)
-        // Esto envía invitaciones por correo a todos los attendees (sendUpdates=all)
-        try {
-          const enriched = {
-            ...sessionData,
-            id: created.id,
-            artist_name: resolvedArtist?.stageName || null,
-            project_name: resolvedProject?.title || null,
-          };
-          const gcalRes = await base44.functions.invoke('createGoogleCalendarEvent', { session: enriched });
-          if (gcalRes?.data?.google_event_id) {
-            await base44.entities.Session.update(created.id, {
-              google_event_id: gcalRes.data.google_event_id,
-              google_event_link: gcalRes.data.google_event_link,
-            });
-            queryClient.invalidateQueries({ queryKey: ['sessions'] });
-          }
-          const artistStr = resolvedArtist ? ` para **${resolvedArtist.stageName}**` : '';
-          const emailStr = resolvedArtist?.email ? `\n📧 Invitación enviada a ${resolvedArtist.email}` : '';
-          addMessage("assistant", `✅ Sesión "${ai.title}" creada${artistStr} y sincronizada con Google Calendar.${emailStr}`);
-        } catch {
-          addMessage("assistant", `✅ Sesión "${ai.title}" creada. No se pudo sincronizar con Google Calendar.`);
-        }
+        invalidateAll(resolvedArtist);
+
+        const artistStr = resolvedArtist ? ` para **${resolvedArtist.stageName}**` : '';
+        const emailStr = resolvedArtist?.email ? `\n📧 Invitación enviada a ${resolvedArtist.email}` : '';
+        const gcalOk = res?.data?.gcal?.google_event_id;
+        const gcalStr = gcalOk ? ' y sincronizada con Google Calendar' : '';
+        addMessage("assistant", `✅ Sesión "${ai.title}" creada${artistStr}${gcalStr}.${emailStr}`);
 
       } else if (ai.type === 'deliverable') {
         const oneWeek = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-        await base44.entities.Deliverable.create({
-          deliverable_type: 'Demo',
-          title: ai.title,
-          due_date_time: oneWeek.toISOString(),
-          status: 'Pending',
-          notes: ai.description,
-          ...(resolvedArtist && { artist_id: resolvedArtist.id }),
-          ...(resolvedProject && { project_id: resolvedProject.id }),
+        await base44.functions.invoke('assistantCreateActivity', {
+          activityType: 'deliverable',
+          deliverableData: {
+            deliverable_type: 'Demo',
+            title: ai.title,
+            due_date_time: oneWeek.toISOString(),
+            status: 'Pending',
+            notes: ai.description,
+            ...(resolvedArtist && { artist_id: resolvedArtist.id }),
+            ...(resolvedProject && { project_id: resolvedProject.id }),
+          },
         });
-        queryClient.invalidateQueries({ queryKey: ['deliverables'] });
-        if (resolvedArtist) queryClient.invalidateQueries({ queryKey: ['artist-sessions', resolvedArtist.id] });
+        invalidateAll(resolvedArtist);
         addMessage("assistant", `✅ Entregable "${ai.title}" creado${resolvedArtist ? ` para ${resolvedArtist.stageName}` : ''}.`);
 
       } else if (ai.type === 'revision') {
-        await base44.entities.Revision.create({
-          request_text: ai.title,
-          revision_type: 'Mix',
-          severity: 'Medium',
-          status: 'Open',
-          timecode: '00:00',
-          ...(resolvedArtist && { artist_id: resolvedArtist.id }),
-          ...(resolvedProject && { project_id: resolvedProject.id }),
+        await base44.functions.invoke('assistantCreateActivity', {
+          activityType: 'revision',
+          revisionData: {
+            request_text: ai.title,
+            revision_type: 'Mix',
+            severity: 'Medium',
+            status: 'Open',
+            timecode: '00:00',
+            ...(resolvedArtist && { artist_id: resolvedArtist.id }),
+            ...(resolvedProject && { project_id: resolvedProject.id }),
+          },
         });
-        queryClient.invalidateQueries({ queryKey: ['revisions'] });
+        invalidateAll(resolvedArtist);
         addMessage("assistant", `✅ Revisión "${ai.title}" registrada.`);
       }
 
