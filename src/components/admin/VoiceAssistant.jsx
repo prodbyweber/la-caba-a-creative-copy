@@ -219,10 +219,14 @@ Responde SOLO JSON válido:
     setPendingAction(null);
     setIsProcessing(true);
 
-    addMessage("assistant", "⏳ Creando y sincronizando...");
+    addMessage("assistant", "⏳ Creando y sincronizando con Google Calendar...");
 
     try {
       if (ai.type === 'session' || ai.type === 'meeting') {
+        // Construir attendees igual que el modal manual: email del artista primero
+        const attendees = [];
+        if (resolvedArtist?.email) attendees.push(resolvedArtist.email);
+
         const sessionData = {
           type: ai.session_type || (ai.type === 'meeting' ? 'Meeting' : 'Session'),
           title: ai.title,
@@ -231,35 +235,43 @@ Responde SOLO JSON válido:
           end_time: endDate.toISOString(),
           status: 'Pending',
           location: ai.location || 'Studio',
+          source: 'cabana',
+          attendees,
           ...(resolvedArtist && { artist_id: resolvedArtist.id }),
           ...(resolvedProject && { project_id: resolvedProject.id }),
         };
 
+        // 1. Guardar en BD (igual que modal manual)
         const created = await base44.entities.Session.create(sessionData);
+        // Invalidar todas las queries relevantes: admin panel + panel del artista
+        queryClient.invalidateQueries({ queryKey: ['sessions'] });
+        if (resolvedArtist) {
+          queryClient.invalidateQueries({ queryKey: ['artist-sessions', resolvedArtist.id] });
+        }
 
-        // Sincronizar con Google Calendar
+        // 2. Sincronizar con Google Calendar (igual que syncToGCal del modal)
+        // Esto envía invitaciones por correo a todos los attendees (sendUpdates=all)
         try {
-          const gcalRes = await base44.functions.invoke('createGoogleCalendarEvent', {
-            session: {
-              ...sessionData,
-              artist_name: resolvedArtist?.stageName || ai.artist_name,
-              project_name: resolvedProject?.title || ai.project_name,
-            }
-          });
-
+          const enriched = {
+            ...sessionData,
+            id: created.id,
+            artist_name: resolvedArtist?.stageName || null,
+            project_name: resolvedProject?.title || null,
+          };
+          const gcalRes = await base44.functions.invoke('createGoogleCalendarEvent', { session: enriched });
           if (gcalRes?.data?.google_event_id) {
             await base44.entities.Session.update(created.id, {
               google_event_id: gcalRes.data.google_event_id,
               google_event_link: gcalRes.data.google_event_link,
-              source: 'cabana'
             });
+            queryClient.invalidateQueries({ queryKey: ['sessions'] });
           }
-        } catch (gcalErr) {
-          // No bloquear si Google Calendar falla
+          const artistStr = resolvedArtist ? ` para **${resolvedArtist.stageName}**` : '';
+          const emailStr = resolvedArtist?.email ? `\n📧 Invitación enviada a ${resolvedArtist.email}` : '';
+          addMessage("assistant", `✅ Sesión "${ai.title}" creada${artistStr} y sincronizada con Google Calendar.${emailStr}`);
+        } catch {
+          addMessage("assistant", `✅ Sesión "${ai.title}" creada. No se pudo sincronizar con Google Calendar.`);
         }
-
-        queryClient.invalidateQueries({ queryKey: ['sessions'] });
-        addMessage("assistant", `✅ ¡Listo! Sesión "${ai.title}" creada${resolvedArtist ? ` para ${resolvedArtist.stageName}` : ''} y sincronizada con Google Calendar.`);
 
       } else if (ai.type === 'deliverable') {
         const oneWeek = new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -273,6 +285,7 @@ Responde SOLO JSON válido:
           ...(resolvedProject && { project_id: resolvedProject.id }),
         });
         queryClient.invalidateQueries({ queryKey: ['deliverables'] });
+        if (resolvedArtist) queryClient.invalidateQueries({ queryKey: ['artist-sessions', resolvedArtist.id] });
         addMessage("assistant", `✅ Entregable "${ai.title}" creado${resolvedArtist ? ` para ${resolvedArtist.stageName}` : ''}.`);
 
       } else if (ai.type === 'revision') {
