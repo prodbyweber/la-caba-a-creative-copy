@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import { base44 } from '@/api/base44Client';
 import ContactLeads from './pages/ContactLeads';
 import Pricing from './pages/Pricing';
 import AdminDashboard from './pages/AdminDashboard';
@@ -27,10 +28,10 @@ const ProtectedAdminRoute = ({ element }) => {
     const checkAdmin = async () => {
       try {
         const currentUser = await base44.auth.me();
+        setUser(currentUser);
         if (currentUser?.role !== 'admin') {
           window.location.href = '/';
         }
-        setUser(currentUser);
       } catch (e) {
         window.location.href = '/';
       } finally {
@@ -42,13 +43,15 @@ const ProtectedAdminRoute = ({ element }) => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center">
+      <div className="fixed inset-0 flex items-center justify-center bg-[#0a0a0b]">
         <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
       </div>
     );
   }
 
-  return user?.role === 'admin' ? element : null;
+  if (!user || user.role !== 'admin') return null;
+
+  return element;
 };
 
 const AuthenticatedApp = () => {
