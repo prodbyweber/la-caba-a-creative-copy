@@ -4,8 +4,6 @@ import { motion, useScroll, useTransform } from "framer-motion";
 export default function Hero({ config }) {
   const heroSubtitle = config?.hero_subtitle || "Producción, imagen y narrativa para artistas que van en serio.";
   const heroCTA = config?.hero_cta_text || "Aplicar a La Cabaña Creative";
-  const heroImage = config?.hero_image_url || "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/c6a0619f6_generated_image.png";
-
   const sectionRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -25,15 +23,8 @@ export default function Hero({ config }) {
 
   return (
     <section ref={sectionRef} className="relative w-full min-h-screen overflow-hidden bg-black">
-      {/* Full-bleed background image */}
-      <div className="absolute inset-0">
-        <img
-          src={heroImage}
-          alt="Hero"
-          className="w-full h-full object-cover object-center"
-        />
-        {/* Subtle dark overlay */}
-        <div className="absolute inset-0 bg-black/25" />
+      {/* Solid dark background */}
+      <div className="absolute inset-0 bg-[#0a0a0b]">
         {/* Bottom fade */}
         <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0a0a0b] to-transparent" />
       </div>
