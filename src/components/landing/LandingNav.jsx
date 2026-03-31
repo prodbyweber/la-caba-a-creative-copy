@@ -105,8 +105,6 @@ export default function LandingNav() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to={createPageUrl("Landing")} className="flex items-center gap-2">
             <motion.div
-              animate={{ opacity: scrolled ? 1 : 0, x: scrolled ? 0 : -8 }}
-              transition={{ duration: 0.3 }}
               className="flex items-center gap-2"
             >
               <img 
