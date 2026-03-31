@@ -401,19 +401,13 @@ export default function LandingEditor() {
             </SectionEditor>
 
             {/* Hero Section Editor */}
-            <SectionEditor title="🎬 Hero Principal" defaultOpen={false}>
+            <SectionEditor title="🎬 Hero Principal" defaultOpen={true}>
+              <p className="text-xs text-white/40 mb-3">El Hero es full-screen con imagen de fondo y el título "Cabaña® Creative" superpuesto. Edita la imagen y el tagline inferior.</p>
               <TextInput
-                label="Título"
-                value={config.hero_title}
-                onChange={(v) => updateField('hero_title', v)}
-                placeholder="El estudio creativo definitivo..."
-                multiline
-              />
-              <TextInput
-                label="Subtítulo"
+                label="Tagline (texto inferior izquierda)"
                 value={config.hero_subtitle}
                 onChange={(v) => updateField('hero_subtitle', v)}
-                placeholder="Producción por horas..."
+                placeholder="Producción, imagen y narrativa para artistas que van en serio."
                 multiline
               />
               <TextInput
@@ -423,7 +417,7 @@ export default function LandingEditor() {
                 placeholder="Aplicar a La Cabaña Creative"
               />
               <ImageUpload
-                label="Imagen del Hero"
+                label="Imagen de Fondo del Hero (full-screen)"
                 value={config.hero_image_url}
                 onChange={(v) => updateField('hero_image_url', v)}
                 isUploading={isUploading}
