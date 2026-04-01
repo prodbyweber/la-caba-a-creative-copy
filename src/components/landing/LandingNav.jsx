@@ -55,8 +55,8 @@ export default function LandingNav() {
     const handleScroll = () => {
       const heroHeight = window.innerHeight;
       setScrolled(window.scrollY > 60);
-      // Logo aparece justo al terminar el scroll del hero (>= 95% del hero height)
-      setLogoVisible(window.scrollY >= heroHeight * 0.9);
+      // Logo aparece justo cuando el título del hero desaparece (al llegar a la barra de nav)
+      setLogoVisible(window.scrollY >= heroHeight * 0.75);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);

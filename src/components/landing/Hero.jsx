@@ -14,11 +14,8 @@ export default function Hero({ config }) {
     offset: ["start start", "end start"],
   });
 
-  // The giant title + isotipo animate from center to top-left, shrinking into the nav logo
-  const titleX = useTransform(scrollYProgress, [0, 0.5], ["0%", "-44%"]);
-  const titleY = useTransform(scrollYProgress, [0, 0.5], ["0%", "-43%"]);
-  const titleScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.095]);
-  const titleOpacity = useTransform(scrollYProgress, [0.4, 0.55], [1, 0]);
+  // El título se desvanece justo al llegar a la barra de nav (al final del scroll del hero)
+  const titleOpacity = useTransform(scrollYProgress, [0.75, 0.95], [1, 0]);
 
   return (
     <section ref={sectionRef} className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0b]">
@@ -58,16 +55,10 @@ export default function Hero({ config }) {
         />
       </motion.div>
 
-      {/* Giant animated brand title — text only, centered, morphs on scroll */}
+      {/* Giant animated brand title — text only, centered, stays fixed until near nav */}
       <motion.div
         className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-[2]"
-        style={{
-          x: titleX,
-          y: titleY,
-          scale: titleScale,
-          transformOrigin: "left top",
-          opacity: titleOpacity,
-        }}
+        style={{ opacity: titleOpacity }}
       >
         <div>
           <div
