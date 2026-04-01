@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, useScroll } from "framer-motion";
 
 const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
 
@@ -8,31 +8,36 @@ export default function Hero({ config }) {
   const heroVideoUrl = config?.hero_video_url || null;
 
   const sectionRef = useRef(null);
-  const [heroVisible, setHeroVisible] = useState(true);
 
-  // Scroll progress dentro del hero (0 = inicio, 1 = fin)
+  // scroll progress dentro del hero
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
 
-  // Animaciones: el título viaja hacia la esquina superior izquierda (donde está el logo del nav)
-  const titleX = useTransform(scrollYProgress, [0, 0.45], ["0%", "-44%"]);
-  const titleY = useTransform(scrollYProgress, [0, 0.45], ["0%", "-43%"]);
-  const titleScale = useTransform(scrollYProgress, [0, 0.45], [1, 0.095]);
-  const titleOpacity = useTransform(scrollYProgress, [0.35, 0.5], [1, 0]);
+  // Opacidad: fade out entre 35% y 50% del scroll del hero
+  const rawOpacity = useTransform(scrollYProgress, [0.35, 0.52], [1, 0]);
+  // Spring suaviza la opacidad para evitar flicker
+  const opacity = useSpring(rawOpacity, { stiffness: 200, damping: 30, mass: 0.5 });
 
-  // Ocultar los elementos fixed cuando el hero ya no está en viewport
+  // El título viaja de centro a la esquina del nav (top-left)
+  // Destino calculado para que aterrice exactamente donde está el logo del nav
+  const rawX = useTransform(scrollYProgress, [0, 0.45], ["0%", "-44%"]);
+  const rawY = useTransform(scrollYProgress, [0, 0.45], ["0%", "-43%"]);
+  const rawScale = useTransform(scrollYProgress, [0, 0.45], [1, 0.095]);
+
+  const x = useSpring(rawX, { stiffness: 300, damping: 40, mass: 0.5 });
+  const y = useSpring(rawY, { stiffness: 300, damping: 40, mass: 0.5 });
+  const scale = useSpring(rawScale, { stiffness: 300, damping: 40, mass: 0.5 });
+
+  // Ocultar completamente los fixed una vez que el hero sale del viewport
+  const [active, setActive] = useState(true);
   useEffect(() => {
-    const unsubscribe = scrollYProgress.on("change", (v) => {
-      setHeroVisible(v < 0.98);
+    const unsub = scrollYProgress.on("change", (v) => {
+      setActive(v < 0.99);
     });
-    return () => unsubscribe();
+    return unsub;
   }, [scrollYProgress]);
-
-  if (!heroVisible) return (
-    <section ref={sectionRef} className="relative w-full min-h-screen bg-[#0a0a0b]" />
-  );
 
   return (
     <section ref={sectionRef} className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0b]">
@@ -56,67 +61,59 @@ export default function Hero({ config }) {
       {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0a0a0b] to-transparent z-10" />
 
-      {/* Isotipo — fixed, visible solo mientras el hero está activo */}
-      <motion.div
-        className="fixed inset-0 flex items-start justify-center pointer-events-none select-none z-[60]"
-        style={{ opacity: titleOpacity, paddingTop: "12vh" }}
-      >
-        <img
-          src={ISOTIPO_URL}
-          alt=""
-          style={{
-            height: "clamp(3rem, 9vw, 10vw)",
-            width: "auto",
-            display: "block",
-          }}
-        />
-      </motion.div>
+      {active && (
+        <>
+          {/* Isotipo centrado arriba, desaparece junto con el título */}
+          <motion.div
+            className="fixed inset-0 flex items-start justify-center pointer-events-none select-none z-[60]"
+            style={{ opacity, paddingTop: "12vh" }}
+          >
+            <img
+              src={ISOTIPO_URL}
+              alt=""
+              style={{ height: "clamp(3rem, 9vw, 10vw)", width: "auto", display: "block" }}
+            />
+          </motion.div>
 
-      {/* Título animado — fixed, viaja hacia el logo del nav al hacer scroll */}
-      <motion.div
-        className="fixed inset-0 flex items-center justify-center pointer-events-none select-none z-[60]"
-        style={{
-          x: titleX,
-          y: titleY,
-          scale: titleScale,
-          transformOrigin: "left top",
-          opacity: titleOpacity,
-        }}
-      >
-        <div>
-          <div
-            className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
+          {/* Título: viaja desde el centro hasta la esquina superior izquierda (logo del nav) */}
+          <motion.div
+            className="fixed inset-0 flex items-center justify-center pointer-events-none select-none z-[60]"
             style={{
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-              fontSize: "clamp(5rem, 18vw, 20vw)",
-              color: "#ff5833",
+              x,
+              y,
+              scale,
+              transformOrigin: "left top",
+              opacity,
             }}
           >
-            Cabaña
-            <sup
-              style={{
-                color: "rgba(255,255,255,0.65)",
-                fontSize: "0.25em",
-                fontWeight: 400,
-                marginLeft: "0.1em",
-                verticalAlign: "super",
-              }}
-            >
-              ®
-            </sup>
-          </div>
-          <div
-            className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
-            style={{
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-              fontSize: "clamp(5rem, 18vw, 20vw)",
-              color: "#ffffff",
-            }}
-          >
-            Creative
-          </div>
-        </div>
-      </motion.div>
+            <div>
+              <div
+                className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
+                style={{
+                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                  fontSize: "clamp(5rem, 18vw, 20vw)",
+                  color: "#ff5833",
+                }}
+              >
+                Cabaña
+                <sup style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.25em", fontWeight: 400, marginLeft: "0.1em", verticalAlign: "super" }}>
+                  ®
+                </sup>
+              </div>
+              <div
+                className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
+                style={{
+                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                  fontSize: "clamp(5rem, 18vw, 20vw)",
+                  color: "#ffffff",
+                }}
+              >
+                Creative
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
 
       {/* Bottom bar: tagline */}
       <motion.div
