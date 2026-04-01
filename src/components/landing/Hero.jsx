@@ -25,17 +25,19 @@ export default function Hero({ config }) {
 
   return (
     <section ref={sectionRef} className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0b]">
-      {/* Background video — full screen, behind everything */}
+      {/* Background video — centered, slightly reduced size */}
       {heroVideoUrl && (
         <>
-          <video
-            src={heroVideoUrl}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover opacity-60 z-0"
-          />
+          <div className="absolute inset-0 flex items-center justify-center z-0">
+            <video
+              src={heroVideoUrl}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-[85%] h-[85%] object-cover opacity-60 rounded-2xl"
+            />
+          </div>
           <div className="absolute inset-0 bg-[#0a0a0b]/15 z-0" />
         </>
       )}
