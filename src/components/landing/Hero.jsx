@@ -44,7 +44,7 @@ export default function Hero({ config }) {
 
       {/* Isotipo — centered, above the title text */}
       <motion.div
-        className="absolute inset-0 flex items-start justify-center pointer-events-none select-none z-[2]"
+        className="fixed inset-0 flex items-start justify-center pointer-events-none select-none z-[60]"
         style={{ opacity: titleOpacity, paddingTop: "12vh" }}
       >
         <img
@@ -60,7 +60,7 @@ export default function Hero({ config }) {
 
       {/* Giant animated brand title — text only, animated toward nav on scroll */}
       <motion.div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-[2]"
+        className="fixed inset-0 flex items-center justify-center pointer-events-none select-none z-[60]"
         style={{
           x: titleX,
           y: titleY,
