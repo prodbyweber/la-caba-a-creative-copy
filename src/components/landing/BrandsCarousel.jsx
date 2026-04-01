@@ -49,7 +49,7 @@ export default function BrandsCarousel({ logos }) {
                 <img
                   src={logo}
                   alt="Brand logo"
-                  className="max-w-full max-h-full object-contain group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]"
+                  className="max-w-full max-h-full object-contain brightness-0 invert opacity-60 group-hover:opacity-100 transition-opacity duration-300"
                 />
               </div>
             ))}

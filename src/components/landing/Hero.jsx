@@ -108,12 +108,7 @@ export default function Hero({ config }) {
             {heroSubtitle}
           </p>
         </div>
-        <button
-          onClick={scrollToOffers}
-          className="flex-shrink-0 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-white text-black text-sm sm:text-base font-semibold hover:bg-[#ff5833] hover:text-white transition-all duration-300"
-        >
-          {heroCTA}
-        </button>
+
       </motion.div>
     </section>
   );
