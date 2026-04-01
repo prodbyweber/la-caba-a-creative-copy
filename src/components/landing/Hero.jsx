@@ -1,25 +1,24 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
+// Isotipo URL (same as in nav)
 const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
 
 export default function Hero({ config }) {
   const heroSubtitle = config?.hero_subtitle || "Producción, imagen y narrativa para artistas que van en serio.";
   const heroVideoUrl = config?.hero_video_url || null;
 
-  // Scroll global — funciona con elementos fixed
-  const { scrollY } = useScroll();
-
-  // La animación ocurre entre 0 y 60% de la altura de pantalla (antes del nav)
-  const heroH = typeof window !== "undefined" ? window.innerHeight : 800;
-  const end = heroH * 0.6;
-
-  const titleX = useTransform(scrollY, [0, end], ["0%", "-44%"]);
-  const titleY = useTransform(scrollY, [0, end], ["0%", "-43%"]);
-  const titleScale = useTransform(scrollY, [0, end], [1, 0.095]);
-  const titleOpacity = useTransform(scrollY, [end * 0.75, end], [1, 0]);
-
   const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Título viaja y desaparece antes — la animación termina justo al tocar la barra de nav
+  const titleX = useTransform(scrollYProgress, [0, 0.45], ["0%", "-44%"]);
+  const titleY = useTransform(scrollYProgress, [0, 0.45], ["0%", "-43%"]);
+  const titleScale = useTransform(scrollYProgress, [0, 0.45], [1, 0.095]);
+  const titleOpacity = useTransform(scrollYProgress, [0.35, 0.5], [1, 0]);
 
   return (
     <section ref={sectionRef} className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0b]">
@@ -43,7 +42,7 @@ export default function Hero({ config }) {
       {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0a0a0b] to-transparent z-10" />
 
-      {/* Isotipo — fixed, por encima del nav */}
+      {/* Isotipo — centered, above the title text */}
       <motion.div
         className="fixed inset-0 flex items-start justify-center pointer-events-none select-none z-[60]"
         style={{ opacity: titleOpacity, paddingTop: "12vh" }}
@@ -51,11 +50,15 @@ export default function Hero({ config }) {
         <img
           src={ISOTIPO_URL}
           alt=""
-          style={{ height: "clamp(3rem, 9vw, 10vw)", width: "auto", display: "block" }}
+          style={{
+            height: "clamp(3rem, 9vw, 10vw)",
+            width: "auto",
+            display: "block",
+          }}
         />
       </motion.div>
 
-      {/* Giant animated brand title — fixed, por encima del nav */}
+      {/* Giant animated brand title — text only, animated toward nav on scroll */}
       <motion.div
         className="fixed inset-0 flex items-center justify-center pointer-events-none select-none z-[60]"
         style={{
@@ -76,7 +79,15 @@ export default function Hero({ config }) {
             }}
           >
             Cabaña
-            <sup style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.25em", fontWeight: 400, marginLeft: "0.1em", verticalAlign: "super" }}>
+            <sup
+              style={{
+                color: "rgba(255,255,255,0.65)",
+                fontSize: "0.25em",
+                fontWeight: 400,
+                marginLeft: "0.1em",
+                verticalAlign: "super",
+              }}
+            >
               ®
             </sup>
           </div>
