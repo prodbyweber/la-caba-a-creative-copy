@@ -89,20 +89,7 @@ export default function AboutSection() {
               dangerouslySetInnerHTML={{ __html: secondaryText }}
             />
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => {
-                const section = document.getElementById('offers');
-                if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
-              className="mt-4 inline-flex items-center gap-3 text-sm font-semibold text-white border border-white/20 px-7 py-3.5 rounded-full hover:bg-white hover:text-black transition-all duration-300"
-            >
-              Aplicar a La Cabaña
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </motion.button>
+
           </motion.div>
 
           {/* Right — values list */}
