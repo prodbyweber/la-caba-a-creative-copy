@@ -42,7 +42,23 @@ export default function Hero({ config }) {
       {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0a0a0b] to-transparent z-10" />
 
-      {/* Giant animated brand title — includes isotipo + text, morphs into nav logo on scroll */}
+      {/* Isotipo — centered, above the title text */}
+      <motion.div
+        className="absolute inset-0 flex items-start justify-center pointer-events-none select-none z-[2]"
+        style={{ opacity: titleOpacity, paddingTop: "12vh" }}
+      >
+        <img
+          src={ISOTIPO_URL}
+          alt=""
+          style={{
+            height: "clamp(3rem, 9vw, 10vw)",
+            width: "auto",
+            display: "block",
+          }}
+        />
+      </motion.div>
+
+      {/* Giant animated brand title — text only, centered, morphs on scroll */}
       <motion.div
         className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-[2]"
         style={{
@@ -53,51 +69,37 @@ export default function Hero({ config }) {
           opacity: titleOpacity,
         }}
       >
-        <div className="flex items-center gap-[0.18em]">
-          {/* Isotipo — scales with the title */}
-          <img
-            src={ISOTIPO_URL}
-            alt=""
+        <div>
+          <div
+            className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
             style={{
-              height: "clamp(5rem, 18vw, 20vw)",
-              width: "auto",
-              display: "block",
-              flexShrink: 0,
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+              fontSize: "clamp(5rem, 18vw, 20vw)",
+              color: "#ff5833",
             }}
-          />
-          {/* Text block */}
-          <div>
-            <div
-              className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
+          >
+            Cabaña
+            <sup
               style={{
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                fontSize: "clamp(5rem, 18vw, 20vw)",
-                color: "#ff5833",
+                color: "rgba(255,255,255,0.65)",
+                fontSize: "0.25em",
+                fontWeight: 400,
+                marginLeft: "0.1em",
+                verticalAlign: "super",
               }}
             >
-              Cabaña
-              <sup
-                style={{
-                  color: "rgba(255,255,255,0.65)",
-                  fontSize: "0.25em",
-                  fontWeight: 400,
-                  marginLeft: "0.1em",
-                  verticalAlign: "super",
-                }}
-              >
-                ®
-              </sup>
-            </div>
-            <div
-              className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
-              style={{
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                fontSize: "clamp(5rem, 18vw, 20vw)",
-                color: "#ffffff",
-              }}
-            >
-              Creative
-            </div>
+              ®
+            </sup>
+          </div>
+          <div
+            className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
+            style={{
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+              fontSize: "clamp(5rem, 18vw, 20vw)",
+              color: "#ffffff",
+            }}
+          >
+            Creative
           </div>
         </div>
       </motion.div>
