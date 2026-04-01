@@ -20,9 +20,9 @@ export default function BrandsCarousel({ logos }) {
   const totalWidth = displayLogos.length * (96 + 64); // 96px (w-24) + 64px (gap-16)
 
   return (
-    <section className="relative -mt-12 lg:-mt-4 pt-0 pb-0 lg:pb-2 bg-zinc-950/50 border-t border-white/5">
+    <section className="relative py-6 bg-transparent">
       <div className="max-w-full overflow-hidden">
-        <div className="text-center mb-0 lg:mb-1">
+        <div className="text-center mb-3">
           <span className="text-xs uppercase tracking-wider text-gray-500">Hemos colaborado con</span>
         </div>
         
@@ -44,12 +44,12 @@ export default function BrandsCarousel({ logos }) {
             {duplicatedLogos.map((logo, index) => (
               <div
                 key={index}
-                className="flex-shrink-0 w-24 h-12 flex items-center justify-center transition-all duration-300 group"
+                className="flex-shrink-0 w-24 h-12 flex items-center justify-center"
               >
                 <img
                   src={logo}
                   alt="Brand logo"
-                  className="max-w-full max-h-full object-contain brightness-0 invert opacity-60 group-hover:opacity-100 transition-opacity duration-300"
+                  className="max-w-full max-h-full object-contain"
                 />
               </div>
             ))}

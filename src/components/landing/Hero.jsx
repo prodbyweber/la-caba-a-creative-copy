@@ -93,12 +93,12 @@ export default function Hero({ config }) {
 
 
 
-      {/* Bottom bar: tagline + CTA */}
+      {/* Bottom bar: tagline */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.4 }}
-        className="absolute bottom-0 left-0 right-0 z-20 px-4 sm:px-8 lg:px-12 pb-12 sm:pb-16 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 pointer-events-auto"
+        className="absolute bottom-0 left-0 right-0 z-20 px-4 sm:px-8 lg:px-12 pb-28 sm:pb-32 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 pointer-events-auto"
       >
         <div>
           <p className="text-[11px] sm:text-xs font-semibold text-white/50 uppercase tracking-widest mb-1">
