@@ -34,9 +34,9 @@ export default function Hero({ config }) {
             muted
             loop
             playsInline
-            className="absolute inset-0 w-full h-full object-cover opacity-40 z-0"
+            className="absolute inset-0 w-full h-full object-cover opacity-60 z-0"
           />
-          <div className="absolute inset-0 bg-[#0a0a0b]/30 z-0" />
+          <div className="absolute inset-0 bg-[#0a0a0b]/15 z-0" />
         </>
       )}
 
