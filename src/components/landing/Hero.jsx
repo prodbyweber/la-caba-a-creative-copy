@@ -14,8 +14,11 @@ export default function Hero({ config }) {
     offset: ["start start", "end start"],
   });
 
-  // El título se desvanece justo al llegar a la barra de nav (al final del scroll del hero)
-  const titleOpacity = useTransform(scrollYProgress, [0.75, 0.95], [1, 0]);
+  // Título viaja y desaparece antes — la animación termina justo al tocar la barra de nav
+  const titleX = useTransform(scrollYProgress, [0, 0.45], ["0%", "-44%"]);
+  const titleY = useTransform(scrollYProgress, [0, 0.45], ["0%", "-43%"]);
+  const titleScale = useTransform(scrollYProgress, [0, 0.45], [1, 0.095]);
+  const titleOpacity = useTransform(scrollYProgress, [0.35, 0.5], [1, 0]);
 
   return (
     <section ref={sectionRef} className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0b]">
@@ -55,10 +58,16 @@ export default function Hero({ config }) {
         />
       </motion.div>
 
-      {/* Giant animated brand title — text only, centered, stays fixed until near nav */}
+      {/* Giant animated brand title — text only, animated toward nav on scroll */}
       <motion.div
         className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-[2]"
-        style={{ opacity: titleOpacity }}
+        style={{
+          x: titleX,
+          y: titleY,
+          scale: titleScale,
+          transformOrigin: "left top",
+          opacity: titleOpacity,
+        }}
       >
         <div>
           <div
