@@ -25,7 +25,7 @@ export default function Hero({ config }) {
 
   return (
     <section ref={sectionRef} className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0b]">
-      {/* Background video — desktop only, behind everything */}
+      {/* Background video — full screen, behind everything */}
       {heroVideoUrl && (
         <>
           <video
@@ -34,9 +34,9 @@ export default function Hero({ config }) {
             muted
             loop
             playsInline
-            className="hidden sm:block absolute inset-0 w-full h-full object-cover opacity-30 z-0"
+            className="absolute inset-0 w-full h-full object-cover opacity-40 z-0"
           />
-          <div className="hidden sm:block absolute inset-0 bg-[#0a0a0b]/40 z-0" />
+          <div className="absolute inset-0 bg-[#0a0a0b]/30 z-0" />
         </>
       )}
 
@@ -89,25 +89,7 @@ export default function Hero({ config }) {
         </div>
       </motion.div>
 
-      {/* Mobile video — vertical, below center, above bottom bar */}
-      {heroVideoUrl && (
-        <div className="sm:hidden absolute inset-0 flex items-end justify-center z-[1] pb-32">
-          <div
-            className="relative mx-4 rounded-2xl overflow-hidden w-full"
-            style={{ maxWidth: 280, aspectRatio: "9/16", maxHeight: "55vh" }}
-          >
-            <video
-              src={heroVideoUrl}
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0b]/50 via-transparent to-[#0a0a0b]/70 pointer-events-none" />
-          </div>
-        </div>
-      )}
+
 
       {/* Bottom bar: tagline + CTA */}
       <motion.div
