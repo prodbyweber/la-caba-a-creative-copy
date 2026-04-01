@@ -1,7 +1,6 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-// Isotipo URL (same as in nav)
 const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
 
 export default function Hero({ config }) {
@@ -9,16 +8,31 @@ export default function Hero({ config }) {
   const heroVideoUrl = config?.hero_video_url || null;
 
   const sectionRef = useRef(null);
+  const [heroVisible, setHeroVisible] = useState(true);
+
+  // Scroll progress dentro del hero (0 = inicio, 1 = fin)
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
 
-  // Título viaja y desaparece antes — la animación termina justo al tocar la barra de nav
+  // Animaciones: el título viaja hacia la esquina superior izquierda (donde está el logo del nav)
   const titleX = useTransform(scrollYProgress, [0, 0.45], ["0%", "-44%"]);
   const titleY = useTransform(scrollYProgress, [0, 0.45], ["0%", "-43%"]);
   const titleScale = useTransform(scrollYProgress, [0, 0.45], [1, 0.095]);
   const titleOpacity = useTransform(scrollYProgress, [0.35, 0.5], [1, 0]);
+
+  // Ocultar los elementos fixed cuando el hero ya no está en viewport
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on("change", (v) => {
+      setHeroVisible(v < 0.98);
+    });
+    return () => unsubscribe();
+  }, [scrollYProgress]);
+
+  if (!heroVisible) return (
+    <section ref={sectionRef} className="relative w-full min-h-screen bg-[#0a0a0b]" />
+  );
 
   return (
     <section ref={sectionRef} className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0b]">
@@ -42,7 +56,7 @@ export default function Hero({ config }) {
       {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0a0a0b] to-transparent z-10" />
 
-      {/* Isotipo — centered, above the title text */}
+      {/* Isotipo — fixed, visible solo mientras el hero está activo */}
       <motion.div
         className="fixed inset-0 flex items-start justify-center pointer-events-none select-none z-[60]"
         style={{ opacity: titleOpacity, paddingTop: "12vh" }}
@@ -58,7 +72,7 @@ export default function Hero({ config }) {
         />
       </motion.div>
 
-      {/* Giant animated brand title — text only, animated toward nav on scroll */}
+      {/* Título animado — fixed, viaja hacia el logo del nav al hacer scroll */}
       <motion.div
         className="fixed inset-0 flex items-center justify-center pointer-events-none select-none z-[60]"
         style={{
