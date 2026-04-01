@@ -402,7 +402,7 @@ export default function LandingEditor() {
 
             {/* Hero Section Editor */}
             <SectionEditor title="🎬 Hero Principal" defaultOpen={true}>
-              <p className="text-xs text-white/40 mb-3">El Hero es full-screen con imagen de fondo y el título "Cabaña® Creative" superpuesto. Edita la imagen y el tagline inferior.</p>
+              <p className="text-xs text-white/40 mb-3">El Hero muestra el título "Cabaña® Creative" con animación al hacer scroll. En desktop el video se ve de fondo; en mobile aparece debajo del texto en formato vertical.</p>
               <TextInput
                 label="Tagline (texto inferior izquierda)"
                 value={config.hero_subtitle}
@@ -423,6 +423,54 @@ export default function LandingEditor() {
                 isUploading={isUploading}
                 setIsUploading={setIsUploading}
               />
+
+              {/* Video Upload */}
+              <div className="mt-4">
+                <label className="text-sm text-gray-400 mb-2 block font-medium">Video del Hero (desktop fondo / mobile vertical)</label>
+                {config.hero_video_url && (
+                  <div className="mb-3 relative rounded-xl overflow-hidden border border-white/10">
+                    <video
+                      src={config.hero_video_url}
+                      className="w-full h-36 object-cover"
+                      muted
+                      loop
+                      autoPlay
+                      playsInline
+                    />
+                    <button
+                      onClick={() => updateField('hero_video_url', '')}
+                      className="absolute top-2 right-2 p-1.5 bg-black/70 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+                <label className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-dashed border-white/20 cursor-pointer transition-all ${isUploading ? 'opacity-50 pointer-events-none' : 'bg-white/5 hover:bg-white/10'}`}>
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm,video/mov,video/quicktime"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      if (file.size > 50 * 1024 * 1024) {
+                        alert('El video no puede superar los 50 MB.');
+                        return;
+                      }
+                      setIsUploading(true);
+                      try {
+                        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                        updateField('hero_video_url', file_url);
+                      } finally {
+                        setIsUploading(false);
+                      }
+                    }}
+                  />
+                  <Upload className="w-4 h-4 text-emerald-400" />
+                  <span className="text-sm text-white">{isUploading ? 'Subiendo video...' : 'Subir video (máx. 50 MB)'}</span>
+                </label>
+                <p className="text-[10px] text-white/30 mt-1.5">Formatos: MP4, WebM, MOV. En desktop aparece como fondo semitransparente. En mobile se muestra verticalmente bajo el título.</p>
+              </div>
             </SectionEditor>
 
             {/* Brands Logos Section Editor */}

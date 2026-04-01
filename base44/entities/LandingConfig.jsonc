@@ -1,0 +1,331 @@
+{
+  "name": "LandingConfig",
+  "type": "object",
+  "properties": {
+    "hero_title": {
+      "type": "string",
+      "description": "T\u00edtulo principal del hero"
+    },
+    "hero_subtitle": {
+      "type": "string",
+      "description": "Subt\u00edtulo del hero"
+    },
+    "hero_image_url": {
+      "type": "string",
+      "description": "URL de la imagen del hero"
+    },
+    "hero_video_url": {
+      "type": "string",
+      "description": "URL del video de fondo del hero (desktop)"
+    },
+    "hero_reveal_image_url": {
+      "type": "string",
+      "description": "URL de la imagen que se revela al rascar"
+    },
+    "hero_audio_url": {
+      "type": "string",
+      "description": "URL del archivo de audio para reproducir despu\u00e9s del scratch"
+    },
+    "hero_youtube_music_link": {
+      "type": "string",
+      "description": "Link de YouTube Music para reproducir despu\u00e9s del scratch"
+    },
+    "hero_cta_text": {
+      "type": "string",
+      "description": "Texto del bot\u00f3n CTA"
+    },
+    "brand_logos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs de logos de marcas (PNG transparentes)"
+    },
+    "testimonials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "image": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Testimoniales de clientes"
+    },
+    "team_members": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "image_url": {
+            "type": "string"
+          },
+          "collaborations": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Miembros del equipo"
+    },
+    "startups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "image": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Lista de startups"
+    },
+    "timeline_milestones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Hitos del timeline biogr\u00e1fico"
+    },
+    "offers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "form_id": {
+            "type": "string"
+          },
+          "booking_link": {
+            "type": "string"
+          },
+          "payment_link": {
+            "type": "string"
+          },
+          "pre_purchase_calendly_link": {
+            "type": "string"
+          },
+          "tag": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "price": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "cta": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "featured": {
+            "type": "boolean"
+          },
+          "highlights": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "technical": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "trailer_url": {
+            "type": "string"
+          },
+          "full_description": {
+            "type": "string"
+          },
+          "for_who": {
+            "type": "string"
+          },
+          "what_you_gain": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "key_content": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "image_url": {
+            "type": "string"
+          },
+          "title_font_size": {
+            "type": "string"
+          },
+          "title_font_weight": {
+            "type": "string"
+          },
+          "description_font_size": {
+            "type": "string"
+          },
+          "price_font_size": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Lista de ofertas/servicios"
+    },
+    "exploracion_title": {
+      "type": "string"
+    },
+    "exploracion_subtitle": {
+      "type": "string"
+    },
+    "exploracion_description": {
+      "type": "string"
+    },
+    "exploracion_image_url": {
+      "type": "string"
+    },
+    "exploracion_form_link": {
+      "type": "string"
+    },
+    "exploracion_payment_link": {
+      "type": "string"
+    },
+    "exploracion_calendly_link": {
+      "type": "string"
+    },
+    "about_main_text": {
+      "type": "string"
+    },
+    "about_secondary_text": {
+      "type": "string"
+    },
+    "about_value1_title": {
+      "type": "string"
+    },
+    "about_value1_desc": {
+      "type": "string"
+    },
+    "about_value2_title": {
+      "type": "string"
+    },
+    "about_value2_desc": {
+      "type": "string"
+    },
+    "about_value3_title": {
+      "type": "string"
+    },
+    "about_value3_desc": {
+      "type": "string"
+    },
+    "about_value4_title": {
+      "type": "string"
+    },
+    "about_value4_desc": {
+      "type": "string"
+    },
+    "sections_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sections_enabled": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "menu_buttons": {
+      "type": "object",
+      "properties": {
+        "quienes_somos": {
+          "type": "boolean",
+          "default": true
+        },
+        "artistas": {
+          "type": "boolean",
+          "default": true
+        },
+        "adn_marca": {
+          "type": "boolean",
+          "default": false
+        },
+        "exploracion": {
+          "type": "boolean",
+          "default": true
+        },
+        "startups": {
+          "type": "boolean",
+          "default": true
+        },
+        "comenzar": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "adn_marca_link": {
+      "type": "string"
+    }
+  },
+  "required": []
+}
