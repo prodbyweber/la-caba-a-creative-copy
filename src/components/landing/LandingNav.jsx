@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
+  const [logoVisible, setLogoVisible] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -51,7 +52,12 @@ export default function LandingNav() {
   };
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 60);
+    const handleScroll = () => {
+      const heroHeight = window.innerHeight;
+      setScrolled(window.scrollY > 60);
+      // Logo aparece cuando el hero title ya terminó su animación de salida (~55% del hero)
+      setLogoVisible(window.scrollY > heroHeight * 0.55);
+    };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -106,6 +112,12 @@ export default function LandingNav() {
           <Link to={createPageUrl("Landing")} className="flex items-center gap-2">
             <motion.div
               className="flex items-center gap-2"
+              initial={{ opacity: 0, x: -16, scale: 0.85 }}
+              animate={logoVisible
+                ? { opacity: 1, x: 0, scale: 1 }
+                : { opacity: 0, x: -16, scale: 0.85 }
+              }
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
             >
               <img 
                 src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png" 

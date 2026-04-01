@@ -1,9 +1,11 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
+// Isotipo URL (same as in nav)
+const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
+
 export default function Hero({ config }) {
   const heroSubtitle = config?.hero_subtitle || "Producción, imagen y narrativa para artistas que van en serio.";
-  const heroCTA = config?.hero_cta_text || "Aplicar a La Cabaña Creative";
   const heroVideoUrl = config?.hero_video_url || null;
 
   const sectionRef = useRef(null);
@@ -12,20 +14,15 @@ export default function Hero({ config }) {
     offset: ["start start", "end start"],
   });
 
-  // Title animates from center to top-left as user scrolls (matching nav logo position)
+  // The giant title + isotipo animate from center to top-left, shrinking into the nav logo
   const titleX = useTransform(scrollYProgress, [0, 0.5], ["0%", "-44%"]);
   const titleY = useTransform(scrollYProgress, [0, 0.5], ["0%", "-43%"]);
   const titleScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.095]);
   const titleOpacity = useTransform(scrollYProgress, [0.4, 0.55], [1, 0]);
 
-  const scrollToOffers = () => {
-    const el = document.getElementById("offers");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
-
   return (
     <section ref={sectionRef} className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0b]">
-      {/* Background video — centered, slightly reduced size */}
+      {/* Background video */}
       {heroVideoUrl && (
         <>
           <div className="absolute inset-0 flex items-center justify-center z-0">
@@ -45,7 +42,7 @@ export default function Hero({ config }) {
       {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0a0a0b] to-transparent z-10" />
 
-      {/* Giant animated brand title */}
+      {/* Giant animated brand title — includes isotipo + text, morphs into nav logo on scroll */}
       <motion.div
         className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-[2]"
         style={{
@@ -56,42 +53,54 @@ export default function Hero({ config }) {
           opacity: titleOpacity,
         }}
       >
-        <div>
-          <div
-            className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
+        <div className="flex items-center gap-[0.18em]">
+          {/* Isotipo — scales with the title */}
+          <img
+            src={ISOTIPO_URL}
+            alt=""
             style={{
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-              fontSize: "clamp(5rem, 18vw, 20vw)",
-              color: "#ff5833",
+              height: "clamp(5rem, 18vw, 20vw)",
+              width: "auto",
+              display: "block",
+              flexShrink: 0,
             }}
-          >
-            Cabaña
-            <sup
+          />
+          {/* Text block */}
+          <div>
+            <div
+              className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
               style={{
-                color: "rgba(255,255,255,0.65)",
-                fontSize: "0.25em",
-                fontWeight: 400,
-                marginLeft: "0.1em",
-                verticalAlign: "super",
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontSize: "clamp(5rem, 18vw, 20vw)",
+                color: "#ff5833",
               }}
             >
-              ®
-            </sup>
-          </div>
-          <div
-            className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
-            style={{
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-              fontSize: "clamp(5rem, 18vw, 20vw)",
-              color: "#ffffff",
-            }}
-          >
-            Creative
+              Cabaña
+              <sup
+                style={{
+                  color: "rgba(255,255,255,0.65)",
+                  fontSize: "0.25em",
+                  fontWeight: 400,
+                  marginLeft: "0.1em",
+                  verticalAlign: "super",
+                }}
+              >
+                ®
+              </sup>
+            </div>
+            <div
+              className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
+              style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontSize: "clamp(5rem, 18vw, 20vw)",
+                color: "#ffffff",
+              }}
+            >
+              Creative
+            </div>
           </div>
         </div>
       </motion.div>
-
-
 
       {/* Bottom bar: tagline */}
       <motion.div
@@ -108,7 +117,6 @@ export default function Hero({ config }) {
             {heroSubtitle}
           </p>
         </div>
-
       </motion.div>
     </section>
   );
