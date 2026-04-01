@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform } from "framer-motion";
 
 const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
 
@@ -8,26 +8,40 @@ export default function Hero({ config }) {
   const heroVideoUrl = config?.hero_video_url || null;
 
   const sectionRef = useRef(null);
+  const progress = useMotionValue(0); // 0 a 1 según scroll dentro del hero
   const [active, setActive] = useState(true);
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
-
-  // Sin springs — transforms directos, máximo rendimiento en producción
-  const opacity = useTransform(scrollYProgress, [0.35, 0.52], [1, 0]);
-  const x = useTransform(scrollYProgress, [0, 0.45], ["0%", "-44%"]);
-  const y = useTransform(scrollYProgress, [0, 0.45], ["0%", "-43%"]);
-  const scale = useTransform(scrollYProgress, [0, 0.45], [1, 0.095]);
-
-  // Desmontar elementos fixed cuando el hero ya no está en pantalla
   useEffect(() => {
-    const unsub = scrollYProgress.on("change", (v) => {
-      setActive(v < 0.98);
-    });
-    return unsub;
-  }, [scrollYProgress]);
+    let raf;
+
+    const update = () => {
+      const section = sectionRef.current;
+      if (!section) return;
+      const { top, height } = section.getBoundingClientRect();
+      // top va de 0 (inicio) a -height (fin)
+      const p = Math.min(1, Math.max(0, -top / height));
+      progress.set(p);
+      setActive(p < 0.98);
+    };
+
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(update);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    update(); // valor inicial
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, [progress]);
+
+  // Transforms directos sobre el MotionValue — sin springs, sin lag
+  const opacity = useTransform(progress, [0.35, 0.52], [1, 0]);
+  const x      = useTransform(progress, [0, 0.45], ["0%", "-44%"]);
+  const y      = useTransform(progress, [0, 0.45], ["0%", "-43%"]);
+  const scale  = useTransform(progress, [0, 0.45], [1, 0.095]);
 
   return (
     <section ref={sectionRef} className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0b]">
@@ -63,7 +77,7 @@ export default function Hero({ config }) {
             />
           </motion.div>
 
-          {/* Título animado — viaja al logo del nav */}
+          {/* Título — viaja al logo del nav */}
           <motion.div
             className="fixed inset-0 flex items-center justify-center pointer-events-none select-none z-[60]"
             style={{
