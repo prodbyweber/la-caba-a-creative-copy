@@ -76,11 +76,6 @@ export default function Hero({ config }) {
           transition={{ duration: 0.7, ease: "easeOut" }}
           className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-20 px-4"
         >
-          <img
-            src={ISOTIPO_URL}
-            alt=""
-            style={{ height: "clamp(2.5rem, 12vw, 5rem)", width: "auto", marginBottom: "1.5rem" }}
-          />
           <div className="text-center">
             <div
               className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
@@ -109,6 +104,22 @@ export default function Hero({ config }) {
         </motion.div>
       )}
 
+      {/* Isotipo móvil — encima del video, parte superior */}
+      {isMobile && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="absolute top-[10vh] left-0 right-0 flex justify-center pointer-events-none select-none z-20"
+        >
+          <img
+            src={ISOTIPO_URL}
+            alt=""
+            style={{ height: "clamp(2.5rem, 12vw, 5rem)", width: "auto" }}
+          />
+        </motion.div>
+      )}
+
       {/* ── DESKTOP: título animado scroll-driven con fixed ── */}
       {!isMobile && active && (
         <>
@@ -117,7 +128,7 @@ export default function Hero({ config }) {
             className="fixed inset-0 flex items-start justify-center pointer-events-none select-none z-[60]"
             style={{
               opacity,
-              paddingTop: "12vh",
+              paddingTop: "7vh",
               willChange: "opacity",
               WebkitBackfaceVisibility: "hidden",
               backfaceVisibility: "hidden",
