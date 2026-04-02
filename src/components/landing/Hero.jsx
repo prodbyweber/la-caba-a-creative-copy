@@ -6,30 +6,11 @@ const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81e
 // Detectar móvil/tablet una sola vez (evita re-renders)
 const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
-// Umbral de scroll (px) para que el título empiece a desaparecer en móvil
-const MOBILE_FADE_START = 60;
-const MOBILE_FADE_END = 180;
-
 export default function Hero({ config }) {
   const heroSubtitle = config?.hero_subtitle || "Producción, imagen y narrativa para artistas que van en serio.";
   const heroVideoUrl = config?.hero_video_url || null;
 
   const sectionRef = useRef(null);
-
-  // ── MÓVIL: fade out simple al hacer scroll ────────────────────────────────
-  const [mobileScrollY, setMobileScrollY] = useState(0);
-
-  useEffect(() => {
-    if (!isMobile) return;
-    const onScroll = () => setMobileScrollY(window.scrollY || window.pageYOffset);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // Calcular opacidad y translateY para móvil
-  const mobileProgress = Math.min(Math.max((mobileScrollY - MOBILE_FADE_START) / (MOBILE_FADE_END - MOBILE_FADE_START), 0), 1);
-  const mobileOpacity = 1 - mobileProgress;
-  const mobileTranslateY = mobileProgress * -40; // sube 40px mientras desaparece
 
   // ── DESKTOP: animación scroll-driven ──────────────────────────────────────
   const scrollProgress = useMotionValue(0);
@@ -87,18 +68,13 @@ export default function Hero({ config }) {
       {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0a0a0b] to-transparent z-10" />
 
-      {/* ── MÓVIL: título con fade-out al scrollear ── */}
+      {/* ── MÓVIL: título estático centrado, sin fixed, sin scroll-driven ── */}
       {isMobile && (
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
           className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-20 px-4"
-          style={{
-            opacity: mobileScrollY < 30
-              ? mobileScrollY / 30           // fade-in de entrada
-              : mobileOpacity,               // fade-out al scroll
-            transform: `translateY(${mobileTranslateY}px)`,
-            transition: "opacity 0.12s linear, transform 0.12s linear",
-            willChange: "opacity, transform",
-          }}
         >
           <img
             src={ISOTIPO_URL}
@@ -130,7 +106,7 @@ export default function Hero({ config }) {
               Creative
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* ── DESKTOP: título animado scroll-driven con fixed ── */}
