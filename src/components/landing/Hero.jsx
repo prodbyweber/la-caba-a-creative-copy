@@ -26,9 +26,9 @@ export default function Hero({ config }) {
   const rawY = useTransform(scrollYProgress, [0, 0.45], ["0%", "-43%"]);
   const rawScale = useTransform(scrollYProgress, [0, 0.45], [1, 0.095]);
 
-  const x = useSpring(rawX, { stiffness: 300, damping: 40, mass: 0.5 });
-  const y = useSpring(rawY, { stiffness: 300, damping: 40, mass: 0.5 });
-  const scale = useSpring(rawScale, { stiffness: 300, damping: 40, mass: 0.5 });
+  const x = useSpring(rawX, { stiffness: 260, damping: 35, mass: 0.4 });
+  const y = useSpring(rawY, { stiffness: 260, damping: 35, mass: 0.4 });
+  const scale = useSpring(rawScale, { stiffness: 260, damping: 35, mass: 0.4 });
 
   // Ocultar completamente los fixed una vez que el hero sale del viewport
   const [active, setActive] = useState(true);
@@ -84,6 +84,9 @@ export default function Hero({ config }) {
               scale,
               transformOrigin: "left top",
               opacity,
+              willChange: "transform, opacity",
+              WebkitBackfaceVisibility: "hidden",
+              backfaceVisibility: "hidden",
             }}
           >
             <div>
@@ -120,7 +123,7 @@ export default function Hero({ config }) {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.4 }}
-        className="absolute bottom-0 left-0 right-0 z-20 px-4 sm:px-8 lg:px-12 pb-28 sm:pb-32 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 pointer-events-auto"
+        className="absolute bottom-0 left-0 right-0 z-20 px-4 sm:px-8 lg:px-12 pb-40 sm:pb-44 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 pointer-events-auto"
       >
         <div>
           <p className="text-[11px] sm:text-xs font-semibold text-white/50 uppercase tracking-widest mb-1">
