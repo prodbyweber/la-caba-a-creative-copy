@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform, useScroll } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
 
@@ -9,35 +9,42 @@ export default function Hero({ config }) {
 
   const sectionRef = useRef(null);
 
-  // scroll progress dentro del hero
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
+  // Usamos scroll nativo del window para máxima compatibilidad con Safari móvil
+  const scrollProgress = useMotionValue(0);
+  const [active, setActive] = useState(true);
 
-  // Opacidad: fade out entre 35% y 50% del scroll del hero
-  const rawOpacity = useTransform(scrollYProgress, [0.35, 0.52], [1, 0]);
-  // Spring suaviza la opacidad para evitar flicker
+  useEffect(() => {
+    const updateScroll = () => {
+      const section = sectionRef.current;
+      if (!section) return;
+
+      const heroHeight = section.offsetHeight;
+      const scrollY = window.scrollY || window.pageYOffset;
+      const progress = Math.min(Math.max(scrollY / heroHeight, 0), 1);
+
+      scrollProgress.set(progress);
+      setActive(progress < 0.99);
+    };
+
+    // Llamar inmediatamente para el estado inicial
+    updateScroll();
+
+    window.addEventListener("scroll", updateScroll, { passive: true });
+    return () => window.removeEventListener("scroll", updateScroll);
+  }, [scrollProgress]);
+
+  // Opacidad: fade out entre 35% y 52%
+  const rawOpacity = useTransform(scrollProgress, [0.35, 0.52], [1, 0]);
   const opacity = useSpring(rawOpacity, { stiffness: 200, damping: 30, mass: 0.5 });
 
-  // El título viaja de centro a la esquina del nav (top-left)
-  // Destino calculado para que aterrice exactamente donde está el logo del nav
-  const rawX = useTransform(scrollYProgress, [0, 0.45], ["0%", "-44%"]);
-  const rawY = useTransform(scrollYProgress, [0, 0.45], ["0%", "-43%"]);
-  const rawScale = useTransform(scrollYProgress, [0, 0.45], [1, 0.095]);
+  // Movimiento hacia la esquina del nav
+  const rawX = useTransform(scrollProgress, [0, 0.45], ["0%", "-44%"]);
+  const rawY = useTransform(scrollProgress, [0, 0.45], ["0%", "-43%"]);
+  const rawScale = useTransform(scrollProgress, [0, 0.45], [1, 0.095]);
 
   const x = useSpring(rawX, { stiffness: 260, damping: 35, mass: 0.4 });
   const y = useSpring(rawY, { stiffness: 260, damping: 35, mass: 0.4 });
   const scale = useSpring(rawScale, { stiffness: 260, damping: 35, mass: 0.4 });
-
-  // Ocultar completamente los fixed una vez que el hero sale del viewport
-  const [active, setActive] = useState(true);
-  useEffect(() => {
-    const unsub = scrollYProgress.on("change", (v) => {
-      setActive(v < 0.99);
-    });
-    return unsub;
-  }, [scrollYProgress]);
 
   return (
     <section ref={sectionRef} className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0b]">
@@ -63,10 +70,16 @@ export default function Hero({ config }) {
 
       {active && (
         <>
-          {/* Isotipo centrado arriba, desaparece junto con el título */}
+          {/* Isotipo centrado arriba */}
           <motion.div
             className="fixed inset-0 flex items-start justify-center pointer-events-none select-none z-[60]"
-            style={{ opacity, paddingTop: "12vh" }}
+            style={{
+              opacity,
+              paddingTop: "12vh",
+              willChange: "opacity",
+              WebkitBackfaceVisibility: "hidden",
+              backfaceVisibility: "hidden",
+            }}
           >
             <img
               src={ISOTIPO_URL}
@@ -75,7 +88,7 @@ export default function Hero({ config }) {
             />
           </motion.div>
 
-          {/* Título: viaja desde el centro hasta la esquina superior izquierda (logo del nav) */}
+          {/* Título animado */}
           <motion.div
             className="fixed inset-0 flex items-center justify-center pointer-events-none select-none z-[60]"
             style={{
@@ -87,6 +100,8 @@ export default function Hero({ config }) {
               willChange: "transform, opacity",
               WebkitBackfaceVisibility: "hidden",
               backfaceVisibility: "hidden",
+              WebkitTransform: "translateZ(0)",
+              transform: "translateZ(0)",
             }}
           >
             <div>
