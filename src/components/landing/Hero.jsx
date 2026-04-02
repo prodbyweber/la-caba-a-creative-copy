@@ -3,49 +3,49 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
 
+// Detectar móvil/tablet una sola vez (evita re-renders)
+const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
 export default function Hero({ config }) {
   const heroSubtitle = config?.hero_subtitle || "Producción, imagen y narrativa para artistas que van en serio.";
   const heroVideoUrl = config?.hero_video_url || null;
 
   const sectionRef = useRef(null);
 
-  // Usamos scroll nativo del window para máxima compatibilidad con Safari móvil
+  // ── DESKTOP: animación scroll-driven ──────────────────────────────────────
   const scrollProgress = useMotionValue(0);
   const [active, setActive] = useState(true);
 
   useEffect(() => {
+    if (isMobile) return; // móvil no usa scroll-driven
+
     const updateScroll = () => {
       const section = sectionRef.current;
       if (!section) return;
-
       const heroHeight = section.offsetHeight;
       const scrollY = window.scrollY || window.pageYOffset;
       const progress = Math.min(Math.max(scrollY / heroHeight, 0), 1);
-
       scrollProgress.set(progress);
       setActive(progress < 0.99);
     };
 
-    // Llamar inmediatamente para el estado inicial
     updateScroll();
-
     window.addEventListener("scroll", updateScroll, { passive: true });
     return () => window.removeEventListener("scroll", updateScroll);
   }, [scrollProgress]);
 
-  // Opacidad: fade out entre 35% y 52%
   const rawOpacity = useTransform(scrollProgress, [0.35, 0.52], [1, 0]);
-  const opacity = useSpring(rawOpacity, { stiffness: 200, damping: 30, mass: 0.5 });
+  const opacity    = useSpring(rawOpacity, { stiffness: 200, damping: 30, mass: 0.5 });
 
-  // Movimiento hacia la esquina del nav
-  const rawX = useTransform(scrollProgress, [0, 0.45], ["0%", "-44%"]);
-  const rawY = useTransform(scrollProgress, [0, 0.45], ["0%", "-43%"]);
+  const rawX    = useTransform(scrollProgress, [0, 0.45], ["0%", "-44%"]);
+  const rawY    = useTransform(scrollProgress, [0, 0.45], ["0%", "-43%"]);
   const rawScale = useTransform(scrollProgress, [0, 0.45], [1, 0.095]);
 
-  const x = useSpring(rawX, { stiffness: 260, damping: 35, mass: 0.4 });
-  const y = useSpring(rawY, { stiffness: 260, damping: 35, mass: 0.4 });
+  const x     = useSpring(rawX,     { stiffness: 260, damping: 35, mass: 0.4 });
+  const y     = useSpring(rawY,     { stiffness: 260, damping: 35, mass: 0.4 });
   const scale = useSpring(rawScale, { stiffness: 260, damping: 35, mass: 0.4 });
 
+  // ── RENDER ─────────────────────────────────────────────────────────────────
   return (
     <section ref={sectionRef} className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0b]">
       {/* Background video */}
@@ -68,9 +68,51 @@ export default function Hero({ config }) {
       {/* Bottom fade */}
       <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-[#0a0a0b] to-transparent z-10" />
 
-      {active && (
+      {/* ── MÓVIL: título estático centrado, sin fixed, sin scroll-driven ── */}
+      {isMobile && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none z-20 px-4"
+        >
+          <img
+            src={ISOTIPO_URL}
+            alt=""
+            style={{ height: "clamp(2.5rem, 12vw, 5rem)", width: "auto", marginBottom: "1.5rem" }}
+          />
+          <div className="text-center">
+            <div
+              className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
+              style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontSize: "clamp(4rem, 20vw, 8rem)",
+                color: "#ff5833",
+              }}
+            >
+              Cabaña
+              <sup style={{ color: "rgba(255,255,255,0.65)", fontSize: "0.25em", fontWeight: 400, marginLeft: "0.1em", verticalAlign: "super" }}>
+                ®
+              </sup>
+            </div>
+            <div
+              className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
+              style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontSize: "clamp(4rem, 20vw, 8rem)",
+                color: "#ffffff",
+              }}
+            >
+              Creative
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* ── DESKTOP: título animado scroll-driven con fixed ── */}
+      {!isMobile && active && (
         <>
-          {/* Isotipo centrado arriba */}
+          {/* Isotipo */}
           <motion.div
             className="fixed inset-0 flex items-start justify-center pointer-events-none select-none z-[60]"
             style={{
@@ -88,7 +130,7 @@ export default function Hero({ config }) {
             />
           </motion.div>
 
-          {/* Título animado */}
+          {/* Título */}
           <motion.div
             className="fixed inset-0 flex items-center justify-center pointer-events-none select-none z-[60]"
             style={{
@@ -100,8 +142,6 @@ export default function Hero({ config }) {
               willChange: "transform, opacity",
               WebkitBackfaceVisibility: "hidden",
               backfaceVisibility: "hidden",
-              WebkitTransform: "translateZ(0)",
-              transform: "translateZ(0)",
             }}
           >
             <div>
