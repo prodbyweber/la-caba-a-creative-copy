@@ -90,10 +90,9 @@ export default function LandingNav() {
   const navItems = [
     { label: "Servicios", url: createPageUrl("Services"), key: "servicios" },
     { label: "Pricing", url: createPageUrl("Pricing"), key: "pricing" },
-    { label: "Quiénes Somos", id: "team", key: "quienes_somos" },
+    { label: "Acerca de Nosotros", id: "about", key: "quienes_somos" },
     { label: "Artistas", id: "stories", key: "artistas" },
     { label: "ADN de Marca", url: adnMarcaLink, key: "adn_marca" },
-    { label: "Exploración", id: "exploracion", key: "exploracion" },
     { label: "Comenzar", id: "offers", highlight: true, key: "comenzar" }
   ].filter(item => visibleMenuButtons[item.key] !== false);
 
