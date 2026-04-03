@@ -56,8 +56,8 @@ export default function Footer() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Mail className="w-5 h-5 flex-shrink-0" style={{ color: '#ff5833' }} />
-                  <a href="mailto:hola@lacabanacreative.com" className="text-gray-300 hover:text-white transition-colors">
-                    hola@lacabanacreative.com
+                  <a href="mailto:hola@cabanacreative.es" className="text-gray-300 hover:text-white transition-colors">
+                    hola@cabanacreative.es
                   </a>
                 </div>
                 <div className="flex items-center gap-3">
