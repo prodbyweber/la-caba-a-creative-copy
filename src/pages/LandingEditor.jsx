@@ -8,7 +8,7 @@ import { SectionEditor, TextInput, ImageUpload, ArrayEditor } from "@/components
 import HowItWorksEditor from "@/components/admin/HowItWorksEditor";
 import OffersEditor from "@/components/admin/OffersEditor";
 import TimelineEditor from "@/components/admin/TimelineEditor";
-import StoriesEditor from "@/components/admin/StoriesEditor";
+import StoriesEditor from "@/components/admin/StoriesEditor.jsx";
 import StartupsEditor from "@/components/admin/StartupsEditor";
 import FormsEditor from "@/components/admin/FormsEditor";
 import TeamEditor from "@/components/admin/TeamEditor";
