@@ -26,7 +26,9 @@ import {
   ChevronUp,
   Monitor,
   Smartphone,
-  Settings
+  Settings,
+  X,
+  ZoomIn
 } from "lucide-react";
 
 export default function LandingEditor() {
@@ -34,6 +36,7 @@ export default function LandingEditor() {
   const [selectedSection, setSelectedSection] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [previewLogoUrl, setPreviewLogoUrl] = useState(null);
 
   const queryClient = useQueryClient();
 
@@ -484,54 +487,98 @@ export default function LandingEditor() {
 
             {/* Brands Logos Section Editor */}
             <SectionEditor title="🏢 Logos de Marcas Colaboradoras">
+              {/* Modal preview */}
+              {previewLogoUrl && (
+                <div
+                  className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+                  onClick={() => setPreviewLogoUrl(null)}
+                >
+                  <div className="relative bg-white rounded-2xl p-6 max-w-sm w-full flex items-center justify-center" onClick={e => e.stopPropagation()}>
+                    <button
+                      onClick={() => setPreviewLogoUrl(null)}
+                      className="absolute top-2 right-2 p-1.5 bg-black/10 hover:bg-black/20 rounded-lg text-gray-600 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    <img src={previewLogoUrl} alt="Logo preview" className="max-w-full max-h-48 object-contain" />
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-3">
                 {(config.brand_logos || []).map((logo, index) => (
-                  <div key={index} className="flex items-center gap-3 bg-white/5 rounded-xl p-3 border border-white/10">
-                    <img src={logo} alt={`Brand ${index + 1}`} className="w-20 h-12 object-contain bg-white rounded p-2" />
-                    <input
-                      type="text"
-                      value={logo}
-                      onChange={(e) => {
-                        const newLogos = [...config.brand_logos];
-                        newLogos[index] = e.target.value;
-                        updateField('brand_logos', newLogos);
-                      }}
-                      className="flex-1 px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
-                      placeholder="URL de la imagen del logo"
-                    />
-                    <label className="p-2 hover:bg-emerald-500/20 rounded-lg text-emerald-400 transition-colors cursor-pointer">
-                      <input
-                        type="file"
-                        accept="image/png,image/jpg,image/jpeg"
-                        className="hidden"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          
-                          setIsUploading(true);
-                          try {
-                            const { file_url } = await base44.integrations.Core.UploadFile({ file });
-                            const newLogos = [...config.brand_logos];
-                            newLogos[index] = file_url;
-                            updateField('brand_logos', newLogos);
-                          } catch (error) {
-                            console.error('Error uploading logo:', error);
-                          } finally {
-                            setIsUploading(false);
-                          }
+                  <div key={index} className="bg-white/5 rounded-xl border border-white/10 p-3">
+                    {/* Row: delete + thumbnail + url input + upload */}
+                    <div className="flex items-center gap-2">
+                      {/* Delete — siempre visible a la izquierda */}
+                      <button
+                        onClick={() => {
+                          const newLogos = config.brand_logos.filter((_, i) => i !== index);
+                          updateField('brand_logos', newLogos);
                         }}
+                        className="p-2 hover:bg-red-500/20 rounded-lg text-red-400 transition-colors flex-shrink-0"
+                        title="Eliminar logo"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+
+                      {/* Thumbnail clicable para preview */}
+                      <button
+                        type="button"
+                        onClick={() => logo && setPreviewLogoUrl(logo)}
+                        className="relative flex-shrink-0 w-16 h-10 bg-white rounded-lg flex items-center justify-center overflow-hidden group border border-white/10 hover:border-emerald-500/50 transition-colors"
+                        title="Ver logo"
+                      >
+                        {logo ? (
+                          <>
+                            <img src={logo} alt={`Brand ${index + 1}`} className="max-w-full max-h-full object-contain p-1" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-lg">
+                              <ZoomIn className="w-4 h-4 text-white" />
+                            </div>
+                          </>
+                        ) : (
+                          <span className="text-gray-400 text-[10px]">Sin img</span>
+                        )}
+                      </button>
+
+                      {/* URL input */}
+                      <input
+                        type="text"
+                        value={logo}
+                        onChange={(e) => {
+                          const newLogos = [...config.brand_logos];
+                          newLogos[index] = e.target.value;
+                          updateField('brand_logos', newLogos);
+                        }}
+                        className="flex-1 min-w-0 px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                        placeholder="URL de la imagen del logo"
                       />
-                      <Upload className="w-4 h-4" />
-                    </label>
-                    <button
-                      onClick={() => {
-                        const newLogos = config.brand_logos.filter((_, i) => i !== index);
-                        updateField('brand_logos', newLogos);
-                      }}
-                      className="p-2 hover:bg-red-500/20 rounded-lg text-red-400 transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+
+                      {/* Upload */}
+                      <label className="p-2 hover:bg-emerald-500/20 rounded-lg text-emerald-400 transition-colors cursor-pointer flex-shrink-0" title="Subir imagen">
+                        <input
+                          type="file"
+                          accept="image/png,image/jpg,image/jpeg"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setIsUploading(true);
+                            try {
+                              const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                              const newLogos = [...config.brand_logos];
+                              newLogos[index] = file_url;
+                              updateField('brand_logos', newLogos);
+                            } catch (error) {
+                              console.error('Error uploading logo:', error);
+                            } finally {
+                              setIsUploading(false);
+                            }
+                          }}
+                        />
+                        <Upload className="w-4 h-4" />
+                      </label>
+                    </div>
                   </div>
                 ))}
                 
@@ -543,7 +590,6 @@ export default function LandingEditor() {
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
-                      
                       setIsUploading(true);
                       try {
                         const { file_url } = await base44.integrations.Core.UploadFile({ file });
