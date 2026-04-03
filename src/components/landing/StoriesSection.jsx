@@ -67,14 +67,15 @@ const defaultStories = [
 // ── slide background (image / YouTube embed / video file) ────────────────────
 
 function SlideBackground({ story, active }) {
-  const videoId = story.clips?.[0]?.video_url ? getYouTubeId(story.clips[0].video_url) : null;
-  const isFile = story.clips?.[0]?.video_url ? isVideoFile(story.clips[0].video_url) : false;
-  const fileUrl = isFile ? story.clips[0].video_url : null;
+  const firstClipUrl = story.clips?.[0]?.video_url || null;
+  const videoId = getYouTubeId(firstClipUrl);
+  const isFile = isVideoFile(firstClipUrl);
+  const hasVideo = !!(videoId || isFile);
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {/* Layer 1: image always present as fallback */}
-      {story.image && (
+      {/* Image — only when there is NO video */}
+      {!hasVideo && story.image && (
         <motion.img
           src={story.image}
           alt={story.name}
@@ -85,10 +86,10 @@ function SlideBackground({ story, active }) {
         />
       )}
 
-      {/* Layer 2: video file */}
-      {fileUrl && active && (
+      {/* Video file */}
+      {isFile && active && (
         <video
-          src={fileUrl}
+          src={firstClipUrl}
           autoPlay
           muted
           loop
@@ -97,20 +98,27 @@ function SlideBackground({ story, active }) {
         />
       )}
 
-      {/* Layer 3: YouTube iframe */}
+      {/* YouTube iframe — scaled up to hide black bars, centered */}
       {videoId && active && (
-        <iframe
-          src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3`}
-          title={story.name}
-          allow="autoplay; encrypted-media"
-          className="absolute inset-0 w-full h-full pointer-events-none"
+        <div
+          className="absolute pointer-events-none"
           style={{
-            width: "100%",
-            height: "100%",
-            border: "none",
-            transform: "scale(1.1)",
+            top: "50%", left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "177.78vh",   /* 16/9 * 100vh */
+            minWidth: "100%",
+            height: "56.25vw",  /* 9/16 * 100vw */
+            minHeight: "100%",
           }}
-        />
+        >
+          <iframe
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&enablejsapi=0`}
+            title={story.name}
+            allow="autoplay; encrypted-media"
+            className="w-full h-full"
+            style={{ border: "none" }}
+          />
+        </div>
       )}
 
       {/* cinematic vignette + bottom gradient */}
