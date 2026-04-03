@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Trash2, Upload, Film, X, ChevronDown, ExternalLink, Play } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -394,8 +394,19 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
   const [items, setItems] = useState(testimonials);
   const [uploading, setUploading] = useState(null);
 
-  // sync external prop changes
-  useEffect(() => { setItems(testimonials); }, [JSON.stringify(testimonials)]);
+  // sync external prop changes only when not actively editing
+  const isFirstMount = useRef(true);
+  useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      setItems(testimonials);
+      return;
+    }
+    // Only sync from server if testimonials actually changed from outside
+    // (e.g. initial load). We trust local state during edits.
+    setItems(testimonials);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(testimonials)]);
 
   const save = (newItems) => {
     setItems(newItems);

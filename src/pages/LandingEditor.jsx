@@ -216,12 +216,22 @@ export default function LandingEditor() {
 
   const updateMutation = useMutation({
     mutationFn: (data) => base44.entities.LandingConfig.update(config.id, data),
-    onSuccess: () => {
+    onMutate: async (data) => {
+      // Cancel any outgoing refetches so they don't overwrite our optimistic update
+      await queryClient.cancelQueries({ queryKey: ['landingConfig'] });
+      const previous = queryClient.getQueryData(['landingConfig']);
+      // Optimistically update the cache so StoriesEditor doesn't reset
+      queryClient.setQueryData(['landingConfig'], (old) => old ? { ...old, ...data } : old);
+      return { previous };
+    },
+    onError: (error, _data, context) => {
+      // Roll back on error
+      if (context?.previous) queryClient.setQueryData(['landingConfig'], context.previous);
+      console.error('Error updating config:', error);
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['landingConfig'] });
     },
-    onError: (error) => {
-      console.error('Error updating config:', error);
-    }
   });
 
   const handleDragEnd = (result) => {
