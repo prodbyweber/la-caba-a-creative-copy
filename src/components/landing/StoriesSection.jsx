@@ -275,9 +275,9 @@ export default function StoriesSection() {
 
             {/* Author */}
             <div className="flex items-center gap-4">
-              {story.image && (
+              {(story.avatar_url || story.image) && (
                 <div className="w-10 h-10 rounded-full overflow-hidden border border-white/20 flex-shrink-0">
-                  <img src={story.image} alt={story.name} className="w-full h-full object-cover" />
+                  <img src={story.avatar_url || story.image} alt={story.name} className="w-full h-full object-cover" />
                 </div>
               )}
               <div>

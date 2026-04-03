@@ -1,5 +1,5 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
-import { Plus, Trash2, Upload, Film, X, ExternalLink, Play, Save, CheckCircle } from "lucide-react";
+import React, { useState, useRef, useCallback } from "react";
+import { Plus, Trash2, Upload, Film, X, ExternalLink, Play, Save, CheckCircle, User } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 // ── YouTube helpers ────────────────────────────────────────────────────────
@@ -23,56 +23,46 @@ function isVideoFile(url) {
   return /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url || "");
 }
 
-// ── Mini video preview inside editor ─────────────────────────────────────
-function ClipPreview({ clip }) {
+// ── Mini YouTube preview ──────────────────────────────────────────────────
+function YoutubePreview({ url }) {
   const [playing, setPlaying] = useState(false);
-  const ytId = getYouTubeId(clip.video_url);
-  const isFile = isVideoFile(clip.video_url);
-  const thumb = ytId
-    ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`
-    : clip.thumbnail_url || null;
+  const ytId = getYouTubeId(url);
+  if (!ytId) return null;
 
-  if (!clip.video_url && !thumb) return null;
+  const thumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
 
   return (
     <div className="mt-2 rounded-xl overflow-hidden border border-white/10 bg-black">
-      {playing && ytId ? (
-        <div className="aspect-video">
-          <iframe
-            src={`https://www.youtube.com/embed/${ytId}?autoplay=1`}
-            title={clip.title}
-            allow="autoplay; encrypted-media"
-            allowFullScreen
-            className="w-full h-full border-0"
-          />
-        </div>
-      ) : playing && isFile ? (
-        <video src={clip.video_url} controls autoPlay className="w-full aspect-video object-cover" />
+      {playing ? (
+        <>
+          <div className="aspect-video">
+            <iframe
+              src={`https://www.youtube.com/embed/${ytId}?autoplay=1`}
+              title="preview"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+              className="w-full h-full border-0"
+            />
+          </div>
+          <button
+            onClick={() => setPlaying(false)}
+            className="w-full py-1.5 text-xs text-white/50 hover:text-white bg-zinc-900 transition-colors"
+          >
+            Cerrar previsualización
+          </button>
+        </>
       ) : (
         <div className="relative aspect-video cursor-pointer group" onClick={() => setPlaying(true)}>
-          {thumb ? (
-            <img src={thumb} alt={clip.title} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
-              <Film className="w-10 h-10 text-white/20" />
-            </div>
-          )}
+          <img src={thumb} alt="YouTube preview" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 flex items-center justify-center transition-colors">
             <div className="w-12 h-12 rounded-full bg-white/15 backdrop-blur-sm border border-white/30 flex items-center justify-center group-hover:bg-white/25 transition-colors">
               <Play className="w-5 h-5 text-white ml-0.5" />
             </div>
           </div>
-          {ytId && (
-            <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-red-600 rounded text-[10px] font-bold text-white">
-              YouTube
-            </div>
-          )}
+          <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-red-600 rounded text-[10px] font-bold text-white">
+            YouTube
+          </div>
         </div>
-      )}
-      {playing && (
-        <button onClick={() => setPlaying(false)} className="w-full py-1.5 text-xs text-white/50 hover:text-white bg-zinc-900 transition-colors">
-          Cerrar previsualización
-        </button>
       )}
     </div>
   );
@@ -82,13 +72,11 @@ function ClipPreview({ clip }) {
 function ClipEditor({ clip, onUpdate, onRemove }) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
+  const ytId = getYouTubeId(clip.video_url);
 
   const handleUpload = async (file) => {
     if (!file) return;
-    if (file.size > 150 * 1024 * 1024) {
-      alert("El archivo no puede superar 150MB");
-      return;
-    }
+    if (file.size > 150 * 1024 * 1024) { alert("El archivo no puede superar 150MB"); return; }
     setUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
@@ -99,9 +87,6 @@ function ClipEditor({ clip, onUpdate, onRemove }) {
       setUploading(false);
     }
   };
-
-  const ytId = getYouTubeId(clip.video_url);
-  const isFile = isVideoFile(clip.video_url);
 
   return (
     <div className="p-4 bg-zinc-800/60 rounded-xl space-y-3 border border-white/[0.08]">
@@ -125,70 +110,49 @@ function ClipEditor({ clip, onUpdate, onRemove }) {
         <div className="flex gap-2">
           <input
             type="text"
-            value={ytId ? clip.video_url : ""}
+            value={clip.video_url || ""}
             onChange={(e) => onUpdate("video_url", e.target.value)}
             placeholder="https://youtube.com/watch?v=..."
             className="flex-1 px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-red-500"
           />
           {ytId && (
             <a href={clip.video_url} target="_blank" rel="noopener noreferrer"
-              className="p-2 bg-red-500/20 rounded-lg text-red-400 hover:bg-red-500/30 transition-colors">
+              className="p-2 bg-red-500/20 rounded-lg text-red-400 hover:bg-red-500/30 transition-colors flex-shrink-0">
               <ExternalLink className="w-4 h-4" />
             </a>
           )}
         </div>
+        {/* Live YouTube preview */}
+        <YoutubePreview url={clip.video_url} />
       </div>
 
       {/* OR upload file */}
-      <div>
-        <label className="text-[11px] text-gray-500 mb-1 block">📁 O subir archivo de video</label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={isFile ? clip.video_url : ""}
-            onChange={(e) => onUpdate("video_url", e.target.value)}
-            placeholder="URL directa (mp4, webm...)"
-            className="flex-1 px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
-          />
-          <button
-            type="button"
-            disabled={uploading}
-            onClick={() => fileInputRef.current?.click()}
-            className="px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 disabled:opacity-50 rounded-lg text-purple-400 cursor-pointer text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap"
-          >
-            {uploading ? (
-              <div className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <Upload className="w-4 h-4" />
-            )}
-            <span>{uploading ? "Subiendo..." : "Subir"}</span>
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="video/mp4,video/webm,video/ogg,video/mov,video/quicktime"
-            className="hidden"
-            onChange={(e) => handleUpload(e.target.files?.[0])}
-          />
-        </div>
-        <p className="text-[10px] text-gray-600 mt-1">MP4, WebM, MOV — máx. 150MB</p>
-      </div>
-
-      {/* If no YouTube, show thumbnail field */}
       {!ytId && (
         <div>
-          <label className="text-[11px] text-gray-500 mb-1 block">Miniatura (opcional)</label>
-          <input
-            type="text"
-            value={clip.thumbnail_url || ""}
-            onChange={(e) => onUpdate("thumbnail_url", e.target.value)}
-            placeholder="URL de miniatura"
-            className="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
-          />
+          <label className="text-[11px] text-gray-500 mb-1 block">📁 O subir archivo de video</label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={isVideoFile(clip.video_url) ? clip.video_url : ""}
+              onChange={(e) => onUpdate("video_url", e.target.value)}
+              placeholder="URL directa (mp4, webm...)"
+              className="flex-1 px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+            />
+            <button
+              type="button"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+              className="px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 disabled:opacity-50 rounded-lg text-purple-400 text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap"
+            >
+              {uploading ? <div className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" /> : <Upload className="w-4 h-4" />}
+              <span>{uploading ? "Subiendo..." : "Subir"}</span>
+            </button>
+            <input ref={fileInputRef} type="file" accept="video/mp4,video/webm,video/ogg,video/mov,video/quicktime"
+              className="hidden" onChange={(e) => handleUpload(e.target.files?.[0])} />
+          </div>
+          <p className="text-[10px] text-gray-600 mt-1">MP4, WebM, MOV — máx. 150MB</p>
         </div>
       )}
-
-      <ClipPreview clip={clip} />
     </div>
   );
 }
@@ -196,19 +160,20 @@ function ClipEditor({ clip, onUpdate, onRemove }) {
 // ── Single story editor ────────────────────────────────────────────────────
 function StoryEditor({ story, onChange, onRemove }) {
   const [imgUploading, setImgUploading] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   const set = (field, value) => onChange({ ...story, [field]: value });
 
-  const handleImageUpload = async (file) => {
+  const handleImageUpload = async (file, field, setLoading) => {
     if (!file) return;
-    setImgUploading(true);
+    setLoading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      set("image", file_url);
+      set(field, file_url);
     } catch (e) {
       alert("Error al subir imagen");
     } finally {
-      setImgUploading(false);
+      setLoading(false);
     }
   };
 
@@ -223,13 +188,17 @@ function StoryEditor({ story, onChange, onRemove }) {
 
   const removeClip = (i) => onChange({ ...story, clips: clips.filter((_, idx) => idx !== i) });
 
+  // avatar: story.avatar_url (foto de perfil circular)
+  // image: story.image (fondo full-screen)
+  const avatar = story.avatar_url || story.image || null;
+
   return (
     <div className="bg-white/[0.04] rounded-xl border border-white/10 overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-3 p-4 bg-white/[0.03] border-b border-white/[0.06]">
-        <div className="w-12 h-12 rounded-lg overflow-hidden bg-white/5 border border-white/10 flex-shrink-0">
-          {story.image
-            ? <img src={story.image} alt={story.name} className="w-full h-full object-cover" />
+        <div className="w-12 h-12 rounded-full overflow-hidden bg-white/5 border border-white/10 flex-shrink-0">
+          {avatar
+            ? <img src={avatar} alt={story.name} className="w-full h-full object-cover" />
             : <div className="w-full h-full flex items-center justify-center text-white/20 text-lg font-bold">{story.name?.[0] || "?"}</div>
           }
         </div>
@@ -268,22 +237,47 @@ function StoryEditor({ story, onChange, onRemove }) {
             placeholder="Escribe el testimonio..." />
         </div>
 
-        {/* Image */}
+        {/* Avatar (foto de perfil circular) */}
         <div>
-          <label className="text-xs text-gray-400 mb-1 block">Imagen de fondo (se usa solo si no hay video)</label>
+          <label className="text-xs text-gray-400 mb-1 block">📸 Foto de perfil (avatar circular)</label>
+          <div className="flex gap-3 items-center">
+            <div className="w-14 h-14 rounded-full overflow-hidden bg-white/5 border border-white/10 flex-shrink-0">
+              {story.avatar_url
+                ? <img src={story.avatar_url} alt="avatar" className="w-full h-full object-cover" />
+                : <div className="w-full h-full flex items-center justify-center text-white/20"><User className="w-6 h-6" /></div>
+              }
+            </div>
+            <div className="flex-1 space-y-2">
+              <input type="text" value={story.avatar_url || ""} onChange={(e) => set("avatar_url", e.target.value)}
+                className="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                placeholder="URL de la foto de perfil" />
+              <label className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-lg text-emerald-400 cursor-pointer transition-colors flex items-center gap-1.5 text-xs w-fit">
+                <input type="file" accept="image/*" className="hidden"
+                  onChange={(e) => handleImageUpload(e.target.files?.[0], "avatar_url", setAvatarUploading)} />
+                <Upload className="w-3.5 h-3.5" />
+                {avatarUploading ? "Subiendo..." : "Subir foto de perfil"}
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Background image */}
+        <div>
+          <label className="text-xs text-gray-400 mb-1 block">🖼 Imagen de fondo (solo si no hay video)</label>
           <div className="flex gap-2">
             <input type="text" value={story.image || ""} onChange={(e) => set("image", e.target.value)}
               className="flex-1 px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
-              placeholder="URL de imagen" />
+              placeholder="URL de imagen de fondo" />
             <label className="px-3 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-lg text-emerald-400 cursor-pointer transition-colors flex items-center gap-1.5 flex-shrink-0 text-sm">
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e.target.files?.[0])} />
+              <input type="file" accept="image/*" className="hidden"
+                onChange={(e) => handleImageUpload(e.target.files?.[0], "image", setImgUploading)} />
               <Upload className="w-4 h-4" />
               {imgUploading ? "Subiendo..." : "Subir"}
             </label>
           </div>
         </div>
 
-        {/* ── Clips section — always open ── */}
+        {/* ── Clips section ── */}
         <div className="border-t border-white/10 pt-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -326,39 +320,34 @@ function StoryEditor({ story, onChange, onRemove }) {
 }
 
 // ── Main export ────────────────────────────────────────────────────────────
+// IMPORTANT: This component uses a stable initialData snapshot.
+// It does NOT re-sync from props to avoid clip data being lost on save.
+// The parent must pass a stable `key` so this remounts only on fresh load.
 export default function StoriesEditor({ testimonials = [], onUpdate }) {
-  // Local state — completely independent from parent prop after first load
-  const initialized = useRef(false);
-  const [items, setItems] = useState(() => testimonials);
+  // Snapshot initial data once — never re-syncs from props
+  const [items, setItems] = useState(() => 
+    testimonials.map((t, i) => ({ ...t, _localId: t.id || t._localId || i }))
+  );
   const [saved, setSaved] = useState(false);
 
-  // Only sync from prop on first real load (when going from [] to actual data)
-  const prevLength = useRef(testimonials.length);
-  useEffect(() => {
-    if (!initialized.current && testimonials.length > 0) {
-      initialized.current = true;
-      setItems(testimonials);
-    }
-    // Also sync if items were added externally (e.g. page reload)
-    if (testimonials.length !== prevLength.current && initialized.current) {
-      prevLength.current = testimonials.length;
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [testimonials.length]);
-
   const handleSave = useCallback(() => {
-    onUpdate(items);
+    // Strip _localId before saving
+    const clean = items.map(({ _localId, ...rest }) => rest);
+    onUpdate(clean);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   }, [items, onUpdate]);
 
   const addStory = () => {
+    const localId = Date.now();
     setItems(prev => [...prev, {
-      id: Date.now(),
+      _localId: localId,
+      id: localId,
       name: "Nombre del artista",
       role: "Rol",
       quote: "Testimonio del artista...",
-      image: "https://images.unsplash.com/photo-1511367461989-f85a21fda167?w=1920&h=1080&fit=crop&q=80",
+      image: "",
+      avatar_url: "",
       clips: []
     }]);
   };
@@ -384,9 +373,7 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
           </button>
           <button onClick={handleSave}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              saved
-                ? "bg-emerald-500/20 text-emerald-400"
-                : "bg-emerald-500 hover:bg-emerald-600 text-white"
+              saved ? "bg-emerald-500/20 text-emerald-400" : "bg-emerald-500 hover:bg-emerald-600 text-white"
             }`}>
             {saved ? <CheckCircle className="w-4 h-4" /> : <Save className="w-4 h-4" />}
             {saved ? "¡Guardado!" : "Guardar historias"}
@@ -407,7 +394,7 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
         ) : (
           items.map((item, i) => (
             <StoryEditor
-              key={item.id || i}
+              key={item._localId}
               story={item}
               onChange={(updated) => updateStory(i, updated)}
               onRemove={() => removeStory(i)}

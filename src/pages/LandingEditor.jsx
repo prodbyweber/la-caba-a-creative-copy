@@ -225,12 +225,12 @@ export default function LandingEditor() {
       return { previous };
     },
     onError: (error, _data, context) => {
-      // Roll back on error
       if (context?.previous) queryClient.setQueryData(['landingConfig'], context.previous);
       console.error('Error updating config:', error);
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['landingConfig'] });
+    // Do NOT invalidate here — it would overwrite optimistic state and reset StoriesEditor
+    onSuccess: () => {
+      // Silently succeed — cache already updated optimistically
     },
   });
 
@@ -365,7 +365,8 @@ export default function LandingEditor() {
 
             {/* Testimonials Section Editor */}
             <SectionEditor title="💬 Historias que hemos contado">
-              <StoriesEditor 
+              <StoriesEditor
+                key={`stories-${config.id}`}
                 testimonials={config.testimonials || []}
                 onUpdate={(testimonials) => updateField('testimonials', testimonials)}
               />
