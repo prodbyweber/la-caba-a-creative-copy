@@ -197,6 +197,21 @@ const COUNTRIES = [
 // Map de código de país (ISO) a entrada de COUNTRIES
 const COUNTRY_BY_CODE = Object.fromEntries(COUNTRIES.map(c => [c.code, c]));
 
+// Componente de bandera SVG profesional usando flagcdn.com
+function Flag({ code, className = "" }) {
+  return (
+    <img
+      src={`https://flagcdn.com/w20/${code.toLowerCase()}.png`}
+      srcSet={`https://flagcdn.com/w40/${code.toLowerCase()}.png 2x`}
+      width="20"
+      height="15"
+      alt={code}
+      className={`rounded-[2px] object-cover flex-shrink-0 ${className}`}
+      style={{ display: 'block' }}
+    />
+  );
+}
+
 export default function PhoneInput({ value, onChange }) {
   const [selectedCountry, setSelectedCountry] = useState(COUNTRY_BY_CODE["ES"]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -265,7 +280,7 @@ export default function PhoneInput({ value, onChange }) {
         className="flex-shrink-0 flex items-center gap-1 px-2.5 py-3 bg-zinc-900 border border-white/10 border-r-0 rounded-l-lg text-white hover:bg-zinc-800 transition-colors focus:outline-none"
         style={{ minWidth: 0 }}
       >
-        <span className="text-base leading-none">{selectedCountry.flag}</span>
+        <Flag code={selectedCountry.code} />
         <span className="text-xs text-gray-300 whitespace-nowrap">{selectedCountry.dial}</span>
         <ChevronDown className={`w-3 h-3 text-gray-500 flex-shrink-0 transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
       </button>
@@ -310,7 +325,7 @@ export default function PhoneInput({ value, onChange }) {
                     selectedCountry.code === country.code ? "bg-white/5 text-[#ff5833]" : "text-gray-300"
                   }`}
                 >
-                  <span className="text-base flex-shrink-0">{country.flag}</span>
+                  <Flag code={country.code} />
                   <span className="flex-1 truncate min-w-0">{country.name}</span>
                   <span className="text-gray-500 text-xs flex-shrink-0">{country.dial}</span>
                 </button>
