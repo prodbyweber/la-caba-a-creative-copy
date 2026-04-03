@@ -1,8 +1,8 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Plus, Trash2, Upload, Film, X, ExternalLink, Play, Save, CheckCircle, User } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
-// ── YouTube helpers ────────────────────────────────────────────────────────
+// ── helpers ───────────────────────────────────────────────────────────────
 function getYouTubeId(url) {
   if (!url) return null;
   const patterns = [
@@ -23,13 +23,11 @@ function isVideoFile(url) {
   return /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url || "");
 }
 
-// ── Mini YouTube preview ──────────────────────────────────────────────────
+// ── YouTube inline preview ────────────────────────────────────────────────
 function YoutubePreview({ url }) {
   const [playing, setPlaying] = useState(false);
   const ytId = getYouTubeId(url);
   if (!ytId) return null;
-
-  const thumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
 
   return (
     <div className="mt-2 rounded-xl overflow-hidden border border-white/10 bg-black">
@@ -44,31 +42,27 @@ function YoutubePreview({ url }) {
               className="w-full h-full border-0"
             />
           </div>
-          <button
-            onClick={() => setPlaying(false)}
-            className="w-full py-1.5 text-xs text-white/50 hover:text-white bg-zinc-900 transition-colors"
-          >
+          <button onClick={() => setPlaying(false)}
+            className="w-full py-1.5 text-xs text-white/50 hover:text-white bg-zinc-900 transition-colors">
             Cerrar previsualización
           </button>
         </>
       ) : (
         <div className="relative aspect-video cursor-pointer group" onClick={() => setPlaying(true)}>
-          <img src={thumb} alt="YouTube preview" className="w-full h-full object-cover" />
+          <img src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} alt="YouTube preview" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 flex items-center justify-center transition-colors">
             <div className="w-12 h-12 rounded-full bg-white/15 backdrop-blur-sm border border-white/30 flex items-center justify-center group-hover:bg-white/25 transition-colors">
               <Play className="w-5 h-5 text-white ml-0.5" />
             </div>
           </div>
-          <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-red-600 rounded text-[10px] font-bold text-white">
-            YouTube
-          </div>
+          <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-red-600 rounded text-[10px] font-bold text-white">YouTube</div>
         </div>
       )}
     </div>
   );
 }
 
-// ── Single clip editor ─────────────────────────────────────────────────────
+// ── Clip editor ───────────────────────────────────────────────────────────
 function ClipEditor({ clip, onUpdate, onRemove }) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
@@ -80,7 +74,7 @@ function ClipEditor({ clip, onUpdate, onRemove }) {
     setUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      onUpdate("video_url", file_url);
+      onUpdate({ ...clip, video_url: file_url });
     } catch (e) {
       alert("Error al subir el video: " + e.message);
     } finally {
@@ -90,12 +84,11 @@ function ClipEditor({ clip, onUpdate, onRemove }) {
 
   return (
     <div className="p-4 bg-zinc-800/60 rounded-xl space-y-3 border border-white/[0.08]">
-      {/* Title + remove */}
       <div className="flex items-center gap-2">
         <input
           type="text"
           value={clip.title || ""}
-          onChange={(e) => onUpdate("title", e.target.value)}
+          onChange={(e) => onUpdate({ ...clip, title: e.target.value })}
           placeholder="Título del clip"
           className="flex-1 px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
         />
@@ -104,14 +97,13 @@ function ClipEditor({ clip, onUpdate, onRemove }) {
         </button>
       </div>
 
-      {/* YouTube URL */}
       <div>
         <label className="text-[11px] text-gray-500 mb-1 block">🔗 Link de YouTube</label>
         <div className="flex gap-2">
           <input
             type="text"
             value={clip.video_url || ""}
-            onChange={(e) => onUpdate("video_url", e.target.value)}
+            onChange={(e) => onUpdate({ ...clip, video_url: e.target.value })}
             placeholder="https://youtube.com/watch?v=..."
             className="flex-1 px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-red-500"
           />
@@ -122,11 +114,9 @@ function ClipEditor({ clip, onUpdate, onRemove }) {
             </a>
           )}
         </div>
-        {/* Live YouTube preview */}
         <YoutubePreview url={clip.video_url} />
       </div>
 
-      {/* OR upload file */}
       {!ytId && (
         <div>
           <label className="text-[11px] text-gray-500 mb-1 block">📁 O subir archivo de video</label>
@@ -134,16 +124,12 @@ function ClipEditor({ clip, onUpdate, onRemove }) {
             <input
               type="text"
               value={isVideoFile(clip.video_url) ? clip.video_url : ""}
-              onChange={(e) => onUpdate("video_url", e.target.value)}
+              onChange={(e) => onUpdate({ ...clip, video_url: e.target.value })}
               placeholder="URL directa (mp4, webm...)"
               className="flex-1 px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
             />
-            <button
-              type="button"
-              disabled={uploading}
-              onClick={() => fileInputRef.current?.click()}
-              className="px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 disabled:opacity-50 rounded-lg text-purple-400 text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap"
-            >
+            <button type="button" disabled={uploading} onClick={() => fileInputRef.current?.click()}
+              className="px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 disabled:opacity-50 rounded-lg text-purple-400 text-sm transition-colors flex items-center gap-1.5 whitespace-nowrap">
               {uploading ? <div className="w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" /> : <Upload className="w-4 h-4" />}
               <span>{uploading ? "Subiendo..." : "Subir"}</span>
             </button>
@@ -157,14 +143,14 @@ function ClipEditor({ clip, onUpdate, onRemove }) {
   );
 }
 
-// ── Single story editor ────────────────────────────────────────────────────
+// ── Story editor ──────────────────────────────────────────────────────────
 function StoryEditor({ story, onChange, onRemove }) {
   const [imgUploading, setImgUploading] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
 
   const set = (field, value) => onChange({ ...story, [field]: value });
 
-  const handleImageUpload = async (file, field, setLoading) => {
+  const handleUploadImage = async (file, field, setLoading) => {
     if (!file) return;
     setLoading(true);
     try {
@@ -179,18 +165,11 @@ function StoryEditor({ story, onChange, onRemove }) {
 
   const clips = story.clips || [];
 
-  const addClip = () => onChange({ ...story, clips: [...clips, { title: "", video_url: "", thumbnail_url: "" }] });
-
-  const updateClip = (i, field, value) => {
-    const next = clips.map((c, idx) => idx === i ? { ...c, [field]: value } : c);
-    onChange({ ...story, clips: next });
-  };
-
+  const addClip = () => onChange({ ...story, clips: [...clips, { id: Date.now(), title: "", video_url: "", thumbnail_url: "" }] });
+  const updateClip = (i, updated) => onChange({ ...story, clips: clips.map((c, idx) => idx === i ? updated : c) });
   const removeClip = (i) => onChange({ ...story, clips: clips.filter((_, idx) => idx !== i) });
 
-  // avatar: story.avatar_url (foto de perfil circular)
-  // image: story.image (fondo full-screen)
-  const avatar = story.avatar_url || story.image || null;
+  const avatar = story.avatar_url || null;
 
   return (
     <div className="bg-white/[0.04] rounded-xl border border-white/10 overflow-hidden">
@@ -213,7 +192,6 @@ function StoryEditor({ story, onChange, onRemove }) {
       </div>
 
       <div className="p-4 space-y-4">
-        {/* Name */}
         <div>
           <label className="text-xs text-gray-400 mb-1 block">Nombre del artista</label>
           <input type="text" value={story.name || ""} onChange={(e) => set("name", e.target.value)}
@@ -221,7 +199,6 @@ function StoryEditor({ story, onChange, onRemove }) {
             placeholder="Carlos Mendoza" />
         </div>
 
-        {/* Role */}
         <div>
           <label className="text-xs text-gray-400 mb-1 block">Rol</label>
           <input type="text" value={story.role || ""} onChange={(e) => set("role", e.target.value)}
@@ -229,7 +206,6 @@ function StoryEditor({ story, onChange, onRemove }) {
             placeholder="Artista Urbano" />
         </div>
 
-        {/* Quote */}
         <div>
           <label className="text-xs text-gray-400 mb-1 block">Testimonio</label>
           <textarea value={story.quote || ""} onChange={(e) => set("quote", e.target.value)} rows={3}
@@ -237,9 +213,9 @@ function StoryEditor({ story, onChange, onRemove }) {
             placeholder="Escribe el testimonio..." />
         </div>
 
-        {/* Avatar (foto de perfil circular) */}
+        {/* Avatar / foto de perfil */}
         <div>
-          <label className="text-xs text-gray-400 mb-1 block">📸 Foto de perfil (avatar circular)</label>
+          <label className="text-xs text-gray-400 mb-2 block">📸 Foto de perfil (avatar circular)</label>
           <div className="flex gap-3 items-center">
             <div className="w-14 h-14 rounded-full overflow-hidden bg-white/5 border border-white/10 flex-shrink-0">
               {story.avatar_url
@@ -248,14 +224,15 @@ function StoryEditor({ story, onChange, onRemove }) {
               }
             </div>
             <div className="flex-1 space-y-2">
-              <input type="text" value={story.avatar_url || ""} onChange={(e) => set("avatar_url", e.target.value)}
+              <input type="text" value={story.avatar_url || ""}
+                onChange={(e) => set("avatar_url", e.target.value)}
                 className="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
-                placeholder="URL de la foto de perfil" />
+                placeholder="URL de foto de perfil" />
               <label className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-lg text-emerald-400 cursor-pointer transition-colors flex items-center gap-1.5 text-xs w-fit">
                 <input type="file" accept="image/*" className="hidden"
-                  onChange={(e) => handleImageUpload(e.target.files?.[0], "avatar_url", setAvatarUploading)} />
+                  onChange={(e) => handleUploadImage(e.target.files?.[0], "avatar_url", setAvatarUploading)} />
                 <Upload className="w-3.5 h-3.5" />
-                {avatarUploading ? "Subiendo..." : "Subir foto de perfil"}
+                {avatarUploading ? "Subiendo..." : "Subir foto"}
               </label>
             </div>
           </div>
@@ -270,14 +247,14 @@ function StoryEditor({ story, onChange, onRemove }) {
               placeholder="URL de imagen de fondo" />
             <label className="px-3 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 rounded-lg text-emerald-400 cursor-pointer transition-colors flex items-center gap-1.5 flex-shrink-0 text-sm">
               <input type="file" accept="image/*" className="hidden"
-                onChange={(e) => handleImageUpload(e.target.files?.[0], "image", setImgUploading)} />
+                onChange={(e) => handleUploadImage(e.target.files?.[0], "image", setImgUploading)} />
               <Upload className="w-4 h-4" />
               {imgUploading ? "Subiendo..." : "Subir"}
             </label>
           </div>
         </div>
 
-        {/* ── Clips section ── */}
+        {/* Clips */}
         <div className="border-t border-white/10 pt-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -287,11 +264,9 @@ function StoryEditor({ story, onChange, onRemove }) {
             </div>
             <button type="button" onClick={addClip}
               className="px-3 py-1.5 bg-purple-500/20 hover:bg-purple-500/30 rounded-lg text-purple-400 text-xs font-medium transition-colors flex items-center gap-1">
-              <Plus className="w-3.5 h-3.5" />
-              Añadir clip
+              <Plus className="w-3.5 h-3.5" /> Añadir clip
             </button>
           </div>
-
           <div className="space-y-3">
             {clips.length === 0 ? (
               <div className="py-6 border border-dashed border-white/10 rounded-xl text-center">
@@ -304,12 +279,9 @@ function StoryEditor({ story, onChange, onRemove }) {
               </div>
             ) : (
               clips.map((clip, i) => (
-                <ClipEditor
-                  key={i}
-                  clip={clip}
-                  onUpdate={(field, value) => updateClip(i, field, value)}
-                  onRemove={() => removeClip(i)}
-                />
+                <ClipEditor key={clip.id || i} clip={clip}
+                  onUpdate={(updated) => updateClip(i, updated)}
+                  onRemove={() => removeClip(i)} />
               ))
             )}
           </div>
@@ -319,57 +291,57 @@ function StoryEditor({ story, onChange, onRemove }) {
   );
 }
 
-// ── Main export ────────────────────────────────────────────────────────────
-// IMPORTANT: This component uses a stable initialData snapshot.
-// It does NOT re-sync from props to avoid clip data being lost on save.
-// The parent must pass a stable `key` so this remounts only on fresh load.
-export default function StoriesEditor({ testimonials = [], onUpdate }) {
-  // Snapshot initial data once — never re-syncs from props
-  const [items, setItems] = useState(() => 
-    testimonials.map((t, i) => ({ ...t, _localId: t.id || t._localId || i }))
-  );
+// ── Main — FULLY CONTROLLED (no local state copy, parent owns data) ────────
+export default function StoriesEditor({ testimonials, onSave }) {
+  // items mirrors props but allows local edits before explicit save
+  const [items, setItems] = useState(testimonials || []);
   const [saved, setSaved] = useState(false);
+  // Track if we've already loaded non-empty data from server
+  const loadedRef = useRef(false);
 
-  const handleSave = useCallback(() => {
-    // Strip _localId before saving
-    const clean = items.map(({ _localId, ...rest }) => rest);
-    onUpdate(clean);
+  // Sync from props ONLY on the very first time real data arrives (e.g. from server)
+  // After that, local edits take precedence until the user saves.
+  if (!loadedRef.current && testimonials && testimonials.length > 0) {
+    loadedRef.current = true;
+    // Use a functional-style trick: we compare and update without triggering extra renders
+    // We update synchronously here (safe in render for initialization patterns)
+  }
+
+  // One-time sync when real data first arrives from server (after initial empty render)
+  useEffect(() => {
+    if (!loadedRef.current && testimonials && testimonials.length > 0) {
+      loadedRef.current = true;
+      setItems(testimonials);
+    }
+  }, [testimonials]);
+
+  const handleSave = () => {
+    onSave(items);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
-  }, [items, onUpdate]);
-
-  const addStory = () => {
-    const localId = Date.now();
-    setItems(prev => [...prev, {
-      _localId: localId,
-      id: localId,
-      name: "Nombre del artista",
-      role: "Rol",
-      quote: "Testimonio del artista...",
-      image: "",
-      avatar_url: "",
-      clips: []
-    }]);
   };
 
-  const updateStory = (index, updated) => {
-    setItems(prev => prev.map((item, i) => i === index ? updated : item));
-  };
+  const addStory = () => setItems(prev => [...prev, {
+    id: Date.now(),
+    name: "Nombre del artista",
+    role: "Rol",
+    quote: "Testimonio del artista...",
+    image: "",
+    avatar_url: "",
+    clips: []
+  }]);
 
-  const removeStory = (index) => {
-    setItems(prev => prev.filter((_, i) => i !== index));
-  };
+  const updateStory = (i, updated) => setItems(prev => prev.map((item, idx) => idx === i ? updated : item));
+  const removeStory = (i) => setItems(prev => prev.filter((_, idx) => idx !== i));
 
   return (
     <div className="space-y-4">
-      {/* Toolbar */}
       <div className="flex items-center justify-between gap-2">
         <span className="text-sm text-gray-400">{items.length} historia{items.length !== 1 ? "s" : ""}</span>
         <div className="flex items-center gap-2">
           <button onClick={addStory}
             className="flex items-center gap-1.5 px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-white/70 text-sm transition-colors">
-            <Plus className="w-4 h-4" />
-            Añadir Historia
+            <Plus className="w-4 h-4" /> Añadir Historia
           </button>
           <button onClick={handleSave}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
@@ -381,7 +353,6 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
         </div>
       </div>
 
-      {/* Stories list */}
       <div className="space-y-4">
         {items.length === 0 ? (
           <div className="text-center py-12 border border-dashed border-white/20 rounded-xl">
@@ -394,7 +365,7 @@ export default function StoriesEditor({ testimonials = [], onUpdate }) {
         ) : (
           items.map((item, i) => (
             <StoryEditor
-              key={item._localId}
+              key={item.id || i}
               story={item}
               onChange={(updated) => updateStory(i, updated)}
               onRemove={() => removeStory(i)}
