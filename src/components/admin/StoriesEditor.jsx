@@ -299,14 +299,6 @@ export default function StoriesEditor({ testimonials, onSave }) {
   // Track if we've already loaded non-empty data from server
   const loadedRef = useRef(false);
 
-  // Sync from props ONLY on the very first time real data arrives (e.g. from server)
-  // After that, local edits take precedence until the user saves.
-  if (!loadedRef.current && testimonials && testimonials.length > 0) {
-    loadedRef.current = true;
-    // Use a functional-style trick: we compare and update without triggering extra renders
-    // We update synchronously here (safe in render for initialization patterns)
-  }
-
   // One-time sync when real data first arrives from server (after initial empty render)
   useEffect(() => {
     if (!loadedRef.current && testimonials && testimonials.length > 0) {
