@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import Hero from "@/components/landing/Hero";
 import OffersCarousel from "@/components/landing/OffersCarousel";
 import BrandsCarousel from "@/components/landing/BrandsCarousel";
-import StoriesSection from "@/components/landing/StoriesSection";
+import StoriesSection from "@/components/landing/StoriesSection.jsx";
 import DashboardPreview from "@/components/landing/DashboardPreview";
 
 import AboutSection from "@/components/landing/AboutSection";
