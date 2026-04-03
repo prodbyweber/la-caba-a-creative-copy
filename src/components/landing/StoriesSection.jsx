@@ -166,9 +166,10 @@ export default function StoriesSection() {
   const stories = (config?.testimonials?.length > 0 ? config.testimonials : defaultStories);
 
   const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
+  const [direction, setDirection] = useState(1);
   const [paused, setPaused] = useState(false);
   const autoRef = useRef(null);
+  const touchStartX = useRef(null);
 
   const go = (idx, dir = 1) => {
     setDirection(dir);
@@ -195,6 +196,15 @@ export default function StoriesSection() {
     return () => window.removeEventListener("keydown", handler);
   }, [current]);
 
+  // Touch swipe handlers
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 50) { dx < 0 ? next() : prev(); }
+    touchStartX.current = null;
+  };
+
   const variants = {
     enter: (dir) => ({ x: dir > 0 ? "6%" : "-6%", opacity: 0, scale: 1.02 }),
     center: { x: "0%", opacity: 1, scale: 1 },
@@ -209,6 +219,8 @@ export default function StoriesSection() {
       style={{ height: "100svh", minHeight: 560 }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* ── Slides ── */}
       <AnimatePresence custom={direction} mode="sync">
