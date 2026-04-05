@@ -32,11 +32,11 @@ export default function BrandsCarousel({ logos }) {
         }
         .brand-logo-glow {
           transition: filter 0.3s ease, opacity 0.3s ease;
-          filter: brightness(0.5) grayscale(1);
-          opacity: 0.6;
+          filter: none;
+          opacity: 1;
         }
         .brand-logo-glow:hover {
-          filter: brightness(1.4) saturate(1.2) drop-shadow(0 0 12px rgba(255,255,255,0.55)) drop-shadow(0 0 28px rgba(255,88,51,0.35));
+          filter: brightness(1.3) drop-shadow(0 0 12px rgba(255,255,255,0.55)) drop-shadow(0 0 28px rgba(255,88,51,0.35));
           opacity: 1;
         }
       `}</style>
