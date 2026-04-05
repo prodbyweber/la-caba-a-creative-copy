@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const defaultLogos = [
   "https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=200&h=100&fit=crop",
@@ -10,18 +10,17 @@ const defaultLogos = [
 
 export default function BrandsCarousel({ logos }) {
   const displayLogos = logos && logos.length > 0 ? logos : defaultLogos;
-  // Duplicate twice so the seam is invisible during the CSS loop
-  const loopLogos = [...displayLogos, ...displayLogos];
-
-  // Duration scales with number of logos so speed stays consistent
-  const duration = displayLogos.length * 3;
+  // Triple para que el loop sea invisible
+  const loopLogos = [...displayLogos, ...displayLogos, ...displayLogos];
+  const duration = displayLogos.length * 3.5;
+  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   return (
-    <section className="relative py-6 bg-transparent overflow-hidden">
+    <section className="relative py-8 bg-transparent overflow-hidden">
       <style>{`
         @keyframes brands-scroll {
           0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+          100% { transform: translateX(-33.333%); }
         }
         .brands-track {
           display: flex;
@@ -31,26 +30,44 @@ export default function BrandsCarousel({ logos }) {
           animation: brands-scroll ${duration}s linear infinite;
           will-change: transform;
         }
-        .brands-track:hover {
-          animation-play-state: paused;
+        .brand-logo-glow {
+          transition: filter 0.3s ease, opacity 0.3s ease;
+          filter: brightness(0.5) grayscale(1);
+          opacity: 0.6;
+        }
+        .brand-logo-glow:hover {
+          filter: brightness(1.4) saturate(1.2) drop-shadow(0 0 12px rgba(255,255,255,0.55)) drop-shadow(0 0 28px rgba(255,88,51,0.35));
+          opacity: 1;
         }
       `}</style>
 
-      <div className="text-center mb-3">
-        <span className="text-xs uppercase tracking-wider text-gray-500">Hemos colaborado con</span>
+      <div className="text-center mb-5">
+        <span className="text-[10px] uppercase tracking-[0.3em] text-white/25 font-medium">
+          Marcas colaboradoras
+        </span>
       </div>
 
-      <div className="brands-track">
-        {loopLogos.map((logo, i) => (
-          <div key={i} className="flex-shrink-0 w-24 h-12 flex items-center justify-center">
-            <img
-              src={logo}
-              alt="Brand logo"
-              className="max-w-full max-h-full object-contain"
-              loading="lazy"
-            />
-          </div>
-        ))}
+      {/* Fade edges */}
+      <div className="relative">
+        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#0a0a0b] to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#0a0a0b] to-transparent z-10 pointer-events-none" />
+
+        <div className="brands-track">
+          {loopLogos.map((logo, i) => (
+            <div
+              key={i}
+              className="flex-shrink-0 w-28 h-14 flex items-center justify-center"
+            >
+              <img
+                src={logo}
+                alt="Brand logo"
+                className="brand-logo-glow max-w-full max-h-full object-contain cursor-pointer"
+                loading="lazy"
+                draggable={false}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

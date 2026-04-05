@@ -7,7 +7,7 @@ const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81e
 const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
 export default function Hero({ config }) {
-  const heroSubtitle = config?.hero_subtitle || "Producción, imagen y narrativa para artistas que van en serio.";
+  const heroSubtitle = config?.hero_subtitle || "Más que lo que se escucha.";
   const heroVideoUrl = config?.hero_video_url || null;
 
   const sectionRef = useRef(null);
