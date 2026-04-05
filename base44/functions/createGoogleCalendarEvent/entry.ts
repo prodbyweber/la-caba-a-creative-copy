@@ -39,10 +39,12 @@ Deno.serve(async (req) => {
     .filter(email => email && email.trim())
     .map(email => ({ email: email.trim() }));
 
+  const isOnline = session.location === 'Online';
+
   const event = {
     summary: session.title,
     description: descParts.join('\n'),
-    location: session.location === 'Studio' ? 'Estudio Cabaña Creative, Madrid' : session.location === 'Online' ? 'Online (Google Meet)' : session.location || '',
+    location: session.location === 'Studio' ? 'Estudio Cabaña Creative, Madrid' : isOnline ? 'Google Meet' : session.location || '',
     start: {
       dateTime: toMadridISO(session.start_time),
       timeZone: 'Europe/Madrid'
@@ -53,10 +55,8 @@ Deno.serve(async (req) => {
     },
     colorId: session.type === 'Meeting' ? '9' : session.type === 'StudioWork' ? '2' : '1',
     attendees: attendees,
-    // Send email invites to attendees
     guestsCanModifyEvent: false,
     guestsCanInviteOthers: false,
-    // Reminders: popup 30 min before + email 1 day before
     reminders: {
       useDefault: false,
       overrides: [
@@ -64,10 +64,22 @@ Deno.serve(async (req) => {
         { method: 'popup', minutes: 10 },
         { method: 'email', minutes: 60 * 24 }
       ]
-    }
+    },
+    // Google Meet: only for Online sessions
+    ...(isOnline && {
+      conferenceData: {
+        createRequest: {
+          requestId: `cabana-${Date.now()}`,
+          conferenceSolutionKey: { type: 'hangoutsMeet' }
+        }
+      }
+    })
   };
 
-  const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?sendUpdates=all', {
+  // conferenceDataVersion=1 is required to generate Google Meet links
+  const calendarUrl = `https://www.googleapis.com/calendar/v3/calendars/primary/events?sendUpdates=all${isOnline ? '&conferenceDataVersion=1' : ''}`;
+
+  const res = await fetch(calendarUrl, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -82,5 +94,10 @@ Deno.serve(async (req) => {
   }
 
   const created = await res.json();
-  return Response.json({ google_event_id: created.id, google_event_link: created.htmlLink });
+  const meetLink = created.conferenceData?.entryPoints?.find(e => e.entryPointType === 'video')?.uri || null;
+  return Response.json({
+    google_event_id: created.id,
+    google_event_link: created.htmlLink,
+    google_meet_link: meetLink
+  });
 });

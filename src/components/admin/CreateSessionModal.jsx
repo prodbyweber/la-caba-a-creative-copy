@@ -100,10 +100,14 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
       } else if (!isUpdate) {
         const res = await base44.functions.invoke('createGoogleCalendarEvent', { session: enriched });
         if (res.data?.google_event_id) {
-          await base44.entities.Session.update(session.id, {
+          const updateData = {
             google_event_id: res.data.google_event_id,
             google_event_link: res.data.google_event_link
-          });
+          };
+          if (res.data.google_meet_link) {
+            updateData.google_meet_link = res.data.google_meet_link;
+          }
+          await base44.entities.Session.update(session.id, updateData);
           queryClient.invalidateQueries({ queryKey: ['sessions'] });
         }
         setGcalStatus('success');
