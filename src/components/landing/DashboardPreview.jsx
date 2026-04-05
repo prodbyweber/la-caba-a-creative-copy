@@ -213,7 +213,7 @@ export default function DashboardPreview() {
             <span className="text-white/20">Centralizada.</span>
           </h2>
           <p className="text-base text-white/30 max-w-md mx-auto leading-relaxed font-light">
-            Proyectos, catálogo, clips y agenda — todo en un solo lugar.
+            Más que lo que se escucha.
           </p>
         </motion.div>
 
