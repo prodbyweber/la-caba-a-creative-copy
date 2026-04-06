@@ -13,6 +13,7 @@ import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
 import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
 import SocialLinksCard from "@/components/dashboard/SocialLinksCard";
+import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
 
 export default function ArtistDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -105,6 +106,7 @@ export default function ArtistDashboard() {
                   onEditProfile={() => setIsEditingProfile(true)}
                 />
               </div>
+              <StudioHoursBlock artist={artist} />
               <UpcomingSessionsCard artistId={artist.id} />
               <SocialLinksCard />
             </div>

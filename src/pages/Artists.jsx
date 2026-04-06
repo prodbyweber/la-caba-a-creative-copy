@@ -8,7 +8,7 @@ import ArtistProfilePanel from "@/components/admin/ArtistProfilePanel";
 
 export default function Artists() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("Active");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedArtist, setSelectedArtist] = useState(null);
   const [editArtist, setEditArtist] = useState(null);
@@ -48,15 +48,11 @@ export default function Artists() {
     const matchesSearch = artist.stageName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          artist.legalName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          artist.email?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "All" || artist.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    return matchesSearch && artist.status === "Active";
   });
 
   const statusCounts = {
-    All: artists.length,
-    Lead: artists.filter(a => a.status === 'Lead').length,
     Active: artists.filter(a => a.status === 'Active').length,
-    Inactive: artists.filter(a => a.status === 'Inactive').length
   };
 
   return (
@@ -91,19 +87,9 @@ export default function Artists() {
           </div>
           
           <div className="flex gap-2 overflow-x-auto pb-2">
-            {['All', 'Lead', 'Active', 'Inactive'].map((status) => (
-              <button
-                key={status}
-                onClick={() => setStatusFilter(status)}
-                className={`px-4 py-2 rounded-xl whitespace-nowrap transition-all ${
-                  statusFilter === status
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                }`}
-              >
-                {status} ({statusCounts[status]})
-              </button>
-            ))}
+            <span className="px-4 py-2 rounded-xl bg-emerald-500 text-white text-sm font-medium">
+              Active ({statusCounts.Active})
+            </span>
           </div>
         </div>
 

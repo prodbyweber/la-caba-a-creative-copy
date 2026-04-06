@@ -84,6 +84,11 @@
     "notes": {
       "type": "string",
       "description": "Notas internas sobre el artista"
+    },
+    "studio_hours_total": {
+      "type": "number",
+      "default": 0,
+      "description": "Total de horas de estudio asignadas al artista"
     }
   },
   "required": [

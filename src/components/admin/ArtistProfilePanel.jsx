@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { X, User, Mail, Phone, MapPin, Tag, ExternalLink, Music2, Play, Pause, FileText, Plus, Save, Edit, Upload, Check, LayoutDashboard } from "lucide-react";
+import { X, User, Mail, Phone, MapPin, Tag, ExternalLink, Music2, Play, Pause, FileText, Plus, Save, Edit, Upload, Check, LayoutDashboard, Clock } from "lucide-react";
+import StudioHoursAdmin from "@/components/admin/StudioHoursAdmin";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
@@ -118,6 +119,7 @@ export default function ArtistProfilePanel({ artist, onClose }) {
 
   const tabs = [
     { id: "overview", label: "Overview" },
+    { id: "hours", label: "Horas" },
     { id: "projects", label: `Projects (${projects.length})` },
     { id: "calendar", label: `Calendar (${sessions.length})` },
     { id: "deliverables", label: `Deliverables (${deliverables.length})` },
@@ -421,6 +423,16 @@ export default function ArtistProfilePanel({ artist, onClose }) {
                   artist.notes && <p className="text-gray-300 whitespace-pre-wrap">{artist.notes}</p>
                 )}
               </div>
+            </div>
+          )}
+
+          {activeTab === "hours" && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-amber-400" />
+                <h3 className="text-lg font-bold">Horas de Estudio</h3>
+              </div>
+              <StudioHoursAdmin artist={artist} />
             </div>
           )}
 
