@@ -2,7 +2,6 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import Hero from "@/components/landing/Hero";
-import OffersCarousel from "@/components/landing/OffersCarousel";
 import BrandsCarousel from "@/components/landing/BrandsCarousel";
 import StoriesSection from "@/components/landing/StoriesSection.jsx";
 import DashboardPreview from "@/components/landing/DashboardPreview";
@@ -39,7 +38,6 @@ export default function Landing() {
         <div id="about"><AboutSection /></div>
         <div id="team"><TeamSection /></div>
         <div id="stories"><StoriesSection /></div>
-        <div id="offers"><OffersCarousel /></div>
         <DashboardPreview />
 
         </main>

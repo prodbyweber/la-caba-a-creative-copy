@@ -6,7 +6,6 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { SectionEditor, TextInput, ImageUpload, ArrayEditor } from "@/components/admin/SectionEditor";
 import HowItWorksEditor from "@/components/admin/HowItWorksEditor";
-import OffersEditor from "@/components/admin/OffersEditor";
 import TimelineEditor from "@/components/admin/TimelineEditor";
 import StoriesEditor from "@/components/admin/StoriesEditor.jsx";
 import StartupsEditor from "@/components/admin/StartupsEditor";
@@ -355,14 +354,6 @@ export default function LandingEditor() {
             {/* Forms Management */}
             <SectionEditor title="📋 Gestión de Formularios" defaultOpen={false}>
               <FormsEditor />
-            </SectionEditor>
-
-            {/* Offers Section Editor */}
-            <SectionEditor title="💎 Formas de Ayudarte" defaultOpen={true}>
-              <OffersEditor 
-                offers={config.offers || []}
-                onUpdate={(offers) => updateField('offers', offers)}
-              />
             </SectionEditor>
 
             {/* Testimonials Section Editor */}
