@@ -306,37 +306,37 @@ function BrandView() {
   return (
     <div className="space-y-28 lg:space-y-40">
 
-      {/* Bloque 1 */}
+      {/* Bloque 1: Apertura */}
       <Block>
         <h2
           className="text-5xl sm:text-6xl lg:text-8xl font-black leading-[0.92] tracking-tight text-white max-w-4xl"
           style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
         >
-          Conectamos marcas con
-          <span className="text-white/20"> la cultura.</span>
+          No trabajamos con
+          <span className="text-white/20"> cualquier marca.</span>
         </h2>
         <p className="mt-8 text-lg sm:text-xl text-white/50 font-light max-w-2xl leading-relaxed">
-          Trabajamos con marcas que entienden que la música, el arte y la identidad cultural son el lenguaje más auténtico para conectar con su audiencia.
+          Trabajamos con marcas que entienden que hoy no se trata de estar… sino de significar algo.
         </p>
         <div className="mt-10 h-px bg-gradient-to-r from-[#ff5833]/40 via-[#ff5833]/10 to-transparent w-40" />
         <p className="mt-8 text-base text-white/35 max-w-xl leading-relaxed">
-          Nuestra posición en el ecosistema creativo nos permite crear puentes reales entre marcas y comunidades.
+          Marcas que ya tienen una base. Producto, intención y una dirección inicial. Y que saben que para crecer necesitan algo más que contenido.
         </p>
       </Block>
 
-      {/* Bloque 2 */}
+      {/* Bloque 2: Con quién trabajamos */}
       <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
         <Block delay={0}>
-          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Colaboración estratégica</p>
+          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">¿Con quién trabajamos?</p>
           <h3
             className="text-3xl sm:text-4xl font-black text-white leading-tight tracking-tight mb-8"
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
           >
-            Más que publicidad.
-            <br />Presencia cultural.
+            Marcas en fase
+            <br />de crecimiento.
           </h3>
           <p className="text-white/35 text-sm leading-relaxed">
-            Integramos tu marca en proyectos creativos reales con impacto auténtico.
+            Si solo buscas contenido rápido… no somos para ti.
           </p>
         </Block>
 
@@ -348,10 +348,10 @@ function BrandView() {
           className="space-y-0 divide-y divide-white/[0.05]"
         >
           {[
-            "Patrocinio de proyectos artísticos",
-            "Colaboraciones con artistas de nuestro roster",
-            "Branded content audiovisual",
-            "Activaciones en cultura urbana",
+            "Proyectos con identidad en desarrollo",
+            "Marcas que ya venden pero no conectan",
+            "Equipos que quieren elevar su imagen",
+            "Marcas que entienden el valor de la creatividad",
           ].map((item, i) => (
             <motion.li
               key={i}
@@ -367,73 +367,77 @@ function BrandView() {
         </motion.ul>
       </div>
 
-      {/* Bloque 3 */}
+      {/* Bloque 3: Donde nos movemos */}
       <Block>
         <div className="max-w-3xl">
-          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Con autenticidad</p>
+          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Donde nos movemos</p>
           <h3
             className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight"
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
           >
-            No vendemos espacios.
+            La intersección entre
             <br />
-            <span className="text-white/25">Construimos relevancia.</span>
+            <span className="text-white/25">cultura, estética y digital.</span>
           </h3>
           <p className="mt-8 text-white/40 text-base leading-relaxed max-w-xl">
-            Las marcas que trabajan con nosotros no aparecen. Se integran. La diferencia entre interrumpir y pertenecer es la clave de todo lo que hacemos.
+            Especialmente con marcas de moda, streetwear, lifestyle, proyectos creativos y productos digitales. En Europa y Estados Unidos, estas marcas no compiten por producto. Compiten por atención, identidad y experiencia.
           </p>
         </div>
       </Block>
 
-      {/* Bloque 4: Grid visual */}
+      {/* Bloque 4: Campañas + grid visual */}
       <Block>
         <div className="mb-10">
-          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Ecosistema creativo</p>
+          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Campañas que se sienten</p>
           <h3
             className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight mb-4"
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
           >
-            Tu marca dentro
+            Contenido que no parece
             <br />
-            <span className="text-white/25">de un universo vivo.</span>
+            <span className="text-white/25">publicidad. Que se consume.</span>
           </h3>
           <p className="text-white/40 text-base leading-relaxed max-w-2xl">
-            Acceso a artistas, proyectos, audiencias y espacios creativos donde tu marca puede tener presencia genuina y recordación real.
+            Creamos campañas audiovisuales pensadas para parar el scroll, generar conexión y quedarse en la cabeza.
           </p>
         </div>
         <ThumbStrip items={brandThumbnails} />
       </Block>
 
-      {/* Bloque 5 */}
+      {/* Bloque 5: Creatividad + Marketing */}
       <Block>
         <div className="max-w-3xl">
-          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Propuesta de valor</p>
+          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Creatividad + Marketing</p>
           <h3
             className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight"
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
           >
-            Posicionamiento cultural
+            No solo creamos.
             <br />
-            <span className="text-white/25">que ningún anuncio puede comprar.</span>
+            <span className="text-white/25">Entendemos cómo convertir.</span>
           </h3>
+          <p className="mt-8 text-white/40 text-base leading-relaxed max-w-xl">
+            Sabemos qué funciona, cómo se consume y cómo convertir atención en resultado. Cada pieza tiene un objetivo claro.
+          </p>
         </div>
       </Block>
 
-      {/* Bloque 6: Formatos */}
+      {/* Bloque 6: Web */}
       <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
         <Block delay={0}>
-          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Formatos de colaboración</p>
+          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Desarrollo Web</p>
           <h3
             className="text-3xl sm:text-4xl font-black text-white leading-tight tracking-tight mb-6"
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
           >
-            Desde la idea hasta la ejecución.
+            Web como experiencia,
+            <br />no como escaparate.
           </h3>
           <p className="text-white/40 text-base leading-relaxed">
-            Diseñamos el formato de colaboración que mejor se adapta a tu marca: desde patrocinio de lanzamientos hasta campañas de contenido orgánico con artistas de nuestro entorno.
+            Muchas marcas invierten en contenido… pero cuando alguien entra en su web, no pasa nada. Nosotros diseñamos plataformas que sí convierten.
           </p>
           <p className="mt-4 text-white/25 text-sm leading-relaxed">
-            Flexibilidad estratégica. Impacto cultural. Resultados medibles.
+            No hacemos webs "bonitas". Creamos espacios donde tu marca se entiende, se siente y se convierte.
           </p>
         </Block>
 
@@ -445,10 +449,10 @@ function BrandView() {
           className="space-y-0 divide-y divide-white/[0.05]"
         >
           {[
-            { num: "01", label: "Patrocinio de lanzamientos musicales" },
-            { num: "02", label: "Contenido audiovisual con artistas" },
-            { num: "03", label: "Activaciones en eventos y espacios" },
-            { num: "04", label: "Campañas de marca con impacto cultural" },
+            { num: "01", label: "Diseño web con dirección creativa" },
+            { num: "02", label: "Estructura pensada para conversión" },
+            { num: "03", label: "Experiencia clara y atractiva" },
+            { num: "04", label: "Integración con contenido y campañas" },
           ].map((item, i) => (
             <motion.div
               key={i}
@@ -466,27 +470,27 @@ function BrandView() {
         </motion.div>
       </div>
 
-      {/* Bloque final */}
+      {/* Bloque final: Todo conectado */}
       <Block>
         <div className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-10 sm:p-14 overflow-hidden">
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#ff5833]/[0.06] rounded-full blur-3xl pointer-events-none" />
           <div className="relative z-10">
-            <p className="text-[10px] font-bold text-[#ff5833] uppercase tracking-[0.35em] mb-6">Partnership</p>
+            <p className="text-[10px] font-bold text-[#ff5833] uppercase tracking-[0.35em] mb-6">Objetivo</p>
             <h3
               className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight mb-6"
               style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
             >
-              Las mejores marcas no siguen la cultura.
+              Construimos, no
               <br />
-              <span className="text-white/25">La crean.</span>
+              <span className="text-white/25">improvisamos.</span>
             </h3>
             <p className="text-white/40 text-base leading-relaxed max-w-2xl">
-              Si tu marca busca una presencia auténtica en el ecosistema de la música urbana y la cultura creativa, trabajamos contigo para construirla desde dentro.
+              Campañas, contenido y web no van separados. Todo forma parte de lo mismo: cómo se ve tu marca, cómo se entiende y cómo convierte. Construimos una línea. Una presencia. Una forma de estar.
             </p>
             <div className="mt-8 h-px bg-gradient-to-r from-[#ff5833]/50 via-[#ff5833]/10 to-transparent w-32" />
             <p className="mt-6 text-white/20 text-sm">
-              No somos una agencia.{" "}
-              <span className="text-white/40">Somos el ecosistema donde tu marca puede vivir de verdad.</span>
+              Si tu marca está lista para hacer las cosas bien…{" "}
+              <span className="text-white/40">hablemos.</span>
             </p>
           </div>
         </div>
