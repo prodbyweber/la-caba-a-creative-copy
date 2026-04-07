@@ -7,7 +7,7 @@ import BrandsCarousel from "@/components/landing/BrandsCarousel";
 import StoriesSection from "@/components/landing/StoriesSection.jsx";
 import DashboardPreview from "@/components/landing/DashboardPreview";
 
-import AboutSection from "@/components/landing/AboutSection";
+import AboutSection from "@/components/landing/AboutSection.jsx";
 import TeamSection from "@/components/landing/TeamSection";
 import MemberBanner from "@/components/landing/MemberBanner";
 import LandingNav from "@/components/landing/LandingNav";
