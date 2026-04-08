@@ -16,7 +16,8 @@ import {
   TrendingUp,
   Home,
   DollarSign,
-  Inbox
+  Inbox,
+  Monitor
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -30,6 +31,7 @@ const navItems = [
   { icon: DollarSign, label: "Contabilidad Pro", page: "FinanceDashboard" },
   { icon: TrendingUp, label: "Inversor", page: "InvestorDashboard" },
   { icon: Settings, label: "Landing Editor", page: "LandingEditor" },
+  { icon: Monitor, label: "Banners", page: "BannersAdmin" },
   { icon: Inbox, label: "Solicitudes", page: "ContactLeads" }
 ];
 

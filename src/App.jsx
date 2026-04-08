@@ -12,6 +12,7 @@ import { base44 } from '@/api/base44Client';
 import ContactLeads from './pages/ContactLeads';
 import Pricing from './pages/Pricing';
 import AdminDashboard from './pages/AdminDashboard';
+import BannersAdmin from './pages/BannersAdmin';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -100,6 +101,7 @@ const AuthenticatedApp = () => {
       <Route path="/ContactLeads" element={<ContactLeads />} />
       <Route path="/Pricing" element={<Pricing />} />
       <Route path="/AdminDashboard" element={<ProtectedAdminRoute element={<AdminDashboard />} />} />
+      <Route path="/BannersAdmin" element={<ProtectedAdminRoute element={<BannersAdmin />} />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
