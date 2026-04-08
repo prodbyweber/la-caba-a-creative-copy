@@ -403,6 +403,60 @@ export default function LandingEditor() {
               />
             </SectionEditor>
 
+            {/* Hero Banners Editor */}
+            <SectionEditor title="🖼️ Banners de Portada (3 bloques)" defaultOpen={false}>
+              <p className="text-xs text-white/40 mb-4">Sube o cambia la imagen de cada uno de los 3 banners que aparecen debajo del carrusel de marcas.</p>
+              {[
+                { key: "hero_banner_1_image", label: "Banner 1 — MUSE CLUB" },
+                { key: "hero_banner_2_image", label: "Banner 2 — LA NUEVA CORRIENTE" },
+                { key: "hero_banner_3_image", label: "Banner 3 — FRIENDS & FAMILY" },
+              ].map((banner) => (
+                <div key={banner.key} className="mb-5">
+                  <label className="text-sm text-gray-400 mb-2 block font-medium">{banner.label}</label>
+                  {config[banner.key] && (
+                    <div className="mb-2 relative rounded-xl overflow-hidden border border-white/10" style={{ height: 100 }}>
+                      <img src={config[banner.key]} alt={banner.label} className="w-full h-full object-cover" />
+                      <button
+                        onClick={() => updateField(banner.key, "")}
+                        className="absolute top-2 right-2 p-1.5 bg-black/70 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={config[banner.key] || ""}
+                      onChange={(e) => updateField(banner.key, e.target.value)}
+                      placeholder="URL de imagen..."
+                      className="flex-1 px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                    />
+                    <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-white/20 cursor-pointer transition-all text-sm ${isUploading ? "opacity-50 pointer-events-none" : "bg-white/5 hover:bg-white/10 text-white"}`}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setIsUploading(true);
+                          try {
+                            const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                            updateField(banner.key, file_url);
+                          } finally {
+                            setIsUploading(false);
+                          }
+                        }}
+                      />
+                      <Upload className="w-4 h-4 text-emerald-400" />
+                      {isUploading ? "Subiendo..." : "Subir"}
+                    </label>
+                  </div>
+                </div>
+              ))}
+            </SectionEditor>
+
             {/* Hero Section Editor */}
             <SectionEditor title="🎬 Hero Principal" defaultOpen={true}>
               <p className="text-xs text-white/40 mb-3">El Hero muestra el título "Cabaña® Creative" con animación al hacer scroll. En desktop el video se ve de fondo; en mobile aparece debajo del texto en formato vertical.</p>
