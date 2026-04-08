@@ -10,7 +10,6 @@ import TimelineEditor from "@/components/admin/TimelineEditor";
 import StoriesEditor from "@/components/admin/StoriesEditor.jsx";
 import StartupsEditor from "@/components/admin/StartupsEditor";
 import FormsEditor from "@/components/admin/FormsEditor";
-import TeamEditor from "@/components/admin/TeamEditor";
 import AboutEditor from "@/components/admin/AboutEditor";
 import ExploracionEditor from "@/components/admin/ExploracionEditor";
 import PlansEditor from "@/components/admin/PlansEditor";
@@ -372,14 +371,6 @@ export default function LandingEditor() {
             {/* About Section Editor */}
             <SectionEditor title="📖 Acerca de Nosotros">
               <AboutEditor 
-                config={config}
-                onUpdate={(data) => updateMutation.mutate(data)}
-              />
-            </SectionEditor>
-
-            {/* Team Section Editor */}
-            <SectionEditor title="👥 ¿Quiénes Somos? (Equipo)">
-              <TeamEditor 
                 config={config}
                 onUpdate={(data) => updateMutation.mutate(data)}
               />

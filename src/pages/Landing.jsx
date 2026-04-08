@@ -8,7 +8,6 @@ import StoriesSection from "@/components/landing/StoriesSection.jsx";
 import DashboardPreview from "@/components/landing/DashboardPreview";
 
 import AboutSection from "@/components/landing/AboutSection.jsx";
-import TeamSection from "@/components/landing/TeamSection";
 import MemberBanner from "@/components/landing/MemberBanner";
 import LandingNav from "@/components/landing/LandingNav";
 import Footer from "@/components/landing/Footer";
@@ -38,7 +37,7 @@ export default function Landing() {
         <BrandsCarousel logos={config?.brand_logos} />
         <HeroBanners />
         <div id="about"><AboutSection /></div>
-        <div id="team"><TeamSection /></div>
+
         <div id="stories"><StoriesSection /></div>
         <DashboardPreview />
 
