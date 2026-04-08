@@ -230,7 +230,8 @@ export default function LandingEditor() {
       console.error('Error updating config:', error);
     },
     onSuccess: () => {
-      // Cache already updated optimistically in onMutate — no need to invalidate
+      // Invalidate so other components (landing page) see fresh data
+      queryClient.invalidateQueries({ queryKey: ['landingConfig'] });
     },
   });
 

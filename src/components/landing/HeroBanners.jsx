@@ -4,7 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
 function isVideoUrl(url) {
-  return /\.(mp4|webm|mov)(\?|$)/i.test(url || "");
+  if (!url) return false;
+  // Match extension before any query string, or check content-type hints in URL
+  return /\.(mp4|webm|mov|quicktime)(\?|#|$)/i.test(url) || /video\//i.test(url);
 }
 
 const defaultBanners = [
@@ -51,6 +53,7 @@ function BannerBlock({ banner, image, index }) {
       {/* Background: video or image */}
       {isVideoUrl(image) ? (
         <video
+          key={image}
           src={image}
           autoPlay
           muted
@@ -140,7 +143,8 @@ export default function HeroBanners() {
     queryFn: async () => {
       const configs = await base44.entities.LandingConfig.list();
       return configs.length > 0 ? configs[0] : null;
-    }
+    },
+    staleTime: 0,
   });
 
   return (
