@@ -198,22 +198,22 @@ export default function DashboardPreview() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-20 lg:mb-24"
+          className="text-center mb-20"
         >
-          <div className="flex items-center gap-3 mb-8">
+          <div className="flex items-center justify-center gap-3 mb-8">
             <span className="text-[10px] font-bold text-[#ff5833] uppercase tracking-[0.35em]">Plataforma</span>
             <div className="h-px bg-[#ff5833]/25 w-12" />
           </div>
           <h2
-            className="text-5xl sm:text-7xl lg:text-8xl font-black text-white leading-[0.92] tracking-tight mb-6 max-w-3xl"
+            className="text-5xl sm:text-7xl lg:text-8xl font-black text-white leading-[0.92] tracking-tight mb-6"
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
           >
-            Tu carrera en
+            Tu carrera.
             <br />
-            <span className="text-white/20">un solo lugar.</span>
+            <span className="text-white/20">Centralizada.</span>
           </h2>
-          <p className="text-sm sm:text-base text-white/30 max-w-xl leading-relaxed font-light">
-            Proyectos, catálogo, analíticas y agenda — todo conectado para que te enfoques en crear.
+          <p className="text-base text-white/30 max-w-md mx-auto leading-relaxed font-light">
+            Más que lo que se escucha.
           </p>
         </motion.div>
 
