@@ -6,7 +6,7 @@ import { base44 } from "@/api/base44Client";
 const defaultBanners = [
   {
     tag: "the girls",
-    title: "MUSE CLUB",
+    title: "Muse Club",
     subtitle: "She sets the tone",
     cta: "Explore",
     defaultImage: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1800&h=900&fit=crop&q=85",
@@ -14,7 +14,7 @@ const defaultBanners = [
   },
   {
     tag: "Sonido nuevo",
-    title: "LA NUEVA CORRIENTE",
+    title: "La nueva corriente",
     subtitle: "Donde nace el sonido nuevo",
     cta: "Descubrir",
     defaultImage: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=1800&h=900&fit=crop&q=85",
@@ -22,9 +22,9 @@ const defaultBanners = [
   },
   {
     tag: "Comunidad",
-    title: "FRIENDS & FAMILY",
+    title: "Friends & Family",
     subtitle: "Inside the circle",
-    cta: "View All",
+    cta: "Ver más",
     defaultImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1800&h=900&fit=crop&q=85",
     configKey: "hero_banner_3_image",
   },
