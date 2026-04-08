@@ -399,11 +399,8 @@ export default function LandingEditor() {
             {/* Hero Banners Editor */}
             <SectionEditor title="🖼️ Banners de Portada (3 bloques)" defaultOpen={false}>
               <BannersEditor
+                configId={config.id}
                 config={config}
-                onSave={async (field, value) => {
-                  await base44.entities.LandingConfig.update(config.id, { [field]: value });
-                  queryClient.invalidateQueries({ queryKey: ['landingConfig'] });
-                }}
               />
             </SectionEditor>
 

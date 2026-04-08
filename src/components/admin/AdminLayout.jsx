@@ -31,7 +31,6 @@ const navItems = [
   { icon: DollarSign, label: "Contabilidad Pro", page: "FinanceDashboard" },
   { icon: TrendingUp, label: "Inversor", page: "InvestorDashboard" },
   { icon: Settings, label: "Landing Editor", page: "LandingEditor" },
-  { icon: Monitor, label: "Banners", page: "BannersAdmin" },
   { icon: Inbox, label: "Solicitudes", page: "ContactLeads" }
 ];
 
