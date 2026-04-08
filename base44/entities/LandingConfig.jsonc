@@ -34,6 +34,18 @@
       "type": "string",
       "description": "Texto del bot\u00f3n CTA"
     },
+    "hero_banner_1_image": {
+      "type": "string",
+      "description": "URL de imagen o video del banner 1 (Muse Club)"
+    },
+    "hero_banner_2_image": {
+      "type": "string",
+      "description": "URL de imagen o video del banner 2 (La Nueva Corriente)"
+    },
+    "hero_banner_3_image": {
+      "type": "string",
+      "description": "URL de imagen o video del banner 3 (Friends & Family)"
+    },
     "brand_logos": {
       "type": "array",
       "items": {
