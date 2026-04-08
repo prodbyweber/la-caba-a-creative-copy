@@ -37,8 +37,8 @@ function BannerBlock({ banner, image, index }) {
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-      className="relative w-full overflow-hidden group cursor-pointer"
-      style={{ height: "clamp(320px, 55vw, 680px)" }}
+      className="relative w-screen overflow-hidden group cursor-pointer"
+      style={{ height: "clamp(320px, 60vw, 780px)", marginLeft: "calc(-50vw + 50%)" }}
     >
       {/* Background image with zoom on hover */}
       <img

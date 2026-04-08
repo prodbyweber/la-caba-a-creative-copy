@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -8,7 +8,9 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
+  const [scrollingDown, setScrollingDown] = useState(false);
   const [logoVisible, setLogoVisible] = useState(false);
+  const lastScrollY = useRef(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -53,10 +55,17 @@ export default function LandingNav() {
 
   useEffect(() => {
     const handleScroll = () => {
+      const currentY = window.scrollY;
       const heroHeight = window.innerHeight;
-      setScrolled(window.scrollY > 60);
-      // Logo aparece exactamente cuando el título termina su animación (~50% del hero)
-      setLogoVisible(window.scrollY >= heroHeight * 0.5);
+      setScrolled(currentY > 60);
+      setLogoVisible(currentY >= heroHeight * 0.5);
+      // Transparente al bajar, opaco al subir
+      if (currentY > lastScrollY.current && currentY > 80) {
+        setScrollingDown(true);
+      } else {
+        setScrollingDown(false);
+      }
+      lastScrollY.current = currentY;
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -102,9 +111,11 @@ export default function LandingNav() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled 
-            ? "bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5" 
-            : "bg-transparent"
+          scrollingDown
+            ? "opacity-0 pointer-events-none"
+            : scrolled
+              ? "opacity-100 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5"
+              : "opacity-100 bg-transparent"
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
