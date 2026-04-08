@@ -157,7 +157,7 @@ function ProjectRow({ project, index }) {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="flex gap-3 pb-2 overflow-x-auto scrollbar-none pl-0 sm:pl-14">
+            <div className="flex gap-3 pb-2 overflow-x-auto scrollbar-none pl-14">
               {project.clips.map((clip, i) => (
                 <ClipCard key={i} clip={clip} index={i} />
               ))}

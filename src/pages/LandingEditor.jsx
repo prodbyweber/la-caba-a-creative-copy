@@ -369,7 +369,21 @@ export default function LandingEditor() {
               <StartupsEditor />
             </SectionEditor>
 
+            {/* About Section Editor */}
+            <SectionEditor title="📖 Acerca de Nosotros">
+              <AboutEditor 
+                config={config}
+                onUpdate={(data) => updateMutation.mutate(data)}
+              />
+            </SectionEditor>
 
+            {/* Team Section Editor */}
+            <SectionEditor title="👥 ¿Quiénes Somos? (Equipo)">
+              <TeamEditor 
+                config={config}
+                onUpdate={(data) => updateMutation.mutate(data)}
+              />
+            </SectionEditor>
 
             {/* Timeline Section Editor */}
             <SectionEditor title="📅 Timeline Biográfico">

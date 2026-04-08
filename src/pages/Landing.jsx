@@ -35,12 +35,13 @@ export default function Landing() {
       {!isLoading && (
         <main>
           <Hero config={config} />
-          <BrandsCarousel logos={config?.brand_logos} />
-          <HeroBanners />
-          <div id="about"><AboutSection /></div>
-          <div id="team"><TeamSection /></div>
-          <div id="stories"><StoriesSection /></div>
-          <DashboardPreview />
+        <BrandsCarousel logos={config?.brand_logos} />
+        <HeroBanners />
+        <div id="about"><AboutSection /></div>
+        <div id="team"><TeamSection /></div>
+        <div id="stories"><StoriesSection /></div>
+        <DashboardPreview />
+
         </main>
       )}
 
