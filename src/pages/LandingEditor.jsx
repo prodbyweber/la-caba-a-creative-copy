@@ -14,6 +14,7 @@ import AboutEditor from "@/components/admin/AboutEditor";
 import ExploracionEditor from "@/components/admin/ExploracionEditor";
 import PlansEditor from "@/components/admin/PlansEditor";
 import BannersEditor from "@/components/admin/BannersEditor";
+import { Link } from "react-router-dom";
 import { 
   Eye, 
   GripVertical, 
@@ -403,14 +404,12 @@ export default function LandingEditor() {
                   <p className="text-sm font-semibold text-white">Editor dedicado de Banners</p>
                   <p className="text-xs text-white/40 mt-0.5">Accede al editor completo para subir imágenes y videos con guardado directo.</p>
                 </div>
-                <a
-                  href="/BannersAdmin"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to="/BannersAdmin"
                   className="flex-shrink-0 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-white text-sm font-medium transition-colors whitespace-nowrap"
                 >
                   Abrir editor →
-                </a>
+                </Link>
               </div>
               <BannersEditor
                 configId={config.id}
