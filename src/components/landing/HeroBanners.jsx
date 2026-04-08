@@ -11,7 +11,7 @@ function isVideoUrl(url) {
 
 const defaultBanners = [
   {
-    tag: "the girls",
+    tag: "The Girls - Modelos",
     title: "Muse Club",
     subtitle: "She sets the tone",
     cta: "Explore",
