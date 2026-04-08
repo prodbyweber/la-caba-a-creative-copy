@@ -54,9 +54,17 @@ const ProtectedAdminRoute = ({ element }) => {
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const isLoading = isLoadingPublicSettings || isLoadingAuth;
 
-  // Show loading spinner while checking app public settings or auth
-  if (isLoadingPublicSettings || isLoadingAuth) {
+  // Hide splash only when auth is fully resolved (never show blank screen or spinner)
+  React.useEffect(() => {
+    if (!isLoading) {
+      window.__cabanaHideSplash && window.__cabanaHideSplash();
+    }
+  }, [isLoading]);
+
+  if (isLoading) {
+    // Keep splash visible — render nothing underneath
     return null;
   }
 
