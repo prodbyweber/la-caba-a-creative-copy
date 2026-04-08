@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -17,6 +17,7 @@ const defaultBanners = [
     cta: "Explore",
     defaultImage: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1800&h=900&fit=crop&q=85",
     configKey: "hero_banner_1_image",
+    mobilePositionKey: "hero_banner_1_mobile_position",
   },
   {
     tag: "Sonido nuevo",
@@ -25,6 +26,7 @@ const defaultBanners = [
     cta: "Descubrir",
     defaultImage: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=1800&h=900&fit=crop&q=85",
     configKey: "hero_banner_2_image",
+    mobilePositionKey: "hero_banner_2_mobile_position",
   },
   {
     tag: "Comunidad",
@@ -33,10 +35,23 @@ const defaultBanners = [
     cta: "Ver todo",
     defaultImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1800&h=900&fit=crop&q=85",
     configKey: "hero_banner_3_image",
+    mobilePositionKey: "hero_banner_3_mobile_position",
   },
 ];
 
-function BannerBlock({ banner, image, index }) {
+function useMobile() {
+  const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 768);
+  React.useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  return isMobile;
+}
+
+function BannerBlock({ banner, image, mobilePosition, index }) {
+  const isMobile = useMobile();
+  const objectPos = isMobile && mobilePosition ? mobilePosition : "center center";
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -68,7 +83,7 @@ function BannerBlock({ banner, image, index }) {
           alt={banner.title}
           loading="lazy"
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1400ms] ease-in-out group-hover:scale-[1.04]"
-          style={{ objectPosition: "center center" }}
+          style={{ objectPosition: objectPos }}
         />
       )}
 
@@ -161,6 +176,7 @@ export default function HeroBanners() {
           key={i}
           banner={banner}
           image={config?.[banner.configKey] || banner.defaultImage}
+          mobilePosition={config?.[banner.mobilePositionKey] || "center center"}
           index={i}
         />
       ))}

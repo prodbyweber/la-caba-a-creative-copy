@@ -1,13 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Upload, Trash2, CheckCircle, AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
+import { Upload, Trash2, CheckCircle, AlertCircle, ArrowLeft, RefreshCw, Smartphone } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 
 const BANNERS = [
-  { key: "hero_banner_1_image", label: "Banner 1", subtitle: "Muse Club" },
-  { key: "hero_banner_2_image", label: "Banner 2", subtitle: "La Nueva Corriente" },
-  { key: "hero_banner_3_image", label: "Banner 3", subtitle: "Friends & Family" },
+  { key: "hero_banner_1_image", mobileKey: "hero_banner_1_mobile_position", label: "Banner 1", subtitle: "Muse Club" },
+  { key: "hero_banner_2_image", mobileKey: "hero_banner_2_mobile_position", label: "Banner 2", subtitle: "La Nueva Corriente" },
+  { key: "hero_banner_3_image", mobileKey: "hero_banner_3_mobile_position", label: "Banner 3", subtitle: "Friends & Family" },
+];
+
+// Presets de posición para mobile
+const POSITION_PRESETS = [
+  { label: "Centro", value: "center center" },
+  { label: "Arriba centro", value: "center top" },
+  { label: "Abajo centro", value: "center bottom" },
+  { label: "Izq. centro", value: "left center" },
+  { label: "Der. centro", value: "right center" },
+  { label: "Izq. arriba", value: "left top" },
+  { label: "Der. arriba", value: "right top" },
+  { label: "Izq. abajo", value: "left bottom" },
+  { label: "Der. abajo", value: "right bottom" },
 ];
 
 function isVideoUrl(url) {
@@ -16,35 +29,39 @@ function isVideoUrl(url) {
   return cleanUrl.endsWith(".mp4") || cleanUrl.endsWith(".webm") || cleanUrl.endsWith(".mov");
 }
 
-function BannerCard({ bannerDef, configId, savedUrl, onUpdated }) {
+function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, onUpdated }) {
   const [url, setUrl] = useState(savedUrl || "");
+  const [mobilePosition, setMobilePosition] = useState(savedMobilePosition || "center center");
+  const [customX, setCustomX] = useState("50");
+  const [customY, setCustomY] = useState("50");
   const [uploading, setUploading] = useState(false);
-  const [status, setStatus] = useState(null); // null | "saving" | "ok" | "error"
+  const [status, setStatus] = useState(null);
+  const [showMobilePanel, setShowMobilePanel] = useState(false);
   const fileInputImg = useRef();
   const fileInputVid = useRef();
-
-  // Sync ONLY when parent has a new value from server and local is still empty
   const mounted = useRef(false);
+
   useEffect(() => {
     if (!mounted.current) {
       mounted.current = true;
       setUrl(savedUrl || "");
+      setMobilePosition(savedMobilePosition || "center center");
     }
   }, []);
 
   const isVideo = isVideoUrl(url);
 
-  const persist = async (newUrl) => {
+  const persist = async (fields) => {
+    if (!configId) return;
     setStatus("saving");
     try {
-      await base44.entities.LandingConfig.update(configId, { [bannerDef.key]: newUrl });
-      setUrl(newUrl);
+      await base44.entities.LandingConfig.update(configId, fields);
       setStatus("ok");
-      onUpdated(bannerDef.key, newUrl);
+      onUpdated(fields);
       setTimeout(() => setStatus(null), 2500);
     } catch (e) {
       setStatus("error");
-      console.error("Error guardando banner:", e);
+      console.error("Error guardando:", e);
     }
   };
 
@@ -57,22 +74,35 @@ function BannerCard({ bannerDef, configId, savedUrl, onUpdated }) {
     setUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      await persist(file_url);
+      setUrl(file_url);
+      await persist({ [bannerDef.key]: file_url });
     } catch (e) {
       setStatus("error");
       alert("Error al subir el archivo: " + e.message);
     } finally {
       setUploading(false);
-      // Reset file inputs so same file can be re-selected
       if (fileInputImg.current) fileInputImg.current.value = "";
       if (fileInputVid.current) fileInputVid.current.value = "";
     }
   };
 
-  const handleRemove = () => persist("");
+  const handleRemove = () => {
+    setUrl("");
+    persist({ [bannerDef.key]: "" });
+  };
 
   const handleUrlBlur = () => {
-    if (url !== savedUrl) persist(url);
+    if (url !== savedUrl) persist({ [bannerDef.key]: url });
+  };
+
+  const applyMobilePosition = (pos) => {
+    setMobilePosition(pos);
+    persist({ [bannerDef.mobileKey]: pos });
+  };
+
+  const applyCustomPosition = () => {
+    const pos = `${customX}% ${customY}%`;
+    applyMobilePosition(pos);
   };
 
   return (
@@ -113,18 +143,13 @@ function BannerCard({ bannerDef, configId, savedUrl, onUpdated }) {
         </div>
       </div>
 
-      {/* Preview */}
+      {/* Preview desktop */}
       <div className="relative bg-black/40" style={{ height: 180 }}>
         {url ? (
           isVideo ? (
-            <video
-              key={url}
-              src={url}
-              autoPlay muted loop playsInline
-              className="w-full h-full object-cover"
-            />
+            <video key={url} src={url} autoPlay muted loop playsInline className="w-full h-full object-cover" />
           ) : (
-            <img src={url} alt={bannerDef.subtitle} className="w-full h-full object-cover" />
+            <img src={url} alt={bannerDef.subtitle} className="w-full h-full object-cover" style={{ objectPosition: "center center" }} />
           )
         ) : (
           <div className="w-full h-full flex items-center justify-center">
@@ -140,7 +165,7 @@ function BannerCard({ bannerDef, configId, savedUrl, onUpdated }) {
 
       {/* Controls */}
       <div className="p-5 space-y-3">
-        {/* URL manual */}
+        {/* URL */}
         <div>
           <label className="text-xs text-white/40 mb-1.5 block">URL directa (opcional)</label>
           <input
@@ -176,28 +201,117 @@ function BannerCard({ bannerDef, configId, savedUrl, onUpdated }) {
         </div>
 
         {/* Hidden inputs */}
-        <input
-          ref={fileInputImg}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => handleFileUpload(e.target.files?.[0], false)}
-        />
-        <input
-          ref={fileInputVid}
-          type="file"
-          accept="video/mp4,video/webm,video/mov,video/quicktime"
-          className="hidden"
-          onChange={(e) => handleFileUpload(e.target.files?.[0], true)}
-        />
+        <input ref={fileInputImg} type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e.target.files?.[0], false)} />
+        <input ref={fileInputVid} type="file" accept="video/mp4,video/webm,video/mov,video/quicktime" className="hidden" onChange={(e) => handleFileUpload(e.target.files?.[0], true)} />
+
+        {/* Mobile position toggle */}
+        {url && !isVideo && (
+          <button
+            onClick={() => setShowMobilePanel(!showMobilePanel)}
+            className={`w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border text-sm transition-all ${
+              showMobilePanel
+                ? "border-blue-500/40 bg-blue-500/10 text-blue-300"
+                : "border-white/10 bg-white/5 text-white/60 hover:text-white hover:bg-white/10"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Smartphone className="w-4 h-4" />
+              <span>Ajuste Mobile</span>
+            </div>
+            <span className="text-xs text-white/30 font-mono">{mobilePosition}</span>
+          </button>
+        )}
       </div>
+
+      {/* Mobile position panel */}
+      {showMobilePanel && url && !isVideo && (
+        <div className="border-t border-white/[0.06] p-5 space-y-4 bg-blue-500/[0.03]">
+          <p className="text-xs text-white/40">
+            Ajusta el punto focal de la imagen en <span className="text-blue-400">versión móvil</span> (pantalla vertical).
+          </p>
+
+          {/* Mobile preview — 9:16 aspect */}
+          <div className="flex gap-4 items-start">
+            <div className="flex-shrink-0">
+              <p className="text-[10px] text-white/30 mb-1.5 uppercase tracking-widest">Vista mobile</p>
+              <div
+                className="relative overflow-hidden rounded-xl border border-white/10 bg-black"
+                style={{ width: 90, height: 160 }}
+              >
+                <img
+                  src={url}
+                  alt="mobile preview"
+                  className="w-full h-full object-cover"
+                  style={{ objectPosition: mobilePosition }}
+                />
+                {/* Phone notch */}
+                <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-8 h-1 bg-black/60 rounded-full" />
+              </div>
+              <p className="text-[9px] text-white/20 mt-1 text-center font-mono">{mobilePosition}</p>
+            </div>
+
+            <div className="flex-1 space-y-3">
+              {/* Presets grid */}
+              <div>
+                <p className="text-[10px] text-white/30 mb-2 uppercase tracking-widest">Presets</p>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {POSITION_PRESETS.map((preset) => (
+                    <button
+                      key={preset.value}
+                      onClick={() => applyMobilePosition(preset.value)}
+                      className={`px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all text-center leading-tight ${
+                        mobilePosition === preset.value
+                          ? "bg-blue-500/30 border border-blue-500/50 text-blue-300"
+                          : "bg-white/5 border border-white/10 text-white/50 hover:text-white hover:bg-white/10"
+                      }`}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom XY sliders */}
+              <div>
+                <p className="text-[10px] text-white/30 mb-2 uppercase tracking-widest">Posición exacta (%)</p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-white/30 w-4">X</span>
+                    <input
+                      type="range" min="0" max="100" value={customX}
+                      onChange={(e) => setCustomX(e.target.value)}
+                      className="flex-1 accent-blue-500 cursor-pointer"
+                    />
+                    <span className="text-[10px] text-white/50 font-mono w-7 text-right">{customX}%</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-white/30 w-4">Y</span>
+                    <input
+                      type="range" min="0" max="100" value={customY}
+                      onChange={(e) => setCustomY(e.target.value)}
+                      className="flex-1 accent-blue-500 cursor-pointer"
+                    />
+                    <span className="text-[10px] text-white/50 font-mono w-7 text-right">{customY}%</span>
+                  </div>
+                  <button
+                    onClick={applyCustomPosition}
+                    className="w-full py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 text-xs font-medium transition-colors border border-blue-500/20"
+                  >
+                    Aplicar posición exacta
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default function BannersAdmin() {
   const [configId, setConfigId] = useState(null);
-  const [bannerUrls, setBannerUrls] = useState({});
+  const [bannerData, setBannerData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -212,10 +326,13 @@ export default function BannersAdmin() {
       }
       const cfg = configs[0];
       setConfigId(cfg.id);
-      setBannerUrls({
+      setBannerData({
         hero_banner_1_image: cfg.hero_banner_1_image || "",
+        hero_banner_1_mobile_position: cfg.hero_banner_1_mobile_position || "center center",
         hero_banner_2_image: cfg.hero_banner_2_image || "",
+        hero_banner_2_mobile_position: cfg.hero_banner_2_mobile_position || "center center",
         hero_banner_3_image: cfg.hero_banner_3_image || "",
+        hero_banner_3_mobile_position: cfg.hero_banner_3_mobile_position || "center center",
       });
     } catch (e) {
       setError("Error al cargar la configuración: " + e.message);
@@ -224,12 +341,10 @@ export default function BannersAdmin() {
     }
   };
 
-  useEffect(() => {
-    loadConfig();
-  }, []);
+  useEffect(() => { loadConfig(); }, []);
 
-  const handleUpdated = (key, newUrl) => {
-    setBannerUrls((prev) => ({ ...prev, [key]: newUrl }));
+  const handleUpdated = (fields) => {
+    setBannerData((prev) => ({ ...prev, ...fields }));
   };
 
   return (
@@ -240,16 +355,13 @@ export default function BannersAdmin() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Link
-                  to="/LandingEditor"
-                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors"
-                >
+                <Link to="/LandingEditor" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-colors">
                   <ArrowLeft className="w-4 h-4" />
                 </Link>
                 <h1 className="text-2xl sm:text-3xl font-bold text-white">Banners de Portada</h1>
               </div>
               <p className="text-sm text-white/40 ml-11">
-                Sube imagen o video para cada banner. Los cambios se guardan automáticamente en la base de datos.
+                Sube imagen o video y ajusta la miniatura móvil de cada banner.
               </p>
             </div>
             <button
@@ -262,7 +374,6 @@ export default function BannersAdmin() {
             </button>
           </div>
 
-          {/* States */}
           {loading && (
             <div className="flex items-center justify-center py-24">
               <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
@@ -284,7 +395,8 @@ export default function BannersAdmin() {
                     key={banner.key}
                     bannerDef={banner}
                     configId={configId}
-                    savedUrl={bannerUrls[banner.key]}
+                    savedUrl={bannerData[banner.key]}
+                    savedMobilePosition={bannerData[banner.mobileKey]}
                     onUpdated={handleUpdated}
                   />
                 ))}
@@ -292,8 +404,7 @@ export default function BannersAdmin() {
 
               <div className="mt-8 p-4 bg-white/[0.02] border border-white/[0.06] rounded-xl">
                 <p className="text-xs text-white/30 text-center">
-                  Los cambios se guardan automáticamente al subir un archivo o al confirmar la URL.
-                  La landing page se actualiza al recargar.
+                  Los cambios se guardan automáticamente. El ajuste mobile solo afecta la posición en pantallas pequeñas.
                 </p>
               </div>
             </>

@@ -38,13 +38,25 @@
       "type": "string",
       "description": "URL de imagen o video del banner 1 (Muse Club)"
     },
+    "hero_banner_1_mobile_position": {
+      "type": "string",
+      "description": "object-position CSS para mobile del banner 1 (ej: 'center top', '70% center')"
+    },
     "hero_banner_2_image": {
       "type": "string",
       "description": "URL de imagen o video del banner 2 (La Nueva Corriente)"
     },
+    "hero_banner_2_mobile_position": {
+      "type": "string",
+      "description": "object-position CSS para mobile del banner 2"
+    },
     "hero_banner_3_image": {
       "type": "string",
       "description": "URL de imagen o video del banner 3 (Friends & Family)"
+    },
+    "hero_banner_3_mobile_position": {
+      "type": "string",
+      "description": "object-position CSS para mobile del banner 3"
     },
     "brand_logos": {
       "type": "array",
