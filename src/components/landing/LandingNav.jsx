@@ -112,10 +112,10 @@ export default function LandingNav() {
         animate={{ y: 0 }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrollingDown
-            ? "opacity-0 pointer-events-none"
+            ? "bg-transparent border-transparent backdrop-blur-none"
             : scrolled
-              ? "opacity-100 bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5"
-              : "opacity-100 bg-transparent"
+              ? "bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5"
+              : "bg-transparent"
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
