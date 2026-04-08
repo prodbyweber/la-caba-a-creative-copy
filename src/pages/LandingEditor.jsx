@@ -396,56 +396,91 @@ export default function LandingEditor() {
 
             {/* Hero Banners Editor */}
             <SectionEditor title="🖼️ Banners de Portada (3 bloques)" defaultOpen={false}>
-              <p className="text-xs text-white/40 mb-4">Sube o cambia la imagen de cada uno de los 3 banners que aparecen debajo del carrusel de marcas.</p>
+              <p className="text-xs text-white/40 mb-4">Sube imagen o video corto (máx. 30 MB) para cada banner. Los videos se reproducen en loop automáticamente.</p>
               {[
-                { key: "hero_banner_1_image", label: "Banner 1 — MUSE CLUB" },
-                { key: "hero_banner_2_image", label: "Banner 2 — LA NUEVA CORRIENTE" },
-                { key: "hero_banner_3_image", label: "Banner 3 — FRIENDS & FAMILY" },
-              ].map((banner) => (
-                <div key={banner.key} className="mb-5">
-                  <label className="text-sm text-gray-400 mb-2 block font-medium">{banner.label}</label>
-                  {config[banner.key] && (
-                    <div className="mb-2 relative rounded-xl overflow-hidden border border-white/10" style={{ height: 100 }}>
-                      <img src={config[banner.key]} alt={banner.label} className="w-full h-full object-cover" />
-                      <button
-                        onClick={() => updateField(banner.key, "")}
-                        className="absolute top-2 right-2 p-1.5 bg-black/70 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                  <div className="flex gap-2">
+                { key: "hero_banner_1_image", label: "Banner 1 — Muse Club" },
+                { key: "hero_banner_2_image", label: "Banner 2 — La Nueva Corriente" },
+                { key: "hero_banner_3_image", label: "Banner 3 — Friends & Family" },
+              ].map((banner) => {
+                const url = config[banner.key] || "";
+                const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(url);
+                return (
+                  <div key={banner.key} className="mb-6 p-3 bg-white/[0.03] rounded-xl border border-white/10">
+                    <label className="text-sm text-gray-400 mb-3 block font-medium">{banner.label}</label>
+                    {url && (
+                      <div className="mb-3 relative rounded-xl overflow-hidden border border-white/10" style={{ height: 110 }}>
+                        {isVideo ? (
+                          <video src={url} className="w-full h-full object-cover" autoPlay muted loop playsInline />
+                        ) : (
+                          <img src={url} alt={banner.label} className="w-full h-full object-cover" />
+                        )}
+                        <div className="absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-bold bg-black/60 text-white/70">
+                          {isVideo ? "VIDEO" : "IMAGEN"}
+                        </div>
+                        <button
+                          onClick={() => updateField(banner.key, "")}
+                          className="absolute top-2 right-2 p-1.5 bg-black/70 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
                     <input
                       type="text"
-                      value={config[banner.key] || ""}
+                      value={url}
                       onChange={(e) => updateField(banner.key, e.target.value)}
-                      placeholder="URL de imagen..."
-                      className="flex-1 px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+                      placeholder="URL de imagen o video..."
+                      className="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500 mb-2"
                     />
-                    <label className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-white/20 cursor-pointer transition-all text-sm ${isUploading ? "opacity-50 pointer-events-none" : "bg-white/5 hover:bg-white/10 text-white"}`}>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          setIsUploading(true);
-                          try {
-                            const { file_url } = await base44.integrations.Core.UploadFile({ file });
-                            updateField(banner.key, file_url);
-                          } finally {
-                            setIsUploading(false);
-                          }
-                        }}
-                      />
-                      <Upload className="w-4 h-4 text-emerald-400" />
-                      {isUploading ? "Subiendo..." : "Subir"}
-                    </label>
+                    <div className="flex gap-2">
+                      <label className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-white/20 cursor-pointer transition-all text-sm ${isUploading ? "opacity-50 pointer-events-none" : "bg-white/5 hover:bg-white/10 text-white"}`}>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setIsUploading(true);
+                            try {
+                              const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                              updateField(banner.key, file_url);
+                            } finally {
+                              setIsUploading(false);
+                            }
+                          }}
+                        />
+                        <Upload className="w-4 h-4 text-emerald-400" />
+                        {isUploading ? "Subiendo..." : "Subir imagen"}
+                      </label>
+                      <label className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-purple-500/30 cursor-pointer transition-all text-sm ${isUploading ? "opacity-50 pointer-events-none" : "bg-purple-500/5 hover:bg-purple-500/10 text-purple-300"}`}>
+                        <input
+                          type="file"
+                          accept="video/mp4,video/webm,video/mov,video/quicktime"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            if (file.size > 30 * 1024 * 1024) {
+                              alert("El video no puede superar los 30 MB.");
+                              return;
+                            }
+                            setIsUploading(true);
+                            try {
+                              const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                              updateField(banner.key, file_url);
+                            } finally {
+                              setIsUploading(false);
+                            }
+                          }}
+                        />
+                        <Upload className="w-4 h-4 text-purple-400" />
+                        {isUploading ? "Subiendo..." : "Subir video (30MB)"}
+                      </label>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </SectionEditor>
 
             {/* Hero Section Editor */}
