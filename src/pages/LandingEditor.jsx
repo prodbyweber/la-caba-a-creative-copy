@@ -398,6 +398,20 @@ export default function LandingEditor() {
 
             {/* Hero Banners Editor */}
             <SectionEditor title="🖼️ Banners de Portada (3 bloques)" defaultOpen={false}>
+              <div className="mb-4 p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-white">Editor dedicado de Banners</p>
+                  <p className="text-xs text-white/40 mt-0.5">Accede al editor completo para subir imágenes y videos con guardado directo.</p>
+                </div>
+                <a
+                  href="/BannersAdmin"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-white text-sm font-medium transition-colors whitespace-nowrap"
+                >
+                  Abrir editor →
+                </a>
+              </div>
               <BannersEditor
                 configId={config.id}
                 config={config}
