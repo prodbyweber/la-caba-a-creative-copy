@@ -25,24 +25,14 @@ export default function Landing() {
     <div className="min-h-screen bg-[#0a0a0b] text-white overflow-x-hidden">
       <LandingNav />
       
-      {isLoading && (
-        <div className="min-h-[500px] flex items-center justify-center bg-black">
-          <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        </div>
-      )}
-      
-      {!isLoading && (
-        <main>
-          <Hero config={config} />
+      <main>
+        <Hero config={config} />
         <BrandsCarousel logos={config?.brand_logos} />
         <HeroBanners />
         <div id="about"><AboutSection /></div>
-
         <div id="stories"><StoriesSection /></div>
         <DashboardPreview />
-
-        </main>
-      )}
+      </main>
 
       <Footer />
     </div>
