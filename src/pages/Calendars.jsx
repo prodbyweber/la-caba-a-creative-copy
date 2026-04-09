@@ -153,7 +153,11 @@ export default function Calendars() {
               const allItems = [
                 ...daySessions.map(s => ({ ...s, _kind: 'session' })),
                 ...dayDeliverables.map(d => ({ ...d, _kind: 'deliverable' }))
-              ];
+              ].sort((a, b) => {
+                const aTime = a._kind === 'session' ? (a.start_time ? new Date(a.start_time) : 0) : (a.due_date_time ? new Date(a.due_date_time) : 0);
+                const bTime = b._kind === 'session' ? (b.start_time ? new Date(b.start_time) : 0) : (b.due_date_time ? new Date(b.due_date_time) : 0);
+                return aTime - bTime;
+              });
               const maxVisible = 3;
               const overflow = allItems.length - maxVisible;
 
