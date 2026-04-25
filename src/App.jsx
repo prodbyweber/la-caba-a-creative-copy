@@ -15,6 +15,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import BannersAdmin from './pages/BannersAdmin';
 import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
+import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -120,6 +121,7 @@ function App() {
             <NavigationTracker />
             <AuthenticatedApp />
             <GlobalAudioPlayer />
+            <DesktopAudioPlayer />
           </Router>
           <Toaster />
         </GlobalAudioProvider>
