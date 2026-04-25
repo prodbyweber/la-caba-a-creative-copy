@@ -13,9 +13,7 @@ import {
   X,
   Search,
   Music2,
-  TrendingUp,
   Home,
-  DollarSign,
   Inbox,
   Monitor
 } from "lucide-react";
@@ -28,8 +26,7 @@ const navItems = [
   { icon: FolderKanban, label: "Projects", page: "Projects" },
   { icon: Music2, label: "Tracks", page: "Tracks" },
   { icon: Calendar, label: "Calendars", page: "Calendars" },
-  { icon: DollarSign, label: "Contabilidad Pro", page: "FinanceDashboard" },
-  { icon: TrendingUp, label: "Inversor", page: "InvestorDashboard" },
+
   { icon: Settings, label: "Landing Editor", page: "LandingEditor" },
   { icon: Inbox, label: "Solicitudes", page: "ContactLeads" }
 ];
