@@ -13,6 +13,7 @@ import ContactLeads from './pages/ContactLeads';
 import Pricing from './pages/Pricing';
 import AdminDashboard from './pages/AdminDashboard';
 import BannersAdmin from './pages/BannersAdmin';
+import OnboardingProfile from './pages/OnboardingProfile';
 import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
@@ -101,6 +102,7 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
+      <Route path="/OnboardingProfile" element={<OnboardingProfile />} />
       <Route path="/ContactLeads" element={<ContactLeads />} />
       <Route path="/Pricing" element={<Pricing />} />
       <Route path="/AdminDashboard" element={<ProtectedAdminRoute element={<AdminDashboard />} />} />
