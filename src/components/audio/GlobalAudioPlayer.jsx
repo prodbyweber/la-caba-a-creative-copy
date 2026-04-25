@@ -8,11 +8,6 @@ export default function GlobalAudioPlayer() {
   const [isDragging, setIsDragging] = useState(false);
   const progressRef = useRef(null);
   const playerRef = useRef(null);
-  const isDraggingRef = useRef(false);
-
-  useEffect(() => {
-    isDraggingRef.current = isDragging;
-  }, [isDragging]);
 
   const performSeek = useCallback((clientX) => {
     if (!progressRef.current) return;
@@ -26,60 +21,57 @@ export default function GlobalAudioPlayer() {
     setIsDragging(true);
   }, []);
 
-  const handleSeekUp = useCallback((e) => {
-    e.preventDefault();
+  const handleSeekUp = useCallback(() => {
     setIsDragging(false);
   }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    if (isDragging) {
+      performSeek(e.clientX);
+    }
+  }, [isDragging, performSeek]);
+
+  const handleTouchMove = useCallback((e) => {
+    if (isDragging && e.touches[0]) {
+      e.preventDefault();
+      performSeek(e.touches[0].clientX);
+    }
+  }, [isDragging, performSeek]);
 
   const handleClick = useCallback((e) => {
     performSeek(e.clientX);
   }, [performSeek]);
 
-  // Mouse move - solo ejecuta si está arrastrando
+  // Agregar listeners globales cuando está arrastrando
   useEffect(() => {
-    if (!isDraggingRef.current) return;
+    if (!isDragging) return;
 
-    const handleMouseMove = (e) => {
-      if (isDraggingRef.current) {
-        performSeek(e.clientX);
-      }
+    const handleGlobalMouseMove = (e) => {
+      performSeek(e.clientX);
     };
 
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    document.addEventListener("mousemove", handleMouseMove, { passive: true });
-    document.addEventListener("mouseup", handleMouseUp);
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [performSeek]);
-
-  // Touch move - solo ejecuta si está arrastrando
-  useEffect(() => {
-    if (!isDraggingRef.current) return;
-
-    const handleTouchMove = (e) => {
-      if (isDraggingRef.current && e.touches[0]) {
+    const handleGlobalTouchMove = (e) => {
+      if (e.touches[0]) {
         performSeek(e.touches[0].clientX);
       }
     };
 
-    const handleTouchEnd = () => {
+    const handleGlobalEnd = () => {
       setIsDragging(false);
     };
 
-    document.addEventListener("touchmove", handleTouchMove, { passive: false });
-    document.addEventListener("touchend", handleTouchEnd);
+    document.addEventListener("mousemove", handleGlobalMouseMove, { passive: true });
+    document.addEventListener("touchmove", handleGlobalTouchMove, { passive: false });
+    document.addEventListener("mouseup", handleGlobalEnd);
+    document.addEventListener("touchend", handleGlobalEnd);
 
     return () => {
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleTouchEnd);
+      document.removeEventListener("mousemove", handleGlobalMouseMove);
+      document.removeEventListener("touchmove", handleGlobalTouchMove);
+      document.removeEventListener("mouseup", handleGlobalEnd);
+      document.removeEventListener("touchend", handleGlobalEnd);
     };
-  }, [performSeek]);
+  }, [isDragging, performSeek]);
 
   const formatTime = (sec) => {
     if (!sec || !Number.isFinite(sec)) return "0:00";
@@ -105,7 +97,10 @@ export default function GlobalAudioPlayer() {
           transition={{ duration: 0.3 }}
           className="fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 backdrop-blur-xl"
           style={{ background: "rgba(10, 10, 11, 0.95)" }}
-          onContextMenu={(e) => e.preventDefault()}
+          onMouseMove={handleMouseMove}
+          onTouchMove={handleTouchMove}
+          onMouseUp={handleSeekUp}
+          onTouchEnd={handleSeekUp}
         >
           {/* Progress bar - mejorada */}
           <div className="relative h-4 sm:h-5 flex items-center px-3 sm:px-5">
@@ -122,11 +117,10 @@ export default function GlobalAudioPlayer() {
               />
               {/* Handle Circle */}
               <div
-               className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-emerald-400 rounded-full shadow-lg border border-white cursor-grab active:cursor-grabbing hover:w-4.5 hover:h-4.5 sm:hover:w-5 sm:hover:h-5 transition-all pointer-events-auto"
+               className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-emerald-400 rounded-full shadow-lg border border-white cursor-grab active:cursor-grabbing hover:w-4.5 hover:h-4.5 sm:hover:w-5 sm:hover:h-5 transition-all"
                style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`, transform: "translate(-50%, -50%)" }}
                onMouseDown={handleSeekDown}
                onTouchStart={handleSeekDown}
-               onPointerDown={handleSeekDown}
               />
             </div>
           </div>
