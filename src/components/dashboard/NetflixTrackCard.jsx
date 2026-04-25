@@ -126,16 +126,17 @@ function TrackDetailModal({ track, onClose, onEdit, playing, onTogglePlay }) {
             {track.audio_file_url && (
               <button
                 onClick={(e) => { e.stopPropagation(); onTogglePlay(e); }}
-                className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-all"
                 style={{
-                  background: playing ? "rgba(255,255,255,0.15)" : "white",
-                  color: playing ? "white" : "black",
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  backdropFilter: "blur(8px)",
                 }}
               >
                 {playing ? (
-                  <><Pause className="w-3.5 h-3.5" fill="currentColor" /> Pausar</>
+                  <Pause className="w-4 h-4 text-white" fill="white" />
                 ) : (
-                  <><Play className="w-3.5 h-3.5 ml-0.5" fill="currentColor" /> Reproducir</>
+                  <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
                 )}
               </button>
             )}
