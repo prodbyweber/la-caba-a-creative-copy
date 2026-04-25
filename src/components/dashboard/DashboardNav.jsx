@@ -103,14 +103,7 @@ export default function DashboardNav({ artistName, artistId }) {
             </Link>
           )}
 
-          <button className="p-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10 transition-all hidden sm:block">
-            <Settings className="w-4 h-4" />
-          </button>
-          
-          {/* Avatar */}
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-bold cursor-pointer hover:scale-105 transition-transform">
-            JV
-          </div>
+
         </div>
       </div>
       </nav>
