@@ -185,7 +185,7 @@ function TrackDetailModal({ track, onClose, onEdit, playing, onTogglePlay }) {
   );
 }
 
-function TrackCard({ track, onEdit }) {
+function TrackCard({ track, onEdit, isFirst }) {
   const [hovered, setHovered] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [previewing, setPreviewing] = useState(false);
@@ -263,7 +263,7 @@ function TrackCard({ track, onEdit }) {
           animate={{ scale: hovered ? 1.18 : 1 }}
           transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="rounded-xl cursor-pointer shadow-2xl"
-          style={{ width: 200, transformOrigin: "center center", overflow: "visible" }}
+          style={{ width: 200, transformOrigin: isFirst ? "left center" : "center center", overflow: "visible" }}
           onClick={handleCardClick}
         >
           <div className="rounded-xl overflow-hidden" style={{ background: "#1a1a1c" }}>
@@ -422,5 +422,5 @@ function TrackCard({ track, onEdit }) {
 }
 
 export default function NetflixTrackCard({ track, index, onEdit }) {
-  return <TrackCard track={track} index={index} onEdit={onEdit} />;
+  return <TrackCard track={track} index={index} onEdit={onEdit} isFirst={index === 0} />;
 }
