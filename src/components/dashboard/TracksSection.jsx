@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Music2, Upload, Edit, Trash2, Image as ImageIcon, Check, X, Play, Pause } from "lucide-react";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
+import { Plus, Music2, Upload, Edit, Image as ImageIcon, Check, X } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import TrackCardExpanded from "./TrackCardExpanded";
+import NetflixTrackCard from "./NetflixTrackCard";
 
 export default function TracksSection({ jlyArtistId }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -113,11 +111,12 @@ export default function TracksSection({ jlyArtistId }) {
               </button>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {tracks.map((track, index) => (
-                <TrackCardExpanded
+                <NetflixTrackCard
                   key={track.id}
                   track={track}
+                  index={index}
                   onEdit={setEditingTrack}
                 />
               ))}
@@ -156,7 +155,8 @@ function TrackModal({ isOpen, track, projects, onClose }) {
     bpm: null,
     key: "",
     status: "idea",
-    notes: ""
+    notes: "",
+    versions: {}
   });
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
@@ -576,6 +576,40 @@ function TrackModal({ isOpen, track, projects, onClose }) {
               </label>
             </div>
 
+            {/* Drive Folders */}
+            <div className="space-y-3">
+              <h4 className="font-semibold text-white flex items-center gap-2">
+                <span className="w-1 h-4 bg-emerald-500 rounded-full" />
+                Links de Drive / Versiones
+              </h4>
+              <div className="grid md:grid-cols-2 gap-3">
+                {[
+                  { key: "mp3", label: "MP3" },
+                  { key: "wav_24bit", label: "WAV 24bit" },
+                  { key: "stems", label: "Stems" },
+                  { key: "mix", label: "Mix" },
+                  { key: "master_24bit", label: "Master 24bit" },
+                  { key: "show", label: "Show en vivo" },
+                  { key: "acapella", label: "Acapella" },
+                  { key: "beat_wav", label: "Beat WAV" },
+                ].map(v => (
+                  <div key={v.key}>
+                    <label className="block text-xs font-medium text-gray-400 mb-1">{v.label}</label>
+                    <input
+                      type="text"
+                      value={formData.versions?.[v.key] || ""}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        versions: { ...(formData.versions || {}), [v.key]: e.target.value }
+                      })}
+                      placeholder="https://drive.google.com/..."
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-xs placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Notes */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Notas</label>
@@ -583,7 +617,7 @@ function TrackModal({ isOpen, track, projects, onClose }) {
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Notas adicionales sobre la pista..."
-                rows={4}
+                rows={3}
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors resize-none"
               />
             </div>
