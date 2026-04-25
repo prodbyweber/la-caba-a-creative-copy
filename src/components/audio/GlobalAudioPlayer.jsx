@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, ChevronDown, X, Music2 } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
@@ -7,8 +7,7 @@ export default function GlobalAudioPlayer() {
   const { playingTrack, isPlaying, currentTime, duration, hidden, pauseTrack, resumeTrack, stopTrack, setHidden, seekTrack } = useGlobalAudio();
   const [isDragging, setIsDragging] = useState(false);
   const progressRef = useRef(null);
-
-  if (!playingTrack) return null;
+  const playerRef = useRef(null);
 
   const handleSeekDown = () => setIsDragging(true);
   const handleSeekUp = () => setIsDragging(false);
@@ -33,10 +32,17 @@ export default function GlobalAudioPlayer() {
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
+  React.useEffect(() => {
+    if (playerRef.current && playingTrack) {
+      playerRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [playingTrack?.id]);
+
   return (
     <AnimatePresence>
-      {!hidden && playingTrack && (
+      {playingTrack && (
         <motion.div
+          ref={playerRef}
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}

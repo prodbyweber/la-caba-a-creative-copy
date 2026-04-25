@@ -10,11 +10,12 @@ export function GlobalAudioProvider({ children }) {
   const [hidden, setHidden] = useState(false);
   const audioRef = useRef(null);
 
-  const playTrack = useCallback((track, onPlay) => {
+  const playTrack = useCallback((track) => {
     // Si es el mismo track, solo resume
     if (playingTrack?.id === track.id && audioRef.current) {
       audioRef.current.play();
       setIsPlaying(true);
+      setHidden(false);
       return;
     }
 
@@ -42,7 +43,6 @@ export function GlobalAudioProvider({ children }) {
 
     audio.onended = () => {
       setIsPlaying(false);
-      setPlayingTrack(null);
     };
 
     audio.onerror = () => {
