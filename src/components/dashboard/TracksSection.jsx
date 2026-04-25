@@ -75,10 +75,11 @@ export default function TracksSection({ jlyArtistId }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5 overflow-hidden"
+        className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5"
+        style={{ overflow: "visible" }}
       >
         {/* Header */}
-        <div className="p-3 lg:p-4 border-b border-white/5 flex items-center justify-between">
+        <div className="p-3 lg:p-4 border-b border-white/5 flex items-center justify-between" style={{ borderRadius: "1rem 1rem 0 0", background: "linear-gradient(to right, #141414, #0a0a0b)" }}>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
               <Music2 className="w-4 h-4 text-purple-400" />
@@ -97,10 +98,10 @@ export default function TracksSection({ jlyArtistId }) {
           </button>
         </div>
 
-        {/* Tracks List */}
-        <div className="p-3 lg:p-4">
+        {/* Tracks Carousel */}
+        <div className="py-4 px-2" style={{ overflowX: "visible" }}>
           {tracks.length === 0 ? (
-            <div className="text-center py-8">
+            <div className="text-center py-8 px-4">
               <Music2 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
               <p className="text-gray-500 text-sm mb-3">No tienes tracks aún</p>
               <button
@@ -111,7 +112,17 @@ export default function TracksSection({ jlyArtistId }) {
               </button>
             </div>
           ) : (
-            <div className="space-y-1.5">
+            <div
+              className="flex gap-3 pb-2"
+              style={{
+                overflowX: "auto",
+                overflowY: "visible",
+                scrollbarWidth: "none",
+                msOverflowStyle: "none",
+                paddingBottom: "180px",
+                marginBottom: "-180px",
+              }}
+            >
               {tracks.map((track, index) => (
                 <NetflixTrackCard
                   key={track.id}
