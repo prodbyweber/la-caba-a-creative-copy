@@ -94,16 +94,6 @@ export const AuthProvider = ({ children }) => {
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       setIsAuthenticated(true);
-      
-      // Verificar si el usuario necesita completar onboarding
-      const artists = await base44.entities.Artist.filter({ user_id: currentUser.id });
-      if (!artists || artists.length === 0) {
-        // Usuario nuevo: redirigir a onboarding
-        setTimeout(() => {
-          window.location.href = '/OnboardingProfile';
-        }, 500);
-      }
-      
       setIsLoadingAuth(false);
     } catch (error) {
       console.error('User auth check failed:', error);
