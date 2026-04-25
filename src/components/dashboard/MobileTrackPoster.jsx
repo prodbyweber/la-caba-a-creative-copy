@@ -137,15 +137,14 @@ function MobileTrackDetail({ track, onClose, onEdit, playing, onTogglePlay }) {
             {track.audio_file_url && (
               <button
                 onClick={onTogglePlay}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex-shrink-0"
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0"
                 style={{
                   background: playing ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.9)",
                   color: playing ? "white" : "black",
                   border: playing ? "1px solid rgba(255,255,255,0.2)" : "none",
                 }}
               >
-                {playing ? <Pause className="w-4 h-4" fill="white" /> : <Play className="w-4 h-4 ml-0.5" fill="black" />}
-                {playing ? "Pausar" : "Reproducir"}
+                {playing ? <Pause className="w-4 h-4" fill={playing ? "white" : "black"} /> : <Play className="w-4 h-4 ml-0.5" fill={playing ? "white" : "black"} />}
               </button>
             )}
             <button onClick={() => { onClose(); onEdit(track); }}
