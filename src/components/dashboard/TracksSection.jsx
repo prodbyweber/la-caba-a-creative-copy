@@ -99,7 +99,7 @@ export default function TracksSection({ jlyArtistId }) {
         </div>
 
         {/* Tracks Carousel */}
-        <div className="py-4 px-2" style={{ overflowX: "visible" }}>
+        <div style={{ overflowX: "auto", overflowY: "visible", padding: "60px 8px 200px", margin: "-60px 0 -200px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
           {tracks.length === 0 ? (
             <div className="text-center py-8 px-4">
               <Music2 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
@@ -112,18 +112,7 @@ export default function TracksSection({ jlyArtistId }) {
               </button>
             </div>
           ) : (
-            <div
-              className="flex gap-3"
-              style={{
-                overflowX: "auto",
-                overflowY: "visible",
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
-                paddingBottom: "220px",
-                marginBottom: "-220px",
-                paddingTop: "12px",
-              }}
-            >
+            <div className="flex gap-3" style={{ width: "max-content" }}>
               {tracks.map((track, index) => (
                 <NetflixTrackCard
                   key={track.id}

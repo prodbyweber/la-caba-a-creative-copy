@@ -155,16 +155,11 @@ function TrackCard({ track, onEdit }) {
 
   const handleMouseEnter = () => {
     setHovered(true);
-    // Auto-preview on hover (only if user hasn't manually started playback)
-    if (track.audio_file_url && audioRef.current && !userPlayingRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
-    }
   };
 
   const handleMouseLeave = () => {
     setHovered(false);
-    // Stop hover preview but not user-initiated playback
+    // Only stop if not user-initiated
     if (audioRef.current && !userPlayingRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -192,7 +187,7 @@ function TrackCard({ track, onEdit }) {
 
   return (
     <>
-      {/* Outer container — fixed width, overflow visible so expanded card isn't clipped */}
+      {/* Outer container — fixed width, overflow visible */}
       <div
         className="relative flex-shrink-0"
         style={{ width: 200, zIndex: hovered ? 50 : 1 }}
@@ -202,8 +197,8 @@ function TrackCard({ track, onEdit }) {
         <motion.div
           animate={{ scale: hovered ? 1.18 : 1 }}
           transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="rounded-xl overflow-visible cursor-pointer origin-bottom shadow-2xl"
-          style={{ width: 200, transformOrigin: "bottom center" }}
+          className="rounded-xl cursor-pointer shadow-2xl"
+          style={{ width: 200, transformOrigin: "center center", overflow: "visible" }}
         >
           {/* Inner card — clipped normally */}
           <div className="rounded-xl overflow-hidden" style={{ background: "#1a1a1c" }}>
