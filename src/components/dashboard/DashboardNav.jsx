@@ -7,7 +7,7 @@ import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 
 
-export default function DashboardNav({ artistName, artistId }) {
+export default function DashboardNav({ artistName, artistId, children }) {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -90,21 +90,21 @@ export default function DashboardNav({ artistName, artistId }) {
 
           {/* Right */}
           <div className="flex items-center gap-2">
-          {/* Admin button only visible for admin users */}
-          {isAdmin && (
-            <Link to={createPageUrl("AdminDashboard")}>
-              <button 
-                className="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all flex items-center gap-1.5"
-                title="Panel Admin"
-              >
-                <Home className="w-3.5 h-3.5" />
-                <span className="text-xs font-medium hidden sm:inline">Admin</span>
-              </button>
-            </Link>
-          )}
-
-
-        </div>
+            {/* Admin button only visible for admin users */}
+            {isAdmin && (
+              <Link to={createPageUrl("AdminDashboard")}>
+                <button 
+                  className="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all flex items-center gap-1.5"
+                  title="Panel Admin"
+                >
+                  <Home className="w-3.5 h-3.5" />
+                  <span className="text-xs font-medium hidden sm:inline">Admin</span>
+                </button>
+              </Link>
+            )}
+            {/* Avatar / profile slot — passed as children */}
+            {children}
+          </div>
       </div>
       </nav>
 

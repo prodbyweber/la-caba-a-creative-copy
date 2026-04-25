@@ -6,18 +6,16 @@ import { ArrowLeft, Music2, Film } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import DashboardNav from "@/components/dashboard/DashboardNav";
-import ArtistProfileCard from "@/components/dashboard/ArtistProfileCard";
-import ArtistProfileEditor from "@/components/dashboard/ArtistProfileEditor";
+import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
 import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
-import SocialLinksCard from "@/components/dashboard/SocialLinksCard";
 import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
 import ClipsLibrary from "@/components/clips/ClipsLibrary";
 
 
 export default function ArtistDashboard() {
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [showProfileDrawer, setShowProfileDrawer] = useState(false);
   const [catalogMode, setCatalogMode] = useState("audio"); // "audio" | "video"
 
 
@@ -70,7 +68,9 @@ export default function ArtistDashboard() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
-      <DashboardNav artistName={artist.stageName} artistId={artist.id} />
+      <DashboardNav artistName={artist.stageName} artistId={artist.id}>
+        <ArtistAvatarButton artist={artist} onClick={() => setShowProfileDrawer(true)} />
+      </DashboardNav>
 
       <main className="pt-14">
         <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
@@ -120,15 +120,6 @@ export default function ArtistDashboard() {
             </div>
           </div>
 
-          {/* Mobile Artist Profile */}
-          <div className="lg:hidden mb-3">
-            <ArtistProfileCard
-              compact={true}
-              artist={artist}
-              onEditProfile={() => setIsEditingProfile(true)}
-            />
-          </div>
-
           {/* ── MODO Audio ── */}
           <AnimatePresence mode="wait">
             {catalogMode === "audio" && (
@@ -145,15 +136,8 @@ export default function ArtistDashboard() {
                     <TracksSection jlyArtistId={artist.id} />
                   </div>
                   <div className="lg:col-span-3 space-y-3">
-                    <div className="hidden lg:block">
-                      <ArtistProfileCard
-                        artist={artist}
-                        onEditProfile={() => setIsEditingProfile(true)}
-                      />
-                    </div>
                     <StudioHoursBlock artist={artist} />
                     <UpcomingSessionsCard artistId={artist.id} />
-                    <SocialLinksCard />
                   </div>
                 </div>
               </motion.div>
@@ -175,10 +159,10 @@ export default function ArtistDashboard() {
         </div>
       </main>
 
-      <ArtistProfileEditor
+      <ArtistProfileDrawer
         artist={artist}
-        isOpen={isEditingProfile}
-        onClose={() => setIsEditingProfile(false)}
+        isOpen={showProfileDrawer}
+        onClose={() => setShowProfileDrawer(false)}
       />
     </div>
   );
