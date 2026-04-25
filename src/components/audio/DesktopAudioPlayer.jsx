@@ -102,18 +102,28 @@ export default function DesktopAudioPlayer() {
 
               {/* Progress */}
               <div className="space-y-2">
-                <div
-                  ref={progressRef}
-                  className="h-1.5 bg-white/5 rounded-full cursor-pointer hover:bg-white/8 transition-all"
-                  onMouseDown={() => setIsDragging(true)}
-                  onMouseUp={() => setIsDragging(false)}
-                  onMouseMove={(e) => isDragging && handleSeek(e)}
-                  onClick={handleSeek}
-                >
+                <div className="relative h-6 flex items-center group">
                   <div
-                    className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full shadow-lg"
-                    style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-                  />
+                    ref={progressRef}
+                    className="w-full h-2 bg-white/5 rounded-full cursor-pointer hover:bg-white/8 transition-all relative"
+                    onMouseDown={() => setIsDragging(true)}
+                    onMouseUp={() => setIsDragging(false)}
+                    onMouseMove={(e) => isDragging && handleSeek(e)}
+                    onClick={handleSeek}
+                  >
+                    <div
+                      className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full shadow-lg"
+                      style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                    />
+                    {/* Handle/Circle */}
+                    <div
+                      className="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-emerald-400 rounded-full shadow-lg border-2 border-white cursor-grab active:cursor-grabbing hover:w-6 hover:h-6 transition-all"
+                      style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`, transform: "translate(-50%, -50%)" }}
+                      onMouseDown={() => setIsDragging(true)}
+                      onMouseUp={() => setIsDragging(false)}
+                      onMouseMove={(e) => isDragging && handleSeek(e)}
+                    />
+                  </div>
                 </div>
                 <div className="flex justify-between text-xs text-white/50 font-medium">
                   <span>{formatTime(currentTime)}</span>
