@@ -93,7 +93,7 @@ export default function ArtistDashboard() {
                 style={{ color: catalogMode === "audio" ? "#fff" : "rgba(255,255,255,0.3)" }}
               >
                 <Music2 className="w-3.5 h-3.5" />
-                <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>AUDIO</span>
+                <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Audio</span>
                 {catalogMode === "audio" && (
                   <motion.div
                     layoutId="catalogUnderline"
@@ -108,7 +108,7 @@ export default function ArtistDashboard() {
                 style={{ color: catalogMode === "video" ? "#fff" : "rgba(255,255,255,0.3)" }}
               >
                 <Film className="w-3.5 h-3.5" />
-                <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>VIDEO</span>
+                <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Video</span>
                 {catalogMode === "video" && (
                   <motion.div
                     layoutId="catalogUnderline"
@@ -129,7 +129,7 @@ export default function ArtistDashboard() {
             />
           </div>
 
-          {/* ── MODO AUDIO ── */}
+          {/* ── MODO Audio ── */}
           <AnimatePresence mode="wait">
             {catalogMode === "audio" && (
               <motion.div
@@ -159,7 +159,7 @@ export default function ArtistDashboard() {
               </motion.div>
             )}
 
-            {/* ── MODO VIDEO (Clips) ── */}
+            {/* ── MODO Video (Clips) ── */}
             {catalogMode === "video" && (
               <motion.div
                 key="video"
