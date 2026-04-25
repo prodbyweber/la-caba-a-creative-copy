@@ -159,159 +159,47 @@ export default function ProjectDetail() {
       <DashboardNav />
 
       <main className="pt-16">
-        <div className="p-4 sm:p-6 max-w-6xl mx-auto">
-          {/* Project Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5 p-6 mb-6"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <button 
-                  onClick={() => window.history.back()} 
-                  className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 mb-3 transition-colors"
-                  title="Volver"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  <span className="hidden sm:inline">Volver</span>
-                </button>
-                <h1 className="text-3xl sm:text-4xl font-bold mb-2">{project.title}</h1>
-                {project.description && (
-                  <p className="text-gray-400 mb-3 text-sm sm:text-base">{project.description}</p>
-                )}
-                <div className="flex items-center gap-3">
-                  <span className={`px-3 py-1 rounded-lg text-sm font-medium ${
-                    project.status === 'active' 
-                      ? 'bg-emerald-500/10 text-emerald-400' 
-                      : 'bg-gray-500/10 text-gray-400'
-                  }`}>
-                    {project.status === 'active' ? 'Activo' : 'Completado'}
-                  </span>
-                  <span className="text-gray-500 text-sm">
-                    {tracks.length} tracks
-                  </span>
-                </div>
+        <div className="px-3 sm:px-6 py-4 sm:py-6 max-w-5xl mx-auto w-full">
+          {/* Minimal Project Header */}
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <div className="flex-1 min-w-0">
+              <button 
+                onClick={() => window.history.back()} 
+                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 mb-2 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Volver</span>
+              </button>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">{project.title}</h1>
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className={`px-2.5 py-0.5 rounded text-xs font-medium ${
+                  project.status === 'active' 
+                    ? 'bg-emerald-500/10 text-emerald-400' 
+                    : 'bg-gray-500/10 text-gray-400'
+                }`}>
+                  {project.status === 'active' ? 'Activo' : 'Completado'}
+                </span>
+                <span className="text-gray-500 text-xs">
+                  {tracks.length} track{tracks.length !== 1 ? 's' : ''}
+                </span>
               </div>
             </div>
-
-            {/* Moodboard Gallery - Pinterest Style Collage */}
-            {moodboardImages.length > 0 && (
-              <div className="mb-6">
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <p className="text-xs text-gray-500 flex items-center gap-2">
-                    <Palette className="w-3 h-3" />
-                    Visual Moodboard
-                  </p>
-                  <label className="cursor-pointer">
-                    <input 
-                      type="file" 
-                      accept="image/*"
-                      onChange={(e) => e.target.files?.[0] && handleAddMoodboardSlot(e.target.files[0])}
-                      className="hidden"
-                    />
-                    <button className="px-2 py-1 text-xs bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 rounded transition-all flex items-center gap-1">
-                      <Plus className="w-3 h-3" />
-                      Añadir
-                    </button>
-                  </label>
-                </div>
-                <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="moodboard" type="moodboard">
-                    {(provided) => (
-                      <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="grid gap-1 mb-2 auto-rows-[60px] sm:auto-rows-[80px] md:auto-rows-[100px]"
-                        style={{
-                          gridTemplateColumns: 'repeat(auto-fit, minmax(60px, 1fr))',
-                        }}
-                      >
-                        {moodboardImages.map((url, index) => {
-                          const colSpan = 1;
-                          const rowSpan = 1;
-                          
-                          return (
-                            <Draggable key={`img-${index}`} draggableId={`img-${index}`} index={index}>
-                              {(provided, snapshot) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  className={`relative group rounded-lg overflow-hidden cursor-grab active:cursor-grabbing transition-all ${
-                                    snapshot.isDragging ? 'opacity-60 ring-2 ring-emerald-400 shadow-lg' : 'hover:shadow-lg'
-                                  }`}
-                                  style={{
-                                    gridColumn: `span ${colSpan}`,
-                                    gridRow: `span ${rowSpan}`,
-                                    ...provided.draggableProps.style
-                                  }}
-                                >
-                                  <img 
-                                    src={url} 
-                                    alt={`Ref ${index + 1}`}
-                                    className="w-full h-full object-cover"
-                                  />
-                                  
-                                  {/* Overlay */}
-                                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all" />
-                                  
-                                  {/* Drag Handle */}
-                                  <div {...provided.dragHandleProps} className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                                    <div className="bg-black/70 backdrop-blur-sm p-1.5 rounded-lg">
-                                      <GripVertical className="w-4 h-4 text-white" />
-                                    </div>
-                                  </div>
-                                  
-                                  {/* Remove Button */}
-                                  <button
-                                    onClick={() => handleRemoveMoodboardSlot(index)}
-                                    className="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-600 rounded-lg opacity-0 group-hover:opacity-100 transition-all z-10"
-                                  >
-                                    <X className="w-4 h-4 text-white" />
-                                  </button>
-                                </div>
-                              )}
-                            </Draggable>
-                          );
-                        })}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              </div>
-            )}
-
-            {moodboardImages.length === 0 && (
-              <label className="block w-full h-20 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-emerald-500/30 hover:bg-white/5 transition-all">
-                <input 
-                  type="file" 
-                  accept="image/*"
-                  onChange={(e) => e.target.files?.[0] && handleAddMoodboardSlot(e.target.files[0])}
-                  className="hidden"
-                />
-                <div className="w-full h-full flex items-center justify-center gap-2 text-gray-600 text-sm">
-                  <Plus className="w-4 h-4" />
-                  Añadir referencias visuales al moodboard
-                </div>
-              </label>
-            )}
-          </motion.div>
+          </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-4 sm:mb-6 -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 sm:py-3 z-20">
+          <div className="flex gap-2 mb-6 border-b border-white/5 pb-3">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all ${
+                className={`flex items-center gap-2 px-0 py-2 text-sm font-medium transition-colors border-b-2 ${
                   activeTab === tab.id
-                    ? 'bg-emerald-500 text-white'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                    ? 'text-white border-emerald-500'
+                    : 'text-gray-500 border-transparent hover:text-gray-400'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
-                {tab.label}
+                <span className="hidden sm:inline">{tab.label}</span>
               </button>
             ))}
           </div>
@@ -324,9 +212,9 @@ export default function ProjectDetail() {
               {/* Add Track Button */}
               <button
                 onClick={() => setShowAddTrack(!showAddTrack)}
-                className="w-full p-4 rounded-xl border-2 border-dashed border-white/10 hover:border-emerald-500/50 bg-white/5 hover:bg-white/10 flex items-center justify-center gap-2 text-gray-400 hover:text-emerald-400 transition-all"
+                className="w-full p-3 sm:p-4 rounded-lg border border-white/10 hover:border-white/20 bg-transparent hover:bg-white/5 flex items-center justify-center gap-2 text-xs sm:text-sm text-gray-500 hover:text-gray-300 transition-all"
               >
-                <Plus className="w-5 h-5" />
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                 Añadir Track
               </button>
 
@@ -335,7 +223,7 @@ export default function ProjectDetail() {
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
-                  className="bg-[#141414] rounded-xl p-6 border border-white/5"
+                  className="bg-[#141414] rounded-lg p-4 sm:p-6 border border-white/5"
                 >
                   <TrackForm
                     projectId={projectId}
@@ -346,17 +234,17 @@ export default function ProjectDetail() {
               )}
 
               {/* Tracks List - Netflix Style Vertical */}
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {tracks.map((track, index) => (
                   <motion.div
                     key={track.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
+                    transition={{ delay: index * 0.03 }}
                     className="group"
                   >
                     {editingTrack?.id === track.id ? (
-                      <div className="bg-[#141414] rounded-xl border border-white/5 overflow-hidden p-6">
+                      <div className="bg-[#141414] rounded-xl border border-white/5 overflow-hidden p-4 sm:p-6">
                         <TrackForm
                           track={track}
                           projectId={projectId}
@@ -365,9 +253,9 @@ export default function ProjectDetail() {
                         />
                       </div>
                     ) : (
-                      <div className="bg-[#141414] hover:bg-[#1a1a1a] rounded-xl border border-white/5 hover:border-white/10 overflow-hidden transition-all duration-300 flex gap-4 p-4">
+                      <div className="bg-[#0f0f10] hover:bg-[#1a1a1c] rounded-lg border border-white/5 hover:border-white/8 overflow-hidden transition-all duration-200 flex gap-3 sm:gap-4 p-3 sm:p-3.5">
                         {/* Track Number */}
-                        <div className="text-center font-bold text-gray-500 flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                        <div className="text-center font-bold text-gray-500 flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs sm:text-sm">
                           {track.track_number || index + 1}
                         </div>
 
@@ -386,11 +274,11 @@ export default function ProjectDetail() {
                             />
                           )}
 
-                          <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center overflow-hidden relative">
+                          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center overflow-hidden relative">
                             {track.cover_url ? (
                               <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
                             ) : (
-                              <Music2 className="w-6 h-6 text-white/40" />
+                              <Music2 className="w-5 h-5 sm:w-6 sm:h-6 text-white/40" />
                             )}
 
                             {/* Play Button Overlay */}
@@ -409,12 +297,12 @@ export default function ProjectDetail() {
                                     e.stopPropagation();
                                     togglePlay(track.id);
                                   }}
-                                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white active:scale-95 hover:scale-110 flex items-center justify-center transition-all shadow-lg z-10 touch-manipulation"
+                                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/90 hover:bg-white active:scale-95 hover:scale-110 flex items-center justify-center transition-all shadow-lg z-10 touch-manipulation"
                                 >
                                   {playingTrackId === track.id ? (
-                                    <Pause className="w-4 h-4 text-black" fill="black" />
+                                    <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black" fill="black" />
                                   ) : (
-                                    <Play className="w-4 h-4 text-black ml-0.5" fill="black" />
+                                    <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black ml-0.5" fill="black" />
                                   )}
                                 </button>
                               </>
@@ -424,8 +312,8 @@ export default function ProjectDetail() {
 
                         {/* Info */}
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-white mb-1.5 line-clamp-1">{track.title}</h4>
-                          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400">
+                          <h4 className="font-bold text-white mb-0.5 sm:mb-1 line-clamp-1 text-sm sm:text-base">{track.title}</h4>
+                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-gray-400">
                             {track.composer && (
                               <span className="truncate">{track.composer}</span>
                             )}
@@ -433,7 +321,7 @@ export default function ProjectDetail() {
                               <span className="text-gray-600">·</span>
                             )}
                             {track.status && (
-                              <span className={`px-2 py-0.5 rounded font-medium ${
+                              <span className={`px-1.5 sm:px-2 py-0.5 rounded font-medium ${
                                 track.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400' :
                                 track.status === 'mastering' ? 'bg-purple-500/10 text-purple-400' :
                                 'bg-gray-500/10 text-gray-400'
@@ -441,29 +329,24 @@ export default function ProjectDetail() {
                                 {track.status}
                               </span>
                             )}
-                            {track.dolby_atmos && (
-                              <span className="px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 font-medium">
-                                ATMOS
-                              </span>
-                            )}
                           </div>
                         </div>
 
-                        {/* Duration */}
+                        {/* Duration - Hidden on mobile */}
                         {track.duration && (
-                          <div className="text-sm text-gray-500 flex-shrink-0">
+                          <div className="text-xs sm:text-sm text-gray-500 flex-shrink-0 hidden sm:block">
                             {Math.floor(track.duration / 60)}:{String(Math.floor(track.duration % 60)).padStart(2, '0')}
                           </div>
                         )}
 
-                        {/* Actions */}
-                        <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {/* Actions - Always visible on mobile, hover on desktop */}
+                        <div className="flex items-center gap-1 flex-shrink-0 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => setEditingTrack(track)}
-                            className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                            className="p-1.5 sm:p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                             title="Editar"
                           >
-                            <Edit className="w-4 h-4" />
+                            <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </button>
                           <button
                             onClick={() => {
@@ -471,10 +354,10 @@ export default function ProjectDetail() {
                                 deleteTrackMutation.mutate(track.id);
                               }
                             }}
-                            className="p-2 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-colors"
+                            className="p-1.5 sm:p-2 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-colors"
                             title="Eliminar"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </button>
                         </div>
                       </div>
