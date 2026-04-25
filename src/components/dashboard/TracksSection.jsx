@@ -113,14 +113,15 @@ export default function TracksSection({ jlyArtistId }) {
             </div>
           ) : (
             <div
-              className="flex gap-3 pb-2"
+              className="flex gap-3"
               style={{
                 overflowX: "auto",
                 overflowY: "visible",
                 scrollbarWidth: "none",
                 msOverflowStyle: "none",
-                paddingBottom: "180px",
-                marginBottom: "-180px",
+                paddingBottom: "220px",
+                marginBottom: "-220px",
+                paddingTop: "12px",
               }}
             >
               {tracks.map((track, index) => (
