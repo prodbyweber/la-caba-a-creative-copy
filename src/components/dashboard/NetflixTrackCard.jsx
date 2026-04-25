@@ -173,19 +173,24 @@ function TrackCard({ track, index, onEdit }) {
 
   const status = statusConfig[track.status] || statusConfig.idea;
 
-  // Auto-play on hover, pause on leave (but keep playing state if user clicked play)
+  // Track whether playback was user-initiated (persists on leave) or hover-initiated
+  const userPlayingRef = useRef(false);
+
   const handleMouseEnter = () => {
     setHovered(true);
-    if (track.audio_file_url && audioRef.current && !playing) {
+    if (track.audio_file_url && audioRef.current && !userPlayingRef.current) {
+      // Preview: always restart from beginning
+      audioRef.current.currentTime = 0;
       audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
     }
   };
 
   const handleMouseLeave = () => {
     setHovered(false);
-    // Only auto-pause if we auto-started (not user-initiated — but we keep it simple: always pause on leave)
-    if (audioRef.current && playing) {
+    // Only pause if it's a hover-preview (not user-initiated)
+    if (audioRef.current && !userPlayingRef.current) {
       audioRef.current.pause();
+      audioRef.current.currentTime = 0;
       setPlaying(false);
     }
   };
@@ -194,12 +199,22 @@ function TrackCard({ track, index, onEdit }) {
   const togglePlay = (e) => {
     e.stopPropagation();
     if (!audioRef.current) return;
-    if (playing) {
+    if (userPlayingRef.current) {
+      // Stop user playback
       audioRef.current.pause();
+      userPlayingRef.current = false;
       setPlaying(false);
     } else {
+      // Start user playback — takes over from hover preview
+      userPlayingRef.current = true;
       audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
     }
+  };
+
+  // Reset userPlayingRef when audio ends
+  const handleEnded = () => {
+    userPlayingRef.current = false;
+    setPlaying(false);
   };
 
   return (
@@ -222,8 +237,8 @@ function TrackCard({ track, index, onEdit }) {
               ref={audioRef}
               src={track.audio_file_url}
               preload="metadata"
-              onEnded={() => setPlaying(false)}
-              onPause={() => setPlaying(false)}
+              onEnded={handleEnded}
+              onPause={() => { if (!userPlayingRef.current) setPlaying(false); }}
             />
           )}
 
