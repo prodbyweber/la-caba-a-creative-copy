@@ -191,10 +191,12 @@ function TrackCard({ track, onEdit, isFirst }) {
   const [playing, setPlaying] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
+  const [showPreviewAnimation, setShowPreviewAnimation] = useState(false);
 
   const previewRef = useRef(null);
   const playbackRef = useRef(null);
   const previewTimerRef = useRef(null);
+  const hoverDelayRef = useRef(null);
 
   const globalAudio = useGlobalAudio();
 
@@ -215,19 +217,28 @@ function TrackCard({ track, onEdit, isFirst }) {
       clearTimeout(previewTimerRef.current);
       previewTimerRef.current = null;
     }
+    if (hoverDelayRef.current) {
+      clearTimeout(hoverDelayRef.current);
+      hoverDelayRef.current = null;
+    }
     setPreviewing(false);
+    setShowPreviewAnimation(false);
   };
 
   const handleMouseEnter = () => {
     setHovered(true);
-    // No reproducir preview si hay algo sonando en cualquier tarjeta
-    if (track.audio_file_url && previewRef.current && !playing && !globalAudio?.playingTrack) {
-      previewRef.current.currentTime = 0;
-      previewRef.current.volume = 0.6;
-      previewRef.current.play().then(() => {
-        setPreviewing(true);
-        previewTimerRef.current = setTimeout(() => stopPreview(), 40000);
-      }).catch(() => {});
+    // No reproducir preview si hay algo sonando globalmente
+    if (track.audio_file_url && previewRef.current && !playing && !globalAudio?.playingTrack && !globalAudio?.isPlaying) {
+      // Delay de 1.5 segundos antes de iniciar preview
+      hoverDelayRef.current = setTimeout(() => {
+        setShowPreviewAnimation(true);
+        previewRef.current.currentTime = 0;
+        previewRef.current.volume = 0.6;
+        previewRef.current.play().then(() => {
+          setPreviewing(true);
+          previewTimerRef.current = setTimeout(() => stopPreview(), 40000);
+        }).catch(() => {});
+      }, 1500);
     }
   };
 
@@ -284,13 +295,19 @@ function TrackCard({ track, onEdit, isFirst }) {
               <motion.div
                 style={{ width: "100%", height: "100%" }}
                 animate={
-                  hovered || playing
-                    ? { scale: 1.1, x: playing ? [0, 3, -3, 1, 0] : 2 }
+                  playing
+                    ? { scale: 1.1, x: [0, 3, -3, 1, 0] }
+                    : showPreviewAnimation
+                    ? { scale: 1.1, x: 2 }
+                    : hovered
+                    ? { scale: 1.08 }
                     : { scale: 1, x: 0 }
                 }
                 transition={
                   playing
                     ? { scale: { duration: 0.7 }, x: { duration: 8, repeat: Infinity, ease: "easeInOut" } }
+                    : showPreviewAnimation
+                    ? { duration: 1.5, ease: "easeOut" }
                     : { duration: 0.7, ease: "easeOut" }
                 }
               >
