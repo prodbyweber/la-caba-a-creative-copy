@@ -22,17 +22,20 @@ const FOLDER_DEFS = [
 ];
 
 // Minimal animated waveform
-function AudioWave() {
-  const bars = [3, 6, 9, 5, 8, 4, 7, 3, 6, 8, 5];
+function AudioWave({ large = false }) {
+  const bars = large
+    ? [4, 8, 14, 10, 18, 8, 12, 6, 16, 10, 14, 7, 11, 5, 9]
+    : [3, 6, 9, 5, 8, 4, 7, 3, 6, 8, 5];
   return (
-    <div className="flex items-end gap-[2px] h-4">
+    <div className={`flex items-end gap-[2px] ${large ? "h-8" : "h-4"}`}>
       {bars.map((h, i) => (
         <div
           key={i}
-          className="w-[2px] rounded-full"
+          className="rounded-full"
           style={{
+            width: large ? "3px" : "2px",
             height: `${h}px`,
-            background: "rgba(255,255,255,0.4)",
+            background: large ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.4)",
             animation: `waveBar 0.${6 + (i % 5)}s ease-in-out infinite alternate`,
             animationDelay: `${i * 0.07}s`,
           }}
@@ -41,9 +44,18 @@ function AudioWave() {
       <style>{`
         @keyframes waveBar {
           from { transform: scaleY(0.3); opacity: 0.3; }
-          to   { transform: scaleY(1);   opacity: 0.8; }
+          to   { transform: scaleY(1);   opacity: 0.9; }
         }
       `}</style>
+    </div>
+  );
+}
+
+function MetaRow({ label, value }) {
+  return (
+    <div>
+      <span className="text-[10px] font-semibold text-white/25 uppercase tracking-wider block">{label}</span>
+      <span className="text-xs text-white/65 font-medium">{value}</span>
     </div>
   );
 }
@@ -129,22 +141,13 @@ function TrackDetailModal({ track, onClose, onEdit }) {
   );
 }
 
-function MetaRow({ label, value }) {
-  return (
-    <div>
-      <span className="text-[10px] font-semibold text-white/25 uppercase tracking-wider block">{label}</span>
-      <span className="text-xs text-white/65 font-medium">{value}</span>
-    </div>
-  );
-}
-
 function TrackCard({ track, onEdit }) {
   const [hovered, setHovered] = useState(false);
-  const [playing, setPlaying] = useState(false);   // true = user playback active
-  const [previewing, setPreviewing] = useState(false); // true = hover preview active
+  const [expanded, setExpanded] = useState(false);   // click to expand inline
+  const [playing, setPlaying] = useState(false);      // full playback
+  const [previewing, setPreviewing] = useState(false); // hover preview
   const [showDetail, setShowDetail] = useState(false);
 
-  // Two separate audio elements: one for preview, one for full playback
   const previewRef = useRef(null);
   const playbackRef = useRef(null);
   const previewTimerRef = useRef(null);
@@ -171,16 +174,12 @@ function TrackCard({ track, onEdit }) {
 
   const handleMouseEnter = () => {
     setHovered(true);
-    // Start preview only if not already in full playback
     if (track.audio_file_url && previewRef.current && !playing) {
       previewRef.current.currentTime = 0;
       previewRef.current.volume = 0.6;
       previewRef.current.play().then(() => {
         setPreviewing(true);
-        // Stop after 40 seconds
-        previewTimerRef.current = setTimeout(() => {
-          stopPreview();
-        }, 40000);
+        previewTimerRef.current = setTimeout(() => stopPreview(), 40000);
       }).catch(() => {});
     }
   };
@@ -193,51 +192,51 @@ function TrackCard({ track, onEdit }) {
   const togglePlay = (e) => {
     e.stopPropagation();
     if (!playbackRef.current) return;
-
     if (playing) {
-      // Pause full playback
       playbackRef.current.pause();
       setPlaying(false);
     } else {
-      // Stop preview first
       stopPreview();
-      // Start full playback from where it was (or beginning)
       playbackRef.current.volume = 1;
       playbackRef.current.play().then(() => setPlaying(true)).catch(() => {});
     }
   };
 
-  const handlePlaybackEnded = () => {
-    setPlaying(false);
+  const handlePlaybackEnded = () => setPlaying(false);
+
+  const handleCardClick = () => {
+    setExpanded(prev => !prev);
   };
 
   return (
     <>
-      {/* Outer container — fixed width, overflow visible */}
+      {/* Outer container */}
       <div
         className="relative flex-shrink-0"
-        style={{ width: 200, zIndex: hovered ? 50 : 1 }}
+        style={{ width: 200, zIndex: hovered || expanded ? 50 : 1 }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <motion.div
-          animate={{ scale: hovered ? 1.18 : 1 }}
+          animate={{ scale: hovered && !expanded ? 1.18 : 1 }}
           transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="rounded-xl cursor-pointer shadow-2xl"
           style={{ width: 200, transformOrigin: "center center", overflow: "visible" }}
         >
-          {/* Inner card — clipped normally */}
-          <div className="rounded-xl overflow-hidden" style={{ background: "#1a1a1c" }}>
+          {/* Inner card */}
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{ background: "#1a1a1c" }}
+            onClick={handleCardClick}
+          >
             {track.audio_file_url && (
               <>
-                {/* Preview audio — hover only, stops at 40s */}
                 <audio ref={previewRef} src={track.audio_file_url} preload="metadata" />
-                {/* Playback audio — full song, persists */}
                 <audio ref={playbackRef} src={track.audio_file_url} preload="metadata" onEnded={handlePlaybackEnded} />
               </>
             )}
 
-            {/* Cover image with cinematic pan */}
+            {/* Cover image */}
             <div style={{ height: 118, overflow: "hidden", position: "relative" }}>
               <motion.div
                 style={{ width: "100%", height: "100%" }}
@@ -252,7 +251,6 @@ function TrackCard({ track, onEdit }) {
                     : { duration: 0.7, ease: "easeOut" }
                 }
               >
-
                 {track.cover_url ? (
                   <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
                 ) : (
@@ -262,7 +260,6 @@ function TrackCard({ track, onEdit }) {
                 )}
               </motion.div>
 
-              {/* Gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
 
               {/* Status badge */}
@@ -271,7 +268,7 @@ function TrackCard({ track, onEdit }) {
                 {status.label}
               </div>
 
-              {/* Info chevron on hover */}
+              {/* Info chevron — opens modal (stopPropagation so card click doesn't fire) */}
               <AnimatePresence>
                 {hovered && (
                   <motion.button
@@ -292,7 +289,7 @@ function TrackCard({ track, onEdit }) {
                 )}
               </AnimatePresence>
 
-              {/* Bottom: title + play btn */}
+              {/* Bottom: title + small play btn */}
               <div className="absolute bottom-0 left-0 right-0 px-2.5 pb-2 flex items-end justify-between">
                 <div className="flex-1 min-w-0 pr-2">
                   <p className="text-white font-bold text-[11px] leading-tight line-clamp-1">{track.title}</p>
@@ -320,9 +317,9 @@ function TrackCard({ track, onEdit }) {
               </div>
             </div>
 
-            {/* Metadata panel — slides in below */}
+            {/* Hover metadata panel */}
             <AnimatePresence>
-              {hovered && (
+              {hovered && !expanded && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
@@ -332,7 +329,6 @@ function TrackCard({ track, onEdit }) {
                   style={{ background: "#1a1a1c" }}
                 >
                   <div className="px-2.5 pt-2 pb-3 space-y-1.5">
-                    {/* Status + waveform row */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="px-1.5 py-0.5 rounded text-[8px] font-bold"
@@ -343,11 +339,8 @@ function TrackCard({ track, onEdit }) {
                           <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-orange-500/20 text-orange-400">ATMOS</span>
                         )}
                       </div>
-                      {/* Waveform when playing or previewing */}
                       {(playing || previewing) && <AudioWave />}
                     </div>
-
-                    {/* Meta tags */}
                     {metaParts.length > 0 && (
                       <div className="flex flex-wrap gap-x-1.5 gap-y-0.5">
                         {metaParts.map((part, i) => (
@@ -358,8 +351,6 @@ function TrackCard({ track, onEdit }) {
                         ))}
                       </div>
                     )}
-
-                    {/* Credits */}
                     {(track.producers?.length > 0 || track.mix_engineer) && (
                       <p className="text-[8px] text-white/25 truncate">
                         {track.producers?.length > 0 && `Prod. ${track.producers[0]}`}
@@ -367,6 +358,101 @@ function TrackCard({ track, onEdit }) {
                         {track.mix_engineer && `Mix: ${track.mix_engineer}`}
                       </p>
                     )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* ── EXPANDED panel (click on card) ── */}
+            <AnimatePresence>
+              {expanded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.28, ease: "easeOut" }}
+                  className="overflow-hidden"
+                  style={{ background: "#111" }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  {/* Cinematic image with constant pan animation */}
+                  <div style={{ height: 100, overflow: "hidden", position: "relative" }}>
+                    <motion.div
+                      style={{ width: "100%", height: "100%" }}
+                      animate={{ scale: 1.12, x: [0, 4, -4, 2, 0] }}
+                      transition={{ x: { duration: 10, repeat: Infinity, ease: "easeInOut" }, scale: { duration: 1 } }}
+                    >
+                      {track.cover_url ? (
+                        <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-[#1e1e2e] to-[#0a0a0b]" />
+                      )}
+                    </motion.div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent" />
+
+                    {/* Title over image */}
+                    <div className="absolute bottom-2 left-3 right-3">
+                      <p className="text-white font-black text-xs leading-tight truncate">{track.title}</p>
+                    </div>
+                  </div>
+
+                  {/* Cinematic play button + waveform */}
+                  <div className="px-3 py-3 flex flex-col items-center gap-2">
+                    {track.audio_file_url && (
+                      <button
+                        onClick={togglePlay}
+                        className="relative w-10 h-10 rounded-full flex items-center justify-center transition-all"
+                        style={{
+                          background: playing
+                            ? "rgba(255,255,255,0.08)"
+                            : "rgba(255,255,255,0.10)",
+                          border: "1px solid rgba(255,255,255,0.20)",
+                          backdropFilter: "blur(8px)",
+                          boxShadow: playing ? "0 0 20px rgba(255,255,255,0.12)" : "none",
+                        }}
+                      >
+                        {playing ? (
+                          <Pause className="w-4 h-4 text-white" fill="white" />
+                        ) : (
+                          <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+                        )}
+                      </button>
+                    )}
+
+                    {/* Waveform — always visible in expanded, animated when audio active */}
+                    <div style={{ opacity: (playing || previewing) ? 1 : 0.2, transition: "opacity 0.4s" }}>
+                      <AudioWave large />
+                    </div>
+                  </div>
+
+                  {/* Minimal meta */}
+                  <div className="px-3 pb-3 space-y-1">
+                    {metaParts.length > 0 && (
+                      <div className="flex flex-wrap gap-x-1.5 gap-y-0.5">
+                        {metaParts.map((part, i) => (
+                          <React.Fragment key={i}>
+                            <span className="text-[9px] text-white/40">{part}</span>
+                            {i < metaParts.length - 1 && <span className="text-[9px] text-white/15">·</span>}
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    )}
+                    {(track.producers?.length > 0 || track.mix_engineer) && (
+                      <p className="text-[8px] text-white/20 truncate">
+                        {track.producers?.length > 0 && `Prod. ${track.producers[0]}`}
+                        {track.producers?.length > 0 && track.mix_engineer && " · "}
+                        {track.mix_engineer && `Mix: ${track.mix_engineer}`}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="px-1.5 py-0.5 rounded text-[8px] font-bold"
+                        style={{ background: status.color + "25", color: status.color }}>
+                        {status.label}
+                      </span>
+                      {track.dolby_atmos && (
+                        <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-orange-500/20 text-orange-400">ATMOS</span>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               )}
