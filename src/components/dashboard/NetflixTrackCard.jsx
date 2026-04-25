@@ -48,7 +48,17 @@ function AudioWave() {
   );
 }
 
-function TrackDetailModal({ track, onClose, onEdit }) {
+function MetaRow({ label, value }) {
+  return (
+    <div>
+      <span className="text-[10px] font-semibold text-white/25 uppercase tracking-wider block">{label}</span>
+      <span className="text-xs text-white/65 font-medium">{value}</span>
+    </div>
+  );
+}
+
+// Modal recibe el estado de playback externo para sincronizarlo
+function TrackDetailModal({ track, onClose, onEdit, playing, onTogglePlay }) {
   const status = statusConfig[track.status] || statusConfig.idea;
   const folders = FOLDER_DEFS.filter(f => track.versions?.[f.key]);
 
@@ -67,27 +77,70 @@ function TrackDetailModal({ track, onClose, onEdit }) {
         className="relative w-full max-w-lg rounded-xl overflow-hidden shadow-2xl"
         style={{ background: "#181818" }}
       >
-        <div className="relative" style={{ height: 220 }}>
-          {track.cover_url ? (
-            <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
-              <Music2 className="w-16 h-16 text-white/10" />
-            </div>
-          )}
+        {/* Cover with cinematic animation — same as card */}
+        <div className="relative" style={{ height: 220, overflow: "hidden" }}>
+          <motion.div
+            style={{ width: "100%", height: "100%", position: "absolute", inset: 0 }}
+            animate={
+              playing
+                ? { scale: 1.08, x: [0, 4, -4, 2, 0] }
+                : { scale: 1.04, x: 0 }
+            }
+            transition={
+              playing
+                ? { scale: { duration: 0.7 }, x: { duration: 8, repeat: Infinity, ease: "easeInOut" } }
+                : { duration: 0.7, ease: "easeOut" }
+            }
+          >
+            {track.cover_url ? (
+              <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
+                <Music2 className="w-16 h-16 text-white/10" />
+              </div>
+            )}
+          </motion.div>
+
           <div className="absolute inset-0 bg-gradient-to-t from-[#181818] via-[#181818]/40 to-transparent" />
+
           <button onClick={onClose}
             className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-colors">
             <X className="w-4 h-4 text-white" />
           </button>
-          <div className="absolute bottom-4 left-5">
+
+          <div className="absolute bottom-4 left-5 right-5 flex items-end justify-between">
             <h2 className="text-white font-black text-2xl leading-tight">{track.title}</h2>
+            {/* Waveform when playing */}
+            {playing && (
+              <div className="mb-1">
+                <AudioWave />
+              </div>
+            )}
           </div>
         </div>
+
         <div className="px-5 pb-5 pt-3 space-y-4">
+          {/* Actions row: play + edit + badges */}
           <div className="flex items-center gap-2">
+            {/* Play button in modal, synced with card */}
+            {track.audio_file_url && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onTogglePlay(e); }}
+                className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-bold transition-colors"
+                style={{
+                  background: playing ? "rgba(255,255,255,0.15)" : "white",
+                  color: playing ? "white" : "black",
+                }}
+              >
+                {playing ? (
+                  <><Pause className="w-3.5 h-3.5" fill="currentColor" /> Pausar</>
+                ) : (
+                  <><Play className="w-3.5 h-3.5 ml-0.5" fill="currentColor" /> Reproducir</>
+                )}
+              </button>
+            )}
             <button onClick={() => onEdit(track)}
-              className="flex items-center gap-2 px-4 py-2 rounded-md bg-white text-black text-sm font-bold hover:bg-white/90 transition-colors">
+              className="flex items-center gap-2 px-4 py-2 rounded-md bg-white/10 text-white/70 text-sm font-bold hover:bg-white/20 transition-colors">
               <Edit className="w-3.5 h-3.5" /> Editar
             </button>
             <div className="flex items-center gap-1.5 ml-1">
@@ -100,6 +153,7 @@ function TrackDetailModal({ track, onClose, onEdit }) {
               )}
             </div>
           </div>
+
           <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
             {track.composers?.length > 0 && <MetaRow label="Compositores" value={track.composers.join(", ")} />}
             {track.producers?.length > 0 && <MetaRow label="Productores" value={track.producers.join(", ")} />}
@@ -109,6 +163,7 @@ function TrackDetailModal({ track, onClose, onEdit }) {
             {track.bpm && <MetaRow label="BPM" value={track.bpm} />}
             {track.key && <MetaRow label="Tonalidad" value={track.key} />}
           </div>
+
           {folders.length > 0 && (
             <div>
               <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest mb-2">Versiones</p>
@@ -129,22 +184,12 @@ function TrackDetailModal({ track, onClose, onEdit }) {
   );
 }
 
-function MetaRow({ label, value }) {
-  return (
-    <div>
-      <span className="text-[10px] font-semibold text-white/25 uppercase tracking-wider block">{label}</span>
-      <span className="text-xs text-white/65 font-medium">{value}</span>
-    </div>
-  );
-}
-
 function TrackCard({ track, onEdit }) {
   const [hovered, setHovered] = useState(false);
-  const [playing, setPlaying] = useState(false);   // true = user playback active
-  const [previewing, setPreviewing] = useState(false); // true = hover preview active
+  const [playing, setPlaying] = useState(false);
+  const [previewing, setPreviewing] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
 
-  // Two separate audio elements: one for preview, one for full playback
   const previewRef = useRef(null);
   const playbackRef = useRef(null);
   const previewTimerRef = useRef(null);
@@ -171,16 +216,12 @@ function TrackCard({ track, onEdit }) {
 
   const handleMouseEnter = () => {
     setHovered(true);
-    // Start preview only if not already in full playback
     if (track.audio_file_url && previewRef.current && !playing) {
       previewRef.current.currentTime = 0;
       previewRef.current.volume = 0.6;
       previewRef.current.play().then(() => {
         setPreviewing(true);
-        // Stop after 40 seconds
-        previewTimerRef.current = setTimeout(() => {
-          stopPreview();
-        }, 40000);
+        previewTimerRef.current = setTimeout(() => stopPreview(), 40000);
       }).catch(() => {});
     }
   };
@@ -193,27 +234,24 @@ function TrackCard({ track, onEdit }) {
   const togglePlay = (e) => {
     e.stopPropagation();
     if (!playbackRef.current) return;
-
     if (playing) {
-      // Pause full playback
       playbackRef.current.pause();
       setPlaying(false);
     } else {
-      // Stop preview first
       stopPreview();
-      // Start full playback from where it was (or beginning)
       playbackRef.current.volume = 1;
       playbackRef.current.play().then(() => setPlaying(true)).catch(() => {});
     }
   };
 
-  const handlePlaybackEnded = () => {
-    setPlaying(false);
+  const handleCardClick = () => {
+    setShowDetail(true);
   };
+
+  const handlePlaybackEnded = () => setPlaying(false);
 
   return (
     <>
-      {/* Outer container — fixed width, overflow visible */}
       <div
         className="relative flex-shrink-0"
         style={{ width: 200, zIndex: hovered ? 50 : 1 }}
@@ -225,19 +263,17 @@ function TrackCard({ track, onEdit }) {
           transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="rounded-xl cursor-pointer shadow-2xl"
           style={{ width: 200, transformOrigin: "center center", overflow: "visible" }}
+          onClick={handleCardClick}
         >
-          {/* Inner card — clipped normally */}
           <div className="rounded-xl overflow-hidden" style={{ background: "#1a1a1c" }}>
             {track.audio_file_url && (
               <>
-                {/* Preview audio — hover only, stops at 40s */}
                 <audio ref={previewRef} src={track.audio_file_url} preload="metadata" />
-                {/* Playback audio — full song, persists */}
                 <audio ref={playbackRef} src={track.audio_file_url} preload="metadata" onEnded={handlePlaybackEnded} />
               </>
             )}
 
-            {/* Cover image with cinematic pan */}
+            {/* Cover with cinematic pan */}
             <div style={{ height: 118, overflow: "hidden", position: "relative" }}>
               <motion.div
                 style={{ width: "100%", height: "100%" }}
@@ -252,7 +288,6 @@ function TrackCard({ track, onEdit }) {
                     : { duration: 0.7, ease: "easeOut" }
                 }
               >
-
                 {track.cover_url ? (
                   <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
                 ) : (
@@ -262,7 +297,6 @@ function TrackCard({ track, onEdit }) {
                 )}
               </motion.div>
 
-              {/* Gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
 
               {/* Status badge */}
@@ -320,7 +354,7 @@ function TrackCard({ track, onEdit }) {
               </div>
             </div>
 
-            {/* Metadata panel — slides in below */}
+            {/* Metadata panel — slides in below on hover */}
             <AnimatePresence>
               {hovered && (
                 <motion.div
@@ -332,7 +366,6 @@ function TrackCard({ track, onEdit }) {
                   style={{ background: "#1a1a1c" }}
                 >
                   <div className="px-2.5 pt-2 pb-3 space-y-1.5">
-                    {/* Status + waveform row */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="px-1.5 py-0.5 rounded text-[8px] font-bold"
@@ -343,11 +376,9 @@ function TrackCard({ track, onEdit }) {
                           <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-orange-500/20 text-orange-400">ATMOS</span>
                         )}
                       </div>
-                      {/* Waveform when playing or previewing */}
                       {(playing || previewing) && <AudioWave />}
                     </div>
 
-                    {/* Meta tags */}
                     {metaParts.length > 0 && (
                       <div className="flex flex-wrap gap-x-1.5 gap-y-0.5">
                         {metaParts.map((part, i) => (
@@ -359,7 +390,6 @@ function TrackCard({ track, onEdit }) {
                       </div>
                     )}
 
-                    {/* Credits */}
                     {(track.producers?.length > 0 || track.mix_engineer) && (
                       <p className="text-[8px] text-white/25 truncate">
                         {track.producers?.length > 0 && `Prod. ${track.producers[0]}`}
@@ -381,6 +411,8 @@ function TrackCard({ track, onEdit }) {
             track={track}
             onClose={() => setShowDetail(false)}
             onEdit={(t) => { setShowDetail(false); onEdit(t); }}
+            playing={playing}
+            onTogglePlay={togglePlay}
           />
         )}
       </AnimatePresence>
