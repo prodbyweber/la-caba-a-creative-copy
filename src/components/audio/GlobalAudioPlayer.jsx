@@ -49,14 +49,14 @@ export default function GlobalAudioPlayer() {
 
   return (
     <AnimatePresence>
-      {playingTrack && (
+      {playingTrack && !hidden && (
         <motion.div
           ref={playerRef}
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 backdrop-blur-xl"
+          className="fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 backdrop-blur-xl"
           style={{ background: "rgba(10, 10, 11, 0.95)" }}
           onMouseMove={handleMouseMove}
           onMouseUp={handleSeekUp}
