@@ -81,12 +81,12 @@ export default function TracksSection({ jlyArtistId }) {
         {/* Header */}
         <div className="p-3 lg:p-4 border-b border-white/5 flex items-center justify-between" style={{ borderRadius: "1rem 1rem 0 0", background: "linear-gradient(to right, #141414, #0a0a0b)" }}>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <Music2 className="w-4 h-4 text-purple-400" />
+            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+            <Music2 className="w-4 h-4 text-white/40" />
             </div>
             <div>
               <h3 className="text-base font-bold text-white">Tracks</h3>
-              <p className="text-xs text-gray-500 hidden lg:block">Con metadata y versiones</p>
+
             </div>
           </div>
           <button

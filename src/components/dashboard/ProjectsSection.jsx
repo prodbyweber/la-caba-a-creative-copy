@@ -85,8 +85,8 @@ export default function ProjectsSection({ jlyArtistId }) {
         {/* Header */}
         <div className="p-3 lg:p-4 border-b border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-              <FolderOpen className="w-4 h-4 text-emerald-400" />
+            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+              <FolderOpen className="w-4 h-4 text-white/40" />
             </div>
             <div>
               <h3 className="text-base font-bold text-white">Proyectos Activos</h3>
