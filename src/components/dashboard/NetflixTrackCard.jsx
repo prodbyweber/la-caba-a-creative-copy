@@ -293,19 +293,19 @@ function TrackCard({ track, index, onEdit }) {
               )}
             </div>
 
-            {/* Play button — always visible, small */}
+            {/* Play button — always visible, always transparent */}
             {track.audio_file_url && (
               <button
                 onClick={togglePlay}
                 className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all"
                 style={{
-                  background: playing ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.15)",
-                  border: "1px solid rgba(255,255,255,0.2)",
+                  background: "rgba(255,255,255,0.12)",
+                  border: "1px solid rgba(255,255,255,0.18)",
                   backdropFilter: "blur(4px)",
                 }}
               >
-                {playing ? (
-                  <Pause className="w-2.5 h-2.5 text-black" fill="black" />
+                {userPlayingRef.current ? (
+                  <Pause className="w-2.5 h-2.5 text-white" fill="white" />
                 ) : (
                   <Play className="w-2.5 h-2.5 text-white ml-0.5" fill="white" />
                 )}
