@@ -155,11 +155,16 @@ function TrackCard({ track, onEdit }) {
 
   const handleMouseEnter = () => {
     setHovered(true);
+    // Preview on hover only if user hasn't manually started playback
+    if (track.audio_file_url && audioRef.current && !userPlayingRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
+    }
   };
 
   const handleMouseLeave = () => {
     setHovered(false);
-    // Only stop if not user-initiated
+    // Stop preview, but not user-initiated playback
     if (audioRef.current && !userPlayingRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
