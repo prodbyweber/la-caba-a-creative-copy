@@ -1,36 +1,22 @@
 import React, { useState, useRef, useEffect, createContext, useContext, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Info } from "lucide-react";
+import { useGlobalAudio } from "@/context/GlobalAudioContext";
 
-// ─── Global audio context so only one track plays at a time ───────────────────
+// ─── Fallback local audio context (deprecado, usar useGlobalAudio) ───────────
 const AudioContext = createContext(null);
 
 export function MobileAudioProvider({ children }) {
-  const [playingId, setPlayingId] = useState(null);
-  const stopRef = useRef(null); // fn to stop the currently playing audio
-
-  const requestPlay = useCallback((id, stopFn) => {
-    // Stop previous
-    if (stopRef.current && playingId !== id) {
-      stopRef.current();
-    }
-    stopRef.current = stopFn;
-    setPlayingId(id);
-  }, [playingId]);
-
-  const notifyStopped = useCallback((id) => {
-    setPlayingId(prev => (prev === id ? null : prev));
-  }, []);
-
+  // Fallback vacío para compatibilidad
   return (
-    <AudioContext.Provider value={{ playingId, requestPlay, notifyStopped }}>
+    <AudioContext.Provider value={{ playingId: null }}>
       {children}
     </AudioContext.Provider>
   );
 }
 
 function useMobileAudio() {
-  return useContext(AudioContext);
+  return useContext(AudioContext) || {};
 }
 
 // ─── Animated waveform ────────────────────────────────────────────────────────
@@ -210,59 +196,31 @@ function MobileTrackDetail({ track, onClose, onEdit, playing, onTogglePlay }) {
 // ─── Poster card ──────────────────────────────────────────────────────────────
 export default function MobileTrackPoster({ track, onEdit }) {
   const [showDetail, setShowDetail] = useState(false);
-  const audioRef = useRef(null);
-  const ctx = useMobileAudio();
-  const isPlaying = ctx?.playingId === track.id;
+  const globalAudio = useGlobalAudio();
+  const isPlaying = globalAudio?.playingTrack?.id === track.id;
 
   const status = statusConfig[track.status] || statusConfig.idea;
   const hasAudio = !!track.audio_file_url;
 
-  // Stop this track's audio
-  const stopAudio = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-    ctx?.notifyStopped(track.id);
-  }, [ctx, track.id]);
-
-  // Toggle play/pause
+  // Toggle play/pause using global audio
   const handleTogglePlay = useCallback((e) => {
     if (e) e.stopPropagation();
-    if (!audioRef.current) return;
+    if (!hasAudio) return;
 
     if (isPlaying) {
-      stopAudio();
+      globalAudio.pauseTrack();
     } else {
-      ctx?.requestPlay(track.id, stopAudio);
-      audioRef.current.volume = 1;
-      audioRef.current.play().catch(() => {});
+      globalAudio.playTrack(track);
     }
-  }, [isPlaying, stopAudio, ctx, track.id]);
-
-  // When context switches away from us, pause
-  useEffect(() => {
-    if (!isPlaying && audioRef.current && !audioRef.current.paused) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-  }, [isPlaying]);
+  }, [isPlaying, hasAudio, globalAudio, track]);
 
   return (
     <>
-      {hasAudio && (
-        <audio
-          ref={audioRef}
-          src={track.audio_file_url}
-          preload="metadata"
-          onEnded={() => ctx?.notifyStopped(track.id)}
-        />
-      )}
 
       <div className="flex-shrink-0 w-[110px]">
         {/* Poster */}
         <div
-          className="relative rounded-lg overflow-hidden mb-1.5 cursor-pointer"
+          className="relative rounded-lg overflow-hidden mb-1.5 cursor-pointer group"
           style={{ aspectRatio: "2/3" }}
           onClick={() => setShowDetail(true)}
         >

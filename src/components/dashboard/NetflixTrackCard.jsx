@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X } from "lucide-react";
+import { useGlobalAudio } from "@/context/GlobalAudioContext";
 
 const statusConfig = {
   idea:       { label: "Idea",          color: "#6b7280" },
@@ -194,6 +195,8 @@ function TrackCard({ track, onEdit, isFirst }) {
   const previewRef = useRef(null);
   const playbackRef = useRef(null);
   const previewTimerRef = useRef(null);
+
+  const globalAudio = useGlobalAudio();
 
   const status = statusConfig[track.status] || statusConfig.idea;
 

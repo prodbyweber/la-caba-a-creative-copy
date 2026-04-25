@@ -13,6 +13,8 @@ import ContactLeads from './pages/ContactLeads';
 import Pricing from './pages/Pricing';
 import AdminDashboard from './pages/AdminDashboard';
 import BannersAdmin from './pages/BannersAdmin';
+import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
+import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -113,11 +115,14 @@ function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <NavigationTracker />
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
+        <GlobalAudioProvider>
+          <Router>
+            <NavigationTracker />
+            <AuthenticatedApp />
+            <GlobalAudioPlayer />
+          </Router>
+          <Toaster />
+        </GlobalAudioProvider>
       </QueryClientProvider>
     </AuthProvider>
   )
