@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, ChevronDown, X, Music2 } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
@@ -8,38 +8,78 @@ export default function GlobalAudioPlayer() {
   const [isDragging, setIsDragging] = useState(false);
   const progressRef = useRef(null);
   const playerRef = useRef(null);
+  const isDraggingRef = useRef(false);
 
-  const handleSeekDown = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
+  useEffect(() => {
+    isDraggingRef.current = isDragging;
+  }, [isDragging]);
 
-  const handleSeekUp = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleSeek = (e) => {
+  const performSeek = useCallback((clientX) => {
     if (!progressRef.current) return;
     const rect = progressRef.current.getBoundingClientRect();
-    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     seekTrack(percent * duration);
-  };
+  }, [duration, seekTrack]);
 
-  const handleTouchSeek = (e) => {
-    if (!isDragging || !progressRef.current) return;
+  const handleSeekDown = useCallback((e) => {
     e.preventDefault();
-    const touch = e.touches[0];
-    const rect = progressRef.current.getBoundingClientRect();
-    const percent = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
-    seekTrack(percent * duration);
-  };
+    setIsDragging(true);
+  }, []);
 
-  const handleMouseMove = (e) => {
-    if (isDragging) {
-      handleSeek(e);
-    }
-  };
+  const handleSeekUp = useCallback((e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
+
+  const handleClick = useCallback((e) => {
+    performSeek(e.clientX);
+  }, [performSeek]);
+
+  // Mouse move - solo ejecuta si está arrastrando
+  useEffect(() => {
+    if (!isDraggingRef.current) return;
+
+    const handleMouseMove = (e) => {
+      if (isDraggingRef.current) {
+        performSeek(e.clientX);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove, { passive: true });
+    document.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [performSeek]);
+
+  // Touch move - solo ejecuta si está arrastrando
+  useEffect(() => {
+    if (!isDraggingRef.current) return;
+
+    const handleTouchMove = (e) => {
+      if (isDraggingRef.current && e.touches[0]) {
+        performSeek(e.touches[0].clientX);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      setIsDragging(false);
+    };
+
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [performSeek]);
 
   const formatTime = (sec) => {
     if (!sec || !Number.isFinite(sec)) return "0:00";
@@ -65,11 +105,7 @@ export default function GlobalAudioPlayer() {
           transition={{ duration: 0.3 }}
           className="fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 backdrop-blur-xl"
           style={{ background: "rgba(10, 10, 11, 0.95)" }}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleSeekUp}
-          onMouseLeave={handleSeekUp}
-          onTouchMove={handleTouchSeek}
-          onTouchEnd={handleSeekUp}
+          onContextMenu={(e) => e.preventDefault()}
         >
           {/* Progress bar - mejorada */}
           <div className="relative h-4 sm:h-5 flex items-center px-3 sm:px-5">
@@ -78,7 +114,7 @@ export default function GlobalAudioPlayer() {
               className="w-full h-1 sm:h-1.5 bg-white/5 cursor-pointer group hover:bg-white/8 transition-all active:bg-white/12 relative rounded-full"
               onMouseDown={handleSeekDown}
               onTouchStart={handleSeekDown}
-              onClick={handleSeek}
+              onClick={handleClick}
             >
               <div
                 className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all shadow-lg"
@@ -86,10 +122,11 @@ export default function GlobalAudioPlayer() {
               />
               {/* Handle Circle */}
               <div
-                className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-emerald-400 rounded-full shadow-lg border border-white cursor-grab active:cursor-grabbing hover:w-4.5 hover:h-4.5 sm:hover:w-5 sm:hover:h-5 transition-all"
-                style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`, transform: "translate(-50%, -50%)" }}
-                onMouseDown={handleSeekDown}
-                onTouchStart={handleSeekDown}
+               className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-emerald-400 rounded-full shadow-lg border border-white cursor-grab active:cursor-grabbing hover:w-4.5 hover:h-4.5 sm:hover:w-5 sm:hover:h-5 transition-all pointer-events-auto"
+               style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`, transform: "translate(-50%, -50%)" }}
+               onMouseDown={handleSeekDown}
+               onTouchStart={handleSeekDown}
+               onPointerDown={handleSeekDown}
               />
             </div>
           </div>
