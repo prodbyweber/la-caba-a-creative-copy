@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Bell, Search, Settings, Home, BarChart3, Film, Music2, FolderKanban, Share2, Calendar, Palette, Menu, X, LayoutDashboard } from "lucide-react";
+import { Bell, Search, Settings, Home, BarChart3, BookOpen, Music2, FolderKanban, Share2, Calendar, Palette, Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
@@ -25,10 +25,8 @@ export default function DashboardNav({ artistName, artistId }) {
   }, []);
   
   const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
+    { icon: BookOpen, label: "Catálogo", page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
     { icon: BarChart3, label: "Análisis", page: artistId ? `Analytics?artistId=${artistId}` : "Analytics" },
-    { icon: Film, label: "Clips", page: artistId ? `Clips?artistId=${artistId}` : "Clips" },
-    { icon: Music2, label: "Tracks", page: artistId ? `ArtistTracks?artistId=${artistId}` : "Tracks" },
     { icon: FolderKanban, label: "Proyectos", page: artistId ? `ArtistProjects?artistId=${artistId}` : "Projects" },
     { icon: Calendar, label: "Calendario", page: artistId ? `Calendars?artistId=${artistId}` : "Calendars" },
     { icon: Palette, label: "ADN", page: artistId ? `ADNdeMarca?artistId=${artistId}` : "ADNdeMarca" },
