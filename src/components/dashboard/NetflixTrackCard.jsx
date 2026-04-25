@@ -255,7 +255,7 @@ function TrackCard({ track, onEdit, isFirst }) {
     <>
       <div
         className="relative flex-shrink-0"
-        style={{ width: 200, zIndex: hovered ? 50 : 1 }}
+        style={{ width: 240, zIndex: hovered ? 50 : 1 }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
@@ -263,7 +263,7 @@ function TrackCard({ track, onEdit, isFirst }) {
           animate={{ scale: hovered ? 1.18 : 1 }}
           transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="rounded-xl cursor-pointer shadow-2xl"
-          style={{ width: 200, transformOrigin: isFirst ? "left center" : "center center", overflow: "visible" }}
+          style={{ width: 240, transformOrigin: isFirst ? "left center" : "center center", overflow: "visible" }}
           onClick={handleCardClick}
         >
           <div className="rounded-xl overflow-hidden" style={{ background: "#1a1a1c" }}>
@@ -275,7 +275,7 @@ function TrackCard({ track, onEdit, isFirst }) {
             )}
 
             {/* Cover with cinematic pan */}
-            <div style={{ height: 118, overflow: "hidden", position: "relative" }}>
+            <div style={{ height: 150, overflow: "hidden", position: "relative" }}>
               <motion.div
                 style={{ width: "100%", height: "100%" }}
                 animate={

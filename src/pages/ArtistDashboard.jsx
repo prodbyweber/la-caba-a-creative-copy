@@ -71,7 +71,7 @@ export default function ArtistDashboard() {
       </DashboardNav>
 
       <main className="pt-14">
-        <div className="px-3 sm:px-6 lg:px-8 py-5">
+        <div className="px-4 sm:px-8 lg:px-12 py-5">
 
           {/* Header con volver + selector Audio/Video */}
           <div className="mb-5 flex items-center gap-4">

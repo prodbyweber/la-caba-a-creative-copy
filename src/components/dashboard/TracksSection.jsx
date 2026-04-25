@@ -99,7 +99,7 @@ export default function TracksSection({ jlyArtistId }) {
         </div>
 
         {/* Tracks Carousel */}
-        <div style={{ overflowX: "auto", overflowY: "visible", padding: "60px 8px 200px", margin: "-60px 0 -200px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
+        <div style={{ overflowX: "auto", overflowY: "visible", padding: "60px 16px 200px", margin: "-60px 0 -200px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
           {tracks.length === 0 ? (
             <div className="text-center py-8 px-4">
               <Music2 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
