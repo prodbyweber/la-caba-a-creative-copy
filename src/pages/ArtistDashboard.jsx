@@ -9,8 +9,6 @@ import DashboardNav from "@/components/dashboard/DashboardNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
-import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
-import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
 import ClipsLibrary from "@/components/clips/ClipsLibrary";
 
 
@@ -73,7 +71,7 @@ export default function ArtistDashboard() {
       </DashboardNav>
 
       <main className="pt-14">
-        <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
+        <div className="px-3 sm:px-6 lg:px-8 py-5">
 
           {/* Header con volver + selector Audio/Video */}
           <div className="mb-5 flex items-center gap-4">
@@ -130,15 +128,9 @@ export default function ArtistDashboard() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.25 }}
               >
-                <div className="grid lg:grid-cols-12 gap-3">
-                  <div className="lg:col-span-9 space-y-3">
-                    <ProjectsSection jlyArtistId={artist.id} />
-                    <TracksSection jlyArtistId={artist.id} />
-                  </div>
-                  <div className="lg:col-span-3 space-y-3">
-                    <StudioHoursBlock artist={artist} />
-                    <UpcomingSessionsCard artistId={artist.id} />
-                  </div>
+                <div className="space-y-4">
+                  <ProjectsSection jlyArtistId={artist.id} />
+                  <TracksSection jlyArtistId={artist.id} />
                 </div>
               </motion.div>
             )}

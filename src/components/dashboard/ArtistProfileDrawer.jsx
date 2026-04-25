@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Edit, Youtube, Instagram, Music, Video, Plus, Check, User } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
+import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
 
 const socialPlatforms = [
   { id: "youtube",   name: "YouTube",   icon: Youtube,   textColor: "text-red-400",   borderColor: "border-red-500/30",   bg: "from-red-500/15 to-red-600/15" },
@@ -189,6 +191,12 @@ export default function ArtistProfileDrawer({ artist, isOpen, onClose }) {
               {artist.bio && !isEditing && (
                 <p className="text-xs text-white/30 leading-relaxed">{artist.bio}</p>
               )}
+
+              {/* Horas de estudio + Próximas sesiones */}
+              <div className="space-y-3">
+                <StudioHoursBlock artist={artist} />
+                <UpcomingSessionsCard artistId={artist.id} />
+              </div>
 
               {/* Redes sociales */}
               <div>
