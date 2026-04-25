@@ -250,11 +250,19 @@ function TrackCard({ track, onEdit, isFirst }) {
   const togglePlay = (e) => {
     e.stopPropagation();
     if (!playbackRef.current) return;
+    
+    // Cancelar delay de hover si existe
+    if (hoverDelayRef.current) {
+      clearTimeout(hoverDelayRef.current);
+      hoverDelayRef.current = null;
+    }
+    stopPreview();
+    
     if (playing) {
       playbackRef.current.pause();
       setPlaying(false);
     } else {
-      stopPreview();
+      // Play inmediato sin delay
       playbackRef.current.currentTime = 0;
       playbackRef.current.volume = 1;
       playbackRef.current.play().then(() => setPlaying(true)).catch(() => {});
