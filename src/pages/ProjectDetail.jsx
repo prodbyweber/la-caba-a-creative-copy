@@ -156,11 +156,10 @@ export default function ProjectDetail() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
-      <DashboardNav onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <DashboardNav />
 
-      <main className="lg:pl-64 pt-16">
-        <div className="p-4 sm:p-6 max-w-[1600px] mx-auto">
+      <main className="pt-16">
+        <div className="p-4 sm:p-6 max-w-6xl mx-auto">
           {/* Project Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -346,18 +345,18 @@ export default function ProjectDetail() {
                 </motion.div>
               )}
 
-              {/* Tracks List */}
-              <div className="space-y-3">
+              {/* Tracks List - Netflix Style Vertical */}
+              <div className="space-y-2">
                 {tracks.map((track, index) => (
                   <motion.div
                     key={track.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="bg-[#141414] rounded-xl border border-white/5 overflow-hidden"
+                    className="group"
                   >
                     {editingTrack?.id === track.id ? (
-                      <div className="p-6">
+                      <div className="bg-[#141414] rounded-xl border border-white/5 overflow-hidden p-6">
                         <TrackForm
                           track={track}
                           projectId={projectId}
@@ -366,14 +365,14 @@ export default function ProjectDetail() {
                         />
                       </div>
                     ) : (
-                      <div className="p-4 flex items-center gap-4">
+                      <div className="bg-[#141414] hover:bg-[#1a1a1a] rounded-xl border border-white/5 hover:border-white/10 overflow-hidden transition-all duration-300 flex gap-4 p-4">
                         {/* Track Number */}
-                        <div className="w-8 text-center font-bold text-gray-500 flex-shrink-0">
+                        <div className="text-center font-bold text-gray-500 flex-shrink-0 w-6 h-6 flex items-center justify-center">
                           {track.track_number || index + 1}
                         </div>
 
-                        {/* Cover with Play Button Overlay */}
-                        <div className="relative group flex-shrink-0">
+                        {/* Cover with Play Button */}
+                        <div className="relative flex-shrink-0">
                           {track.audio_file_url && (
                             <audio
                               ref={(el) => { if (el) audioRefs.current[track.id] = el; }}
@@ -386,14 +385,14 @@ export default function ProjectDetail() {
                               onError={(e) => console.error('Audio load error:', e, track.audio_file_url)}
                             />
                           )}
-                          
-                          <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center overflow-hidden relative">
+
+                          <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center overflow-hidden relative">
                             {track.cover_url ? (
                               <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
                             ) : (
-                              <Music2 className="w-8 h-8 text-white/40" />
+                              <Music2 className="w-6 h-6 text-white/40" />
                             )}
-                            
+
                             {/* Play Button Overlay */}
                             {track.audio_file_url && (
                               <>
@@ -410,12 +409,12 @@ export default function ProjectDetail() {
                                     e.stopPropagation();
                                     togglePlay(track.id);
                                   }}
-                                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/90 hover:bg-white active:scale-95 hover:scale-110 flex items-center justify-center transition-all shadow-2xl z-10 touch-manipulation"
+                                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 hover:bg-white active:scale-95 hover:scale-110 flex items-center justify-center transition-all shadow-lg z-10 touch-manipulation"
                                 >
                                   {playingTrackId === track.id ? (
-                                    <Pause className="w-5 h-5 text-black" fill="black" />
+                                    <Pause className="w-4 h-4 text-black" fill="black" />
                                   ) : (
-                                    <Play className="w-5 h-5 text-black ml-0.5" fill="black" />
+                                    <Play className="w-4 h-4 text-black ml-0.5" fill="black" />
                                   )}
                                 </button>
                               </>
@@ -425,18 +424,16 @@ export default function ProjectDetail() {
 
                         {/* Info */}
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-white mb-1">{track.title}</h4>
-                          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                          <h4 className="font-bold text-white mb-1.5 line-clamp-1">{track.title}</h4>
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-gray-400">
                             {track.composer && (
-                              <span>Compositor: {track.composer}</span>
+                              <span className="truncate">{track.composer}</span>
                             )}
-                            {track.dolby_atmos && (
-                              <span className="px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 text-xs font-medium">
-                                Dolby Atmos
-                              </span>
+                            {track.composer && track.status && (
+                              <span className="text-gray-600">·</span>
                             )}
                             {track.status && (
-                              <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                              <span className={`px-2 py-0.5 rounded font-medium ${
                                 track.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400' :
                                 track.status === 'mastering' ? 'bg-purple-500/10 text-purple-400' :
                                 'bg-gray-500/10 text-gray-400'
@@ -444,24 +441,27 @@ export default function ProjectDetail() {
                                 {track.status}
                               </span>
                             )}
+                            {track.dolby_atmos && (
+                              <span className="px-2 py-0.5 rounded bg-orange-500/10 text-orange-400 font-medium">
+                                ATMOS
+                              </span>
+                            )}
                           </div>
                         </div>
 
-                        {/* Stats */}
-                        <div className="flex items-center gap-6 text-sm text-gray-500">
-                          {track.clips_count > 0 && (
-                            <div className="text-center">
-                              <div className="font-bold text-white">{track.clips_count}</div>
-                              <div className="text-xs">Clips</div>
-                            </div>
-                          )}
-                        </div>
+                        {/* Duration */}
+                        {track.duration && (
+                          <div className="text-sm text-gray-500 flex-shrink-0">
+                            {Math.floor(track.duration / 60)}:{String(Math.floor(track.duration % 60)).padStart(2, '0')}
+                          </div>
+                        )}
 
                         {/* Actions */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => setEditingTrack(track)}
                             className="p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                            title="Editar"
                           >
                             <Edit className="w-4 h-4" />
                           </button>
@@ -472,6 +472,7 @@ export default function ProjectDetail() {
                               }
                             }}
                             className="p-2 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-colors"
+                            title="Eliminar"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
