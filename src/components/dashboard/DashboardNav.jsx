@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Bell, Search, Settings, Home, BarChart3, BookOpen, Music2, FolderKanban, Share2, Calendar, Palette, Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -23,10 +23,21 @@ export default function DashboardNav({ artistName, artistId, children }) {
     };
     checkAdmin();
   }, []);
+
+  // Fetch LandingConfig para saber si Analytics está habilitado
+  const { data: landingConfig } = useQuery({
+    queryKey: ['landingConfig'],
+    queryFn: async () => {
+      const configs = await base44.entities.LandingConfig.list();
+      return configs[0];
+    }
+  });
+
+  const analyticsEnabled = landingConfig?.sections_enabled?.analytics !== false;
   
   const menuItems = [
     { icon: BookOpen, label: "Catálogo", page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
-    { icon: BarChart3, label: "Análisis", page: artistId ? `Analytics?artistId=${artistId}` : "Analytics" },
+    ...(analyticsEnabled ? [{ icon: BarChart3, label: "Análisis", page: artistId ? `Analytics?artistId=${artistId}` : "Analytics" }] : []),
     { icon: FolderKanban, label: "Proyectos", page: artistId ? `ArtistProjects?artistId=${artistId}` : "Projects" },
     { icon: Calendar, label: "Calendario", page: artistId ? `Calendars?artistId=${artistId}` : "Calendars" },
     { icon: Palette, label: "ADN", page: artistId ? `ADNdeMarca?artistId=${artistId}` : "ADNdeMarca" },

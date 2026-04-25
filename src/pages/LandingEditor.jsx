@@ -727,7 +727,7 @@ export default function LandingEditor() {
             <SectionEditor title="🔗 Configuración del Menú" defaultOpen={false}>
               <div className="space-y-4">
                 <div className="bg-white/5 rounded-lg p-4 space-y-3">
-                  <h3 className="text-sm font-medium text-white mb-4">Visibilidad de botones del menú:</h3>
+                  <h3 className="text-sm font-medium text-white mb-4">Visibilidad de botones del menú y funciones:</h3>
                   {[
                     { key: 'quienes_somos', label: 'Quiénes Somos' },
                     { key: 'artistas', label: 'Artistas' },
@@ -754,6 +754,28 @@ export default function LandingEditor() {
                       </button>
                     </div>
                   ))}
+                  
+                  {/* Analytics Toggle */}
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <div className="flex items-center justify-between p-2 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                      <label className="text-sm font-medium text-purple-300">📊 Panel de Análisis (en cuentas de artistas)</label>
+                      <button
+                        onClick={() => {
+                          const newSections = { ...config.sections_enabled };
+                          newSections.analytics = newSections.analytics !== false ? false : true;
+                          updateField('sections_enabled', newSections);
+                        }}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                          config.sections_enabled?.analytics !== false
+                            ? 'bg-emerald-500/20 text-emerald-400' 
+                            : 'bg-white/5 text-gray-500'
+                        }`}
+                      >
+                        {config.sections_enabled?.analytics !== false ? 'Habilitado' : 'Deshabilitado'}
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-white/30 mt-2 px-2">Controla si los artistas ven el apartado de Análisis en el menú de su panel.</p>
+                  </div>
                 </div>
 
                 <div className="pt-4 border-t border-white/10">
