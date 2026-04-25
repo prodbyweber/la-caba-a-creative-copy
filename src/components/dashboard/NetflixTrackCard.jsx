@@ -140,10 +140,14 @@ function MetaRow({ label, value }) {
 
 function TrackCard({ track, onEdit }) {
   const [hovered, setHovered] = useState(false);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(false);   // true = user playback active
+  const [previewing, setPreviewing] = useState(false); // true = hover preview active
   const [showDetail, setShowDetail] = useState(false);
-  const audioRef = useRef(null);
-  const userPlayingRef = useRef(false);
+
+  // Two separate audio elements: one for preview, one for full playback
+  const previewRef = useRef(null);
+  const playbackRef = useRef(null);
+  const previewTimerRef = useRef(null);
 
   const status = statusConfig[track.status] || statusConfig.idea;
 
@@ -153,40 +157,57 @@ function TrackCard({ track, onEdit }) {
     track.key,
   ].filter(Boolean);
 
+  const stopPreview = () => {
+    if (previewRef.current) {
+      previewRef.current.pause();
+      previewRef.current.currentTime = 0;
+    }
+    if (previewTimerRef.current) {
+      clearTimeout(previewTimerRef.current);
+      previewTimerRef.current = null;
+    }
+    setPreviewing(false);
+  };
+
   const handleMouseEnter = () => {
     setHovered(true);
-    // Preview on hover only if user hasn't manually started playback
-    if (track.audio_file_url && audioRef.current && !userPlayingRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
+    // Start preview only if not already in full playback
+    if (track.audio_file_url && previewRef.current && !playing) {
+      previewRef.current.currentTime = 0;
+      previewRef.current.volume = 0.6;
+      previewRef.current.play().then(() => {
+        setPreviewing(true);
+        // Stop after 40 seconds
+        previewTimerRef.current = setTimeout(() => {
+          stopPreview();
+        }, 40000);
+      }).catch(() => {});
     }
   };
 
   const handleMouseLeave = () => {
     setHovered(false);
-    // Stop preview, but not user-initiated playback
-    if (audioRef.current && !userPlayingRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setPlaying(false);
-    }
+    stopPreview();
   };
 
   const togglePlay = (e) => {
     e.stopPropagation();
-    if (!audioRef.current) return;
-    if (userPlayingRef.current) {
-      audioRef.current.pause();
-      userPlayingRef.current = false;
+    if (!playbackRef.current) return;
+
+    if (playing) {
+      // Pause full playback
+      playbackRef.current.pause();
       setPlaying(false);
     } else {
-      userPlayingRef.current = true;
-      audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
+      // Stop preview first
+      stopPreview();
+      // Start full playback from where it was (or beginning)
+      playbackRef.current.volume = 1;
+      playbackRef.current.play().then(() => setPlaying(true)).catch(() => {});
     }
   };
 
-  const handleEnded = () => {
-    userPlayingRef.current = false;
+  const handlePlaybackEnded = () => {
     setPlaying(false);
   };
 
@@ -208,13 +229,12 @@ function TrackCard({ track, onEdit }) {
           {/* Inner card — clipped normally */}
           <div className="rounded-xl overflow-hidden" style={{ background: "#1a1a1c" }}>
             {track.audio_file_url && (
-              <audio
-                ref={audioRef}
-                src={track.audio_file_url}
-                preload="metadata"
-                onEnded={handleEnded}
-                onPause={() => { if (!userPlayingRef.current) setPlaying(false); }}
-              />
+              <>
+                {/* Preview audio — hover only, stops at 40s */}
+                <audio ref={previewRef} src={track.audio_file_url} preload="metadata" />
+                {/* Playback audio — full song, persists */}
+                <audio ref={playbackRef} src={track.audio_file_url} preload="metadata" onEnded={handlePlaybackEnded} />
+              </>
             )}
 
             {/* Cover image with cinematic pan */}
@@ -232,6 +252,7 @@ function TrackCard({ track, onEdit }) {
                     : { duration: 0.7, ease: "easeOut" }
                 }
               >
+
                 {track.cover_url ? (
                   <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
                 ) : (
@@ -322,8 +343,8 @@ function TrackCard({ track, onEdit }) {
                           <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-orange-500/20 text-orange-400">ATMOS</span>
                         )}
                       </div>
-                      {/* Waveform only when playing */}
-                      {playing && <AudioWave />}
+                      {/* Waveform when playing or previewing */}
+                      {(playing || previewing) && <AudioWave />}
                     </div>
 
                     {/* Meta tags */}
