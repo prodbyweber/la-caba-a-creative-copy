@@ -1,7 +1,66 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect, createContext, useContext, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Music2, X, Edit, ExternalLink } from "lucide-react";
+import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Info } from "lucide-react";
 
+// ─── Global audio context so only one track plays at a time ───────────────────
+const AudioContext = createContext(null);
+
+export function MobileAudioProvider({ children }) {
+  const [playingId, setPlayingId] = useState(null);
+  const stopRef = useRef(null); // fn to stop the currently playing audio
+
+  const requestPlay = useCallback((id, stopFn) => {
+    // Stop previous
+    if (stopRef.current && playingId !== id) {
+      stopRef.current();
+    }
+    stopRef.current = stopFn;
+    setPlayingId(id);
+  }, [playingId]);
+
+  const notifyStopped = useCallback((id) => {
+    setPlayingId(prev => (prev === id ? null : prev));
+  }, []);
+
+  return (
+    <AudioContext.Provider value={{ playingId, requestPlay, notifyStopped }}>
+      {children}
+    </AudioContext.Provider>
+  );
+}
+
+function useMobileAudio() {
+  return useContext(AudioContext);
+}
+
+// ─── Animated waveform ────────────────────────────────────────────────────────
+function AudioWave({ small = false }) {
+  const bars = [3, 6, 9, 5, 8, 4, 7, 5];
+  const h = small ? 10 : 14;
+  return (
+    <div className="flex items-end gap-[1.5px]" style={{ height: h }}>
+      {bars.map((b, i) => (
+        <div
+          key={i}
+          className="w-[2px] rounded-full bg-white/70"
+          style={{
+            height: Math.round((b / 9) * h),
+            animation: `mobileWave 0.${5 + (i % 5)}s ease-in-out infinite alternate`,
+            animationDelay: `${i * 0.07}s`,
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes mobileWave {
+          from { transform: scaleY(0.25); opacity: 0.3; }
+          to   { transform: scaleY(1);    opacity: 0.9; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ─── Status config ────────────────────────────────────────────────────────────
 const statusConfig = {
   idea:       { label: "Idea",          color: "#6b7280" },
   production: { label: "Producción",    color: "#60a5fa" },
@@ -19,8 +78,8 @@ const FOLDER_DEFS = [
   { key: "acapella",     label: "Acapella" },
 ];
 
-// Simple bottom sheet detail view for mobile
-function MobileTrackDetail({ track, onClose, onEdit }) {
+// ─── Bottom-sheet detail (with shared play state) ─────────────────────────────
+function MobileTrackDetail({ track, onClose, onEdit, playing, onTogglePlay }) {
   const status = statusConfig[track.status] || statusConfig.idea;
   const folders = FOLDER_DEFS.filter(f => track.versions?.[f.key]);
 
@@ -29,7 +88,7 @@ function MobileTrackDetail({ track, onClose, onEdit }) {
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
-        className="absolute inset-0 bg-black/75"
+        className="absolute inset-0 bg-black/80"
       />
       <motion.div
         initial={{ y: "100%" }}
@@ -37,42 +96,74 @@ function MobileTrackDetail({ track, onClose, onEdit }) {
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 30, stiffness: 300 }}
         className="relative rounded-t-2xl overflow-hidden"
-        style={{ background: "#181818", maxHeight: "85vh", overflowY: "auto" }}
+        style={{ background: "#181818", maxHeight: "88vh", overflowY: "auto" }}
       >
-        {/* Cover banner */}
-        <div className="relative h-52 overflow-hidden flex-shrink-0">
-          {track.cover_url ? (
-            <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
-              <Music2 className="w-16 h-16 text-white/10" />
-            </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#181818] via-[#181818]/50 to-transparent" />
+        {/* Cover banner with cinematic pan when playing */}
+        <div className="relative overflow-hidden flex-shrink-0" style={{ height: 220 }}>
+          <motion.div
+            className="absolute inset-0"
+            animate={playing ? { scale: 1.08, x: [0, 4, -4, 2, 0] } : { scale: 1.02, x: 0 }}
+            transition={playing
+              ? { scale: { duration: 0.7 }, x: { duration: 8, repeat: Infinity, ease: "easeInOut" } }
+              : { duration: 0.7 }}
+          >
+            {track.cover_url ? (
+              <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
+                <Music2 className="w-16 h-16 text-white/10" />
+              </div>
+            )}
+          </motion.div>
+
+          <div className="absolute inset-0 bg-gradient-to-t from-[#181818] via-[#181818]/40 to-transparent" />
+
+          {/* Close */}
           <button onClick={onClose}
             className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center">
             <X className="w-4 h-4 text-white" />
           </button>
-          <div className="absolute bottom-4 left-4 right-4">
-            <h2 className="text-white font-black text-2xl leading-tight">{track.title}</h2>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold"
-                style={{ background: status.color + "30", color: status.color }}>
-                {status.label}
-              </span>
-              {track.dolby_atmos && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-400">ATMOS</span>
-              )}
-            </div>
+
+          {/* Title + wave */}
+          <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+            <h2 className="text-white font-black text-2xl leading-tight flex-1 pr-3">{track.title}</h2>
+            {playing && <AudioWave />}
           </div>
         </div>
 
-        <div className="px-4 pb-8 pt-3 space-y-4">
-          {/* Edit button */}
-          <button onClick={() => { onClose(); onEdit(track); }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold w-full justify-center hover:bg-white/15 transition-colors">
-            <Edit className="w-4 h-4" /> Editar track
-          </button>
+        <div className="px-4 pb-8 pt-4 space-y-4">
+          {/* Play + Edit row */}
+          <div className="flex items-center gap-2">
+            {track.audio_file_url && (
+              <button
+                onClick={onTogglePlay}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all flex-shrink-0"
+                style={{
+                  background: playing ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.9)",
+                  color: playing ? "white" : "black",
+                  border: playing ? "1px solid rgba(255,255,255,0.2)" : "none",
+                }}
+              >
+                {playing ? <Pause className="w-4 h-4" fill="white" /> : <Play className="w-4 h-4 ml-0.5" fill="black" />}
+                {playing ? "Pausar" : "Reproducir"}
+              </button>
+            )}
+            <button onClick={() => { onClose(); onEdit(track); }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold flex-1 justify-center hover:bg-white/15 transition-colors">
+              <Edit className="w-4 h-4" /> Editar
+            </button>
+          </div>
+
+          {/* Status badges */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold"
+              style={{ background: status.color + "28", color: status.color }}>
+              {status.label}
+            </span>
+            {track.dolby_atmos && (
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-400">ATMOS</span>
+            )}
+          </div>
 
           {/* Meta */}
           {(track.genre || track.bpm || track.key) && (
@@ -84,12 +175,16 @@ function MobileTrackDetail({ track, onClose, onEdit }) {
           )}
 
           {track.composers?.length > 0 && (
-            <div><p className="text-[10px] text-white/25 uppercase tracking-wider mb-1">Compositores</p>
-            <p className="text-xs text-white/60">{track.composers.join(", ")}</p></div>
+            <div>
+              <p className="text-[10px] text-white/25 uppercase tracking-wider mb-1">Compositores</p>
+              <p className="text-xs text-white/60">{track.composers.join(", ")}</p>
+            </div>
           )}
           {track.producers?.length > 0 && (
-            <div><p className="text-[10px] text-white/25 uppercase tracking-wider mb-1">Productores</p>
-            <p className="text-xs text-white/60">{track.producers.join(", ")}</p></div>
+            <div>
+              <p className="text-[10px] text-white/25 uppercase tracking-wider mb-1">Productores</p>
+              <p className="text-xs text-white/60">{track.producers.join(", ")}</p>
+            </div>
           )}
 
           {folders.length > 0 && (
@@ -113,34 +208,132 @@ function MobileTrackDetail({ track, onClose, onEdit }) {
   );
 }
 
+// ─── Poster card ──────────────────────────────────────────────────────────────
 export default function MobileTrackPoster({ track, onEdit }) {
   const [showDetail, setShowDetail] = useState(false);
+  const audioRef = useRef(null);
+  const ctx = useMobileAudio();
+  const isPlaying = ctx?.playingId === track.id;
+
   const status = statusConfig[track.status] || statusConfig.idea;
+  const hasAudio = !!track.audio_file_url;
+
+  // Stop this track's audio
+  const stopAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    ctx?.notifyStopped(track.id);
+  }, [ctx, track.id]);
+
+  // Toggle play/pause
+  const handleTogglePlay = useCallback((e) => {
+    if (e) e.stopPropagation();
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      stopAudio();
+    } else {
+      ctx?.requestPlay(track.id, stopAudio);
+      audioRef.current.volume = 1;
+      audioRef.current.play().catch(() => {});
+    }
+  }, [isPlaying, stopAudio, ctx, track.id]);
+
+  // When context switches away from us, pause
+  useEffect(() => {
+    if (!isPlaying && audioRef.current && !audioRef.current.paused) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [isPlaying]);
 
   return (
     <>
-      <div
-        className="flex-shrink-0 w-[110px] cursor-pointer"
-        onClick={() => setShowDetail(true)}
-      >
-        {/* Poster — 2:3 ratio like Netflix movie poster */}
-        <div className="relative rounded-lg overflow-hidden mb-1.5" style={{ aspectRatio: "2/3" }}>
-          {track.cover_url ? (
-            <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#1e1e2e] to-[#0a0a0b] flex items-center justify-center">
-              <Music2 className="w-8 h-8 text-white/15" />
-            </div>
-          )}
-          {/* Bottom gradient + title overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 p-2">
-            <p className="text-white font-bold text-[11px] leading-tight line-clamp-2">{track.title}</p>
+      {hasAudio && (
+        <audio
+          ref={audioRef}
+          src={track.audio_file_url}
+          preload="metadata"
+          onEnded={() => ctx?.notifyStopped(track.id)}
+        />
+      )}
+
+      <div className="flex-shrink-0 w-[110px]">
+        {/* Poster */}
+        <div
+          className="relative rounded-lg overflow-hidden mb-1.5 cursor-pointer"
+          style={{ aspectRatio: "2/3" }}
+        >
+          {/* Cover with cinematic pan when playing */}
+          <motion.div
+            className="absolute inset-0"
+            animate={isPlaying ? { scale: 1.08, x: [0, 3, -3, 1, 0] } : { scale: 1, x: 0 }}
+            transition={isPlaying
+              ? { scale: { duration: 0.7 }, x: { duration: 8, repeat: Infinity, ease: "easeInOut" } }
+              : { duration: 0.5 }}
+          >
+            {track.cover_url ? (
+              <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-[#1e1e2e] to-[#0a0a0b] flex items-center justify-center">
+                <Music2 className="w-8 h-8 text-white/15" />
+              </div>
+            )}
+          </motion.div>
+
+          {/* Bottom gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent" />
+
+          {/* Info button — top right, integrated in card */}
+          <button
+            onClick={(e) => { e.stopPropagation(); setShowDetail(true); }}
+            className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center"
+            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
+          >
+            <ChevronDown className="w-3 h-3 text-white/70" />
+          </button>
+
+          {/* Bottom area: title + play button */}
+          <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 flex items-end justify-between gap-1">
+            <p className="text-white font-bold text-[11px] leading-tight line-clamp-2 flex-1">{track.title}</p>
+
+            {hasAudio && (
+              <button
+                onClick={handleTogglePlay}
+                className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all active:scale-90"
+                style={{
+                  background: isPlaying ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.88)",
+                  border: isPlaying ? "1px solid rgba(255,255,255,0.3)" : "none",
+                  backdropFilter: "blur(4px)",
+                }}
+              >
+                {isPlaying
+                  ? <Pause className="w-2.5 h-2.5 text-white" fill="white" />
+                  : <Play className="w-2.5 h-2.5 text-black ml-0.5" fill="black" />
+                }
+              </button>
+            )}
           </div>
-          {/* Status dot */}
-          <div className="absolute top-2 left-2 w-1.5 h-1.5 rounded-full" style={{ background: status.color }} />
+
+          {/* Waveform when playing — center of card */}
+          <AnimatePresence>
+            {isPlaying && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+              >
+                <AudioWave small />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-        <p className="text-[10px] text-white/35 truncate">{status.label}</p>
+
+        {/* Status label below poster */}
+        <p className="text-[10px] truncate" style={{ color: status.color + "99" }}>{status.label}</p>
       </div>
 
       <AnimatePresence>
@@ -149,6 +342,8 @@ export default function MobileTrackPoster({ track, onEdit }) {
             track={track}
             onClose={() => setShowDetail(false)}
             onEdit={onEdit}
+            playing={isPlaying}
+            onTogglePlay={handleTogglePlay}
           />
         )}
       </AnimatePresence>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import MobileTrackPoster from "./MobileTrackPoster";
+import MobileTrackPoster, { MobileAudioProvider } from "./MobileTrackPoster";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Music2, Upload, Edit, Image as ImageIcon, Check, X } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -109,14 +109,16 @@ export default function TracksSection({ jlyArtistId }) {
               </button>
             </div>
           ) : (
-            <div className="overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-              <div className="flex gap-2.5" style={{ width: "max-content" }}>
-                {tracks.map((track) => (
-                  <MobileTrackPoster key={track.id} track={track} onEdit={setEditingTrack} />
-                ))}
-                <div className="flex-shrink-0 w-1" />
+            <MobileAudioProvider>
+              <div className="overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                <div className="flex gap-2.5" style={{ width: "max-content" }}>
+                  {tracks.map((track) => (
+                    <MobileTrackPoster key={track.id} track={track} onEdit={setEditingTrack} />
+                  ))}
+                  <div className="flex-shrink-0 w-1" />
+                </div>
               </div>
-            </div>
+            </MobileAudioProvider>
           )}
         </div>
 
