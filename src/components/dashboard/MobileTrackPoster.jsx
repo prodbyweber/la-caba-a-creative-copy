@@ -265,6 +265,7 @@ export default function MobileTrackPoster({ track, onEdit }) {
         <div
           className="relative rounded-lg overflow-hidden mb-1.5 cursor-pointer"
           style={{ aspectRatio: "2/3" }}
+          onClick={() => setShowDetail(true)}
         >
           {/* Cover with cinematic pan when playing */}
           <motion.div
