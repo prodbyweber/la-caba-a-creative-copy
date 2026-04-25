@@ -220,7 +220,8 @@ function TrackCard({ track, onEdit, isFirst }) {
 
   const handleMouseEnter = () => {
     setHovered(true);
-    if (track.audio_file_url && previewRef.current && !playing) {
+    // No reproducir preview si hay algo sonando en cualquier tarjeta
+    if (track.audio_file_url && previewRef.current && !playing && !globalAudio?.playingTrack) {
       previewRef.current.currentTime = 0;
       previewRef.current.volume = 0.6;
       previewRef.current.play().then(() => {
@@ -243,6 +244,7 @@ function TrackCard({ track, onEdit, isFirst }) {
       setPlaying(false);
     } else {
       stopPreview();
+      playbackRef.current.currentTime = 0;
       playbackRef.current.volume = 1;
       playbackRef.current.play().then(() => setPlaying(true)).catch(() => {});
     }
