@@ -64,21 +64,31 @@ export default function GlobalAudioPlayer() {
           onTouchEnd={handleSeekUp}
         >
           {/* Progress bar - mejorada */}
-          <div
-            ref={progressRef}
-            className="h-1 sm:h-1.5 bg-white/5 cursor-pointer group hover:bg-white/8 transition-all active:bg-white/12"
-            onMouseDown={handleSeekDown}
-            onTouchStart={handleSeekDown}
-            onTouchMove={handleTouchSeek}
-            onClick={handleSeek}
-          >
+          <div className="relative h-4 sm:h-5 flex items-center px-3 sm:px-5">
             <div
-              className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all shadow-lg"
-              style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-            />
+              ref={progressRef}
+              className="w-full h-1 sm:h-1.5 bg-white/5 cursor-pointer group hover:bg-white/8 transition-all active:bg-white/12 relative rounded-full"
+              onMouseDown={handleSeekDown}
+              onTouchStart={handleSeekDown}
+              onTouchMove={handleTouchSeek}
+              onClick={handleSeek}
+            >
+              <div
+                className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all shadow-lg"
+                style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+              />
+              {/* Handle Circle */}
+              <div
+                className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-emerald-400 rounded-full shadow-lg border border-white cursor-grab active:cursor-grabbing hover:w-4.5 hover:h-4.5 sm:hover:w-5 sm:hover:h-5 transition-all"
+                style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`, transform: "translate(-50%, -50%)" }}
+                onMouseDown={handleSeekDown}
+                onTouchStart={handleSeekDown}
+                onTouchMove={handleTouchSeek}
+              />
+            </div>
           </div>
 
-          <div className="px-3 sm:px-5 py-3 sm:py-4 flex items-center gap-2.5 sm:gap-4">
+          <div className="px-3 sm:px-5 py-2 sm:py-3 flex items-center gap-2.5 sm:gap-4">
             {/* Cover thumb - mejorado */}
             <div className="w-10 sm:w-12 h-10 sm:h-12 rounded-lg flex items-center justify-center flex-shrink-0 shadow-md" style={{ background: "#1a1a1c", border: "1px solid rgba(255,255,255,0.05)" }}>
               {playingTrack.cover_url ? (
