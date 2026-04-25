@@ -80,18 +80,15 @@ export default function ProjectsSection({ jlyArtistId }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5 overflow-hidden"
+        className="sm:bg-gradient-to-br sm:from-[#141414] sm:to-black sm:rounded-2xl sm:border sm:border-white/5 sm:overflow-hidden"
       >
         {/* Header */}
-        <div className="p-3 lg:p-4 border-b border-white/5 flex items-center justify-between">
+        <div className="px-0 sm:px-4 sm:py-3 sm:border-b sm:border-white/5 flex items-center justify-between mb-3 sm:mb-0">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+            <div className="hidden sm:flex w-8 h-8 rounded-lg bg-white/5 items-center justify-center">
               <FolderOpen className="w-4 h-4 text-white/40" />
             </div>
-            <div>
-              <h3 className="text-base font-bold text-white">Proyectos Activos</h3>
-              <p className="text-xs text-gray-500 hidden lg:block">Albums, EPs y Singles</p>
-            </div>
+            <h3 className="text-base font-bold text-white">Proyectos Activos</h3>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
@@ -103,7 +100,7 @@ export default function ProjectsSection({ jlyArtistId }) {
         </div>
 
         {/* Projects Carousel */}
-        <div className="p-4 lg:p-5">
+        <div className="sm:p-4 lg:p-5">
           {projects.length === 0 ? (
             <div className="text-center py-12">
               <FolderOpen className="w-16 h-16 text-gray-600 mx-auto mb-4" />
@@ -116,72 +113,85 @@ export default function ProjectsSection({ jlyArtistId }) {
               </button>
             </div>
           ) : (
-            <div className="overflow-hidden" ref={emblaRef}>
-              <div className="flex gap-4">
-                {projects.map((project, i) => {
-                const projectTracks = getProjectTracks(project.id);
-                return (
-                  <div 
-                    key={project.id} 
-                    className="flex-[0_0_150px] sm:flex-[0_0_175px]"
-                  >
-                    <Link to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.05 }}
-                        className="group bg-white/5 rounded-xl p-2 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer h-full"
-                      >
-                      {/* Project Cover */}
-                      <div className="relative aspect-square rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 mb-2 overflow-hidden">
-                        {project.cover_url ? (
-                          <img 
-                            src={project.cover_url} 
-                            alt={project.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : projectTracks[0]?.cover_url ? (
-                          <img 
-                            src={projectTracks[0].cover_url} 
-                            alt={project.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Music2 className="w-8 h-8 text-white/20" />
+            /* Mobile: scroll nativo edge-to-edge. Desktop: Embla */
+            <>
+              {/* MOBILE carousel */}
+              <div className="sm:hidden -mx-4 px-4 overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                <div className="flex gap-2.5" style={{ width: "max-content" }}>
+                  {projects.map((project, i) => {
+                    const projectTracks = getProjectTracks(project.id);
+                    return (
+                      <Link key={project.id} to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
+                        <div className="flex-shrink-0 w-[120px]">
+                          <div className="relative aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-white/10 to-white/5 mb-1.5">
+                            {project.cover_url ? (
+                              <img src={project.cover_url} alt={project.title} className="w-full h-full object-cover" />
+                            ) : projectTracks[0]?.cover_url ? (
+                              <img src={projectTracks[0].cover_url} alt={project.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Music2 className="w-7 h-7 text-white/20" />
+                              </div>
+                            )}
+                            <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-black/80 text-[8px] font-medium text-white">
+                              {projectTracks.length}
+                            </div>
                           </div>
-                        )}
-                        {/* Track Count Badge */}
-                        <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[9px] font-medium">
-                          {projectTracks.length}
+                          <p className="text-[11px] font-semibold text-white truncate leading-tight">{project.title}</p>
+                          <p className="text-[10px] text-white/35 truncate">{getProjectYear(project)}{project.type ? ` · ${project.type}` : ""}</p>
                         </div>
-                      </div>
-
-                      {/* Info - Estilo Netflix */}
-                      <div className="space-y-0.5 px-0.5">
-                        <h4 className="font-semibold text-xs text-white group-hover:text-emerald-400 transition-colors truncate">
-                          {project.title}
-                        </h4>
-                        <div className="flex flex-wrap items-center gap-1 text-[10px] text-gray-400">
-                          <span className="font-medium text-white">{getProjectYear(project)}</span>
-                          {project.type && (
-                            <>
-                              <span>•</span>
-                              <span className="text-emerald-400 font-semibold">{project.type}</span>
-                            </>
-                          )}
-                        </div>
-                        <div className="text-[10px] text-gray-500 truncate">
-                          {getArtistName(project.artist_id)}{getCollaboratorNames(project.collaborator_artist_ids)}
-                        </div>
-                      </div>
-                    </motion.div>
-                    </Link>
-                  </div>
-                );
-                })}
+                      </Link>
+                    );
+                  })}
+                  {/* trailing space */}
+                  <div className="flex-shrink-0 w-1" />
+                </div>
               </div>
-            </div>
+
+              {/* DESKTOP carousel (Embla) */}
+              <div className="hidden sm:block overflow-hidden" ref={emblaRef}>
+                <div className="flex gap-4">
+                  {projects.map((project, i) => {
+                  const projectTracks = getProjectTracks(project.id);
+                  return (
+                    <div key={project.id} className="flex-[0_0_150px] sm:flex-[0_0_175px]">
+                      <Link to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: i * 0.05 }}
+                          className="group bg-white/5 rounded-xl p-2 border border-white/5 hover:border-emerald-500/30 transition-all cursor-pointer h-full"
+                        >
+                          <div className="relative aspect-square rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 mb-2 overflow-hidden">
+                            {project.cover_url ? (
+                              <img src={project.cover_url} alt={project.title} className="w-full h-full object-cover" />
+                            ) : projectTracks[0]?.cover_url ? (
+                              <img src={projectTracks[0].cover_url} alt={project.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Music2 className="w-8 h-8 text-white/20" />
+                              </div>
+                            )}
+                            <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[9px] font-medium">
+                              {projectTracks.length}
+                            </div>
+                          </div>
+                          <div className="space-y-0.5 px-0.5">
+                            <h4 className="font-semibold text-xs text-white group-hover:text-emerald-400 transition-colors truncate">{project.title}</h4>
+                            <div className="flex flex-wrap items-center gap-1 text-[10px] text-gray-400">
+                              <span className="font-medium text-white">{getProjectYear(project)}</span>
+                              {project.type && <><span>•</span><span className="text-emerald-400 font-semibold">{project.type}</span></>}
+                            </div>
+                            <div className="text-[10px] text-gray-500 truncate">{getArtistName(project.artist_id)}{getCollaboratorNames(project.collaborator_artist_ids)}</div>
+                          </div>
+                        </motion.div>
+                      </Link>
+                    </div>
+                  );
+                  })}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </motion.div>

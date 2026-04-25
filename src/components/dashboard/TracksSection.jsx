@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import MobileTrackPoster from "./MobileTrackPoster";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Music2, Upload, Edit, Image as ImageIcon, Check, X } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -75,19 +76,17 @@ export default function TracksSection({ jlyArtistId }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-br from-[#141414] to-black rounded-2xl border border-white/5"
+        className="sm:bg-gradient-to-br sm:from-[#141414] sm:to-black sm:rounded-2xl sm:border sm:border-white/5"
         style={{ overflow: "visible" }}
       >
         {/* Header */}
-        <div className="p-3 lg:p-4 border-b border-white/5 flex items-center justify-between" style={{ borderRadius: "1rem 1rem 0 0", background: "linear-gradient(to right, #141414, #0a0a0b)" }}>
+        <div className="px-0 sm:px-4 sm:py-3 sm:border-b sm:border-white/5 flex items-center justify-between mb-3 sm:mb-0"
+          style={{ borderRadius: "1rem 1rem 0 0" }}>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-            <Music2 className="w-4 h-4 text-white/40" />
+            <div className="hidden sm:flex w-8 h-8 rounded-lg bg-white/5 items-center justify-center">
+              <Music2 className="w-4 h-4 text-white/40" />
             </div>
-            <div>
-              <h3 className="text-base font-bold text-white">Tracks</h3>
-
-            </div>
+            <h3 className="text-base font-bold text-white">Tracks</h3>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
@@ -98,28 +97,44 @@ export default function TracksSection({ jlyArtistId }) {
           </button>
         </div>
 
-        {/* Tracks Carousel */}
-        <div style={{ overflowX: "auto", overflowY: "visible", padding: "60px 16px 200px", margin: "-60px 0 -200px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
+        {/* MOBILE: poster-style Netflix carousel edge-to-edge */}
+        <div className="sm:hidden -mx-4 px-4">
           {tracks.length === 0 ? (
             <div className="text-center py-8 px-4">
               <Music2 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
               <p className="text-gray-500 text-sm mb-3">No tienes tracks aún</p>
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors"
-              >
+              <button onClick={() => setShowCreateModal(true)}
+                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors">
+                Crear tu primer track
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+              <div className="flex gap-2.5" style={{ width: "max-content" }}>
+                {tracks.map((track) => (
+                  <MobileTrackPoster key={track.id} track={track} onEdit={setEditingTrack} />
+                ))}
+                <div className="flex-shrink-0 w-1" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* DESKTOP: existing Netflix hover cards */}
+        <div className="hidden sm:block" style={{ overflowX: "auto", overflowY: "visible", padding: "60px 16px 200px", margin: "-60px 0 -200px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
+          {tracks.length === 0 ? (
+            <div className="text-center py-8 px-4">
+              <Music2 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-500 text-sm mb-3">No tienes tracks aún</p>
+              <button onClick={() => setShowCreateModal(true)}
+                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors">
                 Crear tu primer track
               </button>
             </div>
           ) : (
             <div className="flex gap-3" style={{ width: "max-content" }}>
               {tracks.map((track, index) => (
-                <NetflixTrackCard
-                  key={track.id}
-                  track={track}
-                  index={index}
-                  onEdit={setEditingTrack}
-                />
+                <NetflixTrackCard key={track.id} track={track} index={index} onEdit={setEditingTrack} />
               ))}
             </div>
           )}
