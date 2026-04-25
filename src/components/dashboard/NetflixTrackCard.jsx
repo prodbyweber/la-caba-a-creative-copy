@@ -173,7 +173,24 @@ function TrackCard({ track, index, onEdit }) {
 
   const status = statusConfig[track.status] || statusConfig.idea;
 
-  // Toggle play — persists without hover
+  // Auto-play on hover, pause on leave (but keep playing state if user clicked play)
+  const handleMouseEnter = () => {
+    setHovered(true);
+    if (track.audio_file_url && audioRef.current && !playing) {
+      audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+    // Only auto-pause if we auto-started (not user-initiated — but we keep it simple: always pause on leave)
+    if (audioRef.current && playing) {
+      audioRef.current.pause();
+      setPlaying(false);
+    }
+  };
+
+  // Manual toggle — persists without hover
   const togglePlay = (e) => {
     e.stopPropagation();
     if (!audioRef.current) return;
@@ -190,8 +207,8 @@ function TrackCard({ track, index, onEdit }) {
       <div
         className="relative flex-shrink-0"
         style={{ width: 200 }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         {/* Card */}
         <motion.div
@@ -204,7 +221,7 @@ function TrackCard({ track, index, onEdit }) {
             <audio
               ref={audioRef}
               src={track.audio_file_url}
-              preload="none"
+              preload="metadata"
               onEnded={() => setPlaying(false)}
               onPause={() => setPlaying(false)}
             />
@@ -231,12 +248,26 @@ function TrackCard({ track, index, onEdit }) {
             {status.label}
           </div>
 
-          {/* Atmos badge top-right */}
-          {track.dolby_atmos && (
-            <div className="absolute top-2 right-2 px-1 py-0.5 rounded text-[8px] font-bold bg-orange-500/20 text-orange-400">
-              ATMOS
-            </div>
-          )}
+          {/* Info chevron — top-right on hover */}
+          <AnimatePresence>
+            {hovered && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.15 }}
+                onClick={(e) => { e.stopPropagation(); setShowDetail(true); }}
+                className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
+                style={{
+                  background: "rgba(20,20,20,0.80)",
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  backdropFilter: "blur(6px)",
+                }}
+              >
+                <ChevronDown className="w-2.5 h-2.5 text-white/70" />
+              </motion.button>
+            )}
+          </AnimatePresence>
 
           {/* Bottom row: title + play btn */}
           <div className="absolute bottom-0 left-0 right-0 px-2.5 pb-2 flex items-end justify-between">
@@ -266,29 +297,6 @@ function TrackCard({ track, index, onEdit }) {
               </button>
             )}
           </div>
-
-          {/* Info chevron — bottom-right on hover */}
-          <AnimatePresence>
-            {hovered && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.15 }}
-                onClick={(e) => { e.stopPropagation(); setShowDetail(true); }}
-                className="absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center"
-                style={{
-                  background: "rgba(30,30,30,0.85)",
-                  border: "1.5px solid rgba(255,255,255,0.2)",
-                  backdropFilter: "blur(6px)",
-                  // only show if no audio (so it doesn't overlap play btn)
-                  ...(track.audio_file_url ? { bottom: 2, right: 32 } : { bottom: 2, right: 8 }),
-                }}
-              >
-                <ChevronDown className="w-3 h-3 text-white/70" />
-              </motion.button>
-            )}
-          </AnimatePresence>
 
           {/* Playing equalizer overlay */}
           {playing && (
