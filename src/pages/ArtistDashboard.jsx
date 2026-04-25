@@ -14,25 +14,23 @@ import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
 import SocialLinksCard from "@/components/dashboard/SocialLinksCard";
 import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
 import ClipsLibrary from "@/components/clips/ClipsLibrary";
-import ClipsCalendar from "@/components/clips/ClipsCalendar";
-import ClipsHeader from "@/components/clips/ClipsHeader";
-import { LayoutGrid, Calendar } from "lucide-react";
+
 
 export default function ArtistDashboard() {
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [catalogMode, setCatalogMode] = useState("audio"); // "audio" | "video"
-  const [clipsTab, setClipsTab] = useState("library");
+
 
   const urlParams = new URLSearchParams(window.location.search);
   const artistId = urlParams.get("artistId") || urlParams.get("id");
 
-  const [clipsFilters, setClipsFilters] = useState({
+  const clipsFilters = {
     status: "all",
     platform: [],
     artist: artistId || "all",
     dateRange: null,
     search: ""
-  });
+  };
 
   const { data: artist, isLoading } = useQuery({
     queryKey: ['artist', artistId],
@@ -78,46 +76,46 @@ export default function ArtistDashboard() {
         <div className="px-6 sm:px-12 lg:px-16 xl:px-24 py-6 max-w-[1600px] mx-auto">
 
           {/* Header con volver + selector Audio/Video */}
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-5 flex items-center gap-4">
             <Link
               to={createPageUrl("ArtistPanelList")}
-              className="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1.5"
+              className="text-xs text-white/30 hover:text-white/70 transition-colors flex items-center gap-1.5 flex-shrink-0"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Volver
             </Link>
 
-            {/* Selector Audio / Video animado */}
-            <div className="relative flex items-center bg-[#1a1a1c] border border-white/10 rounded-full p-1 gap-0">
-              {/* Pill animado */}
-              <motion.div
-                layout
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                className={`absolute top-1 bottom-1 rounded-full ${
-                  catalogMode === "audio"
-                    ? "bg-purple-600 left-1 right-[calc(50%+2px)]"
-                    : "bg-orange-500 left-[calc(50%+2px)] right-1"
-                }`}
-              />
-
+            {/* Selector Audio / Video — estilo cinematico minimalista */}
+            <div className="flex items-center gap-0 border-b border-white/10">
               <button
                 onClick={() => setCatalogMode("audio")}
-                className={`relative z-10 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 ${
-                  catalogMode === "audio" ? "text-white" : "text-gray-400 hover:text-white"
-                }`}
+                className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200"
+                style={{ color: catalogMode === "audio" ? "#fff" : "rgba(255,255,255,0.3)" }}
               >
                 <Music2 className="w-3.5 h-3.5" />
-                Audio
+                <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>AUDIO</span>
+                {catalogMode === "audio" && (
+                  <motion.div
+                    layoutId="catalogUnderline"
+                    className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
               </button>
-
               <button
                 onClick={() => setCatalogMode("video")}
-                className={`relative z-10 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold transition-colors duration-200 ${
-                  catalogMode === "video" ? "text-white" : "text-gray-400 hover:text-white"
-                }`}
+                className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200"
+                style={{ color: catalogMode === "video" ? "#fff" : "rgba(255,255,255,0.3)" }}
               >
                 <Film className="w-3.5 h-3.5" />
-                Video
+                <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>VIDEO</span>
+                {catalogMode === "video" && (
+                  <motion.div
+                    layoutId="catalogUnderline"
+                    className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
               </button>
             </div>
           </div>
@@ -170,53 +168,7 @@ export default function ArtistDashboard() {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.25 }}
               >
-                {/* Tabs dentro del panel de clips */}
-                <div className="flex items-center gap-1 mb-4 border-b border-white/5">
-                  <button
-                    onClick={() => setClipsTab("library")}
-                    className={`flex items-center gap-2 px-5 py-2.5 font-medium text-sm transition-all relative ${
-                      clipsTab === "library" ? "text-orange-400" : "text-gray-500 hover:text-white"
-                    }`}
-                  >
-                    <LayoutGrid className="w-4 h-4" />
-                    Biblioteca
-                    {clipsTab === "library" && (
-                      <motion.div layoutId="clipsTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-400" />
-                    )}
-                  </button>
-                  <button
-                    onClick={() => setClipsTab("calendar")}
-                    className={`flex items-center gap-2 px-5 py-2.5 font-medium text-sm transition-all relative ${
-                      clipsTab === "calendar" ? "text-orange-400" : "text-gray-500 hover:text-white"
-                    }`}
-                  >
-                    <Calendar className="w-4 h-4" />
-                    Calendario
-                    {clipsTab === "calendar" && (
-                      <motion.div layoutId="clipsTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-400" />
-                    )}
-                  </button>
-                </div>
-
-                <ClipsHeader
-                  filters={clipsFilters}
-                  setFilters={setClipsFilters}
-                  activeTab={clipsTab}
-                  artistId={artistId}
-                />
-
-                <motion.div
-                  key={clipsTab}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {clipsTab === "library" ? (
-                    <ClipsLibrary filters={clipsFilters} />
-                  ) : (
-                    <ClipsCalendar filters={clipsFilters} />
-                  )}
-                </motion.div>
+                <ClipsLibrary filters={clipsFilters} />
               </motion.div>
             )}
           </AnimatePresence>
