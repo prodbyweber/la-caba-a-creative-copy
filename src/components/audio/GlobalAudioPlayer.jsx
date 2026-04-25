@@ -9,9 +9,15 @@ export default function GlobalAudioPlayer() {
   const progressRef = useRef(null);
   const playerRef = useRef(null);
 
-  const handleSeekDown = () => setIsDragging(true);
-  
-  const handleSeekUp = () => setIsDragging(false);
+  const handleSeekDown = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleSeekUp = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
 
   const handleSeek = (e) => {
     if (!progressRef.current) return;
@@ -21,7 +27,8 @@ export default function GlobalAudioPlayer() {
   };
 
   const handleTouchSeek = (e) => {
-    if (!progressRef.current) return;
+    if (!isDragging || !progressRef.current) return;
+    e.preventDefault();
     const touch = e.touches[0];
     const rect = progressRef.current.getBoundingClientRect();
     const percent = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
@@ -61,6 +68,7 @@ export default function GlobalAudioPlayer() {
           onMouseMove={handleMouseMove}
           onMouseUp={handleSeekUp}
           onMouseLeave={handleSeekUp}
+          onTouchMove={handleTouchSeek}
           onTouchEnd={handleSeekUp}
         >
           {/* Progress bar - mejorada */}
@@ -70,7 +78,6 @@ export default function GlobalAudioPlayer() {
               className="w-full h-1 sm:h-1.5 bg-white/5 cursor-pointer group hover:bg-white/8 transition-all active:bg-white/12 relative rounded-full"
               onMouseDown={handleSeekDown}
               onTouchStart={handleSeekDown}
-              onTouchMove={handleTouchSeek}
               onClick={handleSeek}
             >
               <div
@@ -83,7 +90,6 @@ export default function GlobalAudioPlayer() {
                 style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`, transform: "translate(-50%, -50%)" }}
                 onMouseDown={handleSeekDown}
                 onTouchStart={handleSeekDown}
-                onTouchMove={handleTouchSeek}
               />
             </div>
           </div>
