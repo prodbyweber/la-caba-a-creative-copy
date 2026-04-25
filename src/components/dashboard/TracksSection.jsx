@@ -91,9 +91,9 @@ export default function TracksSection({ jlyArtistId }) {
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-600 text-white text-sm font-medium flex items-center gap-1.5 transition-colors"
+            className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/60 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-all"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-3 h-3" />
             <span className="hidden lg:inline">Nuevo</span>
           </button>
         </div>

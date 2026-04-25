@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play, Pause, Edit, Music2, ExternalLink,
-  FolderOpen, Mic2, Sliders, Zap, Star, ChevronDown, Plus
+  ChevronDown, X
 } from "lucide-react";
 
 const statusConfig = {
@@ -24,36 +24,156 @@ const FOLDER_DEFS = [
   { key: "beat_wav",     label: "Beat WAV" },
 ];
 
-function TrackCard({ track, index, onEdit }) {
-  const [hovered, setHovered] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const audioRef = useRef(null);
-  const hoverTimer = useRef(null);
-  const cardRef = useRef(null);
-
+// Full Netflix-style detail modal
+function TrackDetailModal({ track, onClose, onEdit }) {
   const status = statusConfig[track.status] || statusConfig.idea;
   const folders = FOLDER_DEFS.filter(f => track.versions?.[f.key]);
 
-  useEffect(() => {
-    if (hovered && track.audio_file_url && audioRef.current) {
-      hoverTimer.current = setTimeout(async () => {
-        try {
-          audioRef.current.currentTime = 0;
-          await audioRef.current.play();
-          setPlaying(true);
-        } catch {}
-      }, 700);
-    } else {
-      clearTimeout(hoverTimer.current);
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-        setPlaying(false);
-      }
-    }
-    return () => clearTimeout(hoverTimer.current);
-  }, [hovered]);
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/85 backdrop-blur-sm"
+      />
 
+      {/* Panel */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.94, y: 20 }}
+        transition={{ duration: 0.22, ease: "easeOut" }}
+        className="relative w-full max-w-lg rounded-xl overflow-hidden shadow-2xl"
+        style={{ background: "#181818" }}
+      >
+        {/* Hero cover */}
+        <div className="relative" style={{ height: 220 }}>
+          {track.cover_url ? (
+            <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
+              <Music2 className="w-16 h-16 text-white/10" />
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#181818] via-[#181818]/40 to-transparent" />
+
+          {/* Close */}
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-colors"
+          >
+            <X className="w-4 h-4 text-white" />
+          </button>
+
+          {/* Title over image */}
+          <div className="absolute bottom-4 left-5">
+            <h2 className="text-white font-black text-2xl leading-tight">{track.title}</h2>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="px-5 pb-5 pt-3 space-y-4">
+          {/* Action row */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onEdit(track)}
+              className="flex items-center gap-2 px-4 py-2 rounded-md bg-white text-black text-sm font-bold hover:bg-white/90 transition-colors"
+            >
+              <Edit className="w-3.5 h-3.5" />
+              Editar
+            </button>
+            <div className="flex items-center gap-1.5 ml-1">
+              <span
+                className="px-2 py-1 rounded text-[10px] font-bold"
+                style={{ background: status.color + "22", color: status.color }}
+              >
+                {status.label}
+              </span>
+              {track.dolby_atmos && (
+                <span className="px-2 py-1 rounded text-[10px] font-bold bg-orange-500/20 text-orange-400">
+                  ATMOS
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Meta grid */}
+          <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+            {track.composers?.length > 0 && (
+              <MetaRow label="Compositores" value={track.composers.join(", ")} />
+            )}
+            {track.producers?.length > 0 && (
+              <MetaRow label="Productores" value={track.producers.join(", ")} />
+            )}
+            {track.mix_engineer && (
+              <MetaRow label="Mezcla" value={track.mix_engineer} />
+            )}
+            {track.master_engineer && (
+              <MetaRow label="Masterización" value={track.master_engineer} />
+            )}
+            {track.genre && (
+              <MetaRow label="Género" value={track.genre} />
+            )}
+            {track.bpm && (
+              <MetaRow label="BPM" value={track.bpm} />
+            )}
+            {track.key && (
+              <MetaRow label="Tonalidad" value={track.key} />
+            )}
+          </div>
+
+          {/* Drive folders */}
+          {folders.length > 0 && (
+            <div>
+              <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest mb-2">Versiones</p>
+              <div className="flex flex-wrap gap-1.5">
+                {folders.map(f => (
+                  <a
+                    key={f.key}
+                    href={track.versions[f.key]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-white/[0.06] hover:bg-white/10 text-white/50 hover:text-white border border-white/[0.08] text-xs transition-colors"
+                  >
+                    <ExternalLink className="w-2.5 h-2.5" />
+                    {f.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Notes */}
+          {track.notes && (
+            <p className="text-xs text-white/35 leading-relaxed">{track.notes}</p>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function MetaRow({ label, value }) {
+  return (
+    <div>
+      <span className="text-[10px] font-semibold text-white/25 uppercase tracking-wider block">{label}</span>
+      <span className="text-xs text-white/65 font-medium">{value}</span>
+    </div>
+  );
+}
+
+function TrackCard({ track, index, onEdit }) {
+  const [hovered, setHovered] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
+  const audioRef = useRef(null);
+
+  const status = statusConfig[track.status] || statusConfig.idea;
+
+  // Toggle play — persists without hover
   const togglePlay = (e) => {
     e.stopPropagation();
     if (!audioRef.current) return;
@@ -65,216 +185,140 @@ function TrackCard({ track, index, onEdit }) {
     }
   };
 
-  // Determine if card should expand left or right based on index
-  const expandDirection = index % 5 >= 3 ? "right" : "left";
-
   return (
-    <div
-      ref={cardRef}
-      className="relative flex-shrink-0"
-      style={{ width: 160 }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {/* Base Card */}
+    <>
       <div
-        className="relative rounded-md overflow-hidden cursor-pointer"
-        style={{
-          width: 160,
-          height: 90,
-          background: "#1a1a1c",
-          transition: "transform 0.15s ease",
-          transform: hovered ? "scale(1.05)" : "scale(1)",
-          zIndex: hovered ? 5 : 1,
-          position: "relative",
-        }}
+        className="relative flex-shrink-0"
+        style={{ width: 200 }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
       >
-        {track.audio_file_url && (
-          <audio
-            ref={audioRef}
-            src={track.audio_file_url}
-            preload="none"
-            onEnded={() => setPlaying(false)}
-            onPause={() => setPlaying(false)}
-          />
-        )}
-
-        {/* Cover image / gradient */}
-        {track.cover_url ? (
-          <img
-            src={track.cover_url}
-            alt={track.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#1e1e2e] to-[#0a0a0b] flex items-center justify-center">
-            <Music2 className="w-8 h-8 text-white/10" />
-          </div>
-        )}
-
-        {/* Dark gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-        {/* Status badge */}
-        <div
-          className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold"
-          style={{ background: status.color + "33", color: status.color }}
+        {/* Card */}
+        <motion.div
+          animate={{ scale: hovered ? 1.06 : 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          className="relative rounded-lg overflow-hidden cursor-pointer"
+          style={{ width: 200, height: 118, background: "#1a1a1c" }}
         >
-          {status.label}
-        </div>
+          {track.audio_file_url && (
+            <audio
+              ref={audioRef}
+              src={track.audio_file_url}
+              preload="none"
+              onEnded={() => setPlaying(false)}
+              onPause={() => setPlaying(false)}
+            />
+          )}
 
-        {/* Atmos badge */}
-        {track.dolby_atmos && (
-          <div className="absolute top-1.5 right-1.5 px-1 py-0.5 rounded text-[8px] font-bold bg-orange-500/20 text-orange-400">
-            ATMOS
+          {/* Cover */}
+          {track.cover_url ? (
+            <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[#1e1e2e] to-[#0a0a0b] flex items-center justify-center">
+              <Music2 className="w-8 h-8 text-white/10" />
+            </div>
+          )}
+
+          {/* Gradient overlays */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+          {hovered && <div className="absolute inset-0 bg-black/20" />}
+
+          {/* Status badge top-left */}
+          <div
+            className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[9px] font-bold"
+            style={{ background: status.color + "30", color: status.color }}
+          >
+            {status.label}
           </div>
-        )}
 
-        {/* Title */}
-        <div className="absolute bottom-0 left-0 right-0 p-2">
-          <p className="text-white font-bold text-xs leading-tight line-clamp-1">{track.title}</p>
-        </div>
+          {/* Atmos badge top-right */}
+          {track.dolby_atmos && (
+            <div className="absolute top-2 right-2 px-1 py-0.5 rounded text-[8px] font-bold bg-orange-500/20 text-orange-400">
+              ATMOS
+            </div>
+          )}
 
-        {/* Playing bars */}
-        {playing && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex items-end gap-0.5 h-5">
-              {[1,2,3,4].map(i => (
+          {/* Bottom row: title + play btn */}
+          <div className="absolute bottom-0 left-0 right-0 px-2.5 pb-2 flex items-end justify-between">
+            <div className="flex-1 min-w-0 pr-2">
+              <p className="text-white font-bold text-[11px] leading-tight line-clamp-1">{track.title}</p>
+              {track.genre && (
+                <p className="text-white/30 text-[9px] truncate mt-0.5">{track.genre}</p>
+              )}
+            </div>
+
+            {/* Play button — always visible, small */}
+            {track.audio_file_url && (
+              <button
+                onClick={togglePlay}
+                className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all"
+                style={{
+                  background: playing ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.15)",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  backdropFilter: "blur(4px)",
+                }}
+              >
+                {playing ? (
+                  <Pause className="w-2.5 h-2.5 text-black" fill="black" />
+                ) : (
+                  <Play className="w-2.5 h-2.5 text-white ml-0.5" fill="white" />
+                )}
+              </button>
+            )}
+          </div>
+
+          {/* Info chevron — bottom-right on hover */}
+          <AnimatePresence>
+            {hovered && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.15 }}
+                onClick={(e) => { e.stopPropagation(); setShowDetail(true); }}
+                className="absolute bottom-2 right-2 w-6 h-6 rounded-full flex items-center justify-center"
+                style={{
+                  background: "rgba(30,30,30,0.85)",
+                  border: "1.5px solid rgba(255,255,255,0.2)",
+                  backdropFilter: "blur(6px)",
+                  // only show if no audio (so it doesn't overlap play btn)
+                  ...(track.audio_file_url ? { bottom: 2, right: 32 } : { bottom: 2, right: 8 }),
+                }}
+              >
+                <ChevronDown className="w-3 h-3 text-white/70" />
+              </motion.button>
+            )}
+          </AnimatePresence>
+
+          {/* Playing equalizer overlay */}
+          {playing && (
+            <div className="absolute top-2.5 left-1/2 -translate-x-1/2 flex items-end gap-0.5 h-3 pointer-events-none">
+              {[1,2,3].map(i => (
                 <div
                   key={i}
-                  className="w-0.5 rounded-full bg-white"
+                  className="w-0.5 rounded-full bg-white/70"
                   style={{
-                    height: `${6 + i * 3}px`,
-                    animation: `pulse 0.${4 + i}s ease-in-out infinite alternate`,
+                    height: `${5 + i * 3}px`,
+                    animation: `pulse 0.${4+i}s ease-in-out infinite alternate`,
                   }}
                 />
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </motion.div>
       </div>
 
-      {/* Netflix-style hover preview panel */}
+      {/* Detail Modal */}
       <AnimatePresence>
-        {hovered && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: -4 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: -4 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute z-50 rounded-lg overflow-hidden shadow-2xl"
-            style={{
-              width: 260,
-              top: -10,
-              left: expandDirection === "left" ? 0 : "auto",
-              right: expandDirection === "right" ? 0 : "auto",
-              background: "#181818",
-              boxShadow: "0 8px 40px rgba(0,0,0,0.8)",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Preview image / cover large */}
-            <div className="relative" style={{ height: 140 }}>
-              {track.cover_url ? (
-                <img
-                  src={track.cover_url}
-                  alt={track.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-purple-900/60 to-black flex items-center justify-center">
-                  <Music2 className="w-12 h-12 text-white/10" />
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#181818] via-transparent to-transparent" />
-
-              {/* Title overlay */}
-              <div className="absolute bottom-2 left-3">
-                <p className="text-white font-black text-sm leading-tight">{track.title}</p>
-              </div>
-            </div>
-
-            {/* Controls */}
-            <div className="px-3 pt-2 pb-1 flex items-center gap-2">
-              <button
-                onClick={togglePlay}
-                className="w-8 h-8 rounded-full bg-white flex items-center justify-center hover:bg-white/90 transition-colors flex-shrink-0"
-              >
-                {playing ? (
-                  <Pause className="w-3.5 h-3.5 text-black" fill="black" />
-                ) : (
-                  <Play className="w-3.5 h-3.5 text-black ml-0.5" fill="black" />
-                )}
-              </button>
-              <button
-                onClick={() => onEdit(track)}
-                className="w-8 h-8 rounded-full border border-white/30 flex items-center justify-center hover:border-white/60 transition-colors"
-              >
-                <Edit className="w-3 h-3 text-white/70" />
-              </button>
-              {folders.length > 0 && (
-                <div className="flex items-center gap-1 text-white/30 ml-1">
-                  <FolderOpen className="w-3 h-3" />
-                  <span className="text-[10px]">{folders.length}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Metadata */}
-            <div className="px-3 pb-2 space-y-1.5">
-              {/* Tags row */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span
-                  className="text-[10px] font-bold px-1.5 py-0.5 rounded"
-                  style={{ background: status.color + "25", color: status.color }}
-                >
-                  {status.label}
-                </span>
-                {track.dolby_atmos && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-400">
-                    ATMOS
-                  </span>
-                )}
-                {track.bpm && (
-                  <span className="text-[10px] text-white/40">{track.bpm} BPM</span>
-                )}
-                {track.key && (
-                  <span className="text-[10px] text-white/40">{track.key}</span>
-                )}
-              </div>
-
-              {/* Credits */}
-              <div className="text-[10px] text-white/40 leading-relaxed">
-                {track.composers?.length > 0 && (
-                  <span>{track.composers.join(" · ")}</span>
-                )}
-                {track.genre && (
-                  <span className="ml-1.5 text-white/25">• {track.genre}</span>
-                )}
-              </div>
-
-              {/* Drive folders */}
-              {folders.length > 0 && (
-                <div className="flex flex-wrap gap-1 pt-0.5">
-                  {folders.map(f => (
-                    <a
-                      key={f.key}
-                      href={track.versions[f.key]}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[9px] px-1.5 py-0.5 rounded bg-white/[0.06] hover:bg-white/10 text-white/50 hover:text-white border border-white/[0.08] transition-colors flex items-center gap-1"
-                    >
-                      <ExternalLink className="w-2 h-2" />
-                      {f.label}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          </motion.div>
+        {showDetail && (
+          <TrackDetailModal
+            track={track}
+            onClose={() => setShowDetail(false)}
+            onEdit={(t) => { setShowDetail(false); onEdit(t); }}
+          />
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }
 

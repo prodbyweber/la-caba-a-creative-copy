@@ -1,124 +1,51 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Star, TrendingUp, Award, Verified, Edit } from "lucide-react";
+import { Edit } from "lucide-react";
 
 export default function ArtistProfileCard({ compact = false, artist, onEditProfile }) {
   if (!artist) return null;
 
-  const stats = [
-    { label: "Streams", value: 88 },
-    { label: "Interacción", value: 92 },
-    { label: "Alcance", value: 85 },
-    { label: "Crecimiento", value: 94 },
-    { label: "Contenido", value: 90 },
-    { label: "Impacto", value: 87 }
-  ];
-
-  if (compact) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-[#141414] rounded-xl border border-white/5 p-4"
-      >
-        <div className="flex items-center gap-3">
-          {/* Avatar */}
-          <div className="relative flex-shrink-0">
-            <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-emerald-500/20 bg-gradient-to-br from-emerald-500 to-emerald-700">
-              {artist.avatar_url ? (
-                <img 
-                  src={artist.avatar_url}
-                  alt={artist.stageName}
-                  className="w-full h-full object-cover object-top"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-white font-bold text-lg">
-                  {artist.stageName?.charAt(0).toUpperCase()}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-bold text-white text-base">{artist.stageName}</h3>
-              <Verified className="w-4 h-4 text-emerald-500" />
-            </div>
-            <p className="text-xs text-gray-500">{artist.genre || 'Artista'}</p>
-          </div>
-
-          {/* Edit Button */}
-          {onEditProfile && (
-            <button
-              onClick={onEditProfile}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors flex-shrink-0"
-            >
-              <Edit className="w-4 h-4 text-gray-400 hover:text-white" />
-            </button>
-          )}
-        </div>
-      </motion.div>
-    );
-  }
-
+  // Both compact and full render the same minimal Instagram-style profile
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 }}
-      className="bg-gradient-to-b from-[#141414] to-black rounded-lg border border-white/5 overflow-hidden"
+      className="flex items-center gap-3 px-3 py-2 rounded-xl border border-white/[0.06] bg-white/[0.02]"
     >
-      <div className="relative">
-        {/* Artist Image - Reducido */}
-        <div className="relative h-[180px] overflow-hidden">
+      {/* Avatar — small circle, cinematic, no color */}
+      <div className="relative flex-shrink-0">
+        <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1c1c1e] border border-white/10">
           {artist.avatar_url ? (
-            <img 
+            <img
               src={artist.avatar_url}
               alt={artist.stageName}
-              className="w-full h-full object-contain object-top"
+              className="w-full h-full object-cover object-top grayscale"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-700">
-              <span className="text-6xl font-black text-white/30">
-                {artist.stageName?.charAt(0).toUpperCase()}
-              </span>
+            <div className="w-full h-full flex items-center justify-center text-white/30 font-semibold text-sm">
+              {artist.stageName?.charAt(0).toUpperCase()}
             </div>
           )}
         </div>
-
-        {/* Content overlay */}
-        <div className="relative px-4 pb-4 z-20">
-          <div className="bg-black/40 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-            {/* Artist Info */}
-            <div className="flex items-center gap-3">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-xl font-bold text-white">{artist.stageName}</h3>
-                  <Verified className="w-5 h-5 text-emerald-500" />
-                </div>
-                <span className="text-sm text-gray-400">{artist.genre || 'Artista'}</span>
-              </div>
-              
-              {/* Pro Badge */}
-              <div className="px-3 py-1.5 bg-emerald-600 rounded-lg flex items-center gap-1.5">
-                <Star className="w-3.5 h-3.5 text-white" fill="white" />
-                <span className="text-xs font-bold text-white uppercase">Pro</span>
-              </div>
-
-              {/* Edit Button */}
-              {onEditProfile && (
-                <button
-                  onClick={onEditProfile}
-                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-                >
-                  <Edit className="w-4 h-4 text-gray-400 hover:text-white" />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
+        <p className="text-white text-xs font-semibold leading-tight truncate">{artist.stageName}</p>
+        {artist.genre && (
+          <p className="text-white/25 text-[10px] truncate">{artist.genre}</p>
+        )}
+      </div>
+
+      {/* Edit icon */}
+      {onEditProfile && (
+        <button
+          onClick={onEditProfile}
+          className="p-1.5 rounded-lg hover:bg-white/5 transition-colors flex-shrink-0"
+        >
+          <Edit className="w-3 h-3 text-white/25 hover:text-white/60" />
+        </button>
+      )}
     </motion.div>
   );
 }
