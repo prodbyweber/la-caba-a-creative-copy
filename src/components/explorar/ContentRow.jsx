@@ -31,7 +31,8 @@ function ContentCard({ item, onClick }) {
 
   const openYT = (e) => {
     e.stopPropagation();
-    setShowYT(true);
+    const url = item.youtube_url || item.youtube_music_url;
+    if (url) window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const handleCardClick = () => {
@@ -137,12 +138,12 @@ function ContentCard({ item, onClick }) {
                     <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
                   </button>
                 )}
-                {/* If has both: show both */}
+                {/* If has both: show YouTube button too */}
                 {hasVideo && hasAudio && (
                   <button
                     onClick={openYT}
                     className="w-8 h-8 rounded-full bg-red-600/70 backdrop-blur-sm flex items-center justify-center border border-red-400/30 hover:bg-red-600 transition-colors"
-                    title="Ver video"
+                    title="Ver en YouTube"
                   >
                     <Youtube className="w-3.5 h-3.5 text-white" />
                   </button>
@@ -166,44 +167,7 @@ function ContentCard({ item, onClick }) {
         </motion.div>
       </motion.div>
 
-      {/* YouTube Lightbox */}
-      <AnimatePresence>
-        {showYT && ytId && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[300] bg-black/95 backdrop-blur-lg flex items-center justify-center p-4"
-            onClick={() => setShowYT(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.92, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.92, opacity: 0 }}
-              className="relative w-full max-w-4xl"
-              onClick={e => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setShowYT(false)}
-                className="absolute -top-10 right-0 p-2 text-white/60 hover:text-white transition-colors flex items-center gap-2 text-sm"
-              >
-                <X className="w-5 h-5" /> Cerrar
-              </button>
-              <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                <iframe
-                  src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
-                  className="w-full h-full"
-                  allow="autoplay; encrypted-media"
-                  allowFullScreen
-                  title={item.title}
-                />
-              </div>
-              <p className="text-white font-bold text-lg mt-4 px-1">{item.title}</p>
-              {item.subtitle && <p className="text-white/40 text-sm px-1 mt-0.5">{item.subtitle}</p>}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
     </>
   );
 }

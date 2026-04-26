@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import { Play, Info, Youtube } from "lucide-react";
+import { Play, Info } from "lucide-react";
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -9,32 +9,26 @@ function getYoutubeId(url) {
 }
 
 export default function ExplorarHero({ item, artist, onExplore }) {
-  const [showVideo, setShowVideo] = useState(false);
-
-  const ytId = getYoutubeId(item?.youtube_url || item?.youtube_music_url);
+  const ytUrl = item?.youtube_url || item?.youtube_music_url;
+  const ytId = getYoutubeId(ytUrl);
   const bg = item?.image || artist?.avatar_url || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80";
+
+  const openYT = () => {
+    if (ytUrl) window.open(ytUrl, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <div className="relative w-full" style={{ height: "85vh", minHeight: 500 }}>
       {/* Background */}
       <div className="absolute inset-0 overflow-hidden">
-        {showVideo && ytId ? (
-          <iframe
-            src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&controls=0&loop=1&rel=0&modestbranding=1`}
-            className="w-full h-full object-cover scale-110"
-            allow="autoplay"
-            title="Hero video"
-          />
-        ) : (
-          <motion.img
-            src={bg}
-            alt={item?.title}
-            className="w-full h-full object-cover"
-            initial={{ scale: 1.08 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 8, ease: "easeOut" }}
-          />
-        )}
+        <motion.img
+          src={bg}
+          alt={item?.title}
+          className="w-full h-full object-cover"
+          initial={{ scale: 1.08 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 8, ease: "easeOut" }}
+        />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(8,8,8,0.93) 35%, rgba(8,8,8,0.2) 100%)" }} />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,8,8,1) 0%, transparent 50%)" }} />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(8,8,8,0.4) 0%, transparent 30%)" }} />
@@ -82,11 +76,11 @@ export default function ExplorarHero({ item, artist, onExplore }) {
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => setShowVideo(!showVideo)}
+                onClick={openYT}
                 className="flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-white/90 transition-colors text-sm"
               >
                 <Play className="w-4 h-4" fill="black" />
-                {showVideo ? "Detener" : "Reproducir"}
+                Reproducir
               </motion.button>
             )}
             {artist && (
