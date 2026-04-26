@@ -132,6 +132,8 @@ export default function Explorar() {
     <div className="min-h-screen bg-[#080808] text-white overflow-x-hidden">
       <ExplorarNav
         currentUser={currentUser}
+        activeSection="home"
+        setActiveSection={() => {}}
         searchOpen={searchOpen}
         setSearchOpen={setSearchOpen}
         searchQuery={searchQuery}
