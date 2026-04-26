@@ -10,12 +10,14 @@ import ArtistProfileCard from "@/components/dashboard/ArtistProfileCard";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
 import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
+import OnboardingForm from "@/components/onboarding/OnboardingForm";
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [artistId, setArtistId] = useState(null);
   const [jlyArtistId, setJlyArtistId] = useState(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const navigate = useNavigate();
 
   // All hooks must be called unconditionally before any early returns
@@ -36,7 +38,15 @@ export default function Dashboard() {
           return; // Admins permanecen en Dashboard general
         }
 
-        // Para usuarios normales, buscar su perfil de artista
+        // Para usuarios normales: verificar si ya completó el onboarding
+        const profiles = await base44.entities.UserProfile.filter({ user_id: userData.id });
+        if (profiles.length === 0) {
+          // No tiene perfil → mostrar onboarding
+          setShowOnboarding(true);
+          return;
+        }
+
+        // Tiene perfil → buscar su perfil de artista
         const allArtists = await base44.entities.Artist.list();
         const userArtist = allArtists.find(a => a.user_id === userData.id);
 
@@ -67,6 +77,29 @@ export default function Dashboard() {
       setJlyArtistId(jlyArtist.id);
     }
   }, [artists]);
+
+  // Mostrar onboarding para usuarios sin perfil
+  if (showOnboarding && user) {
+    return (
+      <OnboardingForm
+        user={user}
+        onComplete={async () => {
+          setShowOnboarding(false);
+          // Tras completar, crear perfil de artista y redirigir
+          const allArtists = await base44.entities.Artist.list();
+          const userArtist = allArtists.find(a => a.user_id === user.id);
+          if (userArtist) {
+            navigate(`${createPageUrl('ArtistDashboard')}?artistId=${userArtist.id}`);
+          } else {
+            const response = await base44.functions.invoke('createArtistProfileForNewUser', {});
+            if (response.data?.artistId) {
+              navigate(`${createPageUrl('ArtistDashboard')}?artistId=${response.data.artistId}`);
+            }
+          }
+        }}
+      />
+    );
+  }
 
   // No mostrar nada mientras se verifica el usuario
   if (!user) {
