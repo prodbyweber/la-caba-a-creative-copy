@@ -9,7 +9,9 @@ function getYoutubeId(url) {
 }
 
 // Modal de reproductor YouTube inline
-function YoutubeModal({ ytId, title, onClose }) {
+function YoutubeModal({ ytId, title, originalUrl, onClose }) {
+  const [embedFailed, setEmbedFailed] = useState(false);
+
   return (
     <AnimatePresence>
       {ytId && (
@@ -30,22 +32,54 @@ function YoutubeModal({ ytId, title, onClose }) {
           >
             <div className="flex items-center justify-between mb-3 px-1">
               <p className="text-white font-bold text-sm truncate pr-4">{title}</p>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors flex-shrink-0"
-              >
-                <X className="w-4 h-4 text-white" />
-              </button>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {originalUrl && (
+                  <a
+                    href={originalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white text-xs font-medium transition-colors"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <Youtube className="w-3.5 h-3.5" />
+                    Abrir en YouTube
+                  </a>
+                )}
+                <button
+                  onClick={onClose}
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                >
+                  <X className="w-4 h-4 text-white" />
+                </button>
+              </div>
             </div>
-            <div className="relative w-full rounded-xl overflow-hidden shadow-2xl" style={{ paddingBottom: "56.25%" }}>
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
-                title={title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="absolute inset-0 w-full h-full"
-              />
-            </div>
+            {embedFailed ? (
+              <div className="w-full rounded-xl bg-[#111] border border-white/10 flex flex-col items-center justify-center py-16 gap-4">
+                <Youtube className="w-12 h-12 text-red-400" />
+                <p className="text-white/70 text-sm text-center">Este video no permite reproducción embebida.</p>
+                {originalUrl && (
+                  <a
+                    href={originalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold transition-colors"
+                  >
+                    Ver en YouTube →
+                  </a>
+                )}
+              </div>
+            ) : (
+              <div className="relative w-full rounded-xl overflow-hidden shadow-2xl" style={{ paddingBottom: "56.25%" }}>
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
+                  title={title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                  onError={() => setEmbedFailed(true)}
+                />
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}
@@ -76,7 +110,14 @@ function ContentCard({ item, onClick }) {
 
   const openYTModal = (e) => {
     e.stopPropagation();
+    // Try embed first, fall back to opening in new tab if embed fails
     setShowYTModal(true);
+  };
+
+  const openInYoutube = (e) => {
+    e.stopPropagation();
+    const url = item.youtube_url || item.youtube_music_url;
+    if (url) window.open(url, "_blank");
   };
 
   const handleCardClick = () => {
@@ -90,6 +131,7 @@ function ContentCard({ item, onClick }) {
         <YoutubeModal
           ytId={ytId}
           title={item.title}
+          originalUrl={item.youtube_url || item.youtube_music_url}
           onClose={() => setShowYTModal(false)}
         />
       )}

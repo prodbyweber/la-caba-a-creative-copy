@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Info, X } from "lucide-react";
+import { Play, Info, X, Youtube } from "lucide-react";
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -10,6 +10,7 @@ function getYoutubeId(url) {
 
 export default function ExplorarHero({ item, artist, onExplore }) {
   const [showModal, setShowModal] = useState(false);
+  const [embedFailed, setEmbedFailed] = useState(false);
   const ytUrl = item?.youtube_url || item?.youtube_music_url;
   const ytId = getYoutubeId(ytUrl);
   const bg = item?.image || artist?.avatar_url || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80";
@@ -36,22 +37,54 @@ export default function ExplorarHero({ item, artist, onExplore }) {
           >
             <div className="flex items-center justify-between mb-3 px-1">
               <p className="text-white font-bold text-sm truncate pr-4">{item?.title}</p>
-              <button
-                onClick={() => setShowModal(false)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors flex-shrink-0"
-              >
-                <X className="w-4 h-4 text-white" />
-              </button>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {ytUrl && (
+                  <a
+                    href={ytUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white text-xs font-medium transition-colors"
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <Youtube className="w-3.5 h-3.5" />
+                    Abrir en YouTube
+                  </a>
+                )}
+                <button
+                  onClick={() => { setShowModal(false); setEmbedFailed(false); }}
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                >
+                  <X className="w-4 h-4 text-white" />
+                </button>
+              </div>
             </div>
-            <div className="relative w-full rounded-xl overflow-hidden shadow-2xl" style={{ paddingBottom: "56.25%" }}>
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
-                title={item?.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                className="absolute inset-0 w-full h-full"
-              />
-            </div>
+            {embedFailed ? (
+              <div className="w-full rounded-xl bg-[#111] border border-white/10 flex flex-col items-center justify-center py-16 gap-4">
+                <Youtube className="w-12 h-12 text-red-400" />
+                <p className="text-white/70 text-sm text-center">Este video no permite reproducción embebida.</p>
+                {ytUrl && (
+                  <a
+                    href={ytUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold transition-colors"
+                  >
+                    Ver en YouTube →
+                  </a>
+                )}
+              </div>
+            ) : (
+              <div className="relative w-full rounded-xl overflow-hidden shadow-2xl" style={{ paddingBottom: "56.25%" }}>
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
+                  title={item?.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  className="absolute inset-0 w-full h-full"
+                  onError={() => setEmbedFailed(true)}
+                />
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}
