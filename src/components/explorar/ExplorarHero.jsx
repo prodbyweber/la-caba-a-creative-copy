@@ -37,26 +37,12 @@ export default function ExplorarHero({ item, artist, onExplore }) {
           >
             <div className="flex items-center justify-between mb-3 px-1">
               <p className="text-white font-bold text-sm truncate pr-4">{item?.title}</p>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {ytUrl && (
-                  <a
-                    href={ytUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-600 text-white text-xs font-medium transition-colors"
-                    onClick={e => e.stopPropagation()}
-                  >
-                    <Youtube className="w-3.5 h-3.5" />
-                    Abrir en YouTube
-                  </a>
-                )}
-                <button
-                  onClick={() => { setShowModal(false); setEmbedFailed(false); }}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-                >
-                  <X className="w-4 h-4 text-white" />
-                </button>
-              </div>
+              <button
+                onClick={() => { setShowModal(false); setEmbedFailed(false); }}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors flex-shrink-0"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
             </div>
             {embedFailed ? (
               <div className="w-full rounded-xl bg-[#111] border border-white/10 flex flex-col items-center justify-center py-16 gap-4">
