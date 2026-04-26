@@ -10,6 +10,14 @@
       "type": "string",
       "description": "Email del usuario"
     },
+    "first_name": {
+      "type": "string",
+      "description": "Nombre"
+    },
+    "last_name": {
+      "type": "string",
+      "description": "Apellido"
+    },
     "full_name": {
       "type": "string",
       "description": "Nombre completo"
@@ -18,9 +26,18 @@
       "type": "string",
       "description": "Nombre art\u00edstico"
     },
+    "gender": {
+      "type": "string",
+      "enum": [
+        "male",
+        "female",
+        "prefer_not_to_say"
+      ],
+      "description": "G\u00e9nero"
+    },
     "phone": {
       "type": "string",
-      "description": "N\u00famero de tel\u00e9fono con c\u00f3digo de \u00e1rea"
+      "description": "N\u00famero de tel\u00e9fono"
     },
     "phone_country_code": {
       "type": "string",

@@ -95,11 +95,12 @@ export default function UserProfiles() {
         ) : (
           <div className="bg-[#111113] border border-white/[0.06] rounded-2xl overflow-hidden">
             {/* Table header */}
-            <div className="grid gap-4 px-5 py-3 border-b border-white/[0.05] text-[10px] font-semibold text-white/25 uppercase tracking-widest" style={{ gridTemplateColumns: "3fr 2fr 2fr 2fr 1fr 1fr" }}>
+            <div className="grid gap-4 px-5 py-3 border-b border-white/[0.05] text-[10px] font-semibold text-white/25 uppercase tracking-widest" style={{ gridTemplateColumns: "3fr 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr" }}>
               <span>Usuario</span>
               <span>Nombre artístico</span>
+              <span>Género</span>
               <span>Teléfono</span>
-              <span>Nacionalidad</span>
+              <span>País</span>
               <span>Tipo</span>
               <span>Fecha</span>
             </div>
@@ -113,7 +114,7 @@ export default function UserProfiles() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: i * 0.02 }}
                   className="grid gap-4 px-5 py-4 hover:bg-white/[0.03] transition-colors items-center"
-                  style={{ gridTemplateColumns: "3fr 2fr 2fr 2fr 1fr 1fr" }}
+                  style={{ gridTemplateColumns: "3fr 1.5fr 1.5fr 1.5fr 1fr 1fr 1fr" }}
                 >
                   {/* Usuario */}
                   <div className="flex items-center gap-3 min-w-0">
@@ -122,12 +123,16 @@ export default function UserProfiles() {
                         <img src={profile.profile_photo_url} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-xs font-bold text-white/30">
-                          {profile.full_name?.[0]?.toUpperCase() || "?"}
+                          {(profile.first_name || profile.full_name)?.[0]?.toUpperCase() || "?"}
                         </div>
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-white truncate">{profile.full_name || "—"}</p>
+                      <p className="text-sm font-semibold text-white truncate">
+                        {profile.first_name && profile.last_name
+                          ? `${profile.first_name} ${profile.last_name}`
+                          : profile.full_name || "—"}
+                      </p>
                       <p className="text-[11px] text-white/30 truncate">{profile.user_email || "—"}</p>
                     </div>
                   </div>
@@ -135,12 +140,20 @@ export default function UserProfiles() {
                   {/* Nombre artístico */}
                   <span className="text-sm text-white/60 truncate">{profile.artist_name || <span className="text-white/20">—</span>}</span>
 
+                  {/* Género */}
+                  <span className="text-sm text-white/60 truncate">
+                    {profile.gender === "male" ? "Masculino"
+                      : profile.gender === "female" ? "Femenino"
+                      : profile.gender === "prefer_not_to_say" ? "N/D"
+                      : <span className="text-white/20">—</span>}
+                  </span>
+
                   {/* Teléfono */}
                   <span className="text-sm text-white/60">
                     {profile.phone ? `${profile.phone_country_code || ""} ${profile.phone}` : <span className="text-white/20">—</span>}
                   </span>
 
-                  {/* Nacionalidad */}
+                  {/* País */}
                   <span className="text-sm text-white/60 truncate">{profile.nationality || <span className="text-white/20">—</span>}</span>
 
                   {/* Tipo */}

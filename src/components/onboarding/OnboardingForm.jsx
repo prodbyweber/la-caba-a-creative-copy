@@ -1,33 +1,33 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import { User, Music2, Building2, Camera, ChevronRight, Check } from "lucide-react";
+import { Music2, Building2, Camera, ChevronRight, Check, User } from "lucide-react";
 
 const COUNTRY_CODES = [
-  { code: "+1", country: "US/CA", flag: "🇺🇸" },
-  { code: "+34", country: "España", flag: "🇪🇸" },
-  { code: "+52", country: "México", flag: "🇲🇽" },
-  { code: "+54", country: "Argentina", flag: "🇦🇷" },
-  { code: "+57", country: "Colombia", flag: "🇨🇴" },
-  { code: "+58", country: "Venezuela", flag: "🇻🇪" },
-  { code: "+51", country: "Perú", flag: "🇵🇪" },
-  { code: "+56", country: "Chile", flag: "🇨🇱" },
-  { code: "+593", country: "Ecuador", flag: "🇪🇨" },
-  { code: "+53", country: "Cuba", flag: "🇨🇺" },
-  { code: "+507", country: "Panamá", flag: "🇵🇦" },
-  { code: "+503", country: "El Salvador", flag: "🇸🇻" },
-  { code: "+502", country: "Guatemala", flag: "🇬🇹" },
-  { code: "+504", country: "Honduras", flag: "🇭🇳" },
-  { code: "+505", country: "Nicaragua", flag: "🇳🇮" },
-  { code: "+506", country: "Costa Rica", flag: "🇨🇷" },
-  { code: "+55", country: "Brasil", flag: "🇧🇷" },
-  { code: "+598", country: "Uruguay", flag: "🇺🇾" },
-  { code: "+591", country: "Bolivia", flag: "🇧🇴" },
-  { code: "+595", country: "Paraguay", flag: "🇵🇾" },
-  { code: "+44", country: "UK", flag: "🇬🇧" },
-  { code: "+33", country: "Francia", flag: "🇫🇷" },
-  { code: "+49", country: "Alemania", flag: "🇩🇪" },
-  { code: "+39", country: "Italia", flag: "🇮🇹" },
+  { code: "+1", flag: "🇺🇸", country: "US/CA" },
+  { code: "+34", flag: "🇪🇸", country: "España" },
+  { code: "+52", flag: "🇲🇽", country: "México" },
+  { code: "+54", flag: "🇦🇷", country: "Argentina" },
+  { code: "+57", flag: "🇨🇴", country: "Colombia" },
+  { code: "+58", flag: "🇻🇪", country: "Venezuela" },
+  { code: "+51", flag: "🇵🇪", country: "Perú" },
+  { code: "+56", flag: "🇨🇱", country: "Chile" },
+  { code: "+593", flag: "🇪🇨", country: "Ecuador" },
+  { code: "+53", flag: "🇨🇺", country: "Cuba" },
+  { code: "+507", flag: "🇵🇦", country: "Panamá" },
+  { code: "+503", flag: "🇸🇻", country: "El Salvador" },
+  { code: "+502", flag: "🇬🇹", country: "Guatemala" },
+  { code: "+504", flag: "🇭🇳", country: "Honduras" },
+  { code: "+505", flag: "🇳🇮", country: "Nicaragua" },
+  { code: "+506", flag: "🇨🇷", country: "Costa Rica" },
+  { code: "+55", flag: "🇧🇷", country: "Brasil" },
+  { code: "+598", flag: "🇺🇾", country: "Uruguay" },
+  { code: "+591", flag: "🇧🇴", country: "Bolivia" },
+  { code: "+595", flag: "🇵🇾", country: "Paraguay" },
+  { code: "+44", flag: "🇬🇧", country: "UK" },
+  { code: "+33", flag: "🇫🇷", country: "Francia" },
+  { code: "+49", flag: "🇩🇪", country: "Alemania" },
+  { code: "+39", flag: "🇮🇹", country: "Italia" },
 ];
 
 const COUNTRIES = [
@@ -41,13 +41,21 @@ const COUNTRIES = [
 const inputClass = "w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors";
 const labelClass = "block text-[11px] font-semibold text-white/30 uppercase tracking-widest mb-2";
 
+const STEPS = [
+  { id: 1, title: "¿Quién eres?", subtitle: "Cuéntanos cómo usar la plataforma" },
+  { id: 2, title: "Tus datos", subtitle: "Información personal y de contacto" },
+  { id: 3, title: "Casi listo", subtitle: "Agrega una foto de perfil" },
+];
+
 export default function OnboardingForm({ user, onComplete }) {
-  const [step, setStep] = useState(1); // 1: tipo, 2: datos personales, 3: foto
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [form, setForm] = useState({
-    full_name: user?.full_name || "",
+    first_name: "",
+    last_name: "",
     artist_name: "",
+    gender: "",
     phone_country_code: "+34",
     phone: "",
     nationality: "",
@@ -72,11 +80,15 @@ export default function OnboardingForm({ user, onComplete }) {
   const handleSubmit = async () => {
     setLoading(true);
     try {
+      const full_name = `${form.first_name} ${form.last_name}`.trim();
       await base44.entities.UserProfile.create({
         user_id: user.id,
         user_email: user.email,
-        full_name: form.full_name,
+        first_name: form.first_name,
+        last_name: form.last_name,
+        full_name,
         artist_name: form.artist_name,
+        gender: form.gender,
         phone: form.phone,
         phone_country_code: form.phone_country_code,
         nationality: form.nationality,
@@ -91,46 +103,57 @@ export default function OnboardingForm({ user, onComplete }) {
     }
   };
 
-  const canProceedStep1 = !!form.account_type;
-  const canProceedStep2 = form.full_name && form.phone && form.nationality;
+  const canStep1 = !!form.account_type;
+  const canStep2 = form.first_name && form.last_name && form.phone && form.nationality && form.gender;
 
   return (
-    <div className="fixed inset-0 z-[500] bg-[#080808] flex items-center justify-center p-4">
-      {/* Background subtle grid */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
+    <div className="fixed inset-0 z-[500] bg-[#080808] flex items-center justify-center p-4 overflow-y-auto">
+      {/* Subtle grid background */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+          backgroundSize: "60px 60px"
+        }}
+      />
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative w-full max-w-md"
+        className="relative w-full max-w-md py-8"
       >
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-8">
           <div className="text-[11px] font-black uppercase tracking-[0.3em] text-white/20 mb-3">Cabaña Creative</div>
-          <h1 className="text-3xl font-black text-white leading-none" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.03em" }}>
-            {step === 1 ? "¿Quién eres?" : step === 2 ? "Tus datos" : "Casi listo"}
+          <h1
+            className="text-3xl font-black text-white leading-none"
+            style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.03em" }}
+          >
+            {STEPS[step - 1].title}
           </h1>
-          <p className="text-white/30 text-sm mt-2">
-            {step === 1 ? "Cuéntanos cómo usar la plataforma" : step === 2 ? "Completa tu perfil" : "Agrega una foto opcional"}
-          </p>
+          <p className="text-white/30 text-sm mt-2">{STEPS[step - 1].subtitle}</p>
         </div>
 
-        {/* Step indicator */}
+        {/* Step progress */}
         <div className="flex items-center gap-2 mb-8">
-          {[1, 2, 3].map(s => (
-            <div key={s} className={`h-0.5 flex-1 rounded-full transition-all duration-500 ${s <= step ? "bg-white" : "bg-white/10"}`} />
+          {STEPS.map(s => (
+            <div
+              key={s.id}
+              className={`h-0.5 flex-1 rounded-full transition-all duration-500 ${s.id <= step ? "bg-white" : "bg-white/10"}`}
+            />
           ))}
         </div>
 
         <AnimatePresence mode="wait">
+
           {/* STEP 1: Tipo de cuenta */}
           {step === 1 && (
             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <div className="grid grid-cols-2 gap-4 mb-8">
                 {[
-                  { key: "artist", label: "Artista", desc: "Músico, creativo, performer", IconComp: Music2 },
-                  { key: "brand", label: "Marca", desc: "Empresa, proyecto, colectivo", IconComp: Building2 },
-                ].map(({ key, label, desc, IconComp }) => (
+                  { key: "artist", label: "Artista", desc: "Músico, creativo, performer", Icon: Music2 },
+                  { key: "brand", label: "Marca", desc: "Empresa, proyecto, colectivo", Icon: Building2 },
+                ].map(({ key, label, desc, Icon }) => (
                   <button
                     key={key}
                     onClick={() => set("account_type", key)}
@@ -145,7 +168,7 @@ export default function OnboardingForm({ user, onComplete }) {
                         <Check className="w-3 h-3 text-black" strokeWidth={3} />
                       </div>
                     )}
-                    <IconComp className={`w-6 h-6 mb-3 ${form.account_type === key ? "text-white" : "text-white/30"}`} />
+                    <Icon className={`w-6 h-6 mb-3 ${form.account_type === key ? "text-white" : "text-white/30"}`} />
                     <p className={`font-bold text-base ${form.account_type === key ? "text-white" : "text-white/50"}`}>{label}</p>
                     <p className="text-[11px] text-white/25 mt-1 leading-tight">{desc}</p>
                   </button>
@@ -153,7 +176,7 @@ export default function OnboardingForm({ user, onComplete }) {
               </div>
 
               <button
-                disabled={!canProceedStep1}
+                disabled={!canStep1}
                 onClick={() => setStep(2)}
                 className="w-full py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-white text-black hover:bg-white/90 disabled:opacity-20 disabled:cursor-not-allowed"
               >
@@ -165,16 +188,64 @@ export default function OnboardingForm({ user, onComplete }) {
           {/* STEP 2: Datos personales */}
           {step === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-              <div>
-                <label className={labelClass}>Nombre completo *</label>
-                <input className={inputClass} placeholder="Tu nombre completo" value={form.full_name} onChange={e => set("full_name", e.target.value)} />
+              {/* Nombre y apellido */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelClass}>Nombre *</label>
+                  <input
+                    className={inputClass}
+                    placeholder="Tu nombre"
+                    value={form.first_name}
+                    onChange={e => set("first_name", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Apellido *</label>
+                  <input
+                    className={inputClass}
+                    placeholder="Tu apellido"
+                    value={form.last_name}
+                    onChange={e => set("last_name", e.target.value)}
+                  />
+                </div>
               </div>
 
+              {/* Nombre artístico / marca */}
               <div>
                 <label className={labelClass}>{form.account_type === "brand" ? "Nombre de marca" : "Nombre artístico"}</label>
-                <input className={inputClass} placeholder={form.account_type === "brand" ? "Nombre de tu marca" : "Tu alias artístico"} value={form.artist_name} onChange={e => set("artist_name", e.target.value)} />
+                <input
+                  className={inputClass}
+                  placeholder={form.account_type === "brand" ? "Nombre de tu marca" : "Tu alias artístico"}
+                  value={form.artist_name}
+                  onChange={e => set("artist_name", e.target.value)}
+                />
               </div>
 
+              {/* Género */}
+              <div>
+                <label className={labelClass}>Género *</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { key: "male", label: "Masculino" },
+                    { key: "female", label: "Femenino" },
+                    { key: "prefer_not_to_say", label: "Prefiero no decirlo" },
+                  ].map(({ key, label }) => (
+                    <button
+                      key={key}
+                      onClick={() => set("gender", key)}
+                      className={`py-2.5 px-2 rounded-xl border text-xs font-medium transition-all ${
+                        form.gender === key
+                          ? "border-white/50 bg-white/[0.1] text-white"
+                          : "border-white/[0.07] bg-white/[0.03] text-white/40 hover:border-white/20 hover:text-white/70"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Teléfono */}
               <div>
                 <label className={labelClass}>Teléfono *</label>
                 <div className="flex gap-2">
@@ -185,13 +256,22 @@ export default function OnboardingForm({ user, onComplete }) {
                     style={{ minWidth: 90 }}
                   >
                     {COUNTRY_CODES.map(c => (
-                      <option key={c.code} value={c.code} className="bg-[#111]">{c.flag} {c.code}</option>
+                      <option key={c.code} value={c.code} className="bg-[#111]">
+                        {c.flag} {c.code}
+                      </option>
                     ))}
                   </select>
-                  <input className={inputClass} placeholder="Número de teléfono" value={form.phone} onChange={e => set("phone", e.target.value)} type="tel" />
+                  <input
+                    className={inputClass}
+                    placeholder="Número de teléfono"
+                    value={form.phone}
+                    onChange={e => set("phone", e.target.value)}
+                    type="tel"
+                  />
                 </div>
               </div>
 
+              {/* Nacionalidad */}
               <div>
                 <label className={labelClass}>País de nacionalidad *</label>
                 <select value={form.nationality} onChange={e => set("nationality", e.target.value)} className={inputClass}>
@@ -200,22 +280,32 @@ export default function OnboardingForm({ user, onComplete }) {
                 </select>
               </div>
 
+              {/* Dirección */}
               <div>
                 <label className={labelClass}>Dirección</label>
-                <input className={inputClass} placeholder="Ciudad, País" value={form.address} onChange={e => set("address", e.target.value)} />
+                <input
+                  className={inputClass}
+                  placeholder="Ciudad, País"
+                  value={form.address}
+                  onChange={e => set("address", e.target.value)}
+                />
               </div>
 
+              {/* Email (readonly) */}
               <div>
                 <label className={labelClass}>Correo electrónico</label>
                 <input className={inputClass} value={user?.email || ""} disabled style={{ opacity: 0.4, cursor: "not-allowed" }} />
               </div>
 
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setStep(1)} className="px-5 py-3.5 rounded-xl font-bold text-sm text-white/40 hover:text-white/70 border border-white/10 hover:border-white/20 transition-all">
+                <button
+                  onClick={() => setStep(1)}
+                  className="px-5 py-3.5 rounded-xl font-bold text-sm text-white/40 hover:text-white/70 border border-white/10 hover:border-white/20 transition-all"
+                >
                   Atrás
                 </button>
                 <button
-                  disabled={!canProceedStep2}
+                  disabled={!canStep2}
                   onClick={() => setStep(3)}
                   className="flex-1 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-white text-black hover:bg-white/90 disabled:opacity-20 disabled:cursor-not-allowed"
                 >
@@ -230,14 +320,21 @@ export default function OnboardingForm({ user, onComplete }) {
             <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <div className="flex flex-col items-center mb-8">
                 <label className="cursor-pointer group">
-                  <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handlePhotoUpload(e.target.files[0])} />
-                  <div className={`w-28 h-28 rounded-full border-2 border-dashed flex items-center justify-center overflow-hidden transition-all duration-200 ${form.profile_photo_url ? "border-white/30" : "border-white/15 group-hover:border-white/30"}`}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={e => e.target.files?.[0] && handlePhotoUpload(e.target.files[0])}
+                  />
+                  <div className={`w-32 h-32 rounded-full border-2 border-dashed flex items-center justify-center overflow-hidden transition-all duration-200 ${
+                    form.profile_photo_url ? "border-white/30" : "border-white/15 group-hover:border-white/30"
+                  }`}>
                     {form.profile_photo_url ? (
                       <img src={form.profile_photo_url} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
                       <div className="flex flex-col items-center gap-2">
-                        <Camera className="w-6 h-6 text-white/25 group-hover:text-white/50 transition-colors" />
-                        <span className="text-[10px] text-white/25 group-hover:text-white/40 transition-colors">
+                        <Camera className="w-7 h-7 text-white/25 group-hover:text-white/50 transition-colors" />
+                        <span className="text-[10px] text-white/25 group-hover:text-white/40 transition-colors text-center px-2">
                           {uploadingPhoto ? "Subiendo..." : "Subir foto"}
                         </span>
                       </div>
@@ -245,10 +342,29 @@ export default function OnboardingForm({ user, onComplete }) {
                   </div>
                 </label>
                 <p className="text-white/25 text-xs mt-4">Opcional — puedes añadirla después</p>
+
+                {/* Summary */}
+                <div className="mt-6 w-full p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-1.5 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-white/30">Nombre</span>
+                    <span className="text-white font-medium">{form.first_name} {form.last_name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/30">Tipo</span>
+                    <span className="text-white font-medium capitalize">{form.account_type === "artist" ? "Artista" : "Marca"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/30">País</span>
+                    <span className="text-white font-medium">{form.nationality}</span>
+                  </div>
+                </div>
               </div>
 
               <div className="flex gap-3">
-                <button onClick={() => setStep(2)} className="px-5 py-3.5 rounded-xl font-bold text-sm text-white/40 hover:text-white/70 border border-white/10 hover:border-white/20 transition-all">
+                <button
+                  onClick={() => setStep(2)}
+                  className="px-5 py-3.5 rounded-xl font-bold text-sm text-white/40 hover:text-white/70 border border-white/10 hover:border-white/20 transition-all"
+                >
                   Atrás
                 </button>
                 <button
@@ -263,6 +379,7 @@ export default function OnboardingForm({ user, onComplete }) {
               </div>
             </motion.div>
           )}
+
         </AnimatePresence>
       </motion.div>
     </div>
