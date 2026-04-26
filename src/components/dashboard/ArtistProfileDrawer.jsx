@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Edit, Youtube, Instagram, Music, Video, Plus, Check, User, Camera } from "lucide-react";
+import { X, Edit, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
@@ -83,6 +83,11 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
   const [editingPlatform, setEditingPlatform] = useState(null);
   const [platformUrl, setPlatformUrl] = useState("");
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoPos, setPhotoPos] = useState({ x: 50, y: 50 });
+  const [photoScale, setPhotoScale] = useState(1);
+  const cropRef = useRef(null);
+  const dragging = useRef(false);
+  const lastMouse = useRef({ x: 0, y: 0 });
 
   const queryClient = useQueryClient();
 
@@ -101,7 +106,19 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
     },
   });
 
+  const parsePhotoPos = (posStr) => {
+    if (!posStr) return { x: 50, y: 50 };
+    const parts = posStr.split(" ");
+    return {
+      x: parseFloat(parts[0]) || 50,
+      y: parseFloat(parts[1]) || 50,
+    };
+  };
+
   const handleEditOpen = () => {
+    const pos = parsePhotoPos(artist?.photo_position);
+    setPhotoPos(pos);
+    setPhotoScale(artist?.photo_scale || 1);
     setFormData({
       // Datos personales del UserProfile
       first_name: userProfile?.first_name || "",
@@ -127,15 +144,40 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setFormData(f => ({ ...f, avatar_url: file_url }));
+      setPhotoPos({ x: 50, y: 50 });
+      setPhotoScale(1);
     } finally {
       setUploadingPhoto(false);
     }
   };
 
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+  const startDrag = (clientX, clientY) => {
+    dragging.current = true;
+    lastMouse.current = { x: clientX, y: clientY };
+  };
+
+  const onDragMove = (clientX, clientY) => {
+    if (!dragging.current || !cropRef.current) return;
+    const rect = cropRef.current.getBoundingClientRect();
+    const dx = ((clientX - lastMouse.current.x) / rect.width) * -100;
+    const dy = ((clientY - lastMouse.current.y) / rect.height) * -100;
+    lastMouse.current = { x: clientX, y: clientY };
+    setPhotoPos(p => ({
+      x: clamp(p.x + dx, 0, 100),
+      y: clamp(p.y + dy, 0, 100),
+    }));
+  };
+
+  const stopDrag = () => { dragging.current = false; };
+
   const handleSaveProfile = async () => {
     const city = formData.address
       ? `${formData.address}, ${formData.country_of_residence}`
       : formData.country_of_residence;
+
+    const photoPosition = `${photoPos.x}% ${photoPos.y}%`;
 
     // Actualizar artista
     await updateArtistMutation.mutateAsync({
@@ -148,6 +190,8 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
       nationality: formData.nationality,
       country_of_residence: formData.country_of_residence,
       avatar_url: formData.avatar_url,
+      photo_position: photoPosition,
+      photo_scale: photoScale,
       social_links: socialLinks,
     });
 
@@ -226,8 +270,14 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                     <img
                       src={artist.avatar_url}
                       alt={artist.stageName}
-                      className="w-full h-full object-cover"
-                      style={{ objectPosition: artist.photo_position || "center center" }}
+                      draggable={false}
+                      className="w-full h-full"
+                      style={{
+                        objectFit: "cover",
+                        objectPosition: artist.photo_position || "center center",
+                        transform: `scale(${artist.photo_scale || 1})`,
+                        transformOrigin: artist.photo_position || "center center",
+                      }}
                     />
                   ) : (
                     <User className="w-9 h-9 text-white/20" />
@@ -258,21 +308,76 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                     <div className="space-y-3 p-4 rounded-xl border border-white/8" style={{ background: "#181818" }}>
                       <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest">Editar perfil</p>
 
-                      {/* Foto */}
-                      <div className="flex justify-center">
-                        <label className="cursor-pointer group relative">
-                          <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handlePhotoUpload(e.target.files[0])} />
-                          <div className="w-16 h-16 rounded-full overflow-hidden border border-white/10 flex items-center justify-center bg-white/5">
+                      {/* Foto + editor de recorte */}
+                      <div className="flex flex-col items-center gap-2">
+                        {/* Preview circular con drag */}
+                        <div className="relative">
+                          <div
+                            ref={cropRef}
+                            className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20 cursor-grab active:cursor-grabbing select-none"
+                            style={{ background: "#1c1c1e" }}
+                            onMouseDown={e => startDrag(e.clientX, e.clientY)}
+                            onMouseMove={e => onDragMove(e.clientX, e.clientY)}
+                            onMouseUp={stopDrag}
+                            onMouseLeave={stopDrag}
+                            onTouchStart={e => startDrag(e.touches[0].clientX, e.touches[0].clientY)}
+                            onTouchMove={e => { e.preventDefault(); onDragMove(e.touches[0].clientX, e.touches[0].clientY); }}
+                            onTouchEnd={stopDrag}
+                          >
                             {formData.avatar_url ? (
-                              <img src={formData.avatar_url} alt="" className="w-full h-full object-cover" />
+                              <img
+                                src={formData.avatar_url}
+                                alt=""
+                                draggable={false}
+                                className="w-full h-full pointer-events-none"
+                                style={{
+                                  objectFit: "cover",
+                                  objectPosition: `${photoPos.x}% ${photoPos.y}%`,
+                                  transform: `scale(${photoScale})`,
+                                  transformOrigin: `${photoPos.x}% ${photoPos.y}%`,
+                                }}
+                              />
                             ) : (
-                              <User className="w-6 h-6 text-white/20" />
+                              <div className="w-full h-full flex items-center justify-center">
+                                <User className="w-8 h-8 text-white/20" />
+                              </div>
                             )}
-                            <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Camera className="w-4 h-4 text-white" />
-                            </div>
                           </div>
-                          {uploadingPhoto && <div className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /></div>}
+                          {uploadingPhoto && (
+                            <div className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center">
+                              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Hint drag */}
+                        {formData.avatar_url && (
+                          <p className="text-[10px] text-white/25 flex items-center gap-1">
+                            <Move className="w-3 h-3" /> Arrastra para encuadrar
+                          </p>
+                        )}
+
+                        {/* Zoom slider */}
+                        {formData.avatar_url && (
+                          <div className="flex items-center gap-2 w-full px-2">
+                            <ZoomOut className="w-3 h-3 text-white/30 flex-shrink-0" />
+                            <input
+                              type="range"
+                              min={1}
+                              max={3}
+                              step={0.05}
+                              value={photoScale}
+                              onChange={e => setPhotoScale(parseFloat(e.target.value))}
+                              className="flex-1 accent-white h-1 cursor-pointer"
+                            />
+                            <ZoomIn className="w-3 h-3 text-white/30 flex-shrink-0" />
+                          </div>
+                        )}
+
+                        {/* Botón cambiar foto */}
+                        <label className="cursor-pointer text-[10px] text-white/30 hover:text-white/60 transition-colors underline underline-offset-2">
+                          <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handlePhotoUpload(e.target.files[0])} />
+                          {uploadingPhoto ? "Subiendo..." : formData.avatar_url ? "Cambiar foto" : "Subir foto"}
                         </label>
                       </div>
 
