@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { base44 } from '@/api/base44Client';
 import ContactLeads from './pages/ContactLeads';
+import UserProfiles from './pages/UserProfiles';
 import Pricing from './pages/Pricing';
 import AdminDashboard from './pages/AdminDashboard';
 import BannersAdmin from './pages/BannersAdmin';
@@ -18,6 +19,7 @@ import ExplorarAdmin from './pages/ExplorarAdmin';
 import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
+import OnboardingForm from '@/components/onboarding/OnboardingForm';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -60,6 +62,24 @@ const ProtectedAdminRoute = ({ element }) => {
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
   const isLoading = isLoadingPublicSettings || isLoadingAuth;
+  const [currentUser, setCurrentUser] = React.useState(null);
+  const [userProfile, setUserProfile] = React.useState(null);
+  const [profileChecked, setProfileChecked] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!isLoading && !authError) {
+      base44.auth.me().then(async (u) => {
+        if (u) {
+          setCurrentUser(u);
+          const profiles = await base44.entities.UserProfile.filter({ user_id: u.id });
+          setUserProfile(profiles.length > 0 ? profiles[0] : null);
+        }
+        setProfileChecked(true);
+      }).catch(() => setProfileChecked(true));
+    } else if (!isLoading) {
+      setProfileChecked(true);
+    }
+  }, [isLoading, authError]);
 
   // Hide splash only when auth is fully resolved (never show blank screen or spinner)
   React.useEffect(() => {
@@ -68,9 +88,14 @@ const AuthenticatedApp = () => {
     }
   }, [isLoading]);
 
-  if (isLoading) {
+  if (isLoading || (!profileChecked && !authError)) {
     // Keep splash visible — render nothing underneath
     return null;
+  }
+
+  // Show onboarding if user is authenticated but has no profile
+  if (currentUser && userProfile === null && profileChecked) {
+    return <OnboardingForm user={currentUser} onComplete={() => base44.entities.UserProfile.filter({ user_id: currentUser.id }).then(p => setUserProfile(p[0] || null))} />;
   }
 
   // Handle authentication errors
@@ -109,6 +134,7 @@ const AuthenticatedApp = () => {
       <Route path="/BannersAdmin" element={<ProtectedAdminRoute element={<BannersAdmin />} />} />
       <Route path="/Explorar" element={<Explorar />} />
       <Route path="/ExplorarAdmin" element={<ProtectedAdminRoute element={<ExplorarAdmin />} />} />
+      <Route path="/UserProfiles" element={<ProtectedAdminRoute element={<UserProfiles />} />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

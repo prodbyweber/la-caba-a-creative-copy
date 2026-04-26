@@ -27,10 +27,10 @@ const navItems = [
   { icon: FolderKanban, label: "Projects", page: "Projects" },
   { icon: Music2, label: "Tracks", page: "Tracks" },
   { icon: Calendar, label: "Calendars", page: "Calendars" },
-
   { icon: Settings, label: "Landing Editor", page: "LandingEditor" },
   { icon: Compass, label: "Explorar Editor", page: "ExplorarAdmin" },
-  { icon: Inbox, label: "Solicitudes", page: "ContactLeads" }
+  { icon: Inbox, label: "Solicitudes", page: "ContactLeads" },
+  { icon: Monitor, label: "Perfiles", page: "UserProfiles" },
 ];
 
 export default function AdminLayout({ children, activePage }) {
