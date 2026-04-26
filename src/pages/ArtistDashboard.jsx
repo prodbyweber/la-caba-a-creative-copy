@@ -1,10 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Music2, Film } from "lucide-react";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
+import { Music2, Film } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
@@ -15,10 +13,14 @@ import ClipsLibrary from "@/components/clips/ClipsLibrary";
 export default function ArtistDashboard() {
   const [showProfileDrawer, setShowProfileDrawer] = useState(false);
   const [catalogMode, setCatalogMode] = useState("audio"); // "audio" | "video"
-
+  const [currentUser, setCurrentUser] = useState(null);
 
   const urlParams = new URLSearchParams(window.location.search);
   const artistId = urlParams.get("artistId") || urlParams.get("id");
+
+  useEffect(() => {
+    base44.auth.me().then(u => setCurrentUser(u)).catch(() => {});
+  }, []);
 
   const clipsFilters = {
     status: "all",
@@ -35,6 +37,15 @@ export default function ArtistDashboard() {
       return artists.find(a => a.id === artistId);
     },
     enabled: !!artistId
+  });
+
+  const { data: userProfile } = useQuery({
+    queryKey: ['userProfile', artist?.user_id],
+    queryFn: async () => {
+      const profiles = await base44.entities.UserProfile.list();
+      return profiles.find(p => p.user_id === artist?.user_id) || null;
+    },
+    enabled: !!artist?.user_id
   });
 
   if (isLoading) {
@@ -73,18 +84,10 @@ export default function ArtistDashboard() {
       <main className="pt-14">
         <div className="px-4 sm:px-8 lg:px-12 py-5 [&_.mobile-carousel]:!-mx-4">
 
-          {/* Header con volver + selector Audio/Video */}
-          <div className="mb-5 flex items-center gap-4">
-            <Link
-              to={createPageUrl("ArtistPanelList")}
-              className="text-xs text-white/30 hover:text-white/70 transition-colors flex items-center gap-1.5 flex-shrink-0"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Volver
-            </Link>
-
+          {/* Header — selector Audio/Video */}
+          <div className="mb-5">
             {/* Selector Audio / Video — estilo cinematico minimalista */}
-            <div className="flex items-center gap-0 border-b border-white/10">
+            <div className="flex items-center gap-0 border-b border-white/10 w-fit">
               <button
                 onClick={() => setCatalogMode("audio")}
                 className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200"
@@ -153,6 +156,7 @@ export default function ArtistDashboard() {
 
       <ArtistProfileDrawer
         artist={artist}
+        userProfile={userProfile}
         isOpen={showProfileDrawer}
         onClose={() => setShowProfileDrawer(false)}
       />

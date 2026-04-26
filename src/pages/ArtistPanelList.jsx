@@ -9,10 +9,26 @@ import { Button } from "@/components/ui/button";
 
 export default function ArtistPanelList() {
   const navigate = useNavigate();
+  const [currentUser, setCurrentUser] = React.useState(null);
+  const [authChecked, setAuthChecked] = React.useState(false);
+
+  React.useEffect(() => {
+    base44.auth.me().then(u => {
+      setCurrentUser(u);
+      setAuthChecked(true);
+      // Solo admins pueden ver esta página
+      if (u?.role !== 'admin') {
+        navigate('/');
+      }
+    }).catch(() => {
+      navigate('/');
+    });
+  }, []);
 
   const { data: artists, isLoading } = useQuery({
     queryKey: ['artists'],
-    queryFn: () => base44.entities.Artist.list('-created_date')
+    queryFn: () => base44.entities.Artist.list('-created_date'),
+    enabled: authChecked && currentUser?.role === 'admin'
   });
 
   const handleViewDashboard = (artistId) => {

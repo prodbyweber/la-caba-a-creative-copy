@@ -52,7 +52,6 @@ import Accounting from './pages/Accounting';
 import AdminDashboard from './pages/AdminDashboard';
 import Analytics from './pages/Analytics';
 import ArtistDashboard from './pages/ArtistDashboard';
-import ArtistPanelList from './pages/ArtistPanelList';
 import ArtistProjects from './pages/ArtistProjects';
 import ArtistTracks from './pages/ArtistTracks';
 import Artists from './pages/Artists';
@@ -87,7 +86,6 @@ export const PAGES = {
     "AdminDashboard": AdminDashboard,
     "Analytics": Analytics,
     "ArtistDashboard": ArtistDashboard,
-    "ArtistPanelList": ArtistPanelList,
     "ArtistProjects": ArtistProjects,
     "ArtistTracks": ArtistTracks,
     "Artists": Artists,

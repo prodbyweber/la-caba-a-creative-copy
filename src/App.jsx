@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { base44 } from '@/api/base44Client';
 import ContactLeads from './pages/ContactLeads';
+import ArtistPanelList from './pages/ArtistPanelList';
 import UserProfiles from './pages/UserProfiles';
 import Pricing from './pages/Pricing';
 import AdminDashboard from './pages/AdminDashboard';
@@ -108,6 +109,7 @@ const AuthenticatedApp = () => {
       <Route path="/Explorar" element={<Explorar />} />
       <Route path="/ExplorarAdmin" element={<ProtectedAdminRoute element={<ExplorarAdmin />} />} />
       <Route path="/UserProfiles" element={<ProtectedAdminRoute element={<UserProfiles />} />} />
+      <Route path="/ArtistPanelList" element={<ProtectedAdminRoute element={<ArtistPanelList />} />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

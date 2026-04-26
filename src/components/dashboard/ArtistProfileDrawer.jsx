@@ -1,10 +1,27 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Edit, Youtube, Instagram, Music, Video, Plus, Check, User } from "lucide-react";
+import { X, Edit, Youtube, Instagram, Music, Video, Plus, Check, User, Camera } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
 import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
+
+const COUNTRY_CODES = [
+  { code: "+1", flag: "🇺🇸" }, { code: "+34", flag: "🇪🇸" }, { code: "+52", flag: "🇲🇽" },
+  { code: "+54", flag: "🇦🇷" }, { code: "+57", flag: "🇨🇴" }, { code: "+58", flag: "🇻🇪" },
+  { code: "+51", flag: "🇵🇪" }, { code: "+56", flag: "🇨🇱" }, { code: "+593", flag: "🇪🇨" },
+  { code: "+55", flag: "🇧🇷" }, { code: "+44", flag: "🇬🇧" }, { code: "+33", flag: "🇫🇷" },
+  { code: "+49", flag: "🇩🇪" }, { code: "+39", flag: "🇮🇹" },
+];
+
+const COUNTRIES = [
+  "España", "México", "Argentina", "Colombia", "Venezuela", "Perú", "Chile",
+  "Ecuador", "Cuba", "Panamá", "Brasil", "Uruguay", "Bolivia", "Paraguay",
+  "República Dominicana", "Puerto Rico", "Estados Unidos", "Canadá",
+  "Reino Unido", "Francia", "Alemania", "Italia", "Portugal", "Otro"
+];
+
+const iClass = "w-full px-3 py-2 rounded-lg text-xs text-white bg-white/5 border border-white/8 focus:outline-none focus:border-white/20 transition-colors";
 
 const socialPlatforms = [
   { id: "youtube",   name: "YouTube",   icon: Youtube,   textColor: "text-red-400",   borderColor: "border-red-500/30",   bg: "from-red-500/15 to-red-600/15" },
@@ -59,43 +76,105 @@ export function ArtistAvatarButton({ artist, onClick }) {
 }
 
 // Drawer lateral completo con perfil + redes + edición
-export default function ArtistProfileDrawer({ artist, isOpen, onClose }) {
+export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClose }) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(null);
   const [socialLinks, setSocialLinks] = useState(artist?.social_links || {});
   const [editingPlatform, setEditingPlatform] = useState(null);
   const [platformUrl, setPlatformUrl] = useState("");
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   const queryClient = useQueryClient();
 
-  const updateMutation = useMutation({
+  const updateArtistMutation = useMutation({
     mutationFn: (data) => base44.entities.Artist.update(artist.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['artist', artist?.id] });
       queryClient.invalidateQueries({ queryKey: ['artists'] });
-      setIsEditing(false);
+    },
+  });
+
+  const updateProfileMutation = useMutation({
+    mutationFn: (data) => base44.entities.UserProfile.update(userProfile.id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userProfile', artist?.user_id] });
     },
   });
 
   const handleEditOpen = () => {
     setFormData({
-      stageName: artist?.stageName || "",
+      // Datos personales del UserProfile
+      first_name: userProfile?.first_name || "",
+      last_name: userProfile?.last_name || "",
+      artist_name: userProfile?.artist_name || artist?.stageName || "",
+      gender: userProfile?.gender || "",
+      phone_country_code: userProfile?.phone_country_code || "+34",
+      phone: userProfile?.phone || "",
+      nationality: userProfile?.nationality || artist?.nationality || "",
+      country_of_residence: userProfile?.country_of_residence || artist?.country_of_residence || "",
+      address: userProfile?.address || "",
+      // Datos del artista
       genre: artist?.genre || "",
       bio: artist?.bio || "",
-      location: artist?.location || "",
-      avatar_url: artist?.avatar_url || "",
+      avatar_url: artist?.avatar_url || userProfile?.profile_photo_url || "",
     });
     setIsEditing(true);
   };
 
-  const handleSaveProfile = () => {
-    updateMutation.mutate({ ...formData, social_links: socialLinks });
+  const handlePhotoUpload = async (file) => {
+    if (!file) return;
+    setUploadingPhoto(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData(f => ({ ...f, avatar_url: file_url }));
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    const city = formData.address
+      ? `${formData.address}, ${formData.country_of_residence}`
+      : formData.country_of_residence;
+
+    // Actualizar artista
+    await updateArtistMutation.mutateAsync({
+      stageName: formData.artist_name || formData.first_name,
+      legalName: `${formData.first_name} ${formData.last_name}`.trim(),
+      genre: formData.genre,
+      bio: formData.bio,
+      phone: formData.phone ? `${formData.phone_country_code} ${formData.phone}`.trim() : '',
+      location: city,
+      nationality: formData.nationality,
+      country_of_residence: formData.country_of_residence,
+      avatar_url: formData.avatar_url,
+      social_links: socialLinks,
+    });
+
+    // Actualizar UserProfile si existe
+    if (userProfile?.id) {
+      await updateProfileMutation.mutateAsync({
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        full_name: `${formData.first_name} ${formData.last_name}`.trim(),
+        artist_name: formData.artist_name,
+        gender: formData.gender,
+        phone: formData.phone,
+        phone_country_code: formData.phone_country_code,
+        nationality: formData.nationality,
+        country_of_residence: formData.country_of_residence,
+        address: formData.address,
+        profile_photo_url: formData.avatar_url,
+      });
+    }
+
+    setIsEditing(false);
   };
 
   const handleSaveSocial = () => {
     const updated = { ...socialLinks, [editingPlatform]: platformUrl };
     setSocialLinks(updated);
-    updateMutation.mutate({ social_links: updated });
+    updateArtistMutation.mutate({ social_links: updated });
     setEditingPlatform(null);
     setPlatformUrl("");
   };
@@ -104,7 +183,7 @@ export default function ArtistProfileDrawer({ artist, isOpen, onClose }) {
     const updated = { ...socialLinks };
     delete updated[id];
     setSocialLinks(updated);
-    updateMutation.mutate({ social_links: updated });
+    updateArtistMutation.mutate({ social_links: updated });
   };
 
   if (!artist) return null;
@@ -178,40 +257,115 @@ export default function ArtistProfileDrawer({ artist, isOpen, onClose }) {
                   >
                     <div className="space-y-3 p-4 rounded-xl border border-white/8" style={{ background: "#181818" }}>
                       <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest">Editar perfil</p>
-                      {[
-                        { key: "stageName", label: "Nombre artístico" },
-                        { key: "genre",     label: "Género" },
-                        { key: "location",  label: "Ubicación" },
-                        { key: "avatar_url",label: "URL Avatar" },
-                      ].map(({ key, label }) => (
-                        <div key={key}>
-                          <label className="block text-[10px] text-white/30 mb-1">{label}</label>
-                          <input
-                            value={formData[key]}
-                            onChange={e => setFormData({ ...formData, [key]: e.target.value })}
-                            className="w-full px-3 py-2 rounded-lg text-xs text-white bg-white/5 border border-white/8 focus:outline-none focus:border-white/20 transition-colors"
-                          />
+
+                      {/* Foto */}
+                      <div className="flex justify-center">
+                        <label className="cursor-pointer group relative">
+                          <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handlePhotoUpload(e.target.files[0])} />
+                          <div className="w-16 h-16 rounded-full overflow-hidden border border-white/10 flex items-center justify-center bg-white/5">
+                            {formData.avatar_url ? (
+                              <img src={formData.avatar_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <User className="w-6 h-6 text-white/20" />
+                            )}
+                            <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Camera className="w-4 h-4 text-white" />
+                            </div>
+                          </div>
+                          {uploadingPhoto && <div className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center"><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /></div>}
+                        </label>
+                      </div>
+
+                      {/* Nombre y apellido */}
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-[10px] text-white/30 mb-1">Nombre</label>
+                          <input value={formData.first_name} onChange={e => setFormData(f => ({ ...f, first_name: e.target.value }))} className={iClass} placeholder="Nombre" />
                         </div>
-                      ))}
+                        <div>
+                          <label className="block text-[10px] text-white/30 mb-1">Apellido</label>
+                          <input value={formData.last_name} onChange={e => setFormData(f => ({ ...f, last_name: e.target.value }))} className={iClass} placeholder="Apellido" />
+                        </div>
+                      </div>
+
+                      {/* Nombre artístico */}
+                      <div>
+                        <label className="block text-[10px] text-white/30 mb-1">Nombre artístico</label>
+                        <input value={formData.artist_name} onChange={e => setFormData(f => ({ ...f, artist_name: e.target.value }))} className={iClass} placeholder="Alias artístico" />
+                      </div>
+
+                      {/* Género musical */}
+                      <div>
+                        <label className="block text-[10px] text-white/30 mb-1">Género musical</label>
+                        <input value={formData.genre} onChange={e => setFormData(f => ({ ...f, genre: e.target.value }))} className={iClass} placeholder="Ej: Urban, Reggaeton..." />
+                      </div>
+
+                      {/* Género personal */}
+                      <div>
+                        <label className="block text-[10px] text-white/30 mb-1">Género</label>
+                        <div className="grid grid-cols-3 gap-1">
+                          {[{ key: "male", label: "Masc." }, { key: "female", label: "Fem." }, { key: "prefer_not_to_say", label: "N/D" }].map(({ key, label }) => (
+                            <button key={key} onClick={() => setFormData(f => ({ ...f, gender: key }))}
+                              className={`py-1.5 rounded-lg border text-[10px] font-medium transition-all ${formData.gender === key ? "border-white/40 bg-white/10 text-white" : "border-white/8 bg-white/3 text-white/30 hover:border-white/20"}`}>
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Teléfono */}
+                      <div>
+                        <label className="block text-[10px] text-white/30 mb-1">Teléfono</label>
+                        <div className="flex gap-1.5">
+                          <select value={formData.phone_country_code} onChange={e => setFormData(f => ({ ...f, phone_country_code: e.target.value }))}
+                            className="bg-white/5 border border-white/8 rounded-lg px-2 py-2 text-white text-xs focus:outline-none" style={{ minWidth: 72 }}>
+                            {COUNTRY_CODES.map(c => <option key={c.code} value={c.code} className="bg-[#111]">{c.flag} {c.code}</option>)}
+                          </select>
+                          <input value={formData.phone} onChange={e => setFormData(f => ({ ...f, phone: e.target.value }))} className={iClass} placeholder="Número" type="tel" />
+                        </div>
+                      </div>
+
+                      {/* Nacionalidad */}
+                      <div>
+                        <label className="block text-[10px] text-white/30 mb-1">Nacionalidad</label>
+                        <select value={formData.nationality} onChange={e => setFormData(f => ({ ...f, nationality: e.target.value }))} className={iClass}>
+                          <option value="" className="bg-[#111]">Selecciona un país</option>
+                          {COUNTRIES.map(c => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
+                        </select>
+                      </div>
+
+                      {/* País de residencia */}
+                      <div>
+                        <label className="block text-[10px] text-white/30 mb-1">País de residencia</label>
+                        <select value={formData.country_of_residence} onChange={e => setFormData(f => ({ ...f, country_of_residence: e.target.value }))} className={iClass}>
+                          <option value="" className="bg-[#111]">Selecciona un país</option>
+                          {COUNTRIES.map(c => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
+                        </select>
+                      </div>
+
+                      {/* Ciudad */}
+                      <div>
+                        <label className="block text-[10px] text-white/30 mb-1">Ciudad</label>
+                        <input value={formData.address} onChange={e => setFormData(f => ({ ...f, address: e.target.value }))} className={iClass} placeholder="Ciudad" />
+                      </div>
+
+                      {/* Bio */}
                       <div>
                         <label className="block text-[10px] text-white/30 mb-1">Bio</label>
-                        <textarea
-                          value={formData.bio}
-                          onChange={e => setFormData({ ...formData, bio: e.target.value })}
-                          rows={3}
-                          className="w-full px-3 py-2 rounded-lg text-xs text-white bg-white/5 border border-white/8 focus:outline-none focus:border-white/20 transition-colors resize-none"
-                        />
+                        <textarea value={formData.bio} onChange={e => setFormData(f => ({ ...f, bio: e.target.value }))} rows={3}
+                          className="w-full px-3 py-2 rounded-lg text-xs text-white bg-white/5 border border-white/8 focus:outline-none focus:border-white/20 transition-colors resize-none" />
                       </div>
+
                       <div className="flex gap-2 pt-1">
                         <button onClick={() => setIsEditing(false)} className="flex-1 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/50 font-medium transition-colors">
                           Cancelar
                         </button>
                         <button
                           onClick={handleSaveProfile}
-                          disabled={updateMutation.isPending}
+                          disabled={updateArtistMutation.isPending}
                           className="flex-1 py-2 rounded-lg bg-white text-black text-xs font-bold transition-colors disabled:opacity-50"
                         >
-                          {updateMutation.isPending ? "..." : "Guardar"}
+                          {updateArtistMutation.isPending ? "..." : "Guardar"}
                         </button>
                       </div>
                     </div>
