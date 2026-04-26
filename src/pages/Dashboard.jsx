@@ -46,23 +46,11 @@ export default function Dashboard() {
           return;
         }
 
-        // Tiene perfil → buscar su perfil de artista
-        const allArtists = await base44.entities.Artist.list();
-        const userArtist = allArtists.find(a => a.user_id === userData.id);
-
-        if (userArtist) {
-          setArtistId(userArtist.id);
-          navigate(`${createPageUrl('ArtistDashboard')}?artistId=${userArtist.id}`);
-        } else {
-          try {
-            const response = await base44.functions.invoke('createArtistProfileForNewUser', {});
-            if (response.data?.artistId) {
-              setArtistId(response.data.artistId);
-              navigate(`${createPageUrl('ArtistDashboard')}?artistId=${response.data.artistId}`);
-            }
-          } catch (err) {
-            console.error('Error creating artist profile:', err);
-          }
+        // Tiene perfil → crear/sincronizar artista (la función actualiza si ya existe)
+        const response = await base44.functions.invoke('createArtistProfileForNewUser', {});
+        if (response.data?.artistId) {
+          setArtistId(response.data.artistId);
+          navigate(`${createPageUrl('ArtistDashboard')}?artistId=${response.data.artistId}`);
         }
       } catch (err) {
         console.error('Error al obtener usuario:', err);
@@ -85,16 +73,10 @@ export default function Dashboard() {
         user={user}
         onComplete={async () => {
           setShowOnboarding(false);
-          // Tras completar, crear perfil de artista y redirigir
-          const allArtists = await base44.entities.Artist.list();
-          const userArtist = allArtists.find(a => a.user_id === user.id);
-          if (userArtist) {
-            navigate(`${createPageUrl('ArtistDashboard')}?artistId=${userArtist.id}`);
-          } else {
-            const response = await base44.functions.invoke('createArtistProfileForNewUser', {});
-            if (response.data?.artistId) {
-              navigate(`${createPageUrl('ArtistDashboard')}?artistId=${response.data.artistId}`);
-            }
+          // Crear/sincronizar artista con datos del onboarding y redirigir
+          const response = await base44.functions.invoke('createArtistProfileForNewUser', {});
+          if (response.data?.artistId) {
+            navigate(`${createPageUrl('ArtistDashboard')}?artistId=${response.data.artistId}`);
           }
         }}
       />
