@@ -93,8 +93,12 @@ const AuthenticatedApp = () => {
     return null;
   }
 
-  // Show onboarding if user is authenticated but has no profile
-  if (currentUser && userProfile === null && profileChecked) {
+  // Show onboarding ONLY if user is newly registered (created in last 10 min) and has no profile
+  const isNewUser = currentUser?.created_date
+    ? (Date.now() - new Date(currentUser.created_date).getTime()) < 10 * 60 * 1000
+    : false;
+
+  if (currentUser && userProfile === null && profileChecked && isNewUser) {
     return <OnboardingForm user={currentUser} onComplete={() => base44.entities.UserProfile.filter({ user_id: currentUser.id }).then(p => setUserProfile(p[0] || null))} />;
   }
 
