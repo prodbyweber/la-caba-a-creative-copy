@@ -60,46 +60,45 @@ const ProtectedAdminRoute = ({ element }) => {
 };
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user: contextUser, isAuthenticated } = useAuth();
   const isLoading = isLoadingPublicSettings || isLoadingAuth;
-  const [currentUser, setCurrentUser] = React.useState(null);
-  const [userProfile, setUserProfile] = React.useState(null);
-  const [profileChecked, setProfileChecked] = React.useState(false);
+  // undefined = not checked yet, null = checked but no profile, object = has profile
+  const [userProfile, setUserProfile] = React.useState(undefined);
 
   React.useEffect(() => {
-    if (!isLoading && !authError) {
-      base44.auth.me().then(async (u) => {
-        if (u) {
-          setCurrentUser(u);
-          const profiles = await base44.entities.UserProfile.filter({ user_id: u.id });
-          setUserProfile(profiles.length > 0 ? profiles[0] : null);
-        }
-        setProfileChecked(true);
-      }).catch(() => setProfileChecked(true));
-    } else if (!isLoading) {
-      setProfileChecked(true);
+    if (!isLoading && isAuthenticated && contextUser) {
+      setUserProfile(undefined); // reset while fetching
+      base44.entities.UserProfile.filter({ user_id: contextUser.id })
+        .then(profiles => setUserProfile(profiles.length > 0 ? profiles[0] : null))
+        .catch(() => setUserProfile(null));
+    } else if (!isLoading && !isAuthenticated) {
+      setUserProfile(undefined);
     }
-  }, [isLoading, authError]);
+  }, [isLoading, isAuthenticated, contextUser?.id]);
 
-  // Hide splash only when auth is fully resolved (never show blank screen or spinner)
+  // Hide splash only when auth is fully resolved
   React.useEffect(() => {
     if (!isLoading) {
       window.__cabanaHideSplash && window.__cabanaHideSplash();
     }
   }, [isLoading]);
 
-  if (isLoading || (!profileChecked && !authError)) {
-    // Keep splash visible — render nothing underneath
+  // Wait for auth + profile check to complete
+  if (isLoading || (isAuthenticated && userProfile === undefined)) {
     return null;
   }
 
-  // Show onboarding ONLY if user is newly registered (created in last 10 min) and has no profile
-  const isNewUser = currentUser?.created_date
-    ? (Date.now() - new Date(currentUser.created_date).getTime()) < 10 * 60 * 1000
-    : false;
-
-  if (currentUser && userProfile === null && profileChecked && isNewUser) {
-    return <OnboardingForm user={currentUser} onComplete={() => base44.entities.UserProfile.filter({ user_id: currentUser.id }).then(p => setUserProfile(p[0] || null))} />;
+  // Show onboarding for ANY authenticated user without a profile (Google auth or email)
+  if (isAuthenticated && contextUser && userProfile === null) {
+    return (
+      <OnboardingForm
+        user={contextUser}
+        onComplete={() =>
+          base44.entities.UserProfile.filter({ user_id: contextUser.id })
+            .then(p => setUserProfile(p[0] || null))
+        }
+      />
+    );
   }
 
   // Handle authentication errors
