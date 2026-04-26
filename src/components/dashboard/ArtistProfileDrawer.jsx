@@ -30,28 +30,30 @@ const socialPlatforms = [
   { id: "tiktok",    name: "TikTok",    icon: Video,     textColor: "text-purple-400",borderColor: "border-purple-500/30",bg: "from-purple-500/15 to-purple-600/15" },
 ];
 
-// Mapa de banderas por país
-const COUNTRY_FLAGS = {
-  "España": "🇪🇸", "México": "🇲🇽", "Argentina": "🇦🇷", "Colombia": "🇨🇴",
-  "Venezuela": "🇻🇪", "Perú": "🇵🇪", "Chile": "🇨🇱", "Ecuador": "🇪🇨",
-  "Cuba": "🇨🇺", "Panamá": "🇵🇦", "El Salvador": "🇸🇻", "Guatemala": "🇬🇹",
-  "Honduras": "🇭🇳", "Nicaragua": "🇳🇮", "Costa Rica": "🇨🇷", "Brasil": "🇧🇷",
-  "Uruguay": "🇺🇾", "Bolivia": "🇧🇴", "Paraguay": "🇵🇾",
-  "República Dominicana": "🇩🇴", "Puerto Rico": "🇵🇷",
-  "Estados Unidos": "🇺🇸", "Canadá": "🇨🇦",
-  "Reino Unido": "🇬🇧", "Francia": "🇫🇷", "Alemania": "🇩🇪",
-  "Italia": "🇮🇹", "Portugal": "🇵🇹",
+// Códigos de país ISO para banderas SVG via flagcdn
+const COUNTRY_ISO = {
+  "España": "es", "México": "mx", "Argentina": "ar", "Colombia": "co",
+  "Venezuela": "ve", "Perú": "pe", "Chile": "cl", "Ecuador": "ec",
+  "Cuba": "cu", "Panamá": "pa", "El Salvador": "sv", "Guatemala": "gt",
+  "Honduras": "hn", "Nicaragua": "ni", "Costa Rica": "cr", "Brasil": "br",
+  "Uruguay": "uy", "Bolivia": "bo", "Paraguay": "py",
+  "República Dominicana": "do", "Puerto Rico": "pr",
+  "Estados Unidos": "us", "Canadá": "ca",
+  "Reino Unido": "gb", "Francia": "fr", "Alemania": "de",
+  "Italia": "it", "Portugal": "pt",
 };
 
-function CountryBadge({ country, label }) {
-  const flag = COUNTRY_FLAGS[country];
-  if (!country) return null;
+function FlagPin({ country, tooltip }) {
+  const iso = COUNTRY_ISO[country];
+  if (!iso) return null;
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
-      {flag && <span className="text-base leading-none">{flag}</span>}
-      <div>
-        {label && <p className="text-[9px] text-white/25 uppercase tracking-widest leading-none mb-0.5">{label}</p>}
-        <p className="text-xs text-white/70 font-medium leading-none">{country}</p>
+    <div className="group relative" title={tooltip}>
+      <div className="w-5 h-5 rounded-sm overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity shadow-sm">
+        <img
+          src={`https://flagcdn.com/w40/${iso}.png`}
+          alt={country}
+          className="w-full h-full object-cover"
+        />
       </div>
     </div>
   );
@@ -264,29 +266,43 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
             <div className="flex-1 overflow-y-auto px-5 py-5 space-y-6">
 
               {/* Avatar + nombre */}
-              <div className="flex flex-col items-center gap-3">
-                <div className="w-20 h-20 rounded-full overflow-hidden border border-white/10 flex items-center justify-center" style={{ background: "#1c1c1e" }}>
-                  {artist.avatar_url ? (
-                    <img
-                      src={artist.avatar_url}
-                      alt={artist.stageName}
-                      draggable={false}
-                      className="w-full h-full"
-                      style={{
-                        objectFit: "cover",
-                        objectPosition: artist.photo_position || "center center",
-                        transform: `scale(${artist.photo_scale || 1})`,
-                        transformOrigin: artist.photo_position || "center center",
-                      }}
-                    />
-                  ) : (
-                    <User className="w-9 h-9 text-white/20" />
+              <div className="flex flex-col items-center gap-3 pt-2">
+                {/* Avatar con banderas flotantes */}
+                <div className="relative">
+                  <div className="w-24 h-24 rounded-full overflow-hidden border border-white/10 flex items-center justify-center" style={{ background: "#1c1c1e" }}>
+                    {artist.avatar_url ? (
+                      <img
+                        src={artist.avatar_url}
+                        alt={artist.stageName}
+                        draggable={false}
+                        className="w-full h-full"
+                        style={{
+                          objectFit: "cover",
+                          objectPosition: artist.photo_position || "center center",
+                          transform: `scale(${artist.photo_scale || 1})`,
+                          transformOrigin: artist.photo_position || "center center",
+                        }}
+                      />
+                    ) : (
+                      <User className="w-10 h-10 text-white/20" />
+                    )}
+                  </div>
+                  {/* Banderas flotantes — solo imagen, sin texto */}
+                  {artist.nationality && (
+                    <div className="absolute -bottom-0.5 -left-1">
+                      <FlagPin country={artist.nationality} tooltip={`Nacionalidad: ${artist.nationality}`} />
+                    </div>
+                  )}
+                  {artist.country_of_residence && artist.country_of_residence !== artist.nationality && (
+                    <div className="absolute -bottom-0.5 -right-1">
+                      <FlagPin country={artist.country_of_residence} tooltip={`Residencia: ${artist.country_of_residence}`} />
+                    </div>
                   )}
                 </div>
+
                 <div className="text-center">
                   <p className="text-white font-bold text-base leading-tight">{artist.stageName}</p>
                   {artist.genre && <p className="text-white/30 text-xs mt-0.5">{artist.genre}</p>}
-                  {artist.location && <p className="text-white/20 text-[10px] mt-0.5">{artist.location}</p>}
                 </div>
                 <button
                   onClick={handleEditOpen}
@@ -477,18 +493,6 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                   </motion.div>
                 )}
               </AnimatePresence>
-
-              {/* Países — nacionalidad y residencia */}
-              {(artist.nationality || artist.country_of_residence) && !isEditing && (
-                <div className="flex flex-col gap-2">
-                  {artist.nationality && (
-                    <CountryBadge country={artist.nationality} label="Nacionalidad" />
-                  )}
-                  {artist.country_of_residence && artist.country_of_residence !== artist.nationality && (
-                    <CountryBadge country={artist.country_of_residence} label="Residencia" />
-                  )}
-                </div>
-              )}
 
               {/* Bio */}
               {artist.bio && !isEditing && (
