@@ -1,6 +1,6 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { Play, Info } from "lucide-react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Play, Info, X } from "lucide-react";
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -9,15 +9,54 @@ function getYoutubeId(url) {
 }
 
 export default function ExplorarHero({ item, artist, onExplore }) {
+  const [showModal, setShowModal] = useState(false);
   const ytUrl = item?.youtube_url || item?.youtube_music_url;
   const ytId = getYoutubeId(ytUrl);
   const bg = item?.image || artist?.avatar_url || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80";
 
-  const openYT = () => {
-    if (ytUrl) window.open(ytUrl, "_blank", "noopener,noreferrer");
-  };
-
   return (
+    <>
+    {/* YouTube Modal */}
+    <AnimatePresence>
+      {showModal && ytId && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[300] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4"
+          onClick={() => setShowModal(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="relative w-full max-w-4xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3 px-1">
+              <p className="text-white font-bold text-sm truncate pr-4">{item?.title}</p>
+              <button
+                onClick={() => setShowModal(false)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors flex-shrink-0"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+            <div className="relative w-full rounded-xl overflow-hidden shadow-2xl" style={{ paddingBottom: "56.25%" }}>
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
+                title={item?.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full"
+              />
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+
     <div className="relative w-full" style={{ height: "85vh", minHeight: 500 }}>
       {/* Background */}
       <div className="absolute inset-0 overflow-hidden">
@@ -76,7 +115,7 @@ export default function ExplorarHero({ item, artist, onExplore }) {
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={openYT}
+                onClick={() => setShowModal(true)}
                 className="flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-lg hover:bg-white/90 transition-colors text-sm"
               >
                 <Play className="w-4 h-4" fill="black" />
@@ -98,5 +137,6 @@ export default function ExplorarHero({ item, artist, onExplore }) {
         </motion.div>
       </div>
     </div>
+    </>
   );
 }

@@ -8,10 +8,55 @@ function getYoutubeId(url) {
   return match ? match[1] : null;
 }
 
+// Modal de reproductor YouTube inline
+function YoutubeModal({ ytId, title, onClose }) {
+  return (
+    <AnimatePresence>
+      {ytId && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[300] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="relative w-full max-w-4xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3 px-1">
+              <p className="text-white font-bold text-sm truncate pr-4">{title}</p>
+              <button
+                onClick={onClose}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors flex-shrink-0"
+              >
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+            <div className="relative w-full rounded-xl overflow-hidden shadow-2xl" style={{ paddingBottom: "56.25%" }}>
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
+                title={title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="absolute inset-0 w-full h-full"
+              />
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 function ContentCard({ item, onClick }) {
   const [hovered, setHovered] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [showYT, setShowYT] = useState(false);
+  const [showYTModal, setShowYTModal] = useState(false);
   const audioRef = useRef(null);
 
   const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
@@ -29,10 +74,9 @@ function ContentCard({ item, onClick }) {
     }
   };
 
-  const openYT = (e) => {
+  const openYTModal = (e) => {
     e.stopPropagation();
-    const url = item.youtube_url || item.youtube_music_url;
-    if (url) window.open(url, "_blank", "noopener,noreferrer");
+    setShowYTModal(true);
   };
 
   const handleCardClick = () => {
@@ -41,6 +85,15 @@ function ContentCard({ item, onClick }) {
 
   return (
     <>
+      {/* YouTube Modal */}
+      {showYTModal && (
+        <YoutubeModal
+          ytId={ytId}
+          title={item.title}
+          onClose={() => setShowYTModal(false)}
+        />
+      )}
+
       <motion.div
         className="relative flex-shrink-0 cursor-pointer group"
         style={{ width: 220 }}
@@ -128,24 +181,15 @@ function ContentCard({ item, onClick }) {
                     )}
                   </button>
                 )}
-                {/* YouTube */}
-                {hasVideo && !hasAudio && (
+
+                {/* YouTube modal button */}
+                {hasVideo && (
                   <button
-                    onClick={openYT}
+                    onClick={openYTModal}
                     className="w-10 h-10 rounded-full bg-red-600/80 backdrop-blur-sm flex items-center justify-center border border-red-400/30 hover:bg-red-600 transition-colors"
-                    title="Ver en YouTube"
+                    title="Reproducir video"
                   >
                     <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
-                  </button>
-                )}
-                {/* If has both: show YouTube button too */}
-                {hasVideo && hasAudio && (
-                  <button
-                    onClick={openYT}
-                    className="w-8 h-8 rounded-full bg-red-600/70 backdrop-blur-sm flex items-center justify-center border border-red-400/30 hover:bg-red-600 transition-colors"
-                    title="Ver en YouTube"
-                  >
-                    <Youtube className="w-3.5 h-3.5 text-white" />
                   </button>
                 )}
               </motion.div>
@@ -158,7 +202,6 @@ function ContentCard({ item, onClick }) {
             {item.subtitle && (
               <p className="text-white/40 text-[10px] mt-0.5 truncate">{item.subtitle}</p>
             )}
-            {/* Indicators */}
             <div className="flex items-center gap-1.5 mt-1">
               {hasVideo && <Youtube className="w-2.5 h-2.5 text-red-400/70" />}
               {hasAudio && <Music2 className="w-2.5 h-2.5 text-emerald-400/70" />}
@@ -166,8 +209,6 @@ function ContentCard({ item, onClick }) {
           </div>
         </motion.div>
       </motion.div>
-
-
     </>
   );
 }
