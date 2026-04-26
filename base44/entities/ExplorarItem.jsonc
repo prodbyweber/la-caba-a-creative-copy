@@ -1,0 +1,64 @@
+{
+  "name": "ExplorarItem",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo del item"
+    },
+    "row_category": {
+      "type": "string",
+      "enum": [
+        "trending",
+        "new_releases",
+        "mini_films",
+        "afro_caribbean",
+        "experimental"
+      ],
+      "description": "Categor\u00eda / fila en la que aparece"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden dentro de la fila"
+    },
+    "thumbnail_url": {
+      "type": "string",
+      "description": "URL de la miniatura personalizada (opcional, si no se usa la de YouTube)"
+    },
+    "youtube_url": {
+      "type": "string",
+      "description": "URL del video de YouTube"
+    },
+    "youtube_music_url": {
+      "type": "string",
+      "description": "URL de YouTube Music"
+    },
+    "audio_file_url": {
+      "type": "string",
+      "description": "URL de archivo de audio directo"
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "Subt\u00edtulo o g\u00e9nero"
+    },
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista vinculado (opcional)"
+    },
+    "is_hero": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si este item aparece en el hero principal"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si est\u00e1 visible en la plataforma"
+    }
+  },
+  "required": [
+    "title",
+    "row_category"
+  ]
+}

@@ -1,72 +1,214 @@
 import React, { useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Music2, Play } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Music2, Play, Pause, Youtube, X } from "lucide-react";
 
-function ContentCard({ item, onClick, variant }) {
+function getYoutubeId(url) {
+  if (!url) return null;
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return match ? match[1] : null;
+}
+
+function ContentCard({ item, onClick }) {
   const [hovered, setHovered] = useState(false);
-  const isPortrait = variant === "portrait";
+  const [playing, setPlaying] = useState(false);
+  const [showYT, setShowYT] = useState(false);
+  const audioRef = useRef(null);
+
+  const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
+  const hasAudio = !!item.audio_file_url;
+  const hasVideo = !!ytId;
+
+  const toggleAudio = (e) => {
+    e.stopPropagation();
+    if (!audioRef.current) return;
+    if (playing) {
+      audioRef.current.pause();
+      setPlaying(false);
+    } else {
+      audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
+    }
+  };
+
+  const openYT = (e) => {
+    e.stopPropagation();
+    setShowYT(true);
+  };
+
+  const handleCardClick = () => {
+    if (item.artist_id) onClick(item);
+  };
 
   return (
-    <motion.div
-      className="relative flex-shrink-0 cursor-pointer group"
-      style={{ width: isPortrait ? 160 : 240 }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={() => onClick(item)}
-    >
+    <>
       <motion.div
-        animate={{ scale: hovered ? 1.07 : 1, zIndex: hovered ? 10 : 1 }}
-        transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="relative rounded-xl overflow-hidden"
-        style={{ aspectRatio: isPortrait ? "2/3" : "16/9", background: "#1a1a1c" }}
+        className="relative flex-shrink-0 cursor-pointer group"
+        style={{ width: 220 }}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onClick={handleCardClick}
       >
-        {item.image ? (
-          <img
-            src={item.image}
-            alt={item.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Music2 className="w-8 h-8 text-white/15" />
-          </div>
-        )}
+        <motion.div
+          animate={{ scale: hovered ? 1.06 : 1 }}
+          transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="relative rounded-xl overflow-hidden bg-[#1a1a1c]"
+          style={{ aspectRatio: "16/9" }}
+        >
+          {/* Audio element */}
+          {hasAudio && (
+            <audio
+              ref={audioRef}
+              src={item.audio_file_url}
+              preload="metadata"
+              onEnded={() => setPlaying(false)}
+            />
+          )}
 
-        {/* Gradient overlay */}
-        <div
-          className="absolute inset-0 transition-opacity duration-300"
-          style={{
-            background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)",
-            opacity: hovered ? 1 : 0.6,
-          }}
-        />
-
-        {/* Play button on hover */}
-        {hovered && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-              <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
+          {/* Cover image */}
+          {item.image ? (
+            <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Music2 className="w-8 h-8 text-white/10" />
             </div>
+          )}
+
+          {/* Gradient */}
+          <div
+            className="absolute inset-0 transition-opacity duration-300"
+            style={{
+              background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)",
+              opacity: hovered ? 1 : 0.5,
+            }}
+          />
+
+          {/* Playing bar animation */}
+          {playing && (
+            <div className="absolute top-2 left-2 flex items-end gap-[2px] h-4">
+              {[3, 6, 9, 5, 8, 4, 7].map((h, i) => (
+                <div
+                  key={i}
+                  className="w-[2px] rounded-full bg-white/60"
+                  style={{
+                    height: `${h}px`,
+                    animation: `waveBar 0.${6 + (i % 5)}s ease-in-out infinite alternate`,
+                    animationDelay: `${i * 0.07}s`,
+                  }}
+                />
+              ))}
+              <style>{`
+                @keyframes waveBar {
+                  from { transform: scaleY(0.3); opacity: 0.3; }
+                  to   { transform: scaleY(1); opacity: 0.8; }
+                }
+              `}</style>
+            </div>
+          )}
+
+          {/* Hover controls */}
+          <AnimatePresence>
+            {hovered && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 flex items-center justify-center gap-3"
+              >
+                {/* Audio play */}
+                {hasAudio && (
+                  <button
+                    onClick={toggleAudio}
+                    className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 hover:bg-white/30 transition-colors"
+                    title={playing ? "Pausar" : "Reproducir audio"}
+                  >
+                    {playing ? (
+                      <Pause className="w-4 h-4 text-white" fill="white" />
+                    ) : (
+                      <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+                    )}
+                  </button>
+                )}
+                {/* YouTube */}
+                {hasVideo && !hasAudio && (
+                  <button
+                    onClick={openYT}
+                    className="w-10 h-10 rounded-full bg-red-600/80 backdrop-blur-sm flex items-center justify-center border border-red-400/30 hover:bg-red-600 transition-colors"
+                    title="Ver en YouTube"
+                  >
+                    <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+                  </button>
+                )}
+                {/* If has both: show both */}
+                {hasVideo && hasAudio && (
+                  <button
+                    onClick={openYT}
+                    className="w-8 h-8 rounded-full bg-red-600/70 backdrop-blur-sm flex items-center justify-center border border-red-400/30 hover:bg-red-600 transition-colors"
+                    title="Ver video"
+                  >
+                    <Youtube className="w-3.5 h-3.5 text-white" />
+                  </button>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Bottom info */}
+          <div className="absolute bottom-0 left-0 right-0 p-3">
+            <p className="text-white font-bold text-xs leading-tight line-clamp-1">{item.title}</p>
+            {item.subtitle && (
+              <p className="text-white/40 text-[10px] mt-0.5 truncate">{item.subtitle}</p>
+            )}
+            {/* Indicators */}
+            <div className="flex items-center gap-1.5 mt-1">
+              {hasVideo && <Youtube className="w-2.5 h-2.5 text-red-400/70" />}
+              {hasAudio && <Music2 className="w-2.5 h-2.5 text-emerald-400/70" />}
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+
+      {/* YouTube Lightbox */}
+      <AnimatePresence>
+        {showYT && ytId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[300] bg-black/95 backdrop-blur-lg flex items-center justify-center p-4"
+            onClick={() => setShowYT(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.92, opacity: 0 }}
+              className="relative w-full max-w-4xl"
+              onClick={e => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowYT(false)}
+                className="absolute -top-10 right-0 p-2 text-white/60 hover:text-white transition-colors flex items-center gap-2 text-sm"
+              >
+                <X className="w-5 h-5" /> Cerrar
+              </button>
+              <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                <iframe
+                  src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
+                  className="w-full h-full"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                  title={item.title}
+                />
+              </div>
+              <p className="text-white font-bold text-lg mt-4 px-1">{item.title}</p>
+              {item.subtitle && <p className="text-white/40 text-sm px-1 mt-0.5">{item.subtitle}</p>}
+            </motion.div>
           </motion.div>
         )}
-
-        {/* Bottom info */}
-        <div className="absolute bottom-0 left-0 right-0 p-3">
-          <p className="text-white font-bold text-xs leading-tight line-clamp-2">{item.title}</p>
-          {item.subtitle && (
-            <p className="text-white/40 text-[10px] mt-0.5 truncate">{item.subtitle}</p>
-          )}
-        </div>
-      </motion.div>
-    </motion.div>
+      </AnimatePresence>
+    </>
   );
 }
 
-export default function ContentRow({ title, items, onItemClick, variant = "landscape" }) {
+export default function ContentRow({ title, items, onItemClick }) {
   const rowRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -74,8 +216,7 @@ export default function ContentRow({ title, items, onItemClick, variant = "lands
   const scroll = (dir) => {
     const el = rowRef.current;
     if (!el) return;
-    const amount = dir === "left" ? -600 : 600;
-    el.scrollBy({ left: amount, behavior: "smooth" });
+    el.scrollBy({ left: dir === "left" ? -600 : 600, behavior: "smooth" });
     setTimeout(() => {
       setCanScrollLeft(el.scrollLeft > 0);
       setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
@@ -86,29 +227,25 @@ export default function ContentRow({ title, items, onItemClick, variant = "lands
 
   return (
     <div className="relative group/row py-4 px-4 sm:px-8">
-      {/* Title */}
-      <h2
-        className="text-sm font-bold text-white mb-3 tracking-wide"
-        style={{ fontFamily: "'Helvetica Neue', sans-serif" }}
-      >
+      <h2 className="text-sm font-bold text-white mb-3 tracking-wide" style={{ fontFamily: "'Helvetica Neue', sans-serif" }}>
         {title}
       </h2>
 
-      {/* Scroll buttons */}
       {canScrollLeft && (
         <button
           onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-24 bg-gradient-to-r from-[#080808] to-transparent flex items-center justify-start pl-1 opacity-0 group-hover/row:opacity-100 transition-opacity"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-32 bg-gradient-to-r from-[#080808] to-transparent flex items-center justify-start pl-1 opacity-0 group-hover/row:opacity-100 transition-opacity"
         >
           <div className="w-8 h-8 rounded-full bg-black/60 border border-white/10 flex items-center justify-center">
             <ChevronLeft className="w-4 h-4 text-white" />
           </div>
         </button>
       )}
-      {canScrollRight && items.length > 5 && (
+
+      {canScrollRight && items.length > 4 && (
         <button
           onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-24 bg-gradient-to-l from-[#080808] to-transparent flex items-center justify-end pr-1 opacity-0 group-hover/row:opacity-100 transition-opacity"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-32 bg-gradient-to-l from-[#080808] to-transparent flex items-center justify-end pr-1 opacity-0 group-hover/row:opacity-100 transition-opacity"
         >
           <div className="w-8 h-8 rounded-full bg-black/60 border border-white/10 flex items-center justify-center">
             <ChevronRight className="w-4 h-4 text-white" />
@@ -116,10 +253,9 @@ export default function ContentRow({ title, items, onItemClick, variant = "lands
         </button>
       )}
 
-      {/* Cards */}
       <div
         ref={rowRef}
-        className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide"
+        className="flex gap-3 overflow-x-auto pb-2"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         onScroll={(e) => {
           const el = e.currentTarget;
@@ -128,7 +264,7 @@ export default function ContentRow({ title, items, onItemClick, variant = "lands
         }}
       >
         {items.map((item, i) => (
-          <ContentCard key={`${item.id}-${i}`} item={item} onClick={onItemClick} variant={variant} />
+          <ContentCard key={`${item.id}-${i}`} item={item} onClick={onItemClick} />
         ))}
       </div>
     </div>

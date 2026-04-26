@@ -15,7 +15,8 @@ import {
   Music2,
   Home,
   Inbox,
-  Monitor
+  Monitor,
+  Compass
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -28,6 +29,7 @@ const navItems = [
   { icon: Calendar, label: "Calendars", page: "Calendars" },
 
   { icon: Settings, label: "Landing Editor", page: "LandingEditor" },
+  { icon: Compass, label: "Explorar Editor", page: "ExplorarAdmin" },
   { icon: Inbox, label: "Solicitudes", page: "ContactLeads" }
 ];
 

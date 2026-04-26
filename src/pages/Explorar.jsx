@@ -1,18 +1,27 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { Play, Search, X, ChevronLeft, ChevronRight, Film, Music2, Users, Compass } from "lucide-react";
+import { Search, X, Music2 } from "lucide-react";
 import ExplorarNav from "@/components/explorar/ExplorarNav";
 import ExplorarHero from "@/components/explorar/ExplorarHero";
 import ContentRow from "@/components/explorar/ContentRow";
 import ArtistProfileModal from "@/components/explorar/ArtistProfileModal";
 
+const ROW_LABELS = {
+  trending:       "En Tendencia",
+  new_releases:   "Nuevos Lanzamientos",
+  mini_films:     "Mini Films",
+  afro_caribbean: "Afro / Caribbean Vibes",
+  experimental:   "Experimental / New Wave",
+};
+
+const ROW_ORDER = ["trending", "new_releases", "mini_films", "afro_caribbean", "experimental"];
+
 export default function Explorar() {
   const [selectedArtist, setSelectedArtist] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
-  const [activeSection, setActiveSection] = useState("home");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -25,6 +34,12 @@ export default function Explorar() {
     });
   }, []);
 
+  const { data: explorarItems = [] } = useQuery({
+    queryKey: ["explorar-items"],
+    queryFn: () => base44.entities.ExplorarItem.filter({ is_active: true }),
+    enabled: !!currentUser,
+  });
+
   const { data: artists = [] } = useQuery({
     queryKey: ["explorar-artists"],
     queryFn: () => base44.entities.Artist.filter({ status: "Active" }),
@@ -33,13 +48,13 @@ export default function Explorar() {
 
   const { data: projects = [] } = useQuery({
     queryKey: ["explorar-projects"],
-    queryFn: () => base44.entities.Project.list("-created_date", 50),
+    queryFn: () => base44.entities.Project.list("-created_date", 30),
     enabled: !!currentUser,
   });
 
   const { data: tracks = [] } = useQuery({
     queryKey: ["explorar-tracks"],
-    queryFn: () => base44.entities.Track.list("-created_date", 60),
+    queryFn: () => base44.entities.Track.list("-created_date", 30),
     enabled: !!currentUser,
   });
 
@@ -53,83 +68,62 @@ export default function Explorar() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center max-w-md px-6"
         >
-          <div className="mb-8">
-            <div className="text-4xl font-black text-white mb-2" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.04em" }}>
-              CABAÑA<span className="text-[#ff5833]">®</span>
-            </div>
-            <div className="text-xs text-white/30 uppercase tracking-widest mb-8">Creative Universe</div>
-            <h2 className="text-2xl font-bold text-white mb-3">Acceso exclusivo</h2>
-            <p className="text-white/50 text-sm leading-relaxed mb-8">
-              Esta plataforma está disponible solo para artistas y miembros registrados de La Cabaña Creative.
-            </p>
-            <button
-              onClick={() => base44.auth.redirectToLogin(window.location.href)}
-              className="px-8 py-3 bg-white text-black font-bold rounded-lg hover:bg-white/90 transition-all"
-            >
-              Iniciar sesión
-            </button>
+          <div
+            className="text-4xl font-black text-white mb-2"
+            style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.04em" }}
+          >
+            CABAÑA<span className="text-[#ff5833]">®</span>
           </div>
+          <div className="text-xs text-white/30 uppercase tracking-widest mb-8">Creative Universe</div>
+          <h2 className="text-2xl font-bold text-white mb-3">Acceso exclusivo</h2>
+          <p className="text-white/50 text-sm leading-relaxed mb-8">
+            Esta plataforma está disponible solo para artistas y miembros registrados de La Cabaña Creative.
+          </p>
+          <button
+            onClick={() => base44.auth.redirectToLogin(window.location.href)}
+            className="px-8 py-3 bg-white text-black font-bold rounded-lg hover:bg-white/90 transition-all"
+          >
+            Iniciar sesión
+          </button>
         </motion.div>
       </div>
     );
   }
 
-  // Build content rows from real data
-  const artistsWithCovers = artists.filter(a => a.avatar_url);
-  const projectsWithCovers = projects.filter(p => p.cover_url);
-  const tracksWithCovers = tracks.filter(t => t.cover_url || t.audio_file_url);
+  // Map ExplorarItem to card format
+  const mapItemToCard = (item) => {
+    const ytThumb = getYoutubeThumbnail(item.youtube_url || item.youtube_music_url);
+    const artist = artists.find(a => a.id === item.artist_id);
+    return {
+      id: item.id,
+      title: item.title,
+      image: item.thumbnail_url || ytThumb || null,
+      subtitle: item.subtitle || artist?.stageName,
+      youtube_url: item.youtube_url,
+      youtube_music_url: item.youtube_music_url,
+      audio_file_url: item.audio_file_url,
+      artist_id: item.artist_id,
+      raw: item,
+      type: "explorar",
+    };
+  };
 
-  // Categorized rows
-  const newReleases = projectsWithCovers.slice(0, 12);
-  const trending = [...artistsWithCovers].sort(() => Math.random() - 0.5).slice(0, 12);
-  const miniFilms = projects.filter(p => p.type === "Single" || p.type === "EP").filter(p => p.cover_url).slice(0, 10);
-  const experimental = projects.filter(p => p.genre && ["Experimental", "New Wave", "Electronic", "Jazz"].some(g => p.genre?.toLowerCase().includes(g.toLowerCase()))).filter(p => p.cover_url).slice(0, 10);
-  const urban = projects.filter(p => p.genre && ["Afro", "Reggaeton", "Trap", "Urban", "Afrobeats", "Caribbean"].some(g => p.genre?.toLowerCase().includes(g.toLowerCase()))).filter(p => p.cover_url).slice(0, 10);
+  // Hero item
+  const heroItem = explorarItems.find(i => i.is_hero) || explorarItems[0];
+  const heroCard = heroItem ? mapItemToCard(heroItem) : null;
+  const heroArtist = heroCard?.artist_id ? artists.find(a => a.id === heroCard.artist_id) : null;
 
-  // Fallback: use all projects in categories if filtered lists are empty
-  const rowTrending = trending.length > 3 ? trending : artistsWithCovers.slice(0, 12);
-  const rowNewReleases = newReleases.length > 3 ? newReleases : projectsWithCovers.slice(0, 12);
-  const rowMiniFilms = miniFilms.length > 2 ? miniFilms : projectsWithCovers.slice(2, 12);
-  const rowUrban = urban.length > 2 ? urban : projectsWithCovers.slice(4, 14);
-  const rowExperimental = experimental.length > 2 ? experimental : projectsWithCovers.slice(6, 16);
-
-  // Featured hero: pick the newest project with cover
-  const heroProject = projectsWithCovers[0];
-  const heroArtist = heroProject ? artists.find(a => a.id === heroProject.artist_id) : artistsWithCovers[0];
-
-  // Search filter
+  // Search
   const searchResults = searchQuery.length > 1
-    ? [
-        ...artists.filter(a => a.stageName?.toLowerCase().includes(searchQuery.toLowerCase())).map(a => ({ ...a, _type: "artist" })),
-        ...projects.filter(p => p.title?.toLowerCase().includes(searchQuery.toLowerCase())).map(p => ({ ...p, _type: "project" })),
-        ...tracks.filter(t => t.title?.toLowerCase().includes(searchQuery.toLowerCase())).map(t => ({ ...t, _type: "track" })),
-      ].slice(0, 20)
+    ? explorarItems.filter(i =>
+        i.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        i.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
+      ).map(mapItemToCard)
     : [];
 
-  const mapArtistToCard = (artist) => ({
-    id: artist.id,
-    title: artist.stageName,
-    image: artist.avatar_url,
-    subtitle: artist.genre,
-    type: "artist",
-    raw: artist,
-  });
-
-  const mapProjectToCard = (project) => ({
-    id: project.id,
-    title: project.title,
-    image: project.cover_url,
-    subtitle: project.genre || project.type,
-    type: "project",
-    raw: project,
-  });
-
-  const handleCardClick = (item) => {
-    if (item.type === "artist") {
-      setSelectedArtist(item.raw);
-    } else {
-      // Find the artist for this project
-      const artist = artists.find(a => a.id === item.raw?.artist_id);
+  const handleCardClick = (card) => {
+    if (card.artist_id) {
+      const artist = artists.find(a => a.id === card.artist_id);
       if (artist) setSelectedArtist(artist);
     }
   };
@@ -138,8 +132,6 @@ export default function Explorar() {
     <div className="min-h-screen bg-[#080808] text-white overflow-x-hidden">
       <ExplorarNav
         currentUser={currentUser}
-        activeSection={activeSection}
-        setActiveSection={setActiveSection}
         searchOpen={searchOpen}
         setSearchOpen={setSearchOpen}
         searchQuery={searchQuery}
@@ -163,7 +155,7 @@ export default function Explorar() {
                     autoFocus
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    placeholder="Buscar artistas, proyectos, tracks..."
+                    placeholder="Buscar artistas, tracks, films..."
                     className="flex-1 bg-transparent text-white placeholder-white/30 outline-none text-base"
                   />
                 </div>
@@ -171,34 +163,33 @@ export default function Explorar() {
                   <X className="w-5 h-5 text-white/60" />
                 </button>
               </div>
-
               {searchResults.length > 0 ? (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {searchResults.map((item, i) => (
                     <motion.div
-                      key={`${item._type}-${item.id}`}
+                      key={item.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.03 }}
-                      onClick={() => { handleCardClick({ ...item, type: item._type, raw: item }); setSearchOpen(false); }}
+                      onClick={() => { handleCardClick(item); setSearchOpen(false); }}
                       className="cursor-pointer group"
                     >
-                      <div className="aspect-square rounded-xl overflow-hidden mb-2 bg-white/5">
-                        {(item.avatar_url || item.cover_url) ? (
-                          <img src={item.avatar_url || item.cover_url} alt={item.stageName || item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <div className="aspect-video rounded-xl overflow-hidden mb-2 bg-white/5">
+                        {item.image ? (
+                          <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <Music2 className="w-8 h-8 text-white/20" />
                           </div>
                         )}
                       </div>
-                      <p className="text-xs font-semibold text-white truncate">{item.stageName || item.title}</p>
-                      <p className="text-[10px] text-white/40 capitalize">{item._type}</p>
+                      <p className="text-xs font-semibold text-white truncate">{item.title}</p>
+                      {item.subtitle && <p className="text-[10px] text-white/40">{item.subtitle}</p>}
                     </motion.div>
                   ))}
                 </div>
               ) : searchQuery.length > 1 ? (
-                <p className="text-white/40 text-center py-12">No se encontraron resultados para "{searchQuery}"</p>
+                <p className="text-white/40 text-center py-12">Sin resultados para "{searchQuery}"</p>
               ) : (
                 <p className="text-white/20 text-center py-12">Empieza a escribir para buscar...</p>
               )}
@@ -207,73 +198,46 @@ export default function Explorar() {
         )}
       </AnimatePresence>
 
-      {/* Main Content */}
-      <main>
-        {/* Hero */}
-        {heroProject && (
-          <ExplorarHero
-            project={heroProject}
-            artist={heroArtist}
-            onArtistClick={() => heroArtist && setSelectedArtist(heroArtist)}
-          />
+      {/* Hero */}
+      {heroCard && (
+        <ExplorarHero
+          item={heroCard}
+          artist={heroArtist}
+          onExplore={() => heroArtist && setSelectedArtist(heroArtist)}
+        />
+      )}
+
+      {/* Content rows */}
+      <div className="relative z-10 -mt-16 pb-24 space-y-2">
+        {ROW_ORDER.map(cat => {
+          const catItems = explorarItems
+            .filter(i => i.row_category === cat)
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .map(mapItemToCard);
+
+          if (catItems.length === 0) return null;
+
+          return (
+            <ContentRow
+              key={cat}
+              title={ROW_LABELS[cat]}
+              items={catItems}
+              onItemClick={handleCardClick}
+              artists={artists}
+            />
+          );
+        })}
+
+        {explorarItems.length === 0 && (
+          <div className="text-center py-32 px-6">
+            <Music2 className="w-12 h-12 text-white/10 mx-auto mb-4" />
+            <p className="text-white/30 text-sm">No hay contenido publicado aún.</p>
+            <p className="text-white/15 text-xs mt-1">Los administradores pueden añadir contenido desde el panel admin.</p>
+          </div>
         )}
+      </div>
 
-        {/* Content Rows */}
-        <div className="relative z-10 -mt-16 pb-20 space-y-2">
-          {rowTrending.length > 0 && (
-            <ContentRow
-              title="🔥 En Tendencia"
-              items={rowTrending.map(mapArtistToCard)}
-              onItemClick={handleCardClick}
-              variant="portrait"
-            />
-          )}
-          {rowNewReleases.length > 0 && (
-            <ContentRow
-              title="✨ Nuevos Lanzamientos"
-              items={rowNewReleases.map(mapProjectToCard)}
-              onItemClick={handleCardClick}
-              variant="landscape"
-            />
-          )}
-          {rowMiniFilms.length > 0 && (
-            <ContentRow
-              title="🎬 Mini Films"
-              items={rowMiniFilms.map(mapProjectToCard)}
-              onItemClick={handleCardClick}
-              variant="landscape"
-            />
-          )}
-          {rowUrban.length > 0 && (
-            <ContentRow
-              title="🌍 Afro / Caribbean Vibes"
-              items={rowUrban.map(mapProjectToCard)}
-              onItemClick={handleCardClick}
-              variant="landscape"
-            />
-          )}
-          {rowExperimental.length > 0 && (
-            <ContentRow
-              title="🌀 Experimental / New Wave"
-              items={rowExperimental.map(mapProjectToCard)}
-              onItemClick={handleCardClick}
-              variant="landscape"
-            />
-          )}
-
-          {/* All Artists Row */}
-          {artistsWithCovers.length > 0 && (
-            <ContentRow
-              title="👤 Artistas"
-              items={artistsWithCovers.map(mapArtistToCard)}
-              onItemClick={handleCardClick}
-              variant="portrait"
-            />
-          )}
-        </div>
-      </main>
-
-      {/* Artist Modal */}
+      {/* Artist modal */}
       <AnimatePresence>
         {selectedArtist && (
           <ArtistProfileModal
@@ -286,4 +250,11 @@ export default function Explorar() {
       </AnimatePresence>
     </div>
   );
+}
+
+function getYoutubeThumbnail(url) {
+  if (!url) return null;
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (!match) return null;
+  return `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`;
 }

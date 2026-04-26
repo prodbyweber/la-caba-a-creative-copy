@@ -14,6 +14,7 @@ import Pricing from './pages/Pricing';
 import AdminDashboard from './pages/AdminDashboard';
 import BannersAdmin from './pages/BannersAdmin';
 import Explorar from './pages/Explorar';
+import ExplorarAdmin from './pages/ExplorarAdmin';
 import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
@@ -107,6 +108,7 @@ const AuthenticatedApp = () => {
       <Route path="/AdminDashboard" element={<ProtectedAdminRoute element={<AdminDashboard />} />} />
       <Route path="/BannersAdmin" element={<ProtectedAdminRoute element={<BannersAdmin />} />} />
       <Route path="/Explorar" element={<Explorar />} />
+      <Route path="/ExplorarAdmin" element={<ProtectedAdminRoute element={<ExplorarAdmin />} />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
