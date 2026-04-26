@@ -13,6 +13,33 @@ const socialPlatforms = [
   { id: "tiktok",    name: "TikTok",    icon: Video,     textColor: "text-purple-400",borderColor: "border-purple-500/30",bg: "from-purple-500/15 to-purple-600/15" },
 ];
 
+// Mapa de banderas por país
+const COUNTRY_FLAGS = {
+  "España": "🇪🇸", "México": "🇲🇽", "Argentina": "🇦🇷", "Colombia": "🇨🇴",
+  "Venezuela": "🇻🇪", "Perú": "🇵🇪", "Chile": "🇨🇱", "Ecuador": "🇪🇨",
+  "Cuba": "🇨🇺", "Panamá": "🇵🇦", "El Salvador": "🇸🇻", "Guatemala": "🇬🇹",
+  "Honduras": "🇭🇳", "Nicaragua": "🇳🇮", "Costa Rica": "🇨🇷", "Brasil": "🇧🇷",
+  "Uruguay": "🇺🇾", "Bolivia": "🇧🇴", "Paraguay": "🇵🇾",
+  "República Dominicana": "🇩🇴", "Puerto Rico": "🇵🇷",
+  "Estados Unidos": "🇺🇸", "Canadá": "🇨🇦",
+  "Reino Unido": "🇬🇧", "Francia": "🇫🇷", "Alemania": "🇩🇪",
+  "Italia": "🇮🇹", "Portugal": "🇵🇹",
+};
+
+function CountryBadge({ country, label }) {
+  const flag = COUNTRY_FLAGS[country];
+  if (!country) return null;
+  return (
+    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+      {flag && <span className="text-base leading-none">{flag}</span>}
+      <div>
+        {label && <p className="text-[9px] text-white/25 uppercase tracking-widest leading-none mb-0.5">{label}</p>}
+        <p className="text-xs text-white/70 font-medium leading-none">{country}</p>
+      </div>
+    </div>
+  );
+}
+
 // Avatar circular — icono que va en la nav
 export function ArtistAvatarButton({ artist, onClick }) {
   return (
@@ -23,7 +50,7 @@ export function ArtistAvatarButton({ artist, onClick }) {
       title={artist?.stageName || "Perfil"}
     >
       {artist?.avatar_url ? (
-        <img src={artist.avatar_url} alt={artist.stageName} className="w-full h-full object-cover object-top grayscale" />
+        <img src={artist.avatar_url} alt={artist.stageName} className="w-full h-full object-cover object-top" />
       ) : (
         <User className="w-4 h-4 text-white/30" />
       )}
@@ -117,7 +144,12 @@ export default function ArtistProfileDrawer({ artist, isOpen, onClose }) {
               <div className="flex flex-col items-center gap-3">
                 <div className="w-20 h-20 rounded-full overflow-hidden border border-white/10 flex items-center justify-center" style={{ background: "#1c1c1e" }}>
                   {artist.avatar_url ? (
-                    <img src={artist.avatar_url} alt={artist.stageName} className="w-full h-full object-cover object-top grayscale" />
+                    <img
+                      src={artist.avatar_url}
+                      alt={artist.stageName}
+                      className="w-full h-full object-cover"
+                      style={{ objectPosition: artist.photo_position || "center center" }}
+                    />
                   ) : (
                     <User className="w-9 h-9 text-white/20" />
                   )}
@@ -186,6 +218,18 @@ export default function ArtistProfileDrawer({ artist, isOpen, onClose }) {
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              {/* Países — nacionalidad y residencia */}
+              {(artist.nationality || artist.country_of_residence) && !isEditing && (
+                <div className="flex flex-col gap-2">
+                  {artist.nationality && (
+                    <CountryBadge country={artist.nationality} label="Nacionalidad" />
+                  )}
+                  {artist.country_of_residence && artist.country_of_residence !== artist.nationality && (
+                    <CountryBadge country={artist.country_of_residence} label="Residencia" />
+                  )}
+                </div>
+              )}
 
               {/* Bio */}
               {artist.bio && !isEditing && (

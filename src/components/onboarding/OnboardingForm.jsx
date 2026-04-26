@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import { Music2, Building2, Camera, ChevronRight, Check, User } from "lucide-react";
+import { Music2, Building2, Camera, ChevronRight, Check, Move } from "lucide-react";
 
 const COUNTRY_CODES = [
   { code: "+1", flag: "🇺🇸", country: "US/CA" },
@@ -47,10 +47,76 @@ const STEPS = [
   { id: 3, title: "Casi listo", subtitle: "Agrega una foto de perfil" },
 ];
 
+// Photo cropper — lets user drag to reposition
+function PhotoCropper({ url, position, onPositionChange, onChangePhoto, uploading }) {
+  const containerRef = useRef(null);
+  const dragging = useRef(false);
+  const lastPos = useRef({ x: 0, y: 0 });
+  const [pos, setPos] = useState(position || { x: 50, y: 50 });
+
+  const clamp = (v) => Math.max(0, Math.min(100, v));
+
+  const startDrag = (clientX, clientY) => {
+    dragging.current = true;
+    lastPos.current = { x: clientX, y: clientY };
+  };
+
+  const onMove = (clientX, clientY) => {
+    if (!dragging.current || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const dx = ((clientX - lastPos.current.x) / rect.width) * -100;
+    const dy = ((clientY - lastPos.current.y) / rect.height) * -100;
+    lastPos.current = { x: clientX, y: clientY };
+    setPos(p => {
+      const next = { x: clamp(p.x + dx), y: clamp(p.y + dy) };
+      onPositionChange(next);
+      return next;
+    });
+  };
+
+  const stopDrag = () => { dragging.current = false; };
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <div
+        ref={containerRef}
+        className="relative w-36 h-36 rounded-full overflow-hidden border-2 border-white/20 cursor-grab active:cursor-grabbing select-none shadow-2xl"
+        onMouseDown={e => startDrag(e.clientX, e.clientY)}
+        onMouseMove={e => onMove(e.clientX, e.clientY)}
+        onMouseUp={stopDrag}
+        onMouseLeave={stopDrag}
+        onTouchStart={e => startDrag(e.touches[0].clientX, e.touches[0].clientY)}
+        onTouchMove={e => { e.preventDefault(); onMove(e.touches[0].clientX, e.touches[0].clientY); }}
+        onTouchEnd={stopDrag}
+      >
+        <img
+          src={url}
+          alt="Preview"
+          draggable={false}
+          className="w-full h-full object-cover pointer-events-none"
+          style={{ objectPosition: `${pos.x}% ${pos.y}%` }}
+        />
+        {/* drag hint overlay */}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity rounded-full">
+          <Move className="w-6 h-6 text-white/70" />
+        </div>
+      </div>
+      <p className="text-[10px] text-white/25 flex items-center gap-1">
+        <Move className="w-3 h-3" /> Arrastra para encuadrar
+      </p>
+      <label className="cursor-pointer text-xs text-white/40 hover:text-white/70 transition-colors underline underline-offset-2">
+        <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && onChangePhoto(e.target.files[0])} />
+        {uploading ? "Subiendo..." : "Cambiar foto"}
+      </label>
+    </div>
+  );
+}
+
 export default function OnboardingForm({ user, onComplete }) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoPosition, setPhotoPosition] = useState({ x: 50, y: 50 });
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -59,6 +125,7 @@ export default function OnboardingForm({ user, onComplete }) {
     phone_country_code: "+34",
     phone: "",
     nationality: "",
+    country_of_residence: "",
     address: "",
     profile_photo_url: "",
     account_type: "",
@@ -81,6 +148,7 @@ export default function OnboardingForm({ user, onComplete }) {
     setLoading(true);
     try {
       const full_name = `${form.first_name} ${form.last_name}`.trim();
+      const photo_position = `${photoPosition.x}% ${photoPosition.y}%`;
       await base44.entities.UserProfile.create({
         user_id: user.id,
         user_email: user.email,
@@ -92,8 +160,10 @@ export default function OnboardingForm({ user, onComplete }) {
         phone: form.phone,
         phone_country_code: form.phone_country_code,
         nationality: form.nationality,
+        country_of_residence: form.country_of_residence,
         address: form.address,
         profile_photo_url: form.profile_photo_url,
+        photo_position,
         account_type: form.account_type,
         onboarding_completed: true,
       });
@@ -104,11 +174,10 @@ export default function OnboardingForm({ user, onComplete }) {
   };
 
   const canStep1 = !!form.account_type;
-  const canStep2 = form.first_name && form.last_name && form.phone && form.nationality && form.gender;
+  const canStep2 = form.first_name && form.last_name && form.phone && form.nationality && form.gender && form.country_of_residence;
 
   return (
     <div className="fixed inset-0 z-[500] bg-[#080808] flex items-center justify-center p-4 overflow-y-auto">
-      {/* Subtle grid background */}
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
@@ -125,28 +194,22 @@ export default function OnboardingForm({ user, onComplete }) {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="text-[11px] font-black uppercase tracking-[0.3em] text-white/20 mb-3">Cabaña Creative</div>
-          <h1
-            className="text-3xl font-black text-white leading-none"
-            style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.03em" }}
-          >
+          <h1 className="text-3xl font-black text-white leading-none" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.03em" }}>
             {STEPS[step - 1].title}
           </h1>
           <p className="text-white/30 text-sm mt-2">{STEPS[step - 1].subtitle}</p>
         </div>
 
-        {/* Step progress */}
+        {/* Progress */}
         <div className="flex items-center gap-2 mb-8">
           {STEPS.map(s => (
-            <div
-              key={s.id}
-              className={`h-0.5 flex-1 rounded-full transition-all duration-500 ${s.id <= step ? "bg-white" : "bg-white/10"}`}
-            />
+            <div key={s.id} className={`h-0.5 flex-1 rounded-full transition-all duration-500 ${s.id <= step ? "bg-white" : "bg-white/10"}`} />
           ))}
         </div>
 
         <AnimatePresence mode="wait">
 
-          {/* STEP 1: Tipo de cuenta */}
+          {/* STEP 1 */}
           {step === 1 && (
             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <div className="grid grid-cols-2 gap-4 mb-8">
@@ -174,7 +237,6 @@ export default function OnboardingForm({ user, onComplete }) {
                   </button>
                 ))}
               </div>
-
               <button
                 disabled={!canStep1}
                 onClick={() => setStep(2)}
@@ -185,32 +247,20 @@ export default function OnboardingForm({ user, onComplete }) {
             </motion.div>
           )}
 
-          {/* STEP 2: Datos personales */}
+          {/* STEP 2 */}
           {step === 2 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-              {/* Nombre y apellido */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className={labelClass}>Nombre *</label>
-                  <input
-                    className={inputClass}
-                    placeholder="Tu nombre"
-                    value={form.first_name}
-                    onChange={e => set("first_name", e.target.value)}
-                  />
+                  <input className={inputClass} placeholder="Tu nombre" value={form.first_name} onChange={e => set("first_name", e.target.value)} />
                 </div>
                 <div>
                   <label className={labelClass}>Apellido *</label>
-                  <input
-                    className={inputClass}
-                    placeholder="Tu apellido"
-                    value={form.last_name}
-                    onChange={e => set("last_name", e.target.value)}
-                  />
+                  <input className={inputClass} placeholder="Tu apellido" value={form.last_name} onChange={e => set("last_name", e.target.value)} />
                 </div>
               </div>
 
-              {/* Nombre artístico / marca */}
               <div>
                 <label className={labelClass}>{form.account_type === "brand" ? "Nombre de marca" : "Nombre artístico"}</label>
                 <input
@@ -221,7 +271,6 @@ export default function OnboardingForm({ user, onComplete }) {
                 />
               </div>
 
-              {/* Género */}
               <div>
                 <label className={labelClass}>Género *</label>
                 <div className="grid grid-cols-3 gap-2">
@@ -245,7 +294,6 @@ export default function OnboardingForm({ user, onComplete }) {
                 </div>
               </div>
 
-              {/* Teléfono */}
               <div>
                 <label className={labelClass}>Teléfono *</label>
                 <div className="flex gap-2">
@@ -256,18 +304,10 @@ export default function OnboardingForm({ user, onComplete }) {
                     style={{ minWidth: 90 }}
                   >
                     {COUNTRY_CODES.map(c => (
-                      <option key={c.code} value={c.code} className="bg-[#111]">
-                        {c.flag} {c.code}
-                      </option>
+                      <option key={c.code} value={c.code} className="bg-[#111]">{c.flag} {c.code}</option>
                     ))}
                   </select>
-                  <input
-                    className={inputClass}
-                    placeholder="Número de teléfono"
-                    value={form.phone}
-                    onChange={e => set("phone", e.target.value)}
-                    type="tel"
-                  />
+                  <input className={inputClass} placeholder="Número de teléfono" value={form.phone} onChange={e => set("phone", e.target.value)} type="tel" />
                 </div>
               </div>
 
@@ -280,28 +320,28 @@ export default function OnboardingForm({ user, onComplete }) {
                 </select>
               </div>
 
-              {/* Dirección */}
+              {/* País de residencia */}
               <div>
-                <label className={labelClass}>Dirección</label>
-                <input
-                  className={inputClass}
-                  placeholder="Ciudad, País"
-                  value={form.address}
-                  onChange={e => set("address", e.target.value)}
-                />
+                <label className={labelClass}>País de residencia *</label>
+                <select value={form.country_of_residence} onChange={e => set("country_of_residence", e.target.value)} className={inputClass}>
+                  <option value="" className="bg-[#111]">¿Dónde vives actualmente?</option>
+                  {COUNTRIES.map(c => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
+                </select>
               </div>
 
-              {/* Email (readonly) */}
+              {/* Ciudad */}
+              <div>
+                <label className={labelClass}>Ciudad</label>
+                <input className={inputClass} placeholder="Ciudad" value={form.address} onChange={e => set("address", e.target.value)} />
+              </div>
+
               <div>
                 <label className={labelClass}>Correo electrónico</label>
                 <input className={inputClass} value={user?.email || ""} disabled style={{ opacity: 0.4, cursor: "not-allowed" }} />
               </div>
 
               <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => setStep(1)}
-                  className="px-5 py-3.5 rounded-xl font-bold text-sm text-white/40 hover:text-white/70 border border-white/10 hover:border-white/20 transition-all"
-                >
+                <button onClick={() => setStep(1)} className="px-5 py-3.5 rounded-xl font-bold text-sm text-white/40 hover:text-white/70 border border-white/10 hover:border-white/20 transition-all">
                   Atrás
                 </button>
                 <button
@@ -315,33 +355,30 @@ export default function OnboardingForm({ user, onComplete }) {
             </motion.div>
           )}
 
-          {/* STEP 3: Foto de perfil */}
+          {/* STEP 3: Foto */}
           {step === 3 && (
             <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <div className="flex flex-col items-center mb-8">
-                <label className="cursor-pointer group">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={e => e.target.files?.[0] && handlePhotoUpload(e.target.files[0])}
+                {form.profile_photo_url ? (
+                  <PhotoCropper
+                    url={form.profile_photo_url}
+                    position={photoPosition}
+                    onPositionChange={setPhotoPosition}
+                    onChangePhoto={handlePhotoUpload}
+                    uploading={uploadingPhoto}
                   />
-                  <div className={`w-32 h-32 rounded-full border-2 border-dashed flex items-center justify-center overflow-hidden transition-all duration-200 ${
-                    form.profile_photo_url ? "border-white/30" : "border-white/15 group-hover:border-white/30"
-                  }`}>
-                    {form.profile_photo_url ? (
-                      <img src={form.profile_photo_url} alt="Profile" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="flex flex-col items-center gap-2">
-                        <Camera className="w-7 h-7 text-white/25 group-hover:text-white/50 transition-colors" />
-                        <span className="text-[10px] text-white/25 group-hover:text-white/40 transition-colors text-center px-2">
-                          {uploadingPhoto ? "Subiendo..." : "Subir foto"}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </label>
-                <p className="text-white/25 text-xs mt-4">Opcional — puedes añadirla después</p>
+                ) : (
+                  <label className="cursor-pointer group">
+                    <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handlePhotoUpload(e.target.files[0])} />
+                    <div className="w-36 h-36 rounded-full border-2 border-dashed border-white/15 group-hover:border-white/30 flex flex-col items-center justify-center overflow-hidden transition-all duration-200 bg-white/[0.03]">
+                      <Camera className="w-8 h-8 text-white/25 group-hover:text-white/50 transition-colors" />
+                      <span className="text-[10px] text-white/25 group-hover:text-white/40 transition-colors text-center px-2 mt-1">
+                        {uploadingPhoto ? "Subiendo..." : "Subir foto"}
+                      </span>
+                    </div>
+                  </label>
+                )}
+                <p className="text-white/20 text-xs mt-4">Opcional — puedes añadirla después</p>
 
                 {/* Summary */}
                 <div className="mt-6 w-full p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-1.5 text-sm">
@@ -351,20 +388,21 @@ export default function OnboardingForm({ user, onComplete }) {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-white/30">Tipo</span>
-                    <span className="text-white font-medium capitalize">{form.account_type === "artist" ? "Artista" : "Marca"}</span>
+                    <span className="text-white font-medium">{form.account_type === "artist" ? "Artista" : "Marca"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/30">País</span>
+                    <span className="text-white/30">Nacionalidad</span>
                     <span className="text-white font-medium">{form.nationality}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/30">Residencia</span>
+                    <span className="text-white font-medium">{form.country_of_residence}</span>
                   </div>
                 </div>
               </div>
 
               <div className="flex gap-3">
-                <button
-                  onClick={() => setStep(2)}
-                  className="px-5 py-3.5 rounded-xl font-bold text-sm text-white/40 hover:text-white/70 border border-white/10 hover:border-white/20 transition-all"
-                >
+                <button onClick={() => setStep(2)} className="px-5 py-3.5 rounded-xl font-bold text-sm text-white/40 hover:text-white/70 border border-white/10 hover:border-white/20 transition-all">
                   Atrás
                 </button>
                 <button
@@ -372,9 +410,7 @@ export default function OnboardingForm({ user, onComplete }) {
                   disabled={loading}
                   className="flex-1 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-white text-black hover:bg-white/90 disabled:opacity-50"
                 >
-                  {loading ? "Guardando..." : (
-                    <><Check className="w-4 h-4" /> Entrar a Cabaña</>
-                  )}
+                  {loading ? "Guardando..." : (<><Check className="w-4 h-4" /> Entrar a Cabaña</>)}
                 </button>
               </div>
             </motion.div>

@@ -18,13 +18,18 @@ Deno.serve(async (req) => {
     const existingArtist = artists.find(a => a.user_id === user.id);
 
     // Datos base del artista usando UserProfile si existe
+    const residenceOrNationality = userProfile?.country_of_residence || userProfile?.nationality || '';
+    const city = userProfile?.address ? `${userProfile.address}, ${residenceOrNationality}` : residenceOrNationality;
     const artistData = {
       stageName: userProfile?.artist_name || userProfile?.full_name || user.full_name || user.email.split('@')[0],
       legalName: userProfile?.full_name || user.full_name || '',
       email: userProfile?.user_email || user.email,
       phone: userProfile?.phone ? `${userProfile.phone_country_code || ''} ${userProfile.phone}`.trim() : '',
-      location: userProfile?.nationality || '',
+      location: city,
       avatar_url: userProfile?.profile_photo_url || '',
+      photo_position: userProfile?.photo_position || 'center center',
+      nationality: userProfile?.nationality || '',
+      country_of_residence: userProfile?.country_of_residence || '',
       status: 'Active',
       user_id: user.id
     };

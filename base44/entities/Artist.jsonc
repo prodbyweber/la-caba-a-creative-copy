@@ -20,7 +20,20 @@
     },
     "location": {
       "type": "string",
-      "description": "Ubicaci\u00f3n"
+      "description": "Ubicaci\u00f3n (ciudad, pa\u00eds)"
+    },
+    "nationality": {
+      "type": "string",
+      "description": "Pa\u00eds de nacionalidad"
+    },
+    "country_of_residence": {
+      "type": "string",
+      "description": "Pa\u00eds de residencia actual"
+    },
+    "photo_position": {
+      "type": "string",
+      "description": "Posici\u00f3n del recorte circular (CSS object-position)",
+      "default": "center center"
     },
     "status": {
       "type": "string",

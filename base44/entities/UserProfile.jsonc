@@ -47,13 +47,22 @@
       "type": "string",
       "description": "Pa\u00eds de nacionalidad"
     },
+    "country_of_residence": {
+      "type": "string",
+      "description": "Pa\u00eds de residencia actual"
+    },
     "address": {
       "type": "string",
-      "description": "Direcci\u00f3n"
+      "description": "Direcci\u00f3n / Ciudad"
     },
     "profile_photo_url": {
       "type": "string",
       "description": "URL de la foto de perfil"
+    },
+    "photo_position": {
+      "type": "string",
+      "description": "Posici\u00f3n del recorte circular (CSS object-position, ej: 'center top')",
+      "default": "center center"
     },
     "account_type": {
       "type": "string",
