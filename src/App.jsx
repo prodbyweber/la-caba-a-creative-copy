@@ -60,62 +60,23 @@ const ProtectedAdminRoute = ({ element }) => {
 };
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user: contextUser, isAuthenticated } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
   const isLoading = isLoadingPublicSettings || isLoadingAuth;
-  // undefined = not checked yet, null = checked but no profile, object = has profile
-  const [userProfile, setUserProfile] = React.useState(undefined);
 
-  React.useEffect(() => {
-    if (!isLoading && isAuthenticated && contextUser) {
-      setUserProfile(undefined); // reset while fetching
-      base44.entities.UserProfile.filter({ user_id: contextUser.id })
-        .then(profiles => setUserProfile(profiles.length > 0 ? profiles[0] : null))
-        .catch(() => setUserProfile(null));
-    } else if (!isLoading && !isAuthenticated) {
-      setUserProfile(undefined);
-    }
-  }, [isLoading, isAuthenticated, contextUser?.id]);
-
-  // Hide splash only when auth is fully resolved
   React.useEffect(() => {
     if (!isLoading) {
       window.__cabanaHideSplash && window.__cabanaHideSplash();
     }
   }, [isLoading]);
 
-  // Wait for auth to resolve; if authenticated also wait for profile check
-  if (isLoading) return null;
-  if (isAuthenticated && userProfile === undefined) return null;
+  if (isLoading) {
+    return null;
+  }
 
-  // Handle authentication errors BEFORE checking onboarding
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      navigateToLogin();
-      return null;
-    }
-  }
-
-  // Show onboarding for ANY authenticated user without a profile (Google auth or email)
-  if (isAuthenticated && contextUser && userProfile === null) {
-    return (
-      <OnboardingForm
-        user={contextUser}
-        onComplete={() =>
-          base44.entities.UserProfile.filter({ user_id: contextUser.id })
-            .then(p => setUserProfile(p[0] || null))
-        }
-      />
-    );
-  }
-
-  // Handle authentication errors (fallback)
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
       navigateToLogin();
       return null;
     }
