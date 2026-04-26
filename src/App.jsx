@@ -83,9 +83,18 @@ const AuthenticatedApp = () => {
     }
   }, [isLoading]);
 
-  // Wait for auth + profile check to complete
-  if (isLoading || (isAuthenticated && userProfile === undefined)) {
-    return null;
+  // Wait for auth to resolve; if authenticated also wait for profile check
+  if (isLoading) return null;
+  if (isAuthenticated && userProfile === undefined) return null;
+
+  // Handle authentication errors BEFORE checking onboarding
+  if (authError) {
+    if (authError.type === 'user_not_registered') {
+      return <UserNotRegisteredError />;
+    } else if (authError.type === 'auth_required') {
+      navigateToLogin();
+      return null;
+    }
   }
 
   // Show onboarding for ANY authenticated user without a profile (Google auth or email)
@@ -101,7 +110,7 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Handle authentication errors
+  // Handle authentication errors (fallback)
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
