@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Save, Film, Upload, Star, Image as ImageIcon, Youtube, Music2, Link } from "lucide-react";
+import { X, Save, Film, Upload, Star, Image as ImageIcon, Youtube, Music2, Link, Volume2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 function getYoutubeThumbnail(url) {
@@ -18,6 +18,7 @@ const EMPTY_HERO = {
   hero_order: 0,
   hero_media_url: "",
   hero_media_type: "image",
+  hero_audio_enabled: false,
   hero_link: "",
   hero_link_label: "Más info",
   youtube_url: "",
@@ -128,8 +129,27 @@ export default function HeroSlideModal({ item, artists, onClose, onSave }) {
                 {uploadingMedia ? "Subiendo..." : "Subir"}
               </label>
             </div>
-            <p className="text-[10px] text-white/20 mt-1">El video se reproducirá en loop sin sonido. Acepta .mp4, .webm, .jpg, .png, .webp</p>
+            <p className="text-[10px] text-white/20 mt-1">El video se reproducirá en loop. Acepta .mp4, .webm, .jpg, .png, .webp</p>
           </div>
+
+          {/* Audio toggle — solo visible si es video */}
+          {form.hero_media_type === "video" && form.hero_media_url && (
+            <div className="flex items-center justify-between p-3 rounded-xl border border-white/[0.07] bg-white/[0.02]">
+              <div className="flex items-center gap-2.5">
+                <Volume2 className="w-4 h-4 text-white/40" />
+                <div>
+                  <p className="text-xs font-semibold text-white/70">Activar audio del video</p>
+                  <p className="text-[10px] text-white/25">El visitante verá un botón de bocina para activar/silenciar</p>
+                </div>
+              </div>
+              <div
+                onClick={() => set("hero_audio_enabled", !form.hero_audio_enabled)}
+                className={`w-9 h-5 rounded-full transition-colors cursor-pointer flex-shrink-0 ${form.hero_audio_enabled ? "bg-emerald-500" : "bg-white/10"}`}
+              >
+                <div className={`w-4 h-4 bg-white rounded-full mt-0.5 shadow transition-transform ${form.hero_audio_enabled ? "translate-x-4" : "translate-x-0.5"}`} />
+              </div>
+            </div>
+          )}
 
           {/* === SECCIÓN: INFORMACIÓN === */}
           <div className="grid grid-cols-2 gap-4">

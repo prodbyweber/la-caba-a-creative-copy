@@ -139,6 +139,11 @@
       "default": "image",
       "description": "Tipo de media del hero: imagen o video"
     },
+    "hero_audio_enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si el video del hero puede tener audio activable por el usuario"
+    },
     "hero_link": {
       "type": "string",
       "description": "URL o ruta de destino al hacer clic en el hero"

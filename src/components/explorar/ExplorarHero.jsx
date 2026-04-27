@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Info, X, Youtube, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { Play, Info, X, Youtube, ChevronLeft, ChevronRight, ExternalLink, Volume2, VolumeX } from "lucide-react";
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -13,19 +13,29 @@ function HeroSlide({ item, artist, onExplore, active }) {
   const ytId = getYoutubeId(ytUrl);
   const bg = item?.image || artist?.avatar_url || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80";
   const isVideo = item?.hero_media_type === "video" && item?.hero_media_url;
+  const audioEnabled = isVideo && !!(item?.raw?.hero_audio_enabled ?? item?.hero_audio_enabled);
   const videoRef = useRef(null);
   const [videoReady, setVideoReady] = useState(false);
+  const [muted, setMuted] = useState(true); // always starts muted
 
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
     if (active) {
-      // Don't reset currentTime — let it continue from where it is for seamless loop
       vid.play().catch(() => {});
     } else {
       vid.pause();
+      // Reset to muted when slide becomes inactive
+      setMuted(true);
     }
   }, [active]);
+
+  // Sync muted state to video element
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    vid.muted = muted;
+  }, [muted]);
 
   const handleActionBtn = () => {
     const link = item?.hero_link;
@@ -67,6 +77,22 @@ function HeroSlide({ item, artist, onExplore, active }) {
               preload="auto"
               onCanPlay={() => setVideoReady(true)}
             />
+            {/* Audio toggle button — only if audio is enabled for this slide */}
+            {audioEnabled && videoReady && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5 }}
+                onClick={() => setMuted(m => !m)}
+                className="absolute bottom-4 right-4 z-20 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-black/70 hover:border-white/40 transition-all"
+                title={muted ? "Activar sonido" : "Silenciar"}
+              >
+                {muted
+                  ? <VolumeX className="w-4 h-4 text-white/70" />
+                  : <Volume2 className="w-4 h-4 text-white" />
+                }
+              </motion.button>
+            )}
           </>
         ) : (
           <img
