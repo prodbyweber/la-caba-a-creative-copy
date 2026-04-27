@@ -4,7 +4,87 @@
   "properties": {
     "title": {
       "type": "string",
-      "description": "T\u00edtulo del item"
+      "description": "T\u00edtulo del proyecto"
+    },
+    "content_type": {
+      "type": "string",
+      "enum": [
+        "song",
+        "album",
+        "ep",
+        "minifilm",
+        "film",
+        "series"
+      ],
+      "default": "song",
+      "description": "Tipo de contenido"
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "Subt\u00edtulo o g\u00e9nero"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n del proyecto"
+    },
+    "year": {
+      "type": "number",
+      "description": "A\u00f1o de lanzamiento"
+    },
+    "duration": {
+      "type": "string",
+      "description": "Duraci\u00f3n (ej: 3:24 o 1h 12min)"
+    },
+    "thumbnail_url": {
+      "type": "string",
+      "description": "URL de la portada / miniatura"
+    },
+    "preview_media_url": {
+      "type": "string",
+      "description": "URL del video o imagen de preview en loop"
+    },
+    "preview_media_type": {
+      "type": "string",
+      "enum": [
+        "image",
+        "video"
+      ],
+      "default": "image",
+      "description": "Tipo de media del preview: imagen o video"
+    },
+    "youtube_url": {
+      "type": "string",
+      "description": "URL del video de YouTube"
+    },
+    "youtube_music_url": {
+      "type": "string",
+      "description": "URL de YouTube Music"
+    },
+    "audio_file_url": {
+      "type": "string",
+      "description": "URL de archivo de audio directo"
+    },
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista principal"
+    },
+    "credits": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "artist_id": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Cr\u00e9ditos del proyecto (elenco, crew)"
     },
     "row_category": {
       "type": "string",
@@ -21,30 +101,6 @@
       "type": "number",
       "default": 0,
       "description": "Orden dentro de la fila"
-    },
-    "thumbnail_url": {
-      "type": "string",
-      "description": "URL de la miniatura personalizada"
-    },
-    "youtube_url": {
-      "type": "string",
-      "description": "URL del video de YouTube"
-    },
-    "youtube_music_url": {
-      "type": "string",
-      "description": "URL de YouTube Music"
-    },
-    "audio_file_url": {
-      "type": "string",
-      "description": "URL de archivo de audio directo"
-    },
-    "subtitle": {
-      "type": "string",
-      "description": "Subt\u00edtulo o g\u00e9nero"
-    },
-    "artist_id": {
-      "type": "string",
-      "description": "ID del artista vinculado (opcional)"
     },
     "is_hero": {
       "type": "boolean",
@@ -71,11 +127,11 @@
     },
     "hero_link": {
       "type": "string",
-      "description": "URL o ruta de destino al hacer clic en 'M\u00e1s info' del hero"
+      "description": "URL o ruta de destino al hacer clic en el hero"
     },
     "hero_link_label": {
       "type": "string",
-      "description": "Texto del bot\u00f3n de acci\u00f3n del hero (ej: 'Ver ahora', 'Escuchar')",
+      "description": "Texto del bot\u00f3n de acci\u00f3n del hero",
       "default": "M\u00e1s info"
     },
     "is_active": {
@@ -85,7 +141,6 @@
     }
   },
   "required": [
-    "title",
-    "row_category"
+    "title"
   ]
 }

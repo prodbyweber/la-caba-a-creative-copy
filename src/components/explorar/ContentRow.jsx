@@ -125,40 +125,57 @@ function CreditsModal({ item, hasVideo, hasAudio, playing, onClose, onPlay, onTo
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+          {/* Metadata */}
+          <div className="grid grid-cols-2 gap-x-8 gap-y-2 mb-4">
             {item.subtitle && (
               <div>
-                <span className="text-white/35 text-xs">Artista: </span>
-                <span className="text-white/70 text-xs">{item.subtitle}</span>
+                <span className="text-white/30 text-xs">Género: </span>
+                <span className="text-white/60 text-xs">{item.subtitle}</span>
               </div>
             )}
-            {item.raw?.row_category && (
+            {item.raw?.year && (
               <div>
-                <span className="text-white/35 text-xs">Categoría: </span>
-                <span className="text-white/70 text-xs capitalize">{item.raw.row_category.replace(/_/g, " ")}</span>
+                <span className="text-white/30 text-xs">Año: </span>
+                <span className="text-white/60 text-xs">{item.raw.year}</span>
+              </div>
+            )}
+            {item.raw?.duration && (
+              <div>
+                <span className="text-white/30 text-xs">Duración: </span>
+                <span className="text-white/60 text-xs">{item.raw.duration}</span>
+              </div>
+            )}
+            {item.raw?.content_type && (
+              <div>
+                <span className="text-white/30 text-xs">Tipo: </span>
+                <span className="text-white/60 text-xs capitalize">{item.raw.content_type}</span>
               </div>
             )}
             {item.youtube_url && (
               <div className="col-span-2">
-                <span className="text-white/35 text-xs">YouTube: </span>
                 <a href={item.youtube_url} target="_blank" rel="noopener noreferrer"
-                  className="text-white/70 text-xs hover:text-white transition-colors underline underline-offset-2"
+                  className="text-white/40 text-xs hover:text-white transition-colors underline underline-offset-2"
                   onClick={e => e.stopPropagation()}>
                   Ver en YouTube →
                 </a>
               </div>
             )}
-            {item.youtube_music_url && (
-              <div className="col-span-2">
-                <span className="text-white/35 text-xs">YouTube Music: </span>
-                <a href={item.youtube_music_url} target="_blank" rel="noopener noreferrer"
-                  className="text-white/70 text-xs hover:text-white transition-colors underline underline-offset-2"
-                  onClick={e => e.stopPropagation()}>
-                  Escuchar →
-                </a>
-              </div>
-            )}
           </div>
+
+          {/* Créditos */}
+          {item.raw?.credits && item.raw.credits.length > 0 && (
+            <div>
+              <p className="text-[10px] font-semibold text-white/20 uppercase tracking-widest mb-2">Créditos</p>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
+                {item.raw.credits.map((credit, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <span className="text-white/25 text-xs flex-shrink-0">{credit.role}:</span>
+                    <span className="text-white/60 text-xs truncate">{credit.name || "—"}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     </motion.div>,
@@ -264,20 +281,33 @@ function ContentCard({ item, onClick }) {
             </div>
           )}
 
-          {/* YouTube preview iframe */}
+          {/* Preview en loop (video o iframe YouTube si no hay preview propio) */}
           <AnimatePresence>
-            {previewActive && hasVideo && (
+            {previewActive && (item.raw?.preview_media_url || hasVideo) && (
               <motion.div
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 transition={{ duration: 0.4 }}
                 className="absolute inset-0"
               >
-                <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${ytId}`}
-                  className="w-full h-full"
-                  allow="autoplay"
-                  style={{ pointerEvents: "none" }}
-                />
+                {item.raw?.preview_media_url ? (
+                  item.raw.preview_media_type === "video" ? (
+                    <video
+                      src={item.raw.preview_media_url}
+                      className="w-full h-full object-cover"
+                      autoPlay muted loop playsInline
+                      style={{ pointerEvents: "none" }}
+                    />
+                  ) : (
+                    <img src={item.raw.preview_media_url} alt="" className="w-full h-full object-cover" style={{ pointerEvents: "none" }} />
+                  )
+                ) : hasVideo ? (
+                  <iframe
+                    src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${ytId}`}
+                    className="w-full h-full"
+                    allow="autoplay"
+                    style={{ pointerEvents: "none" }}
+                  />
+                ) : null}
               </motion.div>
             )}
           </AnimatePresence>
