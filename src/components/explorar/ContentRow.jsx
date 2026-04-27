@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Music2, Play, Pause, Youtube, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Music2, Play, Pause, Youtube, X, Info } from "lucide-react";
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -78,6 +78,7 @@ function ContentCard({ item, onClick }) {
   const [previewActive, setPreviewActive] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [showYTModal, setShowYTModal] = useState(false);
+  const [showCredits, setShowCredits] = useState(false);
   const audioRef = useRef(null);
   const hoverTimer = useRef(null);
 
@@ -263,16 +264,153 @@ function ContentCard({ item, onClick }) {
 
           {/* Bottom info */}
           <div className="absolute bottom-0 left-0 right-0 p-3">
-            <p className="text-white font-bold text-xs leading-tight line-clamp-1">{item.title}</p>
-            {item.subtitle && (
-              <p className="text-white/40 text-[10px] mt-0.5 truncate">{item.subtitle}</p>
-            )}
-            <div className="flex items-center gap-1.5 mt-1">
-              {hasVideo && <Youtube className="w-2.5 h-2.5 text-red-400/70" />}
-              {hasAudio && <Music2 className="w-2.5 h-2.5 text-emerald-400/70" />}
+            <div className="flex items-end justify-between gap-1">
+              <div className="flex-1 min-w-0">
+                <p className="text-white font-bold text-xs leading-tight line-clamp-1">{item.title}</p>
+                {item.subtitle && (
+                  <p className="text-white/40 text-[10px] mt-0.5 truncate">{item.subtitle}</p>
+                )}
+                <div className="flex items-center gap-1.5 mt-1">
+                  {hasVideo && <Youtube className="w-2.5 h-2.5 text-red-400/70" />}
+                  {hasAudio && <Music2 className="w-2.5 h-2.5 text-emerald-400/70" />}
+                </div>
+              </div>
+              {/* Credits button */}
+              <button
+                onClick={e => { e.stopPropagation(); setShowCredits(true); }}
+                className="flex-shrink-0 w-6 h-6 rounded-full bg-black/50 backdrop-blur-sm border border-white/15 flex items-center justify-center hover:bg-black/70 transition-colors"
+                title="Ver créditos"
+              >
+                <Info className="w-3 h-3 text-white/60" />
+              </button>
             </div>
           </div>
         </div>
+
+        {/* Credits panel — estilo Netflix */}
+        <AnimatePresence>
+          {showCredits && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[400] bg-black/85 backdrop-blur-xl flex items-center justify-center p-4"
+              onClick={() => setShowCredits(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.93, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.93, opacity: 0, y: 20 }}
+                transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="relative w-full max-w-lg rounded-2xl overflow-hidden"
+                style={{ background: "#141414" }}
+                onClick={e => e.stopPropagation()}
+              >
+                {/* Hero media — video loop o imagen */}
+                <div className="relative w-full" style={{ aspectRatio: "16/9" }}>
+                  {item.hero_media_type === "video" && item.hero_media_url ? (
+                    <video
+                      src={item.hero_media_url}
+                      className="w-full h-full object-cover"
+                      autoPlay muted loop playsInline
+                    />
+                  ) : item.image ? (
+                    <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#1a1a1c] to-[#080808] flex items-center justify-center">
+                      <Music2 className="w-12 h-12 text-white/10" />
+                    </div>
+                  )}
+                  {/* Gradient over hero */}
+                  <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 40%, #141414 100%)" }} />
+                  {/* Close */}
+                  <button
+                    onClick={() => setShowCredits(false)}
+                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 border border-white/10 flex items-center justify-center hover:bg-black/80 transition-colors"
+                  >
+                    <X className="w-4 h-4 text-white" />
+                  </button>
+                  {/* Title over hero */}
+                  <div className="absolute bottom-0 left-0 right-0 px-6 pb-4">
+                    <h2 className="text-xl font-black text-white leading-tight" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.02em" }}>
+                      {item.title}
+                    </h2>
+                    {item.subtitle && <p className="text-white/50 text-xs mt-0.5">{item.subtitle}</p>}
+                  </div>
+                </div>
+
+                {/* Info section */}
+                <div className="px-6 pt-2 pb-6">
+                  {/* Action buttons */}
+                  <div className="flex items-center gap-2 mb-5">
+                    {hasVideo && (
+                      <button
+                        onClick={e => { e.stopPropagation(); setShowCredits(false); setShowYTModal(true); }}
+                        className="flex items-center gap-2 px-5 py-2 bg-white text-black font-bold text-sm rounded-lg hover:bg-white/90 transition-colors"
+                      >
+                        <Play className="w-4 h-4" fill="black" />
+                        Reproducir
+                      </button>
+                    )}
+                    {hasAudio && (
+                      <button
+                        onClick={e => { e.stopPropagation(); toggleAudio(e); }}
+                        className="flex items-center gap-2 px-5 py-2 bg-white/15 text-white font-bold text-sm rounded-lg hover:bg-white/25 transition-colors border border-white/10"
+                      >
+                        {playing ? <Pause className="w-4 h-4" fill="white" /> : <Play className="w-4 h-4" fill="white" />}
+                        {playing ? "Pausar" : "Escuchar"}
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Credits grid */}
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                    {item.raw?.artist_id && (
+                      <div>
+                        <span className="text-white/35 text-xs">Artista: </span>
+                        <span className="text-white/70 text-xs">{item.subtitle || "—"}</span>
+                      </div>
+                    )}
+                    {item.raw?.row_category && (
+                      <div>
+                        <span className="text-white/35 text-xs">Categoría: </span>
+                        <span className="text-white/70 text-xs capitalize">{item.raw.row_category.replace("_", " ")}</span>
+                      </div>
+                    )}
+                    {item.youtube_url && (
+                      <div className="col-span-2">
+                        <span className="text-white/35 text-xs">YouTube: </span>
+                        <a
+                          href={item.youtube_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-white/70 text-xs hover:text-white transition-colors underline underline-offset-2"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          Ver en YouTube →
+                        </a>
+                      </div>
+                    )}
+                    {item.youtube_music_url && (
+                      <div className="col-span-2">
+                        <span className="text-white/35 text-xs">YouTube Music: </span>
+                        <a
+                          href={item.youtube_music_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-white/70 text-xs hover:text-white transition-colors underline underline-offset-2"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          Escuchar →
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
     </>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, Compass } from "lucide-react";
+import { Search, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -39,12 +39,11 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
         {/* Logo */}
         <div className="flex items-center gap-6">
           <Link to={createPageUrl("Landing")}>
-            <span
-              className="text-[#ff5833] font-black text-xl cursor-pointer"
-              style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.04em" }}
-            >
-              CABAÑA<sup className="text-white/40 text-[0.5rem] font-normal">®</sup>
-            </span>
+            <img
+              src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
+              alt="Cabaña Creative"
+              className="h-10 w-auto cursor-pointer opacity-90 hover:opacity-100 transition-opacity"
+            />
           </Link>
 
           {/* Nav links — hidden on mobile */}
@@ -79,14 +78,13 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
             </button>
           </Link>
 
-          {/* Avatar */}
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold cursor-pointer select-none"
-            style={{ background: "linear-gradient(135deg, #ff5833, #ff8c00)" }}
-            title={currentUser?.full_name || ""}
+          {/* Avatar — icono minimalista */}
+          <button
+            className="w-8 h-8 flex items-center justify-center text-white/50 hover:text-white transition-colors"
+            title={currentUser?.full_name || "Perfil"}
           >
-            {initials}
-          </div>
+            <User className="w-5 h-5" strokeWidth={1.5} />
+          </button>
         </div>
       </div>
     </nav>
