@@ -14,10 +14,9 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
   }, []);
 
   const navLinks = [
-    { label: "Inicio", key: "home" },
-    { label: "Artistas", key: "artists" },
+    { label: "Inicio", key: "inicio" },
+    { label: "Música", key: "musica" },
     { label: "Films", key: "films" },
-    { label: "Explorar", key: "explore" },
   ];
 
   const initials = currentUser?.full_name

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -26,8 +26,7 @@ export default function Explorar() {
   const [authChecked, setAuthChecked] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
-  const [activeTypeFilter, setActiveTypeFilter] = useState("all");
-  const [activeGenreFilter, setActiveGenreFilter] = useState("");
+  const [activeSection, setActiveSection] = useState("inicio"); // inicio | musica | films
   const [profileOpen, setProfileOpen] = useState(false);
   const isAdmin = currentUser?.role === "admin";
 
@@ -75,12 +74,6 @@ export default function Explorar() {
     queryFn: () => base44.entities.SectionAssignment.list("order"),
     enabled: !!currentUser,
   });
-
-  // All unique genres for filter bar — must be before any early return
-  const allGenres = useMemo(() =>
-    [...new Set(explorarItems.flatMap(i => i.genres || []))].sort(),
-    [explorarItems]
-  );
 
   if (!authChecked) return null;
 
@@ -142,15 +135,19 @@ export default function Explorar() {
     ? heroRawItems.map(mapItemToCard)
     : explorarItems.slice(0, 1).map(mapItemToCard);
 
-  // Content type labels
-  const TYPE_LABELS = { song: "Canción", album: "Álbum", ep: "EP", minifilm: "Mini Film", film: "Film", series: "Serie" };
+  // Tipos que se consideran "música" y "films/audiovisual"
+  const MUSIC_TYPES = ["song", "album", "ep"];
+  const FILM_TYPES = ["minifilm", "film", "series"];
 
-  // Filter function for items
+  const isMusicItem = (i) => !i.content_type || MUSIC_TYPES.includes(i.content_type);
+  const isFilmItem = (i) => FILM_TYPES.includes(i.content_type);
+
+  // Filter function for items according to active section
   const applyFilters = (items) => {
     return items.filter(i => {
-      const matchType = activeTypeFilter === "all" || i.content_type === activeTypeFilter;
-      const matchGenre = !activeGenreFilter || (i.genres || []).includes(activeGenreFilter);
-      return matchType && matchGenre;
+      if (activeSection === "musica") return isMusicItem(i);
+      if (activeSection === "films") return isFilmItem(i);
+      return true; // inicio: todo
     });
   };
 
@@ -175,8 +172,8 @@ export default function Explorar() {
     <div className="min-h-screen bg-[#080808] text-white overflow-x-hidden">
       <ExplorarNav
         currentUser={currentUser}
-        activeSection="home"
-        setActiveSection={() => {}}
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
         searchOpen={searchOpen}
         setSearchOpen={setSearchOpen}
         searchQuery={searchQuery}
@@ -274,54 +271,7 @@ export default function Explorar() {
       {/* Content rows */}
       <div className="relative z-10 -mt-16 pb-24">
 
-        {/* Filter bar */}
-        {explorarItems.length > 0 && (
-          <div className="px-4 sm:px-8 pt-6 pb-3 space-y-2">
-            {/* Type filters */}
-            <div className="flex gap-1.5 flex-wrap">
-              {["all", "song", "album", "ep", "minifilm", "film", "series"].map(t => (
-                <button
-                  key={t}
-                  onClick={() => setActiveTypeFilter(t)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
-                    activeTypeFilter === t
-                      ? "bg-white text-black border-white"
-                      : "bg-white/[0.04] text-white/40 border-white/[0.08] hover:border-white/20 hover:text-white/70"
-                  }`}
-                >
-                  {t === "all" ? "Todo" : TYPE_LABELS[t]}
-                </button>
-              ))}
-            </div>
 
-            {/* Genre filters */}
-            {allGenres.length > 0 && (
-              <div className="flex gap-1.5 flex-wrap">
-                {activeGenreFilter && (
-                  <button
-                    onClick={() => setActiveGenreFilter("")}
-                    className="px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border bg-white/10 text-white/60 border-white/20 hover:bg-white/5"
-                  >
-                    Limpiar género
-                  </button>
-                )}
-                {allGenres.map(g => (
-                  <button
-                    key={g}
-                    onClick={() => setActiveGenreFilter(activeGenreFilter === g ? "" : g)}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border ${
-                      activeGenreFilter === g
-                        ? "bg-white text-black border-white"
-                        : "bg-white/[0.03] text-white/35 border-white/[0.07] hover:border-white/15 hover:text-white/60"
-                    }`}
-                  >
-                    {g}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
 
         <div className="space-y-2">
         {explorarSections.length > 0 ? (
