@@ -103,6 +103,10 @@ export default function Explorar() {
       youtube_music_url: item.youtube_music_url,
       audio_file_url: item.audio_file_url,
       artist_id: item.artist_id,
+      hero_media_url: item.hero_media_url,
+      hero_media_type: item.hero_media_type,
+      hero_link: item.hero_link,
+      hero_link_label: item.hero_link_label,
       raw: item,
       type: "explorar",
     };
