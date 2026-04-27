@@ -327,27 +327,21 @@ function ContentCard({ item, onClick }) {
             )}
           </AnimatePresence>
 
-          {/* Bottom info */}
-          <div className="absolute bottom-0 left-0 right-0 p-3">
-            <div className="flex items-end justify-between gap-1">
-              <div className="flex-1 min-w-0">
-                <p className="text-white font-bold text-xs leading-tight line-clamp-1">{item.title}</p>
-                {item.subtitle && <p className="text-white/40 text-[10px] mt-0.5 truncate">{item.subtitle}</p>}
-                <div className="flex items-center gap-1.5 mt-1">
-                  {hasVideo && <Youtube className="w-2.5 h-2.5 text-red-400/70" />}
-                  {hasAudio && <Music2 className="w-2.5 h-2.5 text-emerald-400/70" />}
-                </div>
-              </div>
-              {/* Credits button — estilo Netflix chevron */}
-              <button
+          {/* Credits button — esquina inferior derecha, solo visible en hover */}
+          <AnimatePresence>
+            {hovered && (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 onClick={e => { e.stopPropagation(); setShowCredits(true); }}
-                className="flex-shrink-0 w-6 h-6 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-black/70 hover:border-white/40 transition-all"
+                className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-black/70 hover:border-white/40 transition-all"
                 title="Más información"
               >
                 <ChevronDown className="w-3.5 h-3.5 text-white/80" />
-              </button>
-            </div>
-          </div>
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
     </>
