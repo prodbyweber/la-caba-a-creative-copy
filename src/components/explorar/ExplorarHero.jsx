@@ -16,17 +16,17 @@ function HeroSlide({ item, artist, onExplore, active }) {
   const audioEnabled = isVideo && !!(item?.raw?.hero_audio_enabled ?? item?.hero_audio_enabled);
   const videoRef = useRef(null);
   const [videoReady, setVideoReady] = useState(false);
-  const [muted, setMuted] = useState(true); // always starts muted
+  const [muted, setMuted] = useState(!audioEnabled); // unmuted by default if audio is enabled
 
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
     if (active) {
+      vid.muted = audioEnabled ? false : true;
+      setMuted(!audioEnabled);
       vid.play().catch(() => {});
     } else {
       vid.pause();
-      // Reset to muted when slide becomes inactive
-      setMuted(true);
     }
   }, [active]);
 
@@ -84,7 +84,7 @@ function HeroSlide({ item, artist, onExplore, active }) {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5 }}
                 onClick={() => setMuted(m => !m)}
-                className="absolute bottom-4 right-4 z-20 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-black/70 hover:border-white/40 transition-all"
+                className="absolute bottom-12 right-4 z-20 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-black/70 hover:border-white/40 transition-all"
                 title={muted ? "Activar sonido" : "Silenciar"}
               >
                 {muted
