@@ -5,8 +5,9 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, Trash2, Edit, GripVertical, Eye, EyeOff,
-  Star, Youtube, Music2, Image as ImageIcon, X, Save, Film, Upload, ChevronDown, ChevronUp
+  Star, Youtube, Music2, Image as ImageIcon, X, Save, Film, Upload, ChevronDown, ChevronUp, ExternalLink
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import HeroSlideModal from "@/components/explorar/HeroSlideModal";
 
@@ -326,13 +327,22 @@ export default function ExplorarAdmin() {
             <h1 className="text-2xl font-bold text-white">Editor Explorar</h1>
             <p className="text-sm text-white/30 mt-0.5">Gestiona hero y contenido de la plataforma</p>
           </div>
-          <button
-            onClick={() => { setEditingItem(null); setShowItemModal(true); }}
-            className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Nuevo item
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/Explorar"
+              className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white font-medium rounded-xl text-sm transition-colors"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Ver Explorar
+            </Link>
+            <button
+              onClick={() => { setEditingItem(null); setShowItemModal(true); }}
+              className="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Nuevo item
+            </button>
+          </div>
         </div>
 
         {/* ═══════════════════════════════════════════
