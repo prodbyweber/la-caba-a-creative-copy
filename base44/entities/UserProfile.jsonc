@@ -26,6 +26,10 @@
       "type": "string",
       "description": "Nombre art\u00edstico"
     },
+    "display_name": {
+      "type": "string",
+      "description": "Nombre mostrado en el perfil p\u00fablico"
+    },
     "gender": {
       "type": "string",
       "enum": [
@@ -59,9 +63,17 @@
       "type": "string",
       "description": "URL de la foto de perfil"
     },
+    "avatar_url": {
+      "type": "string",
+      "description": "URL del avatar del cat\u00e1logo (puede ser diferente al de onboarding)"
+    },
+    "bio": {
+      "type": "string",
+      "description": "Bio p\u00fablica del creador"
+    },
     "photo_position": {
       "type": "string",
-      "description": "Posici\u00f3n del recorte circular (CSS object-position, ej: 'center top')",
+      "description": "Posici\u00f3n del recorte circular (CSS object-position)",
       "default": "center center"
     },
     "account_type": {
@@ -76,11 +88,41 @@
       "type": "boolean",
       "default": false,
       "description": "Si complet\u00f3 el onboarding"
+    },
+    "media_items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "description": "youtube | image | video"
+          },
+          "url": {
+            "type": "string"
+          },
+          "thumbnail": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Material personal del creador (YouTube, im\u00e1genes, video loops)"
+    },
+    "role_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags de rol: artista, modelo, director, etc."
     }
   },
   "required": [
-    "user_id",
-    "full_name",
-    "account_type"
+    "user_id"
   ]
 }

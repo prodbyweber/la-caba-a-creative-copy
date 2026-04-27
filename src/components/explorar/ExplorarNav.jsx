@@ -4,7 +4,7 @@ import { Search, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
-export default function ExplorarNav({ currentUser, activeSection, setActiveSection, searchOpen, setSearchOpen, searchQuery, setSearchQuery }) {
+export default function ExplorarNav({ currentUser, activeSection, setActiveSection, searchOpen, setSearchOpen, searchQuery, setSearchQuery, onProfileOpen }) {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -78,12 +78,17 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
             </button>
           </Link>
 
-          {/* Avatar — icono minimalista */}
+          {/* Avatar — abre panel de perfil */}
           <button
-            className="w-8 h-8 flex items-center justify-center text-white/50 hover:text-white transition-colors"
+            onClick={onProfileOpen}
+            className="w-8 h-8 rounded-full overflow-hidden border border-white/10 hover:border-white/30 transition-all flex items-center justify-center bg-white/5 hover:bg-white/10 flex-shrink-0"
             title={currentUser?.full_name || "Perfil"}
           >
-            <User className="w-5 h-5" strokeWidth={1.5} />
+            {currentUser?.avatar_url ? (
+              <img src={currentUser.avatar_url} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <User className="w-4 h-4 text-white/50" strokeWidth={1.5} />
+            )}
           </button>
         </div>
       </div>

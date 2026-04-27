@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import ExplorarHero from "@/components/explorar/ExplorarHero";
 import ContentRow from "@/components/explorar/ContentRow";
 import ArtistProfileModal from "@/components/explorar/ArtistProfileModal";
+import UserProfilePanel from "@/components/explorar/UserProfilePanel";
 
 // Legacy fallback labels (for items with row_category but no ExplorarSection yet)
 const LEGACY_ROW_LABELS = {
@@ -27,6 +28,7 @@ export default function Explorar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeTypeFilter, setActiveTypeFilter] = useState("all");
   const [activeGenreFilter, setActiveGenreFilter] = useState("");
+  const [profileOpen, setProfileOpen] = useState(false);
   const isAdmin = currentUser?.role === "admin";
 
   useEffect(() => {
@@ -73,6 +75,12 @@ export default function Explorar() {
     queryFn: () => base44.entities.SectionAssignment.list("order"),
     enabled: !!currentUser,
   });
+
+  // All unique genres for filter bar — must be before any early return
+  const allGenres = useMemo(() =>
+    [...new Set(explorarItems.flatMap(i => i.genres || []))].sort(),
+    [explorarItems]
+  );
 
   if (!authChecked) return null;
 
@@ -134,12 +142,6 @@ export default function Explorar() {
     ? heroRawItems.map(mapItemToCard)
     : explorarItems.slice(0, 1).map(mapItemToCard);
 
-  // All unique genres for filter bar
-  const allGenres = useMemo(() =>
-    [...new Set(explorarItems.flatMap(i => i.genres || []))].sort(),
-    [explorarItems]
-  );
-
   // Content type labels
   const TYPE_LABELS = { song: "Canción", album: "Álbum", ep: "EP", minifilm: "Mini Film", film: "Film", series: "Serie" };
 
@@ -179,6 +181,7 @@ export default function Explorar() {
         setSearchOpen={setSearchOpen}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        onProfileOpen={() => setProfileOpen(true)}
       />
 
       {/* Admin shortcut */}
@@ -382,6 +385,18 @@ export default function Explorar() {
             projects={projects.filter(p => p.artist_id === selectedArtist.id)}
             tracks={tracks.filter(t => projects.some(p => p.artist_id === selectedArtist.id && p.id === t.project_id))}
             onClose={() => setSelectedArtist(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* User profile panel */}
+      <AnimatePresence>
+        {profileOpen && (
+          <UserProfilePanel
+            currentUser={currentUser}
+            explorarItems={explorarItems}
+            artists={artists}
+            onClose={() => setProfileOpen(false)}
           />
         )}
       </AnimatePresence>
