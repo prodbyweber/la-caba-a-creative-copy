@@ -295,6 +295,7 @@ function ContentCard({ item, onClick }) {
                       src={item.raw.preview_media_url}
                       className="w-full h-full object-cover"
                       autoPlay muted loop playsInline
+                      preload="none"
                       style={{ pointerEvents: "none" }}
                     />
                   ) : (

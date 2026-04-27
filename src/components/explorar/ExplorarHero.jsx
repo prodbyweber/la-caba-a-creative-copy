@@ -14,14 +14,16 @@ function HeroSlide({ item, artist, onExplore, active }) {
   const bg = item?.image || artist?.avatar_url || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80";
   const isVideo = item?.hero_media_type === "video" && item?.hero_media_url;
   const videoRef = useRef(null);
+  const [videoReady, setVideoReady] = useState(false);
 
   useEffect(() => {
-    if (!videoRef.current) return;
+    const vid = videoRef.current;
+    if (!vid) return;
     if (active) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play().catch(() => {});
+      // Don't reset currentTime — let it continue from where it is for seamless loop
+      vid.play().catch(() => {});
     } else {
-      videoRef.current.pause();
+      vid.pause();
     }
   }, [active]);
 
@@ -44,23 +46,34 @@ function HeroSlide({ item, artist, onExplore, active }) {
       {/* Background media */}
       <div className="absolute inset-0 overflow-hidden">
         {isVideo ? (
-          <video
-            ref={videoRef}
-            src={item.hero_media_url}
-            className="w-full h-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-          />
+          <>
+            {/* Thumbnail placeholder shown until video is ready */}
+            {item.thumbnail_url && !videoReady && (
+              <img
+                src={item.thumbnail_url}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+            <video
+              ref={videoRef}
+              src={item.hero_media_url}
+              className="w-full h-full object-cover"
+              style={{ opacity: videoReady ? 1 : 0, transition: "opacity 0.6s ease" }}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              onCanPlay={() => setVideoReady(true)}
+            />
+          </>
         ) : (
-          <motion.img
+          <img
             src={item?.hero_media_url || bg}
             alt={item?.title}
             className="w-full h-full object-cover"
-            initial={{ scale: 1.06 }}
-            animate={active ? { scale: 1 } : { scale: 1.06 }}
-            transition={{ duration: 7, ease: "easeOut" }}
+            style={{ transform: "scale(1)" }}
           />
         )}
         <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(8,8,8,0.82) 30%, rgba(8,8,8,0.10) 100%)" }} />
