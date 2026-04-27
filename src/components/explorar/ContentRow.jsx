@@ -99,8 +99,9 @@ function AudioWave() {
   );
 }
 
-function ContentCard({ item, onClick, isFirst }) {
+function ContentCard({ item, onClick, isFirst, isLast }) {
   const [hovered, setHovered] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [showPreviewAnim, setShowPreviewAnim] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -114,6 +115,13 @@ function ContentCard({ item, onClick, isFirst }) {
   const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
   const hasAudio = !!item.audio_file_url;
   const hasVideo = !!ytId;
+
+  // Créditos / metadata de la tarjeta
+  const artist = item.raw?.artist_id ? null : null; // viene de item.subtitle si hay artista
+  const metaLines = [
+    item.subtitle,
+    hasVideo && hasAudio ? "Video · Audio" : hasVideo ? "Video" : hasAudio ? "Audio" : null,
+  ].filter(Boolean);
 
   const stopPreview = () => {
     if (previewRef.current) {
@@ -145,20 +153,22 @@ function ContentCard({ item, onClick, isFirst }) {
 
   const handleMouseLeave = () => {
     setHovered(false);
+    // No cerrar expanded al salir — se cierra sólo al volver a hacer click
     stopPreview();
   };
 
   const togglePlay = (e) => {
     e.stopPropagation();
-    if (!playbackRef.current) return;
+    const ref = hasAudio ? playbackRef.current : null;
+    if (!ref) { if (hasVideo) { setShowYTModal(true); } return; }
     stopPreview();
     if (playing) {
-      playbackRef.current.pause();
+      ref.pause();
       setPlaying(false);
     } else {
-      playbackRef.current.currentTime = 0;
-      playbackRef.current.volume = 1;
-      playbackRef.current.play().then(() => setPlaying(true)).catch(() => {});
+      ref.currentTime = 0;
+      ref.volume = 1;
+      ref.play().then(() => setPlaying(true)).catch(() => {});
     }
   };
 
@@ -167,9 +177,17 @@ function ContentCard({ item, onClick, isFirst }) {
     setShowYTModal(true);
   };
 
+  const toggleExpanded = (e) => {
+    e.stopPropagation();
+    setExpanded(v => !v);
+  };
+
   const handleCardClick = () => {
     if (item.artist_id) onClick(item);
   };
+
+  // Determinar el origen del transform para que no se corte
+  const originX = isFirst ? "left" : isLast ? "right" : "center";
 
   return (
     <>
@@ -182,20 +200,34 @@ function ContentCard({ item, onClick, isFirst }) {
         />
       )}
 
+      {/* Contenedor con padding lateral para que la escala no se corte */}
       <div
-        className="relative flex-shrink-0"
-        style={{ width: 220, zIndex: hovered ? 50 : 1 }}
+        className="relative flex-shrink-0 py-6"
+        style={{ width: 220, zIndex: hovered || expanded ? 50 : 1 }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <motion.div
-          animate={{ scale: hovered ? 1.18 : 1 }}
+          animate={{ scale: hovered || expanded ? 1.15 : 1 }}
           transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="rounded-xl cursor-pointer shadow-2xl"
-          style={{ width: 220, transformOrigin: isFirst ? "left center" : "center center", overflow: "visible" }}
+          className="cursor-pointer shadow-2xl"
+          style={{
+            transformOrigin: `${originX} center`,
+            borderRadius: 12,
+            overflow: "visible",
+          }}
           onClick={handleCardClick}
         >
-          <div className="rounded-xl overflow-hidden" style={{ background: "#1a1a1c" }}>
+          {/* Card shell con bordes siempre visibles */}
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{
+              background: "#1a1a1c",
+              border: "1px solid rgba(255,255,255,0.08)",
+              boxShadow: hovered || expanded ? "0 20px 60px rgba(0,0,0,0.7)" : "0 4px 16px rgba(0,0,0,0.4)",
+              transition: "box-shadow 0.3s ease",
+            }}
+          >
             {/* Audio elements */}
             {hasAudio && (
               <>
@@ -214,7 +246,7 @@ function ContentCard({ item, onClick, isFirst }) {
                     : showPreviewAnim
                     ? { scale: 1.1, x: 2 }
                     : hovered
-                    ? { scale: 1.08 }
+                    ? { scale: 1.05 }
                     : { scale: 1, x: 0 }
                 }
                 transition={
@@ -234,9 +266,9 @@ function ContentCard({ item, onClick, isFirst }) {
                 )}
               </motion.div>
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
 
-              {/* Info chevron on hover */}
+              {/* Expand chevron — abre panel de info */}
               <AnimatePresence>
                 {hovered && (
                   <motion.button
@@ -244,20 +276,22 @@ function ContentCard({ item, onClick, isFirst }) {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.15 }}
-                    onClick={(e) => { e.stopPropagation(); handleCardClick(); }}
+                    onClick={toggleExpanded}
                     className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
                     style={{
-                      background: "rgba(20,20,20,0.80)",
+                      background: "rgba(20,20,20,0.85)",
                       border: "1px solid rgba(255,255,255,0.18)",
                       backdropFilter: "blur(6px)",
                     }}
                   >
-                    <ChevronDown className="w-2.5 h-2.5 text-white/70" />
+                    <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                      <ChevronDown className="w-2.5 h-2.5 text-white/70" />
+                    </motion.div>
                   </motion.button>
                 )}
               </AnimatePresence>
 
-              {/* Bottom: title + play/yt btn */}
+              {/* Bottom: título + play */}
               <div className="absolute bottom-0 left-0 right-0 px-2.5 pb-2 flex items-end justify-between">
                 <div className="flex-1 min-w-0 pr-2">
                   <p className="text-white font-bold text-[11px] leading-tight line-clamp-1">{item.title}</p>
@@ -265,78 +299,87 @@ function ContentCard({ item, onClick, isFirst }) {
                     <p className="text-white/30 text-[9px] truncate mt-0.5">{item.subtitle}</p>
                   )}
                 </div>
-                {/* Play button — audio primero, si no video */}
-                {hasAudio && (
-                  <button
-                    onClick={togglePlay}
-                    className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center"
-                    style={{
-                      background: "rgba(255,255,255,0.12)",
-                      border: "1px solid rgba(255,255,255,0.18)",
-                      backdropFilter: "blur(4px)",
-                    }}
-                  >
-                    {playing ? (
-                      <Pause className="w-2.5 h-2.5 text-white" fill="white" />
-                    ) : (
-                      <Play className="w-2.5 h-2.5 text-white ml-0.5" fill="white" />
-                    )}
-                  </button>
-                )}
-                {!hasAudio && hasVideo && (
-                  <button
-                    onClick={openYTModal}
-                    className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center"
-                    style={{
-                      background: "rgba(255,255,255,0.12)",
-                      border: "1px solid rgba(255,255,255,0.18)",
-                      backdropFilter: "blur(4px)",
-                    }}
-                  >
+                {/* Botón play único — audio si hay, si no abre YT */}
+                <button
+                  onClick={togglePlay}
+                  className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all"
+                  style={{
+                    background: "rgba(255,255,255,0.12)",
+                    border: "1px solid rgba(255,255,255,0.20)",
+                    backdropFilter: "blur(4px)",
+                  }}
+                >
+                  {playing ? (
+                    <Pause className="w-2.5 h-2.5 text-white" fill="white" />
+                  ) : (
                     <Play className="w-2.5 h-2.5 text-white ml-0.5" fill="white" />
-                  </button>
-                )}
+                  )}
+                </button>
               </div>
             </div>
 
-            {/* Metadata panel — desliza hacia abajo en hover */}
+            {/* Panel de metadata — siempre visible al hover, expandido al click en chevron */}
             <AnimatePresence>
-              {hovered && (
+              {(hovered || expanded) && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.22, ease: "easeOut" }}
                   className="overflow-hidden"
-                  style={{ background: "#1a1a1c" }}
+                  style={{ background: "#1a1a1c", borderTop: "1px solid rgba(255,255,255,0.05)" }}
                 >
-                  <div className="px-2.5 pt-2 pb-3 space-y-1.5">
+                  <div className="px-2.5 pt-2 pb-3 space-y-2">
+                    {/* Fila superior: waveform + tipo de media */}
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {hasVideo && (
-                          <button
-                            onClick={openYTModal}
-                            className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-white/8 text-white/50 hover:text-white transition-colors border border-white/10"
-                          >
-                            <Play className="w-2 h-2" fill="currentColor" /> Ver video
-                          </button>
-                        )}
-                        {hasAudio && (
-                          <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-500/15 text-emerald-400">
-                            Audio
-                          </span>
-                        )}
+                      <div className="flex items-center gap-1">
+                        {hasVideo && <Youtube className="w-2.5 h-2.5 text-red-400/60" />}
+                        {hasAudio && <Music2 className="w-2.5 h-2.5 text-emerald-400/60" />}
                       </div>
                       {(playing || previewing) && <AudioWave />}
                     </div>
-                    {item.subtitle && (
-                      <p className="text-[9px] text-white/35 truncate">{item.subtitle}</p>
+
+                    {/* Créditos / metadata estilo película */}
+                    {expanded && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.18 }}
+                        className="space-y-1.5"
+                      >
+                        {item.subtitle && (
+                          <div>
+                            <span className="text-[8px] font-semibold text-white/25 uppercase tracking-widest block">Género</span>
+                            <span className="text-[9px] text-white/55">{item.subtitle}</span>
+                          </div>
+                        )}
+                        {item.raw?.artist_id && (
+                          <div>
+                            <span className="text-[8px] font-semibold text-white/25 uppercase tracking-widest block">Artista</span>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleCardClick(); }}
+                              className="text-[9px] text-white/55 hover:text-white transition-colors"
+                            >
+                              Ver perfil →
+                            </button>
+                          </div>
+                        )}
+                        {hasVideo && (
+                          <button
+                            onClick={openYTModal}
+                            className="w-full mt-1 py-1 rounded-lg text-[8px] font-bold text-white/50 hover:text-white transition-colors flex items-center justify-center gap-1"
+                            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
+                          >
+                            <Play className="w-2 h-2" fill="currentColor" /> Ver en pantalla completa
+                          </button>
+                        )}
+                      </motion.div>
                     )}
-                    {/* Iconos de tipo de media disponible */}
-                    <div className="flex items-center gap-1.5">
-                      {hasVideo && <Youtube className="w-2.5 h-2.5 text-red-400/50" />}
-                      {hasAudio && <Music2 className="w-2.5 h-2.5 text-emerald-400/50" />}
-                    </div>
+
+                    {/* Hint si no está expandido */}
+                    {!expanded && (
+                      <p className="text-[8px] text-white/20">↑ Ver créditos</p>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -395,8 +438,8 @@ export default function ContentRow({ title, items, onItemClick }) {
 
       <div
         ref={rowRef}
-        className="flex gap-3 overflow-x-auto pb-2"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        className="flex gap-3 overflow-x-auto"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none", paddingLeft: 4, paddingRight: 4 }}
         onScroll={(e) => {
           const el = e.currentTarget;
           setCanScrollLeft(el.scrollLeft > 0);
@@ -404,7 +447,7 @@ export default function ContentRow({ title, items, onItemClick }) {
         }}
       >
         {items.map((item, i) => (
-          <ContentCard key={`${item.id}-${i}`} item={item} onClick={onItemClick} isFirst={i === 0} />
+          <ContentCard key={`${item.id}-${i}`} item={item} onClick={onItemClick} isFirst={i === 0} isLast={i === items.length - 1} />
         ))}
       </div>
     </div>
