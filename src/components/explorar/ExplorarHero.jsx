@@ -90,7 +90,7 @@ function HeroSlide({ item, artist, onExplore, active }) {
             className="text-5xl sm:text-7xl font-black text-white mb-4 leading-none"
             style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.03em" }}
           >
-            {item?.title || "Cabaña Creative"}
+            {item?.title}
           </h1>
 
           {artist && (
