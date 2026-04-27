@@ -274,7 +274,14 @@ function ContentCard({ item, onClick }) {
         <div className="relative rounded-xl overflow-hidden bg-[#1a1a1c]" style={{ aspectRatio: "16/9" }}>
           {/* Cover image */}
           {item.image ? (
-            <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-full h-full object-cover transition-all duration-500"
+              style={{
+                filter: hovered ? "brightness(1.15) saturate(1.3) contrast(1.05)" : "brightness(1.05) saturate(1.15)",
+              }}
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Music2 className="w-8 h-8 text-white/10" />
@@ -313,12 +320,12 @@ function ContentCard({ item, onClick }) {
             )}
           </AnimatePresence>
 
-          {/* Gradient */}
+          {/* Hover overlay — muy sutil, solo para legibilidad de controles */}
           <div
             className="absolute inset-0 transition-opacity duration-300 pointer-events-none"
             style={{
-              background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)",
-              opacity: hovered ? 1 : 0.5,
+              background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%)",
+              opacity: hovered ? 1 : 0,
             }}
           />
 
