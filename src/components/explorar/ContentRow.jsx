@@ -75,14 +75,11 @@ function YoutubeModal({ ytId, title, originalUrl, onClose }) {
 
 function ContentCard({ item, onClick }) {
   const [hovered, setHovered] = useState(false);
-  const [expanded, setExpanded] = useState(false);
   const [previewActive, setPreviewActive] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [showYTModal, setShowYTModal] = useState(false);
   const audioRef = useRef(null);
   const hoverTimer = useRef(null);
-  const previewTimer = useRef(null);
-  const cardRef = useRef(null);
 
   const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
   const hasAudio = !!item.audio_file_url;
@@ -90,13 +87,9 @@ function ContentCard({ item, onClick }) {
 
   const handleMouseEnter = () => {
     setHovered(true);
-    // Expand immediately on hover
     hoverTimer.current = setTimeout(() => {
-      setExpanded(true);
-    }, 200);
-    // Start preview after 1.5s
-    previewTimer.current = setTimeout(() => {
       setPreviewActive(true);
+      // Auto-play audio preview if available
       if (audioRef.current && !playing) {
         audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
       }
@@ -105,10 +98,9 @@ function ContentCard({ item, onClick }) {
 
   const handleMouseLeave = () => {
     setHovered(false);
-    setExpanded(false);
     setPreviewActive(false);
     clearTimeout(hoverTimer.current);
-    clearTimeout(previewTimer.current);
+    // Stop audio preview on leave
     if (audioRef.current && playing) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -147,141 +139,30 @@ function ContentCard({ item, onClick }) {
         />
       )}
 
-      {/* Wrapper that reserves space so the row doesn't shift */}
-      <div
-        ref={cardRef}
-        className="relative flex-shrink-0"
-        style={{ width: 220, height: 124 }}
+      <motion.div
+        className="relative flex-shrink-0 cursor-pointer group"
+        style={{ width: 220 }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onClick={handleCardClick}
+        animate={previewActive ? { scale: 1.1, zIndex: 10 } : { scale: 1, zIndex: 1 }}
+        transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
-        {/* Expanded Netflix card — absolutely positioned above */}
-        <AnimatePresence>
-          {expanded && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.88, y: 0 }}
-              animate={{ opacity: 1, scale: 1, y: -20 }}
-              exit={{ opacity: 0, scale: 0.88, y: 0 }}
-              transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="absolute left-1/2 -translate-x-1/2 z-50 rounded-xl overflow-hidden shadow-2xl"
-              style={{ width: 300, background: "#181818", top: 0 }}
-              onClick={e => e.stopPropagation()}
-            >
-              {/* Video/Image section */}
-              <div className="relative w-full" style={{ aspectRatio: "16/9" }}>
-                {/* Audio element */}
-                {hasAudio && (
-                  <audio ref={audioRef} src={item.audio_file_url} preload="metadata" onEnded={() => setPlaying(false)} />
-                )}
-
-                {/* Cover */}
-                {item.image ? (
-                  <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-[#111] flex items-center justify-center">
-                    <Music2 className="w-10 h-10 text-white/10" />
-                  </div>
-                )}
-
-                {/* YouTube preview iframe */}
-                <AnimatePresence>
-                  {previewActive && hasVideo && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.5 }}
-                      className="absolute inset-0"
-                    >
-                      <iframe
-                        src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${ytId}`}
-                        className="w-full h-full"
-                        allow="autoplay"
-                        style={{ pointerEvents: "none" }}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* Bottom gradient */}
-                <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to top, #181818 0%, transparent 50%)" }} />
-              </div>
-
-              {/* Info panel */}
-              <div className="px-4 pb-4 pt-2">
-                {/* Title */}
-                <p className="text-white font-bold text-sm leading-tight mb-2.5">{item.title}</p>
-
-                {/* Action buttons */}
-                <div className="flex items-center gap-2 mb-3">
-                  {/* Play button */}
-                  {(hasVideo || hasAudio) && (
-                    <button
-                      onClick={hasVideo ? openYTModal : toggleAudio}
-                      className="w-9 h-9 rounded-full bg-white flex items-center justify-center hover:bg-white/90 transition-colors flex-shrink-0"
-                      title="Reproducir"
-                    >
-                      {playing && !hasVideo ? (
-                        <Pause className="w-4 h-4 text-black" fill="black" />
-                      ) : (
-                        <Play className="w-4 h-4 text-black ml-0.5" fill="black" />
-                      )}
-                    </button>
-                  )}
-
-                  {/* Expand/detail button */}
-                  {item.artist_id && (
-                    <button
-                      onClick={handleCardClick}
-                      className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors flex-shrink-0"
-                      title="Ver artista"
-                    >
-                      <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                  )}
-
-                  {/* Open YT link */}
-                  {hasVideo && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); window.open(item.youtube_url || item.youtube_music_url, "_blank"); }}
-                      className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors flex-shrink-0 ml-auto"
-                      title="Ver en YouTube"
-                    >
-                      <Youtube className="w-3.5 h-3.5 text-white/70" />
-                    </button>
-                  )}
-                </div>
-
-                {/* Metadata tags */}
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                  {item.subtitle && (
-                    <span className="text-[11px] text-white/50 font-medium">{item.subtitle}</span>
-                  )}
-                  {item.subtitle && (hasVideo || hasAudio) && (
-                    <span className="text-white/20 text-[10px]">·</span>
-                  )}
-                  {hasVideo && (
-                    <span className="text-[11px] text-white/50">Video</span>
-                  )}
-                  {hasVideo && hasAudio && (
-                    <span className="text-white/20 text-[10px]">·</span>
-                  )}
-                  {hasAudio && (
-                    <span className="text-[11px] text-white/50">Audio</span>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Base card — always visible */}
         <div
-          className="w-full h-full rounded-xl overflow-hidden bg-[#1a1a1c] cursor-pointer"
-          onClick={handleCardClick}
+          className="relative rounded-xl overflow-hidden bg-[#1a1a1c]"
+          style={{ aspectRatio: "16/9" }}
         >
+          {/* Audio element */}
+          {hasAudio && (
+            <audio
+              ref={audioRef}
+              src={item.audio_file_url}
+              preload="metadata"
+              onEnded={() => setPlaying(false)}
+            />
+          )}
+
+          {/* Cover image */}
           {item.image ? (
             <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
           ) : (
@@ -289,13 +170,110 @@ function ContentCard({ item, onClick }) {
               <Music2 className="w-8 h-8 text-white/10" />
             </div>
           )}
-          <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)" }} />
-          <div className="absolute bottom-0 left-0 right-0 p-2.5 pointer-events-none">
-            <p className="text-white font-bold text-[11px] leading-tight line-clamp-1">{item.title}</p>
-            {item.subtitle && <p className="text-white/40 text-[9px] mt-0.5 truncate">{item.subtitle}</p>}
+
+          {/* YouTube preview iframe — aparece tras 1.5s hover */}
+          <AnimatePresence>
+            {previewActive && hasVideo && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+                className="absolute inset-0"
+              >
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${ytId}`}
+                  className="w-full h-full"
+                  allow="autoplay"
+                  style={{ pointerEvents: "none" }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Gradient */}
+          <div
+            className="absolute inset-0 transition-opacity duration-300 pointer-events-none"
+            style={{
+              background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)",
+              opacity: hovered ? 1 : 0.5,
+            }}
+          />
+
+          {/* Playing bar animation */}
+          {playing && !previewActive && (
+            <div className="absolute top-2 left-2 flex items-end gap-[2px] h-4">
+              {[3, 6, 9, 5, 8, 4, 7].map((h, i) => (
+                <div
+                  key={i}
+                  className="w-[2px] rounded-full bg-white/60"
+                  style={{
+                    height: `${h}px`,
+                    animation: `waveBar 0.${6 + (i % 5)}s ease-in-out infinite alternate`,
+                    animationDelay: `${i * 0.07}s`,
+                  }}
+                />
+              ))}
+              <style>{`
+                @keyframes waveBar {
+                  from { transform: scaleY(0.3); opacity: 0.3; }
+                  to   { transform: scaleY(1); opacity: 0.8; }
+                }
+              `}</style>
+            </div>
+          )}
+
+          {/* Hover controls */}
+          <AnimatePresence>
+            {hovered && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 flex items-center justify-center gap-2.5"
+              >
+                {/* Audio play */}
+                {hasAudio && (
+                  <button
+                    onClick={toggleAudio}
+                    className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-black/60 transition-colors"
+                    title={playing ? "Pausar" : "Reproducir audio"}
+                  >
+                    {playing ? (
+                      <Pause className="w-3.5 h-3.5 text-white" fill="white" />
+                    ) : (
+                      <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" />
+                    )}
+                  </button>
+                )}
+
+                {/* YouTube modal button — minimalista */}
+                {hasVideo && (
+                  <button
+                    onClick={openYTModal}
+                    className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-black/60 transition-colors"
+                    title="Reproducir video"
+                  >
+                    <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" />
+                  </button>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Bottom info */}
+          <div className="absolute bottom-0 left-0 right-0 p-3">
+            <p className="text-white font-bold text-xs leading-tight line-clamp-1">{item.title}</p>
+            {item.subtitle && (
+              <p className="text-white/40 text-[10px] mt-0.5 truncate">{item.subtitle}</p>
+            )}
+            <div className="flex items-center gap-1.5 mt-1">
+              {hasVideo && <Youtube className="w-2.5 h-2.5 text-red-400/70" />}
+              {hasAudio && <Music2 className="w-2.5 h-2.5 text-emerald-400/70" />}
+            </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     </>
   );
 }
