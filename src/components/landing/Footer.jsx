@@ -40,87 +40,122 @@ export default function Footer() {
     <footer className="border-t border-white/5 bg-[#0a0a0b]">
       <div className="max-w-7xl mx-auto px-6 py-16">
         
-        {/* Contact Section */}
+        {/* Contact Section — Premium */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-16 bg-gradient-to-br from-zinc-900/50 to-zinc-950/50 border border-white/5 rounded-2xl p-8 lg:p-12"
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-16 relative overflow-hidden rounded-3xl"
+          style={{ background: "linear-gradient(135deg, #0e0e0f 0%, #141416 60%, #0a0a0b 100%)", border: "1px solid rgba(255,255,255,0.06)" }}
         >
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Contact Info */}
-            <div>
-              <h3 className="text-3xl font-bold text-white mb-6">Ponte en contacto</h3>
-              <p className="text-gray-400 mb-8">Cuéntanos sobre tu proyecto y encontraremos la mejor forma de ayudarte.</p>
-              
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 flex-shrink-0" style={{ color: '#ff5833' }} />
-                  <a href="mailto:hola@cabanacreative.es" className="text-gray-300 hover:text-white transition-colors">
-                    hola@cabanacreative.es
-                  </a>
+          {/* Ambient glow */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-[#ff5833]/[0.04] rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-60 h-60 bg-white/[0.015] rounded-full blur-[80px] pointer-events-none" />
+
+          <div className="relative z-10 grid lg:grid-cols-2 gap-0">
+            {/* Left — Contact Info */}
+            <div className="p-10 lg:p-14 lg:border-r border-white/[0.05] flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-3 mb-8">
+                  <span className="text-[10px] font-bold text-[#ff5833] uppercase tracking-[0.35em]">Contacto</span>
+                  <div className="h-px bg-[#ff5833]/20 w-8" />
                 </div>
+                <h3
+                  className="text-4xl sm:text-5xl font-black text-white leading-[0.92] tracking-tight mb-5"
+                  style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+                >
+                  Hablemos.
+                </h3>
+                <p className="text-white/35 text-sm leading-relaxed max-w-xs">
+                  Cuéntanos sobre tu proyecto. Encontraremos la mejor forma de trabajar juntos.
+                </p>
+              </div>
+
+              <div className="mt-10 space-y-3">
+                <a
+                  href="mailto:hola@cabanacreative.es"
+                  className="flex items-center gap-3 group"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.07] flex items-center justify-center group-hover:border-[#ff5833]/30 transition-colors">
+                    <Mail className="w-3.5 h-3.5 text-white/30 group-hover:text-[#ff5833]/70 transition-colors" />
+                  </div>
+                  <span className="text-sm text-white/40 group-hover:text-white/70 transition-colors">hola@cabanacreative.es</span>
+                </a>
                 <div className="flex items-center gap-3">
-                  <MapPin className="w-5 h-5 flex-shrink-0" style={{ color: '#ff5833' }} />
-                  <p className="text-gray-300">Madrid, España</p>
+                  <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.07] flex items-center justify-center">
+                    <MapPin className="w-3.5 h-3.5 text-white/30" />
+                  </div>
+                  <span className="text-sm text-white/40">Madrid, España</span>
                 </div>
               </div>
             </div>
 
-            {/* Contact Form */}
-            <form onSubmit={handleContactSubmit} className="space-y-4 min-w-0 w-full overflow-hidden">
-              <div>
+            {/* Right — Form */}
+            <form onSubmit={handleContactSubmit} className="p-10 lg:p-14 space-y-4">
+              <div className="grid grid-cols-2 gap-3">
                 <input
                   type="text"
-                  placeholder="Tu nombre"
+                  placeholder="Nombre"
                   value={contactForm.name}
                   onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none transition-colors"
+                  className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/20 focus:outline-none transition-all"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+                  onFocus={e => e.target.style.borderColor = "rgba(255,88,51,0.35)"}
+                  onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.07)"}
                   required
                 />
-              </div>
-              <div>
                 <input
                   type="email"
-                  placeholder="Tu email"
+                  placeholder="Email"
                   value={contactForm.email}
                   onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none transition-colors"
+                  className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/20 focus:outline-none transition-all"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+                  onFocus={e => e.target.style.borderColor = "rgba(255,88,51,0.35)"}
+                  onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.07)"}
                   required
                 />
               </div>
               <div>
-                <PhoneInput
-                  value={phoneValue}
-                  onChange={setPhoneValue}
-                />
+                <PhoneInput value={phoneValue} onChange={setPhoneValue} />
               </div>
-              <div>
-                <textarea
-                  placeholder="Cuéntanos sobre tu proyecto"
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                  className="w-full px-4 py-3 bg-zinc-900 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none transition-colors h-24 resize-none"
-                  required
-                />
-              </div>
-              
+              <textarea
+                placeholder="Cuéntanos sobre tu proyecto..."
+                value={contactForm.message}
+                onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/20 focus:outline-none transition-all resize-none h-28"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+                onFocus={e => e.target.style.borderColor = "rgba(255,88,51,0.35)"}
+                onBlur={e => e.target.style.borderColor = "rgba(255,255,255,0.07)"}
+                required
+              />
+
               <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ scale: 1.015 }}
+                whileTap={{ scale: 0.985 }}
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-[#ff5833] hover:bg-[#e84d2a] text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-xl text-sm font-bold tracking-wide transition-all disabled:opacity-40"
+                style={{
+                  background: isSubmitting ? "rgba(255,88,51,0.5)" : "#ff5833",
+                  color: "white",
+                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                }}
               >
-                <Send className="w-4 h-4" />
+                <Send className="w-3.5 h-3.5" />
                 {isSubmitting ? "Enviando..." : "Enviar mensaje"}
               </motion.button>
 
               {submitStatus === "success" && (
-                <p className="text-emerald-400 text-sm text-center">¡Mensaje enviado con éxito!</p>
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-emerald-400/80 text-xs text-center">
+                  Mensaje enviado correctamente.
+                </motion.p>
               )}
               {submitStatus === "error" && (
-                <p className="text-red-400 text-sm text-center">Error al enviar. Intenta de nuevo.</p>
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-400/80 text-xs text-center">
+                  Error al enviar. Intenta de nuevo.
+                </motion.p>
               )}
             </form>
           </div>

@@ -194,27 +194,14 @@ export default function DashboardPreview() {
 
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="text-center mb-20"
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="flex items-center gap-3 mb-10"
         >
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <span className="text-[10px] font-bold text-[#ff5833] uppercase tracking-[0.35em]">Plataforma</span>
-            <div className="h-px bg-[#ff5833]/25 w-12" />
-          </div>
-          <h2
-            className="text-5xl sm:text-7xl lg:text-8xl font-black text-white leading-[0.92] tracking-tight mb-6"
-            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
-          >
-            Tu carrera.
-            <br />
-            <span className="text-white/20">Centralizada.</span>
-          </h2>
-          <p className="text-base text-white/30 max-w-md mx-auto leading-relaxed font-light">
-            Más que lo que se escucha.
-          </p>
+          <span className="text-[10px] font-bold text-[#ff5833] uppercase tracking-[0.35em]">Plataforma</span>
+          <div className="h-px bg-[#ff5833]/25 flex-1 max-w-[60px]" />
         </motion.div>
 
         {/* Desktop layout */}
