@@ -270,10 +270,10 @@ export default function Explorar() {
 
       {/* Content rows */}
       <div className="relative z-10 -mt-16 pb-24">
-        {/* Sombreado gradual con viñeta */}
+        {/* Sombreado gradual con viñeta oscura */}
         <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent via-transparent to-black/40 pointer-events-none" />
-        <div className="absolute top-0 left-0 right-0 h-32" style={{
-          background: "radial-gradient(ellipse at center bottom, rgba(0,0,0,0.3) 0%, transparent 70%)",
+        <div className="absolute top-0 left-0 right-0 h-36" style={{
+          background: "radial-gradient(ellipse 100% 60% at center 85%, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)",
           pointerEvents: "none"
         }} />
 
