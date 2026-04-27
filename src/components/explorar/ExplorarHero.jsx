@@ -110,9 +110,9 @@ function HeroSlide({ item, artist, onExplore, active }) {
             }}
           />
         )}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(8,8,8,0.4) 30%, transparent 100%)" }} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,8,8,0.6) 0%, transparent 55%)" }} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(8,8,8,0.1) 0%, transparent 25%)" }} />
+        {/* Gradiente sutil solo en área del texto */}
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(8,8,8,0.25) 20%, transparent 60%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,8,8,0.3) 0%, transparent 35%)" }} />
       </div>
 
       {/* Content */}
