@@ -1,0 +1,23 @@
+{
+  "name": "SectionAssignment",
+  "type": "object",
+  "properties": {
+    "section_id": {
+      "type": "string",
+      "description": "ID de la secci\u00f3n (ExplorarSection)"
+    },
+    "item_id": {
+      "type": "string",
+      "description": "ID del proyecto (ExplorarItem)"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden dentro de la secci\u00f3n"
+    }
+  },
+  "required": [
+    "section_id",
+    "item_id"
+  ]
+}

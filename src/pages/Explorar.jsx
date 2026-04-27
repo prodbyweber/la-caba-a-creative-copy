@@ -9,15 +9,15 @@ import ExplorarHero from "@/components/explorar/ExplorarHero";
 import ContentRow from "@/components/explorar/ContentRow";
 import ArtistProfileModal from "@/components/explorar/ArtistProfileModal";
 
-const ROW_LABELS = {
+// Legacy fallback labels (for items with row_category but no ExplorarSection yet)
+const LEGACY_ROW_LABELS = {
   trending:       "En Tendencia",
   new_releases:   "Nuevos Lanzamientos",
   mini_films:     "Mini Films",
   afro_caribbean: "Afro / Caribbean Vibes",
   experimental:   "Experimental / New Wave",
 };
-
-const ROW_ORDER = ["trending", "new_releases", "mini_films", "afro_caribbean", "experimental"];
+const LEGACY_ROW_ORDER = ["trending", "new_releases", "mini_films", "afro_caribbean", "experimental"];
 
 export default function Explorar() {
   const [selectedArtist, setSelectedArtist] = useState(null);
@@ -57,6 +57,18 @@ export default function Explorar() {
   const { data: tracks = [] } = useQuery({
     queryKey: ["explorar-tracks"],
     queryFn: () => base44.entities.Track.list("-created_date", 30),
+    enabled: !!currentUser,
+  });
+
+  const { data: explorarSections = [] } = useQuery({
+    queryKey: ["explorar-sections"],
+    queryFn: () => base44.entities.ExplorarSection.list("order"),
+    enabled: !!currentUser,
+  });
+
+  const { data: sectionAssignments = [] } = useQuery({
+    queryKey: ["section-assignments"],
+    queryFn: () => base44.entities.SectionAssignment.list("order"),
     enabled: !!currentUser,
   });
 
@@ -234,24 +246,49 @@ export default function Explorar() {
 
       {/* Content rows */}
       <div className="relative z-10 -mt-16 pb-24 space-y-2">
-        {ROW_ORDER.map(cat => {
-          const catItems = explorarItems
-            .filter(i => i.row_category === cat)
-            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            .map(mapItemToCard);
-
-          if (catItems.length === 0) return null;
-
-          return (
-            <ContentRow
-              key={cat}
-              title={ROW_LABELS[cat]}
-              items={catItems}
-              onItemClick={handleCardClick}
-              artists={artists}
-            />
-          );
-        })}
+        {explorarSections.length > 0 ? (
+          // New system: use ExplorarSection + SectionAssignment
+          explorarSections
+            .filter(s => s.is_active !== false)
+            .map(section => {
+              const sectionItemIds = sectionAssignments
+                .filter(a => a.section_id === section.id)
+                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                .map(a => a.item_id);
+              const sectionCards = sectionItemIds
+                .map(id => explorarItems.find(i => i.id === id && i.is_active !== false))
+                .filter(Boolean)
+                .map(mapItemToCard);
+              if (sectionCards.length === 0) return null;
+              return (
+                <ContentRow
+                  key={section.id}
+                  title={section.label}
+                  items={sectionCards}
+                  onItemClick={handleCardClick}
+                  artists={artists}
+                />
+              );
+            })
+        ) : (
+          // Legacy fallback: use row_category on items
+          LEGACY_ROW_ORDER.map(cat => {
+            const catItems = explorarItems
+              .filter(i => i.row_category === cat && i.is_active !== false)
+              .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+              .map(mapItemToCard);
+            if (catItems.length === 0) return null;
+            return (
+              <ContentRow
+                key={cat}
+                title={LEGACY_ROW_LABELS[cat]}
+                items={catItems}
+                onItemClick={handleCardClick}
+                artists={artists}
+              />
+            );
+          })
+        )}
 
         {explorarItems.length === 0 && (
           <div className="text-center py-32 px-6">

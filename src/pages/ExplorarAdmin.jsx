@@ -5,21 +5,22 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, Trash2, Edit, GripVertical, Eye, EyeOff,
-  Star, Film, Upload, ChevronDown, ChevronUp, ExternalLink,
-  Layers, Image as ImageIcon, LayoutGrid, X, Save, Youtube
+  Star, Film, ExternalLink,
+  Layers, Image as ImageIcon, LayoutGrid, X
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import HeroSlideModal from "@/components/explorar/HeroSlideModal";
 import ProjectModal from "@/components/explorar/admin/ProjectModal";
 import ProjectsLibrary from "@/components/explorar/admin/ProjectsLibrary";
+import SectionEditModal from "@/components/explorar/admin/SectionEditModal";
 
-const ROW_CATEGORIES = [
-  { key: "trending",       label: "En Tendencia" },
-  { key: "new_releases",   label: "Nuevos Lanzamientos" },
-  { key: "mini_films",     label: "Mini Films" },
-  { key: "afro_caribbean", label: "Afro / Caribbean Vibes" },
-  { key: "experimental",   label: "Experimental / New Wave" },
+const DEFAULT_SECTIONS = [
+  { key: "trending",       label: "En Tendencia",           order: 0 },
+  { key: "new_releases",   label: "Nuevos Lanzamientos",    order: 1 },
+  { key: "mini_films",     label: "Mini Films",             order: 2 },
+  { key: "afro_caribbean", label: "Afro / Caribbean Vibes", order: 3 },
+  { key: "experimental",   label: "Experimental / New Wave", order: 4 },
 ];
 
 function getYoutubeThumbnail(url) {
@@ -28,59 +29,17 @@ function getYoutubeThumbnail(url) {
   return match ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg` : null;
 }
 
-// ─── Item card en fila (secciones) ─────────────────────────────────────────
-function SectionItemCard({ item, index, onEdit, onDelete, onToggle, artists, provided }) {
-  const thumb = item.thumbnail_url || getYoutubeThumbnail(item.youtube_url || item.youtube_music_url);
-  const artist = artists.find(a => a.id === item.artist_id);
-
-  return (
-    <div
-      ref={provided.innerRef}
-      {...provided.draggableProps}
-      className="flex items-center gap-3 p-3 bg-white/[0.03] hover:bg-white/[0.05] border border-white/[0.06] rounded-xl transition-all group"
-    >
-      <div {...provided.dragHandleProps} className="text-white/20 hover:text-white/50 cursor-grab flex-shrink-0">
-        <GripVertical className="w-4 h-4" />
-      </div>
-      <div className="w-14 h-9 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
-        {thumb ? <img src={thumb} alt={item.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Film className="w-3.5 h-3.5 text-white/15" /></div>}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <p className="text-sm font-semibold text-white truncate">{item.title}</p>
-          {item.is_hero && <Star className="w-3 h-3 text-yellow-400 flex-shrink-0" />}
-        </div>
-        <div className="flex items-center gap-2 mt-0.5">
-          {item.subtitle && <span className="text-[10px] text-white/25 truncate">{item.subtitle}</span>}
-          {artist && <span className="text-[10px] text-emerald-400/60">{artist.stageName}</span>}
-        </div>
-      </div>
-      <span className="text-[10px] text-white/15 w-5 text-center flex-shrink-0">#{item.order ?? index}</span>
-      <div className="flex items-center gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button onClick={() => onToggle(item)} className="p-1.5 rounded-lg hover:bg-white/10 transition-colors">
-          {item.is_active ? <Eye className="w-3.5 h-3.5 text-white/40" /> : <EyeOff className="w-3.5 h-3.5 text-white/20" />}
-        </button>
-        <button onClick={() => onEdit(item)} className="p-1.5 rounded-lg hover:bg-white/10 transition-colors">
-          <Edit className="w-3.5 h-3.5 text-white/40 hover:text-white" />
-        </button>
-        <button onClick={() => { if (confirm("¿Eliminar?")) onDelete(item.id); }} className="p-1.5 rounded-lg hover:bg-red-500/10 transition-colors">
-          <Trash2 className="w-3.5 h-3.5 text-white/25 hover:text-red-400" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─── Página principal ───────────────────────────────────────────────────────
 export default function ExplorarAdmin() {
-  const [activeTab, setActiveTab] = useState("projects"); // projects | sections | hero
+  const [activeTab, setActiveTab] = useState("projects");
   const [editingItem, setEditingItem] = useState(null);
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [editingHero, setEditingHero] = useState(null);
   const [showHeroModal, setShowHeroModal] = useState(false);
-  const [heroExpanded, setHeroExpanded] = useState(true);
+  const [editingSection, setEditingSection] = useState(null); // { section, assignments }
+  const [showSectionModal, setShowSectionModal] = useState(false);
   const qc = useQueryClient();
 
+  // ─── Data queries ────────────────────────────────────────────────────────
   const { data: items = [] } = useQuery({
     queryKey: ["explorar-items"],
     queryFn: () => base44.entities.ExplorarItem.list("order"),
@@ -91,7 +50,23 @@ export default function ExplorarAdmin() {
     queryFn: () => base44.entities.Artist.list(),
   });
 
-  const saveMutation = useMutation({
+  const { data: rawSections = [] } = useQuery({
+    queryKey: ["explorar-sections"],
+    queryFn: () => base44.entities.ExplorarSection.list("order"),
+  });
+
+  const { data: assignments = [] } = useQuery({
+    queryKey: ["section-assignments"],
+    queryFn: () => base44.entities.SectionAssignment.list("order"),
+  });
+
+  // Merge default sections if none exist yet
+  const sections = rawSections.length > 0
+    ? rawSections.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    : DEFAULT_SECTIONS.map((s, i) => ({ ...s, id: `default-${i}`, _isDefault: true }));
+
+  // ─── Mutations for items ─────────────────────────────────────────────────
+  const saveItemMutation = useMutation({
     mutationFn: (form) => form.id
       ? base44.entities.ExplorarItem.update(form.id, form)
       : base44.entities.ExplorarItem.create(form),
@@ -104,33 +79,85 @@ export default function ExplorarAdmin() {
     },
   });
 
-  const deleteMutation = useMutation({
+  const deleteItemMutation = useMutation({
     mutationFn: (id) => base44.entities.ExplorarItem.delete(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["explorar-items"] }),
   });
 
-  const toggleMutation = useMutation({
+  const toggleItemMutation = useMutation({
     mutationFn: (item) => base44.entities.ExplorarItem.update(item.id, { is_active: !item.is_active }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["explorar-items"] }),
   });
 
-  const handleDragEnd = async (result, category) => {
-    if (!result.destination) return;
-    const catItems = items.filter(i => i.row_category === category).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-    const [moved] = catItems.splice(result.source.index, 1);
-    catItems.splice(result.destination.index, 0, moved);
-    await Promise.all(catItems.map((item, idx) => base44.entities.ExplorarItem.update(item.id, { order: idx })));
-    qc.invalidateQueries({ queryKey: ["explorar-items"] });
-  };
+  // ─── Section save: update label + sync assignments ───────────────────────
+  const saveSectionMutation = useMutation({
+    mutationFn: async ({ section, label, orderedItems }) => {
+      // 1. If it was a default section, create it in DB first
+      let sectionId = section.id;
+      if (section._isDefault) {
+        const created = await base44.entities.ExplorarSection.create({
+          key: section.key,
+          label,
+          order: section.order ?? 0,
+          is_active: true,
+        });
+        sectionId = created.id;
+      } else {
+        // Update label
+        await base44.entities.ExplorarSection.update(sectionId, { label });
+      }
 
+      // 2. Delete existing assignments for this section
+      const existing = assignments.filter(a => a.section_id === sectionId);
+      await Promise.all(existing.map(a => base44.entities.SectionAssignment.delete(a.id)));
+
+      // 3. Create new assignments in order
+      await Promise.all(
+        orderedItems.map(({ itemId }, idx) =>
+          base44.entities.SectionAssignment.create({ section_id: sectionId, item_id: itemId, order: idx })
+        )
+      );
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["explorar-sections"] });
+      qc.invalidateQueries({ queryKey: ["section-assignments"] });
+      setShowSectionModal(false);
+      setEditingSection(null);
+    },
+  });
+
+  const addSectionMutation = useMutation({
+    mutationFn: () => base44.entities.ExplorarSection.create({
+      key: `section_${Date.now()}`,
+      label: "Nueva sección",
+      order: sections.length,
+      is_active: true,
+    }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["explorar-sections"] }),
+  });
+
+  const deleteSectionMutation = useMutation({
+    mutationFn: async (sectionId) => {
+      const toDelete = assignments.filter(a => a.section_id === sectionId);
+      await Promise.all(toDelete.map(a => base44.entities.SectionAssignment.delete(a.id)));
+      await base44.entities.ExplorarSection.delete(sectionId);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["explorar-sections"] });
+      qc.invalidateQueries({ queryKey: ["section-assignments"] });
+    },
+  });
+
+  // ─── Hero ────────────────────────────────────────────────────────────────
   const heroItems = items.filter(i => i.is_hero).sort((a, b) => (a.hero_order ?? 0) - (b.hero_order ?? 0));
 
   const TABS = [
     { key: "projects", label: "Proyectos", icon: LayoutGrid, count: items.length },
-    { key: "sections", label: "Secciones", icon: Layers, count: ROW_CATEGORIES.length },
-    { key: "hero",     label: "Hero",      icon: Star,       count: heroItems.length },
+    { key: "sections", label: "Secciones", icon: Layers, count: sections.length },
+    { key: "hero",     label: "Hero",      icon: Star,      count: heroItems.length },
   ];
 
+  // ─── Render ──────────────────────────────────────────────────────────────
   return (
     <AdminLayout activePage="ExplorarAdmin">
       <div className="px-4 sm:px-8 lg:px-12 py-8 max-w-6xl mx-auto">
@@ -143,10 +170,7 @@ export default function ExplorarAdmin() {
             </h1>
             <p className="text-xs text-white/25 mt-0.5">Gestiona el contenido de la plataforma</p>
           </div>
-          <Link
-            to="/Explorar"
-            className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/50 hover:text-white rounded-xl text-xs font-medium transition-colors"
-          >
+          <Link to="/Explorar" className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/50 hover:text-white rounded-xl text-xs font-medium transition-colors">
             <ExternalLink className="w-3.5 h-3.5" />
             Ver Explorar
           </Link>
@@ -159,18 +183,14 @@ export default function ExplorarAdmin() {
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`flex items-center gap-2 px-5 py-3 text-sm font-semibold border-b-2 transition-all -mb-px ${
-                activeTab === tab.key
-                  ? "text-white border-white/60"
-                  : "text-white/30 border-transparent hover:text-white/60"
+                activeTab === tab.key ? "text-white border-white/60" : "text-white/30 border-transparent hover:text-white/60"
               }`}
             >
               <tab.icon className="w-4 h-4" />
               {tab.label}
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                 activeTab === tab.key ? "bg-white/15 text-white/70" : "bg-white/[0.06] text-white/25"
-              }`}>
-                {tab.count}
-              </span>
+              }`}>{tab.count}</span>
             </button>
           ))}
         </div>
@@ -181,63 +201,97 @@ export default function ExplorarAdmin() {
             items={items}
             artists={artists}
             onEdit={(item) => { setEditingItem(item); setShowProjectModal(true); }}
-            onDelete={deleteMutation.mutate}
-            onToggle={toggleMutation.mutate}
+            onDelete={deleteItemMutation.mutate}
+            onToggle={toggleItemMutation.mutate}
             onNew={() => { setEditingItem(null); setShowProjectModal(true); }}
           />
         )}
 
         {/* ═══ TAB: SECCIONES ═══ */}
         {activeTab === "sections" && (
-          <div className="space-y-8">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs text-white/30">Arrastra para reordenar los proyectos dentro de cada sección</p>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-xs text-white/30">Cada sección es una fila en la página Explorar. Un mismo proyecto puede aparecer en varias secciones.</p>
               <button
-                onClick={() => { setEditingItem(null); setShowProjectModal(true); }}
+                onClick={() => addSectionMutation.mutate()}
                 className="flex items-center gap-1.5 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-xl text-xs font-medium transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
-                Nuevo proyecto
+                Nueva sección
               </button>
             </div>
-            {ROW_CATEGORIES.map(cat => {
-              const catItems = items.filter(i => i.row_category === cat.key).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+            {sections.map((section) => {
+              const sectionAssignments = assignments
+                .filter(a => a.section_id === section.id)
+                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+              const sectionItemIds = sectionAssignments.map(a => a.item_id);
+              const sectionItems = sectionItemIds
+                .map(id => items.find(i => i.id === id))
+                .filter(Boolean);
+
               return (
-                <div key={cat.key}>
-                  <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-sm font-bold text-white">{cat.label}</h2>
-                    <span className="text-[10px] text-white/20">{catItems.length} proyectos</span>
+                <div
+                  key={section.id || section.key}
+                  className="rounded-2xl border border-white/[0.07] bg-white/[0.02] overflow-hidden"
+                >
+                  {/* Section header */}
+                  <div className="flex items-center gap-3 px-5 py-4 border-b border-white/[0.05]">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-white">{section.label}</p>
+                      <p className="text-[10px] text-white/25 mt-0.5">{sectionItems.length} proyectos</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setEditingSection({ section, assignments: sectionAssignments });
+                        setShowSectionModal(true);
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/[0.08] text-white/50 hover:text-white text-xs font-medium transition-colors"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                      Editar
+                    </button>
+                    {!section._isDefault && (
+                      <button
+                        onClick={() => { if (confirm(`¿Eliminar sección "${section.label}"?`)) deleteSectionMutation.mutate(section.id); }}
+                        className="p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-white/20 hover:text-red-400" />
+                      </button>
+                    )}
                   </div>
-                  <DragDropContext onDragEnd={(result) => handleDragEnd(result, cat.key)}>
-                    <Droppable droppableId={cat.key}>
-                      {(provided) => (
-                        <div ref={provided.innerRef} {...provided.droppableProps} className="space-y-2">
-                          {catItems.length === 0 && (
-                            <div className="py-6 border border-dashed border-white/[0.06] rounded-xl text-center">
-                              <p className="text-xs text-white/15">Sin proyectos en esta sección</p>
-                              <p className="text-[10px] text-white/10 mt-0.5">Crea un proyecto y asígnalo a esta sección</p>
+
+                  {/* Items preview */}
+                  <div className="px-5 py-4">
+                    {sectionItems.length === 0 ? (
+                      <div className="flex items-center gap-3 py-4 text-center justify-center">
+                        <p className="text-xs text-white/15">Sin proyectos — haz clic en "Editar" para añadir</p>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+                        {sectionItems.map((item, idx) => {
+                          const thumb = item.thumbnail_url || getYoutubeThumbnail(item.youtube_url || item.youtube_music_url);
+                          return (
+                            <div key={item.id} className="flex-shrink-0 relative group">
+                              <div className="w-20 h-14 rounded-lg overflow-hidden bg-white/5">
+                                {thumb ? (
+                                  <img src={thumb} alt={item.title} className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <Film className="w-4 h-4 text-white/10" />
+                                  </div>
+                                )}
+                              </div>
+                              <div className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-black/80 border border-white/10 flex items-center justify-center">
+                                <span className="text-[8px] text-white/50 font-bold">{idx + 1}</span>
+                              </div>
+                              <p className="text-[9px] text-white/30 truncate mt-1 w-20 text-center">{item.title}</p>
                             </div>
-                          )}
-                          {catItems.map((item, index) => (
-                            <Draggable key={item.id} draggableId={item.id} index={index}>
-                              {(provided) => (
-                                <SectionItemCard
-                                  item={item}
-                                  index={index}
-                                  onEdit={(i) => { setEditingItem(i); setShowProjectModal(true); }}
-                                  onDelete={deleteMutation.mutate}
-                                  onToggle={toggleMutation.mutate}
-                                  artists={artists}
-                                  provided={provided}
-                                />
-                              )}
-                            </Draggable>
-                          ))}
-                          {provided.placeholder}
-                        </div>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
@@ -262,7 +316,7 @@ export default function ExplorarAdmin() {
               <div className="py-20 text-center">
                 <Star className="w-10 h-10 text-yellow-500/15 mx-auto mb-3" />
                 <p className="text-sm text-white/20">Sin slides en el carrusel hero</p>
-                <p className="text-xs text-white/10 mt-1">Crea un slide o activa "Destacar en Hero" en cualquier proyecto</p>
+                <p className="text-xs text-white/10 mt-1">Activa "Destacar en Hero" en cualquier proyecto</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -308,7 +362,7 @@ export default function ExplorarAdmin() {
                         </div>
                       </div>
                       <button
-                        onClick={e => { e.stopPropagation(); if (confirm("¿Eliminar este slide?")) deleteMutation.mutate(item.id); }}
+                        onClick={e => { e.stopPropagation(); if (confirm("¿Eliminar este slide?")) deleteItemMutation.mutate(item.id); }}
                         className="absolute top-2 right-2 p-1 bg-black/60 hover:bg-red-600/80 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
                       >
                         <Trash2 className="w-3.5 h-3.5 text-white" />
@@ -322,26 +376,40 @@ export default function ExplorarAdmin() {
         )}
       </div>
 
-      {/* Modal de proyecto */}
+      {/* Modals */}
       <AnimatePresence>
         {showProjectModal && (
           <ProjectModal
             item={editingItem}
             artists={artists}
             onClose={() => { setShowProjectModal(false); setEditingItem(null); }}
-            onSave={saveMutation.mutate}
+            onSave={saveItemMutation.mutate}
           />
         )}
       </AnimatePresence>
 
-      {/* Modal de slide Hero */}
       <AnimatePresence>
         {showHeroModal && (
           <HeroSlideModal
             item={editingHero}
             artists={artists}
             onClose={() => { setShowHeroModal(false); setEditingHero(null); }}
-            onSave={saveMutation.mutate}
+            onSave={saveItemMutation.mutate}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showSectionModal && editingSection && (
+          <SectionEditModal
+            section={editingSection.section}
+            assignments={editingSection.assignments}
+            allItems={items}
+            artists={artists}
+            onClose={() => { setShowSectionModal(false); setEditingSection(null); }}
+            onSave={({ label, orderedItems }) =>
+              saveSectionMutation.mutate({ section: editingSection.section, label, orderedItems })
+            }
           />
         )}
       </AnimatePresence>
