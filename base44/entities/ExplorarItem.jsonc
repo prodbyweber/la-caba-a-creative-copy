@@ -24,7 +24,7 @@
     },
     "thumbnail_url": {
       "type": "string",
-      "description": "URL de la miniatura personalizada (opcional, si no se usa la de YouTube)"
+      "description": "URL de la miniatura personalizada"
     },
     "youtube_url": {
       "type": "string",
@@ -49,7 +49,25 @@
     "is_hero": {
       "type": "boolean",
       "default": false,
-      "description": "Si este item aparece en el hero principal"
+      "description": "Si aparece en el carrusel hero"
+    },
+    "hero_order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden en el carrusel hero"
+    },
+    "hero_media_url": {
+      "type": "string",
+      "description": "URL de video (mp4) o imagen para el fondo del hero"
+    },
+    "hero_media_type": {
+      "type": "string",
+      "enum": [
+        "image",
+        "video"
+      ],
+      "default": "image",
+      "description": "Tipo de media del hero: imagen o video"
     },
     "is_active": {
       "type": "boolean",

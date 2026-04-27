@@ -5,7 +5,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, Trash2, Edit, GripVertical, Eye, EyeOff,
-  Star, ExternalLink, Youtube, Music2, Image as ImageIcon, X, Save
+  Star, Youtube, Music2, Image as ImageIcon, X, Save, Film, Upload
 } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
@@ -35,19 +35,23 @@ const EMPTY_FORM = {
   subtitle: "",
   row_category: "trending",
   order: 0,
+  hero_order: 0,
   youtube_url: "",
   youtube_music_url: "",
   audio_file_url: "",
   thumbnail_url: "",
+  hero_media_url: "",
+  hero_media_type: "image",
   artist_id: "",
   is_hero: false,
   is_active: true,
 };
 
 function ItemModal({ item, artists, onClose, onSave }) {
-  const [form, setForm] = useState(item || EMPTY_FORM);
+  const [form, setForm] = useState(item ? { ...EMPTY_FORM, ...item } : EMPTY_FORM);
   const [uploadingThumb, setUploadingThumb] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [uploadingHeroMedia, setUploadingHeroMedia] = useState(false);
   const [previewVideo, setPreviewVideo] = useState(false);
 
   const ytThumb = getYoutubeThumbnail(form.youtube_url || form.youtube_music_url);
@@ -73,6 +77,18 @@ function ItemModal({ item, artists, onClose, onSave }) {
       setForm(f => ({ ...f, audio_file_url: file_url }));
     } finally {
       setUploadingAudio(false);
+    }
+  };
+
+  const handleUploadHeroMedia = async (file) => {
+    if (!file) return;
+    setUploadingHeroMedia(true);
+    const isVid = file.type.startsWith("video/");
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setForm(f => ({ ...f, hero_media_url: file_url, hero_media_type: isVid ? "video" : "image" }));
+    } finally {
+      setUploadingHeroMedia(false);
     }
   };
 
@@ -255,27 +271,89 @@ function ItemModal({ item, artists, onClose, onSave }) {
             </select>
           </div>
 
-          {/* Toggles */}
-          <div className="flex gap-4">
-            <label className="flex items-center gap-2 cursor-pointer">
+          {/* Hero media — solo si is_hero */}
+          <div className="p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-yellow-400" />
+                <span className="text-xs font-bold text-yellow-400 uppercase tracking-wider">Carrusel Hero</span>
+              </div>
               <div
                 onClick={() => setForm(f => ({ ...f, is_hero: !f.is_hero }))}
-                className={`w-9 h-5 rounded-full transition-colors ${form.is_hero ? 'bg-yellow-500' : 'bg-white/10'}`}
+                className={`w-9 h-5 rounded-full transition-colors cursor-pointer ${form.is_hero ? 'bg-yellow-500' : 'bg-white/10'}`}
               >
                 <div className={`w-4 h-4 bg-white rounded-full mt-0.5 transition-transform shadow ${form.is_hero ? 'translate-x-4' : 'translate-x-0.5'}`} />
               </div>
-              <span className="text-xs text-white/50">Hero principal</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <div
-                onClick={() => setForm(f => ({ ...f, is_active: !f.is_active }))}
-                className={`w-9 h-5 rounded-full transition-colors ${form.is_active ? 'bg-emerald-500' : 'bg-white/10'}`}
-              >
-                <div className={`w-4 h-4 bg-white rounded-full mt-0.5 transition-transform shadow ${form.is_active ? 'translate-x-4' : 'translate-x-0.5'}`} />
-              </div>
-              <span className="text-xs text-white/50">Visible</span>
-            </label>
+            </div>
+
+            {form.is_hero && (
+              <>
+                <div>
+                  <label className="text-xs text-white/40 font-medium mb-1.5 block uppercase tracking-wider">Orden en el carrusel</label>
+                  <input
+                    type="number"
+                    value={form.hero_order ?? 0}
+                    onChange={e => setForm(f => ({ ...f, hero_order: parseInt(e.target.value) || 0 }))}
+                    className="w-24 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs text-white/40 font-medium mb-1.5 block uppercase tracking-wider flex items-center gap-1.5">
+                    <Film className="w-3.5 h-3.5 text-yellow-400" /> Media del fondo (imagen o video MP4)
+                  </label>
+
+                  {/* Preview */}
+                  {form.hero_media_url && (
+                    <div className="relative rounded-xl overflow-hidden mb-2" style={{ aspectRatio: "16/9" }}>
+                      {form.hero_media_type === "video" ? (
+                        <video src={form.hero_media_url} className="w-full h-full object-cover" muted autoPlay loop playsInline />
+                      ) : (
+                        <img src={form.hero_media_url} alt="" className="w-full h-full object-cover" />
+                      )}
+                      <button
+                        onClick={() => setForm(f => ({ ...f, hero_media_url: "", hero_media_type: "image" }))}
+                        className="absolute top-2 right-2 p-1.5 bg-black/70 rounded-lg text-white hover:bg-black/90"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                      <div className="absolute bottom-2 left-2">
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${form.hero_media_type === "video" ? "bg-purple-500/80 text-white" : "bg-blue-500/80 text-white"}`}>
+                          {form.hero_media_type === "video" ? "Video" : "Imagen"}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <input
+                      value={form.hero_media_url}
+                      onChange={e => setForm(f => ({ ...f, hero_media_url: e.target.value }))}
+                      className="flex-1 px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-yellow-500/50"
+                      placeholder="https://... (URL imagen o video)"
+                    />
+                    <label className="px-3 py-2.5 bg-yellow-500/10 border border-yellow-500/20 rounded-lg cursor-pointer hover:bg-yellow-500/20 transition-colors flex items-center gap-1.5 text-yellow-400 text-xs">
+                      <input type="file" accept="image/*,video/mp4,video/webm" className="hidden" onChange={e => e.target.files?.[0] && handleUploadHeroMedia(e.target.files[0])} />
+                      <Upload className="w-3.5 h-3.5" />
+                      {uploadingHeroMedia ? "..." : "Subir"}
+                    </label>
+                  </div>
+                  <p className="text-[10px] text-white/20 mt-1">Acepta .jpg, .png, .webp, .mp4, .webm</p>
+                </div>
+              </>
+            )}
           </div>
+
+          {/* Visible toggle */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <div
+              onClick={() => setForm(f => ({ ...f, is_active: !f.is_active }))}
+              className={`w-9 h-5 rounded-full transition-colors ${form.is_active ? 'bg-emerald-500' : 'bg-white/10'}`}
+            >
+              <div className={`w-4 h-4 bg-white rounded-full mt-0.5 transition-transform shadow ${form.is_active ? 'translate-x-4' : 'translate-x-0.5'}`} />
+            </div>
+            <span className="text-xs text-white/50">Visible en plataforma</span>
+          </label>
 
           {/* Save */}
           <button
@@ -413,6 +491,59 @@ export default function ExplorarAdmin() {
             Nuevo item
           </button>
         </div>
+
+        {/* Hero Carousel Section */}
+        {(() => {
+          const heroItems = items.filter(i => i.is_hero).sort((a, b) => (a.hero_order ?? 0) - (b.hero_order ?? 0));
+          return (
+            <div className="mb-10">
+              <div className="flex items-center gap-2 mb-4">
+                <Star className="w-4 h-4 text-yellow-400" />
+                <h2 className="text-sm font-bold text-white">Carrusel Hero</h2>
+                <span className="text-[10px] text-white/25 ml-1">{heroItems.length} slides</span>
+              </div>
+              {heroItems.length === 0 ? (
+                <div className="py-8 border border-dashed border-yellow-500/20 rounded-xl text-center bg-yellow-500/[0.03]">
+                  <Star className="w-7 h-7 text-yellow-500/30 mx-auto mb-2" />
+                  <p className="text-xs text-white/20">Ningún item marcado como Hero</p>
+                  <p className="text-[10px] text-white/10 mt-1">Activa "Carrusel Hero" al editar un item</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {heroItems.map(item => {
+                    const artist = artists.find(a => a.id === item.artist_id);
+                    const thumb = item.hero_media_type === "video" ? null : (item.hero_media_url || item.thumbnail_url || getYoutubeThumbnail(item.youtube_url));
+                    return (
+                      <div key={item.id} className="relative rounded-xl overflow-hidden border border-yellow-500/20 bg-white/[0.03] group cursor-pointer" style={{ aspectRatio: "16/9" }} onClick={() => openEdit(item)}>
+                        {item.hero_media_type === "video" && item.hero_media_url ? (
+                          <video src={item.hero_media_url} className="w-full h-full object-cover" muted loop playsInline />
+                        ) : thumb ? (
+                          <img src={thumb} alt={item.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-white/[0.03]">
+                            <ImageIcon className="w-6 h-6 text-white/10" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                        <div className="absolute bottom-0 left-0 right-0 p-2.5">
+                          <p className="text-xs font-bold text-white truncate">{item.title}</p>
+                          {artist && <p className="text-[10px] text-white/40 truncate">{artist.stageName}</p>}
+                        </div>
+                        <div className="absolute top-2 left-2 flex gap-1 items-center">
+                          <span className="text-[9px] bg-yellow-500 text-black font-black px-1.5 py-0.5 rounded">#{(item.hero_order ?? 0) + 1}</span>
+                          {item.hero_media_type === "video" && <span className="text-[9px] bg-purple-500/80 text-white font-bold px-1.5 py-0.5 rounded">VIDEO</span>}
+                        </div>
+                        <div className="absolute inset-0 bg-yellow-400/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Edit className="w-5 h-5 text-yellow-400" />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Rows by category */}
         <div className="space-y-8">

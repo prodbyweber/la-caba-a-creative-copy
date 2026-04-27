@@ -108,10 +108,11 @@ export default function Explorar() {
     };
   };
 
-  // Hero item
-  const heroItem = explorarItems.find(i => i.is_hero) || explorarItems[0];
-  const heroCard = heroItem ? mapItemToCard(heroItem) : null;
-  const heroArtist = heroCard?.artist_id ? artists.find(a => a.id === heroCard.artist_id) : null;
+  // Hero items — carrusel, ordenados por hero_order
+  const heroRawItems = explorarItems.filter(i => i.is_hero).sort((a, b) => (a.hero_order ?? 0) - (b.hero_order ?? 0));
+  const heroCards = heroRawItems.length > 0
+    ? heroRawItems.map(mapItemToCard)
+    : explorarItems.slice(0, 1).map(mapItemToCard);
 
   // Search
   const searchResults = searchQuery.length > 1
@@ -200,12 +201,17 @@ export default function Explorar() {
         )}
       </AnimatePresence>
 
-      {/* Hero */}
-      {heroCard && (
+      {/* Hero carrusel */}
+      {heroCards.length > 0 && (
         <ExplorarHero
-          item={heroCard}
-          artist={heroArtist}
-          onExplore={() => heroArtist && setSelectedArtist(heroArtist)}
+          items={heroCards}
+          artists={artists}
+          onExplore={(item) => {
+            if (item?.artist_id) {
+              const a = artists.find(a => a.id === item.artist_id);
+              if (a) setSelectedArtist(a);
+            }
+          }}
         />
       )}
 
