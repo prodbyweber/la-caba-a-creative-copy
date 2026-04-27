@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   X, Upload, Plus, Play, Trash2, ExternalLink,
   Youtube, Film, Music2, Image as ImageIcon, Link as LinkIcon,
-  ChevronRight, Camera, Edit3, Check, Loader2
+  ChevronRight, Camera, Edit3, Check, Loader2, Heart, Bookmark
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -236,9 +236,38 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
   const avatarUrl = userProfile?.avatar_url || linkedArtist?.avatar_url || "";
   const initials = displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
 
+  // Fetch likes and saves for this user
+  const { data: likedItems = [] } = useQuery({
+    queryKey: ["user-likes", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const likes = await base44.entities.Like.filter({ user_id: currentUser.id });
+      const itemIds = likes.map(l => l.item_id);
+      if (itemIds.length === 0) return [];
+      const allItems = await base44.entities.ExplorarItem.filter({ is_active: true });
+      return allItems.filter(item => itemIds.includes(item.id));
+    },
+    enabled: !!currentUser?.id,
+  });
+
+  const { data: savedItems = [] } = useQuery({
+    queryKey: ["user-saves", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return [];
+      const saves = await base44.entities.Save.filter({ user_id: currentUser.id });
+      const itemIds = saves.map(s => s.item_id);
+      if (itemIds.length === 0) return [];
+      const allItems = await base44.entities.ExplorarItem.filter({ is_active: true });
+      return allItems.filter(item => itemIds.includes(item.id));
+    },
+    enabled: !!currentUser?.id,
+  });
+
   const TABS = [
     { key: "aparece", label: "Aparece en" },
     { key: "material", label: "Mi material" },
+    { key: "likes", label: "Me gustas", count: likedItems.length },
+    { key: "saves", label: "Guardados", count: savedItems.length },
   ];
 
   return (
@@ -348,7 +377,10 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
                   <button key={t.key} onClick={() => setActiveTab(t.key)}
                     className={`flex-1 py-3 text-xs font-semibold border-b-2 transition-all ${activeTab === t.key ? "text-white border-white/50" : "text-white/25 border-transparent hover:text-white/50"}`}>
                     {t.label}
-                    {t.key === "aparece" && appearsIn.length > 0 && (
+                    {t.count && t.count > 0 && (
+                      <span className="ml-1.5 text-[9px] px-1.5 py-0.5 rounded-full bg-white/10 text-white/40">{t.count}</span>
+                    )}
+                    {(t.key === "aparece" && appearsIn.length > 0) && (
                       <span className="ml-1.5 text-[9px] px-1.5 py-0.5 rounded-full bg-white/10 text-white/40">{appearsIn.length}</span>
                     )}
                     {t.key === "material" && mediaItems.length > 0 && (
@@ -514,6 +546,110 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
                       Se recomienda subir material producido por Cabaña Creative para mantener la coherencia visual del catálogo.
                     </p>
                   </div>
+                </div>
+              )}
+
+              {/* ── TAB: Me gustas ── */}
+              {activeTab === "likes" && (
+                <div className="px-4 py-5">
+                  {likedItems.length === 0 ? (
+                    <div className="py-16 text-center">
+                      <Heart className="w-10 h-10 text-white/8 mx-auto mb-3" />
+                      <p className="text-xs text-white/20">Sin favoritos aún.</p>
+                      <p className="text-[10px] text-white/10 mt-1">Los proyectos que marques como favoritos aparecerán aquí.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      {likedItems.map((item, i) => {
+                        const thumb = item.thumbnail_url || getYoutubeThumbnail(item.youtube_url || item.youtube_music_url);
+                        const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
+                        return (
+                          <motion.div
+                            key={item.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.04 }}
+                            className="group relative rounded-xl overflow-hidden bg-[#111] cursor-pointer"
+                            style={{ aspectRatio: "3/4" }}
+                            onClick={() => ytId && setPlayingYt(ytId)}
+                          >
+                            {thumb ? (
+                              <img src={thumb} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Music2 className="w-8 h-8 text-white/10" />
+                              </div>
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                            {ytId && (
+                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20">
+                                  <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+                                </div>
+                              </div>
+                            )}
+                            <div className="absolute bottom-0 left-0 right-0 p-2.5">
+                              <p className="text-[11px] font-bold text-white truncate leading-tight">{item.title}</p>
+                              {item.subtitle && <p className="text-[9px] text-white/40 mt-0.5">{item.subtitle}</p>}
+                              {item.year && <p className="text-[9px] text-white/25">{item.year}</p>}
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ── TAB: Guardados ── */}
+              {activeTab === "saves" && (
+                <div className="px-4 py-5">
+                  {savedItems.length === 0 ? (
+                    <div className="py-16 text-center">
+                      <Film className="w-10 h-10 text-white/8 mx-auto mb-3" />
+                      <p className="text-xs text-white/20">Sin guardados aún.</p>
+                      <p className="text-[10px] text-white/10 mt-1">Los proyectos que guardes aparecerán aquí.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      {savedItems.map((item, i) => {
+                        const thumb = item.thumbnail_url || getYoutubeThumbnail(item.youtube_url || item.youtube_music_url);
+                        const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
+                        return (
+                          <motion.div
+                            key={item.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: i * 0.04 }}
+                            className="group relative rounded-xl overflow-hidden bg-[#111] cursor-pointer"
+                            style={{ aspectRatio: "3/4" }}
+                            onClick={() => ytId && setPlayingYt(ytId)}
+                          >
+                            {thumb ? (
+                              <img src={thumb} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Music2 className="w-8 h-8 text-white/10" />
+                              </div>
+                            )}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                            {ytId && (
+                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20">
+                                  <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+                                </div>
+                              </div>
+                            )}
+                            <div className="absolute bottom-0 left-0 right-0 p-2.5">
+                              <p className="text-[11px] font-bold text-white truncate leading-tight">{item.title}</p>
+                              {item.subtitle && <p className="text-[9px] text-white/40 mt-0.5">{item.subtitle}</p>}
+                              {item.year && <p className="text-[9px] text-white/25">{item.year}</p>}
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
             </>
