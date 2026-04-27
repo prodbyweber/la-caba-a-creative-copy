@@ -1,13 +1,10 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Edit, Trash2, Eye, EyeOff, Star, Music2, Film, Search } from "lucide-react";
+import { motion } from "framer-motion";
+import { Plus, Edit, Trash2, Eye, EyeOff, Music2, Film, Search, Star } from "lucide-react";
 
 const TYPE_LABELS = {
   song: "Canción", album: "Álbum", ep: "EP",
   minifilm: "Mini Film", film: "Film", series: "Serie",
-};
-const TYPE_ICONS = {
-  song: "🎵", album: "💿", ep: "🎶", minifilm: "🎬", film: "🎞", series: "📺",
 };
 
 function getYoutubeThumbnail(url) {
@@ -18,12 +15,17 @@ function getYoutubeThumbnail(url) {
 
 export default function ProjectsLibrary({ items, artists, onEdit, onDelete, onToggle, onNew }) {
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [genreFilter, setGenreFilter] = useState("");
+
+  // Collect all unique genres across all items
+  const allGenres = [...new Set(items.flatMap(i => i.genres || []))].sort();
 
   const filtered = items.filter(item => {
     const matchSearch = !search || item.title?.toLowerCase().includes(search.toLowerCase());
-    const matchFilter = filter === "all" || item.content_type === filter;
-    return matchSearch && matchFilter;
+    const matchType = typeFilter === "all" || item.content_type === typeFilter;
+    const matchGenre = !genreFilter || (item.genres || []).includes(genreFilter);
+    return matchSearch && matchType && matchGenre;
   });
 
   const typeFilters = ["all", "song", "album", "ep", "minifilm", "film", "series"];
@@ -31,7 +33,7 @@ export default function ProjectsLibrary({ items, artists, onEdit, onDelete, onTo
   return (
     <div>
       {/* Toolbar */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex items-center gap-3 mb-4">
         <div className="flex-1 flex items-center gap-2 bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5">
           <Search className="w-3.5 h-3.5 text-white/25 flex-shrink-0" />
           <input
@@ -51,21 +53,50 @@ export default function ProjectsLibrary({ items, artists, onEdit, onDelete, onTo
       </div>
 
       {/* Type filter pills */}
-      <div className="flex gap-1.5 flex-wrap mb-6">
+      <div className="flex gap-1.5 flex-wrap mb-3">
         {typeFilters.map(f => (
           <button
             key={f}
-            onClick={() => setFilter(f)}
+            onClick={() => setTypeFilter(f)}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
-              filter === f
+              typeFilter === f
                 ? "bg-white text-black border-white"
                 : "bg-white/[0.04] text-white/35 border-white/[0.08] hover:border-white/20"
             }`}
           >
-            {f === "all" ? "Todos" : `${TYPE_ICONS[f]} ${TYPE_LABELS[f]}`}
+            {f === "all" ? "Todos" : TYPE_LABELS[f]}
           </button>
         ))}
       </div>
+
+      {/* Genre filter */}
+      {allGenres.length > 0 && (
+        <div className="flex gap-1.5 flex-wrap mb-5">
+          <button
+            onClick={() => setGenreFilter("")}
+            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border ${
+              !genreFilter
+                ? "bg-white/15 text-white border-white/30"
+                : "bg-white/[0.03] text-white/30 border-white/[0.06] hover:border-white/15"
+            }`}
+          >
+            Todos los géneros
+          </button>
+          {allGenres.map(g => (
+            <button
+              key={g}
+              onClick={() => setGenreFilter(genreFilter === g ? "" : g)}
+              className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border ${
+                genreFilter === g
+                  ? "bg-white text-black border-white"
+                  : "bg-white/[0.03] text-white/30 border-white/[0.06] hover:border-white/15"
+              }`}
+            >
+              {g}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Grid */}
       {filtered.length === 0 ? (
@@ -104,21 +135,21 @@ export default function ProjectsLibrary({ items, artists, onEdit, onDelete, onTo
                 <div className="absolute top-2 left-2 flex gap-1 flex-wrap">
                   {item.content_type && (
                     <span className="text-[9px] bg-black/70 text-white/70 px-1.5 py-0.5 rounded font-medium">
-                      {TYPE_ICONS[item.content_type]} {TYPE_LABELS[item.content_type]}
+                      {TYPE_LABELS[item.content_type]}
                     </span>
                   )}
-                  {item.is_hero && <span className="text-[9px] bg-yellow-500 text-black px-1.5 py-0.5 rounded font-black">★</span>}
-                  {!item.is_active && <span className="text-[9px] bg-red-600/80 text-white px-1.5 py-0.5 rounded font-bold">OCULTO</span>}
+                  {item.is_hero && <span className="text-[9px] bg-yellow-500 text-black px-1.5 py-0.5 rounded font-black">Hero</span>}
+                  {!item.is_active && <span className="text-[9px] bg-red-600/80 text-white px-1.5 py-0.5 rounded font-bold">Oculto</span>}
                 </div>
 
                 {/* Bottom info */}
                 <div className="absolute bottom-0 left-0 right-0 p-2.5">
                   <p className="text-xs font-bold text-white truncate">{item.title}</p>
-                  {(artist || item.subtitle) && (
-                    <p className="text-[10px] text-white/40 truncate">{artist?.stageName || item.subtitle}</p>
+                  {artist && (
+                    <p className="text-[10px] text-white/40 truncate">{artist.stageName}</p>
                   )}
-                  {item.row_category && (
-                    <p className="text-[9px] text-white/20 truncate mt-0.5 capitalize">{item.row_category.replace(/_/g, " ")}</p>
+                  {item.genres?.length > 0 && (
+                    <p className="text-[9px] text-white/25 truncate mt-0.5">{item.genres.slice(0, 2).join(" · ")}</p>
                   )}
                 </div>
 

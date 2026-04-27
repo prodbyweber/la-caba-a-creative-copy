@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  X, Save, Upload, Youtube, Music2, Image as ImageIcon, Film,
-  Plus, Trash2, User, Star, ChevronDown
+  X, Save, Upload, Youtube, Music2, Film,
+  Plus, Trash2, User, Star
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import GenreSelector from "./GenreSelector";
 
 const CONTENT_TYPES = [
-  { key: "song",     label: "Canción",   icon: "🎵" },
-  { key: "album",    label: "Álbum",     icon: "💿" },
-  { key: "ep",       label: "EP",        icon: "🎶" },
-  { key: "minifilm", label: "Mini Film", icon: "🎬" },
-  { key: "film",     label: "Film",      icon: "🎞" },
-  { key: "series",   label: "Serie",     icon: "📺" },
+  { key: "song",     label: "Canción" },
+  { key: "album",    label: "Álbum" },
+  { key: "ep",       label: "EP" },
+  { key: "minifilm", label: "Mini Film" },
+  { key: "film",     label: "Film" },
+  { key: "series",   label: "Serie" },
 ];
 
 const ROW_CATEGORIES = [
@@ -20,7 +21,7 @@ const ROW_CATEGORIES = [
   { key: "trending",      label: "En Tendencia" },
   { key: "new_releases",  label: "Nuevos Lanzamientos" },
   { key: "mini_films",    label: "Mini Films" },
-  { key: "afro_caribbean","label": "Afro / Caribbean Vibes" },
+  { key: "afro_caribbean",label: "Afro / Caribbean Vibes" },
   { key: "experimental",  label: "Experimental / New Wave" },
 ];
 
@@ -33,6 +34,7 @@ const CREDIT_ROLES = [
 const EMPTY = {
   title: "", content_type: "song", subtitle: "", description: "",
   year: new Date().getFullYear(), duration: "",
+  genres: [], tags: [],
   thumbnail_url: "", preview_media_url: "", preview_media_type: "image",
   youtube_url: "", youtube_music_url: "", audio_file_url: "",
   artist_id: "", credits: [],
@@ -43,18 +45,18 @@ const EMPTY = {
 };
 
 function Toggle({ value, onChange, color = "emerald" }) {
-  const bg = value ? `bg-${color}-500` : "bg-white/10";
+  const colors = { emerald: "bg-emerald-500", yellow: "bg-yellow-500" };
   return (
-    <div onClick={() => onChange(!value)} className={`w-9 h-5 rounded-full transition-colors cursor-pointer ${bg}`}>
+    <div onClick={() => onChange(!value)} className={`w-9 h-5 rounded-full transition-colors cursor-pointer ${value ? colors[color] : "bg-white/10"}`}>
       <div className={`w-4 h-4 bg-white rounded-full mt-0.5 shadow transition-transform ${value ? "translate-x-4" : "translate-x-0.5"}`} />
     </div>
   );
 }
 
 export default function ProjectModal({ item, artists, onClose, onSave }) {
-  const [form, setForm] = useState(item ? { ...EMPTY, ...item } : EMPTY);
+  const [form, setForm] = useState(item ? { ...EMPTY, ...item, genres: item.genres || [], tags: item.tags || [] } : EMPTY);
   const [uploading, setUploading] = useState({});
-  const [tab, setTab] = useState("info"); // info | media | sections | credits
+  const [tab, setTab] = useState("info");
   const [newCredit, setNewCredit] = useState({ artist_id: "", role: "Artista Principal", name: "" });
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
@@ -95,6 +97,7 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
 
   const TABS = [
     { key: "info",     label: "Info" },
+    { key: "genres",   label: "Géneros" },
     { key: "media",    label: "Media" },
     { key: "sections", label: "Secciones" },
     { key: "credits",  label: "Créditos" },
@@ -121,18 +124,19 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-white/[0.07] flex-shrink-0 px-2">
+        <div className="flex border-b border-white/[0.07] flex-shrink-0 px-2 overflow-x-auto">
           {TABS.map(t => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`px-4 py-3 text-xs font-semibold transition-colors border-b-2 ${
-                tab === t.key
-                  ? "text-white border-white/60"
-                  : "text-white/30 border-transparent hover:text-white/60"
+              className={`px-4 py-3 text-xs font-semibold transition-colors border-b-2 whitespace-nowrap ${
+                tab === t.key ? "text-white border-white/60" : "text-white/30 border-transparent hover:text-white/60"
               }`}
             >
               {t.label}
+              {t.key === "genres" && form.genres?.length > 0 && (
+                <span className="ml-1.5 text-[9px] bg-white/10 text-white/50 px-1.5 py-0.5 rounded-full">{form.genres.length}</span>
+              )}
             </button>
           ))}
         </div>
@@ -151,13 +155,13 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
                     <button
                       key={ct.key}
                       onClick={() => set("content_type", ct.key)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
                         form.content_type === ct.key
                           ? "bg-white text-black border-white"
                           : "bg-white/5 text-white/40 border-white/10 hover:border-white/25"
                       }`}
                     >
-                      <span>{ct.icon}</span> {ct.label}
+                      {ct.label}
                     </button>
                   ))}
                 </div>
@@ -170,8 +174,8 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={lc}>Subtítulo / Género</label>
-                  <input value={form.subtitle} onChange={e => set("subtitle", e.target.value)} className={ic} placeholder="Urban, Afrobeats..." />
+                  <label className={lc}>Subtítulo</label>
+                  <input value={form.subtitle} onChange={e => set("subtitle", e.target.value)} className={ic} placeholder="Subtítulo opcional..." />
                 </div>
                 <div>
                   <label className={lc}>Artista principal</label>
@@ -204,6 +208,17 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
                 <Toggle value={form.is_active} onChange={v => set("is_active", v)} />
               </div>
             </>
+          )}
+
+          {/* ── TAB: GÉNEROS ── */}
+          {tab === "genres" && (
+            <GenreSelector
+              contentType={form.content_type}
+              genres={form.genres || []}
+              tags={form.tags || []}
+              onGenresChange={v => set("genres", v)}
+              onTagsChange={v => set("tags", v)}
+            />
           )}
 
           {/* ── TAB: MEDIA ── */}
@@ -242,8 +257,8 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
                       <img src={form.preview_media_url} alt="" className="w-full h-full object-cover" />
                     )}
                     <div className="absolute top-2 left-2">
-                      <span className={`text-[9px] px-2 py-0.5 rounded font-bold ${form.preview_media_type === "video" ? "bg-purple-600 text-white" : "bg-blue-600 text-white"}`}>
-                        {form.preview_media_type === "video" ? "🎬 Video loop" : "🖼 Imagen"}
+                      <span className="text-[9px] px-2 py-0.5 rounded font-bold bg-white/20 text-white">
+                        {form.preview_media_type === "video" ? "Video loop" : "Imagen"}
                       </span>
                     </div>
                     <button onClick={() => set("preview_media_url", "")}
@@ -265,11 +280,11 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
 
               {/* YouTube */}
               <div>
-                <label className={lc}><Youtube className="w-3 h-3 inline mr-1 text-red-400" />URL de YouTube</label>
+                <label className={lc}>URL de YouTube</label>
                 <input value={form.youtube_url} onChange={e => set("youtube_url", e.target.value)} className={ic} placeholder="https://www.youtube.com/watch?v=..." />
               </div>
               <div>
-                <label className={lc}><Music2 className="w-3 h-3 inline mr-1 text-green-400" />YouTube Music</label>
+                <label className={lc}>YouTube Music</label>
                 <input value={form.youtube_music_url} onChange={e => set("youtube_music_url", e.target.value)} className={ic} placeholder="https://music.youtube.com/watch?v=..." />
               </div>
               <div>
@@ -293,7 +308,7 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
           {/* ── TAB: SECCIONES ── */}
           {tab === "sections" && (
             <>
-              <p className="text-xs text-white/30 mb-4">Define en qué sección aparece este proyecto en la página Explorar y si aparece en el hero destacado.</p>
+              <p className="text-xs text-white/30 mb-4">Define en qué sección aparece este proyecto y si aparece en el hero destacado.</p>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
@@ -308,7 +323,6 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
                 </div>
               </div>
 
-              {/* Hero toggle */}
               <div className="p-4 rounded-xl border border-yellow-500/20 bg-yellow-500/[0.03]">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
@@ -363,16 +377,14 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
           {/* ── TAB: CRÉDITOS ── */}
           {tab === "credits" && (
             <>
-              <p className="text-xs text-white/30 mb-4">Asigna el equipo y elenco del proyecto. Los artistas vinculados a cuentas aparecerán conectados a su perfil.</p>
+              <p className="text-xs text-white/30 mb-4">Asigna el equipo y elenco del proyecto.</p>
 
-              {/* Lista de créditos */}
               {(form.credits || []).length > 0 && (
                 <div className="space-y-2 mb-4">
                   {(form.credits || []).map((credit, idx) => {
                     const artist = artists.find(a => a.id === credit.artist_id);
                     return (
                       <div key={idx} className="flex items-center gap-3 p-3 bg-white/[0.03] border border-white/[0.06] rounded-xl group">
-                        {/* Avatar */}
                         <div className="w-8 h-8 rounded-full overflow-hidden bg-white/10 flex-shrink-0 flex items-center justify-center">
                           {artist?.avatar_url ? (
                             <img src={artist.avatar_url} alt={artist.stageName} className="w-full h-full object-cover" />
@@ -398,32 +410,26 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
                 </div>
               )}
 
-              {/* Añadir crédito */}
               <div className="p-4 rounded-xl border border-white/[0.07] bg-white/[0.02] space-y-3">
                 <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest">Añadir crédito</p>
-
                 <div>
                   <label className={lc}>Artista de la plataforma (opcional)</label>
-                  <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
-                    {/* Quick artist grid */}
-                    <select
-                      value={newCredit.artist_id}
-                      onChange={e => {
-                        const a = artists.find(x => x.id === e.target.value);
-                        setNewCredit(n => ({ ...n, artist_id: e.target.value, name: a?.stageName || n.name }));
-                      }}
-                      className={ic}
-                    >
-                      <option value="" className="bg-[#111]">Sin vincular a cuenta</option>
-                      {artists.map(a => (
-                        <option key={a.id} value={a.id} className="bg-[#111]">
-                          {a.stageName}{a.genre ? ` · ${a.genre}` : ""}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <select
+                    value={newCredit.artist_id}
+                    onChange={e => {
+                      const a = artists.find(x => x.id === e.target.value);
+                      setNewCredit(n => ({ ...n, artist_id: e.target.value, name: a?.stageName || n.name }));
+                    }}
+                    className={ic}
+                  >
+                    <option value="" className="bg-[#111]">Sin vincular a cuenta</option>
+                    {artists.map(a => (
+                      <option key={a.id} value={a.id} className="bg-[#111]">
+                        {a.stageName}{a.genre ? ` · ${a.genre}` : ""}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className={lc}>Nombre en créditos</label>
@@ -445,7 +451,6 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
                     </select>
                   </div>
                 </div>
-
                 <button
                   onClick={addCredit}
                   disabled={!newCredit.role && !newCredit.name}

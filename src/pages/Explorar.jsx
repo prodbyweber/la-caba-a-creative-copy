@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -25,6 +25,8 @@ export default function Explorar() {
   const [authChecked, setAuthChecked] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [activeTypeFilter, setActiveTypeFilter] = useState("all");
+  const [activeGenreFilter, setActiveGenreFilter] = useState("");
   const isAdmin = currentUser?.role === "admin";
 
   useEffect(() => {
@@ -126,16 +128,36 @@ export default function Explorar() {
     };
   };
 
-  // Hero items — carrusel, ordenados por hero_order
+  // Hero items
   const heroRawItems = explorarItems.filter(i => i.is_hero).sort((a, b) => (a.hero_order ?? 0) - (b.hero_order ?? 0));
   const heroCards = heroRawItems.length > 0
     ? heroRawItems.map(mapItemToCard)
     : explorarItems.slice(0, 1).map(mapItemToCard);
 
-  // Search
+  // All unique genres for filter bar
+  const allGenres = useMemo(() =>
+    [...new Set(explorarItems.flatMap(i => i.genres || []))].sort(),
+    [explorarItems]
+  );
+
+  // Content type labels
+  const TYPE_LABELS = { song: "Canción", album: "Álbum", ep: "EP", minifilm: "Mini Film", film: "Film", series: "Serie" };
+
+  // Filter function for items
+  const applyFilters = (items) => {
+    return items.filter(i => {
+      const matchType = activeTypeFilter === "all" || i.content_type === activeTypeFilter;
+      const matchGenre = !activeGenreFilter || (i.genres || []).includes(activeGenreFilter);
+      return matchType && matchGenre;
+    });
+  };
+
+  // Search (also respects genres/tags)
   const searchResults = searchQuery.length > 1
     ? explorarItems.filter(i =>
         i.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (i.genres || []).some(g => g.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (i.tags || []).some(t => t.toLowerCase().includes(searchQuery.toLowerCase())) ||
         i.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
       ).map(mapItemToCard)
     : [];
@@ -216,7 +238,9 @@ export default function Explorar() {
                         )}
                       </div>
                       <p className="text-xs font-semibold text-white truncate">{item.title}</p>
-                      {item.subtitle && <p className="text-[10px] text-white/40">{item.subtitle}</p>}
+                      {item.raw?.genres?.length > 0 && (
+                        <p className="text-[10px] text-white/40 truncate">{item.raw.genres.slice(0, 2).join(" · ")}</p>
+                      )}
                     </motion.div>
                   ))}
                 </div>
@@ -245,9 +269,59 @@ export default function Explorar() {
       )}
 
       {/* Content rows */}
-      <div className="relative z-10 -mt-16 pb-24 space-y-2">
+      <div className="relative z-10 -mt-16 pb-24">
+
+        {/* Filter bar */}
+        {explorarItems.length > 0 && (
+          <div className="px-4 sm:px-8 pt-6 pb-3 space-y-2">
+            {/* Type filters */}
+            <div className="flex gap-1.5 flex-wrap">
+              {["all", "song", "album", "ep", "minifilm", "film", "series"].map(t => (
+                <button
+                  key={t}
+                  onClick={() => setActiveTypeFilter(t)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                    activeTypeFilter === t
+                      ? "bg-white text-black border-white"
+                      : "bg-white/[0.04] text-white/40 border-white/[0.08] hover:border-white/20 hover:text-white/70"
+                  }`}
+                >
+                  {t === "all" ? "Todo" : TYPE_LABELS[t]}
+                </button>
+              ))}
+            </div>
+
+            {/* Genre filters */}
+            {allGenres.length > 0 && (
+              <div className="flex gap-1.5 flex-wrap">
+                {activeGenreFilter && (
+                  <button
+                    onClick={() => setActiveGenreFilter("")}
+                    className="px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border bg-white/10 text-white/60 border-white/20 hover:bg-white/5"
+                  >
+                    Limpiar género
+                  </button>
+                )}
+                {allGenres.map(g => (
+                  <button
+                    key={g}
+                    onClick={() => setActiveGenreFilter(activeGenreFilter === g ? "" : g)}
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border ${
+                      activeGenreFilter === g
+                        ? "bg-white text-black border-white"
+                        : "bg-white/[0.03] text-white/35 border-white/[0.07] hover:border-white/15 hover:text-white/60"
+                    }`}
+                  >
+                    {g}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="space-y-2">
         {explorarSections.length > 0 ? (
-          // New system: use ExplorarSection + SectionAssignment
           explorarSections
             .filter(s => s.is_active !== false)
             .map(section => {
@@ -257,26 +331,26 @@ export default function Explorar() {
                 .map(a => a.item_id);
               const sectionCards = sectionItemIds
                 .map(id => explorarItems.find(i => i.id === id && i.is_active !== false))
-                .filter(Boolean)
-                .map(mapItemToCard);
-              if (sectionCards.length === 0) return null;
+                .filter(Boolean);
+              const filtered = applyFilters(sectionCards).map(mapItemToCard);
+              if (filtered.length === 0) return null;
               return (
                 <ContentRow
                   key={section.id}
                   title={section.label}
-                  items={sectionCards}
+                  items={filtered}
                   onItemClick={handleCardClick}
                   artists={artists}
                 />
               );
             })
         ) : (
-          // Legacy fallback: use row_category on items
           LEGACY_ROW_ORDER.map(cat => {
-            const catItems = explorarItems
-              .filter(i => i.row_category === cat && i.is_active !== false)
-              .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-              .map(mapItemToCard);
+            const catItems = applyFilters(
+              explorarItems
+                .filter(i => i.row_category === cat && i.is_active !== false)
+                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            ).map(mapItemToCard);
             if (catItems.length === 0) return null;
             return (
               <ContentRow
@@ -289,6 +363,7 @@ export default function Explorar() {
             );
           })
         )}
+        </div>
 
         {explorarItems.length === 0 && (
           <div className="text-center py-32 px-6">

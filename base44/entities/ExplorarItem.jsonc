@@ -21,7 +21,21 @@
     },
     "subtitle": {
       "type": "string",
-      "description": "Subt\u00edtulo o g\u00e9nero"
+      "description": "Subt\u00edtulo o g\u00e9nero (legacy)"
+    },
+    "genres": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "G\u00e9neros del proyecto (m\u00e1x. 3)"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags adicionales de la obra"
     },
     "description": {
       "type": "string",
@@ -95,7 +109,7 @@
         "afro_caribbean",
         "experimental"
       ],
-      "description": "Categor\u00eda / fila en la que aparece"
+      "description": "Categor\u00eda legacy"
     },
     "order": {
       "type": "number",
