@@ -63,13 +63,18 @@ function HeroSlide({ item, artist, onExplore, active }) {
                 src={item.thumbnail_url}
                 alt=""
                 className="absolute inset-0 w-full h-full object-cover"
+                style={{ filter: "brightness(1.1) saturate(1.2) contrast(1.05)" }}
               />
             )}
             <video
               ref={videoRef}
               src={item.hero_media_url}
               className="w-full h-full object-cover"
-              style={{ opacity: videoReady ? 1 : 0, transition: "opacity 0.6s ease" }}
+              style={{
+                opacity: videoReady ? 1 : 0,
+                transition: "opacity 0.6s ease",
+                filter: "brightness(1.08) saturate(1.15)",
+              }}
               autoPlay
               muted
               loop
@@ -99,12 +104,15 @@ function HeroSlide({ item, artist, onExplore, active }) {
             src={item?.hero_media_url || bg}
             alt={item?.title}
             className="w-full h-full object-cover"
-            style={{ transform: "scale(1)" }}
+            style={{
+              transform: "scale(1)",
+              filter: "brightness(1.08) saturate(1.15)",
+            }}
           />
         )}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(8,8,8,0.82) 30%, rgba(8,8,8,0.10) 100%)" }} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,8,8,0.97) 0%, transparent 45%)" }} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(8,8,8,0.30) 0%, transparent 25%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(8,8,8,0.4) 30%, transparent 100%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,8,8,0.6) 0%, transparent 55%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(8,8,8,0.1) 0%, transparent 25%)" }} />
       </div>
 
       {/* Content */}
