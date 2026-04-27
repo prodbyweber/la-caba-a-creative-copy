@@ -294,6 +294,7 @@ export default function Explorar() {
                   items={filtered}
                   onItemClick={handleCardClick}
                   artists={artists}
+                  currentUser={currentUser}
                 />
               );
             })
@@ -312,6 +313,7 @@ export default function Explorar() {
                 items={catItems}
                 onItemClick={handleCardClick}
                 artists={artists}
+                currentUser={currentUser}
               />
             );
           })

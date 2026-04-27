@@ -1,7 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Music2, Play, Pause, Youtube, X, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, Music2, Play, Pause, Youtube, X, ChevronDown, Heart, Bookmark } from "lucide-react";
+import { base44 } from "@/api/base44Client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -183,7 +185,7 @@ function CreditsModal({ item, hasVideo, hasAudio, playing, onClose, onPlay, onTo
   );
 }
 
-function ContentCard({ item, onClick }) {
+function ContentCard({ item, onClick, currentUser }) {
   const [hovered, setHovered] = useState(false);
   const [previewActive, setPreviewActive] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -191,6 +193,49 @@ function ContentCard({ item, onClick }) {
   const [showCredits, setShowCredits] = useState(false);
   const audioRef = useRef(null);
   const hoverTimer = useRef(null);
+  const qc = useQueryClient();
+
+  // Fetch user's likes and saves for this item
+  const { data: likes = [] } = useQuery({
+    queryKey: ["likes", item.id, currentUser?.id],
+    queryFn: () => currentUser?.id ? base44.entities.Like.filter({ item_id: item.id, user_id: currentUser.id }) : Promise.resolve([]),
+    enabled: !!currentUser?.id,
+  });
+
+  const { data: saves = [] } = useQuery({
+    queryKey: ["saves", item.id, currentUser?.id],
+    queryFn: () => currentUser?.id ? base44.entities.Save.filter({ item_id: item.id, user_id: currentUser.id }) : Promise.resolve([]),
+    enabled: !!currentUser?.id,
+  });
+
+  const isLiked = likes.length > 0;
+  const isSaved = saves.length > 0;
+
+  const toggleLikeMutation = useMutation({
+    mutationFn: async () => {
+      if (isLiked && likes[0]?.id) {
+        await base44.entities.Like.delete(likes[0].id);
+      } else {
+        await base44.entities.Like.create({ user_id: currentUser.id, item_id: item.id });
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["likes", item.id, currentUser?.id] });
+    },
+  });
+
+  const toggleSaveMutation = useMutation({
+    mutationFn: async () => {
+      if (isSaved && saves[0]?.id) {
+        await base44.entities.Save.delete(saves[0].id);
+      } else {
+        await base44.entities.Save.create({ user_id: currentUser.id, item_id: item.id });
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["saves", item.id, currentUser?.id] });
+    },
+  });
 
   const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
   const hasAudio = !!item.audio_file_url;
@@ -365,6 +410,41 @@ function ContentCard({ item, onClick }) {
             )}
           </AnimatePresence>
 
+          {/* Like and Save buttons — esquina superior derecha */}
+          <AnimatePresence>
+            {hovered && currentUser && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute top-2 right-2 flex items-center gap-1.5"
+              >
+                <button
+                  onClick={e => { e.stopPropagation(); toggleLikeMutation.mutate(); }}
+                  className={`w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center border transition-all ${
+                    isLiked
+                      ? "bg-red-500/60 border-red-400/60"
+                      : "bg-black/40 border-white/20 hover:bg-black/60"
+                  }`}
+                  title={isLiked ? "Quitar like" : "Me gusta"}
+                >
+                  <Heart className="w-3.5 h-3.5 text-white" fill={isLiked ? "white" : "none"} />
+                </button>
+                <button
+                  onClick={e => { e.stopPropagation(); toggleSaveMutation.mutate(); }}
+                  className={`w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center border transition-all ${
+                    isSaved
+                      ? "bg-blue-500/60 border-blue-400/60"
+                      : "bg-black/40 border-white/20 hover:bg-black/60"
+                  }`}
+                  title={isSaved ? "Quitar de guardados" : "Guardar"}
+                >
+                  <Bookmark className="w-3.5 h-3.5 text-white" fill={isSaved ? "white" : "none"} />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Credits button — esquina inferior derecha, solo visible en hover */}
           <AnimatePresence>
             {hovered && (
@@ -386,7 +466,7 @@ function ContentCard({ item, onClick }) {
   );
 }
 
-export default function ContentRow({ title, items, onItemClick }) {
+export default function ContentRow({ title, items, onItemClick, currentUser }) {
   const rowRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -438,7 +518,7 @@ export default function ContentRow({ title, items, onItemClick }) {
         }}
       >
         {items.map((item, i) => (
-          <ContentCard key={`${item.id}-${i}`} item={item} onClick={onItemClick} />
+          <ContentCard key={`${item.id}-${i}`} item={item} onClick={onItemClick} currentUser={currentUser} />
         ))}
       </div>
     </div>
