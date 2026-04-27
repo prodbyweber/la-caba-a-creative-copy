@@ -87,8 +87,8 @@ function HeroSlide({ item, artist, onExplore, active }) {
           </div>
 
           <h1
-            className="text-5xl sm:text-7xl font-black text-white mb-4 leading-none"
-            style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.03em" }}
+            className="text-2xl sm:text-3xl font-bold text-white mb-4 leading-tight"
+            style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.02em" }}
           >
             {item?.title}
           </h1>

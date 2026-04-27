@@ -75,13 +75,38 @@ function YoutubeModal({ ytId, title, originalUrl, onClose }) {
 
 function ContentCard({ item, onClick }) {
   const [hovered, setHovered] = useState(false);
+  const [previewActive, setPreviewActive] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [showYTModal, setShowYTModal] = useState(false);
   const audioRef = useRef(null);
+  const hoverTimer = useRef(null);
 
   const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
   const hasAudio = !!item.audio_file_url;
   const hasVideo = !!ytId;
+
+  const handleMouseEnter = () => {
+    setHovered(true);
+    hoverTimer.current = setTimeout(() => {
+      setPreviewActive(true);
+      // Auto-play audio preview if available
+      if (audioRef.current && !playing) {
+        audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
+      }
+    }, 1500);
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+    setPreviewActive(false);
+    clearTimeout(hoverTimer.current);
+    // Stop audio preview on leave
+    if (audioRef.current && playing) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setPlaying(false);
+    }
+  };
 
   const toggleAudio = (e) => {
     e.stopPropagation();
@@ -96,14 +121,7 @@ function ContentCard({ item, onClick }) {
 
   const openYTModal = (e) => {
     e.stopPropagation();
-    // Try embed first, fall back to opening in new tab if embed fails
     setShowYTModal(true);
-  };
-
-  const openInYoutube = (e) => {
-    e.stopPropagation();
-    const url = item.youtube_url || item.youtube_music_url;
-    if (url) window.open(url, "_blank");
   };
 
   const handleCardClick = () => {
@@ -112,7 +130,6 @@ function ContentCard({ item, onClick }) {
 
   return (
     <>
-      {/* YouTube Modal */}
       {showYTModal && (
         <YoutubeModal
           ytId={ytId}
@@ -125,13 +142,13 @@ function ContentCard({ item, onClick }) {
       <motion.div
         className="relative flex-shrink-0 cursor-pointer group"
         style={{ width: 220 }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         onClick={handleCardClick}
+        animate={previewActive ? { scale: 1.1, zIndex: 10 } : { scale: 1, zIndex: 1 }}
+        transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
       >
-        <motion.div
-          animate={{ scale: hovered ? 1.06 : 1 }}
-          transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
+        <div
           className="relative rounded-xl overflow-hidden bg-[#1a1a1c]"
           style={{ aspectRatio: "16/9" }}
         >
@@ -154,9 +171,29 @@ function ContentCard({ item, onClick }) {
             </div>
           )}
 
+          {/* YouTube preview iframe — aparece tras 1.5s hover */}
+          <AnimatePresence>
+            {previewActive && hasVideo && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+                className="absolute inset-0"
+              >
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${ytId}`}
+                  className="w-full h-full"
+                  allow="autoplay"
+                  style={{ pointerEvents: "none" }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Gradient */}
           <div
-            className="absolute inset-0 transition-opacity duration-300"
+            className="absolute inset-0 transition-opacity duration-300 pointer-events-none"
             style={{
               background: "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)",
               opacity: hovered ? 1 : 0.5,
@@ -164,7 +201,7 @@ function ContentCard({ item, onClick }) {
           />
 
           {/* Playing bar animation */}
-          {playing && (
+          {playing && !previewActive && (
             <div className="absolute top-2 left-2 flex items-end gap-[2px] h-4">
               {[3, 6, 9, 5, 8, 4, 7].map((h, i) => (
                 <div
@@ -193,31 +230,31 @@ function ContentCard({ item, onClick }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 flex items-center justify-center gap-3"
+                className="absolute inset-0 flex items-center justify-center gap-2.5"
               >
                 {/* Audio play */}
                 {hasAudio && (
                   <button
                     onClick={toggleAudio}
-                    className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 hover:bg-white/30 transition-colors"
+                    className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-black/60 transition-colors"
                     title={playing ? "Pausar" : "Reproducir audio"}
                   >
                     {playing ? (
-                      <Pause className="w-4 h-4 text-white" fill="white" />
+                      <Pause className="w-3.5 h-3.5 text-white" fill="white" />
                     ) : (
-                      <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+                      <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" />
                     )}
                   </button>
                 )}
 
-                {/* YouTube modal button */}
+                {/* YouTube modal button — minimalista */}
                 {hasVideo && (
                   <button
                     onClick={openYTModal}
-                    className="w-10 h-10 rounded-full bg-red-600/80 backdrop-blur-sm flex items-center justify-center border border-red-400/30 hover:bg-red-600 transition-colors"
+                    className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-black/60 transition-colors"
                     title="Reproducir video"
                   >
-                    <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+                    <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" />
                   </button>
                 )}
               </motion.div>
@@ -235,7 +272,7 @@ function ContentCard({ item, onClick }) {
               {hasAudio && <Music2 className="w-2.5 h-2.5 text-emerald-400/70" />}
             </div>
           </div>
-        </motion.div>
+        </div>
       </motion.div>
     </>
   );
