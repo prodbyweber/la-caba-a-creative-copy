@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Info, X, Youtube, ChevronLeft, ChevronRight } from "lucide-react";
+import { Play, Info, X, Youtube, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -24,6 +24,20 @@ function HeroSlide({ item, artist, onExplore, active }) {
       videoRef.current.pause();
     }
   }, [active]);
+
+  const handleActionBtn = () => {
+    const link = item?.hero_link;
+    if (!link) return;
+    if (link.startsWith("http://") || link.startsWith("https://")) {
+      window.open(link, "_blank", "noopener");
+    } else {
+      window.location.href = link;
+    }
+  };
+
+  const hasPlayBtn = !!ytId;
+  const hasActionBtn = !!(item?.hero_link || artist);
+  const actionLabel = item?.hero_link_label || (artist ? "Ver artista" : "Más info");
 
   return (
     <div className="absolute inset-0">
@@ -49,9 +63,8 @@ function HeroSlide({ item, artist, onExplore, active }) {
             transition={{ duration: 7, ease: "easeOut" }}
           />
         )}
-        {/* Gradients — más suaves para dar visibilidad */}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(8,8,8,0.80) 30%, rgba(8,8,8,0.10) 100%)" }} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,8,8,0.95) 0%, transparent 45%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(8,8,8,0.82) 30%, rgba(8,8,8,0.10) 100%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,8,8,0.97) 0%, transparent 45%)" }} />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(8,8,8,0.30) 0%, transparent 25%)" }} />
       </div>
 
@@ -89,8 +102,9 @@ function HeroSlide({ item, artist, onExplore, active }) {
             </p>
           )}
 
-          <div className="flex items-center gap-3">
-            {ytId && (
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Botón Reproducir — solo si hay YouTube */}
+            {hasPlayBtn && (
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
@@ -101,15 +115,17 @@ function HeroSlide({ item, artist, onExplore, active }) {
                 Reproducir
               </motion.button>
             )}
-            {artist && (
+
+            {/* Botón de acción / redirect */}
+            {hasActionBtn && (
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={onExplore}
+                onClick={item?.hero_link ? handleActionBtn : onExplore}
                 className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm text-white font-bold rounded-lg hover:bg-white/20 transition-colors text-sm border border-white/10"
               >
-                <Info className="w-4 h-4" />
-                Ver artista
+                {item?.hero_link ? <ExternalLink className="w-4 h-4" /> : <Info className="w-4 h-4" />}
+                {actionLabel}
               </motion.button>
             )}
           </div>
@@ -125,14 +141,12 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
   const [embedFailed, setEmbedFailed] = useState(false);
   const intervalRef = useRef(null);
 
-  // Support legacy single-item prop
   const heroItems = items.length > 0 ? items : [];
   const current = heroItems[activeIdx];
-  const currentArtist = current?.artist_id ? artists.find(a => a.id === current.artist_id) : null;
   const ytUrl = current?.youtube_url || current?.youtube_music_url;
   const ytId = getYoutubeId(ytUrl);
 
-  // Inject modal opener
+  // Inject modal opener into current item
   if (current) current._openModal = () => setShowModal(true);
 
   const goTo = (idx) => {
@@ -235,7 +249,7 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
           )}
         </AnimatePresence>
 
-        {/* Navigation arrows — solo si hay más de 1 */}
+        {/* Nav arrows */}
         {heroItems.length > 1 && (
           <>
             <button

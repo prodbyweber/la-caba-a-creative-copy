@@ -69,6 +69,15 @@
       "default": "image",
       "description": "Tipo de media del hero: imagen o video"
     },
+    "hero_link": {
+      "type": "string",
+      "description": "URL o ruta de destino al hacer clic en 'M\u00e1s info' del hero"
+    },
+    "hero_link_label": {
+      "type": "string",
+      "description": "Texto del bot\u00f3n de acci\u00f3n del hero (ej: 'Ver ahora', 'Escuchar')",
+      "default": "M\u00e1s info"
+    },
     "is_active": {
       "type": "boolean",
       "default": true,
