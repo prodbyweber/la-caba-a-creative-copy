@@ -270,6 +270,8 @@ export default function Explorar() {
 
       {/* Content rows */}
       <div className="relative z-10 -mt-16 pb-24">
+        {/* Sombreado cinemático entre hero y trending */}
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-black/60 via-black/30 to-transparent pointer-events-none" />
 
 
 

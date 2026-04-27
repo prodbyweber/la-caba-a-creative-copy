@@ -66,7 +66,7 @@ function YoutubeModal({ ytId, title, originalUrl, onClose }) {
 }
 
 // Credits modal — completamente fuera del árbol de la tarjeta via portal
-function CreditsModal({ item, hasVideo, hasAudio, playing, onClose, onPlay, onToggleAudio }) {
+function CreditsModal({ item, hasVideo, hasAudio, playing, onClose, onPlay, onToggleAudio, currentUser, isLiked, isSaved, onToggleLike, onToggleSave }) {
   const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
 
   return createPortal(
@@ -100,11 +100,39 @@ function CreditsModal({ item, hasVideo, hasAudio, playing, onClose, onPlay, onTo
             className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 border border-white/10 flex items-center justify-center hover:bg-black/80 transition-colors">
             <X className="w-4 h-4 text-white" />
           </button>
-          <div className="absolute bottom-0 left-0 right-0 px-6 pb-4">
-            <h2 className="text-xl font-black text-white leading-tight" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.02em" }}>
-              {item.title}
-            </h2>
-            {item.subtitle && <p className="text-white/50 text-xs mt-0.5">{item.subtitle}</p>}
+          <div className="absolute bottom-0 left-0 right-0 px-6 pb-4 flex items-end justify-between">
+            <div>
+              <h2 className="text-xl font-black text-white leading-tight" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.02em" }}>
+                {item.title}
+              </h2>
+              {item.subtitle && <p className="text-white/50 text-xs mt-0.5">{item.subtitle}</p>}
+            </div>
+            {currentUser && (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => onToggleLike()}
+                  className={`w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center border transition-all ${
+                    isLiked
+                      ? "bg-red-500/60 border-red-400/60"
+                      : "bg-black/40 border-white/20 hover:bg-black/60"
+                  }`}
+                  title={isLiked ? "Quitar like" : "Me gusta"}
+                >
+                  <Heart className="w-3.5 h-3.5 text-white" fill={isLiked ? "white" : "none"} />
+                </button>
+                <button
+                  onClick={() => onToggleSave()}
+                  className={`w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center border transition-all ${
+                    isSaved
+                      ? "bg-blue-500/60 border-blue-400/60"
+                      : "bg-black/40 border-white/20 hover:bg-black/60"
+                  }`}
+                  title={isSaved ? "Quitar de guardados" : "Guardar"}
+                >
+                  <Bookmark className="w-3.5 h-3.5 text-white" fill={isSaved ? "white" : "none"} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -298,6 +326,11 @@ function ContentCard({ item, onClick, currentUser }) {
             onClose={() => setShowCredits(false)}
             onPlay={() => { setShowCredits(false); setShowYTModal(true); }}
             onToggleAudio={(e) => toggleAudio(e)}
+            currentUser={currentUser}
+            isLiked={isLiked}
+            isSaved={isSaved}
+            onToggleLike={() => toggleLikeMutation.mutate()}
+            onToggleSave={() => toggleSaveMutation.mutate()}
           />
         )}
       </AnimatePresence>
@@ -410,40 +443,7 @@ function ContentCard({ item, onClick, currentUser }) {
             )}
           </AnimatePresence>
 
-          {/* Like and Save buttons — esquina superior derecha */}
-          <AnimatePresence>
-            {hovered && currentUser && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute top-2 right-2 flex items-center gap-1.5"
-              >
-                <button
-                  onClick={e => { e.stopPropagation(); toggleLikeMutation.mutate(); }}
-                  className={`w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center border transition-all ${
-                    isLiked
-                      ? "bg-red-500/60 border-red-400/60"
-                      : "bg-black/40 border-white/20 hover:bg-black/60"
-                  }`}
-                  title={isLiked ? "Quitar like" : "Me gusta"}
-                >
-                  <Heart className="w-3.5 h-3.5 text-white" fill={isLiked ? "white" : "none"} />
-                </button>
-                <button
-                  onClick={e => { e.stopPropagation(); toggleSaveMutation.mutate(); }}
-                  className={`w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center border transition-all ${
-                    isSaved
-                      ? "bg-blue-500/60 border-blue-400/60"
-                      : "bg-black/40 border-white/20 hover:bg-black/60"
-                  }`}
-                  title={isSaved ? "Quitar de guardados" : "Guardar"}
-                >
-                  <Bookmark className="w-3.5 h-3.5 text-white" fill={isSaved ? "white" : "none"} />
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+
 
           {/* Credits button — esquina inferior derecha, solo visible en hover */}
           <AnimatePresence>
