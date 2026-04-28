@@ -80,9 +80,10 @@
       "type": "string",
       "enum": [
         "artist",
+        "creator",
         "brand"
       ],
-      "description": "Tipo de cuenta: artista o marca"
+      "description": "Tipo de cuenta: artista, creador o marca"
     },
     "onboarding_completed": {
       "type": "boolean",
@@ -120,6 +121,72 @@
         "type": "string"
       },
       "description": "Tags de rol: artista, modelo, director, etc."
+    },
+    "creator_categories": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "model",
+          "influencer",
+          "content_creator",
+          "photographer",
+          "videographer",
+          "director",
+          "other"
+        ]
+      },
+      "description": "Categor\u00edas del creador (modelo, influencer, creador de contenido, etc.)"
+    },
+    "brand_website": {
+      "type": "string",
+      "description": "Sitio web de la marca"
+    },
+    "brand_description": {
+      "type": "string",
+      "description": "Descripci\u00f3n de la marca"
+    },
+    "promotion_enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si la marca tiene promociones activas"
+    },
+    "promotion_popup_frequency": {
+      "type": "string",
+      "enum": [
+        "rare",
+        "moderate",
+        "frequent"
+      ],
+      "default": "moderate",
+      "description": "Frecuencia de popups de promoci\u00f3n (raro, moderado, frecuente)"
+    },
+    "active_campaigns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          },
+          "image_url": {
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "description": "Campa\u00f1as activas de la marca"
     }
   },
   "required": [

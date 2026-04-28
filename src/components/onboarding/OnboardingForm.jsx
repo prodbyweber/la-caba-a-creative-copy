@@ -47,6 +47,12 @@ const STEPS = [
   { id: 3, title: "Casi listo", subtitle: "Agrega una foto de perfil" },
 ];
 
+const ACCOUNT_TYPES = [
+  { key: "artist", label: "Artista", desc: "Músico, creativo, performer", Icon: Music2 },
+  { key: "creator", label: "Creador", desc: "Modelo, influencer, content creator", Icon: Camera },
+  { key: "brand", label: "Marca", desc: "Empresa, proyecto, colectivo", Icon: Building2 },
+];
+
 // Photo cropper — lets user drag to reposition
 function PhotoCropper({ url, position, onPositionChange, onChangePhoto, uploading }) {
   const containerRef = useRef(null);
@@ -149,7 +155,7 @@ export default function OnboardingForm({ user, onComplete }) {
     try {
       const full_name = `${form.first_name} ${form.last_name}`.trim();
       const photo_position = `${photoPosition.x}% ${photoPosition.y}%`;
-      await base44.entities.UserProfile.create({
+      const profileData = {
         user_id: user.id,
         user_email: user.email,
         first_name: form.first_name,
@@ -166,7 +172,18 @@ export default function OnboardingForm({ user, onComplete }) {
         photo_position,
         account_type: form.account_type,
         onboarding_completed: true,
-      });
+        display_name: form.artist_name || full_name,
+      };
+      
+      // Agregar datos específicos según el tipo de cuenta
+      if (form.account_type === "creator") {
+        profileData.role_tags = [];
+      } else if (form.account_type === "brand") {
+        profileData.promotion_enabled = false;
+        profileData.active_campaigns = [];
+      }
+      
+      await base44.entities.UserProfile.create(profileData);
       onComplete();
     } finally {
       setLoading(false);
@@ -210,30 +227,27 @@ export default function OnboardingForm({ user, onComplete }) {
         <AnimatePresence mode="wait">
 
           {/* STEP 1 */}
-          {step === 1 && (
-            <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                {[
-                  { key: "artist", label: "Artista", desc: "Músico, creativo, performer", Icon: Music2 },
-                  { key: "brand", label: "Marca", desc: "Empresa, proyecto, colectivo", Icon: Building2 },
-                ].map(({ key, label, desc, Icon }) => (
+           {step === 1 && (
+             <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+               <div className="grid grid-cols-3 gap-3 mb-8">
+                 {ACCOUNT_TYPES.map(({ key, label, desc, Icon }) => (
                   <button
                     key={key}
                     onClick={() => set("account_type", key)}
-                    className={`relative p-6 rounded-2xl border text-left transition-all duration-200 ${
+                    className={`relative p-4 rounded-2xl border text-left transition-all duration-200 ${
                       form.account_type === key
                         ? "border-white/50 bg-white/[0.08]"
                         : "border-white/[0.07] bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"
                     }`}
                   >
                     {form.account_type === key && (
-                      <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-white flex items-center justify-center">
-                        <Check className="w-3 h-3 text-black" strokeWidth={3} />
+                      <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-white flex items-center justify-center">
+                        <Check className="w-2.5 h-2.5 text-black" strokeWidth={3} />
                       </div>
                     )}
-                    <Icon className={`w-6 h-6 mb-3 ${form.account_type === key ? "text-white" : "text-white/30"}`} />
-                    <p className={`font-bold text-base ${form.account_type === key ? "text-white" : "text-white/50"}`}>{label}</p>
-                    <p className="text-[11px] text-white/25 mt-1 leading-tight">{desc}</p>
+                    <Icon className={`w-5 h-5 mb-2 ${form.account_type === key ? "text-white" : "text-white/30"}`} />
+                    <p className={`font-bold text-sm ${form.account_type === key ? "text-white" : "text-white/50"}`}>{label}</p>
+                    <p className="text-[10px] text-white/25 mt-0.5 leading-tight">{desc}</p>
                   </button>
                 ))}
               </div>
@@ -387,9 +401,11 @@ export default function OnboardingForm({ user, onComplete }) {
                     <span className="text-white font-medium">{form.first_name} {form.last_name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/30">Tipo</span>
-                    <span className="text-white font-medium">{form.account_type === "artist" ? "Artista" : "Marca"}</span>
-                  </div>
+                     <span className="text-white/30">Tipo</span>
+                     <span className="text-white font-medium">
+                       {form.account_type === "artist" ? "Artista" : form.account_type === "creator" ? "Creador" : "Marca"}
+                     </span>
+                   </div>
                   <div className="flex justify-between">
                     <span className="text-white/30">Nacionalidad</span>
                     <span className="text-white font-medium">{form.nationality}</span>
