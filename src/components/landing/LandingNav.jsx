@@ -142,8 +142,23 @@ export default function LandingNav() {
           </Link>
 
           <div className="hidden md:flex items-center gap-6">
-            {navItems.map((item) => (
-              item.highlight ? (
+            {navItems.map((item) => {
+              const isExplorarButton = item.key === "comenzar" && item.label === "Explorar";
+              return isExplorarButton ? (
+                <button
+                  key={item.key}
+                  onClick={() => {
+                    if (user) {
+                      navigate("/Explorar");
+                    } else {
+                      base44.auth.redirectToLogin(window.location.href);
+                    }
+                  }}
+                  className="px-5 py-2 rounded-full bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
+                >
+                  {item.label}
+                </button>
+              ) : item.highlight ? (
                 <button
                   key={item.key}
                   onClick={() => scrollToSection(item.id)}
@@ -167,8 +182,8 @@ export default function LandingNav() {
                 >
                   {item.label}
                 </button>
-              )
-            ))}
+              );
+            })}
           </div>
 
           <div className="flex items-center gap-4">
@@ -261,8 +276,24 @@ export default function LandingNav() {
               </div>
 
               <div className="flex flex-col gap-6">
-                {navItems.map((item) => (
-                  item.url ? (
+                {navItems.map((item) => {
+                  const isExplorarButton = item.key === "comenzar" && item.label === "Explorar";
+                  return isExplorarButton ? (
+                    <button
+                      key={item.key}
+                      onClick={() => {
+                        if (user) {
+                          navigate("/Explorar");
+                        } else {
+                          base44.auth.redirectToLogin(window.location.href);
+                        }
+                        setMobileOpen(false);
+                      }}
+                      className="text-2xl font-light text-left text-white font-semibold transition-colors"
+                    >
+                      {item.label}
+                    </button>
+                  ) : item.url ? (
                     <Link
                       key={item.key}
                       to={item.url}
@@ -283,8 +314,8 @@ export default function LandingNav() {
                     >
                       {item.label}
                     </button>
-                  )
-                ))}
+                  );
+                })}
                 <div className="pt-6 border-t border-white/10 space-y-2">
                   {user ? (
                     <>
