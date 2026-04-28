@@ -12,8 +12,8 @@ function isVideoUrl(url) {
 
 const defaultBanners = [
   {
-    tag: "The Girls - Modelos",
-    title: "Muse Club",
+    tag: "Creadoras - Modelos",
+    title: "The Girls",
     subtitle: "She sets the tone",
     defaultCta: "Explore",
     defaultLink: "/Explorar",
@@ -22,6 +22,7 @@ const defaultBanners = [
     mobilePositionKey: "hero_banner_1_mobile_position",
     ctaTextKey: "hero_banner_1_cta_text",
     ctaLinkKey: "hero_banner_1_cta_link",
+    audioKey: "hero_banner_1_audio_enabled",
   },
   {
     tag: "Sonido nuevo",
@@ -86,14 +87,14 @@ function useAutoPlayVideo(src) {
   return ref;
 }
 
-function BannerVideo({ src }) {
+function BannerVideo({ src, enableAudio = false }) {
   const ref = useAutoPlayVideo(src);
   return (
     <video
       ref={ref}
       src={src}
       autoPlay
-      muted
+      muted={!enableAudio}
       loop
       playsInline
       preload="auto"
@@ -104,7 +105,7 @@ function BannerVideo({ src }) {
   );
 }
 
-function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, index }) {
+function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEnabled = false, index }) {
   const isMobile = useMobile();
   const navigate = useNavigate();
   const objectPos = isMobile && mobilePosition ? mobilePosition : "center center";
@@ -134,7 +135,7 @@ function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, index })
     >
       {/* Background: video or image */}
       {isVideoUrl(image) ? (
-        <BannerVideo src={image} />
+        <BannerVideo src={image} enableAudio={audioEnabled} />
       ) : (
         <img
           src={image}
@@ -240,6 +241,7 @@ export default function HeroBanners() {
           mobilePosition={config?.[banner.mobilePositionKey] || "center center"}
           ctaText={config?.[banner.ctaTextKey] || ""}
           ctaLink={config?.[banner.ctaLinkKey] || ""}
+          audioEnabled={banner.audioKey ? config?.[banner.audioKey] === true : false}
           index={i}
         />
       ))}
