@@ -8,8 +8,32 @@ const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81e
 const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
 function HeroVideo({ src }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const vid = ref.current;
+    if (!vid) return;
+
+    // Forzar play en cuanto haya suficientes datos
+    const forcePlay = () => { vid.muted = true; vid.play().catch(() => {}); };
+    forcePlay();
+    vid.addEventListener("loadedmetadata", forcePlay, { once: true });
+    vid.addEventListener("canplay", forcePlay, { once: true });
+
+    // Reintento al primer gesto del usuario (política de autoplay en iframes)
+    const onGesture = () => { vid.muted = true; vid.play().catch(() => {}); };
+    document.addEventListener("pointerdown", onGesture, { once: true });
+    document.addEventListener("keydown", onGesture, { once: true });
+
+    return () => {
+      document.removeEventListener("pointerdown", onGesture);
+      document.removeEventListener("keydown", onGesture);
+    };
+  }, [src]);
+
   return (
     <video
+      ref={ref}
       src={src}
       autoPlay
       muted

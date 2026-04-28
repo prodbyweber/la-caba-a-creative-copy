@@ -50,8 +50,30 @@ function useMobile() {
 }
 
 function BannerVideo({ src }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const vid = ref.current;
+    if (!vid) return;
+
+    const forcePlay = () => { vid.muted = true; vid.play().catch(() => {}); };
+    forcePlay();
+    vid.addEventListener("loadedmetadata", forcePlay, { once: true });
+    vid.addEventListener("canplay", forcePlay, { once: true });
+
+    const onGesture = () => { vid.muted = true; vid.play().catch(() => {}); };
+    document.addEventListener("pointerdown", onGesture, { once: true });
+    document.addEventListener("keydown", onGesture, { once: true });
+
+    return () => {
+      document.removeEventListener("pointerdown", onGesture);
+      document.removeEventListener("keydown", onGesture);
+    };
+  }, [src]);
+
   return (
     <video
+      ref={ref}
       src={src}
       autoPlay
       muted
