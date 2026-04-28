@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -51,34 +51,40 @@ function useMobile() {
 
 function BannerVideo({ src }) {
   const videoRef = useRef(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
+
+    setReady(false);
     vid.muted = true;
-    const playPromise = vid.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        const retry = () => { vid.play().catch(() => {}); };
-        document.addEventListener("click", retry, { once: true });
-        document.addEventListener("touchstart", retry, { once: true });
-      });
-    }
+    vid.load();
+
+    const onCanPlay = () => {
+      vid.play().catch(() => {});
+      setReady(true);
+    };
+
+    vid.addEventListener("canplay", onCanPlay, { once: true });
+    return () => vid.removeEventListener("canplay", onCanPlay);
   }, [src]);
 
   return (
     <video
       ref={videoRef}
-      key={src}
       src={src}
-      autoPlay
       muted
       loop
       playsInline
       preload="auto"
       disableRemotePlayback
       className="absolute inset-0 w-full h-full object-cover"
-      style={{ objectPosition: "center center" }}
+      style={{
+        objectPosition: "center center",
+        opacity: ready ? 1 : 0,
+        transition: "opacity 0.6s ease",
+      }}
     />
   );
 }

@@ -8,34 +8,39 @@ const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
 function HeroVideo({ src }) {
   const videoRef = useRef(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
+
+    setReady(false);
     vid.muted = true;
-    const playPromise = vid.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        // Reintentar en cuanto haya interacción del usuario
-        const retry = () => { vid.play().catch(() => {}); };
-        document.addEventListener("click", retry, { once: true });
-        document.addEventListener("touchstart", retry, { once: true });
-      });
-    }
+    vid.load();
+
+    const onCanPlay = () => {
+      vid.play().catch(() => {});
+      setReady(true);
+    };
+
+    vid.addEventListener("canplay", onCanPlay, { once: true });
+    return () => vid.removeEventListener("canplay", onCanPlay);
   }, [src]);
 
   return (
     <video
       ref={videoRef}
       src={src}
-      autoPlay
       muted
       loop
       playsInline
       preload="auto"
       disableRemotePlayback
-      className="w-[85%] h-[85%] object-cover opacity-60 rounded-2xl"
-      style={{ WebkitMediaControls: "none" }}
+      className="w-[85%] h-[85%] object-cover rounded-2xl"
+      style={{
+        opacity: ready ? 0.6 : 0,
+        transition: "opacity 0.6s ease",
+      }}
     />
   );
 }
