@@ -125,7 +125,7 @@ export default function Hero({ config }) {
               className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
               style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                fontSize: "clamp(4rem, 20vw, 8rem)",
+                fontSize: "clamp(3rem, 16vw, 6rem)",
                 color: "#ff5833",
               }}
             >
@@ -138,7 +138,7 @@ export default function Hero({ config }) {
               className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
               style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                fontSize: "clamp(4rem, 20vw, 8rem)",
+                fontSize: "clamp(3rem, 16vw, 6rem)",
                 color: "#ffffff",
               }}
             >
@@ -204,7 +204,7 @@ export default function Hero({ config }) {
                 className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
                 style={{
                   fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                  fontSize: "clamp(5rem, 18vw, 20vw)",
+                  fontSize: "clamp(4rem, 14vw, 16vw)",
                   color: "#ff5833",
                 }}
               >
@@ -217,7 +217,7 @@ export default function Hero({ config }) {
                 className="leading-[0.85] font-black tracking-[-0.04em] whitespace-nowrap"
                 style={{
                   fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                  fontSize: "clamp(5rem, 18vw, 20vw)",
+                  fontSize: "clamp(4rem, 14vw, 16vw)",
                   color: "#ffffff",
                 }}
               >
