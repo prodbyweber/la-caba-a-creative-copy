@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -49,6 +49,40 @@ function useMobile() {
   return isMobile;
 }
 
+function BannerVideo({ src }) {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    vid.muted = true;
+    const playPromise = vid.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        const retry = () => { vid.play().catch(() => {}); };
+        document.addEventListener("click", retry, { once: true });
+        document.addEventListener("touchstart", retry, { once: true });
+      });
+    }
+  }, [src]);
+
+  return (
+    <video
+      ref={videoRef}
+      key={src}
+      src={src}
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="auto"
+      disableRemotePlayback
+      className="absolute inset-0 w-full h-full object-cover"
+      style={{ objectPosition: "center center" }}
+    />
+  );
+}
+
 function BannerBlock({ banner, image, mobilePosition, index }) {
   const isMobile = useMobile();
   const objectPos = isMobile && mobilePosition ? mobilePosition : "center center";
@@ -67,16 +101,7 @@ function BannerBlock({ banner, image, mobilePosition, index }) {
     >
       {/* Background: video or image */}
       {isVideoUrl(image) ? (
-        <video
-          key={image}
-          src={image}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: "center center" }}
-        />
+        <BannerVideo src={image} />
       ) : (
         <img
           src={image}

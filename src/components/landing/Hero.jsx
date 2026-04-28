@@ -6,6 +6,40 @@ const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81e
 // Detectar móvil/tablet una sola vez (evita re-renders)
 const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
+function HeroVideo({ src }) {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    vid.muted = true;
+    const playPromise = vid.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Reintentar en cuanto haya interacción del usuario
+        const retry = () => { vid.play().catch(() => {}); };
+        document.addEventListener("click", retry, { once: true });
+        document.addEventListener("touchstart", retry, { once: true });
+      });
+    }
+  }, [src]);
+
+  return (
+    <video
+      ref={videoRef}
+      src={src}
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="auto"
+      disableRemotePlayback
+      className="w-[85%] h-[85%] object-cover opacity-60 rounded-2xl"
+      style={{ WebkitMediaControls: "none" }}
+    />
+  );
+}
+
 export default function Hero({ config }) {
   const heroSubtitle = config?.hero_subtitle || "Más que lo que se escucha.";
   const heroVideoUrl = config?.hero_video_url || null;
@@ -52,14 +86,7 @@ export default function Hero({ config }) {
       {heroVideoUrl && (
         <>
           <div className="absolute inset-0 flex items-center justify-center z-0">
-            <video
-              src={heroVideoUrl}
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-[85%] h-[85%] object-cover opacity-60 rounded-2xl"
-            />
+            <HeroVideo src={heroVideoUrl} />
           </div>
           <div className="absolute inset-0 bg-[#0a0a0b]/15 z-0" />
         </>
