@@ -54,17 +54,27 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedA
   const isVideo = isVideoUrl(url);
 
   const persist = async (fields) => {
-    if (!configId) return;
-    setStatus("saving");
-    try {
-      await base44.entities.LandingConfig.update(configId, fields);
-      setStatus("ok");
-      onUpdated(fields);
-      setTimeout(() => setStatus(null), 2500);
-    } catch (e) {
-      setStatus("error");
-      console.error("Error guardando:", e);
-    }
+  if (!configId) return;
+  setStatus("saving");
+  try {
+    await base44.entities.LandingConfig.update(configId, fields);
+    setStatus("ok");
+    // Actualizar estado local inmediatamente
+    Object.entries(fields).forEach(([key, value]) => {
+      if (key === bannerDef.audioKey) {
+        setAudioEnabled(value);
+      } else if (key === bannerDef.mobileKey) {
+        setMobilePosition(value);
+      } else if (key === bannerDef.key) {
+        setUrl(value);
+      }
+    });
+    onUpdated(fields);
+    setTimeout(() => setStatus(null), 2500);
+  } catch (e) {
+    setStatus("error");
+    console.error("Error guardando:", e);
+  }
   };
 
   const handleFileUpload = async (file, isVid) => {
@@ -211,8 +221,9 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedA
         {url && isVideo && (
           <button
             onClick={() => {
-              setAudioEnabled(!audioEnabled);
-              persist({ [bannerDef.audioKey]: !audioEnabled });
+              const newAudioState = !audioEnabled;
+              setAudioEnabled(newAudioState);
+              persist({ [bannerDef.audioKey]: newAudioState });
             }}
             className={`w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border text-sm transition-all ${
               audioEnabled
@@ -371,7 +382,14 @@ export default function BannersAdmin() {
   useEffect(() => { loadConfig(); }, []);
 
   const handleUpdated = (fields) => {
-    setBannerData((prev) => ({ ...prev, ...fields }));
+    setBannerData((prev) => {
+      const updated = { ...prev, ...fields };
+      // Garantizar que audioKey se mapea correctamente
+      Object.entries(fields).forEach(([key, value]) => {
+        updated[key] = value;
+      });
+      return updated;
+    });
   };
 
   return (
