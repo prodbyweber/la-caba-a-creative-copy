@@ -42,7 +42,7 @@ export default function Explorar() {
     });
   }, []);
 
-  // Show pricing popup after 6s only for non-logged-in users (once per session)
+  // Show pricing popup after 4s only for non-logged-in users (once per session)
   useEffect(() => {
     if (!authChecked) return;
     if (currentUser) return; // logged in — never show
@@ -51,48 +51,48 @@ export default function Explorar() {
     const timer = setTimeout(() => {
       setShowPricingModal(true);
       sessionStorage.setItem("pricing_modal_shown", "1");
-    }, 6000);
+    }, 4000);
     return () => clearTimeout(timer);
   }, [authChecked, currentUser]);
 
   const { data: explorarItems, isLoading: loadingItems } = useQuery({
     queryKey: ["explorar-items"],
     queryFn: () => base44.entities.ExplorarItem.filter({ is_active: true }),
-    enabled: !!currentUser,
+    enabled: authChecked,
   });
 
   const { data: artists = [], isLoading: loadingArtists } = useQuery({
     queryKey: ["explorar-artists"],
     queryFn: () => base44.entities.Artist.filter({ status: "Active" }),
-    enabled: !!currentUser,
+    enabled: authChecked,
   });
 
   const { data: projects = [] } = useQuery({
     queryKey: ["explorar-projects"],
     queryFn: () => base44.entities.Project.list("-created_date", 30),
-    enabled: !!currentUser,
+    enabled: authChecked,
   });
 
   const { data: tracks = [] } = useQuery({
     queryKey: ["explorar-tracks"],
     queryFn: () => base44.entities.Track.list("-created_date", 30),
-    enabled: !!currentUser,
+    enabled: authChecked,
   });
 
   const { data: explorarSections = [], isLoading: loadingSections } = useQuery({
     queryKey: ["explorar-sections"],
     queryFn: () => base44.entities.ExplorarSection.list("order"),
-    enabled: !!currentUser,
+    enabled: authChecked,
   });
 
   const { data: sectionAssignments = [], isLoading: loadingAssignments } = useQuery({
     queryKey: ["section-assignments"],
     queryFn: () => base44.entities.SectionAssignment.list("order"),
-    enabled: !!currentUser,
+    enabled: authChecked,
   });
 
-  // Mostrar splash hasta que auth esté listo Y (si hay usuario) los datos esenciales carguen
-  const isLoadingContent = currentUser && (loadingItems || loadingArtists || loadingSections || loadingAssignments);
+  // Mostrar splash solo hasta que auth esté listo y los datos iniciales carguen
+  const isLoadingContent = loadingItems || loadingArtists || loadingSections || loadingAssignments;
   const showSplash = !authChecked || isLoadingContent;
 
   if (showSplash) {
@@ -122,10 +122,6 @@ export default function Explorar() {
   }
 
   const items = explorarItems ?? [];
-
-  if (!currentUser) {
-    return <GuestPreview />;
-  }
 
   // Map ExplorarItem to card format
   const mapItemToCard = (item) => {
@@ -352,6 +348,14 @@ export default function Explorar() {
             <p className="text-white/30 text-sm">No hay contenido publicado aún.</p>
             <p className="text-white/15 text-xs mt-1">Los administradores pueden añadir contenido desde el panel admin.</p>
           </div>
+        )}
+
+        {/* Guest fade-out — blurs bottom 40% of content rows for non-logged users */}
+        {!currentUser && (
+          <div
+            className="absolute bottom-0 left-0 right-0 pointer-events-none"
+            style={{ height: "55%", background: "linear-gradient(to bottom, transparent 0%, rgba(8,8,8,0.7) 40%, rgba(8,8,8,0.97) 80%, #080808 100%)" }}
+          />
         )}
       </div>
 
