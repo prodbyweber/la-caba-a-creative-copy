@@ -9,6 +9,7 @@ import ExplorarHero from "@/components/explorar/ExplorarHero";
 import ContentRow from "@/components/explorar/ContentRow";
 import ArtistProfileModal from "@/components/explorar/ArtistProfileModal";
 import UserProfilePanel from "@/components/explorar/UserProfilePanel";
+import PricingModal from "@/components/explorar/PricingModal";
 
 // Legacy fallback labels (for items with row_category but no ExplorarSection yet)
 const LEGACY_ROW_LABELS = {
@@ -28,6 +29,7 @@ export default function Explorar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("inicio"); // inicio | musica | films
   const [profileOpen, setProfileOpen] = useState(false);
+  const [showPricingModal, setShowPricingModal] = useState(false);
   const isAdmin = currentUser?.role === "admin";
 
   useEffect(() => {
@@ -38,6 +40,19 @@ export default function Explorar() {
       setAuthChecked(true);
     });
   }, []);
+
+  // Show pricing popup after 6s only for non-logged-in users (once per session)
+  useEffect(() => {
+    if (!authChecked) return;
+    if (currentUser) return; // logged in — never show
+    const alreadyShown = sessionStorage.getItem("pricing_modal_shown");
+    if (alreadyShown) return;
+    const timer = setTimeout(() => {
+      setShowPricingModal(true);
+      sessionStorage.setItem("pricing_modal_shown", "1");
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [authChecked, currentUser]);
 
   const { data: explorarItems = [] } = useQuery({
     queryKey: ["explorar-items"],
@@ -356,6 +371,13 @@ export default function Explorar() {
             artists={artists}
             onClose={() => setProfileOpen(false)}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Pricing modal — guests only, after 6s */}
+      <AnimatePresence>
+        {showPricingModal && (
+          <PricingModal onClose={() => setShowPricingModal(false)} />
         )}
       </AnimatePresence>
     </div>
