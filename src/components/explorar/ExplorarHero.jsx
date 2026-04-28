@@ -249,14 +249,15 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
                   )}
                 </div>
               ) : (
-                <div className="relative w-full rounded-xl overflow-hidden shadow-2xl" style={{ paddingBottom: "56.25%" }}>
+                <div className="relative w-full rounded-xl overflow-hidden shadow-2xl bg-black" style={{ paddingBottom: "56.25%" }}>
                   <iframe
-                    src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
+                    key={ytId}
+                    src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
                     title={current?.title}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
-                    className="absolute inset-0 w-full h-full"
-                    onError={() => setEmbedFailed(true)}
+                    className="absolute inset-0 w-full h-full border-0"
+                    referrerPolicy="strict-origin-when-cross-origin"
                   />
                 </div>
               )}
