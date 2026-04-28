@@ -54,13 +54,13 @@ export default function Explorar() {
     return () => clearTimeout(timer);
   }, [authChecked, currentUser]);
 
-  const { data: explorarItems = [] } = useQuery({
+  const { data: explorarItems, isLoading: loadingItems } = useQuery({
     queryKey: ["explorar-items"],
     queryFn: () => base44.entities.ExplorarItem.filter({ is_active: true }),
     enabled: !!currentUser,
   });
 
-  const { data: artists = [] } = useQuery({
+  const { data: artists = [], isLoading: loadingArtists } = useQuery({
     queryKey: ["explorar-artists"],
     queryFn: () => base44.entities.Artist.filter({ status: "Active" }),
     enabled: !!currentUser,
@@ -78,19 +78,49 @@ export default function Explorar() {
     enabled: !!currentUser,
   });
 
-  const { data: explorarSections = [] } = useQuery({
+  const { data: explorarSections = [], isLoading: loadingSections } = useQuery({
     queryKey: ["explorar-sections"],
     queryFn: () => base44.entities.ExplorarSection.list("order"),
     enabled: !!currentUser,
   });
 
-  const { data: sectionAssignments = [] } = useQuery({
+  const { data: sectionAssignments = [], isLoading: loadingAssignments } = useQuery({
     queryKey: ["section-assignments"],
     queryFn: () => base44.entities.SectionAssignment.list("order"),
     enabled: !!currentUser,
   });
 
-  if (!authChecked) return null;
+  // Mostrar splash hasta que auth esté listo Y (si hay usuario) los datos esenciales carguen
+  const isLoadingContent = currentUser && (loadingItems || loadingArtists || loadingSections || loadingAssignments);
+  const showSplash = !authChecked || isLoadingContent;
+
+  if (showSplash) {
+    return (
+      <div className="min-h-screen bg-[#080808] flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="flex flex-col items-center gap-6"
+        >
+          <img
+            src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
+            alt="Cabaña Creative"
+            className="w-16 h-16 object-contain"
+            style={{ animation: "cabana-pulse 1.6s ease-in-out infinite" }}
+          />
+          <style>{`
+            @keyframes cabana-pulse {
+              0%, 100% { opacity: 1; transform: scale(1); }
+              50% { opacity: 0.55; transform: scale(0.92); }
+            }
+          `}</style>
+        </motion.div>
+      </div>
+    );
+  }
+
+  const items = explorarItems ?? [];
 
   if (!currentUser) {
     return (
@@ -125,7 +155,7 @@ export default function Explorar() {
   // Map ExplorarItem to card format
   const mapItemToCard = (item) => {
     const ytThumb = getYoutubeThumbnail(item.youtube_url || item.youtube_music_url);
-    const artist = artists.find(a => a.id === item.artist_id);
+    const artist = artists.find(a => a.id === item.artist_id);  
     return {
       id: item.id,
       title: item.title,
@@ -145,10 +175,10 @@ export default function Explorar() {
   };
 
   // Hero items
-  const heroRawItems = explorarItems.filter(i => i.is_hero).sort((a, b) => (a.hero_order ?? 0) - (b.hero_order ?? 0));
+  const heroRawItems = items.filter(i => i.is_hero).sort((a, b) => (a.hero_order ?? 0) - (b.hero_order ?? 0));
   const heroCards = heroRawItems.length > 0
     ? heroRawItems.map(mapItemToCard)
-    : explorarItems.slice(0, 1).map(mapItemToCard);
+    : items.slice(0, 1).map(mapItemToCard);
 
   // Tipos que se consideran "música" y "films/audiovisual"
   const MUSIC_TYPES = ["song", "album", "ep"];
@@ -168,7 +198,7 @@ export default function Explorar() {
 
   // Search (also respects genres/tags)
   const searchResults = searchQuery.length > 1
-    ? explorarItems.filter(i =>
+    ? items.filter(i =>
         i.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (i.genres || []).some(g => g.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (i.tags || []).some(t => t.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -304,7 +334,7 @@ export default function Explorar() {
                 .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
                 .map(a => a.item_id);
               const sectionCards = sectionItemIds
-                .map(id => explorarItems.find(i => i.id === id && i.is_active !== false))
+                .map(id => items.find(i => i.id === id && i.is_active !== false))
                 .filter(Boolean);
               const filtered = applyFilters(sectionCards).map(mapItemToCard);
               if (filtered.length === 0) return null;
@@ -322,7 +352,7 @@ export default function Explorar() {
         ) : (
           LEGACY_ROW_ORDER.map(cat => {
             const catItems = applyFilters(
-              explorarItems
+              items
                 .filter(i => i.row_category === cat && i.is_active !== false)
                 .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
             ).map(mapItemToCard);
@@ -341,7 +371,7 @@ export default function Explorar() {
         )}
         </div>
 
-        {explorarItems.length === 0 && (
+        {items.length === 0 && (
           <div className="text-center py-32 px-6">
             <Music2 className="w-12 h-12 text-white/10 mx-auto mb-4" />
             <p className="text-white/30 text-sm">No hay contenido publicado aún.</p>
@@ -367,7 +397,7 @@ export default function Explorar() {
         {profileOpen && (
           <UserProfilePanel
             currentUser={currentUser}
-            explorarItems={explorarItems}
+            explorarItems={items}
             artists={artists}
             onClose={() => setProfileOpen(false)}
           />
