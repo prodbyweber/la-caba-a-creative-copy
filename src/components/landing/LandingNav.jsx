@@ -98,11 +98,10 @@ export default function LandingNav() {
 
   const navItems = [
     { label: "Servicios", url: createPageUrl("Services"), key: "servicios" },
-    { label: "Explorar", url: "/Explorar", key: "explorar" },
     { label: "Acerca de Nosotros", id: "about", key: "quienes_somos" },
     { label: "Artistas", id: "stories", key: "artistas" },
-    { label: "Comenzar", id: "offers", highlight: true, key: "comenzar" }
-  ].filter(item => item.key !== "explorar" ? visibleMenuButtons[item.key] !== false : true);
+    { label: "Explorar", url: "/Explorar", highlight: true, key: "comenzar" }
+  ].filter(item => visibleMenuButtons[item.key] !== false);
 
   return (
     <>
