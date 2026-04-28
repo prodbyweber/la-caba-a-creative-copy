@@ -342,7 +342,10 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
                   {linkedArtist?.stageName && displayName !== linkedArtist.stageName && (
                     <p className="text-[11px] text-white/25 mb-0.5">{displayName}</p>
                   )}
-                  <p className="text-[10px] text-white/20 mb-3">{currentUser?.email}</p>
+                  <p className="text-[10px] text-white/20 mb-1">{currentUser?.email}</p>
+                  {userProfile?.country_of_residence && (
+                    <p className="text-[10px] text-white/30 mb-3">{userProfile.country_of_residence}{userProfile.address ? `, ${userProfile.address}` : ''}</p>
+                  )}
 
                   {/* Genre + role tags */}
                   {(linkedArtist?.genre || (userProfile?.role_tags?.length > 0)) && (

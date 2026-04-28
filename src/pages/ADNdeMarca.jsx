@@ -84,7 +84,7 @@ const getYouTubeEmbedId = (url) => {
   return null;
 };
 
-export default function ADNdeMarca() {
+export default function ADNdeMarca({ onClose }) {
   const urlParams = new URLSearchParams(window.location.search);
   const artistId = urlParams.get("artistId");
 

@@ -11,11 +11,12 @@ import StatusButton from "@/components/admin/StatusButton";
 import SubscriptionStatus from "@/components/subscription/SubscriptionStatus";
 import {
   Calendar, Clock, AlertCircle, GitPullRequest, FolderKanban,
-  TrendingUp, Users, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal
+  TrendingUp, Users, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal, Zap, ChevronRight
 } from "lucide-react";
 import { format, isToday, parseISO } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import ADNdeMarca from "./ADNdeMarca";
 
 function ItemMenu({ onEdit, onDelete, onArchive, showArchive = false }) {
   const [open, setOpen] = useState(false);
@@ -59,6 +60,7 @@ export default function AdminDashboard() {
   const [editSession, setEditSession] = useState(null);
   const [editDeliverable, setEditDeliverable] = useState(null);
   const [editRevision, setEditRevision] = useState(null);
+  const [showADN, setShowADN] = useState(false);
 
 
   const queryClient = useQueryClient();
@@ -131,6 +133,24 @@ export default function AdminDashboard() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Admin Dashboard</h1>
           <p className="text-sm text-white/30">Actividades prioritarias de hoy</p>
+        </motion.div>
+
+        {/* ADN de Marca Quick Link - Minimalista */}
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mb-6 p-3 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] transition-all cursor-pointer group"
+          onClick={() => setShowADN(true)}
+        >
+          <div className="flex items-center gap-2">
+            <Zap className="w-4 h-4 text-amber-400" />
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-white">ADN de Marca</p>
+              <p className="text-[10px] text-white/30">Gestiona el generador de ADN</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0" />
+          </div>
         </motion.div>
 
         {/* KPI Cards - arriba */}
@@ -359,6 +379,9 @@ export default function AdminDashboard() {
       <CreateSessionModal isOpen={showSessionModal} onClose={handleCloseSession} editData={editSession} />
       <CreateDeliverableModal isOpen={showDeliverableModal} onClose={handleCloseDeliverable} editData={editDeliverable} />
       <CreateRevisionModal isOpen={showRevisionModal} onClose={handleCloseRevision} editData={editRevision} />
+      
+      {/* ADN Modal */}
+      {showADN && <ADNdeMarca onClose={() => setShowADN(false)} />}
 
       <VoiceAssistant />
     </AdminLayout>
