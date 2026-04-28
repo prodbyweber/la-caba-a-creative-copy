@@ -10,6 +10,7 @@ import ContentRow from "@/components/explorar/ContentRow";
 import ArtistProfileModal from "@/components/explorar/ArtistProfileModal";
 import UserProfilePanel from "@/components/explorar/UserProfilePanel";
 import PricingModal from "@/components/explorar/PricingModal";
+import GuestPreview from "@/components/explorar/GuestPreview";
 
 // Legacy fallback labels (for items with row_category but no ExplorarSection yet)
 const LEGACY_ROW_LABELS = {
@@ -123,33 +124,7 @@ export default function Explorar() {
   const items = explorarItems ?? [];
 
   if (!currentUser) {
-    return (
-      <div className="min-h-screen bg-[#080808] flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center max-w-md px-6"
-        >
-          <div
-            className="text-4xl font-black text-white mb-2"
-            style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.04em" }}
-          >
-            CABAÑA<span className="text-[#ff5833]">®</span>
-          </div>
-          <div className="text-xs text-white/30 uppercase tracking-widest mb-8">Creative Universe</div>
-          <h2 className="text-2xl font-bold text-white mb-3">Acceso exclusivo</h2>
-          <p className="text-white/50 text-sm leading-relaxed mb-8">
-            Esta plataforma está disponible solo para artistas y miembros registrados de La Cabaña Creative.
-          </p>
-          <button
-            onClick={() => base44.auth.redirectToLogin(window.location.href)}
-            className="px-8 py-3 bg-white text-black font-bold rounded-lg hover:bg-white/90 transition-all"
-          >
-            Iniciar sesión
-          </button>
-        </motion.div>
-      </div>
-    );
+    return <GuestPreview />;
   }
 
   // Map ExplorarItem to card format
