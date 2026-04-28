@@ -36,224 +36,97 @@
     },
     "hero_banner_1_image": {
       "type": "string",
-      "description": "URL de imagen o video del banner 1 (Muse Club)"
+      "description": "URL de imagen o video del banner 1"
     },
     "hero_banner_1_mobile_position": {
       "type": "string",
-      "description": "object-position CSS para mobile del banner 1 (ej: 'center top', '70% center')"
+      "description": "object-position CSS para mobile del banner 1"
+    },
+    "hero_banner_1_cta_text": {
+      "type": "string",
+      "description": "Texto del bot\u00f3n CTA del banner 1",
+      "default": "Explore"
+    },
+    "hero_banner_1_cta_link": {
+      "type": "string",
+      "description": "Link del bot\u00f3n CTA del banner 1",
+      "default": "/Explorar"
     },
     "hero_banner_2_image": {
       "type": "string",
-      "description": "URL de imagen o video del banner 2 (La Nueva Corriente)"
+      "description": "URL de imagen o video del banner 2"
     },
     "hero_banner_2_mobile_position": {
       "type": "string",
       "description": "object-position CSS para mobile del banner 2"
     },
+    "hero_banner_2_cta_text": {
+      "type": "string",
+      "description": "Texto del bot\u00f3n CTA del banner 2",
+      "default": "Descubrir"
+    },
+    "hero_banner_2_cta_link": {
+      "type": "string",
+      "description": "Link del bot\u00f3n CTA del banner 2",
+      "default": "/Explorar"
+    },
     "hero_banner_3_image": {
       "type": "string",
-      "description": "URL de imagen o video del banner 3 (Friends & Family)"
+      "description": "URL de imagen o video del banner 3"
     },
     "hero_banner_3_mobile_position": {
       "type": "string",
       "description": "object-position CSS para mobile del banner 3"
+    },
+    "hero_banner_3_cta_text": {
+      "type": "string",
+      "description": "Texto del bot\u00f3n CTA del banner 3",
+      "default": "Ver todo"
+    },
+    "hero_banner_3_cta_link": {
+      "type": "string",
+      "description": "Link del bot\u00f3n CTA del banner 3",
+      "default": "/Explorar"
     },
     "brand_logos": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "URLs de logos de marcas (PNG transparentes)"
+      "description": "URLs de logos de marcas"
     },
     "testimonials": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "image": {
-            "type": "string"
-          },
-          "quote": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "role": {
-            "type": "string"
-          }
-        }
+        "type": "object"
       },
       "description": "Testimoniales de clientes"
     },
     "team_members": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "name": {
-            "type": "string"
-          },
-          "role": {
-            "type": "string"
-          },
-          "bio": {
-            "type": "string"
-          },
-          "image_url": {
-            "type": "string"
-          },
-          "collaborations": {
-            "type": "string"
-          }
-        }
+        "type": "object"
       },
       "description": "Miembros del equipo"
     },
     "startups": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "image": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "category": {
-            "type": "string"
-          },
-          "link": {
-            "type": "string"
-          }
-        }
+        "type": "object"
       },
       "description": "Lista de startups"
     },
     "timeline_milestones": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "year": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "image": {
-            "type": "string"
-          }
-        }
+        "type": "object"
       },
       "description": "Hitos del timeline biogr\u00e1fico"
     },
     "offers": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "form_id": {
-            "type": "string"
-          },
-          "booking_link": {
-            "type": "string"
-          },
-          "payment_link": {
-            "type": "string"
-          },
-          "pre_purchase_calendly_link": {
-            "type": "string"
-          },
-          "tag": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "price": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "cta": {
-            "type": "string"
-          },
-          "color": {
-            "type": "string"
-          },
-          "featured": {
-            "type": "boolean"
-          },
-          "highlights": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "technical": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "trailer_url": {
-            "type": "string"
-          },
-          "full_description": {
-            "type": "string"
-          },
-          "for_who": {
-            "type": "string"
-          },
-          "what_you_gain": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "key_content": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "image_url": {
-            "type": "string"
-          },
-          "title_font_size": {
-            "type": "string"
-          },
-          "title_font_weight": {
-            "type": "string"
-          },
-          "description_font_size": {
-            "type": "string"
-          },
-          "price_font_size": {
-            "type": "string"
-          }
-        }
+        "type": "object"
       },
       "description": "Lista de ofertas/servicios"
     },
@@ -322,28 +195,22 @@
       "type": "object",
       "properties": {
         "quienes_somos": {
-          "type": "boolean",
-          "default": true
+          "type": "boolean"
         },
         "artistas": {
-          "type": "boolean",
-          "default": true
+          "type": "boolean"
         },
         "adn_marca": {
-          "type": "boolean",
-          "default": false
+          "type": "boolean"
         },
         "exploracion": {
-          "type": "boolean",
-          "default": true
+          "type": "boolean"
         },
         "startups": {
-          "type": "boolean",
-          "default": true
+          "type": "boolean"
         },
         "comenzar": {
-          "type": "boolean",
-          "default": true
+          "type": "boolean"
         }
       }
     },

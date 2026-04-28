@@ -3,9 +3,9 @@ import { Upload, Trash2, CheckCircle, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const BANNERS = [
-  { key: "hero_banner_1_image", label: "Banner 1", subtitle: "Muse Club" },
-  { key: "hero_banner_2_image", label: "Banner 2", subtitle: "La Nueva Corriente" },
-  { key: "hero_banner_3_image", label: "Banner 3", subtitle: "Friends & Family" },
+  { key: "hero_banner_1_image", label: "Banner 1", subtitle: "Muse Club", ctaTextKey: "hero_banner_1_cta_text", ctaLinkKey: "hero_banner_1_cta_link", defaultCta: "Explore" },
+  { key: "hero_banner_2_image", label: "Banner 2", subtitle: "La Nueva Corriente", ctaTextKey: "hero_banner_2_cta_text", ctaLinkKey: "hero_banner_2_cta_link", defaultCta: "Descubrir" },
+  { key: "hero_banner_3_image", label: "Banner 3", subtitle: "Friends & Family", ctaTextKey: "hero_banner_3_cta_text", ctaLinkKey: "hero_banner_3_cta_link", defaultCta: "Ver todo" },
 ];
 
 function isVideoUrl(url) {
@@ -14,19 +14,22 @@ function isVideoUrl(url) {
   return cleanUrl.endsWith(".mp4") || cleanUrl.endsWith(".webm") || cleanUrl.endsWith(".mov");
 }
 
-function BannerCard({ bannerDef, configId, savedUrl }) {
+function BannerCard({ bannerDef, configId, savedUrl, savedCtaText, savedCtaLink }) {
   const [url, setUrl] = useState(savedUrl || "");
+  const [ctaText, setCtaText] = useState(savedCtaText || "");
+  const [ctaLink, setCtaLink] = useState(savedCtaLink || "");
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState(null); // null | "saving" | "ok" | "error"
   const fileInputImg = useRef();
   const fileInputVid = useRef();
-  // Track the last savedUrl we initialized from, to avoid resetting user edits
   const initializedRef = useRef(false);
 
   useEffect(() => {
     if (!initializedRef.current && savedUrl !== undefined) {
       initializedRef.current = true;
       setUrl(savedUrl || "");
+      setCtaText(savedCtaText || "");
+      setCtaLink(savedCtaLink || "");
     }
   }, [savedUrl]);
 
@@ -66,8 +69,22 @@ function BannerCard({ bannerDef, configId, savedUrl }) {
     }
   };
 
+  const persistCta = async (key, value) => {
+    if (!configId) return;
+    setStatus("saving");
+    try {
+      await base44.entities.LandingConfig.update(configId, { [key]: value });
+      setStatus("ok");
+      setTimeout(() => setStatus(null), 2500);
+    } catch (e) {
+      setStatus("error");
+    }
+  };
+
   const handleRemove = () => persist("");
   const handleUrlBlur = () => { if (url !== savedUrl) persist(url); };
+  const handleCtaTextBlur = () => { if (ctaText !== savedCtaText) persistCta(bannerDef.ctaTextKey, ctaText); };
+  const handleCtaLinkBlur = () => { if (ctaLink !== savedCtaLink) persistCta(bannerDef.ctaLinkKey, ctaLink); };
 
   return (
     <div className="mb-5 bg-white/[0.03] rounded-xl border border-white/10 overflow-hidden">
@@ -136,6 +153,31 @@ function BannerCard({ bannerDef, configId, savedUrl }) {
           placeholder="URL directa (opcional)..."
           className="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
         />
+
+        {/* CTA fields */}
+        <div className="pt-2 pb-1 border-t border-white/[0.06]">
+          <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest mb-2">Botón CTA</p>
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="text"
+              value={ctaText}
+              onChange={(e) => setCtaText(e.target.value)}
+              onBlur={handleCtaTextBlur}
+              placeholder={`Texto (ej: ${bannerDef.defaultCta})`}
+              className="px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+            />
+            <input
+              type="text"
+              value={ctaLink}
+              onChange={(e) => setCtaLink(e.target.value)}
+              onBlur={handleCtaLinkBlur}
+              placeholder="Link (ej: /Explorar)"
+              className="px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+          <p className="text-[10px] text-white/20 mt-1.5">Por defecto redirigen a /Explorar</p>
+        </div>
+
         <div className="grid grid-cols-2 gap-2">
           <label className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border border-dashed border-white/20 text-sm cursor-pointer transition-all ${uploading || status === "saving" ? "opacity-40 pointer-events-none" : "bg-white/5 hover:bg-white/10 text-white"}`}>
             <input ref={fileInputImg} type="file" accept="image/*" className="hidden"
@@ -167,6 +209,8 @@ export default function BannersEditor({ configId, config }) {
           bannerDef={banner}
           configId={configId}
           savedUrl={config?.[banner.key] || ""}
+          savedCtaText={config?.[banner.ctaTextKey] || ""}
+          savedCtaLink={config?.[banner.ctaLinkKey] || ""}
         />
       ))}
     </div>
