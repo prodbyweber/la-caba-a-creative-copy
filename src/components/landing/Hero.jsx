@@ -16,24 +16,23 @@ function HeroVideo({ src }) {
 
     setReady(false);
 
-    const show = () => {
-      vid.play().catch(() => {});
-      setReady(true);
+    const tryPlay = () => {
+      vid.play().then(() => setReady(true)).catch(() => {});
     };
 
-    // Mostrar en cuanto haya datos suficientes
-    vid.addEventListener("loadeddata", show, { once: true });
-    vid.addEventListener("canplay", show, { once: true });
+    const onReady = () => tryPlay();
 
-    // Fallback: mostrar igualmente después de 1.5s aunque no haya evento
-    const fallback = setTimeout(() => { vid.play().catch(() => {}); setReady(true); }, 1500);
-
+    vid.addEventListener("canplaythrough", onReady, { once: true });
+    vid.addEventListener("loadeddata", onReady, { once: true });
     vid.load();
 
+    // Fallback si los eventos no disparan (red lenta)
+    const t = setTimeout(tryPlay, 2000);
+
     return () => {
-      vid.removeEventListener("loadeddata", show);
-      vid.removeEventListener("canplay", show);
-      clearTimeout(fallback);
+      vid.removeEventListener("canplaythrough", onReady);
+      vid.removeEventListener("loadeddata", onReady);
+      clearTimeout(t);
     };
   }, [src]);
 
@@ -41,16 +40,18 @@ function HeroVideo({ src }) {
     <video
       ref={videoRef}
       src={src}
-      autoPlay
       muted
       loop
       playsInline
       preload="auto"
       disableRemotePlayback
+      x-webkit-airplay="deny"
       className="w-[85%] h-[85%] object-cover rounded-2xl"
       style={{
         opacity: ready ? 0.6 : 0,
         transition: "opacity 0.5s ease",
+        // Suprimir controles nativos del navegador
+        WebkitMediaControlsPanel: "none",
       }}
     />
   );

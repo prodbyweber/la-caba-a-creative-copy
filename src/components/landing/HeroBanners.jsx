@@ -59,22 +59,22 @@ function BannerVideo({ src }) {
 
     setReady(false);
 
-    const show = () => {
-      vid.play().catch(() => {});
-      setReady(true);
+    const tryPlay = () => {
+      vid.play().then(() => setReady(true)).catch(() => {});
     };
 
-    vid.addEventListener("loadeddata", show, { once: true });
-    vid.addEventListener("canplay", show, { once: true });
+    const onReady = () => tryPlay();
 
-    const fallback = setTimeout(() => { vid.play().catch(() => {}); setReady(true); }, 1500);
-
+    vid.addEventListener("canplaythrough", onReady, { once: true });
+    vid.addEventListener("loadeddata", onReady, { once: true });
     vid.load();
 
+    const t = setTimeout(tryPlay, 2000);
+
     return () => {
-      vid.removeEventListener("loadeddata", show);
-      vid.removeEventListener("canplay", show);
-      clearTimeout(fallback);
+      vid.removeEventListener("canplaythrough", onReady);
+      vid.removeEventListener("loadeddata", onReady);
+      clearTimeout(t);
     };
   }, [src]);
 
@@ -82,17 +82,18 @@ function BannerVideo({ src }) {
     <video
       ref={videoRef}
       src={src}
-      autoPlay
       muted
       loop
       playsInline
       preload="auto"
       disableRemotePlayback
+      x-webkit-airplay="deny"
       className="absolute inset-0 w-full h-full object-cover"
       style={{
         objectPosition: "center center",
         opacity: ready ? 1 : 0,
         transition: "opacity 0.5s ease",
+        WebkitMediaControlsPanel: "none",
       }}
     />
   );
