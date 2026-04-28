@@ -219,24 +219,31 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedA
 
         {/* Audio toggle for videos */}
         {url && isVideo && (
-          <button
-            onClick={() => {
-              const newAudioState = !audioEnabled;
-              setAudioEnabled(newAudioState);
-              persist({ [bannerDef.audioKey]: newAudioState });
-            }}
-            className={`w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border text-sm transition-all ${
-              audioEnabled
-                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
-                : "border-white/10 bg-white/5 text-white/60 hover:text-white hover:bg-white/10"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-              <span>Audio del video</span>
-            </div>
-            <span className="text-xs text-white/30">{audioEnabled ? "Activo" : "Silenciado"}</span>
-          </button>
+          <div className="space-y-2">
+            <button
+              onClick={() => {
+                const newAudioState = !audioEnabled;
+                setAudioEnabled(newAudioState);
+              }}
+              className={`w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border text-sm transition-all ${
+                audioEnabled
+                  ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                  : "border-white/10 bg-white/5 text-white/60 hover:text-white hover:bg-white/10"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                <span>Audio del video</span>
+              </div>
+              <span className="text-xs text-white/30">{audioEnabled ? "Activo" : "Silenciado"}</span>
+            </button>
+            <button
+              onClick={() => persist({ [bannerDef.audioKey]: audioEnabled })}
+              className="w-full px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 rounded-lg text-xs font-medium transition-all border border-emerald-500/30"
+            >
+              Guardar Configuración de Audio
+            </button>
+          </div>
         )}
 
         {/* Mobile position toggle */}

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
+import { Volume2, VolumeX } from "lucide-react";
 
 function isVideoUrl(url) {
   if (!url) return false;
@@ -109,6 +110,7 @@ function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEna
   const isMobile = useMobile();
   const navigate = useNavigate();
   const objectPos = isMobile && mobilePosition ? mobilePosition : "center center";
+  const [isAudioActive, setIsAudioActive] = useState(audioEnabled);
 
   const handleCta = () => {
     const link = ctaLink || banner.defaultLink;
@@ -135,7 +137,7 @@ function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEna
     >
       {/* Background: video or image */}
       {isVideoUrl(image) ? (
-        <BannerVideo src={image} enableAudio={audioEnabled} />
+        <BannerVideo src={image} enableAudio={isAudioActive} />
       ) : (
         <img
           src={image}
@@ -151,6 +153,27 @@ function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEna
 
       {/* Bottom gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+      {/* Audio Control Button — cinemático */}
+      {isVideoUrl(image) && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.5 + index * 0.06, duration: 0.5 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsAudioActive(!isAudioActive);
+          }}
+          className="absolute top-6 right-6 z-20 p-2.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 transition-all duration-300 group/audio hover:scale-110"
+        >
+          {isAudioActive ? (
+            <Volume2 className="w-5 h-5 text-white" />
+          ) : (
+            <VolumeX className="w-5 h-5 text-white/50" />
+          )}
+        </motion.button>
+      )}
 
       {/* Content — bottom */}
       <div className="absolute bottom-0 left-0 right-0 px-6 sm:px-12 lg:px-16 pb-12 sm:pb-14 lg:pb-16">
