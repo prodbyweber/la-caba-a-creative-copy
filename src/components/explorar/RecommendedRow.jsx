@@ -80,13 +80,7 @@ export default function RecommendedRow({ currentItem, allItems, onSelect }) {
                   <Music2 className="w-5 h-5 text-white/10" />
                 </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-2.5">
-                <p className="text-[11px] font-bold text-white truncate leading-tight">{item.title}</p>
-                {item.raw?.genres?.length > 0 && (
-                  <p className="text-[9px] text-white/35 truncate mt-0.5">{item.raw.genres.slice(0, 2).join(" · ")}</p>
-                )}
-              </div>
+
             </motion.button>
           );
         })}
