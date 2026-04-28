@@ -24,8 +24,8 @@ export default function PhotosGallery({ userProfileId }) {
   });
 
   const handleUpload = async (file) => {
-    if (!file || file.size > 7 * 1024 * 1024) {
-      alert("El archivo debe ser menor a 7MB");
+    if (!file || file.size > 20 * 1024 * 1024) {
+      alert("El archivo debe ser menor a 20MB");
       return;
     }
 
@@ -79,7 +79,7 @@ export default function PhotosGallery({ userProfileId }) {
                 <p className="text-sm font-medium text-white/70">
                   {uploading ? "Subiendo..." : "Sube una foto"}
                 </p>
-                <p className="text-xs text-white/30 mt-1">Máximo 7MB • JPG, PNG</p>
+                <p className="text-xs text-white/30 mt-1">Máximo 20MB • JPG, PNG</p>
               </div>
             </div>
           </div>
