@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -50,51 +50,16 @@ function useMobile() {
 }
 
 function BannerVideo({ src }) {
-  const videoRef = useRef(null);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const vid = videoRef.current;
-    if (!vid) return;
-
-    setReady(false);
-
-    const tryPlay = () => {
-      vid.play().then(() => setReady(true)).catch(() => {});
-    };
-
-    const onReady = () => tryPlay();
-
-    vid.addEventListener("canplaythrough", onReady, { once: true });
-    vid.addEventListener("loadeddata", onReady, { once: true });
-    vid.load();
-
-    const t = setTimeout(tryPlay, 2000);
-
-    return () => {
-      vid.removeEventListener("canplaythrough", onReady);
-      vid.removeEventListener("loadeddata", onReady);
-      clearTimeout(t);
-    };
-  }, [src]);
-
   return (
     <video
-      ref={videoRef}
       src={src}
+      autoPlay
       muted
       loop
       playsInline
       preload="auto"
-      disableRemotePlayback
-      x-webkit-airplay="deny"
       className="absolute inset-0 w-full h-full object-cover"
-      style={{
-        objectPosition: "center center",
-        opacity: ready ? 1 : 0,
-        transition: "opacity 0.5s ease",
-        WebkitMediaControlsPanel: "none",
-      }}
+      style={{ objectPosition: "center center" }}
     />
   );
 }

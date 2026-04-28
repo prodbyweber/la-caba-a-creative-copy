@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+// HeroVideo usa autoPlay+muted+loop+playsInline — garantizado por política de autoplay del navegador
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
@@ -7,52 +8,16 @@ const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81e
 const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
 function HeroVideo({ src }) {
-  const videoRef = useRef(null);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const vid = videoRef.current;
-    if (!vid) return;
-
-    setReady(false);
-
-    const tryPlay = () => {
-      vid.play().then(() => setReady(true)).catch(() => {});
-    };
-
-    const onReady = () => tryPlay();
-
-    vid.addEventListener("canplaythrough", onReady, { once: true });
-    vid.addEventListener("loadeddata", onReady, { once: true });
-    vid.load();
-
-    // Fallback si los eventos no disparan (red lenta)
-    const t = setTimeout(tryPlay, 2000);
-
-    return () => {
-      vid.removeEventListener("canplaythrough", onReady);
-      vid.removeEventListener("loadeddata", onReady);
-      clearTimeout(t);
-    };
-  }, [src]);
-
   return (
     <video
-      ref={videoRef}
       src={src}
+      autoPlay
       muted
       loop
       playsInline
       preload="auto"
-      disableRemotePlayback
-      x-webkit-airplay="deny"
       className="w-[85%] h-[85%] object-cover rounded-2xl"
-      style={{
-        opacity: ready ? 0.6 : 0,
-        transition: "opacity 0.5s ease",
-        // Suprimir controles nativos del navegador
-        WebkitMediaControlsPanel: "none",
-      }}
+      style={{ opacity: 0.6 }}
     />
   );
 }
