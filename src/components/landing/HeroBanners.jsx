@@ -110,7 +110,7 @@ function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEna
   const isMobile = useMobile();
   const navigate = useNavigate();
   const objectPos = isMobile && mobilePosition ? mobilePosition : "center center";
-  const [isAudioActive, setIsAudioActive] = useState(audioEnabled);
+  const [isAudioActive, setIsAudioActive] = useState(audioEnabled === true);
 
   const handleCta = () => {
     const link = ctaLink || banner.defaultLink;
@@ -121,6 +121,11 @@ function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEna
       navigate(link);
     }
   };
+
+  // Forzar actualización cuando audioEnabled cambia desde props
+  useEffect(() => {
+    setIsAudioActive(audioEnabled === true);
+  }, [audioEnabled]);
 
   return (
     <motion.div

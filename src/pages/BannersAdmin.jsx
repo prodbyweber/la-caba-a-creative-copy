@@ -40,41 +40,38 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedA
   const [showMobilePanel, setShowMobilePanel] = useState(false);
   const fileInputImg = useRef();
   const fileInputVid = useRef();
-  const mounted = useRef(false);
 
   useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true;
-      setUrl(savedUrl || "");
-      setMobilePosition(savedMobilePosition || "center center");
-      setAudioEnabled(savedAudioEnabled || false);
-    }
-  }, []);
+    setUrl(savedUrl || "");
+    setMobilePosition(savedMobilePosition || "center center");
+    setAudioEnabled(savedAudioEnabled === true);
+  }, [savedUrl, savedMobilePosition, savedAudioEnabled]);
 
   const isVideo = isVideoUrl(url);
 
   const persist = async (fields) => {
-  if (!configId) return;
-  setStatus("saving");
-  try {
-    await base44.entities.LandingConfig.update(configId, fields);
-    setStatus("ok");
-    // Actualizar estado local inmediatamente
-    Object.entries(fields).forEach(([key, value]) => {
-      if (key === bannerDef.audioKey) {
-        setAudioEnabled(value);
-      } else if (key === bannerDef.mobileKey) {
-        setMobilePosition(value);
-      } else if (key === bannerDef.key) {
-        setUrl(value);
-      }
-    });
-    onUpdated(fields);
-    setTimeout(() => setStatus(null), 2500);
-  } catch (e) {
-    setStatus("error");
-    console.error("Error guardando:", e);
-  }
+    if (!configId) return;
+    setStatus("saving");
+    try {
+      await base44.entities.LandingConfig.update(configId, fields);
+      setStatus("ok");
+      // Actualizar estado local inmediatamente
+      Object.entries(fields).forEach(([key, value]) => {
+        if (key === bannerDef.audioKey) {
+          setAudioEnabled(value);
+        } else if (key === bannerDef.mobileKey) {
+          setMobilePosition(value);
+        } else if (key === bannerDef.key) {
+          setUrl(value);
+        }
+      });
+      onUpdated(fields);
+      setTimeout(() => setStatus(null), 2500);
+    } catch (e) {
+      setStatus("error");
+      console.error("Error guardando:", e);
+      setTimeout(() => setStatus(null), 2500);
+    }
   };
 
   const handleFileUpload = async (file, isVid) => {
