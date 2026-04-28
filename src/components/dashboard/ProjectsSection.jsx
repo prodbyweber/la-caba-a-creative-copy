@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, FolderOpen, Music2, Image, ChevronRight } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -17,10 +17,13 @@ export default function ProjectsSection({ jlyArtistId }) {
     containScroll: 'trimSnaps'
   });
 
+  const queryClient = useQueryClient();
+
   const { data: allProjects = [], isLoading } = useQuery({
     queryKey: ['projects'],
     queryFn: () => base44.entities.Project.list('-created_date'),
     initialData: [],
+    staleTime: 0,
   });
 
   // Filtrar proyectos solo del artista JLY
@@ -29,15 +32,17 @@ export default function ProjectsSection({ jlyArtistId }) {
     : allProjects;
 
   const { data: tracks } = useQuery({
-    queryKey: ['tracks'],
-    queryFn: () => base44.entities.Track.list(),
+    queryKey: ['all-tracks'],
+    queryFn: () => base44.entities.Track.list('-created_date'),
     initialData: [],
+    staleTime: 0,
   });
 
   const { data: artists = [] } = useQuery({
     queryKey: ['artists'],
     queryFn: () => base44.entities.Artist.list(),
     initialData: [],
+    staleTime: 0,
   });
 
   const getProjectTracks = (projectId) => {

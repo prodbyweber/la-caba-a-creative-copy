@@ -16,6 +16,7 @@ export default function PhotosGallery({ userProfileId }) {
       return profiles.find(p => p.id === userProfileId);
     },
     enabled: !!userProfileId,
+    staleTime: 0,
   });
 
   const updateProfileMutation = useMutation({

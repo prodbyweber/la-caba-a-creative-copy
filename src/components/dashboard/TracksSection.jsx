@@ -16,12 +16,14 @@ export default function TracksSection({ jlyArtistId }) {
     queryKey: ['all-tracks'],
     queryFn: () => base44.entities.Track.list('-created_date'),
     initialData: [],
+    staleTime: 0,
   });
 
   const { data: allProjects = [] } = useQuery({
     queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list(),
+    queryFn: () => base44.entities.Project.list('-created_date'),
     initialData: [],
+    staleTime: 0,
   });
 
   // Filtrar proyectos del artista JLY
