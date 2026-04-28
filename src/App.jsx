@@ -83,14 +83,33 @@ const AuthenticatedApp = () => {
     }
   }
 
+  // Redirect authenticated users to /Explorar from root
+  const AuthRedirect = () => {
+    const { isAuthenticated } = useAuth();
+    const [checked, setChecked] = React.useState(false);
+    const [redirect, setRedirect] = React.useState(false);
+    React.useEffect(() => {
+      base44.auth.isAuthenticated().then(auth => {
+        setRedirect(auth);
+        setChecked(true);
+      });
+    }, []);
+    if (!checked) return null;
+    if (redirect) {
+      window.location.replace('/Explorar');
+      return null;
+    }
+    return (
+      <LayoutWrapper currentPageName={mainPageKey}>
+        <MainPage />
+      </LayoutWrapper>
+    );
+  };
+
   // Render the main app
   return (
     <Routes>
-      <Route path="/" element={
-        <LayoutWrapper currentPageName={mainPageKey}>
-          <MainPage />
-        </LayoutWrapper>
-      } />
+      <Route path="/" element={<AuthRedirect />} />
       {Object.entries(Pages).map(([path, Page]) => (
         <Route
           key={path}

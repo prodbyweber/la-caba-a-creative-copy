@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   X, Upload, Plus, Play, Trash2, ExternalLink,
   Youtube, Film, Music2, Image as ImageIcon, Link as LinkIcon,
-  ChevronRight, Camera, Edit3, Check, Loader2, Heart, Bookmark
+  ChevronRight, Camera, Edit3, Check, Loader2, Heart, Bookmark,
+  LayoutDashboard, ShieldCheck
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -334,6 +336,28 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
                     {displayName}
                   </h2>
                   <p className="text-xs text-white/30 mb-3">{currentUser?.email}</p>
+
+                  {/* Dashboard access buttons */}
+                  <div className="flex flex-wrap justify-center gap-2 mb-4">
+                    {currentUser?.role === "admin" && (
+                      <Link to="/AdminDashboard" onClick={onClose}>
+                        <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white/70 hover:text-white transition-all"
+                          style={{ background: "rgba(255,88,51,0.12)", border: "1px solid rgba(255,88,51,0.25)" }}>
+                          <ShieldCheck className="w-3.5 h-3.5 text-[#ff5833]" />
+                          Admin
+                        </button>
+                      </Link>
+                    )}
+                    {(linkedArtist || currentUser?.role === "admin") && (
+                      <Link to="/ArtistPanelList" onClick={onClose}>
+                        <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white/50 hover:text-white transition-all"
+                          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                          <LayoutDashboard className="w-3.5 h-3.5" />
+                          {currentUser?.role === "admin" ? "Panel artistas" : "Mi dashboard"}
+                        </button>
+                      </Link>
+                    )}
+                  </div>
 
                   {linkedArtist?.genre && (
                     <span className="text-[10px] uppercase tracking-widest px-3 py-1 rounded-full border border-white/10 text-white/40 mb-4">

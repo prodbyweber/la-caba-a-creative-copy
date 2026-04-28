@@ -70,12 +70,14 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
             <Search className="w-4 h-4" />
           </button>
 
-          {/* Back to Dashboard */}
-          <Link to={createPageUrl("ArtistPanelList")}>
-            <button className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white text-xs font-medium transition-all">
-              Dashboard
-            </button>
-          </Link>
+          {/* Back to Dashboard — solo visible si está logueado */}
+          {currentUser && (
+            <Link to={currentUser.role === "admin" ? "/AdminDashboard" : "/ArtistPanelList"}>
+              <button className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white text-xs font-medium transition-all">
+                Dashboard
+              </button>
+            </Link>
+          )}
 
           {/* Avatar — abre panel de perfil */}
           <button
