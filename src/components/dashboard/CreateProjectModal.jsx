@@ -30,6 +30,7 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
     queryKey: ['artists'],
     queryFn: () => base44.entities.Artist.list(),
     initialData: [],
+    staleTime: 0,
   });
 
   useEffect(() => {
@@ -82,6 +83,7 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
       : base44.entities.Project.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
       onClose();
     },
   });
