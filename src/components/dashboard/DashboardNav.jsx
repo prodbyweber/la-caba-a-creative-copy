@@ -86,7 +86,7 @@ export default function DashboardNav({ artistName, artistId, children }) {
                     <button
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                         active 
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                          ? 'bg-transparent text-red-400 border border-red-500/40 hover:border-red-500/60' 
                           : 'text-gray-400 hover:text-white hover:bg-white/5'
                       }`}
                     >
@@ -105,7 +105,7 @@ export default function DashboardNav({ artistName, artistId, children }) {
             {isAdmin && (
               <Link to={createPageUrl("AdminDashboard")}>
                 <button 
-                  className="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all flex items-center gap-1.5"
+                  className="px-2.5 py-1.5 rounded-lg bg-transparent border border-red-500/40 text-red-400 hover:border-red-500/60 transition-all flex items-center gap-1.5"
                   title="Panel Admin"
                 >
                   <Home className="w-3.5 h-3.5" />
@@ -175,7 +175,7 @@ export default function DashboardNav({ artistName, artistId, children }) {
                           onClick={() => setMobileMenuOpen(false)}
                           className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                             active 
-                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                              ? 'bg-transparent text-red-400 border border-red-500/40 hover:border-red-500/60' 
                               : 'text-gray-400 hover:text-white hover:bg-white/5'
                           }`}
                         >
@@ -194,7 +194,7 @@ export default function DashboardNav({ artistName, artistId, children }) {
                     <Link to={createPageUrl("AdminDashboard")}>
                       <button 
                         onClick={() => setMobileMenuOpen(false)}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all text-sm font-medium"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-transparent border border-red-500/40 text-red-400 hover:border-red-500/60 transition-all text-sm font-medium"
                       >
                         <Home className="w-5 h-5" />
                         Panel Admin
