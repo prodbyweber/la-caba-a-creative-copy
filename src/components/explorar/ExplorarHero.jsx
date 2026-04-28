@@ -169,6 +169,7 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen }) {
 
 export default function ExplorarHero({ items = [], artists = [], onExplore }) {
   const [activeIdx, setActiveIdx] = useState(0);
+  const [transitioning, setTransitioning] = useState(false);
   const explorar = useExplorar();
   const cardModalOpen = explorar?.cardModalOpen ?? false;
   const [showModal, setShowModal] = useState(false);
@@ -184,7 +185,12 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
   if (current) current._openModal = () => setShowModal(true);
 
   const goTo = (idx) => {
-    setActiveIdx(idx);
+    if (idx === activeIdx || transitioning) return;
+    setTransitioning(true);
+    setTimeout(() => {
+      setActiveIdx(idx);
+      setTransitioning(false);
+    }, 250); // mitad del fade — cambia el slide en el punto más oscuro
     resetInterval();
   };
 
@@ -261,28 +267,35 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
 
       {/* Hero Carousel */}
       <div className="relative w-full overflow-hidden" style={{ height: "85vh", minHeight: 520 }}>
-        <AnimatePresence mode="sync">
-          {heroItems.map((item, idx) =>
-            idx === activeIdx ? (
-              <motion.div
-                key={item.id || idx}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.8 }}
-                className="absolute inset-0"
-              >
-                <HeroSlide
-                  item={item}
-                  artist={artists.find(a => a.id === item.artist_id)}
-                  onExplore={() => onExplore && onExplore(item)}
-                  active={idx === activeIdx}
-                  cardModalOpen={cardModalOpen}
-                />
-              </motion.div>
-            ) : null
-          )}
-        </AnimatePresence>
+
+        {/* Todos los slides montados simultáneamente — solo el activo es visible */}
+        {heroItems.map((item, idx) => (
+          <div
+            key={item.id || idx}
+            className="absolute inset-0 transition-opacity"
+            style={{
+              opacity: idx === activeIdx ? 1 : 0,
+              transitionDuration: "0ms", // el fade lo gestiona el curtain
+              pointerEvents: idx === activeIdx ? "auto" : "none",
+            }}
+          >
+            <HeroSlide
+              item={item}
+              artist={artists.find(a => a.id === item.artist_id)}
+              onExplore={() => onExplore && onExplore(item)}
+              active={idx === activeIdx && !transitioning}
+              cardModalOpen={cardModalOpen}
+            />
+          </div>
+        ))}
+
+        {/* Cinematic curtain — fade oscuro de 0.5s al cambiar slide */}
+        <motion.div
+          className="absolute inset-0 z-10 pointer-events-none"
+          style={{ background: "#080808" }}
+          animate={{ opacity: transitioning ? 1 : 0 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+        />
 
         {/* Nav arrows */}
         {heroItems.length > 1 && (
