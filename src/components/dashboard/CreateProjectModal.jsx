@@ -107,6 +107,10 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.title.trim()) return;
+    if (!formData.artist_id && !jlyArtistId) {
+      alert('Debes seleccionar un artista');
+      return;
+    }
     
     const dataToSubmit = {
       ...formData,

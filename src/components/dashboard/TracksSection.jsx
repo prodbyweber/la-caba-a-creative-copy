@@ -150,6 +150,7 @@ export default function TracksSection({ jlyArtistId }) {
         isOpen={showCreateModal || !!editingTrack}
         track={editingTrack}
         projects={projects}
+        jlyArtistId={jlyArtistId}
         onClose={() => {
           setShowCreateModal(false);
           setEditingTrack(null);
@@ -159,7 +160,7 @@ export default function TracksSection({ jlyArtistId }) {
   );
 }
 
-function TrackModal({ isOpen, track, projects, onClose }) {
+function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
   const [formData, setFormData] = useState(track || {
     title: "",
     project_id: "",
@@ -209,6 +210,10 @@ function TrackModal({ isOpen, track, projects, onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!formData.title.trim()) {
+      alert('El título del track es requerido');
+      return;
+    }
     saveMutation.mutate(formData);
   };
 
@@ -410,11 +415,15 @@ function TrackModal({ isOpen, track, projects, onClose }) {
                   className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500/50 transition-colors"
                 >
                   <option value="">Sin proyecto</option>
-                  {projects.map((project) => (
-                    <option key={project.id} value={project.id}>
-                      {project.title}
-                    </option>
-                  ))}
+                  {projects && projects.length > 0 ? (
+                    projects.map((project) => (
+                      <option key={project.id} value={project.id}>
+                        {project.title}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No hay proyectos disponibles</option>
+                  )}
                 </select>
               </div>
             </div>
