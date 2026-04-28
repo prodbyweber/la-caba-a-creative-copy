@@ -304,38 +304,63 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
           ) : (
             <>
               {/* Hero / Avatar section */}
-              <div className="relative px-5 pb-6">
-                {/* Background blur from avatar */}
-                {avatarUrl && (
-                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    <img src={avatarUrl} alt="" className="w-full h-full object-cover opacity-10 blur-3xl scale-110" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0a0a0a]" />
-                  </div>
-                )}
+              <div className="relative pb-4">
+                {/* Background hero — avatar blur grande */}
+                <div className="relative w-full overflow-hidden" style={{ height: 140 }}>
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="" className="w-full h-full object-cover scale-110"
+                      style={{ filter: "brightness(0.45) saturate(1.2) blur(2px)" }} />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a]" />
+                  )}
+                  <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 30%, #0a0a0a 100%)" }} />
+                </div>
 
-                <div className="relative flex flex-col items-center text-center pt-4">
-                  {/* Avatar */}
-                  <div className="relative mb-4">
-                    <div className="w-24 h-24 rounded-full overflow-hidden border border-white/10 bg-[#1a1a1a] flex items-center justify-center">
+                {/* Avatar flotante */}
+                <div className="relative px-5 -mt-14 flex flex-col items-center text-center">
+                  <div className="relative mb-3">
+                    <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-[#0a0a0a] shadow-2xl bg-[#1a1a1a] flex items-center justify-center"
+                      style={{ boxShadow: "0 0 0 1px rgba(255,255,255,0.08), 0 8px 32px rgba(0,0,0,0.8)" }}>
                       {avatarUrl ? (
                         <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
                       ) : (
                         <span className="text-2xl font-black text-white/30">{initials}</span>
                       )}
                     </div>
-                    <label className={`absolute bottom-0 right-0 w-7 h-7 rounded-full bg-white/10 border border-white/20 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-colors ${uploadingAvatar ? "opacity-50 pointer-events-none" : ""}`}>
+                    <label className={`absolute bottom-0.5 right-0.5 w-7 h-7 rounded-full bg-[#1a1a1a] border border-white/15 flex items-center justify-center cursor-pointer hover:bg-white/20 transition-colors shadow-lg ${uploadingAvatar ? "opacity-50 pointer-events-none" : ""}`}>
                       <input type="file" accept="image/*" className="hidden"
                         onChange={e => e.target.files?.[0] && handleAvatarUpload(e.target.files[0])} />
-                      {uploadingAvatar ? <Loader2 className="w-3 h-3 text-white animate-spin" /> : <Camera className="w-3 h-3 text-white" />}
+                      {uploadingAvatar ? <Loader2 className="w-3 h-3 text-white animate-spin" /> : <Camera className="w-3 h-3 text-white/60" />}
                     </label>
                   </div>
 
-                  {/* Name */}
+                  {/* Name + account type */}
                   <h2 className="text-xl font-black text-white tracking-tight mb-0.5"
                     style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.03em" }}>
-                    {displayName}
+                    {linkedArtist?.stageName || displayName}
                   </h2>
-                  <p className="text-xs text-white/30 mb-3">{currentUser?.email}</p>
+                  {linkedArtist?.stageName && displayName !== linkedArtist.stageName && (
+                    <p className="text-[11px] text-white/25 mb-0.5">{displayName}</p>
+                  )}
+                  <p className="text-[10px] text-white/20 mb-3">{currentUser?.email}</p>
+
+                  {/* Genre + role tags */}
+                  {(linkedArtist?.genre || (userProfile?.role_tags?.length > 0)) && (
+                    <div className="flex flex-wrap justify-center gap-1.5 mb-4">
+                      {linkedArtist?.genre && (
+                        <span className="text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-full text-white/50"
+                          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                          {linkedArtist.genre}
+                        </span>
+                      )}
+                      {(userProfile?.role_tags || []).slice(0, 3).map((tag, i) => (
+                        <span key={i} className="text-[9px] uppercase tracking-widest px-2.5 py-1 rounded-full text-white/40"
+                          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Dashboard access buttons */}
                   <div className="flex flex-wrap justify-center gap-2 mb-4">
@@ -348,22 +373,25 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
                         </button>
                       </Link>
                     )}
-                    {(linkedArtist || currentUser?.role === "admin") && (
+                    {linkedArtist && (
+                      <Link to={`/ArtistDashboard?artistId=${linkedArtist.id}`} onClick={onClose}>
+                        <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white hover:scale-[1.03] transition-all"
+                          style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)" }}>
+                          <LayoutDashboard className="w-3.5 h-3.5" />
+                          Mi dashboard
+                        </button>
+                      </Link>
+                    )}
+                    {!linkedArtist && currentUser?.role === "admin" && (
                       <Link to="/ArtistPanelList" onClick={onClose}>
                         <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white/50 hover:text-white transition-all"
                           style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
                           <LayoutDashboard className="w-3.5 h-3.5" />
-                          {currentUser?.role === "admin" ? "Panel artistas" : "Mi dashboard"}
+                          Panel artistas
                         </button>
                       </Link>
                     )}
                   </div>
-
-                  {linkedArtist?.genre && (
-                    <span className="text-[10px] uppercase tracking-widest px-3 py-1 rounded-full border border-white/10 text-white/40 mb-4">
-                      {linkedArtist.genre}
-                    </span>
-                  )}
 
                   {/* Bio */}
                   <div className="w-full">
@@ -386,8 +414,8 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
                       </div>
                     ) : (
                       <button onClick={() => setEditingBio(true)}
-                        className="group w-full text-center text-sm text-white/40 hover:text-white/60 transition-colors leading-relaxed">
-                        {bioText || <span className="flex items-center justify-center gap-1 text-white/20 text-xs"><Edit3 className="w-3 h-3" />Añadir bio</span>}
+                        className="group w-full text-center text-sm text-white/35 hover:text-white/55 transition-colors leading-relaxed px-2">
+                        {bioText || <span className="flex items-center justify-center gap-1 text-white/15 text-xs"><Edit3 className="w-3 h-3" />Añadir bio</span>}
                         {bioText && <Edit3 className="w-3 h-3 inline ml-1.5 opacity-0 group-hover:opacity-40 transition-opacity" />}
                       </button>
                     )}
