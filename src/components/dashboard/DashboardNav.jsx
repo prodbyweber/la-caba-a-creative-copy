@@ -40,7 +40,6 @@ export default function DashboardNav({ artistName, artistId, children }) {
     ...(analyticsEnabled ? [{ icon: BarChart3, label: "Análisis", page: artistId ? `Analytics?artistId=${artistId}` : "Analytics" }] : []),
     { icon: FolderKanban, label: "Proyectos", page: artistId ? `ArtistProjects?artistId=${artistId}` : "Projects" },
     { icon: Calendar, label: "Calendario", page: artistId ? `Calendars?artistId=${artistId}` : "Calendars" },
-    { icon: Palette, label: "ADN", page: artistId ? `ADNdeMarca?artistId=${artistId}` : "ADNdeMarca" },
     { icon: Compass, label: "Explorar", page: "Explorar" },
   ];
 
