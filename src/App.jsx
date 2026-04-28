@@ -17,6 +17,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import BannersAdmin from './pages/BannersAdmin';
 import Explorar from './pages/Explorar';
 import ExplorarAdmin from './pages/ExplorarAdmin';
+import ADNdeMarca from './pages/ADNdeMarca';
 import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
@@ -129,6 +130,7 @@ const AuthenticatedApp = () => {
       <Route path="/ExplorarAdmin" element={<ProtectedAdminRoute element={<ExplorarAdmin />} />} />
       <Route path="/UserProfiles" element={<ProtectedAdminRoute element={<UserProfiles />} />} />
       <Route path="/ArtistPanelList" element={<ProtectedAdminRoute element={<ArtistPanelList />} />} />
+      <Route path="/ADNdeMarca" element={<ProtectedAdminRoute element={<ADNdeMarca />} />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

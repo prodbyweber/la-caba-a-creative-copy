@@ -101,9 +101,12 @@ export default function LandingNav() {
     { label: "Explorar", url: "/Explorar", key: "explorar" },
     { label: "Acerca de Nosotros", id: "about", key: "quienes_somos" },
     { label: "Artistas", id: "stories", key: "artistas" },
-    { label: "ADN de Marca", url: adnMarcaLink, key: "adn_marca" },
+    { label: "ADN de Marca", url: adnMarcaLink, key: "adn_marca", adminOnly: true },
     { label: "Comenzar", id: "offers", highlight: true, key: "comenzar" }
-  ].filter(item => item.key !== "explorar" ? visibleMenuButtons[item.key] !== false : true);
+  ].filter(item => {
+    if (item.adminOnly && user?.role !== 'admin') return false;
+    return item.key !== "explorar" ? visibleMenuButtons[item.key] !== false : true;
+  });
 
   return (
     <>
