@@ -61,6 +61,7 @@ export default function AdminDashboard() {
   const [editDeliverable, setEditDeliverable] = useState(null);
   const [editRevision, setEditRevision] = useState(null);
   const [showADN, setShowADN] = useState(false);
+  const [previewType, setPreviewType] = useState(null); // null = admin view, "artist" | "creator" | "brand"
 
 
   const queryClient = useQueryClient();
@@ -123,6 +124,55 @@ export default function AdminDashboard() {
   const handleCloseDeliverable = () => { setShowDeliverableModal(false); setEditDeliverable(null); };
   const handleCloseRevision = () => { setShowRevisionModal(false); setEditRevision(null); };
 
+  // Si está en modo preview, mostrar el dashboard correspondiente
+  if (previewType) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0b]">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0b] border-b border-white/5 px-6 py-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setPreviewType(null)}
+              className="text-xs font-semibold text-white/50 hover:text-white transition-colors underline"
+            >
+              ← Volver a Admin
+            </button>
+            <span className="text-xs text-white/30">|</span>
+            <span className="text-xs text-white/40">
+              Vista previa: {previewType === "artist" ? "Artista" : previewType === "creator" ? "Creador" : "Marca"}
+            </span>
+          </div>
+        </div>
+        <div className="pt-14">
+          {/* Mock artist data para vista previa */}
+          <div style={{
+            userSelect: "none",
+            pointerEvents: "none",
+            opacity: 0.7,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            fontSize: "10px",
+            color: "rgba(255,255,255,0.3)",
+            padding: "60px 20px",
+            zIndex: 40,
+          }}>
+            (Vista previa — datos de demostración)
+          </div>
+          {/* Renderizar ArtistDashboard con account_type simulado */}
+          <div className="px-4 sm:px-8 lg:px-12 py-5">
+            <h2 className="text-2xl font-bold text-white mb-6">
+              Dashboard: {previewType === "artist" ? "Artista" : previewType === "creator" ? "Creador" : "Marca"}
+            </h2>
+            <div className="text-white/40 text-sm bg-white/5 border border-white/10 rounded-xl p-6">
+              <p>Esta es una vista previa de cómo se vería el dashboard para un usuario tipo "<strong>{previewType}</strong>"</p>
+              <p className="text-white/30 text-xs mt-2">Las secciones y opciones se ajustan según el tipo de cuenta seleccionado.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <AdminLayout activePage="AdminDashboard">
       <div className="px-3 sm:px-8 lg:px-14 xl:px-20 py-6 max-w-[1600px] mx-auto">
@@ -133,6 +183,36 @@ export default function AdminDashboard() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Admin Dashboard</h1>
           <p className="text-sm text-white/30">Actividades prioritarias de hoy</p>
+        </motion.div>
+
+        {/* Vista Previa de Dashboards */}
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="mb-6 p-3 rounded-xl border border-white/[0.08] bg-white/[0.03]"
+        >
+          <p className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-2">Vista Previa de Dashboards</p>
+          <div className="flex gap-2 flex-wrap">
+            {[
+              { key: "artist", label: "Artista" },
+              { key: "creator", label: "Creador" },
+              { key: "brand", label: "Marca" },
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setPreviewType(key)}
+                className="text-xs px-3 py-1.5 rounded-lg border transition-all hover:border-white/20"
+                style={{
+                  background: "rgba(255,255,255,0.05)",
+                  color: "rgba(255,255,255,0.4)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </motion.div>
 
         {/* ADN de Marca Quick Link - Minimalista */}
