@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Info, X, Youtube, ChevronLeft, ChevronRight, ExternalLink, Volume2, VolumeX } from "lucide-react";
+import { useExplorar } from "@/context/ExplorarContext.jsx";
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -8,7 +9,7 @@ function getYoutubeId(url) {
   return match ? match[1] : null;
 }
 
-function HeroSlide({ item, artist, onExplore, active }) {
+function HeroSlide({ item, artist, onExplore, active, cardModalOpen }) {
   const ytUrl = item?.youtube_url || item?.youtube_music_url;
   const ytId = getYoutubeId(ytUrl);
   const bg = item?.image || artist?.avatar_url || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80";
@@ -21,14 +22,14 @@ function HeroSlide({ item, artist, onExplore, active }) {
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
-    if (active) {
+    if (active && !cardModalOpen) {
       vid.muted = audioEnabled ? false : true;
       setMuted(!audioEnabled);
       vid.play().catch(() => {});
     } else {
       vid.pause();
     }
-  }, [active]);
+  }, [active, cardModalOpen]);
 
   // Sync muted state to video element
   useEffect(() => {
@@ -184,6 +185,8 @@ function HeroSlide({ item, artist, onExplore, active }) {
 
 export default function ExplorarHero({ items = [], artists = [], onExplore }) {
   const [activeIdx, setActiveIdx] = useState(0);
+  const explorar = useExplorar();
+  const cardModalOpen = explorar?.cardModalOpen ?? false;
   const [showModal, setShowModal] = useState(false);
   const [embedFailed, setEmbedFailed] = useState(false);
   const intervalRef = useRef(null);
@@ -290,6 +293,7 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
                   artist={artists.find(a => a.id === item.artist_id)}
                   onExplore={() => onExplore && onExplore(item)}
                   active={idx === activeIdx}
+                  cardModalOpen={cardModalOpen}
                 />
               </motion.div>
             ) : null

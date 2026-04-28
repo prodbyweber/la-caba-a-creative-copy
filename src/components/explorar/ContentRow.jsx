@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Music2, Play, Pause, Youtube, X, ChevronDown, Heart, Bookmark } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useExplorar } from "@/context/ExplorarContext.jsx";
+import RecommendedRow from "@/components/explorar/RecommendedRow";
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -66,7 +68,7 @@ function YoutubeModal({ ytId, title, originalUrl, onClose }) {
 }
 
 // Credits modal — completamente fuera del árbol de la tarjeta via portal
-function CreditsModal({ item, hasVideo, hasAudio, playing, onClose, onPlay, onToggleAudio, currentUser, isLiked, isSaved, onToggleLike, onToggleSave }) {
+function CreditsModal({ item, hasVideo, hasAudio, playing, onClose, onPlay, onToggleAudio, currentUser, isLiked, isSaved, onToggleLike, onToggleSave, allItems, onSelectRecommended }) {
   const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
 
   return createPortal(
@@ -207,13 +209,20 @@ function CreditsModal({ item, hasVideo, hasAudio, playing, onClose, onPlay, onTo
             </div>
           )}
         </div>
+
+        {/* Recomendados */}
+        <RecommendedRow
+          currentItem={item}
+          allItems={allItems}
+          onSelect={(recommended) => { onClose(); onSelectRecommended && onSelectRecommended(recommended); }}
+        />
       </motion.div>
     </motion.div>,
     document.body
   );
 }
 
-function ContentCard({ item, onClick, currentUser }) {
+function ContentCard({ item, onClick, currentUser, allItems, onSelectRecommended }) {
   const [hovered, setHovered] = useState(false);
   const [previewActive, setPreviewActive] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -222,6 +231,7 @@ function ContentCard({ item, onClick, currentUser }) {
   const audioRef = useRef(null);
   const hoverTimer = useRef(null);
   const qc = useQueryClient();
+  const explorar = useExplorar();
 
   // Fetch user's likes and saves for this item
   const { data: likes = [] } = useQuery({
@@ -313,7 +323,7 @@ function ContentCard({ item, onClick, currentUser }) {
           ytId={ytId}
           title={item.title}
           originalUrl={item.youtube_url || item.youtube_music_url}
-          onClose={() => setShowYTModal(false)}
+          onClose={() => { setShowYTModal(false); explorar?.setCardModalOpen(false); }}
         />
       )}
       <AnimatePresence>
@@ -323,14 +333,16 @@ function ContentCard({ item, onClick, currentUser }) {
             hasVideo={hasVideo}
             hasAudio={hasAudio}
             playing={playing}
-            onClose={() => setShowCredits(false)}
-            onPlay={() => { setShowCredits(false); setShowYTModal(true); }}
+            onClose={() => { setShowCredits(false); explorar?.setCardModalOpen(false); }}
+            onPlay={() => { setShowCredits(false); setShowYTModal(true); explorar?.setCardModalOpen(true); }}
             onToggleAudio={(e) => toggleAudio(e)}
             currentUser={currentUser}
             isLiked={isLiked}
             isSaved={isSaved}
             onToggleLike={() => toggleLikeMutation.mutate()}
             onToggleSave={() => toggleSaveMutation.mutate()}
+            allItems={allItems}
+            onSelectRecommended={onSelectRecommended}
           />
         )}
       </AnimatePresence>
@@ -433,7 +445,7 @@ function ContentCard({ item, onClick, currentUser }) {
                   </button>
                 )}
                 {hasVideo && (
-                  <button onClick={e => { e.stopPropagation(); setShowYTModal(true); }}
+                  <button onClick={e => { e.stopPropagation(); setShowYTModal(true); explorar?.setCardModalOpen(true); }}
                     className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-black/60 transition-colors"
                     title="Reproducir video">
                     <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" />
@@ -452,7 +464,7 @@ function ContentCard({ item, onClick, currentUser }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onClick={e => { e.stopPropagation(); setShowCredits(true); }}
+                onClick={e => { e.stopPropagation(); setShowCredits(true); explorar?.setCardModalOpen(true); }}
                 className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-black/70 hover:border-white/40 transition-all"
                 title="Más información"
               >
@@ -466,7 +478,7 @@ function ContentCard({ item, onClick, currentUser }) {
   );
 }
 
-export default function ContentRow({ title, items, onItemClick, currentUser }) {
+export default function ContentRow({ title, items, onItemClick, currentUser, allItems, onSelectRecommended }) {
   const rowRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -518,7 +530,7 @@ export default function ContentRow({ title, items, onItemClick, currentUser }) {
         }}
       >
         {items.map((item, i) => (
-          <ContentCard key={`${item.id}-${i}`} item={item} onClick={onItemClick} currentUser={currentUser} />
+          <ContentCard key={`${item.id}-${i}`} item={item} onClick={onItemClick} currentUser={currentUser} allItems={allItems} onSelectRecommended={onSelectRecommended} />
         ))}
       </div>
     </div>

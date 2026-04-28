@@ -10,6 +10,7 @@ import ContentRow from "@/components/explorar/ContentRow";
 import ArtistProfileModal from "@/components/explorar/ArtistProfileModal";
 import UserProfilePanel from "@/components/explorar/UserProfilePanel";
 import PricingModal from "@/components/explorar/PricingModal";
+import { ExplorarProvider } from "@/context/ExplorarContext.jsx";
 
 // Legacy fallback labels (for items with row_category but no ExplorarSection yet)
 const LEGACY_ROW_LABELS = {
@@ -191,7 +192,18 @@ export default function Explorar() {
     }
   };
 
+  // Handler to open a recommended item's artist modal (reuses existing handleCardClick logic)
+  const handleSelectRecommended = (card) => {
+    if (card.artist_id) {
+      const artist = artists.find(a => a.id === card.artist_id);
+      if (artist) setSelectedArtist(artist);
+    }
+  };
+
+  const allCards = items.map(mapItemToCard);
+
   return (
+    <ExplorarProvider>
     <div className="min-h-screen bg-[#080808] text-white overflow-x-hidden">
       <ExplorarNav
         currentUser={currentUser}
@@ -324,6 +336,8 @@ export default function Explorar() {
                   onItemClick={handleCardClick}
                   artists={artists}
                   currentUser={currentUser}
+                  allItems={allCards}
+                  onSelectRecommended={handleSelectRecommended}
                 />
               );
             })
@@ -336,14 +350,16 @@ export default function Explorar() {
             ).map(mapItemToCard);
             if (catItems.length === 0) return null;
             return (
-              <ContentRow
-                key={cat}
-                title={LEGACY_ROW_LABELS[cat]}
-                items={catItems}
-                onItemClick={handleCardClick}
-                artists={artists}
-                currentUser={currentUser}
-              />
+            <ContentRow
+              key={cat}
+              title={LEGACY_ROW_LABELS[cat]}
+              items={catItems}
+              onItemClick={handleCardClick}
+              artists={artists}
+              currentUser={currentUser}
+              allItems={allCards}
+              onSelectRecommended={handleSelectRecommended}
+            />
             );
           })
         )}
@@ -447,6 +463,7 @@ export default function Explorar() {
         )}
       </AnimatePresence>
     </div>
+    </ExplorarProvider>
   );
 }
 
