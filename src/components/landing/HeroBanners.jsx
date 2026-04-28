@@ -49,28 +49,31 @@ function useMobile() {
   return isMobile;
 }
 
-function BannerVideo({ src }) {
+function useAutoPlayVideo(src) {
   const ref = useRef(null);
-
   useEffect(() => {
     const vid = ref.current;
-    if (!vid) return;
-
-    const forcePlay = () => { vid.muted = true; vid.play().catch(() => {}); };
-    forcePlay();
-    vid.addEventListener("loadedmetadata", forcePlay, { once: true });
-    vid.addEventListener("canplay", forcePlay, { once: true });
-
-    const onGesture = () => { vid.muted = true; vid.play().catch(() => {}); };
-    document.addEventListener("pointerdown", onGesture, { once: true });
-    document.addEventListener("keydown", onGesture, { once: true });
-
+    if (!vid || !src) return;
+    vid.muted = true;
+    const tryPlay = () => {
+      if (!vid.paused) return;
+      vid.play().catch(() => {});
+    };
+    const interval = setInterval(tryPlay, 300);
+    vid.addEventListener("canplay", tryPlay, { once: true });
+    vid.addEventListener("loadeddata", tryPlay, { once: true });
+    const onPlaying = () => clearInterval(interval);
+    vid.addEventListener("playing", onPlaying);
     return () => {
-      document.removeEventListener("pointerdown", onGesture);
-      document.removeEventListener("keydown", onGesture);
+      clearInterval(interval);
+      vid.removeEventListener("playing", onPlaying);
     };
   }, [src]);
+  return ref;
+}
 
+function BannerVideo({ src }) {
+  const ref = useAutoPlayVideo(src);
   return (
     <video
       ref={ref}
@@ -80,8 +83,9 @@ function BannerVideo({ src }) {
       loop
       playsInline
       preload="auto"
+      disablePictureInPicture
       className="absolute inset-0 w-full h-full object-cover"
-      style={{ objectPosition: "center center" }}
+      style={{ objectPosition: "center center", pointerEvents: "none" }}
     />
   );
 }

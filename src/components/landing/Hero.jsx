@@ -7,30 +7,33 @@ const ISOTIPO_URL = "https://media.base44.com/images/public/6966ddf48947f217e81e
 // Detectar móvil/tablet una sola vez (evita re-renders)
 const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
-function HeroVideo({ src }) {
+function useAutoPlayVideo(src) {
   const ref = useRef(null);
-
   useEffect(() => {
     const vid = ref.current;
-    if (!vid) return;
-
-    // Forzar play en cuanto haya suficientes datos
-    const forcePlay = () => { vid.muted = true; vid.play().catch(() => {}); };
-    forcePlay();
-    vid.addEventListener("loadedmetadata", forcePlay, { once: true });
-    vid.addEventListener("canplay", forcePlay, { once: true });
-
-    // Reintento al primer gesto del usuario (política de autoplay en iframes)
-    const onGesture = () => { vid.muted = true; vid.play().catch(() => {}); };
-    document.addEventListener("pointerdown", onGesture, { once: true });
-    document.addEventListener("keydown", onGesture, { once: true });
-
+    if (!vid || !src) return;
+    vid.muted = true;
+    // Reintento cada 300ms hasta que arranque (cubre iframe sandbox y Safari)
+    const tryPlay = () => {
+      if (!vid.paused) return;
+      vid.play().catch(() => {});
+    };
+    const interval = setInterval(tryPlay, 300);
+    vid.addEventListener("canplay", tryPlay, { once: true });
+    vid.addEventListener("loadeddata", tryPlay, { once: true });
+    // Limpiar cuando arranque definitivamente
+    const onPlaying = () => clearInterval(interval);
+    vid.addEventListener("playing", onPlaying);
     return () => {
-      document.removeEventListener("pointerdown", onGesture);
-      document.removeEventListener("keydown", onGesture);
+      clearInterval(interval);
+      vid.removeEventListener("playing", onPlaying);
     };
   }, [src]);
+  return ref;
+}
 
+function HeroVideo({ src }) {
+  const ref = useAutoPlayVideo(src);
   return (
     <video
       ref={ref}
@@ -40,8 +43,9 @@ function HeroVideo({ src }) {
       loop
       playsInline
       preload="auto"
+      disablePictureInPicture
       className="w-[85%] h-[85%] object-cover rounded-2xl"
-      style={{ opacity: 0.6 }}
+      style={{ opacity: 0.6, pointerEvents: "none" }}
     />
   );
 }
