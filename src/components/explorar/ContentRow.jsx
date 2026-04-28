@@ -68,32 +68,13 @@ function YoutubeModal({ ytId, title, originalUrl, onClose }) {
 }
 
 // Credits modal — completamente fuera del árbol de la tarjeta via portal
-function CreditsModal({ item, hasVideo, hasAudio, playing, onClose, onPlay, onToggleAudio, currentUser, isLiked, isSaved, onToggleLike, onToggleSave, allItems, onSelectRecommended }) {
-  const [nestedItem, setNestedItem] = React.useState(null);
+function CreditsModal({ item: initialItem, hasVideo: initialHasVideo, hasAudio: initialHasAudio, playing, onClose, onPlay, onToggleAudio, currentUser, isLiked, isSaved, onToggleLike, onToggleSave, allItems }) {
+  // currentItem puede cambiar al navegar por recomendados — siempre el mismo modal, X cierra todo
+  const [currentItem, setCurrentItem] = React.useState(initialItem);
+  const item = currentItem;
   const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
-
-  // If a recommended item was clicked, show its own CreditsModal on top
-  if (nestedItem) {
-    const nestedYtId = getYoutubeId(nestedItem.youtube_url || nestedItem.youtube_music_url);
-    return (
-      <CreditsModal
-        item={nestedItem}
-        hasVideo={!!nestedYtId}
-        hasAudio={!!nestedItem.audio_file_url}
-        playing={false}
-        onClose={() => setNestedItem(null)}
-        onPlay={() => {}}
-        onToggleAudio={() => {}}
-        currentUser={currentUser}
-        isLiked={false}
-        isSaved={false}
-        onToggleLike={() => {}}
-        onToggleSave={() => {}}
-        allItems={allItems}
-        onSelectRecommended={() => {}}
-      />
-    );
-  }
+  const hasVideo = !!ytId;
+  const hasAudio = !!item.audio_file_url;
 
   return createPortal(
     <motion.div
@@ -238,7 +219,7 @@ function CreditsModal({ item, hasVideo, hasAudio, playing, onClose, onPlay, onTo
         <RecommendedRow
           currentItem={item}
           allItems={allItems}
-          onSelect={(recommended) => setNestedItem(recommended)}
+          onSelect={(recommended) => setCurrentItem(recommended)}
         />
       </motion.div>
     </motion.div>,
@@ -366,7 +347,6 @@ function ContentCard({ item, onClick, currentUser, allItems, onSelectRecommended
             onToggleLike={() => toggleLikeMutation.mutate()}
             onToggleSave={() => toggleSaveMutation.mutate()}
             allItems={allItems}
-            onSelectRecommended={onSelectRecommended}
           />
         )}
       </AnimatePresence>
