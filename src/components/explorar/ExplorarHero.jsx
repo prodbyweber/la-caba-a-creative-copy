@@ -16,8 +16,7 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen }) {
   const isVideo = item?.hero_media_type === "video" && item?.hero_media_url;
   const audioEnabled = isVideo && !!(item?.raw?.hero_audio_enabled ?? item?.hero_audio_enabled);
   const videoRef = useRef(null);
-  const [videoReady, setVideoReady] = useState(false);
-  const [muted, setMuted] = useState(!audioEnabled); // unmuted by default if audio is enabled
+  const [muted, setMuted] = useState(true);
 
   useEffect(() => {
     const vid = videoRef.current;
@@ -31,7 +30,6 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen }) {
     }
   }, [active, cardModalOpen]);
 
-  // Sync muted state to video element
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
@@ -57,34 +55,20 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen }) {
       {/* Background media */}
       <div className="absolute inset-0 overflow-hidden">
         {isVideo ? (
-          <>
-            {/* Thumbnail placeholder shown until video is ready */}
-            {item.thumbnail_url && !videoReady && (
-              <img
-                src={item.thumbnail_url}
-                alt=""
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ filter: "brightness(1.1) saturate(1.2) contrast(1.05)" }}
-              />
-            )}
-            <video
+        <>
+          <video
               ref={videoRef}
               src={item.hero_media_url}
               className="w-full h-full object-cover"
-              style={{
-                opacity: videoReady ? 1 : 0,
-                transition: "opacity 0.6s ease",
-                filter: "brightness(1.08) saturate(1.15)",
-              }}
+              style={{ filter: "brightness(1.08) saturate(1.15)" }}
               autoPlay
               muted
               loop
               playsInline
               preload="auto"
-              onCanPlay={() => setVideoReady(true)}
             />
             {/* Audio toggle button — only if audio is enabled for this slide */}
-            {audioEnabled && videoReady && (
+            {audioEnabled && (
               <motion.button
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -234,8 +218,8 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
             onClick={() => { setShowModal(false); setEmbedFailed(false); }}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              initial={{ scale: 0.97, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.97, opacity: 0 }}
+              transition={{ duration: 0.12 }}
               className="relative w-full max-w-4xl"
               onClick={e => e.stopPropagation()}
             >

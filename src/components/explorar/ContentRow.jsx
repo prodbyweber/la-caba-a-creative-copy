@@ -25,8 +25,8 @@ function YoutubeModal({ ytId, title, originalUrl, onClose }) {
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            initial={{ scale: 0.97, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.97, opacity: 0 }}
+            transition={{ duration: 0.12 }}
             className="relative w-full max-w-4xl"
             onClick={e => e.stopPropagation()}
           >
@@ -68,13 +68,42 @@ function YoutubeModal({ ytId, title, originalUrl, onClose }) {
 }
 
 // Credits modal — completamente fuera del árbol de la tarjeta via portal
-function CreditsModal({ item: initialItem, hasVideo: initialHasVideo, hasAudio: initialHasAudio, playing, onClose, onPlay, onToggleAudio, currentUser, isLiked, isSaved, onToggleLike, onToggleSave, allItems }) {
-  // currentItem puede cambiar al navegar por recomendados — siempre el mismo modal, X cierra todo
+function CreditsModal({ item: initialItem, playing, onClose, onPlay, onToggleAudio, currentUser, allItems }) {
   const [currentItem, setCurrentItem] = React.useState(initialItem);
   const item = currentItem;
+  const qc = useQueryClient();
   const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
   const hasVideo = !!ytId;
   const hasAudio = !!item.audio_file_url;
+
+  // Likes y saves propios del modal — reactivos al item actual
+  const { data: likes = [] } = useQuery({
+    queryKey: ["likes", item.id, currentUser?.id],
+    queryFn: () => currentUser?.id ? base44.entities.Like.filter({ item_id: item.id, user_id: currentUser.id }) : Promise.resolve([]),
+    enabled: !!currentUser?.id,
+  });
+  const { data: saves = [] } = useQuery({
+    queryKey: ["saves", item.id, currentUser?.id],
+    queryFn: () => currentUser?.id ? base44.entities.Save.filter({ item_id: item.id, user_id: currentUser.id }) : Promise.resolve([]),
+    enabled: !!currentUser?.id,
+  });
+  const isLiked = likes.length > 0;
+  const isSaved = saves.length > 0;
+
+  const toggleLike = useMutation({
+    mutationFn: async () => {
+      if (isLiked && likes[0]?.id) await base44.entities.Like.delete(likes[0].id);
+      else await base44.entities.Like.create({ user_id: currentUser.id, item_id: item.id });
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["likes", item.id, currentUser?.id] }),
+  });
+  const toggleSave = useMutation({
+    mutationFn: async () => {
+      if (isSaved && saves[0]?.id) await base44.entities.Save.delete(saves[0].id);
+      else await base44.entities.Save.create({ user_id: currentUser.id, item_id: item.id });
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["saves", item.id, currentUser?.id] }),
+  });
 
   return createPortal(
     <motion.div
@@ -117,22 +146,18 @@ function CreditsModal({ item: initialItem, hasVideo: initialHasVideo, hasAudio: 
             {currentUser && (
               <div className="flex items-center gap-1.5">
                 <button
-                  onClick={() => onToggleLike()}
+                  onClick={() => toggleLike.mutate()}
                   className={`w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center border transition-all ${
-                    isLiked
-                      ? "bg-red-500/60 border-red-400/60"
-                      : "bg-black/40 border-white/20 hover:bg-black/60"
+                    isLiked ? "bg-red-500/60 border-red-400/60" : "bg-black/40 border-white/20 hover:bg-black/60"
                   }`}
                   title={isLiked ? "Quitar like" : "Me gusta"}
                 >
                   <Heart className="w-3.5 h-3.5 text-white" fill={isLiked ? "white" : "none"} />
                 </button>
                 <button
-                  onClick={() => onToggleSave()}
+                  onClick={() => toggleSave.mutate()}
                   className={`w-8 h-8 rounded-full backdrop-blur-sm flex items-center justify-center border transition-all ${
-                    isSaved
-                      ? "bg-blue-500/60 border-blue-400/60"
-                      : "bg-black/40 border-white/20 hover:bg-black/60"
+                    isSaved ? "bg-blue-500/60 border-blue-400/60" : "bg-black/40 border-white/20 hover:bg-black/60"
                   }`}
                   title={isSaved ? "Quitar de guardados" : "Guardar"}
                 >
@@ -335,17 +360,11 @@ function ContentCard({ item, onClick, currentUser, allItems, onSelectRecommended
         {showCredits && (
           <CreditsModal
             item={item}
-            hasVideo={hasVideo}
-            hasAudio={hasAudio}
             playing={playing}
             onClose={() => { setShowCredits(false); explorar?.setCardModalOpen(false); }}
             onPlay={() => { setShowCredits(false); setShowYTModal(true); explorar?.setCardModalOpen(true); }}
             onToggleAudio={(e) => toggleAudio(e)}
             currentUser={currentUser}
-            isLiked={isLiked}
-            isSaved={isSaved}
-            onToggleLike={() => toggleLikeMutation.mutate()}
-            onToggleSave={() => toggleSaveMutation.mutate()}
             allItems={allItems}
           />
         )}
