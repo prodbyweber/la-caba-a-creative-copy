@@ -14,6 +14,7 @@ import AboutEditor from "@/components/admin/AboutEditor";
 import ExploracionEditor from "@/components/admin/ExploracionEditor";
 import PlansEditor from "@/components/admin/PlansEditor";
 import BannersEditor from "@/components/admin/BannersEditor";
+import GuestPopupEditor from "@/components/admin/GuestPopupEditor";
 import { Link } from "react-router-dom";
 import { 
   Eye, 
@@ -37,6 +38,7 @@ export default function LandingEditor() {
   const [showPreview, setShowPreview] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [previewLogoUrl, setPreviewLogoUrl] = useState(null);
+  const [showGuestPopupEditor, setShowGuestPopupEditor] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -347,6 +349,22 @@ export default function LandingEditor() {
               <Settings className="w-5 h-5 text-emerald-400" />
               Editar Contenido de la Landing
             </h2>
+
+            {/* Guest Popup Editor */}
+            <SectionEditor title="🔓 Popup para Invitados (no registrados)" defaultOpen={false}>
+              <div className="mb-4 p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-white">Editar contenido y diseño del popup</p>
+                  <p className="text-xs text-white/40 mt-0.5">Personaliza el título, subtítulo, botones y colores que ven los usuarios no registrados.</p>
+                </div>
+                <button
+                  onClick={() => setShowGuestPopupEditor(true)}
+                  className="flex-shrink-0 px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-white text-sm font-medium transition-colors whitespace-nowrap"
+                >
+                  Editar popup →
+                </button>
+              </div>
+            </SectionEditor>
 
             {/* Plans Management */}
             <SectionEditor title="💰 Planes de Suscripción" defaultOpen={false}>
@@ -860,6 +878,9 @@ export default function LandingEditor() {
             </p>
           </div>
         </div>
+
+        {/* Guest Popup Editor Modal */}
+        <GuestPopupEditor isOpen={showGuestPopupEditor} onClose={() => setShowGuestPopupEditor(false)} />
       </div>
     </AdminLayout>
   );

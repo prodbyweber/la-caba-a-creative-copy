@@ -61,6 +61,10 @@ export default function Hero({ config }) {
   const heroSubtitle = config?.hero_subtitle || "Más que lo que se escucha.";
   const heroVideoUrl = config?.hero_video_url || null;
 
+  const handleExplorar = () => {
+    window.location.href = '/Explorar';
+  };
+
   const sectionRef = useRef(null);
 
   // ── DESKTOP: animación scroll-driven ──────────────────────────────────────
@@ -228,12 +232,12 @@ export default function Hero({ config }) {
         </>
       )}
 
-      {/* Bottom bar: tagline */}
+      {/* Bottom bar: tagline + button */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, delay: 0.4 }}
-        className="absolute bottom-0 left-0 right-0 z-20 px-4 sm:px-8 lg:px-12 pb-10 sm:pb-14 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 pointer-events-auto"
+        className="absolute bottom-0 left-0 right-0 z-20 px-4 sm:px-8 lg:px-12 pb-10 sm:pb-14 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 pointer-events-auto"
       >
         <div>
           <p className="text-[11px] sm:text-xs font-semibold text-white/50 uppercase tracking-widest mb-1">
@@ -243,6 +247,12 @@ export default function Hero({ config }) {
             {heroSubtitle}
           </p>
         </div>
+        <button
+          onClick={handleExplorar}
+          className="px-8 py-3 rounded-xl bg-white text-black font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] flex-shrink-0 whitespace-nowrap"
+        >
+          Explorar
+        </button>
       </motion.div>
     </section>
   );

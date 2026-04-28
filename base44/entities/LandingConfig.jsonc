@@ -216,6 +216,41 @@
     },
     "adn_marca_link": {
       "type": "string"
+    },
+    "guest_popup_title": {
+      "type": "string",
+      "description": "T\u00edtulo del popup para usuarios no registrados",
+      "default": "Accede al universo\nCaba\u00f1a Creative"
+    },
+    "guest_popup_subtitle": {
+      "type": "string",
+      "description": "Subt\u00edtulo del popup",
+      "default": "Descubre, conecta y crea dentro de una red privada de artistas, creadores y marcas"
+    },
+    "guest_popup_cta_primary": {
+      "type": "string",
+      "description": "Texto del bot\u00f3n principal",
+      "default": "Empieza gratis \u2014 14 d\u00edas"
+    },
+    "guest_popup_cta_secondary": {
+      "type": "string",
+      "description": "Texto del bot\u00f3n secundario",
+      "default": "Iniciar sesi\u00f3n"
+    },
+    "guest_popup_locked_badge": {
+      "type": "string",
+      "description": "Texto del badge de contenido exclusivo",
+      "default": "Contenido exclusivo"
+    },
+    "guest_popup_color_primary": {
+      "type": "string",
+      "description": "Color primario del popup (hex)",
+      "default": "#ff5833"
+    },
+    "guest_popup_color_secondary": {
+      "type": "string",
+      "description": "Color secundario del popup (hex)",
+      "default": "#ffffff"
     }
   },
   "required": []

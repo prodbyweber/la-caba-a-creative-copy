@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
 
 const PLANS = [
   {
@@ -98,7 +99,7 @@ function CinematicPreview() {
         transition={{ delay: 0.4, duration: 0.5 }}
         className="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 bg-black/50 backdrop-blur-sm"
       >
-        <span className="w-1.5 h-1.5 rounded-full bg-[#ff5833]" />
+        <span className="w-1.5 h-1.5 rounded-full" style={{ background: "#ff5833" }} />
         <span className="text-[10px] font-semibold text-white/50 uppercase tracking-widest">Contenido exclusivo</span>
       </motion.div>
     </div>
@@ -106,9 +107,26 @@ function CinematicPreview() {
 }
 
 export default function GuestPreview() {
+  const { data: config } = useQuery({
+    queryKey: ['landingConfig'],
+    queryFn: async () => {
+      const configs = await base44.entities.LandingConfig.list();
+      return configs.length > 0 ? configs[0] : null;
+    }
+  });
+
   const handleSignup = () => {
     base44.auth.redirectToLogin(window.location.href);
   };
+
+  // Usar valores de config o defaults
+  const popupTitle = config?.guest_popup_title || "Accede al universo\nCabaña Creative";
+  const popupSubtitle = config?.guest_popup_subtitle || "Descubre, conecta y crea dentro de una red privada de artistas, creadores y marcas";
+  const ctaPrimary = config?.guest_popup_cta_primary || "Empieza gratis — 14 días";
+  const ctaSecondary = config?.guest_popup_cta_secondary || "Iniciar sesión";
+  const badgeText = config?.guest_popup_locked_badge || "Contenido exclusivo";
+  const colorPrimary = config?.guest_popup_color_primary || "#ff5833";
+  const colorSecondary = config?.guest_popup_color_secondary || "#ffffff";
 
   return (
     <div className="min-h-screen bg-[#080808] text-white overflow-x-hidden">
@@ -126,13 +144,13 @@ export default function GuestPreview() {
         >
           <div className="text-[10px] font-semibold text-white/25 uppercase tracking-[0.3em] mb-4">Cabaña Creative</div>
           <h1
-            className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight"
+            className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight whitespace-pre-line"
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", letterSpacing: "-0.03em" }}
           >
-            Accede al universo<br />Cabaña Creative
+            {popupTitle}
           </h1>
           <p className="text-white/45 text-sm sm:text-base max-w-md mx-auto leading-relaxed">
-            Descubre, conecta y crea dentro de una red privada de artistas, creadores y marcas
+            {popupSubtitle}
           </p>
         </motion.div>
 
@@ -148,15 +166,15 @@ export default function GuestPreview() {
               key={plan.name}
               className="relative rounded-2xl flex flex-col"
               style={{
-                background: plan.highlighted ? "rgba(255,88,51,0.07)" : "rgba(255,255,255,0.025)",
-                border: plan.highlighted ? "1px solid rgba(255,88,51,0.35)" : "1px solid rgba(255,255,255,0.07)",
-                boxShadow: plan.highlighted ? "0 0 30px rgba(255,88,51,0.1)" : "none",
+                background: plan.highlighted ? `${colorPrimary}14` : "rgba(255,255,255,0.025)",
+                border: plan.highlighted ? `1px solid ${colorPrimary}59` : "1px solid rgba(255,255,255,0.07)",
+                boxShadow: plan.highlighted ? `0 0 30px ${colorPrimary}1a` : "none",
               }}
             >
               {plan.badge && (
                 <div
                   className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-white"
-                  style={{ background: "linear-gradient(135deg, #ff5833, #ff8c00)" }}
+                  style={{ background: `linear-gradient(135deg, ${colorPrimary}, #ff8c00)` }}
                 >
                   {plan.badge}
                 </div>
@@ -179,7 +197,7 @@ export default function GuestPreview() {
                     <li key={i} className="flex items-start gap-2.5">
                       <Check
                         className="w-3.5 h-3.5 mt-0.5 flex-shrink-0"
-                        style={{ color: plan.highlighted ? "#ff5833" : "rgba(255,255,255,0.35)" }}
+                        style={{ color: plan.highlighted ? colorPrimary : "rgba(255,255,255,0.35)" }}
                       />
                       <span className="text-xs text-white/55 leading-relaxed">{f}</span>
                     </li>
@@ -199,21 +217,25 @@ export default function GuestPreview() {
         >
           <button
             onClick={handleSignup}
-            className="px-10 py-4 rounded-xl font-black text-base text-black transition-all hover:scale-[1.02] active:scale-[0.98]"
+            className="px-10 py-4 rounded-xl font-black text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
             style={{
-              background: "white",
-              boxShadow: "0 4px 24px rgba(255,255,255,0.15)",
+              background: colorSecondary,
+              color: colorSecondary === "#ffffff" ? "#000" : "#fff",
+              boxShadow: `0 4px 24px ${colorSecondary}26`,
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               letterSpacing: "-0.02em",
             }}
           >
-            Empieza gratis — 14 días
+            {ctaPrimary}
           </button>
           <button
             onClick={handleSignup}
-            className="text-sm text-white/35 hover:text-white/60 transition-colors underline underline-offset-4"
+            className="text-sm transition-colors underline underline-offset-4"
+            style={{ color: "rgba(255,255,255,0.35)" }}
+            onMouseEnter={(e) => e.target.style.color = "rgba(255,255,255,0.6)"}
+            onMouseLeave={(e) => e.target.style.color = "rgba(255,255,255,0.35)"}
           >
-            Iniciar sesión
+            {ctaSecondary}
           </button>
         </motion.div>
       </div>
