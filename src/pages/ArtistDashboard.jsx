@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music2, Film, Image, Zap } from "lucide-react";
+import { Music2, Film, Image, Zap, Eye } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
@@ -15,6 +15,7 @@ export default function ArtistDashboard() {
   const [showProfileDrawer, setShowProfileDrawer] = useState(false);
   const [catalogMode, setCatalogMode] = useState(null); // se asigna dinámicamente
   const [currentUser, setCurrentUser] = useState(null);
+  const [viewMode, setViewMode] = useState(null); // null = real, "artist" | "creator" | "brand" = preview
 
   const urlParams = new URLSearchParams(window.location.search);
   const artistId = urlParams.get("artistId") || urlParams.get("id");
@@ -50,7 +51,8 @@ export default function ArtistDashboard() {
   });
 
   // Determinar qué secciones mostrar según el tipo de cuenta
-  const accountType = userProfile?.account_type || "artist";
+  // Si está en modo preview, usar el tipo de vista seleccionado; si no, usar el real
+  const accountType = viewMode || userProfile?.account_type || "artist";
   
   const showAudioSection = accountType === "artist";
   const showVideoSection = accountType === "artist" || accountType === "creator";
@@ -102,6 +104,41 @@ export default function ArtistDashboard() {
 
       <main className="pt-14">
         <div className="px-4 sm:px-8 lg:px-12 py-5 [&_.mobile-carousel]:!-mx-4">
+          {/* Selector de vista para admin/preview */}
+          {currentUser?.role === "admin" && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-5 p-3 rounded-xl border border-white/[0.08] bg-white/[0.03]"
+            >
+              <p className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-2">Vista Previa</p>
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => setViewMode(null)}
+                  className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                    viewMode === null 
+                      ? 'border-red-500/40 bg-red-500/10 text-red-400' 
+                      : 'border-white/[0.08] bg-white/[0.03] text-white/40 hover:border-white/20'
+                  }`}
+                >
+                  Real
+                </button>
+                {["artist", "creator", "brand"].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setViewMode(type)}
+                    className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
+                      viewMode === type 
+                        ? 'border-red-500/40 bg-red-500/10 text-red-400' 
+                        : 'border-white/[0.08] bg-white/[0.03] text-white/40 hover:border-white/20'
+                    }`}
+                  >
+                    {type === "artist" ? "Artista" : type === "creator" ? "Creador" : "Marca"}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
           {/* Header — selector dinámico según tipo de cuenta */}
            <div className="mb-5">
