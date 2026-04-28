@@ -13,20 +13,27 @@ function useAutoPlayVideo(src) {
     const vid = ref.current;
     if (!vid || !src) return;
     vid.muted = true;
-    // Reintento cada 300ms hasta que arranque (cubre iframe sandbox y Safari)
-    const tryPlay = () => {
-      if (!vid.paused) return;
-      vid.play().catch(() => {});
-    };
-    const interval = setInterval(tryPlay, 300);
-    vid.addEventListener("canplay", tryPlay, { once: true });
-    vid.addEventListener("loadeddata", tryPlay, { once: true });
-    // Limpiar cuando arranque definitivamente
-    const onPlaying = () => clearInterval(interval);
-    vid.addEventListener("playing", onPlaying);
+
+    // Intento inicial y ante cualquier pausa inesperada
+    const tryPlay = () => { vid.muted = true; vid.play().catch(() => {}); };
+
+    // Arrancar inmediatamente y en cuanto haya datos
+    tryPlay();
+    vid.addEventListener("canplay", tryPlay);
+    vid.addEventListener("loadeddata", tryPlay);
+
+    // Si se pausa (cambio de pestaña, etc.), volver a reproducir
+    vid.addEventListener("pause", tryPlay);
+
+    // Visibilidad: reanudar cuando la pestaña vuelva a ser visible
+    const onVisible = () => { if (!document.hidden) tryPlay(); };
+    document.addEventListener("visibilitychange", onVisible);
+
     return () => {
-      clearInterval(interval);
-      vid.removeEventListener("playing", onPlaying);
+      vid.removeEventListener("canplay", tryPlay);
+      vid.removeEventListener("loadeddata", tryPlay);
+      vid.removeEventListener("pause", tryPlay);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, [src]);
   return ref;
@@ -44,8 +51,8 @@ function HeroVideo({ src }) {
       playsInline
       preload="auto"
       disablePictureInPicture
-      className="w-[85%] h-[85%] object-cover rounded-2xl"
-      style={{ opacity: 0.6, pointerEvents: "none" }}
+      className="absolute inset-0 w-full h-full object-cover"
+      style={{ pointerEvents: "none" }}
     />
   );
 }
@@ -92,13 +99,13 @@ export default function Hero({ config }) {
   // ── RENDER ─────────────────────────────────────────────────────────────────
   return (
     <section ref={sectionRef} className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0b]">
-      {/* Background video */}
+      {/* Background video — cubre toda la sección como fondo en loop */}
       {heroVideoUrl && (
         <>
-          <div className="absolute inset-0 flex items-center justify-center z-0">
+          <div className="absolute inset-0 z-0 overflow-hidden">
             <HeroVideo src={heroVideoUrl} />
           </div>
-          <div className="absolute inset-0 bg-[#0a0a0b]/15 z-0" />
+          <div className="absolute inset-0 bg-[#0a0a0b]/30 z-0" />
         </>
       )}
 

@@ -55,18 +55,22 @@ function useAutoPlayVideo(src) {
     const vid = ref.current;
     if (!vid || !src) return;
     vid.muted = true;
-    const tryPlay = () => {
-      if (!vid.paused) return;
-      vid.play().catch(() => {});
-    };
-    const interval = setInterval(tryPlay, 300);
-    vid.addEventListener("canplay", tryPlay, { once: true });
-    vid.addEventListener("loadeddata", tryPlay, { once: true });
-    const onPlaying = () => clearInterval(interval);
-    vid.addEventListener("playing", onPlaying);
+
+    const tryPlay = () => { vid.muted = true; vid.play().catch(() => {}); };
+
+    tryPlay();
+    vid.addEventListener("canplay", tryPlay);
+    vid.addEventListener("loadeddata", tryPlay);
+    vid.addEventListener("pause", tryPlay);
+
+    const onVisible = () => { if (!document.hidden) tryPlay(); };
+    document.addEventListener("visibilitychange", onVisible);
+
     return () => {
-      clearInterval(interval);
-      vid.removeEventListener("playing", onPlaying);
+      vid.removeEventListener("canplay", tryPlay);
+      vid.removeEventListener("loadeddata", tryPlay);
+      vid.removeEventListener("pause", tryPlay);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, [src]);
   return ref;
