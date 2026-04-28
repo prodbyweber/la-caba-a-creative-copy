@@ -58,22 +58,31 @@ function BannerVideo({ src }) {
     if (!vid) return;
 
     setReady(false);
-    vid.muted = true;
-    vid.load();
 
-    const onCanPlay = () => {
+    const show = () => {
       vid.play().catch(() => {});
       setReady(true);
     };
 
-    vid.addEventListener("canplay", onCanPlay, { once: true });
-    return () => vid.removeEventListener("canplay", onCanPlay);
+    vid.addEventListener("loadeddata", show, { once: true });
+    vid.addEventListener("canplay", show, { once: true });
+
+    const fallback = setTimeout(() => { vid.play().catch(() => {}); setReady(true); }, 1500);
+
+    vid.load();
+
+    return () => {
+      vid.removeEventListener("loadeddata", show);
+      vid.removeEventListener("canplay", show);
+      clearTimeout(fallback);
+    };
   }, [src]);
 
   return (
     <video
       ref={videoRef}
       src={src}
+      autoPlay
       muted
       loop
       playsInline
@@ -83,7 +92,7 @@ function BannerVideo({ src }) {
       style={{
         objectPosition: "center center",
         opacity: ready ? 1 : 0,
-        transition: "opacity 0.6s ease",
+        transition: "opacity 0.5s ease",
       }}
     />
   );

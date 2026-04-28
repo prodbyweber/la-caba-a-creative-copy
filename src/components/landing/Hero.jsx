@@ -15,22 +15,33 @@ function HeroVideo({ src }) {
     if (!vid) return;
 
     setReady(false);
-    vid.muted = true;
-    vid.load();
 
-    const onCanPlay = () => {
+    const show = () => {
       vid.play().catch(() => {});
       setReady(true);
     };
 
-    vid.addEventListener("canplay", onCanPlay, { once: true });
-    return () => vid.removeEventListener("canplay", onCanPlay);
+    // Mostrar en cuanto haya datos suficientes
+    vid.addEventListener("loadeddata", show, { once: true });
+    vid.addEventListener("canplay", show, { once: true });
+
+    // Fallback: mostrar igualmente después de 1.5s aunque no haya evento
+    const fallback = setTimeout(() => { vid.play().catch(() => {}); setReady(true); }, 1500);
+
+    vid.load();
+
+    return () => {
+      vid.removeEventListener("loadeddata", show);
+      vid.removeEventListener("canplay", show);
+      clearTimeout(fallback);
+    };
   }, [src]);
 
   return (
     <video
       ref={videoRef}
       src={src}
+      autoPlay
       muted
       loop
       playsInline
@@ -39,7 +50,7 @@ function HeroVideo({ src }) {
       className="w-[85%] h-[85%] object-cover rounded-2xl"
       style={{
         opacity: ready ? 0.6 : 0,
-        transition: "opacity 0.6s ease",
+        transition: "opacity 0.5s ease",
       }}
     />
   );
