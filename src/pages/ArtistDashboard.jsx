@@ -9,7 +9,6 @@ import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
 import ClipsLibrary from "@/components/clips/ClipsLibrary";
 import BrandCampaignsSection from "@/components/dashboard/BrandCampaignsSection";
-import CreativeAdsManager from "@/components/dashboard/CreativeAdsManager";
 
 
 export default function ArtistDashboard() {
@@ -55,12 +54,11 @@ export default function ArtistDashboard() {
   // Si está en modo preview, usar el tipo de vista seleccionado; si no, usar el real
   const accountType = viewMode || userProfile?.account_type || "artist";
   
-  const showAudioSection = accountType === "artist" || accountType === "creator" || accountType === "brand";
-  const showVideoSection = accountType === "artist" || accountType === "creator" || accountType === "brand";
-  const showPhotosSection = accountType === "artist" || accountType === "creator";
+  const showAudioSection = accountType === "artist";
+  const showVideoSection = accountType === "artist" || accountType === "creator";
+  const showPhotosSection = accountType === "creator" || accountType === "brand";
   const showProjectsSection = accountType === "artist" || accountType === "creator" || accountType === "brand";
   const showCampaignsSection = accountType === "brand";
-  const showCreativeAdsSection = accountType === "brand";
   
   // Asignar catalogMode inicial basado en el tipo de cuenta
   useEffect(() => {
@@ -119,7 +117,7 @@ export default function ArtistDashboard() {
                   onClick={() => setViewMode(null)}
                   className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                     viewMode === null 
-                      ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400' 
+                      ? 'border-red-500/40 bg-red-500/10 text-red-400' 
                       : 'border-white/[0.08] bg-white/[0.03] text-white/40 hover:border-white/20'
                   }`}
                 >
@@ -131,7 +129,7 @@ export default function ArtistDashboard() {
                     onClick={() => setViewMode(type)}
                     className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                       viewMode === type 
-                        ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400' 
+                        ? 'border-red-500/40 bg-red-500/10 text-red-400' 
                         : 'border-white/[0.08] bg-white/[0.03] text-white/40 hover:border-white/20'
                     }`}
                   >
@@ -157,7 +155,7 @@ export default function ArtistDashboard() {
                    {catalogMode === "audio" && (
                      <motion.div
                        layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-emerald-400"
+                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
                      />
                    )}
@@ -174,7 +172,7 @@ export default function ArtistDashboard() {
                    {catalogMode === "video" && (
                      <motion.div
                        layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-emerald-400"
+                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
                      />
                    )}
@@ -191,7 +189,7 @@ export default function ArtistDashboard() {
                    {catalogMode === "photos" && (
                      <motion.div
                        layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-emerald-400"
+                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
                      />
                    )}
@@ -208,31 +206,14 @@ export default function ArtistDashboard() {
                    {catalogMode === "campaigns" && (
                      <motion.div
                        layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-emerald-400"
+                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
                      />
                    )}
-                   </button>
-                   )}
-                   {showCreativeAdsSection && (
-                   <button
-                   onClick={() => setCatalogMode("creative-ads")}
-                   className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-                   style={{ color: catalogMode === "creative-ads" ? "#fff" : "rgba(255,255,255,0.3)" }}
-                   >
-                   <Image className="w-3.5 h-3.5" />
-                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Creative Ads</span>
-                   {catalogMode === "creative-ads" && (
-                     <motion.div
-                       layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-emerald-400"
-                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                     />
-                   )}
-                   </button>
-                   )}
-                   </div>
-                   </div>
+                 </button>
+               )}
+             </div>
+           </div>
 
           {/* ── CONTENIDO DINÁMICO POR TIPO DE CUENTA ── */}
           <AnimatePresence mode="wait">
@@ -296,19 +277,6 @@ export default function ArtistDashboard() {
                     <ProjectsSection jlyArtistId={artist.id} />
                   </div>
                 </div>
-              </motion.div>
-            )}
-
-            {/* MARCA: Creative Ads */}
-            {showCreativeAdsSection && catalogMode === "creative-ads" && (
-              <motion.div
-                key="creative-ads"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.25 }}
-              >
-                <CreativeAdsManager userProfileId={userProfile?.id} />
               </motion.div>
             )}
           </AnimatePresence>
