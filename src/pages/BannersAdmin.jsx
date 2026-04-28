@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Upload, Trash2, CheckCircle, AlertCircle, ArrowLeft, RefreshCw, Smartphone } from "lucide-react";
+import { Upload, Trash2, CheckCircle, AlertCircle, ArrowLeft, RefreshCw, Smartphone, Volume2, VolumeX } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 
 const BANNERS = [
-  { key: "hero_banner_1_image", mobileKey: "hero_banner_1_mobile_position", label: "Banner 1", subtitle: "Muse Club" },
-  { key: "hero_banner_2_image", mobileKey: "hero_banner_2_mobile_position", label: "Banner 2", subtitle: "La Nueva Corriente" },
-  { key: "hero_banner_3_image", mobileKey: "hero_banner_3_mobile_position", label: "Banner 3", subtitle: "Friends & Family" },
+  { key: "hero_banner_1_image", mobileKey: "hero_banner_1_mobile_position", audioKey: "hero_banner_1_audio_enabled", label: "Banner 1", subtitle: "The Girls" },
+  { key: "hero_banner_2_image", mobileKey: "hero_banner_2_mobile_position", audioKey: "hero_banner_2_audio_enabled", label: "Banner 2", subtitle: "La Nueva Corriente" },
+  { key: "hero_banner_3_image", mobileKey: "hero_banner_3_mobile_position", audioKey: "hero_banner_3_audio_enabled", label: "Banner 3", subtitle: "Friends & Family" },
 ];
 
 // Presets de posición para mobile
@@ -29,9 +29,10 @@ function isVideoUrl(url) {
   return cleanUrl.endsWith(".mp4") || cleanUrl.endsWith(".webm") || cleanUrl.endsWith(".mov");
 }
 
-function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, onUpdated }) {
+function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedAudioEnabled, onUpdated }) {
   const [url, setUrl] = useState(savedUrl || "");
   const [mobilePosition, setMobilePosition] = useState(savedMobilePosition || "center center");
+  const [audioEnabled, setAudioEnabled] = useState(savedAudioEnabled || false);
   const [customX, setCustomX] = useState("50");
   const [customY, setCustomY] = useState("50");
   const [uploading, setUploading] = useState(false);
@@ -46,6 +47,7 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, onUpda
       mounted.current = true;
       setUrl(savedUrl || "");
       setMobilePosition(savedMobilePosition || "center center");
+      setAudioEnabled(savedAudioEnabled || false);
     }
   }, []);
 
@@ -147,7 +149,7 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, onUpda
       <div className="relative bg-black/40" style={{ height: 180 }}>
         {url ? (
           isVideo ? (
-            <video key={url} src={url} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+            <video key={url} src={url} autoPlay muted={!audioEnabled} loop playsInline className="w-full h-full object-cover" />
           ) : (
             <img src={url} alt={bannerDef.subtitle} className="w-full h-full object-cover" style={{ objectPosition: "center center" }} />
           )
@@ -157,8 +159,9 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, onUpda
           </div>
         )}
         {url && (
-          <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[10px] font-bold text-white/70 uppercase tracking-wider">
+          <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[10px] font-bold text-white/70 uppercase tracking-wider flex items-center gap-1">
             {isVideo ? "Video" : "Imagen"}
+            {isVideo && audioEnabled && <Volume2 className="w-3 h-3 text-emerald-400" />}
           </div>
         )}
       </div>
@@ -203,6 +206,27 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, onUpda
         {/* Hidden inputs */}
         <input ref={fileInputImg} type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e.target.files?.[0], false)} />
         <input ref={fileInputVid} type="file" accept="video/mp4,video/webm,video/mov,video/quicktime" className="hidden" onChange={(e) => handleFileUpload(e.target.files?.[0], true)} />
+
+        {/* Audio toggle for videos */}
+        {url && isVideo && (
+          <button
+            onClick={() => {
+              setAudioEnabled(!audioEnabled);
+              persist({ [bannerDef.audioKey]: !audioEnabled });
+            }}
+            className={`w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl border text-sm transition-all ${
+              audioEnabled
+                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                : "border-white/10 bg-white/5 text-white/60 hover:text-white hover:bg-white/10"
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              {audioEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              <span>Audio del video</span>
+            </div>
+            <span className="text-xs text-white/30">{audioEnabled ? "Activo" : "Silenciado"}</span>
+          </button>
+        )}
 
         {/* Mobile position toggle */}
         {url && !isVideo && (
@@ -329,10 +353,13 @@ export default function BannersAdmin() {
       setBannerData({
         hero_banner_1_image: cfg.hero_banner_1_image || "",
         hero_banner_1_mobile_position: cfg.hero_banner_1_mobile_position || "center center",
+        hero_banner_1_audio_enabled: cfg.hero_banner_1_audio_enabled || false,
         hero_banner_2_image: cfg.hero_banner_2_image || "",
         hero_banner_2_mobile_position: cfg.hero_banner_2_mobile_position || "center center",
+        hero_banner_2_audio_enabled: cfg.hero_banner_2_audio_enabled === true,
         hero_banner_3_image: cfg.hero_banner_3_image || "",
         hero_banner_3_mobile_position: cfg.hero_banner_3_mobile_position || "center center",
+        hero_banner_3_audio_enabled: cfg.hero_banner_3_audio_enabled || false,
       });
     } catch (e) {
       setError("Error al cargar la configuración: " + e.message);
@@ -397,6 +424,7 @@ export default function BannersAdmin() {
                     configId={configId}
                     savedUrl={bannerData[banner.key]}
                     savedMobilePosition={bannerData[banner.mobileKey]}
+                    savedAudioEnabled={bannerData[banner.audioKey]}
                     onUpdated={handleUpdated}
                   />
                 ))}
