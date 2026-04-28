@@ -10,7 +10,6 @@ import ContentRow from "@/components/explorar/ContentRow";
 import ArtistProfileModal from "@/components/explorar/ArtistProfileModal";
 import UserProfilePanel from "@/components/explorar/UserProfilePanel";
 import PricingModal from "@/components/explorar/PricingModal";
-import GuestPreview from "@/components/explorar/GuestPreview";
 
 // Legacy fallback labels (for items with row_category but no ExplorarSection yet)
 const LEGACY_ROW_LABELS = {
@@ -31,6 +30,7 @@ export default function Explorar() {
   const [activeSection, setActiveSection] = useState("inicio"); // inicio | musica | films
   const [profileOpen, setProfileOpen] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
+  const [guestLocked, setGuestLocked] = useState(false); // true after modal is dismissed — persistent blur lock
   const isAdmin = currentUser?.role === "admin";
 
   useEffect(() => {
@@ -42,18 +42,25 @@ export default function Explorar() {
     });
   }, []);
 
-  // Show pricing popup after 4s only for non-logged-in users (once per session)
+  // Show pricing popup after 6s for non-logged-in users (once per session)
+  // After dismissing, keep a persistent blur overlay (guestLocked)
   useEffect(() => {
     if (!authChecked) return;
-    if (currentUser) return; // logged in — never show
+    if (currentUser) return;
+    // If already shown this session, go straight to locked state
     const alreadyShown = sessionStorage.getItem("pricing_modal_shown");
-    if (alreadyShown) return;
+    if (alreadyShown) { setGuestLocked(true); return; }
     const timer = setTimeout(() => {
       setShowPricingModal(true);
       sessionStorage.setItem("pricing_modal_shown", "1");
-    }, 4000);
+    }, 6000);
     return () => clearTimeout(timer);
   }, [authChecked, currentUser]);
+
+  const handleGuestModalClose = () => {
+    setShowPricingModal(false);
+    setGuestLocked(true);
+  };
 
   const { data: explorarItems, isLoading: loadingItems } = useQuery({
     queryKey: ["explorar-items"],
@@ -350,13 +357,7 @@ export default function Explorar() {
           </div>
         )}
 
-        {/* Guest fade-out — blurs bottom 40% of content rows for non-logged users */}
-        {!currentUser && (
-          <div
-            className="absolute bottom-0 left-0 right-0 pointer-events-none"
-            style={{ height: "55%", background: "linear-gradient(to bottom, transparent 0%, rgba(8,8,8,0.7) 40%, rgba(8,8,8,0.97) 80%, #080808 100%)" }}
-          />
-        )}
+
       </div>
 
       {/* Artist modal */}
@@ -383,10 +384,66 @@ export default function Explorar() {
         )}
       </AnimatePresence>
 
+      {/* Persistent blur lock — shown after modal is dismissed, blocks interaction */}
+      <AnimatePresence>
+        {!currentUser && guestLocked && !showPricingModal && (
+          <motion.div
+            key="guest-lock"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className="fixed inset-0 z-[700] flex items-end justify-center pb-8 px-4"
+            style={{
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+              background: "rgba(0,0,0,0.55)",
+              pointerEvents: "all",
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Small sticky CTA badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="flex flex-col sm:flex-row items-center gap-3 px-5 py-3.5 rounded-2xl"
+              style={{
+                background: "rgba(8,8,9,0.95)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+              }}
+            >
+              <div className="text-center sm:text-left">
+                <p className="text-xs font-black text-white" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.02em" }}>
+                  Regístrate para acceder
+                </p>
+                <p className="text-[10px] text-white/35 mt-0.5">Contenido exclusivo para miembros</p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button
+                  onClick={() => base44.auth.redirectToLogin(window.location.href)}
+                  className="px-4 py-2 rounded-xl font-bold text-xs text-black transition-all hover:scale-[1.03]"
+                  style={{ background: "white" }}
+                >
+                  Empieza gratis
+                </button>
+                <button
+                  onClick={() => setShowPricingModal(true)}
+                  className="px-4 py-2 rounded-xl font-semibold text-xs text-white/60 hover:text-white transition-colors"
+                  style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}
+                >
+                  Ver planes
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Pricing modal — guests only, after 6s */}
       <AnimatePresence>
         {showPricingModal && (
-          <PricingModal onClose={() => setShowPricingModal(false)} />
+          <PricingModal onClose={handleGuestModalClose} />
         )}
       </AnimatePresence>
     </div>
