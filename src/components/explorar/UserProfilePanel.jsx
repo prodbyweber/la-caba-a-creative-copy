@@ -363,8 +363,8 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
                   )}
 
                   {/* Dashboard access buttons */}
-                  <div className="flex flex-wrap justify-center gap-2 mb-4">
-                    {currentUser?.role === "admin" && (
+                  {currentUser?.role === "admin" ? (
+                    <div className="flex flex-wrap justify-center gap-2 mb-4">
                       <Link to="/AdminDashboard" onClick={onClose}>
                         <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white/70 hover:text-white transition-all"
                           style={{ background: "rgba(255,88,51,0.12)", border: "1px solid rgba(255,88,51,0.25)" }}>
@@ -372,17 +372,15 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
                           Admin
                         </button>
                       </Link>
-                    )}
-                    {linkedArtist && (
-                      <Link to={`/ArtistDashboard?artistId=${linkedArtist.id}`} onClick={onClose}>
-                        <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white hover:scale-[1.03] transition-all"
-                          style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)" }}>
-                          <LayoutDashboard className="w-3.5 h-3.5" />
-                          Mi dashboard
-                        </button>
-                      </Link>
-                    )}
-                    {!linkedArtist && currentUser?.role === "admin" && (
+                      {linkedArtist && (
+                        <Link to={`/ArtistDashboard?artistId=${linkedArtist.id}`} onClick={onClose}>
+                          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white/50 hover:text-white transition-all"
+                            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                            <LayoutDashboard className="w-3.5 h-3.5" />
+                            Mi dashboard
+                          </button>
+                        </Link>
+                      )}
                       <Link to="/ArtistPanelList" onClick={onClose}>
                         <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white/50 hover:text-white transition-all"
                           style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
@@ -390,8 +388,24 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
                           Panel artistas
                         </button>
                       </Link>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    linkedArtist && (
+                      <Link to={`/ArtistDashboard?artistId=${linkedArtist.id}`} onClick={onClose} className="w-full">
+                        <button className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-white transition-all"
+                          style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)" }}>
+                          <LayoutDashboard className="w-3.5 h-3.5" />
+                          Mi dashboard
+                        </button>
+                      </Link>
+                    )
+                  )}
+                  {!currentUser?.role === "admin" && !linkedArtist && (
+                    <div className="w-full px-3 py-2 rounded-lg text-center text-xs text-white/30"
+                      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                      Sin perfil de artista vinculado
+                    </div>
+                  )}
 
                   {/* Bio */}
                   <div className="w-full">
