@@ -69,7 +69,31 @@ function YoutubeModal({ ytId, title, originalUrl, onClose }) {
 
 // Credits modal — completamente fuera del árbol de la tarjeta via portal
 function CreditsModal({ item, hasVideo, hasAudio, playing, onClose, onPlay, onToggleAudio, currentUser, isLiked, isSaved, onToggleLike, onToggleSave, allItems, onSelectRecommended }) {
+  const [nestedItem, setNestedItem] = React.useState(null);
   const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
+
+  // If a recommended item was clicked, show its own CreditsModal on top
+  if (nestedItem) {
+    const nestedYtId = getYoutubeId(nestedItem.youtube_url || nestedItem.youtube_music_url);
+    return (
+      <CreditsModal
+        item={nestedItem}
+        hasVideo={!!nestedYtId}
+        hasAudio={!!nestedItem.audio_file_url}
+        playing={false}
+        onClose={() => setNestedItem(null)}
+        onPlay={() => {}}
+        onToggleAudio={() => {}}
+        currentUser={currentUser}
+        isLiked={false}
+        isSaved={false}
+        onToggleLike={() => {}}
+        onToggleSave={() => {}}
+        allItems={allItems}
+        onSelectRecommended={() => {}}
+      />
+    );
+  }
 
   return createPortal(
     <motion.div
@@ -214,7 +238,7 @@ function CreditsModal({ item, hasVideo, hasAudio, playing, onClose, onPlay, onTo
         <RecommendedRow
           currentItem={item}
           allItems={allItems}
-          onSelect={(recommended) => { onClose(); onSelectRecommended && onSelectRecommended(recommended); }}
+          onSelect={(recommended) => setNestedItem(recommended)}
         />
       </motion.div>
     </motion.div>,
