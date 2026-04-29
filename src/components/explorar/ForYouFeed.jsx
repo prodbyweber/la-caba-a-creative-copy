@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Heart, Share2, Music2 } from "lucide-react";
+import { X, Heart, Share2, Music2, ChevronRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -35,12 +35,11 @@ function useUploaderProfile(galleryItem, projectCredits) {
 function Overlay({ item, projectTitle, projectItem, galleryItem, liked, setLiked, currentUser }) {
   const uploaderProfile = useUploaderProfile(galleryItem, projectItem?.raw?.credits);
 
-  // Find the credited user whose UserProfile matches one of the credits
-  const creditNames = (projectItem?.raw?.credits || []).map(c => c.name).filter(Boolean);
-
   const displayName = uploaderProfile?.artist_name || uploaderProfile?.display_name || uploaderProfile?.full_name;
   const username = uploaderProfile?.username;
   const avatar = uploaderProfile?.avatar_url || uploaderProfile?.profile_photo_url;
+  const photoPosition = uploaderProfile?.photo_position || "center center";
+  const accountType = uploaderProfile?.account_type;
 
   const handleShare = () => {
     if (navigator.share) {
@@ -57,43 +56,60 @@ function Overlay({ item, projectTitle, projectItem, galleryItem, liked, setLiked
 
       {/* Bottom area */}
       <div className="flex items-end justify-between px-4 pb-10 pointer-events-none"
-        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)" }}>
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.4) 55%, transparent 100%)" }}>
 
         {/* Left: user info + caption */}
         <div className="flex-1 min-w-0 pr-4 pointer-events-auto">
-          {/* User row */}
-          {displayName && (
-            <div className="flex items-center gap-2 mb-2">
-              {username ? (
-                <Link to={`/${username}`} onClick={e => e.stopPropagation()} className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full overflow-hidden border border-white/20 bg-white/10 flex-shrink-0">
-                    {avatar ? (
-                      <img src={avatar} alt={displayName} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-[10px] font-bold text-white/60">
-                          {displayName[0]?.toUpperCase()}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <span className="text-white font-bold text-sm drop-shadow-lg">@{username}</span>
-                </Link>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full overflow-hidden border border-white/20 bg-white/10 flex-shrink-0">
-                    {avatar ? (
-                      <img src={avatar} alt={displayName} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-[10px] font-bold text-white/60">{displayName[0]?.toUpperCase()}</span>
-                      </div>
-                    )}
-                  </div>
-                  <span className="text-white font-bold text-sm drop-shadow-lg">{displayName}</span>
+
+          {/* Instagram-style profile card */}
+          {displayName && username && (
+            <Link
+              to={`/${username}`}
+              onClick={e => e.stopPropagation()}
+              className="flex items-center gap-3 mb-3 group"
+            >
+              {/* Avatar with ring */}
+              <div className="relative flex-shrink-0">
+                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/30 group-hover:border-white/60 transition-colors shadow-lg"
+                  style={{ background: "#222" }}>
+                  {avatar ? (
+                    <img src={avatar} alt={displayName} className="w-full h-full object-cover"
+                      style={{ objectPosition: photoPosition }} />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-xs font-black text-white/60">{displayName[0]?.toUpperCase()}</span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+
+              {/* Name + badge row */}
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-white font-bold text-sm drop-shadow-lg leading-tight group-hover:underline underline-offset-2 truncate">
+                    @{username}
+                  </span>
+                  {accountType === "artist" && (
+                    <span className="flex-shrink-0 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full"
+                      style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.6)" }}>
+                      Artista
+                    </span>
+                  )}
+                  {accountType === "creator" && (
+                    <span className="flex-shrink-0 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full"
+                      style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.6)" }}>
+                      Creador
+                    </span>
+                  )}
+                </div>
+                {displayName !== username && (
+                  <p className="text-white/50 text-[10px] leading-tight truncate">{displayName}</p>
+                )}
+              </div>
+
+              {/* Chevron arrow → perfil */}
+              <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white/70 flex-shrink-0 transition-colors ml-auto" />
+            </Link>
           )}
 
           {/* Project title */}

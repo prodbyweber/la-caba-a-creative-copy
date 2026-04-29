@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import RecommendedRow from "@/components/explorar/RecommendedRow";
 import ProjectGalleryStrip from "@/components/explorar/ProjectGalleryStrip";
 import ForYouFeed from "@/components/explorar/ForYouFeed";
+import GalleryUploadButton from "@/components/explorar/GalleryUploadButton";
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -129,6 +130,15 @@ function CreditsModalInner() {
     staleTime: 60000,
   });
 
+  // Can this user add to gallery? admin OR their artist is credited/main
+  const canAddToGallery = !!currentUser && (
+    currentUser.role === "admin" ||
+    (linkedArtist && (
+      item?.raw?.artist_id === linkedArtist.id ||
+      (item?.raw?.credits || []).some(c => c.artist_id === linkedArtist.id)
+    ))
+  );
+
   if (!creditsModal || !item) return null;
 
   return createPortal(
@@ -238,9 +248,18 @@ function CreditsModalInner() {
           )}
         </div>
 
-        {/* Gallery strip */}
-        {item.raw?.gallery?.length > 0 && (
-          <div className="px-6 pb-4">
+        {/* Gallery strip + upload button for authorized users */}
+        <div className="px-6 pb-4">
+          {canAddToGallery && (
+            <div className="mb-3 flex justify-end">
+              <GalleryUploadButton
+                projectRaw={item.raw}
+                currentUser={currentUser}
+                onUploaded={() => qc.invalidateQueries({ queryKey: ["explorar-items"] })}
+              />
+            </div>
+          )}
+          {(item.raw?.gallery?.length > 0) && (
             <ProjectGalleryStrip
               gallery={item.raw.gallery}
               projectRaw={item.raw}
@@ -248,8 +267,8 @@ function CreditsModalInner() {
               linkedArtistId={linkedArtist?.id}
               onOpenFeed={() => setShowFeed(true)}
             />
-          </div>
-        )}
+          )}
+        </div>
 
         <RecommendedRow
           currentItem={item}
