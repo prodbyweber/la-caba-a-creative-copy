@@ -5,6 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
 import { ArrowLeft, Heart, Share2, Music2, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
+import SavedAndLikesPanel from "@/components/profile/SavedAndLikesPanel";
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -185,6 +186,11 @@ export default function UserPublicProfile() {
             {userProfile.bio}
           </motion.p>
         )}
+
+        {/* Me gustas y Guardado */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="mb-12">
+          <SavedAndLikesPanel userId={userProfile?.user_id} />
+        </motion.div>
 
         {/* Explorar Items */}
         {explorarItems.length > 0 && (

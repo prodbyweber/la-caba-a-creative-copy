@@ -233,38 +233,7 @@ export default function CreatorProfile() {
           </div>
         )}
 
-        {/* Clips de Video */}
-        {clips.length > 0 && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-black mb-6">Videos</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {clips.map((clip, i) => {
-                const ytId = getYoutubeId(clip.file_url);
-                const thumb = clip.thumbnail_url || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : "");
-                return (
-                  <motion.div
-                    key={clip.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="group relative rounded-xl overflow-hidden bg-gradient-to-br from-white/[0.04] to-white/[0.02] border border-white/[0.08] hover:border-white/15 transition-all aspect-square cursor-pointer"
-                  >
-                    {thumb ? (
-                      <img src={thumb} alt={clip.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/10 to-transparent">
-                        <Music2 className="w-8 h-8 text-white/10" />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
-                      <p className="text-xs font-bold text-white line-clamp-2">{clip.title}</p>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+
 
         {/* Catálogo - Proyectos */}
          {explorarItems.length > 0 && (

@@ -3,12 +3,14 @@ import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
+import { Film } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import ArtistProfileCard from "@/components/dashboard/ArtistProfileCard";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
+import ClipsLibrary from "@/components/clips/ClipsLibrary";
 import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
 import OnboardingForm from "@/components/onboarding/OnboardingForm";
 
@@ -110,6 +112,20 @@ export default function Dashboard() {
             <div className="lg:col-span-9 space-y-3">
               <ProjectsSection jlyArtistId={jlyArtistId} />
               <TracksSection jlyArtistId={jlyArtistId} />
+              {/* Videos Section */}
+              <div className="sm:bg-gradient-to-br sm:from-[#141414] sm:to-black sm:rounded-2xl sm:border sm:border-white/5" style={{ overflow: "visible" }}>
+                <div className="px-0 sm:px-4 sm:py-3 sm:border-b sm:border-white/5 flex items-center justify-between mb-3 sm:mb-0">
+                  <div className="flex items-center gap-2">
+                    <div className="hidden sm:flex w-8 h-8 rounded-lg bg-white/5 items-center justify-center">
+                      <Film className="w-4 h-4 text-white/40" />
+                    </div>
+                    <h3 className="text-base font-bold text-white">Clips & Video</h3>
+                  </div>
+                </div>
+                <div className="sm:px-4 sm:pb-4" style={{ overflowX: "auto", overflowY: "visible", padding: "60px 16px 200px", margin: "-60px 0 -200px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                  <ClipsLibrary filters={{ status: "all", platform: [], artist: jlyArtistId || "all", dateRange: null, search: "" }} />
+                </div>
+              </div>
             </div>
 
             {/* Right Column - Desktop only profile */}
