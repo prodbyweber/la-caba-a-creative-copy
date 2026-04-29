@@ -5,8 +5,8 @@ import { base44 } from "@/api/base44Client";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import { 
-  ArrowLeft, Plus, Music2, Palette, Edit, Trash2, 
-  Check, X, Image as ImageIcon, FileText, Sparkles, Play, Pause, GripVertical,
+  ArrowLeft, Plus, Music2, Edit, Trash2, 
+  Check, X, Image as ImageIcon, FileText, Play, Pause, GripVertical,
   FolderPlus, Folder, Film
 } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
@@ -45,14 +45,7 @@ export default function ProjectDetail() {
     enabled: !!projectId,
   });
 
-  const { data: branding } = useQuery({
-    queryKey: ['branding', project?.artist_id],
-    queryFn: async () => {
-      const brandings = await base44.entities.ArtistBranding.filter({ artist_id: project.artist_id });
-      return brandings[0];
-    },
-    enabled: !!project?.artist_id,
-  });
+
 
   React.useEffect(() => {
     if (project?.moodboard_urls && Array.isArray(project.moodboard_urls)) {
@@ -143,7 +136,6 @@ export default function ProjectDetail() {
   const tabs = [
     { id: "tracks", label: "Tracks", icon: Music2 },
     { id: "clips", label: "Clips", icon: Play },
-    { id: "branding", label: "Branding", icon: Palette },
   ];
 
   if (!project) {
@@ -207,7 +199,7 @@ export default function ProjectDetail() {
           {/* Content */}
           {activeTab === "clips" ? (
             <ProjectClipsSection projectId={projectId} tracks={tracks} />
-          ) : activeTab === "tracks" ? (
+          ) : (
             <div className="space-y-4">
               {/* Add Track Button */}
               <button
@@ -366,8 +358,6 @@ export default function ProjectDetail() {
                 ))}
               </div>
             </div>
-          ) : (
-            <BrandingSection branding={branding} artistId={project.artist_id} />
           )}
         </div>
       </main>
@@ -580,245 +570,5 @@ function TrackForm({ track, projectId, onSubmit, onCancel }) {
         </button>
       </div>
     </form>
-  );
-}
-
-function BrandingSection({ branding, artistId }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState(branding || {
-    primary_font: "",
-    secondary_font: "",
-    primary_color: "#10b981",
-    secondary_color: "#8b5cf6",
-    accent_color: "#f97316",
-    visual_style: "",
-    tone_of_voice: "",
-    brand_keywords: []
-  });
-
-  const queryClient = useQueryClient();
-
-  const saveBrandingMutation = useMutation({
-    mutationFn: (data) => {
-      if (branding) {
-        return base44.entities.ArtistBranding.update(branding.id, data);
-      } else {
-        return base44.entities.ArtistBranding.create({ ...data, artist_id: artistId });
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['branding', artistId] });
-      setIsEditing(false);
-    },
-  });
-
-  return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Branding del Artista</h2>
-        <button
-          onClick={() => setIsEditing(!isEditing)}
-          className="px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition-colors"
-        >
-          {isEditing ? 'Cancelar' : 'Editar Branding'}
-        </button>
-      </div>
-
-      {isEditing ? (
-        <div className="bg-[#141414] rounded-xl p-6 border border-white/5 space-y-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Tipografía Principal</label>
-              <input
-                type="text"
-                value={formData.primary_font}
-                onChange={(e) => setFormData({ ...formData, primary_font: e.target.value })}
-                placeholder="Inter, Helvetica..."
-                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Tipografía Secundaria</label>
-              <input
-                type="text"
-                value={formData.secondary_font}
-                onChange={(e) => setFormData({ ...formData, secondary_font: e.target.value })}
-                placeholder="Montserrat, Arial..."
-                className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Color Primario</label>
-              <div className="flex gap-2">
-                <input
-                  type="color"
-                  value={formData.primary_color}
-                  onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
-                  className="w-12 h-10 rounded bg-white/5 border border-white/10"
-                />
-                <input
-                  type="text"
-                  value={formData.primary_color}
-                  onChange={(e) => setFormData({ ...formData, primary_color: e.target.value })}
-                  className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Color Secundario</label>
-              <div className="flex gap-2">
-                <input
-                  type="color"
-                  value={formData.secondary_color}
-                  onChange={(e) => setFormData({ ...formData, secondary_color: e.target.value })}
-                  className="w-12 h-10 rounded bg-white/5 border border-white/10"
-                />
-                <input
-                  type="text"
-                  value={formData.secondary_color}
-                  onChange={(e) => setFormData({ ...formData, secondary_color: e.target.value })}
-                  className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Color de Acento</label>
-              <div className="flex gap-2">
-                <input
-                  type="color"
-                  value={formData.accent_color}
-                  onChange={(e) => setFormData({ ...formData, accent_color: e.target.value })}
-                  className="w-12 h-10 rounded bg-white/5 border border-white/10"
-                />
-                <input
-                  type="text"
-                  value={formData.accent_color}
-                  onChange={(e) => setFormData({ ...formData, accent_color: e.target.value })}
-                  className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Estilo Visual</label>
-            <textarea
-              value={formData.visual_style}
-              onChange={(e) => setFormData({ ...formData, visual_style: e.target.value })}
-              placeholder="Describe el estilo visual del artista..."
-              rows={3}
-              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 resize-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Tono de Voz</label>
-            <textarea
-              value={formData.tone_of_voice}
-              onChange={(e) => setFormData({ ...formData, tone_of_voice: e.target.value })}
-              placeholder="Define el tono de comunicación..."
-              rows={3}
-              className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 resize-none"
-            />
-          </div>
-
-          <button
-            onClick={() => saveBrandingMutation.mutate(formData)}
-            disabled={saveBrandingMutation.isPending}
-            className="w-full px-4 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition-colors disabled:opacity-50"
-          >
-            {saveBrandingMutation.isPending ? 'Guardando...' : 'Guardar Branding'}
-          </button>
-        </div>
-      ) : branding ? (
-        <div className="space-y-6">
-          {/* Color Palette */}
-          <div className="bg-[#141414] rounded-xl p-6 border border-white/5">
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Palette className="w-5 h-5 text-emerald-400" />
-              Paleta de Colores
-            </h3>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <div className="h-24 rounded-lg mb-2" style={{ backgroundColor: branding.primary_color }} />
-                <p className="text-sm text-gray-400">Primario</p>
-                <p className="text-xs font-mono text-gray-500">{branding.primary_color}</p>
-              </div>
-              <div className="flex-1">
-                <div className="h-24 rounded-lg mb-2" style={{ backgroundColor: branding.secondary_color }} />
-                <p className="text-sm text-gray-400">Secundario</p>
-                <p className="text-xs font-mono text-gray-500">{branding.secondary_color}</p>
-              </div>
-              <div className="flex-1">
-                <div className="h-24 rounded-lg mb-2" style={{ backgroundColor: branding.accent_color }} />
-                <p className="text-sm text-gray-400">Acento</p>
-                <p className="text-xs font-mono text-gray-500">{branding.accent_color}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Typography */}
-          <div className="bg-[#141414] rounded-xl p-6 border border-white/5">
-            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-purple-400" />
-              Tipografía
-            </h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              {branding.primary_font && (
-                <div>
-                  <p className="text-sm text-gray-400 mb-1">Principal</p>
-                  <p className="text-xl font-bold" style={{ fontFamily: branding.primary_font }}>
-                    {branding.primary_font}
-                  </p>
-                </div>
-              )}
-              {branding.secondary_font && (
-                <div>
-                  <p className="text-sm text-gray-400 mb-1">Secundaria</p>
-                  <p className="text-xl font-bold" style={{ fontFamily: branding.secondary_font }}>
-                    {branding.secondary_font}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Style Description */}
-          {(branding.visual_style || branding.tone_of_voice) && (
-            <div className="bg-[#141414] rounded-xl p-6 border border-white/5 space-y-4">
-              {branding.visual_style && (
-                <div>
-                  <h3 className="text-lg font-bold mb-2 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-orange-400" />
-                    Estilo Visual
-                  </h3>
-                  <p className="text-gray-400 leading-relaxed">{branding.visual_style}</p>
-                </div>
-              )}
-              {branding.tone_of_voice && (
-                <div>
-                  <h3 className="text-lg font-bold mb-2">Tono de Voz</h3>
-                  <p className="text-gray-400 leading-relaxed">{branding.tone_of_voice}</p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="bg-[#141414] rounded-xl p-12 border border-white/5 text-center">
-          <Palette className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-400 mb-4">No hay branding configurado</p>
-          <button
-            onClick={() => setIsEditing(true)}
-            className="px-6 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition-colors"
-          >
-            Configurar Branding
-          </button>
-        </div>
-      )}
-    </div>
   );
 }
