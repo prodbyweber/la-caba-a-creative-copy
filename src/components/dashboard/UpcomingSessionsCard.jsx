@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { format, parseISO, isToday, isTomorrow, differenceInHours } from "date-fns";
 import SessionDetailModal from "@/components/sessions/SessionDetailModal";
+import StudioHoursBlock from "./StudioHoursBlock";
 
 export default function UpcomingSessionsCard({ artistId }) {
   const [selectedSession, setSelectedSession] = useState(null);
@@ -116,6 +117,11 @@ export default function UpcomingSessionsCard({ artistId }) {
           <Plus className="w-2.5 h-2.5" />
           Agendar
         </button>
+      </div>
+
+      {/* Studio Hours Block */}
+      <div className="px-2 pt-2">
+        <StudioHoursBlock artist={{ id: artistId }} />
       </div>
 
       {/* Sessions List Compacta */}

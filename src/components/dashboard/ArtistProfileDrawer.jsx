@@ -1,10 +1,11 @@
 import React, { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2 } from "lucide-react";
+import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2, ExternalLink as LinkIcon } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
 import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
+import CountryCitySelector from "@/components/common/CountrycitySelector";
 
 const COUNTRY_CODES = [
   { code: "+1", flag: "🇺🇸" }, { code: "+34", flag: "🇪🇸" }, { code: "+52", flag: "🇲🇽" },
@@ -469,10 +470,8 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                             <span className="text-white/60 text-sm">{userProfile?.address ? `${userProfile.address}, ` : ""}{residence || nationality}</span>
                           </div>
                         )}
-                        {/* Studio hours */}
-                        {artist?.id && <StudioHoursBlock artist={artist} />}
                         {/* Empty state */}
-                        {!userProfile?.phone && !artist?.phone && !residence && !nationality && !artist?.id && (
+                        {!userProfile?.phone && !artist?.phone && !residence && !nationality && (
                           <div className="text-center py-8">
                             <p className="text-white/25 text-sm">Completa tu perfil</p>
                             <button onClick={openEdit}
