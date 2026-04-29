@@ -135,17 +135,17 @@ function CreditsModalInner() {
     <motion.div
       key="credits-modal"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/85 backdrop-blur-xl flex items-end justify-center px-4 pb-4 pt-12"
+      className="fixed inset-0 bg-black/85 backdrop-blur-xl flex items-end sm:items-center justify-center px-3 pb-0 sm:pb-4 sm:pt-4"
       style={{ zIndex: 900 }}
       onClick={closeCreditsModal}
     >
       <motion.div
-        initial={{ scale: 0.94, opacity: 0, y: 24 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.94, opacity: 0, y: 24 }}
-        transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="relative w-full max-w-lg rounded-2xl overflow-hidden"
-        style={{ background: "#141414" }}
+        initial={{ y: "100%", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: "100%", opacity: 0 }}
+        transition={{ duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="relative w-full max-w-lg rounded-t-2xl sm:rounded-2xl overflow-y-auto"
+        style={{ background: "#141414", maxHeight: "92dvh" }}
         onClick={e => e.stopPropagation()}
       >
         {/* Hero media */}
