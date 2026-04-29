@@ -31,7 +31,7 @@ export default function Explorar() {
   const [activeSection, setActiveSection] = useState("inicio"); // inicio | musica | films
   const [profileOpen, setProfileOpen] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
-  const [guestLocked, setGuestLocked] = useState(false); // true after modal is dismissed — persistent blur lock
+  const [guestLocked, setGuestLocked] = useState(false);
   const isAdmin = currentUser?.role === "admin";
 
   useEffect(() => {
@@ -96,12 +96,9 @@ export default function Explorar() {
   // explorar_guest_blocked: si es false (o no está definido), Explorar es público
   const guestBlocked = landingConfig?.explorar_guest_blocked === true;
 
-  // Show pricing popup after 6s for non-logged-in users (once per session)
-  // Only if explorar_guest_blocked is enabled in config
+  // Show pricing popup only if explorar_guest_blocked is enabled in config
   useEffect(() => {
-    if (!authChecked) return;
-    if (currentUser) return;
-    if (!guestBlocked) return;
+    if (!authChecked || currentUser || !guestBlocked) return;
     const alreadyShown = sessionStorage.getItem("pricing_modal_shown");
     if (alreadyShown) { setGuestLocked(true); return; }
     const timer = setTimeout(() => {
