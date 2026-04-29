@@ -44,7 +44,8 @@ const labelClass = "block text-[11px] font-semibold text-white/30 uppercase trac
 const STEPS = [
   { id: 1, title: "¿Quién eres?", subtitle: "Cuéntanos cómo usar la plataforma" },
   { id: 2, title: "Tus datos", subtitle: "Información personal y de contacto" },
-  { id: 3, title: "Casi listo", subtitle: "Agrega una foto de perfil" },
+  { id: 3, title: "Tu username", subtitle: "Tu dirección única en la plataforma" },
+  { id: 4, title: "Casi listo", subtitle: "Agrega una foto de perfil" },
 ];
 
 const ACCOUNT_TYPES = [
@@ -118,15 +119,25 @@ function PhotoCropper({ url, position, onPositionChange, onChangePhoto, uploadin
   );
 }
 
+function toUsername(str) {
+  return str.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9_]/g, "")
+    .slice(0, 30);
+}
+
 export default function OnboardingForm({ user, onComplete }) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photoPosition, setPhotoPosition] = useState({ x: 50, y: 50 });
+  const [usernameAvailable, setUsernameAvailable] = useState(null); // null|true|false
+  const [checkingUsername, setCheckingUsername] = useState(false);
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
     artist_name: "",
+    username: "",
     gender: "",
     phone_country_code: "+34",
     phone: "",
@@ -138,6 +149,23 @@ export default function OnboardingForm({ user, onComplete }) {
   });
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
+
+  const checkUsername = async (uname) => {
+    if (!uname || uname.length < 3) { setUsernameAvailable(false); return; }
+    setCheckingUsername(true);
+    try {
+      const existing = await base44.entities.UserProfile.filter({ username: uname });
+      setUsernameAvailable(existing.length === 0);
+    } finally {
+      setCheckingUsername(false);
+    }
+  };
+
+  const handleUsernameChange = (val) => {
+    const clean = toUsername(val);
+    set("username", clean);
+    setUsernameAvailable(null);
+  };
 
   const handlePhotoUpload = async (file) => {
     if (!file) return;
@@ -183,6 +211,7 @@ export default function OnboardingForm({ user, onComplete }) {
         profileData.active_campaigns = [];
       }
       
+      profileData.username = form.username;
       await base44.entities.UserProfile.create(profileData);
       onComplete();
     } finally {
@@ -192,6 +221,7 @@ export default function OnboardingForm({ user, onComplete }) {
 
   const canStep1 = !!form.account_type;
   const canStep2 = form.first_name && form.last_name && form.phone && form.nationality && form.gender && form.country_of_residence;
+  const canStep3 = form.username.length >= 3 && usernameAvailable === true;
 
   return (
     <div className="fixed inset-0 z-[500] bg-[#080808] flex items-center justify-center p-4 overflow-y-auto">
@@ -360,7 +390,7 @@ export default function OnboardingForm({ user, onComplete }) {
                 </button>
                 <button
                   disabled={!canStep2}
-                  onClick={() => setStep(3)}
+                  onClick={() => { setStep(3); if (!form.username) { const suggestion = toUsername(`${form.first_name}${form.last_name}`); set("username", suggestion); checkUsername(suggestion); } }}
                   className="flex-1 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-white text-black hover:bg-white/90 disabled:opacity-20 disabled:cursor-not-allowed"
                 >
                   Continuar <ChevronRight className="w-4 h-4" />
@@ -369,9 +399,59 @@ export default function OnboardingForm({ user, onComplete }) {
             </motion.div>
           )}
 
-          {/* STEP 3: Foto */}
+          {/* STEP 3: Username */}
           {step === 3 && (
-            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+              <div>
+                <label className={labelClass}>Tu username *</label>
+                <p className="text-white/25 text-xs mb-3 leading-relaxed">
+                  Esta será tu URL pública: <span className="text-white/50">cabana.cc/<strong>{form.username || "tunombre"}</strong></span>
+                </p>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-white/25 text-sm select-none">@</div>
+                  <input
+                    className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-8 pr-10 py-3 text-white text-sm placeholder-white/25 focus:outline-none focus:border-white/30 transition-colors"
+                    placeholder="tunombreusuario"
+                    value={form.username}
+                    onChange={e => handleUsernameChange(e.target.value)}
+                    onBlur={() => form.username.length >= 3 && checkUsername(form.username)}
+                    maxLength={30}
+                  />
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    {checkingUsername && <span className="text-white/30 text-xs">...</span>}
+                    {!checkingUsername && usernameAvailable === true && <Check className="w-4 h-4 text-emerald-400" />}
+                    {!checkingUsername && usernameAvailable === false && form.username.length >= 3 && (
+                      <span className="text-red-400 text-lg leading-none">✕</span>
+                    )}
+                  </div>
+                </div>
+                {usernameAvailable === false && form.username.length >= 3 && (
+                  <p className="text-red-400/70 text-xs mt-1.5">Este username ya está en uso. Prueba con otro.</p>
+                )}
+                {usernameAvailable === true && (
+                  <p className="text-emerald-400/70 text-xs mt-1.5">¡Disponible!</p>
+                )}
+                <p className="text-white/15 text-xs mt-2">Solo letras, números y guiones bajos. Mín. 3 caracteres.</p>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button onClick={() => setStep(2)} className="px-5 py-3.5 rounded-xl font-bold text-sm text-white/40 hover:text-white/70 border border-white/10 hover:border-white/20 transition-all">
+                  Atrás
+                </button>
+                <button
+                  disabled={!canStep3}
+                  onClick={() => setStep(4)}
+                  className="flex-1 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-white text-black hover:bg-white/90 disabled:opacity-20 disabled:cursor-not-allowed"
+                >
+                  Continuar <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* STEP 4: Foto */}
+          {step === 4 && (
+            <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
               <div className="flex flex-col items-center mb-8">
                 {form.profile_photo_url ? (
                   <PhotoCropper
@@ -418,7 +498,7 @@ export default function OnboardingForm({ user, onComplete }) {
               </div>
 
               <div className="flex gap-3">
-                <button onClick={() => setStep(2)} className="px-5 py-3.5 rounded-xl font-bold text-sm text-white/40 hover:text-white/70 border border-white/10 hover:border-white/20 transition-all">
+                <button onClick={() => setStep(3)} className="px-5 py-3.5 rounded-xl font-bold text-sm text-white/40 hover:text-white/70 border border-white/10 hover:border-white/20 transition-all">
                   Atrás
                 </button>
                 <button
