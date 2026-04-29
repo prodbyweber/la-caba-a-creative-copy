@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2, Globe } from "lucide-react";
+import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2, Share2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
@@ -431,9 +431,9 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                  <div className="flex items-center gap-2 flex-shrink-0">
                    {userProfile?.username && (
                      <a href={`https://cabanacreative.es/${userProfile.username}`} target="_blank" rel="noopener noreferrer"
-                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-orange-500/30 hover:bg-orange-500/10 text-orange-400 hover:text-orange-300 text-xs font-medium transition-all"
+                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-red-500/30 hover:bg-red-500/10 text-red-400 hover:text-red-300 text-xs font-medium transition-all"
                        title="Ver perfil público">
-                       <Globe className="w-3.5 h-3.5" />
+                       <Share2 className="w-3.5 h-3.5" />
                      </a>
                    )}
                    <button onClick={openEdit}

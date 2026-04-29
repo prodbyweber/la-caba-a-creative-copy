@@ -68,7 +68,7 @@ export default function DashboardNav({ artistName, artistId, children }) {
                 className="h-12 w-auto"
               />
               <div className="hidden lg:flex items-start gap-0" style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, flexDirection: 'column' }}>
-                <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, color: '#ff8a3d', fontWeight: 900, fontSize: '1.1rem' }}>
+                <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, color: '#ff5833', fontWeight: 900, fontSize: '1.1rem' }}>
                    Cabaña<sup style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.55rem', fontWeight: 400, lineHeight: 1, marginLeft: '3px', verticalAlign: 'top', position: 'relative', top: '2px' }}>®</sup>
                  </span>
                 <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, color: 'white', fontWeight: 900, fontSize: '1.1rem' }}>Creative</span>
@@ -148,7 +148,7 @@ export default function DashboardNav({ artistName, artistId, children }) {
                     className="h-10 w-auto"
                   />
                   <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, color: '#ff8a3d', fontWeight: 900, fontSize: '1rem' }}>
+                    <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, color: '#ff5833', fontWeight: 900, fontSize: '1rem' }}>
                        Cabaña<sup style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.5rem', fontWeight: 400, lineHeight: 1, marginLeft: '3px', verticalAlign: 'top', position: 'relative', top: '2px' }}>®</sup>
                      </span>
                     <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, color: 'white', fontWeight: 900, fontSize: '1rem' }}>Creative</span>
