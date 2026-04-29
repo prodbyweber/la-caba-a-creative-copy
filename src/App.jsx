@@ -80,8 +80,13 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      navigateToLogin();
-      return null;
+      // Allow public routes without login
+      const publicPaths = ['/Explorar', '/Pricing', '/PublicProfile'];
+      const isPublicPath = publicPaths.some(p => window.location.pathname.startsWith(p));
+      if (!isPublicPath) {
+        navigateToLogin();
+        return null;
+      }
     }
   }
 
