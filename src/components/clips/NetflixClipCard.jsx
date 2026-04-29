@@ -32,6 +32,44 @@ const statusConfig = {
 
 const platformIcons = { youtube: Youtube, instagram: Instagram, tiktok: Music2 };
 
+// YouTube player modal
+function YouTubePlayerModal({ ytId, title, onClose }) {
+  return (
+    <motion.div
+      key="yt-modal"
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center p-4"
+      style={{ zIndex: 1000 }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ duration: 0.18 }}
+        className="relative w-full max-w-4xl"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-3 px-1">
+          <p className="text-white font-bold text-sm truncate pr-4">{title}</p>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors flex-shrink-0">
+            <X className="w-4 h-4 text-white" />
+          </button>
+        </div>
+        <div className="relative w-full rounded-xl overflow-hidden shadow-2xl bg-black" style={{ paddingBottom: "56.25%" }}>
+          <iframe
+            key={ytId}
+            src={`https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
+            title={title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            className="absolute inset-0 w-full h-full border-0"
+            referrerPolicy="strict-origin-when-cross-origin"
+          />
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function ClipDetailModal({ clip, thumb, onClose, onEdit, onDelete, onDuplicate }) {
   const status = statusConfig[clip.status] || statusConfig.draft;
   return (
@@ -123,6 +161,7 @@ export default function NetflixClipCard({ clip, index, onUpdate, isFirst }) {
   const [hovered, setHovered] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [showYTPlayer, setShowYTPlayer] = useState(false);
   const previewRef = useRef(null);
 
   const thumb = clip.thumbnail_url || STOCK_THUMBS[index % STOCK_THUMBS.length];
@@ -227,10 +266,16 @@ export default function NetflixClipCard({ clip, index, onUpdate, isFirst }) {
                     })}
                   </div>
                 </div>
-                <div className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center"
-                  style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.18)", backdropFilter: "blur(4px)" }}>
-                  <Play className="w-2.5 h-2.5 text-white ml-0.5" fill="white" />
-                </div>
+                {ytId && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowYTPlayer(true); }}
+                    className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                    style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.18)", backdropFilter: "blur(4px)" }}
+                    title="Reproducir video"
+                  >
+                    <Play className="w-2.5 h-2.5 text-white ml-0.5" fill="white" />
+                  </button>
+                )}
               </div>
             </div>
 
@@ -279,6 +324,16 @@ export default function NetflixClipCard({ clip, index, onUpdate, isFirst }) {
             onEdit={(c) => { setShowDetail(false); setEditOpen(true); }}
             onDelete={() => { setShowDetail(false); handleDelete(); }}
             onDuplicate={handleDuplicate}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showYTPlayer && ytId && (
+          <YouTubePlayerModal
+            ytId={ytId}
+            title={clip.title}
+            onClose={() => setShowYTPlayer(false)}
           />
         )}
       </AnimatePresence>
