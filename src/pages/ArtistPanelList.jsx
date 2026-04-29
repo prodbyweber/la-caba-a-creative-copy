@@ -31,6 +31,26 @@ export default function ArtistPanelList() {
     enabled: authChecked && currentUser?.role === 'admin'
   });
 
+  const { data: userProfile } = useQuery({
+    queryKey: ['adminProfile', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      const profiles = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
+      return profiles[0] || null;
+    },
+    enabled: !!currentUser?.id
+  });
+
+  const { data: myArtist } = useQuery({
+    queryKey: ['myArtist', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      const myArtists = await base44.entities.Artist.filter({ user_id: currentUser.id });
+      return myArtists[0] || null;
+    },
+    enabled: !!currentUser?.id
+  });
+
   const handleViewDashboard = (artistId) => {
     const url = createPageUrl("ArtistDashboard") + `?artistId=${artistId}`;
     navigate(url);
@@ -58,6 +78,54 @@ export default function ArtistPanelList() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Tu cuenta - Destacada */}
+        {currentUser && (
+          <div className="mb-12">
+            <p className="text-xs font-semibold text-emerald-400 uppercase tracking-widest mb-4">Tu Cuenta</p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl overflow-hidden border-2 border-emerald-500/50 bg-gradient-to-b from-emerald-950/40 to-black shadow-2xl shadow-emerald-500/20 p-6"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center border-2 border-emerald-500/50">
+                  <span className="text-2xl font-black text-white">{currentUser.full_name?.[0]?.toUpperCase() || "A"}</span>
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-white">{currentUser.full_name}</h3>
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">Admin</span>
+                  </div>
+                  <p className="text-sm text-gray-400">{currentUser.email}</p>
+                </div>
+              </div>
+
+              {myArtist && (
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                    <p className="text-xs text-gray-400 mb-1">Tu Artista Vinculado</p>
+                    <p className="text-sm font-bold text-emerald-400">{myArtist.stageName}</p>
+                  </div>
+                  <button
+                    onClick={() => handleViewDashboard(myArtist.id)}
+                    className="p-3 rounded-lg bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 transition-colors"
+                  >
+                    <p className="text-xs text-gray-400 mb-1">Ver Mi Dashboard</p>
+                    <p className="text-sm font-bold text-emerald-400">Acceder →</p>
+                  </button>
+                </div>
+              )}
+
+              <button
+                onClick={() => navigate(createPageUrl("AdminDashboard"))}
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-semibold transition-all"
+              >
+                Panel de Admin
+              </button>
+            </motion.div>
+          </div>
+        )}
+        
         {isLoading && (
           <div className="flex items-center justify-center py-20">
             <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
