@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Edit, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move } from "lucide-react";
+import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
@@ -21,45 +21,26 @@ const COUNTRIES = [
   "Reino Unido", "Francia", "Alemania", "Italia", "Portugal", "Otro"
 ];
 
-const iClass = "w-full px-3 py-2 rounded-lg text-xs text-white bg-white/5 border border-white/8 focus:outline-none focus:border-white/20 transition-colors";
+const iClass = "w-full px-3 py-2.5 rounded-xl text-sm text-white bg-white/[0.06] border border-white/[0.08] focus:outline-none focus:border-white/25 transition-colors placeholder-white/20";
+const labelClass = "block text-[11px] font-semibold text-white/35 uppercase tracking-wider mb-1.5";
 
 const socialPlatforms = [
-  { id: "youtube",   name: "YouTube",   icon: Youtube,   textColor: "text-red-400",   borderColor: "border-red-500/30",   bg: "from-red-500/15 to-red-600/15" },
-  { id: "instagram", name: "Instagram", icon: Instagram, textColor: "text-pink-400",  borderColor: "border-pink-500/30",  bg: "from-pink-500/15 to-purple-600/15" },
-  { id: "spotify",   name: "Spotify",   icon: Music,     textColor: "text-green-400", borderColor: "border-green-500/30", bg: "from-green-500/15 to-green-600/15" },
-  { id: "tiktok",    name: "TikTok",    icon: Video,     textColor: "text-purple-400",borderColor: "border-purple-500/30",bg: "from-purple-500/15 to-purple-600/15" },
+  { id: "youtube",   name: "YouTube",   icon: Youtube,   color: "#ff4444", bg: "rgba(255,68,68,0.08)" },
+  { id: "instagram", name: "Instagram", icon: Instagram, color: "#e879a0", bg: "rgba(232,121,160,0.08)" },
+  { id: "spotify",   name: "Spotify",   icon: Music,     color: "#1db954", bg: "rgba(29,185,84,0.08)" },
+  { id: "tiktok",    name: "TikTok",    icon: Video,     color: "#a855f7", bg: "rgba(168,85,247,0.08)" },
 ];
 
-// Códigos de país ISO para banderas SVG via flagcdn
 const COUNTRY_ISO = {
   "España": "es", "México": "mx", "Argentina": "ar", "Colombia": "co",
   "Venezuela": "ve", "Perú": "pe", "Chile": "cl", "Ecuador": "ec",
-  "Cuba": "cu", "Panamá": "pa", "El Salvador": "sv", "Guatemala": "gt",
-  "Honduras": "hn", "Nicaragua": "ni", "Costa Rica": "cr", "Brasil": "br",
-  "Uruguay": "uy", "Bolivia": "bo", "Paraguay": "py",
-  "República Dominicana": "do", "Puerto Rico": "pr",
-  "Estados Unidos": "us", "Canadá": "ca",
-  "Reino Unido": "gb", "Francia": "fr", "Alemania": "de",
-  "Italia": "it", "Portugal": "pt",
+  "Cuba": "cu", "Panamá": "pa", "Brasil": "br", "Uruguay": "uy",
+  "Bolivia": "bo", "Paraguay": "py", "República Dominicana": "do",
+  "Puerto Rico": "pr", "Estados Unidos": "us", "Canadá": "ca",
+  "Reino Unido": "gb", "Francia": "fr", "Alemania": "de", "Italia": "it", "Portugal": "pt",
 };
 
-function FlagPin({ country, tooltip }) {
-  const iso = COUNTRY_ISO[country];
-  if (!iso) return null;
-  return (
-    <div className="group relative" title={tooltip}>
-      <div className="w-5 h-5 rounded-sm overflow-hidden opacity-60 group-hover:opacity-100 transition-opacity shadow-sm">
-        <img
-          src={`https://flagcdn.com/w40/${iso}.png`}
-          alt={country}
-          className="w-full h-full object-cover"
-        />
-      </div>
-    </div>
-  );
-}
-
-// Avatar circular — icono que va en la nav
+// ── Avatar button for nav ──────────────────────────────────────────────────
 export function ArtistAvatarButton({ artist, onClick }) {
   return (
     <button
@@ -77,19 +58,164 @@ export function ArtistAvatarButton({ artist, onClick }) {
   );
 }
 
-// Drawer lateral completo con perfil + redes + edición
+// ── Photo crop modal ───────────────────────────────────────────────────────
+function PhotoCropModal({ imageUrl, onSave, onClose }) {
+  const [pos, setPos] = useState({ x: 50, y: 50 });
+  const [scale, setScale] = useState(1);
+  const cropRef = useRef(null);
+  const dragging = useRef(false);
+  const lastMouse = useRef({ x: 0, y: 0 });
+
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+  const startDrag = (clientX, clientY) => {
+    dragging.current = true;
+    lastMouse.current = { x: clientX, y: clientY };
+  };
+
+  const onMove = (clientX, clientY) => {
+    if (!dragging.current || !cropRef.current) return;
+    const rect = cropRef.current.getBoundingClientRect();
+    const dx = ((clientX - lastMouse.current.x) / rect.width) * -100;
+    const dy = ((clientY - lastMouse.current.y) / rect.height) * -100;
+    lastMouse.current = { x: clientX, y: clientY };
+    setPos(p => ({ x: clamp(p.x + dx, 0, 100), y: clamp(p.y + dy, 0, 100) }));
+  };
+
+  const stopDrag = () => { dragging.current = false; };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/90 backdrop-blur-xl"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }}
+        transition={{ type: "spring", damping: 28, stiffness: 300 }}
+        className="w-full sm:max-w-sm rounded-t-3xl sm:rounded-3xl overflow-hidden"
+        style={{ background: "#111" }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 pt-6 pb-4">
+          <p className="text-base font-bold text-white">Ajustar foto</p>
+          <button onClick={onClose} className="w-8 h-8 rounded-full bg-white/8 hover:bg-white/15 flex items-center justify-center transition-colors">
+            <X className="w-4 h-4 text-white/60" />
+          </button>
+        </div>
+
+        {/* Preview circle — large */}
+        <div className="flex justify-center px-6 pb-4">
+          <div
+            ref={cropRef}
+            className="w-52 h-52 rounded-full overflow-hidden border-2 border-white/20 cursor-grab active:cursor-grabbing select-none shadow-2xl"
+            style={{ background: "#1c1c1e" }}
+            onMouseDown={e => startDrag(e.clientX, e.clientY)}
+            onMouseMove={e => onMove(e.clientX, e.clientY)}
+            onMouseUp={stopDrag}
+            onMouseLeave={stopDrag}
+            onTouchStart={e => startDrag(e.touches[0].clientX, e.touches[0].clientY)}
+            onTouchMove={e => { e.preventDefault(); onMove(e.touches[0].clientX, e.touches[0].clientY); }}
+            onTouchEnd={stopDrag}
+          >
+            <img
+              src={imageUrl}
+              alt=""
+              draggable={false}
+              className="w-full h-full pointer-events-none"
+              style={{
+                objectFit: "cover",
+                objectPosition: `${pos.x}% ${pos.y}%`,
+                transform: `scale(${scale})`,
+                transformOrigin: `${pos.x}% ${pos.y}%`,
+              }}
+            />
+          </div>
+        </div>
+
+        <p className="text-center text-[11px] text-white/25 flex items-center justify-center gap-1.5 mb-4">
+          <Move className="w-3 h-3" /> Arrastra para encuadrar
+        </p>
+
+        {/* Zoom */}
+        <div className="flex items-center gap-3 px-6 mb-6">
+          <ZoomOut className="w-4 h-4 text-white/30 flex-shrink-0" />
+          <input type="range" min={1} max={3} step={0.05} value={scale}
+            onChange={e => setScale(parseFloat(e.target.value))}
+            className="flex-1 accent-white h-1 cursor-pointer" />
+          <ZoomIn className="w-4 h-4 text-white/30 flex-shrink-0" />
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 px-6 pb-6">
+          <button onClick={onClose}
+            className="flex-1 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/10 text-white/50 text-sm font-semibold transition-colors">
+            Cancelar
+          </button>
+          <button
+            onClick={() => onSave(`${pos.x}% ${pos.y}%`, scale)}
+            className="flex-1 py-3 rounded-2xl bg-white text-black text-sm font-bold transition-colors hover:bg-white/90">
+            Aplicar
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// ── Social link row ────────────────────────────────────────────────────────
+function SocialRow({ platform, url, onEdit, onRemove }) {
+  const { id, name, icon: Icon, color, bg } = platform;
+  const hasUrl = !!url;
+  return (
+    <div
+      className="flex items-center gap-3 px-3.5 py-3 rounded-2xl border transition-all"
+      style={hasUrl
+        ? { background: bg, borderColor: color + "30" }
+        : { background: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.06)" }
+      }
+    >
+      <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+        style={{ background: hasUrl ? color + "15" : "rgba(255,255,255,0.04)" }}>
+        <Icon className="w-4 h-4" style={{ color: hasUrl ? color : "rgba(255,255,255,0.2)" }} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className={`text-xs font-semibold ${hasUrl ? "text-white/80" : "text-white/25"}`}>{name}</p>
+        {hasUrl && <p className="text-[10px] text-white/30 truncate">{url.replace(/^https?:\/\/(www\.)?/, "")}</p>}
+      </div>
+      <div className="flex items-center gap-1">
+        {hasUrl && (
+          <a href={url} target="_blank" rel="noopener noreferrer"
+            className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+            onClick={e => e.stopPropagation()}>
+            <ExternalLink className="w-3 h-3 text-white/25" />
+          </a>
+        )}
+        <button
+          onClick={hasUrl ? () => onRemove(id) : () => onEdit(id, url || "")}
+          className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+          {hasUrl
+            ? <Trash2 className="w-3 h-3 text-white/25 hover:text-red-400" />
+            : <Plus className="w-3.5 h-3.5 text-white/25" />
+          }
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Main Drawer ────────────────────────────────────────────────────────────
 export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClose }) {
+  const [tab, setTab] = useState("profile"); // "profile" | "social" | "sessions"
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(null);
   const [socialLinks, setSocialLinks] = useState(artist?.social_links || {});
   const [editingPlatform, setEditingPlatform] = useState(null);
   const [platformUrl, setPlatformUrl] = useState("");
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [photoPos, setPhotoPos] = useState({ x: 50, y: 50 });
-  const [photoScale, setPhotoScale] = useState(1);
-  const cropRef = useRef(null);
-  const dragging = useRef(false);
-  const lastMouse = useRef({ x: 0, y: 0 });
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [pendingImageUrl, setPendingImageUrl] = useState(null);
 
   const queryClient = useQueryClient();
 
@@ -110,32 +236,19 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
     },
   });
 
-  const parsePhotoPos = (posStr) => {
-    if (!posStr) return { x: 50, y: 50 };
-    const parts = posStr.split(" ");
-    return {
-      x: parseFloat(parts[0]) || 50,
-      y: parseFloat(parts[1]) || 50,
-    };
-  };
-
-  const handleEditOpen = () => {
-    const pos = parsePhotoPos(artist?.photo_position || userProfile?.photo_position);
-    setPhotoPos(pos);
-    setPhotoScale(artist?.photo_scale || 1);
+  const openEdit = () => {
     setFormData({
       first_name: userProfile?.first_name || "",
       last_name: userProfile?.last_name || "",
       artist_name: userProfile?.artist_name || artist?.stageName || "",
-      gender: userProfile?.gender || "",
       phone_country_code: userProfile?.phone_country_code || "+34",
       phone: userProfile?.phone || "",
       nationality: userProfile?.nationality || artist?.nationality || "",
       country_of_residence: userProfile?.country_of_residence || artist?.country_of_residence || "",
       address: userProfile?.address || "",
-      genre: artist?.genre || "",
-      bio: artist?.bio || userProfile?.bio || "",
       avatar_url: artist?.avatar_url || userProfile?.profile_photo_url || userProfile?.avatar_url || "",
+      photo_position: artist?.photo_position || userProfile?.photo_position || "50% 50%",
+      photo_scale: artist?.photo_scale || 1,
     });
     setIsEditing(true);
   };
@@ -145,75 +258,52 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
     setUploadingPhoto(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setFormData(f => ({ ...f, avatar_url: file_url }));
-      setPhotoPos({ x: 50, y: 50 });
-      setPhotoScale(1);
+      setPendingImageUrl(file_url);
+      setShowCropModal(true);
     } finally {
       setUploadingPhoto(false);
     }
   };
 
-  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-
-  const startDrag = (clientX, clientY) => {
-    dragging.current = true;
-    lastMouse.current = { x: clientX, y: clientY };
+  const handleCropSave = (position, scale) => {
+    setFormData(f => ({ ...f, avatar_url: pendingImageUrl, photo_position: position, photo_scale: scale }));
+    setShowCropModal(false);
+    setPendingImageUrl(null);
   };
 
-  const onDragMove = (clientX, clientY) => {
-    if (!dragging.current || !cropRef.current) return;
-    const rect = cropRef.current.getBoundingClientRect();
-    const dx = ((clientX - lastMouse.current.x) / rect.width) * -100;
-    const dy = ((clientY - lastMouse.current.y) / rect.height) * -100;
-    lastMouse.current = { x: clientX, y: clientY };
-    setPhotoPos(p => ({
-      x: clamp(p.x + dx, 0, 100),
-      y: clamp(p.y + dy, 0, 100),
-    }));
-  };
-
-  const stopDrag = () => { dragging.current = false; };
-
-  const handleSaveProfile = async () => {
+  const handleSave = async () => {
     const city = formData.address
       ? `${formData.address}, ${formData.country_of_residence}`
       : formData.country_of_residence;
 
-    const photoPosition = `${photoPos.x}% ${photoPos.y}%`;
-
-    // Actualizar artista
     await updateArtistMutation.mutateAsync({
       stageName: formData.artist_name || formData.first_name,
       legalName: `${formData.first_name} ${formData.last_name}`.trim(),
-      genre: formData.genre,
-      bio: formData.bio,
       phone: formData.phone ? `${formData.phone_country_code} ${formData.phone}`.trim() : '',
       location: city,
       nationality: formData.nationality,
       country_of_residence: formData.country_of_residence,
       avatar_url: formData.avatar_url,
-      photo_position: photoPosition,
-      photo_scale: photoScale,
+      photo_position: formData.photo_position,
+      photo_scale: formData.photo_scale,
       social_links: socialLinks,
     });
 
-    // Actualizar UserProfile si existe
     if (userProfile?.id) {
       await updateProfileMutation.mutateAsync({
         first_name: formData.first_name,
         last_name: formData.last_name,
         full_name: `${formData.first_name} ${formData.last_name}`.trim(),
         artist_name: formData.artist_name,
-        gender: formData.gender,
         phone: formData.phone,
         phone_country_code: formData.phone_country_code,
         nationality: formData.nationality,
         country_of_residence: formData.country_of_residence,
         address: formData.address,
         profile_photo_url: formData.avatar_url,
+        photo_position: formData.photo_position,
       });
     }
-
     setIsEditing(false);
   };
 
@@ -232,356 +322,346 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
     updateArtistMutation.mutate({ social_links: updated });
   };
 
-  // Drawer funciona también sin artista (solo userProfile)
   if (!artist && !userProfile) return null;
 
+  const avatarUrl = artist?.avatar_url || userProfile?.avatar_url || userProfile?.profile_photo_url;
+  const photoPosition = artist?.photo_position || userProfile?.photo_position || "center center";
+  const photoScale = artist?.photo_scale || 1;
+  const displayName = artist?.stageName || userProfile?.artist_name || userProfile?.display_name || "—";
+  const nationality = artist?.nationality || userProfile?.nationality;
+  const residence = artist?.country_of_residence || userProfile?.country_of_residence;
+
+  const TABS = [
+    { id: "profile", label: "Perfil" },
+    { id: "social",  label: "Redes" },
+    ...(artist?.id ? [{ id: "sessions", label: "Sesiones" }] : []),
+  ];
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-          />
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={onClose}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" />
 
-          {/* Drawer */}
-          <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 28, stiffness: 260 }}
-            className="fixed right-0 top-0 bottom-0 w-80 z-50 flex flex-col"
-            style={{ background: "#111113", borderLeft: "1px solid rgba(255,255,255,0.06)" }}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
-              <span className="text-sm font-semibold text-white/70">Perfil</span>
-              <button onClick={onClose} className="w-7 h-7 rounded-lg hover:bg-white/8 flex items-center justify-center transition-colors">
-                <X className="w-4 h-4 text-white/40" />
-              </button>
-            </div>
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 260 }}
+              className="fixed right-0 top-0 bottom-0 z-50 flex flex-col"
+              style={{ width: "min(360px, 100vw)", background: "#0d0d0e", borderLeft: "1px solid rgba(255,255,255,0.06)" }}
+            >
+              {/* ── HERO SECTION ── */}
+              <div className="relative flex-shrink-0" style={{ height: 160 }}>
+                {/* Background blur of avatar */}
+                {avatarUrl && (
+                  <div className="absolute inset-0 overflow-hidden">
+                    <img src={avatarUrl} alt="" className="w-full h-full object-cover scale-110 blur-xl opacity-30" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-[#0d0d0e]" />
+                  </div>
+                )}
+                {!avatarUrl && <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-[#0d0d0e]" />}
 
-            {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto px-5 py-5 space-y-6">
+                {/* Close button */}
+                <button onClick={onClose}
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/40 border border-white/10 flex items-center justify-center hover:bg-black/60 transition-colors z-10">
+                  <X className="w-4 h-4 text-white/60" />
+                </button>
 
-              {/* Avatar + nombre */}
-              <div className="flex flex-col items-center gap-3 pt-2">
-                {/* Avatar con banderas flotantes */}
-                <div className="relative">
-                  <div className="w-24 h-24 rounded-full overflow-hidden border border-white/10 flex items-center justify-center" style={{ background: "#1c1c1e" }}>
-                    {(artist?.avatar_url || userProfile?.avatar_url || userProfile?.profile_photo_url) ? (
-                      <img
-                        src={artist?.avatar_url || userProfile?.avatar_url || userProfile?.profile_photo_url}
-                        alt={artist?.stageName || userProfile?.display_name || ""}
-                        draggable={false}
-                        className="w-full h-full"
-                        style={{
-                          objectFit: "cover",
-                          objectPosition: artist?.photo_position || userProfile?.photo_position || "center center",
-                          transform: `scale(${artist?.photo_scale || 1})`,
-                          transformOrigin: artist?.photo_position || "center center",
-                        }}
-                      />
-                    ) : (
-                      <User className="w-10 h-10 text-white/20" />
+                {/* Avatar + upload */}
+                <div className="absolute bottom-0 left-5 transform translate-y-1/2 z-10">
+                  <div className="relative group">
+                    <div className="w-20 h-20 rounded-full overflow-hidden border-2 shadow-xl flex items-center justify-center"
+                      style={{ borderColor: "rgba(255,255,255,0.15)", background: "#1c1c1e" }}>
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover"
+                          style={{ objectPosition: photoPosition, transform: `scale(${photoScale})`, transformOrigin: photoPosition }} />
+                      ) : (
+                        <User className="w-8 h-8 text-white/20" />
+                      )}
+                    </div>
+
+                    {/* Upload overlay */}
+                    <label className="absolute inset-0 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                      style={{ background: "rgba(0,0,0,0.6)" }}>
+                      <input type="file" accept="image/*" className="hidden"
+                        onChange={e => e.target.files?.[0] && handlePhotoUpload(e.target.files[0])}
+                        disabled={uploadingPhoto} />
+                      {uploadingPhoto
+                        ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                        : <Camera className="w-5 h-5 text-white" />
+                      }
+                    </label>
+
+                    {/* Adjust crop button — shown when avatar exists */}
+                    {avatarUrl && !isEditing && (
+                      <button
+                        onClick={() => { setPendingImageUrl(avatarUrl); setShowCropModal(true); }}
+                        className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full border border-white/15 flex items-center justify-center transition-colors"
+                        style={{ background: "#1c1c1e" }}
+                        title="Ajustar encuadre"
+                      >
+                        <Move className="w-3 h-3 text-white/40" />
+                      </button>
                     )}
                   </div>
-                  {(artist?.nationality || userProfile?.nationality) && (
-                    <div className="absolute -bottom-0.5 -left-1">
-                      <FlagPin country={artist?.nationality || userProfile?.nationality} tooltip={`Nacionalidad: ${artist?.nationality || userProfile?.nationality}`} />
-                    </div>
-                  )}
-                  {(artist?.country_of_residence || userProfile?.country_of_residence) && (artist?.country_of_residence || userProfile?.country_of_residence) !== (artist?.nationality || userProfile?.nationality) && (
-                    <div className="absolute -bottom-0.5 -right-1">
-                      <FlagPin country={artist?.country_of_residence || userProfile?.country_of_residence} tooltip={`Residencia: ${artist?.country_of_residence || userProfile?.country_of_residence}`} />
-                    </div>
-                  )}
                 </div>
+              </div>
 
-                <div className="text-center">
-                  <p className="text-white font-bold text-base leading-tight">{artist?.stageName || userProfile?.artist_name || userProfile?.display_name || "—"}</p>
-                  {(artist?.genre) && <p className="text-white/30 text-xs mt-0.5">{artist.genre}</p>}
+              {/* ── NAME ROW (offset to leave room for avatar) ── */}
+              <div className="px-5 pt-14 pb-4 flex items-start justify-between flex-shrink-0">
+                <div>
+                  <p className="text-white font-bold text-lg leading-tight">{displayName}</p>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    {nationality && COUNTRY_ISO[nationality] && (
+                      <img src={`https://flagcdn.com/w20/${COUNTRY_ISO[nationality]}.png`} alt={nationality}
+                        className="w-4 h-3 rounded-sm object-cover opacity-70" />
+                    )}
+                    {residence && COUNTRY_ISO[residence] && residence !== nationality && (
+                      <img src={`https://flagcdn.com/w20/${COUNTRY_ISO[residence]}.png`} alt={residence}
+                        className="w-4 h-3 rounded-sm object-cover opacity-70" />
+                    )}
+                    {nationality && <span className="text-white/30 text-xs">{nationality}</span>}
+                  </div>
                 </div>
-                <button
-                  onClick={handleEditOpen}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 text-white/50 hover:text-white text-xs font-medium transition-all"
-                >
-                  <Edit className="w-3 h-3" /> Editar perfil
+                <button onClick={openEdit}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/5 text-white/40 hover:text-white text-xs font-medium transition-all flex-shrink-0">
+                  <Edit2 className="w-3.5 h-3.5" /> Editar
                 </button>
               </div>
 
-              {/* Editar perfil inline */}
-              <AnimatePresence>
-                {isEditing && formData && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="space-y-3 p-4 rounded-xl border border-white/8" style={{ background: "#181818" }}>
-                      <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest">Editar perfil</p>
+              {/* ── TABS ── */}
+              <div className="flex border-b border-white/[0.06] px-5 flex-shrink-0">
+                {TABS.map(t => (
+                  <button key={t.id} onClick={() => setTab(t.id)}
+                    className={`relative px-3 pb-3 pt-1 text-xs font-semibold transition-colors mr-1 ${tab === t.id ? "text-white" : "text-white/30 hover:text-white/60"}`}>
+                    {t.label}
+                    {tab === t.id && (
+                      <motion.div layoutId="drawerTabLine"
+                        className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
+                        transition={{ type: "spring", stiffness: 400, damping: 30 }} />
+                    )}
+                  </button>
+                ))}
+              </div>
 
-                      {/* Foto + editor de recorte */}
-                      <div className="flex flex-col items-center gap-2">
-                        {/* Preview circular con drag */}
-                        <div className="relative">
-                          <div
-                            ref={cropRef}
-                            className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20 cursor-grab active:cursor-grabbing select-none"
-                            style={{ background: "#1c1c1e" }}
-                            onMouseDown={e => startDrag(e.clientX, e.clientY)}
-                            onMouseMove={e => onDragMove(e.clientX, e.clientY)}
-                            onMouseUp={stopDrag}
-                            onMouseLeave={stopDrag}
-                            onTouchStart={e => startDrag(e.touches[0].clientX, e.touches[0].clientY)}
-                            onTouchMove={e => { e.preventDefault(); onDragMove(e.touches[0].clientX, e.touches[0].clientY); }}
-                            onTouchEnd={stopDrag}
-                          >
-                            {formData.avatar_url ? (
-                              <img
-                                src={formData.avatar_url}
-                                alt=""
-                                draggable={false}
-                                className="w-full h-full pointer-events-none"
-                                style={{
-                                  objectFit: "cover",
-                                  objectPosition: `${photoPos.x}% ${photoPos.y}%`,
-                                  transform: `scale(${photoScale})`,
-                                  transformOrigin: `${photoPos.x}% ${photoPos.y}%`,
-                                }}
-                              />
+              {/* ── SCROLLABLE CONTENT ── */}
+              <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+
+                {/* ── TAB: PERFIL ── */}
+                {tab === "profile" && (
+                  <div className="px-5 py-5">
+                    {!isEditing ? (
+                      <div className="space-y-4">
+                        {/* Info cards */}
+                        {(userProfile?.phone || artist?.phone) && (
+                          <div className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/[0.04] border border-white/[0.06]">
+                            <span className="text-white/30 text-xs">📞</span>
+                            <span className="text-white/60 text-sm">{userProfile?.phone || artist?.phone}</span>
+                          </div>
+                        )}
+                        {(residence || nationality) && (
+                          <div className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/[0.04] border border-white/[0.06]">
+                            <span className="text-white/30 text-xs">📍</span>
+                            <span className="text-white/60 text-sm">{userProfile?.address ? `${userProfile.address}, ` : ""}{residence || nationality}</span>
+                          </div>
+                        )}
+                        {/* Studio hours */}
+                        {artist?.id && <StudioHoursBlock artist={artist} />}
+                        {/* Empty state */}
+                        {!userProfile?.phone && !artist?.phone && !residence && !nationality && !artist?.id && (
+                          <div className="text-center py-8">
+                            <p className="text-white/25 text-sm">Completa tu perfil</p>
+                            <button onClick={openEdit}
+                              className="mt-3 text-xs text-white/40 hover:text-white underline underline-offset-2 transition-colors">
+                              Añadir información →
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      /* ── EDIT FORM ── */
+                      <div className="space-y-4">
+                        <p className="text-[11px] font-semibold text-white/25 uppercase tracking-widest">Editar perfil</p>
+
+                        {/* Avatar actions */}
+                        <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/[0.04] border border-white/[0.06]">
+                          <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center border border-white/10"
+                            style={{ background: "#1c1c1e" }}>
+                            {formData?.avatar_url ? (
+                              <img src={formData.avatar_url} alt="" className="w-full h-full object-cover"
+                                style={{ objectPosition: formData.photo_position || "center", transform: `scale(${formData.photo_scale || 1})`, transformOrigin: formData.photo_position || "center" }} />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <User className="w-8 h-8 text-white/20" />
-                              </div>
+                              <User className="w-6 h-6 text-white/20" />
                             )}
                           </div>
-                          {uploadingPhoto && (
-                            <div className="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center">
-                              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Hint drag */}
-                        {formData.avatar_url && (
-                          <p className="text-[10px] text-white/25 flex items-center gap-1">
-                            <Move className="w-3 h-3" /> Arrastra para encuadrar
-                          </p>
-                        )}
-
-                        {/* Zoom slider */}
-                        {formData.avatar_url && (
-                          <div className="flex items-center gap-2 w-full px-2">
-                            <ZoomOut className="w-3 h-3 text-white/30 flex-shrink-0" />
-                            <input
-                              type="range"
-                              min={1}
-                              max={3}
-                              step={0.05}
-                              value={photoScale}
-                              onChange={e => setPhotoScale(parseFloat(e.target.value))}
-                              className="flex-1 accent-white h-1 cursor-pointer"
-                            />
-                            <ZoomIn className="w-3 h-3 text-white/30 flex-shrink-0" />
+                          <div className="flex flex-col gap-2 flex-1">
+                            <label className="cursor-pointer flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.06] hover:bg-white/10 transition-colors">
+                              <input type="file" accept="image/*" className="hidden"
+                                onChange={e => e.target.files?.[0] && handlePhotoUpload(e.target.files[0])}
+                                disabled={uploadingPhoto} />
+                              <Camera className="w-3.5 h-3.5 text-white/40" />
+                              <span className="text-xs text-white/50 font-medium">
+                                {uploadingPhoto ? "Subiendo..." : formData?.avatar_url ? "Cambiar foto" : "Subir foto"}
+                              </span>
+                            </label>
+                            {formData?.avatar_url && (
+                              <button
+                                onClick={() => { setPendingImageUrl(formData.avatar_url); setShowCropModal(true); }}
+                                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.04] hover:bg-white/8 transition-colors">
+                                <Move className="w-3.5 h-3.5 text-white/30" />
+                                <span className="text-xs text-white/40">Ajustar encuadre</span>
+                              </button>
+                            )}
                           </div>
-                        )}
+                        </div>
 
-                        {/* Botón cambiar foto */}
-                        <label className="cursor-pointer text-[10px] text-white/30 hover:text-white/60 transition-colors underline underline-offset-2">
-                          <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handlePhotoUpload(e.target.files[0])} />
-                          {uploadingPhoto ? "Subiendo..." : formData.avatar_url ? "Cambiar foto" : "Subir foto"}
-                        </label>
-                      </div>
+                        {/* Nombre + Apellido */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className={labelClass}>Nombre</label>
+                            <input value={formData?.first_name || ""} onChange={e => setFormData(f => ({ ...f, first_name: e.target.value }))}
+                              className={iClass} placeholder="Nombre" />
+                          </div>
+                          <div>
+                            <label className={labelClass}>Apellido</label>
+                            <input value={formData?.last_name || ""} onChange={e => setFormData(f => ({ ...f, last_name: e.target.value }))}
+                              className={iClass} placeholder="Apellido" />
+                          </div>
+                        </div>
 
-                      {/* Nombre y apellido */}
-                      <div className="grid grid-cols-2 gap-2">
+                        {/* Nombre artístico */}
                         <div>
-                          <label className="block text-[10px] text-white/30 mb-1">Nombre</label>
-                          <input value={formData.first_name} onChange={e => setFormData(f => ({ ...f, first_name: e.target.value }))} className={iClass} placeholder="Nombre" />
+                          <label className={labelClass}>Nombre artístico</label>
+                          <input value={formData?.artist_name || ""} onChange={e => setFormData(f => ({ ...f, artist_name: e.target.value }))}
+                            className={iClass} placeholder="Alias artístico" />
                         </div>
+
+                        {/* Teléfono */}
                         <div>
-                          <label className="block text-[10px] text-white/30 mb-1">Apellido</label>
-                          <input value={formData.last_name} onChange={e => setFormData(f => ({ ...f, last_name: e.target.value }))} className={iClass} placeholder="Apellido" />
+                          <label className={labelClass}>Teléfono</label>
+                          <div className="flex gap-2">
+                            <select value={formData?.phone_country_code || "+34"} onChange={e => setFormData(f => ({ ...f, phone_country_code: e.target.value }))}
+                              className="bg-white/[0.06] border border-white/[0.08] rounded-xl px-2 py-2.5 text-white text-sm focus:outline-none" style={{ minWidth: 76 }}>
+                              {COUNTRY_CODES.map(c => <option key={c.code} value={c.code} className="bg-[#111]">{c.flag} {c.code}</option>)}
+                            </select>
+                            <input value={formData?.phone || ""} onChange={e => setFormData(f => ({ ...f, phone: e.target.value }))}
+                              className={iClass} placeholder="Número" type="tel" />
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Nombre artístico */}
-                      <div>
-                        <label className="block text-[10px] text-white/30 mb-1">Nombre artístico</label>
-                        <input value={formData.artist_name} onChange={e => setFormData(f => ({ ...f, artist_name: e.target.value }))} className={iClass} placeholder="Alias artístico" />
-                      </div>
-
-                      {/* Género musical */}
-                      <div>
-                        <label className="block text-[10px] text-white/30 mb-1">Género musical</label>
-                        <input value={formData.genre} onChange={e => setFormData(f => ({ ...f, genre: e.target.value }))} className={iClass} placeholder="Ej: Urban, Reggaeton..." />
-                      </div>
-
-                      {/* Género personal */}
-                      <div>
-                        <label className="block text-[10px] text-white/30 mb-1">Género</label>
-                        <div className="grid grid-cols-3 gap-1">
-                          {[{ key: "male", label: "Masc." }, { key: "female", label: "Fem." }, { key: "prefer_not_to_say", label: "N/D" }].map(({ key, label }) => (
-                            <button key={key} onClick={() => setFormData(f => ({ ...f, gender: key }))}
-                              className={`py-1.5 rounded-lg border text-[10px] font-medium transition-all ${formData.gender === key ? "border-white/40 bg-white/10 text-white" : "border-white/8 bg-white/3 text-white/30 hover:border-white/20"}`}>
-                              {label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Teléfono */}
-                      <div>
-                        <label className="block text-[10px] text-white/30 mb-1">Teléfono</label>
-                        <div className="flex gap-1.5">
-                          <select value={formData.phone_country_code} onChange={e => setFormData(f => ({ ...f, phone_country_code: e.target.value }))}
-                            className="bg-white/5 border border-white/8 rounded-lg px-2 py-2 text-white text-xs focus:outline-none" style={{ minWidth: 72 }}>
-                            {COUNTRY_CODES.map(c => <option key={c.code} value={c.code} className="bg-[#111]">{c.flag} {c.code}</option>)}
+                        {/* Nacionalidad */}
+                        <div>
+                          <label className={labelClass}>Nacionalidad</label>
+                          <select value={formData?.nationality || ""} onChange={e => setFormData(f => ({ ...f, nationality: e.target.value }))} className={iClass}>
+                            <option value="" className="bg-[#111]">Selecciona un país</option>
+                            {COUNTRIES.map(c => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
                           </select>
-                          <input value={formData.phone} onChange={e => setFormData(f => ({ ...f, phone: e.target.value }))} className={iClass} placeholder="Número" type="tel" />
                         </div>
-                      </div>
 
-                      {/* Nacionalidad */}
-                      <div>
-                        <label className="block text-[10px] text-white/30 mb-1">Nacionalidad</label>
-                        <select value={formData.nationality} onChange={e => setFormData(f => ({ ...f, nationality: e.target.value }))} className={iClass}>
-                          <option value="" className="bg-[#111]">Selecciona un país</option>
-                          {COUNTRIES.map(c => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
-                        </select>
-                      </div>
+                        {/* País de residencia */}
+                        <div>
+                          <label className={labelClass}>País de residencia</label>
+                          <select value={formData?.country_of_residence || ""} onChange={e => setFormData(f => ({ ...f, country_of_residence: e.target.value }))} className={iClass}>
+                            <option value="" className="bg-[#111]">Selecciona un país</option>
+                            {COUNTRIES.map(c => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
+                          </select>
+                        </div>
 
-                      {/* País de residencia */}
-                      <div>
-                        <label className="block text-[10px] text-white/30 mb-1">País de residencia</label>
-                        <select value={formData.country_of_residence} onChange={e => setFormData(f => ({ ...f, country_of_residence: e.target.value }))} className={iClass}>
-                          <option value="" className="bg-[#111]">Selecciona un país</option>
-                          {COUNTRIES.map(c => <option key={c} value={c} className="bg-[#111]">{c}</option>)}
-                        </select>
-                      </div>
+                        {/* Ciudad */}
+                        <div>
+                          <label className={labelClass}>Ciudad</label>
+                          <input value={formData?.address || ""} onChange={e => setFormData(f => ({ ...f, address: e.target.value }))}
+                            className={iClass} placeholder="Ciudad" />
+                        </div>
 
-                      {/* Ciudad */}
-                      <div>
-                        <label className="block text-[10px] text-white/30 mb-1">Ciudad</label>
-                        <input value={formData.address} onChange={e => setFormData(f => ({ ...f, address: e.target.value }))} className={iClass} placeholder="Ciudad" />
-                      </div>
-
-                      {/* Bio */}
-                      <div>
-                        <label className="block text-[10px] text-white/30 mb-1">Bio</label>
-                        <textarea value={formData.bio} onChange={e => setFormData(f => ({ ...f, bio: e.target.value }))} rows={3}
-                          className="w-full px-3 py-2 rounded-lg text-xs text-white bg-white/5 border border-white/8 focus:outline-none focus:border-white/20 transition-colors resize-none" />
-                      </div>
-
-                      <div className="flex gap-2 pt-1">
-                        <button onClick={() => setIsEditing(false)} className="flex-1 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/50 font-medium transition-colors">
-                          Cancelar
-                        </button>
-                        <button
-                          onClick={handleSaveProfile}
-                          disabled={updateArtistMutation.isPending}
-                          className="flex-1 py-2 rounded-lg bg-white text-black text-xs font-bold transition-colors disabled:opacity-50"
-                        >
-                          {updateArtistMutation.isPending ? "..." : "Guardar"}
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Bio */}
-              {(artist?.bio || userProfile?.bio) && !isEditing && (
-                <p className="text-xs text-white/30 leading-relaxed">{artist?.bio || userProfile?.bio}</p>
-              )}
-
-              {/* Horas de estudio + Próximas sesiones */}
-              {artist?.id && (
-                <div className="space-y-3">
-                  <StudioHoursBlock artist={artist} />
-                  <UpcomingSessionsCard artistId={artist.id} />
-                </div>
-              )}
-
-              {/* Redes sociales */}
-              <div>
-                <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest mb-3">Redes Sociales</p>
-                <div className="space-y-2">
-                  {socialPlatforms.map(({ id, name, icon: Icon, textColor, borderColor, bg }) => {
-                    const url = socialLinks[id];
-                    return (
-                      <div key={id} className={`flex items-center gap-2.5 p-2.5 rounded-lg border transition-all bg-gradient-to-br ${url ? `${bg} ${borderColor}` : "bg-white/[0.03] border-white/[0.06]"}`}>
-                        <Icon className={`w-4 h-4 flex-shrink-0 ${url ? textColor : "text-white/20"}`} />
-                        <span className={`text-xs flex-1 truncate ${url ? "text-white/70" : "text-white/20"}`}>
-                          {url ? url.replace(/^https?:\/\/(www\.)?/, "") : name}
-                        </span>
-                        <button
-                          onClick={() => {
-                            if (url) {
-                              handleRemoveSocial(id);
-                            } else {
-                              setEditingPlatform(id);
-                              setPlatformUrl(url || "");
+                        {/* Save / Cancel */}
+                        <div className="flex gap-3 pt-2">
+                          <button onClick={() => setIsEditing(false)}
+                            className="flex-1 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/10 text-white/50 text-sm font-semibold transition-colors">
+                            Cancelar
+                          </button>
+                          <button onClick={handleSave} disabled={updateArtistMutation.isPending}
+                            className="flex-1 py-3 rounded-2xl bg-white text-black text-sm font-bold transition-colors hover:bg-white/90 disabled:opacity-50 flex items-center justify-center gap-2">
+                            {updateArtistMutation.isPending
+                              ? <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                              : <><Check className="w-4 h-4" /> Guardar</>
                             }
-                          }}
-                          className="w-5 h-5 rounded-full flex items-center justify-center transition-colors hover:bg-white/10"
-                        >
-                          {url ? (
-                            <X className="w-3 h-3 text-white/25 hover:text-red-400" />
-                          ) : (
-                            <Plus className="w-3 h-3 text-white/25" />
-                          )}
-                        </button>
-                        {url && (
-                          <a href={url} target="_blank" rel="noopener noreferrer" className="w-5 h-5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
-                            <svg className="w-2.5 h-2.5 text-white/25" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                          </a>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Input para agregar URL de red social */}
-                <AnimatePresence>
-                  {editingPlatform && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="overflow-hidden mt-2"
-                    >
-                      <div className="p-3 rounded-lg border border-white/10" style={{ background: "#181818" }}>
-                        <p className="text-[10px] text-white/30 mb-2">URL de {socialPlatforms.find(p => p.id === editingPlatform)?.name}</p>
-                        <input
-                          type="url"
-                          autoFocus
-                          value={platformUrl}
-                          onChange={e => setPlatformUrl(e.target.value)}
-                          placeholder="https://..."
-                          className="w-full px-3 py-2 rounded-lg text-xs text-white bg-white/5 border border-white/8 focus:outline-none focus:border-white/20 mb-2 transition-colors"
-                        />
-                        <div className="flex gap-2">
-                          <button onClick={() => { setEditingPlatform(null); setPlatformUrl(""); }} className="flex-1 py-1.5 rounded-lg bg-white/5 text-xs text-white/40 font-medium">Cancelar</button>
-                          <button onClick={handleSaveSocial} disabled={!platformUrl} className="flex-1 py-1.5 rounded-lg bg-white text-black text-xs font-bold disabled:opacity-40 flex items-center justify-center gap-1">
-                            <Check className="w-3 h-3" /> Guardar
                           </button>
                         </div>
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                    )}
+                  </div>
+                )}
+
+                {/* ── TAB: REDES ── */}
+                {tab === "social" && (
+                  <div className="px-5 py-5 space-y-2.5">
+                    {socialPlatforms.map(platform => (
+                      <SocialRow
+                        key={platform.id}
+                        platform={platform}
+                        url={socialLinks[platform.id]}
+                        onEdit={(id, url) => { setEditingPlatform(id); setPlatformUrl(url); }}
+                        onRemove={handleRemoveSocial}
+                      />
+                    ))}
+
+                    {/* Edit URL inline */}
+                    <AnimatePresence>
+                      {editingPlatform && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                          className="overflow-hidden mt-1">
+                          <div className="p-4 rounded-2xl border border-white/10 space-y-3" style={{ background: "#1a1a1a" }}>
+                            <p className="text-[11px] font-semibold text-white/30 uppercase tracking-widest">
+                              URL de {socialPlatforms.find(p => p.id === editingPlatform)?.name}
+                            </p>
+                            <input type="url" autoFocus value={platformUrl} onChange={e => setPlatformUrl(e.target.value)}
+                              placeholder="https://..."
+                              className="w-full px-3 py-2.5 rounded-xl text-sm text-white bg-white/[0.06] border border-white/[0.08] focus:outline-none focus:border-white/25 placeholder-white/20" />
+                            <div className="flex gap-2">
+                              <button onClick={() => { setEditingPlatform(null); setPlatformUrl(""); }}
+                                className="flex-1 py-2 rounded-xl bg-white/5 text-xs text-white/40 font-medium">
+                                Cancelar
+                              </button>
+                              <button onClick={handleSaveSocial} disabled={!platformUrl}
+                                className="flex-1 py-2 rounded-xl bg-white text-black text-xs font-bold disabled:opacity-40 flex items-center justify-center gap-1">
+                                <Check className="w-3 h-3" /> Guardar
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+
+                {/* ── TAB: SESIONES ── */}
+                {tab === "sessions" && artist?.id && (
+                  <div className="px-5 py-5">
+                    <UpcomingSessionsCard artistId={artist.id} />
+                  </div>
+                )}
               </div>
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Crop modal — rendered outside drawer */}
+      <AnimatePresence>
+        {showCropModal && pendingImageUrl && (
+          <PhotoCropModal
+            imageUrl={pendingImageUrl}
+            onSave={handleCropSave}
+            onClose={() => { setShowCropModal(false); setPendingImageUrl(null); }}
+          />
+        )}
+      </AnimatePresence>
+    </>
   );
 }

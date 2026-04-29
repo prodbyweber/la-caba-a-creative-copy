@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music2, Film, Image, Zap, Eye, SlidersHorizontal } from "lucide-react";
+import { Music2, Film, Image, Zap, SlidersHorizontal } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
@@ -271,7 +271,19 @@ export default function ArtistDashboard() {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.25 }}
               >
-                <ClipsLibrary filters={clipsFilters} />
+                <div className="sm:bg-gradient-to-br sm:from-[#141414] sm:to-black sm:rounded-2xl sm:border sm:border-white/5" style={{ overflow: "visible" }}>
+                  <div className="px-0 sm:px-4 sm:py-3 sm:border-b sm:border-white/5 flex items-center justify-between mb-3 sm:mb-0">
+                    <div className="flex items-center gap-2">
+                      <div className="hidden sm:flex w-8 h-8 rounded-lg bg-white/5 items-center justify-center">
+                        <Film className="w-4 h-4 text-white/40" />
+                      </div>
+                      <h3 className="text-base font-bold text-white">Clips & Video</h3>
+                    </div>
+                  </div>
+                  <div className="sm:px-4 sm:pb-4" style={{ overflowX: "auto", overflowY: "visible", padding: "60px 16px 200px", margin: "-60px 0 -200px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                    <ClipsLibrary filters={clipsFilters} />
+                  </div>
+                </div>
               </motion.div>
             )}
 

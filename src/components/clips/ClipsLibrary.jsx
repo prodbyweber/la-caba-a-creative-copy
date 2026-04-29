@@ -1,180 +1,10 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Film, Search, Upload, Play, Edit, Trash2, Copy, MoreVertical, Calendar, Youtube, Instagram, Music2, X, Plus } from "lucide-react";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
-import EditClipModal from "./EditClipModal.jsx";
-import ClipPreviewModal from "./ClipPreviewModal.jsx";
+import { useQuery } from "@tanstack/react-query";
+import { Film, Search, Upload, X, Plus } from "lucide-react";
 import UploadClipModal from "./UploadClipModal.jsx";
-
-const STOCK_THUMBS = [
-  "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=700&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=700&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=400&h=700&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=700&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1501612780327-45045538702b?w=400&h=700&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=400&h=700&fit=crop&q=80",
-];
-
-const statusConfig = {
-  draft:      { label: "Borrador",   dot: "bg-white/30" },
-  scheduled:  { label: "Programado", dot: "bg-blue-400" },
-  publishing: { label: "Publicando", dot: "bg-yellow-400 animate-pulse" },
-  published:  { label: "Publicado",  dot: "bg-emerald-400" },
-  error:      { label: "Error",      dot: "bg-red-400" },
-};
-
-const platformIcons = {
-  youtube:   Youtube,
-  instagram: Instagram,
-  tiktok:    Music2,
-};
-
-function ClipTile({ clip, index, onUpdate }) {
-  const [hover, setHover] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
-
-  const thumb = clip.thumbnail_url || STOCK_THUMBS[index % STOCK_THUMBS.length];
-  const status = statusConfig[clip.status] || statusConfig.draft;
-
-  const handleDelete = async () => {
-    if (confirm("¿Eliminar este clip?")) {
-      await base44.entities.Clip.delete(clip.id);
-      onUpdate();
-    }
-  };
-
-  const handleDuplicate = async () => {
-    const newClip = { ...clip, title: `${clip.title} (copia)`, status: "draft", scheduled_at: null };
-    delete newClip.id; delete newClip.created_date; delete newClip.updated_date; delete newClip.created_by;
-    await base44.entities.Clip.create(newClip);
-    onUpdate();
-  };
-
-  return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.04, duration: 0.4 }}
-        className="group relative"
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-      >
-        {/* Thumbnail — 9:16 */}
-        <div
-          className="relative aspect-[9/16] rounded-xl overflow-hidden cursor-pointer bg-[#111]"
-          onClick={() => setPreviewOpen(true)}
-        >
-          <img
-            src={thumb}
-            alt={clip.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-
-          {/* Gradient overlay always */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-          {/* Play button on hover */}
-          <AnimatePresence>
-            {hover && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.15 }}
-                className="absolute inset-0 flex items-center justify-center"
-              >
-                <div className="w-12 h-12 rounded-full border border-white/50 backdrop-blur-sm bg-white/10 flex items-center justify-center">
-                  <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Status dot + duration top */}
-          <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between">
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm">
-              <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${status.dot}`} />
-              <span className="text-[9px] font-medium text-white/80 tracking-wide">{status.label}</span>
-            </div>
-            {clip.duration && (
-              <div className="px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[9px] text-white/70">
-                {Math.floor(clip.duration / 60)}:{String(Math.floor(clip.duration % 60)).padStart(2, '0')}
-              </div>
-            )}
-          </div>
-
-          {/* Bottom info */}
-          <div className="absolute bottom-0 left-0 right-0 p-2.5">
-            <p className="text-white font-semibold text-xs leading-tight line-clamp-2 mb-1.5">{clip.title}</p>
-
-            <div className="flex items-center justify-between">
-              {/* Platforms */}
-              <div className="flex items-center gap-1">
-                {clip.platforms?.slice(0, 3).map(p => {
-                  const Icon = platformIcons[p];
-                  return Icon ? (
-                    <div key={p} className="w-4 h-4 rounded bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                      <Icon className="w-2.5 h-2.5 text-white/70" />
-                    </div>
-                  ) : null;
-                })}
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-0.5" onClick={e => e.stopPropagation()}>
-                <button
-                  onClick={() => setEditOpen(true)}
-                  className="w-6 h-6 rounded flex items-center justify-center bg-white/10 backdrop-blur-sm hover:bg-white/25 transition-colors"
-                >
-                  <Edit className="w-3 h-3 text-white/80" />
-                </button>
-                <div className="relative">
-                  <button
-                    onClick={() => setMenuOpen(!menuOpen)}
-                    className="w-6 h-6 rounded flex items-center justify-center bg-white/10 backdrop-blur-sm hover:bg-white/25 transition-colors"
-                  >
-                    <MoreVertical className="w-3 h-3 text-white/80" />
-                  </button>
-                  {menuOpen && (
-                    <>
-                      <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-                      <div className="absolute right-0 bottom-full mb-1 w-36 bg-[#1a1a1c] border border-white/10 rounded-xl shadow-2xl z-20 py-1 overflow-hidden">
-                        <button onClick={() => { handleDuplicate(); setMenuOpen(false); }}
-                          className="w-full px-3 py-2 text-left text-xs text-white/70 hover:bg-white/5 flex items-center gap-2">
-                          <Copy className="w-3.5 h-3.5" /> Duplicar
-                        </button>
-                        <button onClick={() => { handleDelete(); setMenuOpen(false); }}
-                          className="w-full px-3 py-2 text-left text-xs text-red-400 hover:bg-red-500/10 flex items-center gap-2">
-                          <Trash2 className="w-3.5 h-3.5" /> Eliminar
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {clip.scheduled_at && (
-              <p className="text-[9px] text-white/40 mt-1 flex items-center gap-1">
-                <Calendar className="w-2.5 h-2.5" />
-                {format(new Date(clip.scheduled_at), "d MMM, HH:mm", { locale: es })}
-              </p>
-            )}
-          </div>
-        </div>
-      </motion.div>
-
-      {editOpen && <EditClipModal clip={clip} onClose={() => setEditOpen(false)} onUpdate={onUpdate} />}
-      {previewOpen && <ClipPreviewModal clip={clip} onClose={() => setPreviewOpen(false)} />}
-    </>
-  );
-}
+import NetflixClipCard from "./NetflixClipCard.jsx";
 
 export default function ClipsLibrary({ filters }) {
   const [search, setSearch] = useState("");
@@ -235,11 +65,11 @@ export default function ClipsLibrary({ filters }) {
         </button>
       </div>
 
-      {/* Grid */}
+      {/* Carousel — same style as tracks */}
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="aspect-[9/16] rounded-xl bg-white/[0.04] animate-pulse" />
+        <div className="flex gap-3" style={{ overflowX: "hidden" }}>
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex-shrink-0 rounded-xl bg-white/[0.04] animate-pulse" style={{ width: 240, height: 150 }} />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -262,10 +92,12 @@ export default function ClipsLibrary({ filters }) {
           </button>
         </motion.div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
-          {filtered.map((clip, i) => (
-            <ClipTile key={clip.id} clip={clip} index={i} onUpdate={refetch} />
-          ))}
+        <div style={{ overflowX: "auto", overflowY: "visible", padding: "60px 16px 200px", margin: "-60px -16px -200px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
+          <div className="flex gap-3" style={{ width: "max-content" }}>
+            {filtered.map((clip, i) => (
+              <NetflixClipCard key={clip.id} clip={clip} index={i} onUpdate={refetch} isFirst={i === 0} />
+            ))}
+          </div>
         </div>
       )}
 
