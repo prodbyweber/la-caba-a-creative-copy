@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { motion } from "framer-motion";
-import { ArrowLeft, Heart, Share2, Music2, ExternalLink } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Heart, Share2, Music2, ExternalLink, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import SavedAndLikesPanel from "@/components/profile/SavedAndLikesPanel";
 
@@ -17,6 +17,8 @@ export default function UserPublicProfile() {
   const { username } = useParams();
   const [liked, setLiked] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [playingYt, setPlayingYt] = useState(null);
+  const [viewingImage, setViewingImage] = useState(null);
 
   const { data: userProfile, isLoading } = useQuery({
     queryKey: ["public-profile-username", username],
@@ -229,7 +231,11 @@ export default function UserPublicProfile() {
                 const ytId = getYoutubeId(m.url);
                 const thumb = m.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : "");
                 return (
-                  <div key={m.id || i} className="group relative rounded-xl overflow-hidden bg-white/5 aspect-video cursor-pointer hover:scale-[1.01] transition-transform duration-300">
+                  <motion.div 
+                    key={m.id || i} 
+                    onClick={() => ytId && setPlayingYt(ytId)}
+                    className="group relative rounded-xl overflow-hidden bg-white/5 aspect-video cursor-pointer hover:scale-[1.01] transition-transform duration-300"
+                  >
                     {thumb && <img src={thumb} alt={m.title} className="w-full h-full object-cover" />}
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center">
@@ -239,7 +245,7 @@ export default function UserPublicProfile() {
                     <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
                       <p className="text-xs font-semibold text-white truncate">{m.title}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -252,9 +258,13 @@ export default function UserPublicProfile() {
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/20 mb-4">Galería</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {photos.map((photo, idx) => (
-                <div key={photo.id || idx} className="group relative rounded-xl overflow-hidden aspect-square">
+                <motion.div 
+                  key={photo.id || idx} 
+                  onClick={() => setViewingImage(photo.url)}
+                  className="group relative rounded-xl overflow-hidden aspect-square cursor-pointer hover:scale-[1.02] transition-transform duration-300"
+                >
                   <img src={photo.url} alt={photo.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
@@ -303,6 +313,67 @@ export default function UserPublicProfile() {
           </div>
         )}
       </div>
+
+      {/* YouTube Player Modal */}
+      <AnimatePresence>
+        {playingYt && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[700] bg-black/95 flex items-center justify-center p-4"
+            onClick={() => setPlayingYt(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              className="relative w-full max-w-3xl"
+              onClick={e => e.stopPropagation()}
+            >
+              <button onClick={() => setPlayingYt(null)}
+                className="absolute -top-10 right-0 p-2 text-white/50 hover:text-white transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+              <div className="relative rounded-xl overflow-hidden" style={{ paddingBottom: "56.25%" }}>
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${playingYt}?autoplay=1&rel=0`}
+                  className="absolute inset-0 w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Image Viewer Modal */}
+      <AnimatePresence>
+        {viewingImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[700] bg-black/95 flex items-center justify-center p-4"
+            onClick={() => setViewingImage(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              className="relative max-w-4xl max-h-[90vh] rounded-xl overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <button onClick={() => setViewingImage(null)}
+                className="absolute -top-10 right-0 p-2 text-white/50 hover:text-white transition-colors z-10">
+                <X className="w-5 h-5" />
+              </button>
+              <img src={viewingImage} alt="" className="w-full h-full object-contain" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Footer */}
       <div className="text-center pb-10 px-4">
