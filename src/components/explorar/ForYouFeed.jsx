@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Heart, Share2, Music2, ChevronRight } from "lucide-react";
+import { X, Heart, Share2, Music2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
@@ -61,54 +61,37 @@ function Overlay({ item, projectTitle, projectItem, galleryItem, liked, setLiked
         {/* Left: user info + caption */}
         <div className="flex-1 min-w-0 pr-4 pointer-events-auto">
 
-          {/* Instagram-style profile card */}
-          {displayName && username && (
+          {/* Reels-style user row */}
+          {username && (
             <Link
               to={`/${username}`}
               onClick={e => e.stopPropagation()}
-              className="flex items-center gap-3 mb-3 group"
+              className="flex items-center gap-2.5 mb-3 group"
             >
-              {/* Avatar with ring */}
-              <div className="relative flex-shrink-0">
-                <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/30 group-hover:border-white/60 transition-colors shadow-lg"
-                  style={{ background: "#222" }}>
-                  {avatar ? (
-                    <img src={avatar} alt={displayName} className="w-full h-full object-cover"
-                      style={{ objectPosition: photoPosition }} />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-xs font-black text-white/60">{displayName[0]?.toUpperCase()}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Name + badge row */}
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-white font-bold text-sm drop-shadow-lg leading-tight group-hover:underline underline-offset-2 truncate">
-                    @{username}
-                  </span>
-                  {accountType === "artist" && (
-                    <span className="flex-shrink-0 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full"
-                      style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.6)" }}>
-                      Artista
-                    </span>
-                  )}
-                  {accountType === "creator" && (
-                    <span className="flex-shrink-0 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full"
-                      style={{ background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.6)" }}>
-                      Creador
-                    </span>
-                  )}
-                </div>
-                {displayName !== username && (
-                  <p className="text-white/50 text-[10px] leading-tight truncate">{displayName}</p>
+              {/* Avatar */}
+              <div className="relative flex-shrink-0 w-9 h-9 rounded-full overflow-hidden border-2 shadow-lg"
+                style={{ borderColor: "rgba(255,255,255,0.25)", background: "#222" }}>
+                {avatar ? (
+                  <img src={avatar} alt={displayName} className="w-full h-full object-cover"
+                    style={{ objectPosition: photoPosition }} />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-xs font-black text-white/60">{displayName?.[0]?.toUpperCase()}</span>
+                  </div>
                 )}
               </div>
 
-              {/* Chevron arrow → perfil */}
-              <ChevronRight className="w-4 h-4 text-white/30 group-hover:text-white/70 flex-shrink-0 transition-colors ml-auto" />
+              {/* Username + verified badge */}
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="text-white font-bold text-sm drop-shadow-lg leading-tight truncate">
+                  @{username}
+                </span>
+                {/* Orange verified checkmark */}
+                <svg className="flex-shrink-0 w-4 h-4" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="10" fill="#ff5833"/>
+                  <path d="M6 10l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
             </Link>
           )}
 
