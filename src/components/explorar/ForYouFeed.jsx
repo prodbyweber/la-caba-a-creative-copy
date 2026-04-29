@@ -13,10 +13,7 @@ function getYtShortId(url) {
 }
 
 // ── Resolve uploader profile for a gallery item ──────────────────────────────
-function useUploaderProfile(galleryItem, projectCredits) {
-  // galleryItem may have uploader_user_id set when uploaded by a platform user
-  const uploaderId = galleryItem?.uploader_user_id || null;
-
+function useUploaderProfile(uploaderId) {
   const { data: profile } = useQuery({
     queryKey: ["uploader-profile", uploaderId],
     queryFn: async () => {
@@ -27,19 +24,40 @@ function useUploaderProfile(galleryItem, projectCredits) {
     enabled: !!uploaderId,
     staleTime: 60000,
   });
+  return profile || null;
+}
 
-  return profile;
+// ── Resolve artist profile as fallback uploader ───────────────────────────
+function useArtistProfile(artistId) {
+  const { data: profile } = useQuery({
+    queryKey: ["artist-profile-feed", artistId],
+    queryFn: async () => {
+      if (!artistId) return null;
+      const results = await base44.entities.UserProfile.filter({ });
+      // find by linked artist
+      const artist = await base44.entities.Artist.filter({ id: artistId });
+      if (!artist[0]?.user_id) return null;
+      const up = await base44.entities.UserProfile.filter({ user_id: artist[0].user_id });
+      return up[0] || null;
+    },
+    enabled: !!artistId,
+    staleTime: 60000,
+  });
+  return profile || null;
 }
 
 // ── TikTok-style overlay with user info ──────────────────────────────────────
 function Overlay({ item, projectTitle, projectItem, galleryItem, liked, setLiked, currentUser }) {
-  const uploaderProfile = useUploaderProfile(galleryItem, projectItem?.raw?.credits);
+  const uploaderProfile = useUploaderProfile(galleryItem?.uploader_user_id);
+  const artistId = projectItem?.raw?.artist_id || projectItem?.artist_id;
+  const artistFallback = useArtistProfile(!uploaderProfile ? artistId : null);
 
-  const displayName = uploaderProfile?.artist_name || uploaderProfile?.display_name || uploaderProfile?.full_name;
-  const username = uploaderProfile?.username;
-  const avatar = uploaderProfile?.avatar_url || uploaderProfile?.profile_photo_url;
-  const photoPosition = uploaderProfile?.photo_position || "center center";
-  const accountType = uploaderProfile?.account_type;
+  const profile = uploaderProfile || artistFallback;
+
+  const displayName = profile?.artist_name || profile?.display_name || profile?.full_name;
+  const username = profile?.username;
+  const avatar = profile?.avatar_url || profile?.profile_photo_url;
+  const photoPosition = profile?.photo_position || "center center";
 
   const handleShare = () => {
     if (navigator.share) {
@@ -334,23 +352,7 @@ export default function ForYouFeed({ initialItem, allItems, currentUser, linkedA
         ))}
       </div>
 
-      {/* Progress dots */}
-      <div className="fixed right-3 top-1/2 -translate-y-1/2 z-[1150] flex flex-col gap-1.5">
-        {feed.slice(0, 12).map((_, i) => (
-          <button
-            key={i}
-            onClick={() => {
-              slideRefs.current[i]?.scrollIntoView({ behavior: "smooth" });
-            }}
-            className="rounded-full transition-all"
-            style={{
-              width: 3,
-              height: activeIndex === i ? 16 : 6,
-              background: activeIndex === i ? "white" : "rgba(255,255,255,0.25)",
-            }}
-          />
-        ))}
-      </div>
+
     </motion.div>,
     document.body
   );

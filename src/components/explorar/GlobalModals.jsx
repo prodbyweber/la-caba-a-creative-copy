@@ -135,7 +135,7 @@ function CreditsModalInner() {
     <motion.div
       key="credits-modal"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/85 backdrop-blur-xl flex items-end justify-center px-4 pb-4 pt-12"
       style={{ zIndex: 900 }}
       onClick={closeCreditsModal}
     >
