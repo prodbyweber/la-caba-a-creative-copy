@@ -5,7 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Heart, Share2, Music2, ExternalLink, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import SavedAndLikesPanel from "@/components/profile/SavedAndLikesPanel";
+
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -189,21 +189,21 @@ export default function UserPublicProfile() {
           </motion.p>
         )}
 
-        {/* Me gustas y Guardado */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="mb-12">
-          <SavedAndLikesPanel userId={userProfile?.user_id} />
-        </motion.div>
-
-        {/* Explorar Items */}
+        {/* Aparece en */}
         {explorarItems.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-12">
-            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/20 mb-4">Proyectos</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/20 mb-4">Aparece en</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {explorarItems.slice(0, 12).map((item, idx) => {
                 const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
                 const thumb = item.thumbnail_url || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : "");
                 return (
-                  <motion.div key={item.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: idx * 0.03 }}
+                  <motion.div 
+                    key={item.id} 
+                    initial={{ opacity: 0, scale: 0.95 }} 
+                    animate={{ opacity: 1, scale: 1 }} 
+                    transition={{ delay: idx * 0.03 }}
+                    onClick={() => ytId && setPlayingYt(ytId)}
                     className="group relative rounded-xl overflow-hidden bg-white/5 aspect-square cursor-pointer hover:scale-[1.02] transition-transform duration-300">
                     {thumb ? (
                       <img src={thumb} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -221,6 +221,8 @@ export default function UserPublicProfile() {
             </div>
           </motion.div>
         )}
+
+
 
         {/* YouTube content */}
         {youtubeItems.length > 0 && (
