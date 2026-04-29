@@ -11,12 +11,12 @@ import StatusButton from "@/components/admin/StatusButton";
 import SubscriptionStatus from "@/components/subscription/SubscriptionStatus";
 import {
   Calendar, Clock, AlertCircle, GitPullRequest, FolderKanban,
-  TrendingUp, Users, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal, Zap, ChevronRight
+  TrendingUp, Users, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal
 } from "lucide-react";
 import { format, isToday, parseISO } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import ADNdeMarca from "./ADNdeMarca";
+
 
 function ItemMenu({ onEdit, onDelete, onArchive, showArchive = false }) {
   const [open, setOpen] = useState(false);
@@ -60,7 +60,6 @@ export default function AdminDashboard() {
   const [editSession, setEditSession] = useState(null);
   const [editDeliverable, setEditDeliverable] = useState(null);
   const [editRevision, setEditRevision] = useState(null);
-  const [showADN, setShowADN] = useState(false);
 
 
   const queryClient = useQueryClient();
@@ -135,41 +134,7 @@ export default function AdminDashboard() {
           <p className="text-sm text-white/30">Actividades prioritarias de hoy</p>
         </motion.div>
 
-        {/* Vista Previa de Dashboards */}
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-          className="mb-6 p-3 rounded-xl border border-white/[0.08] bg-white/[0.03]"
-        >
-          <p className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-2">Previsualizar Dashboards</p>
-          <p className="text-[10px] text-white/30 mb-2">Abre el dashboard de cualquier artista para cambiar entre vistas</p>
-          <Link to={createPageUrl("ArtistDashboard?artistId=preview")} className="inline-block">
-            <button
-              className="text-xs px-3 py-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] text-white/40 hover:border-white/20 transition-all"
-            >
-              Ir a Dashboard de Prueba →
-            </button>
-          </Link>
-        </motion.div>
 
-        {/* ADN de Marca Quick Link - Minimalista */}
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-6 p-3 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] transition-all cursor-pointer group"
-          onClick={() => setShowADN(true)}
-        >
-          <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-amber-400" />
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-white">ADN de Marca</p>
-              <p className="text-[10px] text-white/30">Gestiona el generador de ADN</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors flex-shrink-0" />
-          </div>
-        </motion.div>
 
         {/* KPI Cards - arriba */}
         <div className="mb-6">
@@ -398,9 +363,6 @@ export default function AdminDashboard() {
       <CreateDeliverableModal isOpen={showDeliverableModal} onClose={handleCloseDeliverable} editData={editDeliverable} />
       <CreateRevisionModal isOpen={showRevisionModal} onClose={handleCloseRevision} editData={editRevision} />
       
-      {/* ADN Modal */}
-      {showADN && <ADNdeMarca onClose={() => setShowADN(false)} />}
-
       <VoiceAssistant />
     </AdminLayout>
   );
