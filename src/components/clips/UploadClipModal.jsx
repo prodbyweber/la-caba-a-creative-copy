@@ -47,20 +47,7 @@ export default function UploadClipModal({ onClose, artistId: passedArtistId }) {
   const ytThumb = getYoutubeThumbnail(youtubeUrl);
   const activeThumb = thumbnailMode === "youtube" ? ytThumb : thumbnailUrl;
 
-  const { data: allTracks = [] } = useQuery({
-    queryKey: ['allTracks', artistId],
-    queryFn: async () => {
-      if (!artistId) return [];
-      const allProjectsData = await base44.entities.Project.list();
-      const artistProjects = allProjectsData.filter(p => p.artist_id === artistId);
-      const projectIds = artistProjects.map(p => p.id);
-      const allTracksData = await base44.entities.Track.list();
-      return allTracksData.filter(t => projectIds.includes(t.project_id));
-    },
-    enabled: !!artistId,
-  });
 
-  const [selectedTrack, setSelectedTrack] = useState("");
 
   const handleThumbUpload = async (file) => {
     if (!file) return;
@@ -84,12 +71,9 @@ export default function UploadClipModal({ onClose, artistId: passedArtistId }) {
     if (!artistId) { alert("Error: No se pudo determinar el artista"); return; }
     setSaving(true);
     try {
-      const selectedTrackData = allTracks.find(t => t.id === selectedTrack);
       await base44.entities.Clip.create({
         title: title.trim(),
         artist_id: artistId,
-        project_id: selectedTrackData?.project_id || null,
-        track_id: selectedTrack || null,
         file_url: youtubeUrl,
         thumbnail_url: activeThumb || ytThumb || "",
         clip_id: Math.random().toString(36).slice(2, 7),
@@ -207,20 +191,7 @@ export default function UploadClipModal({ onClose, artistId: passedArtistId }) {
             )}
           </div>
 
-          {/* Track (optional) */}
-          <div>
-            <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">Canción relacionada <span className="normal-case font-normal text-white/20">(opcional)</span></label>
-            <select
-              value={selectedTrack}
-              onChange={e => setSelectedTrack(e.target.value)}
-              className={ic}
-            >
-              <option value="">Sin canción</option>
-              {allTracks.map(t => (
-                <option key={t.id} value={t.id}>{t.title}</option>
-              ))}
-            </select>
-          </div>
+
         </div>
 
         {/* Footer */}
