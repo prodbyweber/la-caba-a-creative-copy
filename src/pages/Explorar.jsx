@@ -43,21 +43,6 @@ export default function Explorar() {
     });
   }, []);
 
-  // Show pricing popup after 6s for non-logged-in users (once per session)
-  // Only if explorar_guest_blocked is enabled in config
-  useEffect(() => {
-    if (!authChecked) return;
-    if (currentUser) return;
-    if (!guestBlocked) return; // Explorar is public, no popup
-    const alreadyShown = sessionStorage.getItem("pricing_modal_shown");
-    if (alreadyShown) { setGuestLocked(true); return; }
-    const timer = setTimeout(() => {
-      setShowPricingModal(true);
-      sessionStorage.setItem("pricing_modal_shown", "1");
-    }, 6000);
-    return () => clearTimeout(timer);
-  }, [authChecked, currentUser, guestBlocked]);
-
   const handleGuestModalClose = () => {
     setShowPricingModal(false);
     setGuestLocked(true);
@@ -110,6 +95,21 @@ export default function Explorar() {
 
   // explorar_guest_blocked: si es false (o no está definido), Explorar es público
   const guestBlocked = landingConfig?.explorar_guest_blocked === true;
+
+  // Show pricing popup after 6s for non-logged-in users (once per session)
+  // Only if explorar_guest_blocked is enabled in config
+  useEffect(() => {
+    if (!authChecked) return;
+    if (currentUser) return;
+    if (!guestBlocked) return;
+    const alreadyShown = sessionStorage.getItem("pricing_modal_shown");
+    if (alreadyShown) { setGuestLocked(true); return; }
+    const timer = setTimeout(() => {
+      setShowPricingModal(true);
+      sessionStorage.setItem("pricing_modal_shown", "1");
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [authChecked, currentUser, guestBlocked]);
 
   // Mostrar splash solo hasta que auth esté listo y los datos iniciales carguen
   const isLoadingContent = loadingItems || loadingArtists || loadingSections || loadingAssignments;
