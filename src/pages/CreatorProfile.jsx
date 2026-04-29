@@ -15,6 +15,12 @@ const COUNTRY_ISO = {
   "Reino Unido": "gb", "Francia": "fr", "Alemania": "de", "Italia": "it", "Portugal": "pt",
 };
 
+function getYoutubeId(url) {
+  if (!url) return null;
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return match ? match[1] : null;
+}
+
 export default function CreatorProfile() {
   const { username } = useParams();
   const [currentUser, setCurrentUser] = useState(null);
@@ -187,9 +193,6 @@ export default function CreatorProfile() {
           <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 text-center">
             {hasCountry ? (
               <>
-                {countryCode && (
-                  <img src={`https://flagcdn.com/w60/${countryCode}.png`} alt={userProfile.country_of_residence} className="h-8 mx-auto mb-2" />
-                )}
                 <p className="text-xs text-white/60">{userProfile.country_of_residence}{hasCity ? `, ${userProfile.address}` : ""}</p>
               </>
             ) : (
@@ -202,6 +205,40 @@ export default function CreatorProfile() {
         {userProfile.bio && (
           <div className="mb-12">
             <p className="text-lg text-white/80 leading-relaxed max-w-2xl">{userProfile.bio}</p>
+          </div>
+        )}
+
+        {/* YouTube Videos */}
+        {(userProfile?.media_items || []).filter(m => m.type === "youtube").length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-black mb-6">Videos</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {(userProfile?.media_items || [])
+                .filter(m => m.type === "youtube")
+                .map((video, i) => {
+                  const ytId = getYoutubeId(video.url);
+                  const thumb = video.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : "");
+                  return (
+                    <motion.div
+                      key={video.id || i}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      className="group relative rounded-xl overflow-hidden bg-white/[0.04] border border-white/[0.08] aspect-video cursor-pointer hover:border-white/20 transition-all"
+                    >
+                      {thumb && <img src={thumb} alt={video.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-white ml-0.5" fill="white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
+                        <p className="text-xs font-semibold text-white truncate">{video.title}</p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+            </div>
           </div>
         )}
 
