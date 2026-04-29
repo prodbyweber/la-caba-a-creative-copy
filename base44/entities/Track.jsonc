@@ -1,0 +1,135 @@
+{
+  "name": "Track",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo de la canci\u00f3n"
+    },
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista principal"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "ID del proyecto al que pertenece (opcional)"
+    },
+    "track_number": {
+      "type": "number",
+      "description": "N\u00famero de orden en el proyecto"
+    },
+    "cover_url": {
+      "type": "string",
+      "description": "URL de la portada del track"
+    },
+    "audio_file_url": {
+      "type": "string",
+      "description": "URL del archivo de audio MP3/WAV"
+    },
+    "composers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de compositores"
+    },
+    "producers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de productores musicales"
+    },
+    "mix_engineer": {
+      "type": "string",
+      "description": "Ingeniero de mezcla"
+    },
+    "master_engineer": {
+      "type": "string",
+      "description": "Ingeniero de masterizaci\u00f3n"
+    },
+    "dolby_atmos": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si tiene Dolby Atmos"
+    },
+    "clips_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Cantidad de clips asociados"
+    },
+    "duration": {
+      "type": "number",
+      "description": "Duraci\u00f3n en segundos"
+    },
+    "genre": {
+      "type": "string",
+      "description": "G\u00e9nero musical"
+    },
+    "bpm": {
+      "type": "number",
+      "description": "Beats por minuto"
+    },
+    "key": {
+      "type": "string",
+      "description": "Tonalidad musical"
+    },
+    "lyrics": {
+      "type": "string",
+      "description": "Letra de la canci\u00f3n"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionales"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "idea",
+        "production",
+        "mixing",
+        "mastering",
+        "completed"
+      ],
+      "default": "idea",
+      "description": "Estado del track"
+    },
+    "versions": {
+      "type": "object",
+      "properties": {
+        "mp3": {
+          "type": "string"
+        },
+        "wav_24bit": {
+          "type": "string"
+        },
+        "stems": {
+          "type": "string"
+        },
+        "mix": {
+          "type": "string"
+        },
+        "master_24bit": {
+          "type": "string"
+        },
+        "show": {
+          "type": "string"
+        },
+        "acapella": {
+          "type": "string"
+        },
+        "beat_wav": {
+          "type": "string"
+        },
+        "drive_folder": {
+          "type": "string",
+          "description": "Link a carpeta de Drive"
+        }
+      },
+      "description": "Versiones del track"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

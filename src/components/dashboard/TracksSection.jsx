@@ -230,6 +230,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
       queryClient.invalidateQueries({ queryKey: ['tracks'] });
+      queryClient.refetchQueries({ queryKey: ['all-tracks'] });
       onClose();
     },
   });

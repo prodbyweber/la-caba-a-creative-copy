@@ -50,8 +50,8 @@ export default function ArtistDashboard() {
     queryKey: ['artist', artistId],
     queryFn: async () => {
       if (!artistId) return null;
-      const artists = await base44.entities.Artist.list();
-      return artists.find(a => a.id === artistId) || null;
+      const results = await base44.entities.Artist.filter({ id: artistId });
+      return results[0] || null;
     },
     enabled: !!artistId,
   });
