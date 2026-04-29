@@ -211,6 +211,19 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
     return () => clearInterval(intervalRef.current);
   }, [heroItems.length]);
 
+  // Pausar video cuando la pestaña no está visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      const heroSlides = document.querySelectorAll('video[src]');
+      if (document.hidden) {
+        heroSlides.forEach(video => video.pause());
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   if (heroItems.length === 0) return null;
 
   return (
