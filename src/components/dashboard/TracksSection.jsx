@@ -31,9 +31,10 @@ export default function TracksSection({ jlyArtistId }) {
     ? allProjects.filter(project => project.artist_id === jlyArtistId)
     : allProjects;
 
-  // Filtrar tracks que pertenecen a proyectos de JLY
+  // Filtrar tracks del artista: por proyecto O por artist_id directo
   const tracks = jlyArtistId
     ? allTracks.filter(track => {
+        if (track.artist_id === jlyArtistId) return true;
         const project = allProjects.find(p => p.id === track.project_id);
         return project && project.artist_id === jlyArtistId;
       })
@@ -186,18 +187,39 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
 
   const queryClient = useQueryClient();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (track) {
       setFormData(track);
+    } else {
+      setFormData({
+        title: "",
+        project_id: "",
+        track_number: null,
+        cover_url: "",
+        audio_file_url: "",
+        composers: [],
+        producers: [],
+        mix_engineer: "",
+        master_engineer: "",
+        dolby_atmos: false,
+        genre: "",
+        bpm: null,
+        key: "",
+        status: "idea",
+        notes: "",
+        versions: {}
+      });
     }
-  }, [track]);
+  }, [track, isOpen]);
 
   const saveMutation = useMutation({
     mutationFn: (data) => {
       if (track) {
         return base44.entities.Track.update(track.id, data);
       } else {
-        return base44.entities.Track.create(data);
+        // Incluir artist_id via jlyArtistId para que el track aparezca en el dashboard del artista
+        // El track se vincula al artista a través del proyecto, pero guardamos artist_id directo si no hay proyecto
+        return base44.entities.Track.create({ ...data, artist_id: jlyArtistId || data.artist_id });
       }
     },
     onSuccess: () => {
