@@ -12,7 +12,7 @@ import { base44 } from "@/api/base44Client";
  *  - currentUser: authenticated user object
  *  - onUploaded: called after successful save (no args needed — parent re-fetches)
  */
-export default function GalleryUploadButton({ projectRaw, currentUser, onUploaded }) {
+export default function GalleryUploadButton({ projectRaw, currentUser, onUploaded, compact = false }) {
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [caption, setCaption] = useState("");
@@ -64,20 +64,32 @@ export default function GalleryUploadButton({ projectRaw, currentUser, onUploade
 
   return (
     <>
-      {/* Trigger button */}
-      <button
-        onClick={() => fileRef.current?.click()}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
-        style={{
-          background: "rgba(255,255,255,0.07)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          color: "rgba(255,255,255,0.6)",
-        }}
-        title="Añadir a galería"
-      >
-        <Plus className="w-3.5 h-3.5" />
-        Añadir a galería
-      </button>
+      {/* Trigger button — compact = same size as gallery cell */}
+      {compact ? (
+        <button
+          onClick={() => fileRef.current?.click()}
+          className="flex-shrink-0 rounded-lg flex flex-col items-center justify-center gap-1 transition-all hover:bg-white/10"
+          style={{ width: 52, height: 74, background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.12)" }}
+          title="Añadir a galería"
+        >
+          <Plus className="w-4 h-4 text-white/30" />
+          <span className="text-[8px] text-white/25 font-semibold uppercase tracking-wider">Añadir</span>
+        </button>
+      ) : (
+        <button
+          onClick={() => fileRef.current?.click()}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
+          style={{
+            background: "rgba(255,255,255,0.07)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            color: "rgba(255,255,255,0.6)",
+          }}
+          title="Añadir a galería"
+        >
+          <Plus className="w-3.5 h-3.5" />
+          Añadir a galería
+        </button>
+      )}
 
       <input
         ref={fileRef}
