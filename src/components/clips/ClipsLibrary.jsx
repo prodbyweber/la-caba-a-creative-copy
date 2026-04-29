@@ -18,6 +18,8 @@ export default function ClipsLibrary({ filters }) {
       if (filters.artist !== "all") query.artist_id = filters.artist;
       const allClips = await base44.entities.Clip.filter(query, '-created_date');
       return allClips.filter(clip => {
+        // Filtrar por estado published
+        if (clip.status !== "published") return false;
         if (filters.platform?.length > 0 && !filters.platform.some(p => clip.platforms?.includes(p))) return false;
         if (filters.search) {
           const s = filters.search.toLowerCase();
