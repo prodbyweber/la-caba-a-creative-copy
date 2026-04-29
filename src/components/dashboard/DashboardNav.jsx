@@ -68,9 +68,9 @@ export default function DashboardNav({ artistName, artistId, children }) {
                 className="h-12 w-auto"
               />
               <div className="hidden lg:flex items-start gap-0" style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, flexDirection: 'column' }}>
-                <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, color: '#ff5833', fontWeight: 900, fontSize: '1.1rem' }}>
-                  Cabaña<sup style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.55rem', fontWeight: 400, lineHeight: 1, marginLeft: '3px', verticalAlign: 'top', position: 'relative', top: '2px' }}>®</sup>
-                </span>
+                <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, color: '#ff8a3d', fontWeight: 900, fontSize: '1.1rem' }}>
+                   Cabaña<sup style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.55rem', fontWeight: 400, lineHeight: 1, marginLeft: '3px', verticalAlign: 'top', position: 'relative', top: '2px' }}>®</sup>
+                 </span>
                 <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, color: 'white', fontWeight: 900, fontSize: '1.1rem' }}>Creative</span>
               </div>
             </Link>
@@ -85,7 +85,7 @@ export default function DashboardNav({ artistName, artistId, children }) {
                     <button
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                         active 
-                          ? 'bg-transparent text-red-400 border border-red-500/40 hover:border-red-500/60' 
+                          ? 'bg-transparent text-orange-400 border border-orange-500/40 hover:border-orange-500/60' 
                           : 'text-gray-400 hover:text-white hover:bg-white/5'
                       }`}
                     >
@@ -104,8 +104,8 @@ export default function DashboardNav({ artistName, artistId, children }) {
             {isAdmin && (
               <Link to={createPageUrl("AdminDashboard")}>
                 <button 
-                  className="px-2.5 py-1.5 rounded-lg bg-transparent border border-red-500/40 text-red-400 hover:border-red-500/60 transition-all flex items-center gap-1.5"
-                  title="Panel Admin"
+                 className="px-2.5 py-1.5 rounded-lg bg-transparent border border-orange-500/40 text-orange-400 hover:border-orange-500/60 transition-all flex items-center gap-1.5"
+                 title="Panel Admin"
                 >
                   <Home className="w-3.5 h-3.5" />
                   <span className="text-xs font-medium hidden sm:inline">Admin</span>
@@ -148,9 +148,9 @@ export default function DashboardNav({ artistName, artistId, children }) {
                     className="h-10 w-auto"
                   />
                   <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, color: '#ff5833', fontWeight: 900, fontSize: '1rem' }}>
-                      Cabaña<sup style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.5rem', fontWeight: 400, lineHeight: 1, marginLeft: '3px', verticalAlign: 'top', position: 'relative', top: '2px' }}>®</sup>
-                    </span>
+                    <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, color: '#ff8a3d', fontWeight: 900, fontSize: '1rem' }}>
+                       Cabaña<sup style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.5rem', fontWeight: 400, lineHeight: 1, marginLeft: '3px', verticalAlign: 'top', position: 'relative', top: '2px' }}>®</sup>
+                     </span>
                     <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, color: 'white', fontWeight: 900, fontSize: '1rem' }}>Creative</span>
                   </div>
                 </div>
@@ -174,7 +174,7 @@ export default function DashboardNav({ artistName, artistId, children }) {
                           onClick={() => setMobileMenuOpen(false)}
                           className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                             active 
-                              ? 'bg-transparent text-red-400 border border-red-500/40 hover:border-red-500/60' 
+                              ? 'bg-transparent text-orange-400 border border-orange-500/40 hover:border-orange-500/60' 
                               : 'text-gray-400 hover:text-white hover:bg-white/5'
                           }`}
                         >
@@ -193,7 +193,7 @@ export default function DashboardNav({ artistName, artistId, children }) {
                     <Link to={createPageUrl("AdminDashboard")}>
                       <button 
                         onClick={() => setMobileMenuOpen(false)}
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-transparent border border-red-500/40 text-red-400 hover:border-red-500/60 transition-all text-sm font-medium"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-transparent border border-orange-500/40 text-orange-400 hover:border-orange-500/60 transition-all text-sm font-medium"
                       >
                         <Home className="w-5 h-5" />
                         Panel Admin

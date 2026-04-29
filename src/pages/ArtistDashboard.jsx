@@ -161,15 +161,14 @@ export default function ArtistDashboard() {
                  <button
                    onClick={() => setCatalogMode("audio")}
                    className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-                   style={{ color: catalogMode === "audio" ? "#ff8a3d" : "rgba(255,255,255,0.3)" }}
+                   style={{ color: catalogMode === "audio" ? "#fff" : "rgba(255,255,255,0.3)" }}
                  >
                    <Music2 className="w-3.5 h-3.5" />
                    <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Audio</span>
                    {catalogMode === "audio" && (
                      <motion.div
                        layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px]"
-                       style={{ background: "#ff8a3d" }}
+                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
                      />
                    )}
@@ -179,15 +178,14 @@ export default function ArtistDashboard() {
                  <button
                    onClick={() => setCatalogMode("video")}
                    className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-                   style={{ color: catalogMode === "video" ? "#ff8a3d" : "rgba(255,255,255,0.3)" }}
+                   style={{ color: catalogMode === "video" ? "#fff" : "rgba(255,255,255,0.3)" }}
                  >
                    <Film className="w-3.5 h-3.5" />
                    <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Video</span>
                    {catalogMode === "video" && (
                      <motion.div
                        layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px]"
-                       style={{ background: "#ff8a3d" }}
+                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
                      />
                    )}
@@ -197,15 +195,14 @@ export default function ArtistDashboard() {
                  <button
                    onClick={() => setCatalogMode("photos")}
                    className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-                   style={{ color: catalogMode === "photos" ? "#ff8a3d" : "rgba(255,255,255,0.3)" }}
+                   style={{ color: catalogMode === "photos" ? "#fff" : "rgba(255,255,255,0.3)" }}
                  >
                    <Image className="w-3.5 h-3.5" />
                    <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Fotos</span>
                    {catalogMode === "photos" && (
                      <motion.div
                        layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px]"
-                       style={{ background: "#ff8a3d" }}
+                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
                      />
                    )}
@@ -215,15 +212,14 @@ export default function ArtistDashboard() {
                  <button
                    onClick={() => setCatalogMode("campaigns")}
                    className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-                   style={{ color: catalogMode === "campaigns" ? "#ff8a3d" : "rgba(255,255,255,0.3)" }}
+                   style={{ color: catalogMode === "campaigns" ? "#fff" : "rgba(255,255,255,0.3)" }}
                  >
                    <Zap className="w-3.5 h-3.5" />
                    <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Campañas</span>
                    {catalogMode === "campaigns" && (
                      <motion.div
                        layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px]"
-                       style={{ background: "#ff8a3d" }}
+                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
                      />
                    )}
@@ -233,15 +229,14 @@ export default function ArtistDashboard() {
                  <button
                    onClick={() => setCatalogMode("creative-ads")}
                    className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-                   style={{ color: catalogMode === "creative-ads" ? "#ff8a3d" : "rgba(255,255,255,0.3)" }}
+                   style={{ color: catalogMode === "creative-ads" ? "#fff" : "rgba(255,255,255,0.3)" }}
                  >
                    <Image className="w-3.5 h-3.5" />
                    <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Creative Ads</span>
                    {catalogMode === "creative-ads" && (
                      <motion.div
                        layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px]"
-                       style={{ background: "#ff8a3d" }}
+                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
                      />
                    )}
