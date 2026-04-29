@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
-import { Heart, Share2, User, MapPin, Users, Plus, X } from "lucide-react";
+import { Heart, Share2, User, MapPin, Users, Plus, X, Music2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const COUNTRY_ISO = {
@@ -212,29 +212,29 @@ export default function CreatorProfile() {
         {(userProfile?.media_items || []).filter(m => m.type === "youtube").length > 0 && (
           <div className="mb-12">
             <h2 className="text-2xl font-black mb-6">Videos</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {(userProfile?.media_items || [])
                 .filter(m => m.type === "youtube")
                 .map((video, i) => {
                   const ytId = getYoutubeId(video.url);
-                  const thumb = video.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : "");
                   return (
                     <motion.div
                       key={video.id || i}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.1 }}
-                      className="group relative rounded-xl overflow-hidden bg-white/[0.04] border border-white/[0.08] aspect-video cursor-pointer hover:border-white/20 transition-all"
+                      className="rounded-xl overflow-hidden bg-gradient-to-br from-white/[0.04] to-white/[0.02] border border-white/[0.08] hover:border-white/15 transition-all aspect-video"
                     >
-                      {thumb && <img src={thumb} alt={video.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />}
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center">
-                          <svg className="w-5 h-5 text-white ml-0.5" fill="white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        </div>
-                      </div>
-                      <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
-                        <p className="text-xs font-semibold text-white truncate">{video.title}</p>
-                      </div>
+                      {ytId && (
+                        <iframe
+                          className="w-full h-full"
+                          src={`https://www.youtube.com/embed/${ytId}?rel=0`}
+                          title={video.title}
+                          frameBorder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      )}
                     </motion.div>
                   );
                 })}
@@ -242,40 +242,38 @@ export default function CreatorProfile() {
           </div>
         )}
 
-        {/* Projects Grid */}
-        <div>
-          <h2 className="text-2xl font-black mb-6">Proyectos</h2>
-          {explorarItems.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-white/40 text-sm">Sin proyectos aún</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {explorarItems.map((item) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="group rounded-xl overflow-hidden bg-white/[0.04] border border-white/[0.08] hover:border-white/20 transition-all cursor-pointer"
-                >
-                  <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-purple-500/10 to-transparent">
-                    {item.thumbnail_url ? (
-                      <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <User className="w-12 h-12 text-white/10" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-3">
-                    <h3 className="font-bold text-sm line-clamp-2 group-hover:text-white/80 transition-colors">{item.title}</h3>
-                    <p className="text-xs text-white/40 mt-1">{item.content_type || "Proyecto"}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Catálogo - Proyectos */}
+         {explorarItems.length > 0 && (
+           <div className="mb-12">
+             <h2 className="text-2xl font-black mb-6">Catálogo</h2>
+             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+               {explorarItems.map((item) => {
+                 const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
+                 const thumb = item.thumbnail_url || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : "");
+                 return (
+                   <motion.div
+                     key={item.id}
+                     initial={{ opacity: 0, y: 20 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     className="group relative rounded-xl overflow-hidden bg-gradient-to-br from-white/[0.04] to-white/[0.02] border border-white/[0.08] hover:border-white/15 transition-all cursor-pointer aspect-square"
+                   >
+                     {thumb ? (
+                       <img src={thumb} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                     ) : (
+                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/10 to-transparent">
+                         <Music2 className="w-8 h-8 text-white/10" />
+                       </div>
+                     )}
+                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                       <p className="text-xs font-bold text-white line-clamp-2">{item.title}</p>
+                       <p className="text-[10px] text-white/50 mt-1">{item.content_type || "Proyecto"}</p>
+                     </div>
+                   </motion.div>
+                 );
+               })}
+             </div>
+           </div>
+         )}
       </div>
     </div>
   );
