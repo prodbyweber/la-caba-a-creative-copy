@@ -75,7 +75,6 @@ export default function ArtistDashboard() {
   
   const showAudioSection = accountType === "artist";
   const showVideoSection = accountType === "artist" || accountType === "creator" || accountType === "brand";
-  const showPhotosSection = accountType === "artist" || accountType === "creator";
   const showProjectsSection = accountType === "artist" || accountType === "creator" || accountType === "brand";
   const showCampaignsSection = accountType === "brand";
   const showCreativeAdsSection = accountType === "brand";
@@ -182,7 +181,7 @@ export default function ArtistDashboard() {
                    style={{ color: catalogMode === "video" ? "#fff" : "rgba(255,255,255,0.3)" }}
                  >
                    <Film className="w-3.5 h-3.5" />
-                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Video</span>
+                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Mi Galería</span>
                    {catalogMode === "video" && (
                      <motion.div
                        layoutId="catalogUnderline"
@@ -192,23 +191,7 @@ export default function ArtistDashboard() {
                    )}
                  </button>
                )}
-               {showPhotosSection && (
-                 <button
-                   onClick={() => setCatalogMode("photos")}
-                   className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-                   style={{ color: catalogMode === "photos" ? "#fff" : "rgba(255,255,255,0.3)" }}
-                 >
-                   <Image className="w-3.5 h-3.5" />
-                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Fotos</span>
-                   {catalogMode === "photos" && (
-                     <motion.div
-                       layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
-                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                     />
-                   )}
-                 </button>
-               )}
+
                {showCampaignsSection && (
                  <button
                    onClick={() => setCatalogMode("campaigns")}
@@ -274,38 +257,15 @@ export default function ArtistDashboard() {
                 transition={{ duration: 0.25 }}
                 className="space-y-6"
               >
+                {/* Galería de Fotos */}
+                <PhotosGallery userProfileId={userProfile?.id} />
+
                 {/* Videos */}
                 {effectiveArtist && <VideosSection artistId={effectiveArtist.id} />}
-
-                {/* Clips */}
-                <div className="sm:bg-gradient-to-br sm:from-[#141414] sm:to-black sm:rounded-2xl sm:border sm:border-white/5" style={{ overflow: "visible" }}>
-                  <div className="px-0 sm:px-4 sm:py-3 sm:border-b sm:border-white/5 flex items-center justify-between mb-3 sm:mb-0">
-                    <div className="flex items-center gap-2">
-                      <div className="hidden sm:flex w-8 h-8 rounded-lg bg-white/5 items-center justify-center">
-                        <Film className="w-4 h-4 text-white/40" />
-                      </div>
-                      <h3 className="text-base font-bold text-white">Clips</h3>
-                    </div>
-                  </div>
-                  <div className="sm:px-4 sm:pb-4" style={{ overflowX: "auto", overflowY: "visible", padding: "60px 16px 200px", margin: "-60px 0 -200px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
-                    <ClipsLibrary filters={clipsFilters} />
-                  </div>
-                </div>
               </motion.div>
             )}
 
-            {/* CREADOR: Fotos */}
-            {showPhotosSection && catalogMode === "photos" && (
-              <motion.div
-                key="photos"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.25 }}
-              >
-                <PhotosGallery userProfileId={userProfile?.id} />
-              </motion.div>
-            )}
+
 
             {/* MARCA: Campañas activas */}
             {showCampaignsSection && catalogMode === "campaigns" && (
