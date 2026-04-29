@@ -37,7 +37,7 @@ const EMPTY = {
   genres: [], tags: [],
   thumbnail_url: "", preview_media_url: "", preview_media_type: "image",
   youtube_url: "", youtube_music_url: "", audio_file_url: "",
-  artist_id: "", credits: [],
+  artist_id: "", credits: [], gallery: [],
   row_category: "", order: 0,
   is_hero: false, hero_order: 0, hero_media_url: "", hero_media_type: "image",
   hero_link: "", hero_link_label: "Más info",
@@ -54,10 +54,14 @@ function Toggle({ value, onChange, color = "emerald" }) {
 }
 
 export default function ProjectModal({ item, artists, onClose, onSave }) {
-  const [form, setForm] = useState(item ? { ...EMPTY, ...item, genres: item.genres || [], tags: item.tags || [] } : EMPTY);
+  const [form, setForm] = useState(item ? { ...EMPTY, ...item, genres: item.genres || [], tags: item.tags || [], gallery: item.gallery || [] } : EMPTY);
   const [uploading, setUploading] = useState({});
   const [tab, setTab] = useState("info");
   const [newCredit, setNewCredit] = useState({ artist_id: "", role: "Artista Principal", name: "" });
+  const [newGalleryUrl, setNewGalleryUrl] = useState("");
+  const [newGalleryType, setNewGalleryType] = useState("image");
+  const [newGalleryCaption, setNewGalleryCaption] = useState("");
+  const [uploadingGallery, setUploadingGallery] = useState(false);
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
@@ -92,6 +96,33 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
     setForm(f => ({ ...f, credits: f.credits.filter((_, i) => i !== idx) }));
   };
 
+  const addGalleryItem = () => {
+    if (!newGalleryUrl.trim()) return;
+    const item = {
+      id: `g_${Date.now()}`,
+      type: newGalleryType,
+      url: newGalleryUrl.trim(),
+      caption: newGalleryCaption.trim(),
+    };
+    setForm(f => ({ ...f, gallery: [...(f.gallery || []), item] }));
+    setNewGalleryUrl(""); setNewGalleryCaption("");
+  };
+
+  const removeGalleryItem = (id) => {
+    setForm(f => ({ ...f, gallery: (f.gallery || []).filter(g => g.id !== id) }));
+  };
+
+  const uploadGalleryImage = async (file) => {
+    setUploadingGallery(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const item = { id: `g_${Date.now()}`, type: "image", url: file_url, caption: "" };
+      setForm(f => ({ ...f, gallery: [...(f.gallery || []), item] }));
+    } finally {
+      setUploadingGallery(false);
+    }
+  };
+
   const ic = "w-full px-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-white/25 placeholder-white/20 transition-colors";
   const lc = "text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-1.5 block";
 
@@ -99,6 +130,7 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
     { key: "info",     label: "Info" },
     { key: "genres",   label: "Géneros" },
     { key: "media",    label: "Media" },
+    { key: "gallery",  label: "Galería" },
     { key: "sections", label: "Secciones" },
     { key: "credits",  label: "Créditos" },
   ];
@@ -136,6 +168,9 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
               {t.label}
               {t.key === "genres" && form.genres?.length > 0 && (
                 <span className="ml-1.5 text-[9px] bg-white/10 text-white/50 px-1.5 py-0.5 rounded-full">{form.genres.length}</span>
+              )}
+              {t.key === "gallery" && form.gallery?.length > 0 && (
+                <span className="ml-1.5 text-[9px] bg-white/10 text-white/50 px-1.5 py-0.5 rounded-full">{form.gallery.length}</span>
               )}
             </button>
           ))}
@@ -301,6 +336,85 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
                     <span className="text-sm text-white/25">{uploading.audio_file_url ? "Subiendo..." : "Subir archivo de audio"}</span>
                   </label>
                 )}
+              </div>
+            </>
+          )}
+
+          {/* ── TAB: GALERÍA ── */}
+          {tab === "gallery" && (
+            <>
+              <p className="text-xs text-white/30 mb-4">Añade fotos (subidas) y YouTube Shorts (link) para la mini galería del proyecto.</p>
+
+              {/* Existing items */}
+              {(form.gallery || []).length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                  {(form.gallery || []).map((g) => {
+                    const ytId = g.type === "youtube_short"
+                      ? (g.url.match(/(?:shorts\/|youtu\.be\/|watch\?v=)([a-zA-Z0-9_-]{11})/) || [])[1]
+                      : null;
+                    const thumb = g.type === "youtube_short" && ytId
+                      ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`
+                      : g.url;
+                    return (
+                      <div key={g.id} className="relative group rounded-xl overflow-hidden" style={{ aspectRatio: "9/16" }}>
+                        <img src={thumb} alt={g.caption} className="w-full h-full object-cover" />
+                        {g.type === "youtube_short" && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                            <svg className="w-6 h-6 text-white/80" fill="white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                          </div>
+                        )}
+                        <button
+                          onClick={() => removeGalleryItem(g.id)}
+                          className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3 text-white" />
+                        </button>
+                        {g.caption && (
+                          <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-gradient-to-t from-black/80">
+                            <p className="text-[9px] text-white/70 truncate">{g.caption}</p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Add photo */}
+              <div className="p-4 rounded-xl border border-white/[0.07] bg-white/[0.02] space-y-3 mb-3">
+                <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest">Subir foto</p>
+                <label className="flex items-center gap-2 px-3 py-2.5 bg-white/5 border border-dashed border-white/10 rounded-lg cursor-pointer hover:bg-white/[0.07] transition-colors">
+                  <input type="file" accept="image/*" multiple className="hidden" onChange={e => {
+                    Array.from(e.target.files || []).forEach(f => uploadGalleryImage(f));
+                  }} />
+                  <Upload className="w-4 h-4 text-white/20" />
+                  <span className="text-sm text-white/25">{uploadingGallery ? "Subiendo..." : "Subir imágenes (múltiple)"}</span>
+                </label>
+              </div>
+
+              {/* Add YouTube Short */}
+              <div className="p-4 rounded-xl border border-white/[0.07] bg-white/[0.02] space-y-3">
+                <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest">Añadir YouTube Short</p>
+                <input
+                  value={newGalleryUrl}
+                  onChange={e => { setNewGalleryUrl(e.target.value); setNewGalleryType("youtube_short"); }}
+                  className={ic}
+                  placeholder="https://youtube.com/shorts/..."
+                />
+                <input
+                  value={newGalleryCaption}
+                  onChange={e => setNewGalleryCaption(e.target.value)}
+                  className={ic}
+                  placeholder="Caption opcional"
+                />
+                <button
+                  onClick={addGalleryItem}
+                  disabled={!newGalleryUrl.trim()}
+                  className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white text-xs font-semibold transition-all flex items-center justify-center gap-2 disabled:opacity-40"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Añadir Short
+                </button>
               </div>
             </>
           )}

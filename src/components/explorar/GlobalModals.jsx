@@ -6,6 +6,8 @@ import { useExplorar } from "@/context/ExplorarContext.jsx";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import RecommendedRow from "@/components/explorar/RecommendedRow";
+import ProjectGalleryStrip from "@/components/explorar/ProjectGalleryStrip";
+import ForYouFeed from "@/components/explorar/ForYouFeed";
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -69,11 +71,15 @@ function YoutubeModal() {
 function CreditsModalInner() {
   const { creditsModal, closeCreditsModal, openYtModal } = useExplorar();
   const [currentItem, setCurrentItem] = useState(null);
+  const [showFeed, setShowFeed] = useState(false);
   const qc = useQueryClient();
 
   // Sync currentItem when modal opens with a new item
   useEffect(() => {
-    if (creditsModal?.item) setCurrentItem(creditsModal.item);
+    if (creditsModal?.item) {
+      setCurrentItem(creditsModal.item);
+      setShowFeed(false);
+    }
   }, [creditsModal?.item?.id]);
 
   const item = currentItem;
@@ -220,11 +226,32 @@ function CreditsModalInner() {
           )}
         </div>
 
+        {/* Gallery strip */}
+        {item.raw?.gallery?.length > 0 && (
+          <div className="px-6 pb-4">
+            <ProjectGalleryStrip
+              gallery={item.raw.gallery}
+              onOpenFeed={() => setShowFeed(true)}
+            />
+          </div>
+        )}
+
         <RecommendedRow
           currentItem={item}
           allItems={allItems}
           onSelect={(recommended) => setCurrentItem(recommended)}
         />
+
+        {/* For You Feed */}
+        <AnimatePresence>
+          {showFeed && (
+            <ForYouFeed
+              initialItem={{ ...item, gallery: item.raw?.gallery || [] }}
+              allItems={allItems}
+              onClose={() => setShowFeed(false)}
+            />
+          )}
+        </AnimatePresence>
       </motion.div>
     </motion.div>,
     document.body

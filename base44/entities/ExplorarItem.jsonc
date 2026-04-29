@@ -100,6 +100,34 @@
       },
       "description": "Cr\u00e9ditos del proyecto (elenco, crew)"
     },
+    "gallery": {
+      "type": "array",
+      "description": "Galer\u00eda del proyecto: fotos e yt shorts",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "image",
+              "youtube_short"
+            ],
+            "description": "Tipo: imagen o YouTube Short"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL de imagen o link de YouTube Short"
+          },
+          "caption": {
+            "type": "string",
+            "description": "Texto opcional"
+          }
+        }
+      }
+    },
     "row_category": {
       "type": "string",
       "enum": [
