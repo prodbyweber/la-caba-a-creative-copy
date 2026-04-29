@@ -267,7 +267,6 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
 
   const TABS = [
     { key: "aparece", label: "Aparece en" },
-    { key: "material", label: "Mi material" },
     { key: "likes", label: "Me gustas", count: likedItems.length },
     { key: "saves", label: "Guardados", count: savedItems.length },
   ];
@@ -536,101 +535,7 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
                 </div>
               )}
 
-              {/* ── TAB: Mi material ── */}
-              {activeTab === "material" && (
-                <div className="px-4 py-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-[10px] text-white/25 uppercase tracking-widest font-semibold">
-                      Contenido personal
-                    </p>
-                    <button
-                      onClick={() => setShowAddModal(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/[0.08] text-white/50 hover:text-white text-xs font-semibold transition-colors"
-                    >
-                      <Plus className="w-3 h-3" />
-                      Añadir
-                    </button>
-                  </div>
 
-                  {mediaItems.length === 0 ? (
-                    <button
-                      onClick={() => setShowAddModal(true)}
-                      className="w-full py-12 rounded-2xl border border-dashed border-white/[0.06] flex flex-col items-center gap-3 text-center hover:border-white/15 transition-colors"
-                    >
-                      <Plus className="w-8 h-8 text-white/15" />
-                      <div>
-                        <p className="text-xs text-white/25">Añade tu material</p>
-                        <p className="text-[10px] text-white/12 mt-0.5">YouTube, imágenes, videos loop</p>
-                      </div>
-                    </button>
-                  ) : (
-                    <div className="space-y-2">
-                      {mediaItems.map((m, i) => {
-                        const thumb = m.thumbnail || (m.type === "youtube" ? getYoutubeThumbnail(m.url) : m.type === "image" ? m.url : null);
-                        return (
-                          <motion.div
-                            key={m.id || i}
-                            initial={{ opacity: 0, y: 8 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.04 }}
-                            className="group relative rounded-xl overflow-hidden bg-[#111] border border-white/[0.05]"
-                            style={{ aspectRatio: "16/9" }}
-                          >
-                            {thumb ? (
-                              <img src={thumb} alt={m.title} className="w-full h-full object-cover" />
-                            ) : m.type === "video" ? (
-                              <video src={m.url} className="w-full h-full object-cover" muted loop autoPlay playsInline />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <Film className="w-8 h-8 text-white/10" />
-                              </div>
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-
-                            {/* Play button for YouTube */}
-                            {m.type === "youtube" && (
-                              <button
-                                onClick={() => setPlayingYt(getYoutubeId(m.url))}
-                                className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                              >
-                                <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20">
-                                  <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
-                                </div>
-                              </button>
-                            )}
-
-                            {m.url && m.type !== "youtube" && (
-                              <a href={m.url} target="_blank" rel="noopener noreferrer"
-                                className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
-                                onClick={e => e.stopPropagation()}>
-                                <ExternalLink className="w-3 h-3 text-white/60" />
-                              </a>
-                            )}
-
-                            <button
-                              onClick={() => handleRemoveContent(m.id)}
-                              className="absolute top-2 left-2 p-1.5 bg-black/60 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-900/60"
-                            >
-                              <Trash2 className="w-3 h-3 text-white/60 hover:text-red-400" />
-                            </button>
-
-                            <div className="absolute bottom-0 left-0 right-0 p-2.5">
-                              <p className="text-xs font-semibold text-white truncate">{m.title}</p>
-                              <p className="text-[10px] text-white/30 uppercase tracking-wider">{m.type}</p>
-                            </div>
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  <div className="mt-5 p-3 rounded-xl border border-white/[0.04] bg-white/[0.01]">
-                    <p className="text-[10px] text-white/20 text-center leading-relaxed">
-                      Se recomienda subir material producido por Cabaña Creative para mantener la coherencia visual del catálogo.
-                    </p>
-                  </div>
-                </div>
-              )}
 
               {/* ── TAB: Me gustas ── */}
               {activeTab === "likes" && (

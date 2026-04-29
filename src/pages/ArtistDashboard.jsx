@@ -10,6 +10,7 @@ import TracksSection from "@/components/dashboard/TracksSection";
 import ClipsLibrary from "@/components/clips/ClipsLibrary";
 import BrandCampaignsSection from "@/components/dashboard/BrandCampaignsSection";
 import PhotosGallery from "@/components/dashboard/PhotosGallery";
+import ArtistMaterial from "@/components/dashboard/ArtistMaterial";
 
 
 export default function ArtistDashboard() {
@@ -271,20 +272,25 @@ export default function ArtistDashboard() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.25 }}
+                className="space-y-6"
               >
+                {/* Clips & Video */}
                 <div className="sm:bg-gradient-to-br sm:from-[#141414] sm:to-black sm:rounded-2xl sm:border sm:border-white/5" style={{ overflow: "visible" }}>
                   <div className="px-0 sm:px-4 sm:py-3 sm:border-b sm:border-white/5 flex items-center justify-between mb-3 sm:mb-0">
                     <div className="flex items-center gap-2">
                       <div className="hidden sm:flex w-8 h-8 rounded-lg bg-white/5 items-center justify-center">
                         <Film className="w-4 h-4 text-white/40" />
                       </div>
-                      <h3 className="text-base font-bold text-white">Clips & Video</h3>
+                      <h3 className="text-base font-bold text-white">Clips</h3>
                     </div>
                   </div>
                   <div className="sm:px-4 sm:pb-4" style={{ overflowX: "auto", overflowY: "visible", padding: "60px 16px 200px", margin: "-60px 0 -200px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
                     <ClipsLibrary filters={clipsFilters} />
                   </div>
                 </div>
+
+                {/* Mi Material */}
+                {effectiveArtist && <ArtistMaterial artistId={effectiveArtist.id} />}
               </motion.div>
             )}
 
