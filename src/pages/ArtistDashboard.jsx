@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music2, Film, Image, Zap, Eye } from "lucide-react";
+import { Music2, Film, Image, Zap, Eye, SlidersHorizontal } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
@@ -106,40 +106,26 @@ export default function ArtistDashboard() {
 
       <main className="pt-14">
         <div className="px-4 sm:px-8 lg:px-12 py-5 [&_.mobile-carousel]:!-mx-4">
-          {/* Selector de vista para admin/preview */}
+          {/* Admin: vista previa compacta — no ocupa espacio de contenido */}
           {currentUser?.role === "admin" && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-5 p-3 rounded-xl border border-white/[0.08] bg-white/[0.03]"
-            >
-              <p className="text-xs font-semibold text-white/50 uppercase tracking-widest mb-2">Vista Previa</p>
-              <div className="flex gap-2 flex-wrap">
-                <button
-                  onClick={() => setViewMode(null)}
-                  className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                    viewMode === null 
-                      ? 'border-white/40 bg-white/10 text-white' 
-                      : 'border-white/[0.08] bg-white/[0.03] text-white/40 hover:border-white/20'
-                  }`}
-                >
-                  Real
-                </button>
-                {["artist", "creator", "brand"].map((type) => (
+            <div className="flex justify-end mb-2">
+              <div className="flex items-center gap-1 bg-white/[0.04] border border-white/[0.07] rounded-lg px-1.5 py-1">
+                <SlidersHorizontal className="w-3 h-3 text-white/25 mr-1" />
+                {[{label: "Real", value: null}, {label: "Artista", value: "artist"}, {label: "Creador", value: "creator"}, {label: "Marca", value: "brand"}].map(opt => (
                   <button
-                    key={type}
-                    onClick={() => setViewMode(type)}
-                    className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                      viewMode === type 
-                        ? 'border-white/40 bg-white/10 text-white' 
-                        : 'border-white/[0.08] bg-white/[0.03] text-white/40 hover:border-white/20'
+                    key={String(opt.value)}
+                    onClick={() => setViewMode(opt.value)}
+                    className={`text-[10px] px-2 py-0.5 rounded-md transition-all ${
+                      viewMode === opt.value
+                        ? 'bg-white/15 text-white font-semibold'
+                        : 'text-white/30 hover:text-white/60'
                     }`}
                   >
-                    {type === "artist" ? "Artista" : type === "creator" ? "Creador" : "Marca"}
+                    {opt.label}
                   </button>
                 ))}
               </div>
-            </motion.div>
+            </div>
           )}
 
           {/* Header — selector dinámico según tipo de cuenta */}

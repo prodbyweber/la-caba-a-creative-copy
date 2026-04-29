@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MobileTrackPoster, { MobileAudioProvider } from "./MobileTrackPoster";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Music2, Upload, Edit, Image as ImageIcon, Check, X } from "lucide-react";
@@ -242,9 +242,9 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
       return;
     }
 
-    const validTypes = ['audio/mpeg', 'audio/wav', 'audio/x-wav'];
-    if (!validTypes.includes(file.type)) {
-      alert('Solo se permiten archivos MP3 o WAV');
+    const validTypes = ['audio/mpeg'];
+    if (!validTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.mp3')) {
+      alert('Solo se permiten archivos MP3');
       return;
     }
 
@@ -367,28 +367,31 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
               </div>
             </div>
 
-            {/* Audio Upload */}
+            {/* Audio Upload — solo MP3 */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-3">Archivo de Audio</label>
+              <label className="block text-sm font-medium text-gray-300 mb-3">Archivo de Audio <span className="text-white/30 font-normal">(MP3)</span></label>
               <div className="flex items-center gap-4">
-                <div className="w-32 h-32 rounded-xl bg-gradient-to-br from-emerald-500/20 to-blue-500/20 flex items-center justify-center">
-                  <Music2 className="w-12 h-12 text-white/40" />
+                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-emerald-500/20 to-blue-500/20 flex items-center justify-center flex-shrink-0">
+                  {formData.audio_file_url
+                    ? <Check className="w-8 h-8 text-emerald-400" />
+                    : <Music2 className="w-8 h-8 text-white/40" />
+                  }
                 </div>
                 <div className="flex-1">
                   <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium transition-colors">
                     <Upload className="w-4 h-4" />
-                    {uploadingAudio ? 'Subiendo...' : formData.audio_file_url ? 'Cambiar Audio' : 'Subir Audio'}
+                    {uploadingAudio ? 'Subiendo...' : formData.audio_file_url ? 'Cambiar MP3' : 'Subir MP3'}
                     <input
                       type="file"
-                      accept="audio/mpeg,audio/wav"
+                      accept=".mp3,audio/mpeg"
                       onChange={handleAudioUpload}
                       className="hidden"
                       disabled={uploadingAudio}
                     />
                   </label>
-                  <p className="text-xs text-gray-500 mt-2">MP3 o WAV. Máx 70MB.</p>
+                  <p className="text-xs text-gray-500 mt-2">Solo MP3. Máx 70MB.</p>
                   {formData.audio_file_url && (
-                    <p className="text-xs text-emerald-400 mt-1">✓ Audio cargado</p>
+                    <p className="text-xs text-emerald-400 mt-1">✓ MP3 cargado</p>
                   )}
                 </div>
               </div>
@@ -605,38 +608,23 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
               </label>
             </div>
 
-            {/* Drive Folders */}
-            <div className="space-y-3">
+            {/* Carpeta Drive */}
+            <div className="space-y-2">
               <h4 className="font-semibold text-white flex items-center gap-2">
                 <span className="w-1 h-4 bg-emerald-500 rounded-full" />
-                Links de Drive / Versiones
+                Carpeta de Drive
               </h4>
-              <div className="grid md:grid-cols-2 gap-3">
-                {[
-                  { key: "mp3", label: "MP3" },
-                  { key: "wav_24bit", label: "WAV 24bit" },
-                  { key: "stems", label: "Stems" },
-                  { key: "mix", label: "Mix" },
-                  { key: "master_24bit", label: "Master 24bit" },
-                  { key: "show", label: "Show en vivo" },
-                  { key: "acapella", label: "Acapella" },
-                  { key: "beat_wav", label: "Beat WAV" },
-                ].map(v => (
-                  <div key={v.key}>
-                    <label className="block text-xs font-medium text-gray-400 mb-1">{v.label}</label>
-                    <input
-                      type="text"
-                      value={formData.versions?.[v.key] || ""}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        versions: { ...(formData.versions || {}), [v.key]: e.target.value }
-                      })}
-                      placeholder="https://drive.google.com/..."
-                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-xs placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
-                    />
-                  </div>
-                ))}
-              </div>
+              <p className="text-xs text-white/30">Link a la carpeta de Google Drive con todas las versiones del track (WAV, stems, etc.)</p>
+              <input
+                type="text"
+                value={formData.versions?.drive_folder || ""}
+                onChange={(e) => setFormData({
+                  ...formData,
+                  versions: { drive_folder: e.target.value }
+                })}
+                placeholder="https://drive.google.com/drive/folders/..."
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-xs placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
+              />
             </div>
 
             {/* Notes */}
