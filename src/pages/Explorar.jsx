@@ -63,18 +63,6 @@ export default function Explorar() {
     setGuestLocked(true);
   };
 
-  const { data: landingConfig } = useQuery({
-    queryKey: ["landingConfig"],
-    queryFn: async () => {
-      const configs = await base44.entities.LandingConfig.list();
-      return configs.length > 0 ? configs[0] : null;
-    },
-    enabled: authChecked,
-  });
-
-  // explorar_guest_blocked: si es false (o no está definido), Explorar es público
-  const guestBlocked = landingConfig?.explorar_guest_blocked === true;
-
   const { data: explorarItems, isLoading: loadingItems } = useQuery({
     queryKey: ["explorar-items"],
     queryFn: () => base44.entities.ExplorarItem.filter({ is_active: true }),
@@ -110,6 +98,18 @@ export default function Explorar() {
     queryFn: () => base44.entities.SectionAssignment.list("order"),
     enabled: authChecked,
   });
+
+  const { data: landingConfig } = useQuery({
+    queryKey: ["landingConfig"],
+    queryFn: async () => {
+      const configs = await base44.entities.LandingConfig.list();
+      return configs.length > 0 ? configs[0] : null;
+    },
+    enabled: authChecked,
+  });
+
+  // explorar_guest_blocked: si es false (o no está definido), Explorar es público
+  const guestBlocked = landingConfig?.explorar_guest_blocked === true;
 
   // Mostrar splash solo hasta que auth esté listo y los datos iniciales carguen
   const isLoadingContent = loadingItems || loadingArtists || loadingSections || loadingAssignments;
