@@ -13,13 +13,18 @@ export default function ClipsLibrary({ filters }) {
   const { data: clips = [], isLoading, refetch } = useQuery({
     queryKey: ['clips', filters],
     queryFn: async () => {
-      let query = {};
-      if (filters.status !== "all") query.status = filters.status;
-      if (filters.artist !== "all") query.artist_id = filters.artist;
-      const allClips = await base44.entities.Clip.filter(query, '-created_date');
+      const allClips = await base44.entities.Clip.list('-created_date');
       return allClips.filter(clip => {
         // Filtrar por estado published
         if (clip.status !== "published") return false;
+        
+        // Filtrar por artista (principal o featuring)
+        if (filters.artist !== "all") {
+          const isMainArtist = clip.artist_id === filters.artist;
+          const isFeaturing = clip.featuring_artists?.includes(filters.artist);
+          if (!isMainArtist && !isFeaturing) return false;
+        }
+        
         if (filters.platform?.length > 0 && !filters.platform.some(p => clip.platforms?.includes(p))) return false;
         if (filters.search) {
           const s = filters.search.toLowerCase();

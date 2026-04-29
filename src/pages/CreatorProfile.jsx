@@ -91,6 +91,20 @@ export default function CreatorProfile() {
     enabled: !!artist?.id,
   });
 
+  // Fetch films donde el artista está taggeado en credits
+  const { data: appearingInFilms = [] } = useQuery({
+    queryKey: ["appearing-films", artist?.id],
+    queryFn: async () => {
+      if (!artist?.id) return [];
+      const allItems = await base44.entities.ExplorarItem.list();
+      return allItems.filter(item => 
+        (item.content_type === "film" || item.content_type === "minifilm") &&
+        item.credits?.some(c => c.artist_id === artist.id)
+      );
+    },
+    enabled: !!artist?.id,
+  });
+
   // Toggle follow
   const toggleFollowMutation = useMutation({
     mutationFn: async () => {
@@ -284,6 +298,39 @@ export default function CreatorProfile() {
              </div>
            </div>
          )}
+
+        {/* Aparece en - Films */}
+        {appearingInFilms.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-black mb-6">Aparece en</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {appearingInFilms.map((film) => {
+                const ytId = getYoutubeId(film.youtube_url || film.youtube_music_url);
+                const thumb = film.thumbnail_url || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : "");
+                return (
+                  <motion.div
+                    key={film.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="group relative rounded-xl overflow-hidden bg-gradient-to-br from-white/[0.04] to-white/[0.02] border border-white/[0.08] hover:border-white/15 transition-all cursor-pointer aspect-square"
+                  >
+                    {thumb ? (
+                      <img src={thumb} alt={film.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-orange-500/10 to-transparent">
+                        <Music2 className="w-8 h-8 text-white/10" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+                      <p className="text-xs font-bold text-white line-clamp-2">{film.title}</p>
+                      <p className="text-[10px] text-white/50 mt-1">{film.content_type || "Film"}</p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
