@@ -145,7 +145,7 @@ function CreditsModalInner() {
         exit={{ y: "100%", opacity: 0 }}
         transition={{ duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] }}
         className="relative w-full max-w-lg rounded-t-2xl sm:rounded-2xl overflow-y-auto"
-        style={{ background: "#141414", maxHeight: "92dvh" }}
+        style={{ background: "#141414", maxHeight: "92dvh", scrollbarWidth: "none", msOverflowStyle: "none" }}
         onClick={e => e.stopPropagation()}
       >
         {/* Hero media */}
