@@ -9,7 +9,7 @@ function getYoutubeId(url) {
   return match ? match[1] : null;
 }
 
-function HeroSlide({ item, artist, onExplore, active, cardModalOpen }) {
+function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible }) {
   const ytUrl = item?.youtube_url || item?.youtube_music_url;
   const ytId = getYoutubeId(ytUrl);
   const bg = item?.image || artist?.avatar_url || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80";
@@ -21,14 +21,14 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen }) {
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
-    if (active && !cardModalOpen) {
+    if (active && !cardModalOpen && isVisible) {
       vid.muted = audioEnabled ? false : true;
       setMuted(!audioEnabled);
       vid.play().catch(() => {});
     } else {
       vid.pause();
     }
-  }, [active, cardModalOpen]);
+  }, [active, cardModalOpen, isVisible]);
 
   useEffect(() => {
     const vid = videoRef.current;
@@ -66,6 +66,7 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen }) {
               loop
               playsInline
               preload="auto"
+              data-hero-video
             />
             {/* Audio toggle button — only if audio is enabled for this slide */}
             {audioEnabled && (
@@ -175,6 +176,8 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
   const [showModal, setShowModal] = useState(false);
   const [embedFailed, setEmbedFailed] = useState(false);
   const intervalRef = useRef(null);
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
+  const heroRef = useRef(null);
 
   const heroItems = items.length > 0 ? items : [];
   const current = heroItems[activeIdx];
@@ -210,6 +213,35 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
     resetInterval();
     return () => clearInterval(intervalRef.current);
   }, [heroItems.length]);
+
+  // Intersection Observer para controlar reproducción según visibilidad
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroVisible(entry.isIntersecting && entry.intersectionRatio > 0.5);
+      },
+      { threshold: [0, 0.5] }
+    );
+
+    if (heroRef.current) {
+      observer.observe(heroRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Pausar audio cuando salga de la app web
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        const videos = document.querySelectorAll('[data-hero-video]');
+        videos.forEach(video => video.pause?.());
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   // Pausar video cuando la pestaña no está visible
   useEffect(() => {
@@ -280,7 +312,7 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
       </AnimatePresence>
 
       {/* Hero Carousel */}
-      <div className="relative w-full overflow-hidden" style={{ height: "85vh", minHeight: 520 }}>
+      <div ref={heroRef} className="relative w-full overflow-hidden" style={{ height: "85vh", minHeight: 520 }}>
 
         {/* Todos los slides montados simultáneamente — solo el activo es visible */}
         {heroItems.map((item, idx) => (
@@ -299,6 +331,7 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
               onExplore={() => onExplore && onExplore(item)}
               active={idx === activeIdx && !transitioning}
               cardModalOpen={cardModalOpen}
+              isVisible={isHeroVisible}
             />
           </div>
         ))}
