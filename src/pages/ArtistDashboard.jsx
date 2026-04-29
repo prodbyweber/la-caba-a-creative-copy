@@ -258,7 +258,7 @@ export default function ArtistDashboard() {
               >
                 <div className="space-y-4">
                   <ProjectsSection jlyArtistId={effectiveArtist?.id} />
-                  <TracksSection jlyArtistId={effectiveArtist?.id} />
+                  <TracksSection jlyArtistId={effectiveArtist?.id || artistId} />
                 </div>
               </motion.div>
             )}

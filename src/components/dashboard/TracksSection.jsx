@@ -163,6 +163,7 @@ export default function TracksSection({ jlyArtistId }) {
 }
 
 function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
+  // jlyArtistId es el ID del artista al que se vinculará el track al crearlo
   const [formData, setFormData] = useState(track || {
     title: "",
     project_id: "",
@@ -215,18 +216,20 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
 
   const saveMutation = useMutation({
     mutationFn: (data) => {
+      // Limpiar campos vacíos para no enviar strings vacíos a la BD
+      const clean = Object.fromEntries(
+        Object.entries(data).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
+      );
       if (track) {
-        return base44.entities.Track.update(track.id, data);
+        return base44.entities.Track.update(track.id, clean);
       } else {
-        // Incluir artist_id via jlyArtistId para que el track aparezca en el dashboard del artista
-        // El track se vincula al artista a través del proyecto, pero guardamos artist_id directo si no hay proyecto
-        return base44.entities.Track.create({ ...data, artist_id: jlyArtistId || data.artist_id });
+        // Siempre incluir artist_id del artista activo
+        return base44.entities.Track.create({ ...clean, artist_id: jlyArtistId });
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
       queryClient.invalidateQueries({ queryKey: ['tracks'] });
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
       onClose();
     },
   });
