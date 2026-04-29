@@ -214,6 +214,8 @@ export default function OnboardingForm({ user, onComplete }) {
       profileData.username = form.username;
       await base44.entities.UserProfile.create(profileData);
       onComplete();
+      // Redirigir a Explorar después del registro
+      window.location.href = '/Explorar';
     } finally {
       setLoading(false);
     }
