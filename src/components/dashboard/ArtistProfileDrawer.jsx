@@ -435,7 +435,7 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                  </div>
                  <div className="flex items-center gap-2 flex-shrink-0">
                    {userProfile?.username && (
-                     <button onClick={() => navigate(`/creator/${userProfile.username}`)}
+                     <button onClick={() => window.open(`/creator/${userProfile.username}`, "_blank")}
                        className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/30 hover:border-orange-500/60 hover:bg-orange-500/15 text-orange-400 hover:text-orange-300 text-xs font-semibold transition-all"
                        title="Ver perfil público">
                        <Users className="w-4 h-4" />
