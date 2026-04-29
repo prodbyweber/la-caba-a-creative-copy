@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Edit, Trash2, Copy, Calendar, Youtube, Instagram, Music2, ChevronDown, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -6,6 +6,12 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import EditClipModal from "./EditClipModal.jsx";
 import ClipPreviewModal from "./ClipPreviewModal.jsx";
+
+function getYoutubeId(url) {
+  if (!url) return null;
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return match ? match[1] : null;
+}
 
 const STOCK_THUMBS = [
   "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=700&fit=crop&q=80",
@@ -117,10 +123,14 @@ export default function NetflixClipCard({ clip, index, onUpdate, isFirst }) {
   const [hovered, setHovered] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
+  const previewRef = useRef(null);
 
   const thumb = clip.thumbnail_url || STOCK_THUMBS[index % STOCK_THUMBS.length];
   const status = statusConfig[clip.status] || statusConfig.draft;
+  
+  // Detectar YouTube URL
+  const youtubeUrl = clip.file_url && getYoutubeId(clip.file_url) ? clip.file_url : null;
+  const ytId = youtubeUrl ? getYoutubeId(youtubeUrl) : null;
 
   const handleDelete = async () => {
     if (confirm("¿Eliminar este clip?")) {
@@ -150,7 +160,7 @@ export default function NetflixClipCard({ clip, index, onUpdate, isFirst }) {
           transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="rounded-xl cursor-pointer shadow-2xl"
           style={{ width: 240, transformOrigin: isFirst ? "left center" : "center center", overflow: "visible" }}
-          onClick={() => setPreviewOpen(true)}
+          onClick={() => setShowDetail(true)}
         >
           <div className="rounded-xl overflow-hidden" style={{ background: "#1a1a1c" }}>
             {/* Cover */}
@@ -162,6 +172,24 @@ export default function NetflixClipCard({ clip, index, onUpdate, isFirst }) {
               >
                 <img src={thumb} alt={clip.title} className="w-full h-full object-cover" />
               </motion.div>
+
+              {/* Preview overlay — YouTube embed on hover */}
+              <AnimatePresence>
+                {hovered && ytId && (
+                  <motion.div
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="absolute inset-0"
+                  >
+                    <iframe
+                      src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${ytId}`}
+                      className="w-full h-full border-0"
+                      allow="autoplay"
+                      style={{ pointerEvents: "none" }}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
 
@@ -256,7 +284,6 @@ export default function NetflixClipCard({ clip, index, onUpdate, isFirst }) {
       </AnimatePresence>
 
       {editOpen && <EditClipModal clip={clip} onClose={() => setEditOpen(false)} onUpdate={onUpdate} />}
-      {previewOpen && !showDetail && <ClipPreviewModal clip={clip} onClose={() => setPreviewOpen(false)} />}
     </>
   );
 }
