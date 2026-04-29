@@ -68,6 +68,7 @@ export default function GalleryUploadButton({ projectRaw, currentUser, onUploade
       setOpen(false);
       setPreview(null);
       setCaption("");
+      setYtUrl("");
       setRestricted(false);
       onUploaded?.();
     } finally {

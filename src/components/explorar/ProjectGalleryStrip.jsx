@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Images, Lock } from "lucide-react";
+import { Images, Lock, Trash2 } from "lucide-react";
 import GalleryUploadButton from "@/components/explorar/GalleryUploadButton";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -94,6 +94,11 @@ function GalleryCell({ item }) {
   );
 }
 
+async function deleteGalleryItem(projectRaw, itemId) {
+  const updatedGallery = (projectRaw.gallery || []).filter(g => g.id !== itemId);
+  await base44.entities.ExplorarItem.update(projectRaw.id, { gallery: updatedGallery });
+}
+
 export default function ProjectGalleryStrip({
   gallery, projectRaw, currentUser, linkedArtistId, onOpenFeed, onUploaded
 }) {
@@ -108,6 +113,12 @@ export default function ProjectGalleryStrip({
   if (visibleGallery.length === 0 && !canAdd) return null;
 
   const hasRestricted = hasAny && gallery.some(g => g.restricted) && !currentUser;
+
+  const handleDelete = async (e, item) => {
+    e.stopPropagation();
+    await deleteGalleryItem(projectRaw, item.id);
+    onUploaded?.(); // reuse same callback to trigger refetch
+  };
 
   return (
     <motion.div
@@ -137,13 +148,28 @@ export default function ProjectGalleryStrip({
         )}
       </div>
 
-      {/* All thumbnails (no limit, no +N card) + inline add button */}
+      {/* All thumbnails + inline add button */}
       <div className="flex gap-1.5 items-stretch flex-wrap">
-        {visibleGallery.map((item, i) => (
-          <button key={item.id || i} onClick={onOpenFeed} className="p-0 border-0 bg-transparent">
-            <GalleryCell item={item} />
-          </button>
-        ))}
+        {visibleGallery.map((item, i) => {
+          const isOwn = currentUser && item.uploader_user_id === currentUser.id;
+          return (
+            <div key={item.id || i} className="relative group">
+              <button onClick={onOpenFeed} className="p-0 border-0 bg-transparent">
+                <GalleryCell item={item} />
+              </button>
+              {/* Delete button — only visible for own uploads */}
+              {isOwn && (
+                <button
+                  onClick={(e) => handleDelete(e, item)}
+                  className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-red-900/80"
+                  title="Eliminar"
+                >
+                  <Trash2 className="w-2.5 h-2.5 text-white/80" />
+                </button>
+              )}
+            </div>
+          );
+        })}
 
         {/* Inline add button — only for tagged users */}
         {canAdd && (
