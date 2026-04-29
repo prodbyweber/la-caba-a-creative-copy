@@ -36,7 +36,7 @@ export default function CreatorProfile() {
     enabled: !!username,
   });
 
-  // Fetch linked artist
+  // Fetch linked artist by user_id
   const { data: artist } = useQuery({
     queryKey: ["creator-artist", userProfile?.user_id],
     queryFn: async () => {
@@ -64,15 +64,26 @@ export default function CreatorProfile() {
     enabled: !!currentUser?.id && !!userProfile?.user_id,
   });
 
-  // Fetch explorer items (projects/content)
+  // Fetch projects/explorar items from BOTH artist AND userProfile routes
   const { data: explorarItems = [] } = useQuery({
-    queryKey: ["creator-content", artist?.id],
+    queryKey: ["creator-content", artist?.id, userProfile?.id],
     queryFn: async () => {
-      if (!artist?.id) return [];
-      const items = await base44.entities.ExplorarItem.filter({ artist_id: artist.id });
-      return items;
+      const items = [];
+      // Si hay artista vinculado, obtener sus proyectos
+      if (artist?.id) {
+        const artistItems = await base44.entities.ExplorarItem.filter({ artist_id: artist.id });
+        items.push(...artistItems);
+      }
+      // También obtener items donde el userProfile es el creador directo
+      if (userProfile?.id) {
+        const userItems = await base44.entities.ExplorarItem.filter({ user_profile_id: userProfile.id });
+        items.push(...userItems);
+      }
+      // Remover duplicados
+      const uniqueItems = Array.from(new Map(items.map(item => [item.id, item])).values());
+      return uniqueItems.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
     },
-    enabled: !!artist?.id,
+    enabled: !!artist?.id || !!userProfile?.id,
   });
 
   // Toggle follow
