@@ -571,6 +571,35 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
 
           {activeTab === "schedule" && (
             <div className="space-y-6">
+              {/* Status */}
+              <div>
+                <label className="text-sm font-medium text-gray-400 mb-3 block">
+                  Estado del clip
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {["draft", "scheduled", "published"].map(status => (
+                    <button
+                      key={status}
+                      onClick={() => setFormData({ ...formData, status })}
+                      className={`p-3 rounded-xl border-2 transition-all font-medium text-sm ${
+                        formData.status === status
+                          ? "bg-purple-500/20 border-purple-500/50 text-purple-300"
+                          : "bg-white/5 border-white/10 hover:border-white/20 text-gray-400"
+                      }`}
+                    >
+                      {status === "draft" && "Borrador"}
+                      {status === "scheduled" && "Programado"}
+                      {status === "published" && "Publicado"}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  {formData.status === "draft" && "Visible solo para ti en el dashboard"}
+                  {formData.status === "scheduled" && "Se publicará automáticamente en la fecha programada"}
+                  {formData.status === "published" && "Visible en tu perfil público y en el catálogo"}
+                </p>
+              </div>
+
               {/* Platforms */}
               <div>
                 <label className="text-sm font-medium text-gray-400 mb-3 block">

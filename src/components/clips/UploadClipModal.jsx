@@ -82,7 +82,7 @@ export default function UploadClipModal({ onClose, artistId: passedArtistId }) {
         file_url: youtubeUrl,
         thumbnail_url: activeThumb || ytThumb || "",
         clip_id: Math.random().toString(36).slice(2, 7),
-        status: "draft",
+        status: "published",
         platforms: [],
         hashtags: [],
         tags: [],
