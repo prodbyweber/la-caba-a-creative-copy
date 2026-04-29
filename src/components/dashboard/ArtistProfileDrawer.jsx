@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2, ExternalLink as LinkIcon } from "lucide-react";
+import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2, Globe } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
@@ -415,23 +415,32 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
               {/* ── NAME ROW (offset to leave room for avatar) ── */}
               <div className="px-5 pt-14 pb-4 flex items-start justify-between flex-shrink-0">
                 <div>
-                  <p className="text-white font-bold text-lg leading-tight">{displayName}</p>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    {nationality && COUNTRY_ISO[nationality] && (
-                      <img src={`https://flagcdn.com/w20/${COUNTRY_ISO[nationality]}.png`} alt={nationality}
-                        className="w-4 h-3 rounded-sm object-cover opacity-70" />
-                    )}
-                    {residence && COUNTRY_ISO[residence] && residence !== nationality && (
-                      <img src={`https://flagcdn.com/w20/${COUNTRY_ISO[residence]}.png`} alt={residence}
-                        className="w-4 h-3 rounded-sm object-cover opacity-70" />
-                    )}
-                    {nationality && <span className="text-white/30 text-xs">{nationality}</span>}
-                  </div>
-                </div>
-                <button onClick={openEdit}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/5 text-white/40 hover:text-white text-xs font-medium transition-all flex-shrink-0">
-                  <Edit2 className="w-3.5 h-3.5" /> Editar
-                </button>
+                   <p className="text-white font-bold text-lg leading-tight">{displayName}</p>
+                   <div className="flex items-center gap-1.5 mt-1">
+                     {nationality && COUNTRY_ISO[nationality] && (
+                       <img src={`https://flagcdn.com/w20/${COUNTRY_ISO[nationality]}.png`} alt={nationality}
+                         className="w-4 h-3 rounded-sm object-cover opacity-70" />
+                     )}
+                     {residence && COUNTRY_ISO[residence] && residence !== nationality && (
+                       <img src={`https://flagcdn.com/w20/${COUNTRY_ISO[residence]}.png`} alt={residence}
+                         className="w-4 h-3 rounded-sm object-cover opacity-70" />
+                     )}
+                     {nationality && <span className="text-white/30 text-xs">{nationality}</span>}
+                   </div>
+                 </div>
+                 <div className="flex items-center gap-2 flex-shrink-0">
+                   {userProfile?.username && (
+                     <a href={`https://cabanacreative.es/${userProfile.username}`} target="_blank" rel="noopener noreferrer"
+                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-orange-500/30 hover:bg-orange-500/10 text-orange-400 hover:text-orange-300 text-xs font-medium transition-all"
+                       title="Ver perfil público">
+                       <Globe className="w-3.5 h-3.5" />
+                     </a>
+                   )}
+                   <button onClick={openEdit}
+                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/5 text-white/40 hover:text-white text-xs font-medium transition-all">
+                     <Edit2 className="w-3.5 h-3.5" /> Editar
+                   </button>
+                 </div>
               </div>
 
               {/* ── TABS ── */}
