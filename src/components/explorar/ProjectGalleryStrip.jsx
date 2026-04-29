@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Images, Lock, Plus } from "lucide-react";
+import { Images, Lock } from "lucide-react";
 import GalleryUploadButton from "@/components/explorar/GalleryUploadButton";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -22,7 +22,16 @@ function hasGalleryAccess(galleryItem, projectRaw, currentUser, linkedArtistId) 
   return false;
 }
 
-// Mini uploader profile badge on each cell
+// Only users actually tagged (credited or main artist) can add — plus admins
+function canUserAdd(currentUser, linkedArtistId, projectRaw) {
+  if (!currentUser) return false;
+  if (currentUser.role === "admin") return true;
+  if (!linkedArtistId) return false;
+  if (projectRaw?.artist_id === linkedArtistId) return true;
+  if ((projectRaw?.credits || []).some(c => c.artist_id === linkedArtistId)) return true;
+  return false;
+}
+
 function UploaderBadge({ uploaderUserId }) {
   const { data: profile } = useQuery({
     queryKey: ["uploader-badge", uploaderUserId],
@@ -48,7 +57,6 @@ function UploaderBadge({ uploaderUserId }) {
           : <span className="text-[7px] font-black text-white/70">{initials}</span>
         }
       </div>
-      {/* Orange verified dot */}
       <div className="w-2.5 h-2.5 rounded-full flex-shrink-0 flex items-center justify-center"
         style={{ background: "#ff5833" }}>
         <svg className="w-1.5 h-1.5" fill="white" viewBox="0 0 24 24">
@@ -89,25 +97,16 @@ function GalleryCell({ item }) {
 export default function ProjectGalleryStrip({
   gallery, projectRaw, currentUser, linkedArtistId, onOpenFeed, onUploaded
 }) {
-  const canAdd = !!currentUser && (
-    currentUser.role === "admin" ||
-    (linkedArtistId && (
-      projectRaw?.artist_id === linkedArtistId ||
-      (projectRaw?.credits || []).some(c => c.artist_id === linkedArtistId)
-    ))
-  );
+  const canAdd = canUserAdd(currentUser, linkedArtistId, projectRaw);
 
   const hasAny = gallery && gallery.length > 0;
   const visibleGallery = hasAny
     ? gallery.filter(g => hasGalleryAccess(g, projectRaw, currentUser, linkedArtistId))
     : [];
 
-  // Show section if there's content OR if user can add
   if (!hasAny && !canAdd) return null;
   if (visibleGallery.length === 0 && !canAdd) return null;
 
-  const preview = visibleGallery.slice(0, 4);
-  const remaining = visibleGallery.length - preview.length;
   const hasRestricted = hasAny && gallery.some(g => g.restricted) && !currentUser;
 
   return (
@@ -128,33 +127,25 @@ export default function ProjectGalleryStrip({
             </span>
           )}
         </div>
-        <button
-          onClick={onOpenFeed}
-          className="text-[10px] text-white/30 hover:text-white/60 transition-colors underline underline-offset-2"
-        >
-          Ver todo
-        </button>
-      </div>
-
-      {/* Thumbnails row + inline add button */}
-      <div className="flex gap-1.5 items-stretch overflow-hidden">
         {visibleGallery.length > 0 && (
-          <button onClick={onOpenFeed} className="contents">
-            {preview.map((item, i) => (
-              <GalleryCell key={item.id || i} item={item} />
-            ))}
-            {remaining > 0 && (
-              <div
-                className="flex-shrink-0 rounded-lg flex items-center justify-center bg-white/[0.05] border border-white/[0.08] text-white/30 text-xs font-bold"
-                style={{ width: 52, height: 74 }}
-              >
-                +{remaining}
-              </div>
-            )}
+          <button
+            onClick={onOpenFeed}
+            className="text-[10px] text-white/30 hover:text-white/60 transition-colors underline underline-offset-2"
+          >
+            Ver todo
           </button>
         )}
+      </div>
 
-        {/* Inline add button — same size as cells */}
+      {/* All thumbnails (no limit, no +N card) + inline add button */}
+      <div className="flex gap-1.5 items-stretch flex-wrap">
+        {visibleGallery.map((item, i) => (
+          <button key={item.id || i} onClick={onOpenFeed} className="p-0 border-0 bg-transparent">
+            <GalleryCell item={item} />
+          </button>
+        ))}
+
+        {/* Inline add button — only for tagged users */}
         {canAdd && (
           <GalleryUploadButton
             projectRaw={projectRaw}
