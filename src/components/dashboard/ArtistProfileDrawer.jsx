@@ -1,6 +1,5 @@
 import React, { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2, Share2, Users } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -209,7 +208,6 @@ function SocialRow({ platform, url, onEdit, onRemove }) {
 
 // ── Main Drawer ────────────────────────────────────────────────────────────
 export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClose }) {
-  const navigate = useNavigate();
   const [tab, setTab] = useState("profile"); // "profile" | "social" | "sessions"
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(null);
@@ -435,12 +433,12 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                  </div>
                  <div className="flex items-center gap-2 flex-shrink-0">
                    {userProfile?.username && (
-                     <button onClick={() => window.open(`/creator/${userProfile.username}`, "_blank")}
+                     <a href={`https://cabanacreative.es/${userProfile.username}`} target="_blank" rel="noopener noreferrer"
                        className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/30 hover:border-orange-500/60 hover:bg-orange-500/15 text-orange-400 hover:text-orange-300 text-xs font-semibold transition-all"
                        title="Ver perfil público">
                        <Users className="w-4 h-4" />
                        <span className="hidden sm:inline">Perfil</span>
-                     </button>
+                     </a>
                    )}
                    <button onClick={openEdit}
                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/20 hover:bg-white/5 text-white/40 hover:text-white text-xs font-medium transition-all">

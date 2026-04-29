@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { motion, AnimatePresence } from "framer-motion";
-import { Heart, Share2, User, MapPin, Users, Plus, X, Music2 } from "lucide-react";
+import { motion } from "framer-motion";
+import { Heart, Share2, User, MapPin, Users, Plus, X } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const COUNTRY_ISO = {
@@ -19,7 +19,6 @@ export default function CreatorProfile() {
   const { username } = useParams();
   const [currentUser, setCurrentUser] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
-  const [selectedMedia, setSelectedMedia] = useState(null);
   const qc = useQueryClient();
 
   useEffect(() => {
@@ -36,7 +35,7 @@ export default function CreatorProfile() {
     enabled: !!username,
   });
 
-  // Fetch linked artist by user_id
+  // Fetch linked artist
   const { data: artist } = useQuery({
     queryKey: ["creator-artist", userProfile?.user_id],
     queryFn: async () => {
@@ -64,26 +63,15 @@ export default function CreatorProfile() {
     enabled: !!currentUser?.id && !!userProfile?.user_id,
   });
 
-  // Fetch projects/explorar items from BOTH artist AND userProfile routes
+  // Fetch explorer items (projects/content)
   const { data: explorarItems = [] } = useQuery({
-    queryKey: ["creator-content", artist?.id, userProfile?.id],
+    queryKey: ["creator-content", artist?.id],
     queryFn: async () => {
-      const items = [];
-      // Si hay artista vinculado, obtener sus proyectos
-      if (artist?.id) {
-        const artistItems = await base44.entities.ExplorarItem.filter({ artist_id: artist.id });
-        items.push(...artistItems);
-      }
-      // También obtener items donde el userProfile es el creador directo
-      if (userProfile?.id) {
-        const userItems = await base44.entities.ExplorarItem.filter({ user_profile_id: userProfile.id });
-        items.push(...userItems);
-      }
-      // Remover duplicados
-      const uniqueItems = Array.from(new Map(items.map(item => [item.id, item])).values());
-      return uniqueItems.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+      if (!artist?.id) return [];
+      const items = await base44.entities.ExplorarItem.filter({ artist_id: artist.id });
+      return items;
     },
-    enabled: !!artist?.id || !!userProfile?.id,
+    enabled: !!artist?.id,
   });
 
   // Toggle follow
@@ -217,7 +205,7 @@ export default function CreatorProfile() {
           </div>
         )}
 
-        {/* Projects Grid — Spotify-style banners */}
+        {/* Projects Grid */}
         <div>
           <h2 className="text-2xl font-black mb-6">Proyectos</h2>
           {explorarItems.length === 0 ? (
@@ -225,138 +213,32 @@ export default function CreatorProfile() {
               <p className="text-white/40 text-sm">Sin proyectos aún</p>
             </div>
           ) : (
-            <div className="space-y-6">
-              {explorarItems.map((item, idx) => {
-                const hasGallery = item.gallery && item.gallery.length > 0;
-                const galleryImages = hasGallery ? item.gallery.filter(g => g.type === "image") : [];
-                const galleryVideos = hasGallery ? item.gallery.filter(g => g.type === "youtube_short") : [];
-                
-                return (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="group relative rounded-2xl overflow-hidden bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-white/10 hover:border-white/30 transition-all"
-                  >
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-0">
-                      {/* Main banner */}
-                      <div className="sm:col-span-2 relative h-48 sm:h-64 overflow-hidden bg-black/40">
-                        {item.thumbnail_url ? (
-                          <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        ) : item.preview_media_url ? (
-                          <img src={item.preview_media_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/10 to-pink-500/10">
-                            <Music2 className="w-16 h-16 text-white/10" />
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
-                      </div>
-
-                      {/* Info side */}
-                      <div className="p-6 sm:p-8 flex flex-col justify-between bg-gradient-to-br from-white/5 to-transparent">
-                        <div>
-                          <p className="text-xs text-white/50 uppercase tracking-widest mb-2">{item.content_type || "Proyecto"}</p>
-                          <h3 className="text-xl sm:text-2xl font-black mb-2 line-clamp-3">{item.title}</h3>
-                          {item.description && <p className="text-sm text-white/60 line-clamp-2">{item.description}</p>}
-                          {item.genres && item.genres.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 mt-3">
-                              {item.genres.slice(0, 3).map(g => (
-                                <span key={g} className="text-xs px-2 py-1 rounded-full bg-white/10 text-white/70">{g}</span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Gallery strip */}
-                    {hasGallery && (
-                      <div className="border-t border-white/10 p-4 bg-black/20">
-                        <p className="text-xs text-white/50 uppercase tracking-widest mb-3">Galería</p>
-                        <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
-                          {galleryImages.map((img, i) => (
-                            <button
-                              key={`img-${i}`}
-                              onClick={() => setSelectedMedia({ type: "image", url: img.url, caption: img.caption })}
-                              className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border border-white/10 hover:border-white/30 transition-all hover:scale-105"
-                            >
-                              <img src={img.url} alt="" className="w-full h-full object-cover" />
-                            </button>
-                          ))}
-                          {galleryVideos.map((vid, i) => {
-                            const youtubeId = vid.url?.match(/(?:youtube\.com\/shorts\/|youtu\.be\/)([^\?&]+)/)?.[1];
-                            return youtubeId ? (
-                              <button
-                                key={`vid-${i}`}
-                                onClick={() => setSelectedMedia({ type: "youtube", videoId: youtubeId, caption: vid.caption })}
-                                className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border border-white/10 hover:border-white/30 transition-all hover:scale-105 relative"
-                              >
-                                <img src={`https://img.youtube.com/vi/${youtubeId}/mqdefault.jpg`} alt="" className="w-full h-full object-cover" />
-                                <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/20 transition-colors">
-                                  <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">▶</div>
-                                </div>
-                              </button>
-                            ) : null;
-                          })}
-                        </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {explorarItems.map((item) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="group rounded-xl overflow-hidden bg-white/[0.04] border border-white/[0.08] hover:border-white/20 transition-all cursor-pointer"
+                >
+                  <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-purple-500/10 to-transparent">
+                    {item.thumbnail_url ? (
+                      <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <User className="w-12 h-12 text-white/10" />
                       </div>
                     )}
-                  </motion.div>
-                );
-              })}
+                  </div>
+                  <div className="p-3">
+                    <h3 className="font-bold text-sm line-clamp-2 group-hover:text-white/80 transition-colors">{item.title}</h3>
+                    <p className="text-xs text-white/40 mt-1">{item.content_type || "Proyecto"}</p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           )}
         </div>
-
-        {/* Media Viewer Modal */}
-        <AnimatePresence>
-          {selectedMedia && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedMedia(null)}
-              className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
-            >
-              <motion.div
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.95 }}
-                onClick={e => e.stopPropagation()}
-                className="relative max-w-4xl w-full"
-              >
-                <button
-                  onClick={() => setSelectedMedia(null)}
-                  className="absolute -top-10 right-0 text-white/60 hover:text-white transition-colors"
-                >
-                  <X className="w-8 h-8" />
-                </button>
-                
-                {selectedMedia.type === "image" && (
-                  <img src={selectedMedia.url} alt="" className="w-full rounded-xl" />
-                )}
-                
-                {selectedMedia.type === "youtube" && (
-                  <div className="relative pb-[56.25%] h-0 overflow-hidden rounded-xl bg-black">
-                    <iframe
-                      className="absolute top-0 left-0 w-full h-full"
-                      src={`https://www.youtube.com/embed/${selectedMedia.videoId}`}
-                      title="YouTube video"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                )}
-                
-                {selectedMedia.caption && (
-                  <p className="mt-4 text-center text-white/70 text-sm">{selectedMedia.caption}</p>
-                )}
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </div>
   );
