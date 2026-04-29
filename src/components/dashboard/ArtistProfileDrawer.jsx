@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2, Share2 } from "lucide-react";
+import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2, Share2, Users } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
@@ -414,9 +414,9 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
 
               {/* ── NAME ROW (offset to leave room for avatar) ── */}
               <div className="px-5 pt-14 pb-4 flex items-start justify-between flex-shrink-0">
-                <div>
+                <div className="flex-1">
                    <p className="text-white font-bold text-lg leading-tight">{displayName}</p>
-                   <div className="flex items-center gap-1.5 mt-1">
+                   <div className="flex items-center gap-1.5 mt-2">
                      {nationality && COUNTRY_ISO[nationality] && (
                        <img src={`https://flagcdn.com/w20/${COUNTRY_ISO[nationality]}.png`} alt={nationality}
                          className="w-4 h-3 rounded-sm object-cover opacity-70" />
@@ -427,17 +427,21 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                      )}
                      {nationality && <span className="text-white/30 text-xs">{nationality}</span>}
                    </div>
+                   {userProfile?.username && (
+                     <p className="text-[11px] text-white/40 mt-1.5">@{userProfile.username}</p>
+                   )}
                  </div>
                  <div className="flex items-center gap-2 flex-shrink-0">
                    {userProfile?.username && (
                      <a href={`https://cabanacreative.es/${userProfile.username}`} target="_blank" rel="noopener noreferrer"
-                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-red-500/30 hover:bg-red-500/10 text-red-400 hover:text-red-300 text-xs font-medium transition-all"
+                       className="flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/30 hover:border-orange-500/60 hover:bg-orange-500/15 text-orange-400 hover:text-orange-300 text-xs font-semibold transition-all"
                        title="Ver perfil público">
-                       <Share2 className="w-3.5 h-3.5" />
+                       <Users className="w-4 h-4" />
+                       <span className="hidden sm:inline">Perfil</span>
                      </a>
                    )}
                    <button onClick={openEdit}
-                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/5 text-white/40 hover:text-white text-xs font-medium transition-all">
+                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/20 hover:bg-white/5 text-white/40 hover:text-white text-xs font-medium transition-all">
                      <Edit2 className="w-3.5 h-3.5" /> Editar
                    </button>
                  </div>
