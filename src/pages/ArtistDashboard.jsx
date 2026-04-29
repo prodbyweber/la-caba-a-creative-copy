@@ -14,16 +14,29 @@ import PhotosGallery from "@/components/dashboard/PhotosGallery";
 
 export default function ArtistDashboard() {
   const [showProfileDrawer, setShowProfileDrawer] = useState(false);
-  const [catalogMode, setCatalogMode] = useState(null); // se asigna dinámicamente
+  const [catalogMode, setCatalogMode] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
-  const [viewMode, setViewMode] = useState(null); // null = real, "artist" | "creator" | "brand" = preview
+  const [viewMode, setViewMode] = useState(null);
 
   const urlParams = new URLSearchParams(window.location.search);
-  const artistId = urlParams.get("artistId") || urlParams.get("id");
+  const artistIdParam = urlParams.get("artistId") || urlParams.get("id");
 
   useEffect(() => {
     base44.auth.me().then(u => setCurrentUser(u)).catch(() => {});
   }, []);
+
+  // Si no hay artistId en URL, buscar artista vinculado al usuario actual
+  const { data: selfArtist } = useQuery({
+    queryKey: ['self-artist', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      const artists = await base44.entities.Artist.filter({ user_id: currentUser.id });
+      return artists[0] || null;
+    },
+    enabled: !!currentUser?.id && !artistIdParam,
+  });
+
+  const artistId = artistIdParam || selfArtist?.id;
 
   const clipsFilters = {
     status: "all",
@@ -36,19 +49,23 @@ export default function ArtistDashboard() {
   const { data: artist, isLoading } = useQuery({
     queryKey: ['artist', artistId],
     queryFn: async () => {
+      if (!artistId) return null;
       const artists = await base44.entities.Artist.list();
-      return artists.find(a => a.id === artistId);
+      return artists.find(a => a.id === artistId) || null;
     },
-    enabled: !!artistId
+    enabled: !!artistId,
   });
 
+  // UserProfile: buscar por user_id del artista, o por el usuario actual
   const { data: userProfile } = useQuery({
-    queryKey: ['userProfile', artist?.user_id],
+    queryKey: ['userProfile', artist?.user_id || currentUser?.id],
     queryFn: async () => {
-      const profiles = await base44.entities.UserProfile.list();
-      return profiles.find(p => p.user_id === artist?.user_id) || null;
+      const uid = artist?.user_id || currentUser?.id;
+      if (!uid) return null;
+      const profiles = await base44.entities.UserProfile.filter({ user_id: uid });
+      return profiles[0] || null;
     },
-    enabled: !!artist?.user_id
+    enabled: !!(artist?.user_id || currentUser?.id),
   });
 
   // Determinar qué secciones mostrar según el tipo de cuenta
@@ -71,7 +88,9 @@ export default function ArtistDashboard() {
     }
   }, [userProfile, accountType, catalogMode]);
 
-  if (isLoading) {
+  // Mostrar loading mientras resolvemos artista
+  const resolving = !artistIdParam && !selfArtist && !currentUser;
+  if (isLoading || resolving) {
     return (
       <div className="min-h-screen bg-[#0a0a0b] text-white">
         <DashboardNav />
@@ -85,7 +104,9 @@ export default function ArtistDashboard() {
     );
   }
 
-  if (!artist) {
+  // Si aún no hay artista pero sí hay usuario, mostramos el dashboard igual (para admin sin artista vinculado)
+  // Solo mostramos "no encontrado" si se pasó artistId explícito y no existe
+  if (!artist && artistIdParam) {
     return (
       <div className="min-h-screen bg-[#0a0a0b] text-white">
         <DashboardNav />
@@ -98,10 +119,14 @@ export default function ArtistDashboard() {
     );
   }
 
+  // Artista efectivo — puede ser null para admin sin artista vinculado
+  const effectiveArtist = artist || null;
+  const displayName = effectiveArtist?.stageName || userProfile?.artist_name || userProfile?.display_name || currentUser?.full_name || "Dashboard";
+
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
-      <DashboardNav artistName={artist.stageName} artistId={artist.id}>
-        <ArtistAvatarButton artist={artist} onClick={() => setShowProfileDrawer(true)} />
+      <DashboardNav artistName={displayName} artistId={effectiveArtist?.id}>
+        <ArtistAvatarButton artist={effectiveArtist || { stageName: displayName, avatar_url: userProfile?.profile_photo_url || userProfile?.avatar_url }} onClick={() => setShowProfileDrawer(true)} />
       </DashboardNav>
 
       <main className="pt-14">
@@ -232,8 +257,8 @@ export default function ArtistDashboard() {
                 transition={{ duration: 0.25 }}
               >
                 <div className="space-y-4">
-                  <ProjectsSection jlyArtistId={artist.id} />
-                  <TracksSection jlyArtistId={artist.id} />
+                  <ProjectsSection jlyArtistId={effectiveArtist?.id} />
+                  <TracksSection jlyArtistId={effectiveArtist?.id} />
                 </div>
               </motion.div>
             )}
@@ -276,7 +301,7 @@ export default function ArtistDashboard() {
                   <BrandCampaignsSection userProfileId={userProfile?.id} />
                   <div className="pt-4 border-t border-white/10">
                     <h3 className="text-lg font-bold text-white mb-4">Proyectos y contenido</h3>
-                    <ProjectsSection jlyArtistId={artist.id} />
+                    <ProjectsSection jlyArtistId={effectiveArtist?.id} />
                   </div>
                 </div>
               </motion.div>
@@ -301,7 +326,7 @@ export default function ArtistDashboard() {
       </main>
 
       <ArtistProfileDrawer
-        artist={artist}
+        artist={effectiveArtist}
         userProfile={userProfile}
         isOpen={showProfileDrawer}
         onClose={() => setShowProfileDrawer(false)}

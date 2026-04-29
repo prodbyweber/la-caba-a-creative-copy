@@ -32,13 +32,14 @@ export default function TracksSection({ jlyArtistId }) {
     : allProjects;
 
   // Filtrar tracks del artista: por proyecto O por artist_id directo
+  // Si no hay jlyArtistId, mostrar todos (admin sin artista vinculado)
   const tracks = jlyArtistId
     ? allTracks.filter(track => {
         if (track.artist_id === jlyArtistId) return true;
         const project = allProjects.find(p => p.id === track.project_id);
         return project && project.artist_id === jlyArtistId;
       })
-    : allTracks;
+    : allTracks.slice(0, 50);
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Track.delete(id),

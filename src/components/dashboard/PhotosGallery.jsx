@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -7,21 +7,37 @@ import { Upload, Trash2, Loader2 } from "lucide-react";
 export default function PhotosGallery({ userProfileId }) {
   const qc = useQueryClient();
   const [uploading, setUploading] = useState(false);
+  const [resolvedProfileId, setResolvedProfileId] = useState(userProfileId);
+
+  // Si no hay userProfileId, intentar resolverlo desde el usuario actual
+  useEffect(() => {
+    if (!userProfileId) {
+      base44.auth.me().then(async (u) => {
+        if (!u?.id) return;
+        const profiles = await base44.entities.UserProfile.filter({ user_id: u.id });
+        if (profiles[0]?.id) setResolvedProfileId(profiles[0].id);
+      }).catch(() => {});
+    } else {
+      setResolvedProfileId(userProfileId);
+    }
+  }, [userProfileId]);
+
+  const activeProfileId = resolvedProfileId;
 
   const { data: userProfile } = useQuery({
-    queryKey: ["user-profile-photos", userProfileId],
+    queryKey: ["user-profile-photos", activeProfileId],
     queryFn: async () => {
-      if (!userProfileId) return null;
-      const profiles = await base44.entities.UserProfile.list();
-      return profiles.find(p => p.id === userProfileId);
+      if (!activeProfileId) return null;
+      const profiles = await base44.entities.UserProfile.filter({ id: activeProfileId });
+      return profiles[0] || null;
     },
-    enabled: !!userProfileId,
+    enabled: !!activeProfileId,
     staleTime: 0,
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: (data) => base44.entities.UserProfile.update(userProfileId, data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["user-profile-photos", userProfileId] }),
+    mutationFn: (data) => base44.entities.UserProfile.update(activeProfileId, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["user-profile-photos", activeProfileId] }),
   });
 
   const handleUpload = async (file) => {

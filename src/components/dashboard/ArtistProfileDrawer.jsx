@@ -94,7 +94,9 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
   const queryClient = useQueryClient();
 
   const updateArtistMutation = useMutation({
-    mutationFn: (data) => base44.entities.Artist.update(artist.id, data),
+    mutationFn: (data) => artist?.id
+      ? base44.entities.Artist.update(artist.id, data)
+      : Promise.resolve(null),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['artist', artist?.id] });
       queryClient.invalidateQueries({ queryKey: ['artists'] });
@@ -118,11 +120,10 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
   };
 
   const handleEditOpen = () => {
-    const pos = parsePhotoPos(artist?.photo_position);
+    const pos = parsePhotoPos(artist?.photo_position || userProfile?.photo_position);
     setPhotoPos(pos);
     setPhotoScale(artist?.photo_scale || 1);
     setFormData({
-      // Datos personales del UserProfile
       first_name: userProfile?.first_name || "",
       last_name: userProfile?.last_name || "",
       artist_name: userProfile?.artist_name || artist?.stageName || "",
@@ -132,10 +133,9 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
       nationality: userProfile?.nationality || artist?.nationality || "",
       country_of_residence: userProfile?.country_of_residence || artist?.country_of_residence || "",
       address: userProfile?.address || "",
-      // Datos del artista
       genre: artist?.genre || "",
-      bio: artist?.bio || "",
-      avatar_url: artist?.avatar_url || userProfile?.profile_photo_url || "",
+      bio: artist?.bio || userProfile?.bio || "",
+      avatar_url: artist?.avatar_url || userProfile?.profile_photo_url || userProfile?.avatar_url || "",
     });
     setIsEditing(true);
   };
@@ -232,7 +232,8 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
     updateArtistMutation.mutate({ social_links: updated });
   };
 
-  if (!artist) return null;
+  // Drawer funciona también sin artista (solo userProfile)
+  if (!artist && !userProfile) return null;
 
   return (
     <AnimatePresence>
@@ -270,39 +271,38 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                 {/* Avatar con banderas flotantes */}
                 <div className="relative">
                   <div className="w-24 h-24 rounded-full overflow-hidden border border-white/10 flex items-center justify-center" style={{ background: "#1c1c1e" }}>
-                    {artist.avatar_url ? (
+                    {(artist?.avatar_url || userProfile?.avatar_url || userProfile?.profile_photo_url) ? (
                       <img
-                        src={artist.avatar_url}
-                        alt={artist.stageName}
+                        src={artist?.avatar_url || userProfile?.avatar_url || userProfile?.profile_photo_url}
+                        alt={artist?.stageName || userProfile?.display_name || ""}
                         draggable={false}
                         className="w-full h-full"
                         style={{
                           objectFit: "cover",
-                          objectPosition: artist.photo_position || "center center",
-                          transform: `scale(${artist.photo_scale || 1})`,
-                          transformOrigin: artist.photo_position || "center center",
+                          objectPosition: artist?.photo_position || userProfile?.photo_position || "center center",
+                          transform: `scale(${artist?.photo_scale || 1})`,
+                          transformOrigin: artist?.photo_position || "center center",
                         }}
                       />
                     ) : (
                       <User className="w-10 h-10 text-white/20" />
                     )}
                   </div>
-                  {/* Banderas flotantes — solo imagen, sin texto */}
-                  {artist.nationality && (
+                  {(artist?.nationality || userProfile?.nationality) && (
                     <div className="absolute -bottom-0.5 -left-1">
-                      <FlagPin country={artist.nationality} tooltip={`Nacionalidad: ${artist.nationality}`} />
+                      <FlagPin country={artist?.nationality || userProfile?.nationality} tooltip={`Nacionalidad: ${artist?.nationality || userProfile?.nationality}`} />
                     </div>
                   )}
-                  {artist.country_of_residence && artist.country_of_residence !== artist.nationality && (
+                  {(artist?.country_of_residence || userProfile?.country_of_residence) && (artist?.country_of_residence || userProfile?.country_of_residence) !== (artist?.nationality || userProfile?.nationality) && (
                     <div className="absolute -bottom-0.5 -right-1">
-                      <FlagPin country={artist.country_of_residence} tooltip={`Residencia: ${artist.country_of_residence}`} />
+                      <FlagPin country={artist?.country_of_residence || userProfile?.country_of_residence} tooltip={`Residencia: ${artist?.country_of_residence || userProfile?.country_of_residence}`} />
                     </div>
                   )}
                 </div>
 
                 <div className="text-center">
-                  <p className="text-white font-bold text-base leading-tight">{artist.stageName}</p>
-                  {artist.genre && <p className="text-white/30 text-xs mt-0.5">{artist.genre}</p>}
+                  <p className="text-white font-bold text-base leading-tight">{artist?.stageName || userProfile?.artist_name || userProfile?.display_name || "—"}</p>
+                  {(artist?.genre) && <p className="text-white/30 text-xs mt-0.5">{artist.genre}</p>}
                 </div>
                 <button
                   onClick={handleEditOpen}
@@ -495,15 +495,17 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
               </AnimatePresence>
 
               {/* Bio */}
-              {artist.bio && !isEditing && (
-                <p className="text-xs text-white/30 leading-relaxed">{artist.bio}</p>
+              {(artist?.bio || userProfile?.bio) && !isEditing && (
+                <p className="text-xs text-white/30 leading-relaxed">{artist?.bio || userProfile?.bio}</p>
               )}
 
               {/* Horas de estudio + Próximas sesiones */}
-              <div className="space-y-3">
-                <StudioHoursBlock artist={artist} />
-                <UpcomingSessionsCard artistId={artist.id} />
-              </div>
+              {artist?.id && (
+                <div className="space-y-3">
+                  <StudioHoursBlock artist={artist} />
+                  <UpcomingSessionsCard artistId={artist.id} />
+                </div>
+              )}
 
               {/* Redes sociales */}
               <div>
