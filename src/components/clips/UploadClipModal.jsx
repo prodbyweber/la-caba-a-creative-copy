@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { X, Youtube, Upload, Check, Loader2, Image as ImageIcon, Link } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -17,7 +17,7 @@ function getYoutubeThumbnail(url) {
 
 const ic = "w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors";
 
-export default function UploadClipModal({ onClose, artistId }) {
+export default function UploadClipModal({ onClose, artistId: passedArtistId }) {
   const qc = useQueryClient();
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [title, setTitle] = useState("");
@@ -25,6 +25,23 @@ export default function UploadClipModal({ onClose, artistId }) {
   const [thumbnailMode, setThumbnailMode] = useState("youtube"); // "youtube" | "upload"
   const [uploadingThumb, setUploadingThumb] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // Resolver artist_id: usar el pasado o buscar del usuario actual
+  const [artistId, setArtistId] = useState(passedArtistId || null);
+
+  React.useEffect(() => {
+    if (passedArtistId) {
+      setArtistId(passedArtistId);
+      return;
+    }
+    // Si no hay artistId, intentar resolver del usuario actual
+    base44.auth.me().then(async (u) => {
+      if (!u?.id) return;
+      const artists = await base44.entities.Artist.filter({ user_id: u.id });
+      if (artists[0]?.id) setArtistId(artists[0].id);
+    }).catch(() => {});
+  }, [passedArtistId]);
 
   const ytId = getYoutubeId(youtubeUrl);
   const ytThumb = getYoutubeThumbnail(youtubeUrl);
@@ -64,6 +81,7 @@ export default function UploadClipModal({ onClose, artistId }) {
   const handleSave = async () => {
     if (!ytId) { alert("Introduce un link de YouTube válido"); return; }
     if (!title.trim()) { alert("El título es obligatorio"); return; }
+    if (!artistId) { alert("Error: No se pudo determinar el artista"); return; }
     setSaving(true);
     try {
       const selectedTrackData = allTracks.find(t => t.id === selectedTrack);
