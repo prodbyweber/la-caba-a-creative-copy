@@ -11,6 +11,7 @@ import ArtistProfileModal from "@/components/explorar/ArtistProfileModal";
 import UserProfilePanel from "@/components/explorar/UserProfilePanel";
 import PricingModal from "@/components/explorar/PricingModal";
 import { ExplorarProvider } from "@/context/ExplorarContext.jsx";
+import GlobalModals from "@/components/explorar/GlobalModals";
 
 // Legacy fallback labels (for items with row_category but no ExplorarSection yet)
 const LEGACY_ROW_LABELS = {
@@ -213,6 +214,7 @@ export default function Explorar() {
 
   return (
     <ExplorarProvider>
+    <GlobalModals />
     <div className="min-h-screen bg-[#080808] text-white overflow-x-hidden">
       <ExplorarNav
         currentUser={currentUser}
