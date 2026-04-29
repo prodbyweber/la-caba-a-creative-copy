@@ -1,7 +1,10 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Heart, Share2 } from "lucide-react";
+import { X, Heart, Share2, Music2 } from "lucide-react";
+import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 
 function getYtShortId(url) {
   if (!url) return null;
@@ -9,129 +12,280 @@ function getYtShortId(url) {
   return m ? m[1] : null;
 }
 
-// ── Single full-screen card ──────────────────────────────────────────────────
-function FeedCard({ item, projectTitle }) {
-  const [liked, setLiked] = useState(false);
+// ── Resolve uploader profile for a gallery item ──────────────────────────────
+function useUploaderProfile(galleryItem, projectCredits) {
+  // galleryItem may have uploader_user_id set when uploaded by a platform user
+  const uploaderId = galleryItem?.uploader_user_id || null;
 
-  if (item.type === "youtube_short") {
-    const ytId = getYtShortId(item.url);
-    return (
-      <div className="relative w-full h-full bg-black flex items-center justify-center">
-        {ytId ? (
-          <iframe
-            src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1&loop=1&playlist=${ytId}`}
-            className="w-full h-full border-0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            style={{ pointerEvents: "all" }}
-          />
-        ) : (
-          <div className="text-white/20 text-sm">Video no disponible</div>
-        )}
-        <Overlay item={item} projectTitle={projectTitle} liked={liked} setLiked={setLiked} />
+  const { data: profile } = useQuery({
+    queryKey: ["uploader-profile", uploaderId],
+    queryFn: async () => {
+      if (!uploaderId) return null;
+      const results = await base44.entities.UserProfile.filter({ user_id: uploaderId });
+      return results[0] || null;
+    },
+    enabled: !!uploaderId,
+    staleTime: 60000,
+  });
+
+  return profile;
+}
+
+// ── TikTok-style overlay with user info ──────────────────────────────────────
+function Overlay({ item, projectTitle, projectItem, galleryItem, liked, setLiked, currentUser }) {
+  const uploaderProfile = useUploaderProfile(galleryItem, projectItem?.raw?.credits);
+
+  // Find the credited user whose UserProfile matches one of the credits
+  const creditNames = (projectItem?.raw?.credits || []).map(c => c.name).filter(Boolean);
+
+  const displayName = uploaderProfile?.artist_name || uploaderProfile?.display_name || uploaderProfile?.full_name;
+  const username = uploaderProfile?.username;
+  const avatar = uploaderProfile?.avatar_url || uploaderProfile?.profile_photo_url;
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({ title: projectTitle, url: window.location.href });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+    }
+  };
+
+  return (
+    <div className="absolute inset-0 pointer-events-none flex flex-col justify-between">
+      {/* Top gradient */}
+      <div className="h-24 w-full" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%)" }} />
+
+      {/* Bottom area */}
+      <div className="flex items-end justify-between px-4 pb-10 pointer-events-none"
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)" }}>
+
+        {/* Left: user info + caption */}
+        <div className="flex-1 min-w-0 pr-4 pointer-events-auto">
+          {/* User row */}
+          {displayName && (
+            <div className="flex items-center gap-2 mb-2">
+              {username ? (
+                <Link to={`/${username}`} onClick={e => e.stopPropagation()} className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full overflow-hidden border border-white/20 bg-white/10 flex-shrink-0">
+                    {avatar ? (
+                      <img src={avatar} alt={displayName} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-[10px] font-bold text-white/60">
+                          {displayName[0]?.toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-white font-bold text-sm drop-shadow-lg">@{username}</span>
+                </Link>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full overflow-hidden border border-white/20 bg-white/10 flex-shrink-0">
+                    {avatar ? (
+                      <img src={avatar} alt={displayName} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-[10px] font-bold text-white/60">{displayName[0]?.toUpperCase()}</span>
+                      </div>
+                    )}
+                  </div>
+                  <span className="text-white font-bold text-sm drop-shadow-lg">{displayName}</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Project title */}
+          <p className="text-white font-semibold text-sm leading-snug drop-shadow-lg mb-0.5"
+            style={{ fontFamily: "'Helvetica Neue', sans-serif" }}>
+            {projectTitle}
+          </p>
+
+          {/* Caption */}
+          {galleryItem?.caption && (
+            <p className="text-white/70 text-xs leading-relaxed drop-shadow-lg line-clamp-2">
+              {galleryItem.caption}
+            </p>
+          )}
+        </div>
+
+        {/* Right: action buttons */}
+        <div className="flex flex-col gap-5 items-center flex-shrink-0 pointer-events-auto">
+          <button onClick={() => setLiked(l => !l)} className="flex flex-col items-center gap-1">
+            <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/10">
+              <Heart className={`w-5 h-5 ${liked ? "fill-red-500 text-red-500" : "text-white"}`} />
+            </div>
+            <span className="text-white/60 text-[10px]">{liked ? "1" : ""}</span>
+          </button>
+          <button onClick={handleShare} className="flex flex-col items-center gap-1">
+            <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/10">
+              <Share2 className="w-5 h-5 text-white" />
+            </div>
+          </button>
+        </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
-  // image
+// ── Image card ───────────────────────────────────────────────────────────────
+function ImageCard({ item, projectTitle, projectItem, currentUser, isActive }) {
+  const [liked, setLiked] = useState(false);
   return (
     <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
       <img
         src={item.url}
         alt={item.caption || ""}
-        className="w-full h-full object-contain"
-        style={{ maxHeight: "100%" }}
+        className="w-full h-full object-cover"
       />
-      <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.7) 100%)" }} />
-      <Overlay item={item} projectTitle={projectTitle} liked={liked} setLiked={setLiked} />
+      <Overlay
+        item={item}
+        projectTitle={projectTitle}
+        projectItem={projectItem}
+        galleryItem={item}
+        liked={liked}
+        setLiked={setLiked}
+        currentUser={currentUser}
+      />
     </div>
   );
 }
 
-function Overlay({ item, projectTitle, liked, setLiked }) {
+// ── YouTube Short card ───────────────────────────────────────────────────────
+function YoutubeCard({ item, projectTitle, projectItem, currentUser, isActive }) {
+  const [liked, setLiked] = useState(false);
+  const ytId = getYtShortId(item.url);
+  // Only render iframe when active (prevents autoplay on hidden slides)
+  const src = ytId
+    ? `https://www.youtube.com/embed/${ytId}?autoplay=${isActive ? 1 : 0}&mute=0&controls=1&rel=0&modestbranding=1&loop=1&playlist=${ytId}`
+    : null;
+
   return (
-    <div className="absolute bottom-0 left-0 right-0 px-4 pb-8 flex items-end justify-between pointer-events-none">
-      <div className="pointer-events-none">
-        <p className="text-white font-bold text-sm leading-tight" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.01em" }}>
-          {projectTitle}
-        </p>
-        {item.caption && (
-          <p className="text-white/50 text-xs mt-0.5">{item.caption}</p>
-        )}
-      </div>
-      <div className="flex flex-col gap-4 items-center pointer-events-auto">
-        <button
-          onClick={() => setLiked(l => !l)}
-          className="flex flex-col items-center gap-1"
-        >
-          <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
-            <Heart className={`w-5 h-5 ${liked ? "fill-red-500 text-red-500" : "text-white"}`} />
-          </div>
-        </button>
-        <button className="flex flex-col items-center gap-1">
-          <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
-            <Share2 className="w-5 h-5 text-white" />
-          </div>
-        </button>
+    <div className="relative w-full h-full bg-black flex items-center justify-center">
+      {src ? (
+        <iframe
+          key={`${ytId}-${isActive}`}
+          src={src}
+          className="w-full h-full border-0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          style={{ pointerEvents: "all" }}
+        />
+      ) : (
+        <div className="text-white/20 text-sm">Video no disponible</div>
+      )}
+      {/* Overlay must be on top of iframe but pointer-events-none except buttons */}
+      <div className="absolute inset-0" style={{ pointerEvents: "none" }}>
+        <Overlay
+          item={item}
+          projectTitle={projectTitle}
+          projectItem={projectItem}
+          galleryItem={item}
+          liked={liked}
+          setLiked={setLiked}
+          currentUser={currentUser}
+        />
       </div>
     </div>
   );
 }
 
-// ── Section divider between projects ────────────────────────────────────────
-function ProjectDivider({ title, subtitle }) {
+// ── Single feed slide ────────────────────────────────────────────────────────
+function FeedSlide({ entry, isActive, currentUser }) {
+  if (entry.type === "youtube_short") {
+    return (
+      <YoutubeCard
+        item={entry}
+        projectTitle={entry.projectTitle}
+        projectItem={entry.projectItem}
+        currentUser={currentUser}
+        isActive={isActive}
+      />
+    );
+  }
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-[#080808]" style={{ snapAlign: "start" }}>
-      <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 mb-3">Siguiente proyecto</p>
-      <h2 className="text-2xl font-black text-white text-center px-8" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.03em" }}>
-        {title}
-      </h2>
-      {subtitle && <p className="text-white/40 text-sm mt-2">{subtitle}</p>}
-      <div className="mt-6 animate-bounce">
-        <svg className="w-5 h-5 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
-      </div>
-    </div>
+    <ImageCard
+      item={entry}
+      projectTitle={entry.projectTitle}
+      projectItem={entry.projectItem}
+      currentUser={currentUser}
+      isActive={isActive}
+    />
   );
+}
+
+// Check gallery item access (same logic as ProjectGalleryStrip)
+function hasAccess(galleryItem, projectRaw, currentUser, linkedArtistId) {
+  if (!galleryItem.restricted) return true;
+  if (!currentUser) return false;
+  if (currentUser.role === "admin") return true;
+  if (galleryItem.uploader_user_id && galleryItem.uploader_user_id === currentUser.id) return true;
+  const credits = projectRaw?.credits || [];
+  if (linkedArtistId && credits.some(c => c.artist_id === linkedArtistId)) return true;
+  if (linkedArtistId && projectRaw?.artist_id === linkedArtistId) return true;
+  return false;
 }
 
 // ── Main ForYouFeed ──────────────────────────────────────────────────────────
-export default function ForYouFeed({ initialItem, allItems, onClose }) {
-  // Build flat feed: current project first, then recommended
-  const buildFeed = () => {
-    const feed = [];
+export default function ForYouFeed({ initialItem, allItems, currentUser, linkedArtistId, onClose }) {
+  const containerRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
-    const addProject = (item) => {
-      const gallery = item.raw?.gallery || item.gallery || [];
-      if (gallery.length === 0) return;
-      feed.push({ type: "divider", title: item.title || item.raw?.title, subtitle: item.subtitle || item.raw?.subtitle });
-      gallery.forEach(g => {
-        feed.push({ type: "card", item: g, projectTitle: item.title || item.raw?.title });
+  // Build flat feed of gallery items — current project first, then others
+  const feed = useMemo(() => {
+    const result = [];
+
+    const addProjectItems = (projectItem) => {
+      const gallery = projectItem.raw?.gallery || projectItem.gallery || [];
+      if (!gallery.length) return;
+      // Filter by access
+      const visibleGallery = gallery.filter(g =>
+        hasAccess(g, projectItem.raw || projectItem, currentUser, linkedArtistId)
+      );
+      if (!visibleGallery.length) return;
+      visibleGallery.forEach(g => {
+        result.push({
+          ...g,
+          projectTitle: projectItem.title || projectItem.raw?.title || "",
+          projectItem,
+        });
       });
     };
 
-    // Current project
-    addProject(initialItem);
+    // Current project always first
+    addProjectItems(initialItem);
 
-    // Other projects (those with gallery)
+    // Other projects with galleries
     if (allItems) {
       allItems
         .filter(i => {
           const id = i.id || i.raw?.id;
           const initId = initialItem.id || initialItem.raw?.id;
-          return id !== initId;
+          return id !== initId && ((i.raw?.gallery || i.gallery || []).length > 0);
         })
-        .forEach(i => {
-          const galleryItem = { ...i, gallery: i.raw?.gallery || i.gallery || [] };
-          if ((galleryItem.gallery || []).length > 0) addProject(galleryItem);
-        });
+        .forEach(i => addProjectItems(i));
     }
 
-    return feed;
-  };
+    return result;
+  }, [initialItem, allItems, currentUser, linkedArtistId]);
 
-  const feed = buildFeed();
+  // Track active slide via IntersectionObserver on each slide
+  const slideRefs = useRef([]);
+
+  useEffect(() => {
+    const observers = [];
+    slideRefs.current.forEach((el, idx) => {
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActiveIndex(idx); },
+        { root: containerRef.current, threshold: 0.6 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+    return () => observers.forEach(o => o.disconnect());
+  }, [feed.length]);
 
   if (feed.length === 0) {
     return createPortal(
@@ -151,9 +305,8 @@ export default function ForYouFeed({ initialItem, allItems, onClose }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-[1100] bg-black"
-      style={{ overflowY: "scroll", scrollSnapType: "y mandatory", WebkitOverflowScrolling: "touch" }}
     >
-      {/* Close */}
+      {/* Close button */}
       <button
         onClick={onClose}
         className="fixed top-4 right-4 z-[1200] w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center hover:bg-black/80 transition-colors"
@@ -161,15 +314,44 @@ export default function ForYouFeed({ initialItem, allItems, onClose }) {
         <X className="w-5 h-5 text-white" />
       </button>
 
-      {feed.map((entry, i) => (
-        <div key={i} style={{ scrollSnapAlign: "start", height: "100dvh", width: "100%", flexShrink: 0 }}>
-          {entry.type === "divider" ? (
-            <ProjectDivider title={entry.title} subtitle={entry.subtitle} />
-          ) : (
-            <FeedCard item={entry.item} projectTitle={entry.projectTitle} />
-          )}
-        </div>
-      ))}
+      {/* Scroll container */}
+      <div
+        ref={containerRef}
+        className="w-full h-full overflow-y-scroll"
+        style={{ scrollSnapType: "y mandatory", WebkitOverflowScrolling: "touch", scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+        {feed.map((entry, i) => (
+          <div
+            key={`${entry.id || i}-${i}`}
+            ref={el => slideRefs.current[i] = el}
+            style={{ scrollSnapAlign: "start", height: "100dvh", width: "100%", flexShrink: 0, position: "relative" }}
+          >
+            <FeedSlide
+              entry={entry}
+              isActive={activeIndex === i}
+              currentUser={currentUser}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Progress dots */}
+      <div className="fixed right-3 top-1/2 -translate-y-1/2 z-[1150] flex flex-col gap-1.5">
+        {feed.slice(0, 12).map((_, i) => (
+          <button
+            key={i}
+            onClick={() => {
+              slideRefs.current[i]?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="rounded-full transition-all"
+            style={{
+              width: 3,
+              height: activeIndex === i ? 16 : 6,
+              background: activeIndex === i ? "white" : "rgba(255,255,255,0.25)",
+            }}
+          />
+        ))}
+      </div>
     </motion.div>,
     document.body
   );

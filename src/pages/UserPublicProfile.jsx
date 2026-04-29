@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
-import { ArrowLeft, Heart, Share2, Music2, Image as ImageIcon, ExternalLink } from "lucide-react";
+import { ArrowLeft, Heart, Share2, Music2, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 
 function getYoutubeId(url) {
@@ -38,17 +38,22 @@ export default function UserPublicProfile() {
   });
 
   const { data: explorarItems = [] } = useQuery({
-    queryKey: ["profile-explorar-items", artist?.id],
+    queryKey: ["profile-explorar-items", artist?.id, userProfile?.user_id],
     queryFn: async () => {
-      if (!artist?.id) return [];
       const allItems = await base44.entities.ExplorarItem.filter({ is_active: true });
+      if (!artist?.id) return allItems.filter(item =>
+        // fallback: items whose gallery items were uploaded by this user
+        (item.gallery || []).some(g => g.uploader_user_id === userProfile?.user_id)
+      );
       return allItems.filter(item => {
         if (item.artist_id === artist.id) return true;
         if (item.credits?.some(c => c.artist_id === artist.id)) return true;
+        // Also items where user uploaded gallery content
+        if ((item.gallery || []).some(g => g.uploader_user_id === userProfile?.user_id)) return true;
         return false;
       });
     },
-    enabled: !!artist?.id,
+    enabled: !!userProfile,
   });
 
   const handleShare = () => {
@@ -85,6 +90,13 @@ export default function UserPublicProfile() {
   const initials = displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
   const photos = (userProfile.media_items || []).filter(m => m.type === "image");
   const youtubeItems = (userProfile.media_items || []).filter(m => m.type === "youtube");
+
+  // Collect all public gallery items from explorar items (for this user/artist)
+  const publicGalleryItems = explorarItems.flatMap(item =>
+    (item.gallery || [])
+      .filter(g => !g.restricted)
+      .map(g => ({ ...g, projectTitle: item.title }))
+  );
 
   return (
     <div className="min-h-screen bg-[#080808] text-white overflow-hidden">
@@ -242,7 +254,44 @@ export default function UserPublicProfile() {
           </motion.div>
         )}
 
-        {explorarItems.length === 0 && photos.length === 0 && youtubeItems.length === 0 && (
+        {/* Project Gallery — public items from this user's projects, TikTok-grid style */}
+        {publicGalleryItems.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mb-12">
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/20 mb-4">Contenido del catálogo</p>
+            <div className="grid grid-cols-3 gap-1">
+              {publicGalleryItems.slice(0, 12).map((g, idx) => {
+                const ytId = g.type === "youtube_short"
+                  ? (g.url?.match(/(?:shorts\/|youtu\.be\/|watch\?v=)([a-zA-Z0-9_-]{11})/) || [])[1]
+                  : null;
+                const thumb = g.type === "youtube_short" && ytId
+                  ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`
+                  : g.url;
+                return (
+                  <div key={g.id || idx} className="group relative overflow-hidden bg-white/5" style={{ aspectRatio: "9/16" }}>
+                    {thumb ? (
+                      <img src={thumb} alt={g.caption || g.projectTitle} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center"><Music2 className="w-6 h-6 text-white/10" /></div>
+                    )}
+                    {g.type === "youtube_short" && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-black/50 flex items-center justify-center">
+                          <svg className="w-3.5 h-3.5 text-white ml-0.5" fill="white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2">
+                      <p className="text-[10px] font-bold text-white line-clamp-1">{g.projectTitle}</p>
+                      {g.caption && <p className="text-[9px] text-white/50 line-clamp-1">{g.caption}</p>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+
+        {explorarItems.length === 0 && photos.length === 0 && youtubeItems.length === 0 && publicGalleryItems.length === 0 && (
           <div className="text-center py-20">
             <p className="text-white/20 text-sm">Perfil en construcción</p>
           </div>

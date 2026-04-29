@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   X, Save, Upload, Youtube, Music2, Film,
@@ -62,8 +62,14 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
   const [newGalleryType, setNewGalleryType] = useState("image");
   const [newGalleryCaption, setNewGalleryCaption] = useState("");
   const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
+
+  // Get current user ID so we can tag uploaded gallery items
+  useEffect(() => {
+    base44.auth.me().then(u => setCurrentUserId(u?.id)).catch(() => {});
+  }, []);
 
   const upload = async (key, file, typeKey) => {
     setUploading(u => ({ ...u, [key]: true }));
@@ -116,8 +122,14 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
     setUploadingGallery(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      const item = { id: `g_${Date.now()}`, type: "image", url: file_url, caption: "" };
-      setForm(f => ({ ...f, gallery: [...(f.gallery || []), item] }));
+      const newItem = {
+        id: `g_${Date.now()}`,
+        type: "image",
+        url: file_url,
+        caption: "",
+        uploader_user_id: currentUserId || null,
+      };
+      setForm(f => ({ ...f, gallery: [...(f.gallery || []), newItem] }));
     } finally {
       setUploadingGallery(false);
     }
@@ -368,6 +380,17 @@ export default function ProjectModal({ item, artists, onClose, onSave }) {
                           className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <X className="w-3 h-3 text-white" />
+                        </button>
+                        {/* Restricted badge */}
+                        <button
+                          onClick={() => setForm(f => ({
+                            ...f,
+                            gallery: f.gallery.map(x => x.id === g.id ? { ...x, restricted: !x.restricted } : x)
+                          }))}
+                          className={`absolute top-1.5 left-1.5 w-5 h-5 rounded-full flex items-center justify-center transition-all ${g.restricted ? "bg-amber-500/80 border border-amber-300/40" : "bg-black/40 border border-white/10 opacity-0 group-hover:opacity-100"}`}
+                          title={g.restricted ? "Solo miembros (click para hacer público)" : "Hacer solo para miembros"}
+                        >
+                          <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1a5 5 0 00-5 5v3H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V11a2 2 0 00-2-2h-2V6a5 5 0 00-5-5zm0 2a3 3 0 013 3v3H9V6a3 3 0 013-3zm0 9a2 2 0 110 4 2 2 0 010-4z"/></svg>
                         </button>
                         {g.caption && (
                           <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-gradient-to-t from-black/80">

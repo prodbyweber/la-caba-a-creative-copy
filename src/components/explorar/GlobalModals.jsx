@@ -117,6 +117,18 @@ function CreditsModalInner() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["saves", item?.id, currentUser?.id] }),
   });
 
+  // Resolve linked artist for the current user (for gallery access check)
+  const { data: linkedArtist } = useQuery({
+    queryKey: ["linked-artist", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      const results = await base44.entities.Artist.filter({ user_id: currentUser.id });
+      return results[0] || null;
+    },
+    enabled: !!currentUser?.id,
+    staleTime: 60000,
+  });
+
   if (!creditsModal || !item) return null;
 
   return createPortal(
@@ -231,6 +243,9 @@ function CreditsModalInner() {
           <div className="px-6 pb-4">
             <ProjectGalleryStrip
               gallery={item.raw.gallery}
+              projectRaw={item.raw}
+              currentUser={currentUser}
+              linkedArtistId={linkedArtist?.id}
               onOpenFeed={() => setShowFeed(true)}
             />
           </div>
@@ -248,6 +263,8 @@ function CreditsModalInner() {
             <ForYouFeed
               initialItem={{ ...item, gallery: item.raw?.gallery || [] }}
               allItems={allItems}
+              currentUser={currentUser}
+              linkedArtistId={linkedArtist?.id}
               onClose={() => setShowFeed(false)}
             />
           )}
