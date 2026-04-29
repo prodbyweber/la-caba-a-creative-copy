@@ -30,17 +30,22 @@ export default function UploadClipModal({ onClose, artistId: passedArtistId }) {
   // Resolver artist_id: usar el pasado o buscar del usuario actual
   const [artistId, setArtistId] = useState(passedArtistId || null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (passedArtistId) {
       setArtistId(passedArtistId);
       return;
     }
     // Si no hay artistId, intentar resolver del usuario actual
-    base44.auth.me().then(async (u) => {
-      if (!u?.id) return;
-      const artists = await base44.entities.Artist.filter({ user_id: u.id });
-      if (artists[0]?.id) setArtistId(artists[0].id);
-    }).catch(() => {});
+    (async () => {
+      try {
+        const u = await base44.auth.me();
+        if (!u?.id) return;
+        const artists = await base44.entities.Artist.filter({ user_id: u.id });
+        if (artists[0]?.id) setArtistId(artists[0].id);
+      } catch (e) {
+        console.error("Error resolving artist:", e);
+      }
+    })();
   }, [passedArtistId]);
 
   const ytId = getYoutubeId(youtubeUrl);
