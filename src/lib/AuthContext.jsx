@@ -52,6 +52,14 @@ export const AuthProvider = ({ children }) => {
         if (appError.status === 403 && appError.data?.extra_data?.reason) {
           const reason = appError.data.extra_data.reason;
           if (reason === 'auth_required') {
+            // On public paths, don't block — just set no user and continue
+            const publicPaths = ['/Explorar', '/Pricing', '/PublicProfile'];
+            const isPublicPath = publicPaths.some(p => window.location.pathname.startsWith(p));
+            if (isPublicPath) {
+              setIsLoadingPublicSettings(false);
+              setIsLoadingAuth(false);
+              return;
+            }
             setAuthError({
               type: 'auth_required',
               message: 'Authentication required'
