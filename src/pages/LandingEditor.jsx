@@ -794,6 +794,28 @@ export default function LandingEditor() {
                     </div>
                     <p className="text-[11px] text-white/30 mt-2 px-2">Controla si los artistas ven el apartado de Análisis en el menú de su panel.</p>
                   </div>
+
+                  {/* Explorar Guest Block Toggle */}
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <div className="flex items-center justify-between p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                      <div>
+                        <label className="text-sm font-medium text-orange-300">🔒 Bloqueo de Explorar para invitados</label>
+                        <p className="text-[11px] text-white/30 mt-0.5">
+                          {config.explorar_guest_blocked ? "Usuarios no registrados ven el popup y bloqueo" : "Explorar es público — cualquiera puede ver el contenido"}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => updateField('explorar_guest_blocked', !config.explorar_guest_blocked)}
+                        className={`flex-shrink-0 ml-3 px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                          config.explorar_guest_blocked
+                            ? 'bg-orange-500/20 text-orange-400' 
+                            : 'bg-white/5 text-gray-500'
+                        }`}
+                      >
+                        {config.explorar_guest_blocked ? 'Bloqueado' : 'Público'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="pt-4 border-t border-white/10">

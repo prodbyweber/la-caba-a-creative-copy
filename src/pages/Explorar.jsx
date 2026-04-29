@@ -44,11 +44,11 @@ export default function Explorar() {
   }, []);
 
   // Show pricing popup after 6s for non-logged-in users (once per session)
-  // After dismissing, keep a persistent blur overlay (guestLocked)
+  // Only if explorar_guest_blocked is enabled in config
   useEffect(() => {
     if (!authChecked) return;
     if (currentUser) return;
-    // If already shown this session, go straight to locked state
+    if (!guestBlocked) return; // Explorar is public, no popup
     const alreadyShown = sessionStorage.getItem("pricing_modal_shown");
     if (alreadyShown) { setGuestLocked(true); return; }
     const timer = setTimeout(() => {
@@ -56,12 +56,24 @@ export default function Explorar() {
       sessionStorage.setItem("pricing_modal_shown", "1");
     }, 6000);
     return () => clearTimeout(timer);
-  }, [authChecked, currentUser]);
+  }, [authChecked, currentUser, guestBlocked]);
 
   const handleGuestModalClose = () => {
     setShowPricingModal(false);
     setGuestLocked(true);
   };
+
+  const { data: landingConfig } = useQuery({
+    queryKey: ["landingConfig"],
+    queryFn: async () => {
+      const configs = await base44.entities.LandingConfig.list();
+      return configs.length > 0 ? configs[0] : null;
+    },
+    enabled: authChecked,
+  });
+
+  // explorar_guest_blocked: si es false (o no está definido), Explorar es público
+  const guestBlocked = landingConfig?.explorar_guest_blocked === true;
 
   const { data: explorarItems, isLoading: loadingItems } = useQuery({
     queryKey: ["explorar-items"],
@@ -400,9 +412,9 @@ export default function Explorar() {
         )}
       </AnimatePresence>
 
-      {/* Persistent blur lock — shown after modal is dismissed, blocks interaction */}
+      {/* Persistent blur lock — only when explorar_guest_blocked is enabled */}
       <AnimatePresence>
-        {!currentUser && guestLocked && !showPricingModal && (
+        {!currentUser && guestBlocked && guestLocked && !showPricingModal && (
           <motion.div
             key="guest-lock"
             initial={{ opacity: 0 }}
@@ -456,9 +468,9 @@ export default function Explorar() {
         )}
       </AnimatePresence>
 
-      {/* Pricing modal — guests only, after 6s */}
+      {/* Pricing modal — guests only, after 6s, only when blocked */}
       <AnimatePresence>
-        {showPricingModal && (
+        {showPricingModal && guestBlocked && (
           <PricingModal onClose={handleGuestModalClose} />
         )}
       </AnimatePresence>

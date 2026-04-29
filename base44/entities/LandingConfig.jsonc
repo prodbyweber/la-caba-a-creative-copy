@@ -217,6 +217,11 @@
     "adn_marca_link": {
       "type": "string"
     },
+    "explorar_guest_blocked": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si true, los usuarios no registrados ven el bloqueo/popup en Explorar. Si false, Explorar es p\u00fablico."
+    },
     "guest_popup_title": {
       "type": "string",
       "description": "T\u00edtulo del popup para usuarios no registrados",
