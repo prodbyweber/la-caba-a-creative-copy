@@ -423,6 +423,15 @@ export default function UserProfilePanel({ currentUser, explorarItems = [], arti
                     </a>
                   )}
 
+                  {/* Cerrar sesión */}
+                  <button
+                    onClick={() => base44.auth.logout("/")}
+                    className="flex items-center gap-1.5 text-[10px] text-white/20 hover:text-red-400 transition-colors mt-1 mb-2"
+                  >
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    Cerrar sesión
+                  </button>
+
                   {/* Bio */}
                   <div className="w-full">
                     {editingBio ? (
