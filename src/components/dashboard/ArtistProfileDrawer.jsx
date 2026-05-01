@@ -237,11 +237,17 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
     },
   });
 
+  const generateUsername = () => {
+    const name = userProfile?.artist_name || userProfile?.display_name || artist?.stageName || userProfile?.first_name || "";
+    return name.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "").slice(0, 20) || "user_" + Math.random().toString(36).substr(2, 9);
+  };
+
   const openEdit = () => {
     setFormData({
       first_name: userProfile?.first_name || "",
       last_name: userProfile?.last_name || "",
       artist_name: userProfile?.artist_name || artist?.stageName || "",
+      username: userProfile?.username || generateUsername(),
       phone_country_code: userProfile?.phone_country_code || "+34",
       phone: userProfile?.phone || "",
       nationality: userProfile?.nationality || artist?.nationality || "",
@@ -296,6 +302,7 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
         last_name: formData.last_name,
         full_name: `${formData.first_name} ${formData.last_name}`.trim(),
         artist_name: formData.artist_name,
+        username: formData.username || generateUsername(),
         phone: formData.phone,
         phone_country_code: formData.phone_country_code,
         nationality: formData.nationality,
@@ -416,6 +423,9 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
               <div className="px-5 pt-14 pb-4 flex items-start justify-between flex-shrink-0">
                 <div className="flex-1">
                    <p className="text-white font-bold text-lg leading-tight">{displayName}</p>
+                   {userProfile?.username && (
+                     <p className="text-[11px] text-white/50 mt-1 font-medium">@{userProfile.username}</p>
+                   )}
                    <div className="flex items-center gap-1.5 mt-2">
                      {nationality && COUNTRY_ISO[nationality] && (
                        <img src={`https://flagcdn.com/w20/${COUNTRY_ISO[nationality]}.png`} alt={nationality}
@@ -427,9 +437,6 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                      )}
                      {nationality && <span className="text-white/30 text-xs">{nationality}</span>}
                    </div>
-                   {userProfile?.username && (
-                     <p className="text-[11px] text-white/40 mt-1.5">@{userProfile.username}</p>
-                   )}
                  </div>
                  <div className="flex items-center gap-2 flex-shrink-0">
                   <button onClick={openEdit}
@@ -582,6 +589,14 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                           <label className={labelClass}>Nombre artístico</label>
                           <input value={formData?.artist_name || ""} onChange={e => setFormData(f => ({ ...f, artist_name: e.target.value }))}
                             className={iClass} placeholder="Alias artístico" />
+                        </div>
+
+                        {/* Username */}
+                        <div>
+                          <label className={labelClass}>Username (URL pública)</label>
+                          <input value={formData?.username || ""} onChange={e => setFormData(f => ({ ...f, username: e.target.value }))}
+                            className={iClass} placeholder="tu_nombre" maxLength={30} />
+                          <p className="text-[10px] text-white/20 mt-1">cabanacreative.es/{formData?.username || "tu_nombre"}</p>
                         </div>
 
                         {/* Teléfono */}

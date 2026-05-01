@@ -64,7 +64,24 @@ export default function ArtistDashboard() {
       const uid = artist?.user_id || currentUser?.id;
       if (!uid) return null;
       const profiles = await base44.entities.UserProfile.filter({ user_id: uid });
-      return profiles[0] || null;
+      if (profiles.length > 0) return profiles[0];
+      // Si no existe perfil de usuario, crear uno con datos generados
+      if (artist && !artist?.user_id) {
+        const firstInitial = artist.stageName?.charAt(0) || "U";
+        const lastInitial = artist.stageName?.split(" ")[1]?.charAt(0) || artist.stageName?.charAt(1) || "S";
+        const generatedUsername = artist.stageName?.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "").slice(0, 20) || "artist_" + Math.random().toString(36).substr(2, 9);
+        
+        const created = await base44.entities.UserProfile.create({
+          user_id: uid,
+          username: generatedUsername,
+          display_name: artist.stageName || "Usuario",
+          artist_name: artist.stageName,
+          avatar_url: artist.avatar_url,
+          account_type: "artist",
+        });
+        return created;
+      }
+      return null;
     },
     enabled: !!(artist?.user_id || currentUser?.id),
   });
