@@ -272,26 +272,51 @@ function ArtistView() {
         </motion.div>
       </div>
 
-      {/* Bloque final */}
+      {/* Bloque: Plataforma — Todo vive en un solo lugar */}
       <Block>
         <div className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-10 sm:p-14 overflow-hidden">
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#ff5833]/[0.06] rounded-full blur-3xl pointer-events-none" />
           <div className="relative z-10">
-            <p className="text-[10px] font-bold text-[#ff5833] uppercase tracking-[0.35em] mb-6">Visión</p>
+            <p className="text-[10px] font-bold text-[#ff5833] uppercase tracking-[0.35em] mb-6">Plataforma</p>
             <h3
               className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight mb-6"
               style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
             >
-              Somos el Netflix de la música urbana.
+              Todo vive en un solo lugar.
             </h3>
             <p className="text-white/40 text-base leading-relaxed max-w-2xl">
-              Un espacio donde cada lanzamiento forma parte de algo más grande, donde el contenido tiene continuidad, y donde tu proyecto se desarrolla con visión.
+              Una plataforma donde descubrir música, films y creadores.
             </p>
             <div className="mt-8 h-px bg-gradient-to-r from-[#ff5833]/50 via-[#ff5833]/10 to-transparent w-32" />
             <p className="mt-6 text-white/20 text-sm">
-              Porque no solo producimos música.{" "}
-              <span className="text-white/40">Diseñamos proyectos que se pueden construir, medir y escalar.</span>
+              Cada pieza vive en YouTube dentro del canal del creador.{" "}
+              <span className="text-white/35">Cabaña Creative selecciona, organiza y potencia el contenido.</span>
             </p>
+          </div>
+        </div>
+      </Block>
+
+      {/* Bloque final */}
+      <Block>
+        <div className="max-w-3xl">
+          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Esto no se explica.</p>
+          <h3
+            className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight"
+            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+          >
+            Se explora.
+          </h3>
+          <div className="mt-8">
+            <a
+              href="/Explorar"
+              className="group/btn relative inline-flex items-center px-6 py-2.5 border border-white/40 rounded-full overflow-hidden transition-all duration-300 hover:border-white"
+            >
+              <span className="absolute inset-0 bg-white scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-300 origin-left rounded-full" />
+              <span className="relative z-10 text-[11px] font-semibold text-white group-hover/btn:text-black uppercase tracking-widest transition-colors duration-300"
+                style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
+                Entrar →
+              </span>
+            </a>
           </div>
         </div>
       </Block>
@@ -475,22 +500,22 @@ function BrandView() {
         <div className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-10 sm:p-14 overflow-hidden">
           <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#ff5833]/[0.06] rounded-full blur-3xl pointer-events-none" />
           <div className="relative z-10">
-            <p className="text-[10px] font-bold text-[#ff5833] uppercase tracking-[0.35em] mb-6">Objetivo</p>
+            <p className="text-[10px] font-bold text-[#ff5833] uppercase tracking-[0.35em] mb-6">Potenciamos creadores</p>
             <h3
               className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight mb-6"
               style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
             >
-              Construimos, no
+              A través de contenido,
               <br />
-              <span className="text-white/25">improvisamos.</span>
+              <span className="text-white/25">dirección y distribución.</span>
             </h3>
             <p className="text-white/40 text-base leading-relaxed max-w-2xl">
-              Campañas, contenido y web no van separados. Todo forma parte de lo mismo: cómo se ve tu marca, cómo se entiende y cómo convierte. Construimos una línea. Una presencia. Una forma de estar.
+              Creamos, documentamos y damos visibilidad.
             </p>
             <div className="mt-8 h-px bg-gradient-to-r from-[#ff5833]/50 via-[#ff5833]/10 to-transparent w-32" />
             <p className="mt-6 text-white/20 text-sm">
-              Si tu marca está lista para hacer las cosas bien…{" "}
-              <span className="text-white/40">hablemos.</span>
+              Esto no se explica.{" "}
+              <span className="text-white/40">Se explora.</span>
             </p>
           </div>
         </div>

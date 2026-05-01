@@ -13,10 +13,11 @@ function isVideoUrl(url) {
 
 const defaultBanners = [
   {
-    tag: "Creadoras - Modelos",
-    title: "The Girls",
-    subtitle: "She sets the tone",
-    defaultCta: "Explore",
+    tag: "Creadoras",
+    title: "Creadoras",
+    subtitle: "Rostros, estética y dirección visual.",
+    microcopy: "Cada imagen forma parte de una historia.",
+    defaultCta: "Explorar →",
     defaultLink: "/Explorar",
     defaultImage: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1800&h=900&fit=crop&q=85",
     configKey: "hero_banner_1_image",
@@ -26,10 +27,11 @@ const defaultBanners = [
     audioKey: "hero_banner_1_audio_enabled",
   },
   {
-    tag: "Sonido nuevo",
-    title: "La Nueva Corriente",
-    subtitle: "Donde nace el sonido nuevo",
-    defaultCta: "Descubrir",
+    tag: "Música",
+    title: "Música",
+    subtitle: "Proyectos creados desde cero.",
+    microcopy: "Cada track nace aquí y se mueve fuera.",
+    defaultCta: "Explorar →",
     defaultLink: "/Explorar",
     defaultImage: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=1800&h=900&fit=crop&q=85",
     configKey: "hero_banner_2_image",
@@ -38,10 +40,11 @@ const defaultBanners = [
     ctaLinkKey: "hero_banner_2_cta_link",
   },
   {
-    tag: "Comunidad",
-    title: "Friends & Family",
-    subtitle: "Inside the circle",
-    defaultCta: "Ver todo",
+    tag: "Films",
+    title: "Films",
+    subtitle: "Contenido cinematográfico en formato real.",
+    microcopy: "Todo se documenta. Todo se muestra.",
+    defaultCta: "Explorar →",
     defaultLink: "/Explorar",
     defaultImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1800&h=900&fit=crop&q=85",
     configKey: "hero_banner_3_image",
@@ -206,7 +209,7 @@ function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEna
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.28 + index * 0.06, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="font-black text-white leading-[0.88] tracking-[-0.03em] mb-6"
+            className="font-black text-white leading-[0.88] tracking-[-0.03em] mb-2"
             style={{
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               fontSize: "clamp(2.4rem, 8vw, 4.5rem)",
@@ -214,6 +217,30 @@ function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEna
           >
             {banner.title}
           </motion.h2>
+
+          {/* Subtitle + microcopy */}
+          {banner.subtitle && (
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.34 + index * 0.06, duration: 0.5 }}
+              className="text-sm text-white/55 font-light mb-1 leading-snug"
+            >
+              {banner.subtitle}
+            </motion.p>
+          )}
+          {banner.microcopy && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 + index * 0.06, duration: 0.5 }}
+              className="text-[11px] text-white/30 italic mb-5"
+            >
+              {banner.microcopy}
+            </motion.p>
+          )}
 
           {/* CTA button */}
           <motion.div

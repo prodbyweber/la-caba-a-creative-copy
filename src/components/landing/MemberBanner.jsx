@@ -45,27 +45,28 @@ export default function MemberBanner() {
           </div>
 
           {/* Title */}
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
-            ¿Ya eres parte de La Cabaña Creative?
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6"
+            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", letterSpacing: "-0.02em" }}>
+            Explorar
           </h2>
 
           {/* Description */}
-          <p className="text-white/80 text-base sm:text-lg lg:text-xl max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
-            Si ya formas parte de nuestra comunidad de alumnos, accede directamente a tu plataforma para continuar tu formación y desbloquear todo tu potencial.
+          <p className="text-white/60 text-base sm:text-lg lg:text-xl max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed font-light">
+            Descubre proyectos, creadores y contenido en movimiento.
           </p>
 
           {/* CTA Button */}
           <Link
-            to={createPageUrl("Dashboard")}
+            to="/Explorar"
             className="inline-flex items-center gap-2 px-8 py-4 bg-white hover:bg-gray-100 text-black font-semibold rounded-full transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105"
           >
-            Iniciar Sesión
+            Entrar y ver más
             <ArrowRight className="w-5 h-5" />
           </Link>
 
           {/* Footer Text */}
-          <p className="text-white/50 text-sm mt-6">
-            ¿Aún no eres alumno? Explora nuestros programas arriba
+          <p className="text-white/30 text-sm mt-6 italic">
+            Música · Films · Creadoras
           </p>
         </motion.div>
       </div>

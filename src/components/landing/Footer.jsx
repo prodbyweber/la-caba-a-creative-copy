@@ -179,10 +179,10 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-gray-500 text-sm max-w-sm leading-relaxed mb-3">
-              Formación, dirección creativa y producción musical para artistas que quieren ir en serio.
+              Una plataforma de música, films y creadores. Seleccionado. Organizado. En movimiento.
             </p>
             <p className="text-xs text-gray-600 italic">
-              Algunos servicios requieren validación previa
+              Contenido real, creadores reales.
             </p>
           </div>
 
