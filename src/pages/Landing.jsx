@@ -4,6 +4,7 @@ import { base44 } from "@/api/base44Client";
 import Hero from "@/components/landing/Hero";
 import BrandsCarousel from "@/components/landing/BrandsCarousel";
 import HeroBanners from "@/components/landing/HeroBanners";
+import ExplorarPreview from "@/components/landing/ExplorarPreview";
 import StoriesSection from "@/components/landing/StoriesSection.jsx";
 
 import AboutSection from "@/components/landing/AboutSection.jsx";
@@ -28,6 +29,7 @@ export default function Landing() {
         <Hero config={config} />
         <BrandsCarousel logos={config?.brand_logos} />
         <HeroBanners />
+        <ExplorarPreview />
         <div id="about"><AboutSection /></div>
         <div id="stories"><StoriesSection /></div>
 
