@@ -74,7 +74,7 @@ function MiniHero({ items }) {
           />
         )}
         <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(8,8,8,0.55) 20%, transparent 65%)" }} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,8,8,0.85) 0%, transparent 45%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.4) 35%, transparent 60%)" }} />
       </div>
 
       {/* Curtain */}
@@ -276,11 +276,8 @@ export default function ExplorarPreview() {
             {/* Hero */}
             <MiniHero items={items} />
 
-            {/* Content rows — close to hero like real Explorar */}
-            <div className="relative -mt-14 pt-0 pb-10">
-              {/* subtle top fade for visual continuity */}
-              <div className="absolute top-0 left-0 right-0 h-14 pointer-events-none z-10"
-                style={{ background: "linear-gradient(to bottom, rgba(8,8,8,0.55) 0%, transparent 100%)" }} />
+            {/* Content rows — below hero with clear separation */}
+            <div className="relative pb-10 pt-3">
 
               {row1.length > 0 && <NetflixRow label="En Tendencia" items={row1} rowIndex={0} />}
               {row2.length > 0 && <NetflixRow label="Nuevos Lanzamientos" items={row2} rowIndex={1} />}
