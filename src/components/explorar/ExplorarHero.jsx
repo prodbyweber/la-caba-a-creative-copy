@@ -59,6 +59,7 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible }
           <video
               ref={videoRef}
               src={item.hero_media_url}
+              poster={item?.thumbnail_url || item?.image || undefined}
               className="w-full h-full object-cover"
               style={{ filter: "brightness(1.08) saturate(1.15)" }}
               autoPlay
@@ -171,6 +172,7 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible }
 export default function ExplorarHero({ items = [], artists = [], onExplore }) {
   const [activeIdx, setActiveIdx] = useState(0);
   const [transitioning, setTransitioning] = useState(false);
+  const [heroReady, setHeroReady] = useState(false);
   const explorar = useExplorar();
   const cardModalOpen = explorar?.cardModalOpen ?? false;
   const [showModal, setShowModal] = useState(false);
@@ -256,6 +258,23 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
+  // Preload first slide media so hero appears already loaded
+  useEffect(() => {
+    if (heroItems.length === 0) return;
+    const first = heroItems[0];
+    const isVideo = first?.hero_media_type === "video" && first?.hero_media_url;
+    const src = first?.hero_media_url || first?.image;
+    if (!src) { setHeroReady(true); return; }
+    if (isVideo) {
+      setHeroReady(true); // videos show immediately, black flash avoided via poster
+      return;
+    }
+    const img = new Image();
+    img.onload = () => setHeroReady(true);
+    img.onerror = () => setHeroReady(true);
+    img.src = src;
+  }, [heroItems.length > 0 ? heroItems[0]?.id : null]);
+
   if (heroItems.length === 0) return null;
 
   return (
@@ -312,7 +331,11 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
       </AnimatePresence>
 
       {/* Hero Carousel */}
-      <div ref={heroRef} className="relative w-full overflow-hidden" style={{ height: "85vh", minHeight: 520 }}>
+      <div
+        ref={heroRef}
+        className="relative w-full overflow-hidden transition-opacity duration-700"
+        style={{ height: "85vh", minHeight: 520, opacity: heroReady ? 1 : 0 }}
+      >
 
         {/* Todos los slides montados simultáneamente — solo el activo es visible */}
         {heroItems.map((item, idx) => (
@@ -321,7 +344,7 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
             className="absolute inset-0 transition-opacity"
             style={{
               opacity: idx === activeIdx ? 1 : 0,
-              transitionDuration: "0ms", // el fade lo gestiona el curtain
+              transitionDuration: "0ms",
               pointerEvents: idx === activeIdx ? "auto" : "none",
             }}
           >
