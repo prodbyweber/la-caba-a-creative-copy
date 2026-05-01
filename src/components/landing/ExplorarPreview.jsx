@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { Play, ChevronLeft, ChevronRight, Music2 } from "lucide-react";
+import { Play } from "lucide-react";
 
 function getYtThumb(url) {
   if (!url) return null;
@@ -10,18 +10,17 @@ function getYtThumb(url) {
   return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : null;
 }
 
-const TYPE_LABEL = {
-  song: "Canción", album: "Álbum", ep: "EP",
-  minifilm: "Mini Film", film: "Film", series: "Serie",
-};
-
 // ── Mini Hero (read-only, no interactions) ──────────────────────────────────
 function MiniHero({ items }) {
   const [activeIdx, setActiveIdx] = useState(0);
   const [transitioning, setTransitioning] = useState(false);
   const intervalRef = useRef(null);
 
-  const heroItems = items.filter(i => i.is_hero || i.hero_media_url || i.thumbnail_url || i.youtube_url);
+  // All items with any visual — prefer hero items first, then others
+  const heroItems = [
+    ...items.filter(i => i.is_hero),
+    ...items.filter(i => !i.is_hero && (i.thumbnail_url || i.youtube_url || i.youtube_music_url)),
+  ].slice(0, 8);
   const current = heroItems[activeIdx] || heroItems[0];
 
   const bg = current
@@ -84,20 +83,14 @@ function MiniHero({ items }) {
         style={{ background: "#080808", opacity: transitioning ? 1 : 0 }}
       />
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col justify-end h-full px-5 sm:px-8 pb-6">
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className="text-[9px] font-black uppercase tracking-widest text-[#ff5833]">Destacado</span>
-          {current.subtitle && (
-            <>
-              <span className="text-white/20 text-[9px]">·</span>
-              <span className="text-[9px] text-white/40 uppercase tracking-wider">{current.subtitle}</span>
-            </>
-          )}
+      {/* Content — title + dots */}
+      <div className="relative z-10 flex flex-col justify-end h-full px-5 sm:px-8 pb-5">
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="text-[8px] font-black uppercase tracking-widest text-[#ff5833]">Destacado</span>
         </div>
         <h3
-          className="text-base sm:text-xl font-black text-white leading-tight"
-          style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.025em", maxWidth: 320 }}
+          className="text-sm sm:text-lg font-black text-white leading-tight"
+          style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.025em", maxWidth: 280 }}
         >
           {current.title}
         </h3>
@@ -123,7 +116,6 @@ function MiniHero({ items }) {
 function NetflixCard({ item, index, rowIndex }) {
   const [hovered, setHovered] = useState(false);
   const thumb = item.thumbnail_url || getYtThumb(item.youtube_url || item.youtube_music_url);
-  const label = TYPE_LABEL[item.content_type] || null;
 
   return (
     <motion.div
@@ -144,52 +136,19 @@ function NetflixCard({ item, index, rowIndex }) {
       {thumb ? (
         <img
           src={thumb}
-          alt={item.title}
+          alt=""
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ filter: hovered ? "brightness(1.1) saturate(1.2)" : "brightness(0.95)" }}
+          style={{ filter: hovered ? "brightness(1.08) saturate(1.15)" : "brightness(0.92)" }}
         />
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center" style={{ background: "rgba(255,255,255,0.04)" }}>
-          <Music2 className="w-6 h-6 text-white/10" />
-        </div>
+        <div className="absolute inset-0" style={{ background: "rgba(255,255,255,0.04)" }} />
       )}
 
-      {/* Overlay */}
-      <div
-        className="absolute inset-0 transition-opacity duration-300"
-        style={{
-          background: hovered
-            ? "linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)"
-            : "linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%)",
-        }}
-      />
-
-      {/* Badge */}
-      {label && (
-        <div className="absolute top-1.5 left-1.5">
-          <span className="text-[7px] font-black uppercase tracking-widest px-1 py-0.5 rounded"
-            style={{ background: "rgba(255,88,51,0.9)", color: "white" }}>
-            {label}
-          </span>
-        </div>
-      )}
-
-      {/* Play on hover */}
+      {/* Subtle hover vignette */}
       {hovered && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center">
-            <Play className="w-3 h-3 text-white ml-0.5" fill="white" />
-          </div>
-        </div>
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: "linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 60%)" }} />
       )}
-
-      {/* Title */}
-      <div className="absolute bottom-0 left-0 right-0 px-2 pb-1.5">
-        <p className="text-white font-bold text-[10px] truncate leading-tight"
-          style={{ fontFamily: "'Helvetica Neue', sans-serif" }}>
-          {item.title || "—"}
-        </p>
-      </div>
     </motion.div>
   );
 }
@@ -230,7 +189,13 @@ function FakeNav() {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-full bg-white/10" />
+        <div className="w-6 h-6 rounded-full overflow-hidden border border-white/20 flex-shrink-0">
+          <img
+            src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
+            alt="avatar"
+            className="w-full h-full object-cover"
+          />
+        </div>
       </div>
     </div>
   );
