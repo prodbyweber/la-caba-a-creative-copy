@@ -270,9 +270,17 @@ export default function ExplorarPreview() {
             Atrévete a explorar
           </h2>
           <p className="text-sm sm:text-base text-white/50 leading-relaxed max-w-2xl font-light">
-            Curamos contenido cinemático y audiovisual — música, audiovisuales, films y recomendaciones. 
-            Potenciamos YouTube como reproductor, permitiendo que cada pieza sea 100% monetizada y beneficiada por su algoritmo. 
-            Explorar es descubrir una red donde la creatividad se convierte en movimiento real.
+            Curamos música, films y contenido audiovisual con criterio.
+            <br /><br />
+            Cada pieza forma parte de un catálogo en evolución, pensado con intención y dirección.
+            <br /><br />
+            Utilizando YouTube como motor de distribución y monetización.
+            <br /><br />
+            Potenciamos proyectos a través del contenido, la narrativa y el movimiento.
+            <br /><br />
+            <span className="text-white/70">Explorar es donde las ideas dejan de ser ideas</span>
+            <br />
+            <span className="text-white/70">y empiezan a tomar forma.</span>
           </p>
         </motion.div>
 
