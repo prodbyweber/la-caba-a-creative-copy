@@ -107,42 +107,43 @@ function ThumbStrip({ items }) {
   );
 }
 
-// ── View: Para Artistas ───────────────────────────────────────────────────────
+// ── View: Creadores ───────────────────────────────────────────────────────────
 
 function ArtistView() {
   return (
     <div className="space-y-28 lg:space-y-40">
 
-      {/* Bloque 1 */}
+      {/* Bloque 1 — Apertura */}
       <Block>
         <h2
           className="text-5xl sm:text-6xl lg:text-8xl font-black leading-[0.92] tracking-tight text-white max-w-4xl"
           style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
         >
-          Trabajamos con artistas que ya tienen
-          <span className="text-white/20"> una base.</span>
+          Los creadores
+          <span className="text-white/20"> son el centro.</span>
         </h2>
         <p className="mt-8 text-lg sm:text-xl text-white/50 font-light max-w-2xl leading-relaxed">
-          Música lanzada, una identidad en desarrollo y la intención de entrar en una nueva fase de exploración dentro de su proyecto.
+          Artistas, creadores de contenido, productores, directores… personas que no solo consumen cultura, la están construyendo.
         </p>
         <div className="mt-10 h-px bg-gradient-to-r from-[#ff5833]/40 via-[#ff5833]/10 to-transparent w-40" />
         <p className="mt-8 text-base text-white/35 max-w-xl leading-relaxed">
-          Nuestro enfoque es claro: dar estructura, dirección y coherencia a ese proceso.
+          Nuestro foco es claro: la música y los artistas. Pero todo forma parte de lo mismo: contenido, identidad y movimiento.
         </p>
       </Block>
 
-      {/* Bloque 2 */}
+      {/* Bloque 2 — Con quién trabajamos */}
       <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
         <Block delay={0}>
-          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Enfoque integral</p>
+          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Con quién trabajamos</p>
           <h3
             className="text-3xl sm:text-4xl font-black text-white leading-tight tracking-tight mb-8"
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
           >
-            Construimos el proyecto de forma integral.
+            Creadores que ya
+            <br />han empezado.
           </h3>
           <p className="text-white/35 text-sm leading-relaxed">
-            Todo conectado y alineado con lo que eres como artista.
+            No desde cero, sino desde ese punto donde ya hay algo… pero todavía no está conectado.
           </p>
         </Block>
 
@@ -154,10 +155,10 @@ function ArtistView() {
           className="space-y-0 divide-y divide-white/[0.05]"
         >
           {[
-            "Producción musical con dirección creativa",
-            "Desarrollo de catálogo con visión",
-            "Branding e identidad visual",
-            "Contenido audiovisual estratégico",
+            "Artistas con música publicada",
+            "Proyectos en desarrollo",
+            "Ideas que necesitan dirección",
+            "Gente que ya está en movimiento, pero quiere hacerlo bien",
           ].map((item, i) => (
             <motion.li
               key={i}
@@ -173,44 +174,172 @@ function ArtistView() {
         </motion.ul>
       </div>
 
-      {/* Bloque 3 */}
+      {/* Bloque 3 — Por qué */}
       <Block>
         <div className="max-w-3xl">
-          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Con propósito</p>
+          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Por qué trabajamos con creadores</p>
           <h3
             className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight"
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
           >
-            No hacemos música por hacer.
+            Porque hoy no basta
             <br />
-            <span className="text-white/25">Cada lanzamiento tiene un porqué.</span>
+            <span className="text-white/25">con crear.</span>
           </h3>
           <p className="mt-8 text-white/40 text-base leading-relaxed max-w-xl">
-            Definimos el punto en el que estás, trazamos el camino y ejecutamos con intención. Después medimos, ajustamos y seguimos avanzando.
+            Hay demasiada gente haciendo cosas. Lo que marca la diferencia es dirección, coherencia, identidad, contenido. Ahí es donde entramos.
+          </p>
+          <p className="mt-4 text-white/25 text-sm leading-relaxed max-w-xl">
+            Para convertir lo que haces en algo que se entienda, se vea y tenga impacto.
           </p>
         </div>
       </Block>
 
-      {/* Bloque 4: Netflix */}
+      {/* Bloque 4 — Qué hacemos */}
       <Block>
         <div className="mb-10">
-          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Narrativa continua</p>
+          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Qué hacemos</p>
           <h3
             className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight mb-4"
             style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
           >
-            Pensamos el contenido
+            El proyecto de forma
             <br />
-            <span className="text-white/25">como una serie.</span>
+            <span className="text-white/25">integral.</span>
           </h3>
           <p className="text-white/40 text-base leading-relaxed max-w-2xl">
-            Cada tema, cada visual y cada pieza suma a una narrativa. No se trata solo de lanzar canciones, sino de construir un universo que evoluciona y conecta.
+            Todo conectado. Nada aislado.
           </p>
         </div>
         <ThumbStrip items={artistThumbnails} />
       </Block>
 
-      {/* Bloque 5: Objetivo */}
+      {/* Bloque 5 — Para artistas y creadores */}
+      <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
+        <Block delay={0}>
+          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Para artistas</p>
+          <motion.ul
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="space-y-0 divide-y divide-white/[0.05]"
+          >
+            {[
+              "Producción musical con dirección",
+              "Desarrollo de catálogo",
+              "Construcción de identidad",
+              "Contenido audiovisual estratégico",
+            ].map((item, i) => (
+              <motion.li key={i} variants={bulletItem} className="group flex items-center gap-5 py-5 cursor-default">
+                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#ff5833]/40 group-hover:bg-[#ff5833] transition-colors duration-300" />
+                <span className="text-base text-white/60 group-hover:text-white/90 transition-colors duration-300 font-light">{item}</span>
+              </motion.li>
+            ))}
+          </motion.ul>
+        </Block>
+
+        <Block delay={0.1}>
+          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Para creadores</p>
+          <motion.ul
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="space-y-0 divide-y divide-white/[0.05]"
+          >
+            {[
+              "Dirección estética",
+              "Desarrollo de imagen",
+              "Creación de contenido",
+              "Construcción de presencia",
+            ].map((item, i) => (
+              <motion.li key={i} variants={bulletItem} className="group flex items-center gap-5 py-5 cursor-default">
+                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#ff5833]/40 group-hover:bg-[#ff5833] transition-colors duration-300" />
+                <span className="text-base text-white/60 group-hover:text-white/90 transition-colors duration-300 font-light">{item}</span>
+              </motion.li>
+            ))}
+          </motion.ul>
+        </Block>
+      </div>
+
+      {/* Bloque 6 — Catálogo y Contenido */}
+      <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
+        <Block delay={0}>
+          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Catálogo</p>
+          <h3
+            className="text-3xl sm:text-4xl font-black text-white leading-tight tracking-tight mb-6"
+            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+          >
+            El catálogo
+            <br />es la base.
+          </h3>
+          <p className="text-white/40 text-base leading-relaxed">
+            No son piezas sueltas. Es tu sonido, tu evolución, tu propuesta.
+          </p>
+          <p className="mt-4 text-white/25 text-sm leading-relaxed">
+            Lo organizamos y desarrollamos para que tenga continuidad y dirección.
+          </p>
+        </Block>
+
+        <Block delay={0.1}>
+          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Contenido</p>
+          <h3
+            className="text-3xl sm:text-4xl font-black text-white leading-tight tracking-tight mb-6"
+            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+          >
+            Todo se convierte
+            <br />en contenido.
+          </h3>
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="space-y-0 divide-y divide-white/[0.05]"
+          >
+            {[
+              { num: "01", label: "Sesiones" },
+              { num: "02", label: "Visuales" },
+              { num: "03", label: "Clips" },
+              { num: "04", label: "Proyectos" },
+            ].map((item, i) => (
+              <motion.div key={i} variants={bulletItem} className="group flex items-start gap-6 py-5 cursor-default">
+                <span className="text-[11px] font-bold text-[#ff5833]/40 group-hover:text-[#ff5833] transition-colors duration-300 mt-0.5 tabular-nums">{item.num}</span>
+                <span className="text-base text-white/55 group-hover:text-white/90 transition-colors duration-300 font-light">{item.label}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+        </Block>
+      </div>
+
+      {/* Bloque — Explorar */}
+      <Block>
+        <div className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-10 sm:p-14 overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#ff5833]/[0.06] rounded-full blur-3xl pointer-events-none" />
+          <div className="relative z-10">
+            <p className="text-[10px] font-bold text-[#ff5833] uppercase tracking-[0.35em] mb-6">Explorar</p>
+            <h3
+              className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight mb-6"
+              style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
+            >
+              Todo esto vive
+              <br />
+              <span className="text-white/25">dentro de Cabaña.</span>
+            </h3>
+            <p className="text-white/40 text-base leading-relaxed max-w-2xl">
+              Un espacio donde se reúnen música, films y creadores. Inspirado en el lenguaje del cine independiente y en proyectos que tienen algo real detrás.
+            </p>
+            <div className="mt-8 h-px bg-gradient-to-r from-[#ff5833]/50 via-[#ff5833]/10 to-transparent w-32" />
+            <p className="mt-6 text-white/20 text-sm">
+              Cada pieza vive en tu canal.{" "}
+              <span className="text-white/35">Nosotros seleccionamos, organizamos y mostramos.</span>
+            </p>
+          </div>
+        </div>
+      </Block>
+
+      {/* Bloque final — Cierre */}
       <Block>
         <div className="max-w-3xl">
           <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Objetivo</p>
@@ -220,92 +349,15 @@ function ArtistView() {
           >
             Convertir tu proceso creativo
             <br />
-            <span className="text-white/25">en un proyecto sólido con identidad real.</span>
+            <span className="text-white/25">en un proyecto real.</span>
           </h3>
-        </div>
-      </Block>
-
-      {/* Bloque 6: Plataforma */}
-      <div className="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start">
-        <Block delay={0}>
-          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Plataforma</p>
-          <h3
-            className="text-3xl sm:text-4xl font-black text-white leading-tight tracking-tight mb-6"
-            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
-          >
-            Todo en un solo lugar.
-          </h3>
-          <p className="text-white/40 text-base leading-relaxed">
-            Tendrás acceso a una plataforma donde podrás organizar tu catálogo por proyectos, seguir la evolución de cada track —desde la demo hasta el máster final— y centralizar todo tu contenido audiovisual.
+          <p className="mt-8 text-white/35 text-base leading-relaxed max-w-xl">
+            Con dirección. Con identidad. Y con recorrido.
           </p>
-          <p className="mt-4 text-white/25 text-sm leading-relaxed">
-            Clips, piezas de contenido, visuales y lanzamientos. Con orden y visión.
+          <p className="mt-4 text-white/20 text-sm">
+            Si estás creando en serio, esto tiene sentido.{" "}
+            <span className="text-white/35">Si lo entiendes…</span>
           </p>
-        </Block>
-
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
-          className="space-y-0 divide-y divide-white/[0.05]"
-        >
-          {[
-            { num: "01", label: "Catálogo organizado por proyectos" },
-            { num: "02", label: "Evolución de cada track visible" },
-            { num: "03", label: "Contenido audiovisual centralizado" },
-            { num: "04", label: "Lanzamientos con orden y visión" },
-          ].map((item, i) => (
-            <motion.div
-              key={i}
-              variants={bulletItem}
-              className="group flex items-start gap-6 py-5 cursor-default"
-            >
-              <span className="text-[11px] font-bold text-[#ff5833]/40 group-hover:text-[#ff5833] transition-colors duration-300 mt-0.5 tabular-nums">
-                {item.num}
-              </span>
-              <span className="text-base text-white/55 group-hover:text-white/90 transition-colors duration-300 font-light">
-                {item.label}
-              </span>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-
-      {/* Bloque: Plataforma — Todo vive en un solo lugar */}
-      <Block>
-        <div className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-10 sm:p-14 overflow-hidden">
-          <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#ff5833]/[0.06] rounded-full blur-3xl pointer-events-none" />
-          <div className="relative z-10">
-            <p className="text-[10px] font-bold text-[#ff5833] uppercase tracking-[0.35em] mb-6">Plataforma</p>
-            <h3
-              className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight mb-6"
-              style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
-            >
-              Todo vive en un solo lugar.
-            </h3>
-            <p className="text-white/40 text-base leading-relaxed max-w-2xl">
-              Una plataforma donde descubrir música, films y creadores.
-            </p>
-            <div className="mt-8 h-px bg-gradient-to-r from-[#ff5833]/50 via-[#ff5833]/10 to-transparent w-32" />
-            <p className="mt-6 text-white/20 text-sm">
-              Cada pieza vive en YouTube dentro del canal del creador.{" "}
-              <span className="text-white/35">Cabaña Creative selecciona, organiza y potencia el contenido.</span>
-            </p>
-          </div>
-        </div>
-      </Block>
-
-      {/* Bloque final */}
-      <Block>
-        <div className="max-w-3xl">
-          <p className="text-[10px] font-bold text-[#ff5833]/60 uppercase tracking-[0.3em] mb-6">Esto no se explica.</p>
-          <h3
-            className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight"
-            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
-          >
-            Se explora.
-          </h3>
           <div className="mt-8">
             <a
               href="/Explorar"
@@ -314,7 +366,7 @@ function ArtistView() {
               <span className="absolute inset-0 bg-white scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-300 origin-left rounded-full" />
               <span className="relative z-10 text-[11px] font-semibold text-white group-hover/btn:text-black uppercase tracking-widest transition-colors duration-300"
                 style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
-                Entrar →
+                Entra y explora →
               </span>
             </a>
           </div>
@@ -557,7 +609,7 @@ export default function AboutSection() {
           {/* Toggle */}
           <div className="relative inline-flex items-center bg-white/[0.03] border border-white/[0.08] rounded-full p-1 gap-0.5">
             {[
-              { id: "artists", label: "Para Artistas" },
+              { id: "artists", label: "Creadores" },
               { id: "brands",  label: "Para Marcas" },
             ].map((opt) => {
               const active = view === opt.id;
@@ -594,7 +646,7 @@ export default function AboutSection() {
               animate={{ width: view === "artists" ? "80px" : "64px" }}
             />
             <span className="text-[10px] text-white/20 font-light tracking-widest uppercase">
-              {view === "artists" ? "universo artístico" : "ecosistema de marcas"}
+              {view === "artists" ? "universo creador" : "ecosistema de marcas"}
             </span>
           </div>
         </motion.div>
