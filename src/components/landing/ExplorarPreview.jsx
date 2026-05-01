@@ -269,19 +269,23 @@ export default function ExplorarPreview() {
           >
             Atrévete a explorar
           </h2>
-          <p className="text-sm sm:text-base text-white/50 leading-relaxed max-w-2xl font-light">
-            Curamos música, films y contenido audiovisual con criterio.
-            <br /><br />
-            Cada pieza forma parte de un catálogo en evolución, pensado con intención y dirección.
-            <br /><br />
-            Utilizando YouTube como motor de distribución y monetización.
-            <br /><br />
-            Potenciamos proyectos a través del contenido, la narrativa y el movimiento.
-            <br /><br />
-            <span className="text-white/70">Explorar es donde las ideas dejan de ser ideas</span>
-            <br />
-            <span className="text-white/70">y empiezan a tomar forma.</span>
-          </p>
+          <div className="space-y-5 max-w-2xl">
+            <p className="text-sm sm:text-base text-white/60 leading-relaxed font-light">
+              Curamos música, films y contenido audiovisual <span className="text-white/80">con criterio.</span>
+            </p>
+            <p className="text-sm sm:text-base text-white/50 leading-relaxed font-light">
+              Cada pieza forma parte de un catálogo en evolución, pensado con intención y dirección.
+            </p>
+            <p className="text-sm sm:text-base text-white/50 leading-relaxed font-light">
+              Utilizando YouTube como motor de distribución y monetización.
+            </p>
+            <p className="text-sm sm:text-base text-white/50 leading-relaxed font-light">
+              Potenciamos proyectos a través del contenido, la narrativa y el movimiento.
+            </p>
+            <p className="text-sm sm:text-base text-white/40 leading-relaxed font-light italic pt-2">
+              Explorar es donde las ideas dejan de ser ideas y empiezan a tomar forma.
+            </p>
+          </div>
         </motion.div>
 
         {/* Platform window */}
