@@ -53,7 +53,7 @@ function MiniHero({ items }) {
   if (!current) return null;
 
   return (
-    <div className="relative w-full overflow-hidden" style={{ height: "38vh", minHeight: 220 }}>
+    <div className="relative w-full overflow-hidden" style={{ height: "52vh", minHeight: 280 }}>
       {/* Background */}
       <div className="absolute inset-0">
         {isVideo ? (
@@ -189,12 +189,10 @@ function FakeNav() {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-full overflow-hidden border border-white/20 flex-shrink-0">
-          <img
-            src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
-            alt="avatar"
-            className="w-full h-full object-cover"
-          />
+        <div className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.07)" }}>
+          <svg className="w-3.5 h-3.5 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+          </svg>
         </div>
       </div>
     </div>
@@ -278,11 +276,11 @@ export default function ExplorarPreview() {
             {/* Hero */}
             <MiniHero items={items} />
 
-            {/* Content rows — separated from hero with gentle fade bridge */}
-            <div className="relative pt-6 pb-10">
+            {/* Content rows — close to hero like real Explorar */}
+            <div className="relative -mt-14 pt-0 pb-10">
               {/* subtle top fade for visual continuity */}
-              <div className="absolute top-0 left-0 right-0 h-6 pointer-events-none z-10"
-                style={{ background: "linear-gradient(to bottom, rgba(8,8,8,0.4) 0%, transparent 100%)" }} />
+              <div className="absolute top-0 left-0 right-0 h-14 pointer-events-none z-10"
+                style={{ background: "linear-gradient(to bottom, rgba(8,8,8,0.55) 0%, transparent 100%)" }} />
 
               {row1.length > 0 && <NetflixRow label="En Tendencia" items={row1} rowIndex={0} />}
               {row2.length > 0 && <NetflixRow label="Nuevos Lanzamientos" items={row2} rowIndex={1} />}
