@@ -93,7 +93,7 @@ export default function ProjectsSection({ jlyArtistId }) {
             <div className="hidden sm:flex w-8 h-8 rounded-lg bg-white/5 items-center justify-center">
               <FolderOpen className="w-4 h-4 text-white/40" />
             </div>
-            <h3 className="text-base font-bold text-white">Proyectos Activos</h3>
+            <h3 className="text-base font-bold text-white">Proyectos</h3>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
