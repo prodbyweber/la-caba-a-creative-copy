@@ -175,23 +175,6 @@ export default function ArtistDashboard() {
                    )}
                  </button>
                )}
-               {showPhotosSection && (
-                 <button
-                   onClick={() => setCatalogMode("photos")}
-                   className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-                   style={{ color: catalogMode === "photos" ? "#fff" : "rgba(255,255,255,0.3)" }}
-                 >
-                   <Camera className="w-3.5 h-3.5" />
-                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Fotos</span>
-                   {catalogMode === "photos" && (
-                     <motion.div
-                       layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
-                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                     />
-                   )}
-                 </button>
-               )}
                {showVideoSection && (
                  <button
                    onClick={() => setCatalogMode("video")}
@@ -201,6 +184,23 @@ export default function ArtistDashboard() {
                    <Film className="w-3.5 h-3.5" />
                    <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Video</span>
                    {catalogMode === "video" && (
+                     <motion.div
+                       layoutId="catalogUnderline"
+                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
+                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                     />
+                   )}
+                 </button>
+               )}
+               {showPhotosSection && (
+                 <button
+                   onClick={() => setCatalogMode("photos")}
+                   className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
+                   style={{ color: catalogMode === "photos" ? "#fff" : "rgba(255,255,255,0.3)" }}
+                 >
+                   <Camera className="w-3.5 h-3.5" />
+                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Fotos</span>
+                   {catalogMode === "photos" && (
                      <motion.div
                        layoutId="catalogUnderline"
                        className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
