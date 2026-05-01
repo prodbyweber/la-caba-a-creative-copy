@@ -609,7 +609,7 @@ export default function AboutSection() {
           {/* Toggle */}
           <div className="relative inline-flex items-center bg-white/[0.03] border border-white/[0.08] rounded-full p-1 gap-0.5">
             {[
-              { id: "artists", label: "Creadores" },
+              { id: "artists", label: "Para Creadores" },
               { id: "brands",  label: "Para Marcas" },
             ].map((opt) => {
               const active = view === opt.id;
