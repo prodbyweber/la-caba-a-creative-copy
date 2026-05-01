@@ -83,7 +83,7 @@ function MiniHero({ items }) {
         style={{ background: "#080808", opacity: transitioning ? 1 : 0 }}
       />
 
-      {/* Content — title + dots */}
+      {/* Content — title + dots + CTA */}
       <div className="relative z-10 flex flex-col justify-end h-full px-5 sm:px-8 pb-5">
         <div className="flex items-center gap-1.5 mb-1">
           <span className="text-[8px] font-black uppercase tracking-widest text-[#ff5833]">Destacado</span>
@@ -94,19 +94,49 @@ function MiniHero({ items }) {
         >
           {current.title}
         </h3>
-        {/* Dots */}
-        {heroItems.length > 1 && (
-          <div className="absolute bottom-4 right-5 flex items-center gap-1">
-            {heroItems.slice(0, 6).map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => goTo(idx)}
-                className="h-[2px] rounded-full transition-all duration-300"
-                style={{ width: idx === activeIdx ? 18 : 6, background: idx === activeIdx ? "white" : "rgba(255,255,255,0.25)" }}
-              />
-            ))}
-          </div>
-        )}
+
+        {/* Bottom-right: dots + Acceder button */}
+        <div className="absolute bottom-4 right-4 sm:right-5 flex items-center gap-3">
+          {heroItems.length > 1 && (
+            <div className="flex items-center gap-1">
+              {heroItems.slice(0, 6).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => goTo(idx)}
+                  className="h-[2px] rounded-full transition-all duration-300"
+                  style={{ width: idx === activeIdx ? 18 : 6, background: idx === activeIdx ? "white" : "rgba(255,255,255,0.25)" }}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Cinematic Acceder button */}
+          <a
+            href="/Explorar"
+            onClick={(e) => { e.preventDefault(); base44.auth.redirectToLogin("/Explorar"); }}
+            className="group relative inline-flex items-center gap-1.5 overflow-hidden"
+            style={{
+              padding: "6px 14px 6px 14px",
+              borderRadius: 99,
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.22)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+            }}
+          >
+            {/* White fill on hover */}
+            <span className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <span
+              className="relative z-10 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-white group-hover:text-black transition-colors duration-300 whitespace-nowrap"
+              style={{ fontFamily: "'Helvetica Neue', sans-serif" }}
+            >
+              Acceder
+            </span>
+            <svg className="relative z-10 w-2.5 h-2.5 text-white group-hover:text-black transition-colors duration-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -216,7 +246,7 @@ export default function ExplorarPreview() {
   const row3 = withThumb.slice(14, 21);
 
   return (
-    <section ref={sectionRef} className="relative w-full bg-[#0a0a0b] overflow-hidden py-16 sm:py-24">
+    <section ref={sectionRef} className="relative w-full bg-[#0a0a0b] overflow-hidden pt-16 pb-0 sm:pt-20 sm:pb-0">
       {/* Ambient top glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] pointer-events-none"
         style={{ background: "radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,88,51,0.06) 0%, transparent 70%)" }} />
@@ -306,40 +336,7 @@ export default function ExplorarPreview() {
           </div>
         </motion.div>
 
-        {/* CTA — acceder */}
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 px-1"
-        >
-          <p className="text-sm text-white/30 font-light">
-            Un universo privado de artistas, creadores y marcas.
-          </p>
-          <a
-            href="/Explorar"
-            onClick={(e) => {
-              e.preventDefault();
-              base44.auth.redirectToLogin("/Explorar");
-            }}
-            className="group relative inline-flex items-center gap-2.5 px-6 py-3 rounded-full overflow-hidden transition-all duration-300"
-            style={{
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.14)",
-            }}
-          >
-            <span className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <span
-              className="relative z-10 text-[11px] font-bold uppercase tracking-widest text-white group-hover:text-black transition-colors duration-300"
-              style={{ fontFamily: "'Helvetica Neue', sans-serif" }}
-            >
-              Acceder a la plataforma
-            </span>
-            <svg className="relative z-10 w-3.5 h-3.5 text-white group-hover:text-black transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </a>
-        </motion.div>
+
       </div>
     </section>
   );
