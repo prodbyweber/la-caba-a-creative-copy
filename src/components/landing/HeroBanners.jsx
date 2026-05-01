@@ -15,8 +15,8 @@ const defaultBanners = [
   {
     tag: "Creadoras",
     title: "Creadoras",
-    subtitle: "Rostros, estética y dirección visual.",
-    microcopy: "Cada imagen forma parte de una historia.",
+    subtitle: "",
+    microcopy: "",
     defaultCta: "Explorar →",
     defaultLink: "/Explorar",
     defaultImage: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1800&h=900&fit=crop&q=85",
