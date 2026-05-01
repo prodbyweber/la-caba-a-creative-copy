@@ -258,7 +258,7 @@ function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEna
                 className="relative z-10 text-[10px] font-semibold text-white group-hover/btn:text-black uppercase tracking-widest transition-colors duration-300"
                 style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
               >
-                {ctaText || banner.defaultCta}
+                Explorar
               </span>
             </button>
           </motion.div>
