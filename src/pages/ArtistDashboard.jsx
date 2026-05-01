@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music2, Film, Image, Zap, SlidersHorizontal, ExternalLink } from "lucide-react";
+import { Music2, Film, Image, Zap, SlidersHorizontal, Camera } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
@@ -74,6 +74,7 @@ export default function ArtistDashboard() {
   const accountType = viewMode || userProfile?.account_type || "artist";
   
   const showAudioSection = accountType === "artist";
+  const showPhotosSection = accountType === "artist" || accountType === "creator" || accountType === "brand";
   const showVideoSection = accountType === "artist" || accountType === "creator" || accountType === "brand";
   const showProjectsSection = accountType === "artist" || accountType === "creator" || accountType === "brand";
   const showCampaignsSection = accountType === "brand";
@@ -83,7 +84,7 @@ export default function ArtistDashboard() {
   useEffect(() => {
     if (!catalogMode && userProfile) {
       if (accountType === "artist") setCatalogMode("audio");
-      else if (accountType === "creator") setCatalogMode("video");
+      else if (accountType === "creator") setCatalogMode("photos");
       else if (accountType === "brand") setCatalogMode("campaigns");
     }
   }, [userProfile, accountType, catalogMode]);
@@ -174,6 +175,23 @@ export default function ArtistDashboard() {
                    )}
                  </button>
                )}
+               {showPhotosSection && (
+                 <button
+                   onClick={() => setCatalogMode("photos")}
+                   className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
+                   style={{ color: catalogMode === "photos" ? "#fff" : "rgba(255,255,255,0.3)" }}
+                 >
+                   <Camera className="w-3.5 h-3.5" />
+                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Fotos</span>
+                   {catalogMode === "photos" && (
+                     <motion.div
+                       layoutId="catalogUnderline"
+                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
+                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                     />
+                   )}
+                 </button>
+               )}
                {showVideoSection && (
                  <button
                    onClick={() => setCatalogMode("video")}
@@ -181,7 +199,7 @@ export default function ArtistDashboard() {
                    style={{ color: catalogMode === "video" ? "#fff" : "rgba(255,255,255,0.3)" }}
                  >
                    <Film className="w-3.5 h-3.5" />
-                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Mi Galería</span>
+                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Video</span>
                    {catalogMode === "video" && (
                      <motion.div
                        layoutId="catalogUnderline"
@@ -248,6 +266,18 @@ export default function ArtistDashboard() {
               </motion.div>
             )}
 
+            {showPhotosSection && catalogMode === "photos" && (
+              <motion.div
+                key="photos"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.25 }}
+              >
+                <PhotosGallery userProfileId={userProfile?.id} />
+              </motion.div>
+            )}
+
             {showVideoSection && catalogMode === "video" && (
               <motion.div
                 key="video"
@@ -255,13 +285,8 @@ export default function ArtistDashboard() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.25 }}
-                className="space-y-6"
               >
-                {/* Galería de Fotos */}
-                <PhotosGallery userProfileId={userProfile?.id} />
-
-                {/* Videos */}
-                {effectiveArtist && <VideosSection artistId={effectiveArtist.id} />}
+                <VideosSection artistId={effectiveArtist?.id} userProfileId={userProfile?.id} />
               </motion.div>
             )}
 
