@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 
 // ── Animation variants ────────────────────────────────────────────────────────
 
@@ -43,21 +45,7 @@ const panelVariants = {
 
 // ── Thumbnails ────────────────────────────────────────────────────────────────
 
-const artistThumbnails = [
-  { label: "Producción", img: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=600&h=340&fit=crop" },
-  { label: "Catálogo", img: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=600&h=340&fit=crop" },
-  { label: "Branding", img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=340&fit=crop" },
-  { label: "Contenido", img: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600&h=340&fit=crop" },
-  { label: "Visual", img: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=600&h=340&fit=crop" },
-];
-
-const brandThumbnails = [
-  { label: "Estrategia", img: "https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=600&h=340&fit=crop" },
-  { label: "Identidad", img: "https://images.unsplash.com/photo-1534670007418-fbb7f6cf32c3?w=600&h=340&fit=crop" },
-  { label: "Cultura", img: "https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=600&h=340&fit=crop" },
-  { label: "Campaña", img: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600&h=340&fit=crop" },
-  { label: "Sonido", img: "https://images.unsplash.com/photo-1504509546545-e000b4a62425?w=600&h=340&fit=crop" },
-];
+// thumbnails cargados dinámicamente desde ExplorarItem
 
 // ── Reusable block with scroll animation ─────────────────────────────────────
 
@@ -76,29 +64,41 @@ function Block({ children, delay = 0, className = "" }) {
   );
 }
 
-// ── Thumbnail strip ───────────────────────────────────────────────────────────
+// ── Thumbnail strip — carga portadas reales de ExplorarItem ──────────────────
 
-function ThumbStrip({ items }) {
+function ThumbStrip() {
+  const { data: explorarItems = [] } = useQuery({
+    queryKey: ['explorar-items-thumbs'],
+    queryFn: async () => {
+      const items = await base44.entities.ExplorarItem.filter({ is_active: true });
+      // solo los que tienen thumbnail
+      return items.filter(i => i.thumbnail_url).slice(0, 10);
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (explorarItems.length === 0) return null;
+
   return (
     <div className="flex gap-3 overflow-x-auto pb-3 -mx-2 px-2 scrollbar-none">
-      {items.map((t, i) => (
+      {explorarItems.map((item, i) => (
         <motion.div
-          key={i}
+          key={item.id}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: i * 0.08, duration: 0.55, ease: "easeOut" }}
+          transition={{ delay: i * 0.06, duration: 0.55, ease: "easeOut" }}
           className="group relative flex-shrink-0 w-48 sm:w-60 rounded-xl overflow-hidden cursor-pointer"
           style={{ aspectRatio: "16/9" }}
         >
           <img
-            src={t.img}
-            alt={t.label}
+            src={item.thumbnail_url}
+            alt={item.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-400" />
           <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
-            <p className="text-[11px] font-semibold text-white/80 uppercase tracking-widest">{t.label}</p>
+            <p className="text-[11px] font-semibold text-white/80 uppercase tracking-widest truncate">{item.title}</p>
           </div>
           <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#ff5833] scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
         </motion.div>
@@ -211,7 +211,7 @@ function ArtistView() {
             Todo conectado. Nada aislado.
           </p>
         </div>
-        <ThumbStrip items={artistThumbnails} />
+        <ThumbStrip />
       </Block>
 
       {/* Bloque 5 — Para artistas y creadores */}
@@ -478,7 +478,7 @@ function BrandView() {
             Creamos campañas audiovisuales pensadas para parar el scroll, generar conexión y quedarse en la cabeza.
           </p>
         </div>
-        <ThumbStrip items={brandThumbnails} />
+        <ThumbStrip />
       </Block>
 
       {/* Bloque 5: Creatividad + Marketing */}
