@@ -261,15 +261,19 @@ export default function ExplorarPreview() {
         >
           <p className="text-[10px] font-semibold text-[#ff5833] uppercase tracking-[0.35em] mb-3"
             style={{ fontFamily: "'Helvetica Neue', sans-serif" }}>
-            Plataforma
+            Cabaña Creative
           </p>
           <h2
-            className="font-black text-white leading-[0.9] tracking-[-0.04em]"
+            className="font-black text-white leading-[0.9] tracking-[-0.04em] mb-6"
             style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "clamp(2rem, 5.5vw, 3.6rem)" }}
           >
-            Descubre el universo<br />
-            <span style={{ color: "rgba(255,255,255,0.3)" }}>Cabaña Creative.</span>
+            Atrévete a explorar
           </h2>
+          <p className="text-sm sm:text-base text-white/50 leading-relaxed max-w-2xl font-light">
+            Curamos contenido cinemático y audiovisual — música, audiovisuales, films y recomendaciones. 
+            Potenciamos YouTube como reproductor, permitiendo que cada pieza sea 100% monetizada y beneficiada por su algoritmo. 
+            Explorar es descubrir una red donde la creatividad se convierte en movimiento real.
+          </p>
         </motion.div>
 
         {/* Platform window */}
