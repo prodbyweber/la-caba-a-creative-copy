@@ -56,11 +56,21 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible }
       <div className="absolute inset-0 overflow-hidden">
         {isVideo ? (
         <>
+          {/* Thumbnail shown instantly as background while video buffers */}
+          {(item?.thumbnail_url || item?.image) && (
+            <img
+              src={item.thumbnail_url || item.image}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ filter: "brightness(1.08) saturate(1.15)" }}
+            />
+          )}
           <video
               ref={videoRef}
               src={item.hero_media_url}
               poster={item?.thumbnail_url || item?.image || undefined}
-              className="w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover"
               style={{ filter: "brightness(1.08) saturate(1.15)" }}
               autoPlay
               muted
@@ -258,17 +268,13 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
-  // Preload first slide media so hero appears already loaded
+  // Preload first slide: use thumbnail for instant display, no black flash
   useEffect(() => {
     if (heroItems.length === 0) return;
     const first = heroItems[0];
-    const isVideo = first?.hero_media_type === "video" && first?.hero_media_url;
-    const src = first?.hero_media_url || first?.image;
+    // Always try thumbnail/image first (fast) — video buffers behind it
+    const src = first?.thumbnail_url || first?.image;
     if (!src) { setHeroReady(true); return; }
-    if (isVideo) {
-      setHeroReady(true); // videos show immediately, black flash avoided via poster
-      return;
-    }
     const img = new Image();
     img.onload = () => setHeroReady(true);
     img.onerror = () => setHeroReady(true);

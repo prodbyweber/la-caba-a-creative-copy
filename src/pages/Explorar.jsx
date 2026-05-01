@@ -145,7 +145,16 @@ export default function Explorar() {
   // Map ExplorarItem to card format
   const mapItemToCard = (item) => {
     const ytThumb = getYoutubeThumbnail(item.youtube_url || item.youtube_music_url);
-    const artist = artists.find(a => a.id === item.artist_id);  
+    const artist = artists.find(a => a.id === item.artist_id);
+
+    // Hero media: prioridad → hero_media_url > preview_media_url > thumbnail > ytThumb
+    const heroMediaUrl = item.hero_media_url || item.preview_media_url || null;
+    const heroMediaType = item.hero_media_url
+      ? item.hero_media_type
+      : item.preview_media_url
+        ? item.preview_media_type
+        : "image";
+
     return {
       id: item.id,
       title: item.title,
@@ -155,8 +164,8 @@ export default function Explorar() {
       youtube_music_url: item.youtube_music_url,
       audio_file_url: item.audio_file_url,
       artist_id: item.artist_id,
-      hero_media_url: item.hero_media_url,
-      hero_media_type: item.hero_media_type,
+      hero_media_url: heroMediaUrl,
+      hero_media_type: heroMediaType,
       hero_link: item.hero_link,
       hero_link_label: item.hero_link_label,
       raw: item,
