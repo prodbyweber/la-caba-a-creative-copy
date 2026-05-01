@@ -9,7 +9,7 @@ function getYoutubeId(url) {
   return match ? match[1] : null;
 }
 
-function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible }) {
+function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible, onVideoReady }) {
   const ytUrl = item?.youtube_url || item?.youtube_music_url;
   const ytId = getYoutubeId(ytUrl);
   const bg = item?.image || artist?.avatar_url || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80";
@@ -56,20 +56,9 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible }
       <div className="absolute inset-0 overflow-hidden">
         {isVideo ? (
         <>
-          {/* Thumbnail shown instantly as background while video buffers */}
-          {(item?.thumbnail_url || item?.image) && (
-            <img
-              src={item.thumbnail_url || item.image}
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ filter: "brightness(1.08) saturate(1.15)" }}
-            />
-          )}
           <video
               ref={videoRef}
               src={item.hero_media_url}
-              poster={item?.thumbnail_url || item?.image || undefined}
               className="absolute inset-0 w-full h-full object-cover"
               style={{ filter: "brightness(1.08) saturate(1.15)" }}
               autoPlay
@@ -77,6 +66,7 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible }
               loop
               playsInline
               preload="auto"
+              onCanPlay={() => onVideoReady?.()}
               data-hero-video
             />
             {/* Audio toggle button — only if audio is enabled for this slide */}
@@ -268,12 +258,14 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
-  // Preload first slide: use thumbnail for instant display, no black flash
+  // For image slides: preload the image then show hero
+  // For video slides: hero shows via onVideoReady callback from the video element
   useEffect(() => {
     if (heroItems.length === 0) return;
     const first = heroItems[0];
-    // Always try thumbnail/image first (fast) — video buffers behind it
-    const src = first?.thumbnail_url || first?.image;
+    const isVideo = first?.hero_media_type === "video" && first?.hero_media_url;
+    if (isVideo) return; // video reveals via onCanPlay
+    const src = first?.hero_media_url || first?.image;
     if (!src) { setHeroReady(true); return; }
     const img = new Image();
     img.onload = () => setHeroReady(true);
@@ -337,10 +329,13 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
       </AnimatePresence>
 
       {/* Hero Carousel */}
-      <div
+      <motion.div
         ref={heroRef}
-        className="relative w-full overflow-hidden transition-opacity duration-700"
-        style={{ height: "85vh", minHeight: 520, opacity: heroReady ? 1 : 0 }}
+        className="relative w-full overflow-hidden"
+        initial={{ opacity: 0, scale: 1.04 }}
+        animate={heroReady ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.04 }}
+        transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+        style={{ height: "85vh", minHeight: 520 }}
       >
 
         {/* Todos los slides montados simultáneamente — solo el activo es visible */}
@@ -361,6 +356,7 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
               active={idx === activeIdx && !transitioning}
               cardModalOpen={cardModalOpen}
               isVisible={isHeroVisible}
+              onVideoReady={idx === 0 ? () => setHeroReady(true) : undefined}
             />
           </div>
         ))}
@@ -403,7 +399,7 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
             ))}
           </div>
         )}
-      </div>
+      </motion.div>
     </>
   );
 }
