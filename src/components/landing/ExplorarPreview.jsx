@@ -278,11 +278,11 @@ export default function ExplorarPreview() {
             {/* Hero */}
             <MiniHero items={items} />
 
-            {/* Content rows — overlapping hero bottom */}
-            <div className="relative -mt-10 pb-10">
-              {/* top fade from hero into rows */}
-              <div className="absolute top-0 left-0 right-0 h-10 pointer-events-none z-10"
-                style={{ background: "linear-gradient(to bottom, rgba(8,8,8,0.7) 0%, transparent 100%)" }} />
+            {/* Content rows — separated from hero with gentle fade bridge */}
+            <div className="relative pt-6 pb-10">
+              {/* subtle top fade for visual continuity */}
+              <div className="absolute top-0 left-0 right-0 h-6 pointer-events-none z-10"
+                style={{ background: "linear-gradient(to bottom, rgba(8,8,8,0.4) 0%, transparent 100%)" }} />
 
               {row1.length > 0 && <NetflixRow label="En Tendencia" items={row1} rowIndex={0} />}
               {row2.length > 0 && <NetflixRow label="Nuevos Lanzamientos" items={row2} rowIndex={1} />}
@@ -309,6 +309,41 @@ export default function ExplorarPreview() {
             <div className="absolute bottom-0 left-0 right-0 h-28 pointer-events-none"
               style={{ background: "linear-gradient(to top, #0a0a0b 0%, transparent 100%)" }} />
           </div>
+        </motion.div>
+
+        {/* CTA — acceder */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 px-1"
+        >
+          <p className="text-sm text-white/30 font-light">
+            Un universo privado de artistas, creadores y marcas.
+          </p>
+          <a
+            href="/Explorar"
+            onClick={(e) => {
+              e.preventDefault();
+              base44.auth.redirectToLogin("/Explorar");
+            }}
+            className="group relative inline-flex items-center gap-2.5 px-6 py-3 rounded-full overflow-hidden transition-all duration-300"
+            style={{
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.14)",
+            }}
+          >
+            <span className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <span
+              className="relative z-10 text-[11px] font-bold uppercase tracking-widest text-white group-hover:text-black transition-colors duration-300"
+              style={{ fontFamily: "'Helvetica Neue', sans-serif" }}
+            >
+              Acceder a la plataforma
+            </span>
+            <svg className="relative z-10 w-3.5 h-3.5 text-white group-hover:text-black transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </a>
         </motion.div>
       </div>
     </section>
