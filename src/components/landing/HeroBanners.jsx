@@ -42,8 +42,8 @@ const defaultBanners = [
   {
     tag: "Films",
     title: "Films",
-    subtitle: "Contenido cinematográfico en formato real.",
-    microcopy: "Todo se documenta. Todo se muestra.",
+    subtitle: "",
+    microcopy: "",
     defaultCta: "Explorar →",
     defaultLink: "/Explorar",
     defaultImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1800&h=900&fit=crop&q=85",
@@ -209,7 +209,7 @@ function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEna
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.28 + index * 0.06, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="font-black text-white leading-[0.88] tracking-[-0.03em] mb-2"
+            className="font-black text-white leading-[0.88] tracking-[-0.03em] mb-6"
             style={{
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               fontSize: "clamp(2.4rem, 8vw, 4.5rem)",
