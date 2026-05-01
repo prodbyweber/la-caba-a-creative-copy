@@ -494,13 +494,20 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                             rel="noopener noreferrer"
                             className="w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl border border-orange-500/25 bg-orange-500/[0.07] hover:bg-orange-500/[0.12] hover:border-orange-500/50 transition-all group"
                           >
-                            <div className="w-8 h-8 rounded-full bg-orange-500/15 border border-orange-500/30 flex items-center justify-center flex-shrink-0">
-                              <User className="w-4 h-4 text-orange-400" />
+                            {/* Avatar real de la cuenta */}
+                            <div className="w-9 h-9 rounded-full overflow-hidden border-2 border-orange-500/40 flex-shrink-0 flex items-center justify-center"
+                              style={{ background: "#1c1c1e" }}>
+                              {avatarUrl ? (
+                                <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover"
+                                  style={{ objectPosition: photoPosition }} />
+                              ) : (
+                                <User className="w-4 h-4 text-orange-400/60" />
+                              )}
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-xs font-semibold text-orange-400 group-hover:text-orange-300 transition-colors">Perfil público</span>
-                                <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                                <span className="text-xs font-semibold text-orange-400 group-hover:text-orange-300 transition-colors truncate">{displayName}</span>
+                                <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 flex-shrink-0">
                                   ✓ Verified
                                 </span>
                               </div>
