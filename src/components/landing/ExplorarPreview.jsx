@@ -84,39 +84,39 @@ function MiniHero({ items }) {
       />
 
       {/* Content — title + dots + CTA */}
-      <div className="relative z-10 flex flex-col justify-end h-full px-5 sm:px-8 pb-5">
+      <div className="relative z-10 flex flex-col justify-end h-full px-4 sm:px-8 pb-3 sm:pb-5">
         <div className="flex items-center gap-1.5 mb-1">
-          <span className="text-[8px] font-black uppercase tracking-widest text-[#ff5833]">Destacado</span>
+          <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-[#ff5833]">Destacado</span>
         </div>
         <h3
-          className="text-sm sm:text-lg font-black text-white leading-tight"
-          style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.025em", maxWidth: 280 }}
+          className="text-xs sm:text-lg font-black text-white leading-tight line-clamp-2"
+          style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.025em", maxWidth: "100%" }}
         >
           {current.title}
         </h3>
 
         {/* Bottom-right: dots + Acceder button */}
-        <div className="absolute bottom-4 right-4 sm:right-5 flex items-center gap-3">
+        <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-5 flex items-center gap-2 sm:gap-3">
           {heroItems.length > 1 && (
-            <div className="flex items-center gap-1">
-              {heroItems.slice(0, 6).map((_, idx) => (
+            <div className="flex items-center gap-0.5 sm:gap-1">
+              {heroItems.slice(0, 4).map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => goTo(idx)}
-                  className="h-[2px] rounded-full transition-all duration-300"
-                  style={{ width: idx === activeIdx ? 18 : 6, background: idx === activeIdx ? "white" : "rgba(255,255,255,0.25)" }}
+                  className="h-[1.5px] sm:h-[2px] rounded-full transition-all duration-300"
+                  style={{ width: idx === activeIdx ? 12 : 4, background: idx === activeIdx ? "white" : "rgba(255,255,255,0.25)" }}
                 />
               ))}
             </div>
           )}
 
-          {/* Cinematic Acceder button */}
+          {/* Cinematic Acceder button — mobile optimized */}
           <a
             href="/Explorar"
             onClick={(e) => { e.preventDefault(); base44.auth.redirectToLogin("/Explorar"); }}
-            className="group relative inline-flex items-center gap-1.5 overflow-hidden"
+            className="group relative inline-flex items-center gap-0.5 sm:gap-1.5 overflow-hidden flex-shrink-0"
             style={{
-              padding: "6px 14px 6px 14px",
+              padding: "4px 10px 4px 10px",
               borderRadius: 99,
               background: "rgba(255,255,255,0.08)",
               border: "1px solid rgba(255,255,255,0.22)",
@@ -127,12 +127,12 @@ function MiniHero({ items }) {
             {/* White fill on hover */}
             <span className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <span
-              className="relative z-10 text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-white group-hover:text-black transition-colors duration-300 whitespace-nowrap"
+              className="relative z-10 text-[7px] sm:text-[10px] font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] text-white group-hover:text-black transition-colors duration-300 whitespace-nowrap"
               style={{ fontFamily: "'Helvetica Neue', sans-serif" }}
             >
-              Acceder
+              Ir
             </span>
-            <svg className="relative z-10 w-2.5 h-2.5 text-white group-hover:text-black transition-colors duration-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.8}>
+            <svg className="relative z-10 w-2 h-2 sm:w-2.5 sm:h-2.5 text-white group-hover:text-black transition-colors duration-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
             </svg>
           </a>
@@ -156,7 +156,7 @@ function NetflixCard({ item, index, rowIndex }) {
       onMouseLeave={() => setHovered(false)}
       className="relative flex-shrink-0 rounded-lg overflow-hidden cursor-default"
       style={{
-        width: 180,
+        width: "clamp(120px, 15vw, 180px)",
         aspectRatio: "16/9",
         transform: hovered ? "scale(1.06)" : "scale(1)",
         transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)",
@@ -187,12 +187,12 @@ function NetflixCard({ item, index, rowIndex }) {
 function NetflixRow({ label, items, rowIndex }) {
   if (!items?.length) return null;
   return (
-    <div className="mb-4 px-5 sm:px-8">
-      <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.18em] mb-2"
+    <div className="mb-3 sm:mb-4 px-4 sm:px-8">
+      <p className="text-[8px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.15em] sm:tracking-[0.18em] mb-1.5 sm:mb-2"
         style={{ fontFamily: "'Helvetica Neue', sans-serif" }}>
         {label}
       </p>
-      <div className="flex gap-2 overflow-x-hidden">
+      <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
         {items.map((item, i) => (
           <NetflixCard key={item.id} item={item} index={i} rowIndex={rowIndex} />
         ))}
@@ -307,7 +307,7 @@ export default function ExplorarPreview() {
             <MiniHero items={items} />
 
             {/* Content rows — below hero with clear separation */}
-            <div className="relative pb-10 pt-3">
+            <div className="relative pb-6 sm:pb-10 pt-2 sm:pt-3">
 
               {row1.length > 0 && <NetflixRow label="En Tendencia" items={row1} rowIndex={0} />}
               {row2.length > 0 && <NetflixRow label="Nuevos Lanzamientos" items={row2} rowIndex={1} />}
