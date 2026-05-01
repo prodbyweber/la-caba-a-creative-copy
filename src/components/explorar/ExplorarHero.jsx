@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Info, X, Youtube, ChevronLeft, ChevronRight, ExternalLink, Volume2, VolumeX } from "lucide-react";
 import { useExplorar } from "@/context/ExplorarContext.jsx";
@@ -9,7 +9,7 @@ function getYoutubeId(url) {
   return match ? match[1] : null;
 }
 
-function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible, onVideoReady }) {
+function HeroSlide({ item, artist, onExplore, active, shouldPlayAudio, onVideoReady }) {
   const ytUrl = item?.youtube_url || item?.youtube_music_url;
   const ytId = getYoutubeId(ytUrl);
   const bg = item?.image || artist?.avatar_url || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80";
@@ -18,23 +18,31 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible, 
   const videoRef = useRef(null);
   const [muted, setMuted] = useState(true);
 
+  // Control play/pause and mute based on external state
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
-    if (active && !cardModalOpen && isVisible) {
-      vid.muted = audioEnabled ? false : true;
-      setMuted(!audioEnabled);
+
+    if (active) {
       vid.play().catch(() => {});
+      // Only unmute if audio is enabled for this slide AND conditions allow
+      const wantAudio = audioEnabled && shouldPlayAudio;
+      vid.muted = !wantAudio;
+      setMuted(!wantAudio);
     } else {
       vid.pause();
+      vid.muted = true;
+      setMuted(true);
     }
-  }, [active, cardModalOpen, isVisible]);
+  }, [active, shouldPlayAudio, audioEnabled]);
 
-  useEffect(() => {
+  const handleToggleMute = () => {
     const vid = videoRef.current;
     if (!vid) return;
-    vid.muted = muted;
-  }, [muted]);
+    const next = !muted;
+    vid.muted = next;
+    setMuted(next);
+  };
 
   const handleActionBtn = () => {
     const link = item?.hero_link;
@@ -55,13 +63,12 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible, 
       {/* Background media */}
       <div className="absolute inset-0 overflow-hidden">
         {isVideo ? (
-        <>
-          <video
+          <>
+            <video
               ref={videoRef}
               src={item.hero_media_url}
               className="absolute inset-0 w-full h-full object-cover"
               style={{ filter: "brightness(1.08) saturate(1.15)" }}
-              autoPlay
               muted
               loop
               playsInline
@@ -69,13 +76,13 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible, 
               onCanPlay={() => onVideoReady?.()}
               data-hero-video
             />
-            {/* Audio toggle button — only if audio is enabled for this slide */}
+            {/* Audio toggle — only shown when audio is enabled for this slide */}
             {audioEnabled && (
               <motion.button
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.5 }}
-                onClick={() => setMuted(m => !m)}
+                onClick={handleToggleMute}
                 className="absolute bottom-12 right-4 z-20 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-black/70 hover:border-white/40 transition-all"
                 title={muted ? "Activar sonido" : "Silenciar"}
               >
@@ -91,13 +98,9 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible, 
             src={item?.hero_media_url || bg}
             alt={item?.title}
             className="w-full h-full object-cover"
-            style={{
-              transform: "scale(1)",
-              filter: "brightness(1.08) saturate(1.15)",
-            }}
+            style={{ filter: "brightness(1.08) saturate(1.15)" }}
           />
         )}
-        {/* Gradiente sutil solo en área del texto */}
         <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(8,8,8,0.25) 20%, transparent 60%)" }} />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(8,8,8,0.3) 0%, transparent 35%)" }} />
       </div>
@@ -137,7 +140,6 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible, 
           )}
 
           <div className="flex items-center gap-3 flex-wrap">
-            {/* Botón Reproducir — solo si hay YouTube */}
             {hasPlayBtn && (
               <motion.button
                 whileHover={{ scale: 1.03 }}
@@ -149,8 +151,6 @@ function HeroSlide({ item, artist, onExplore, active, cardModalOpen, isVisible, 
                 Reproducir
               </motion.button>
             )}
-
-            {/* Botón de acción / redirect */}
             {hasActionBtn && (
               <motion.button
                 whileHover={{ scale: 1.03 }}
@@ -178,7 +178,8 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
   const [showModal, setShowModal] = useState(false);
   const [embedFailed, setEmbedFailed] = useState(false);
   const intervalRef = useRef(null);
-  const [isHeroVisible, setIsHeroVisible] = useState(true);
+  // isHeroVisible: true when hero is scrolled into view (>50% visible)
+  const [isHeroVisible, setIsHeroVisible] = useState(false);
   const heroRef = useRef(null);
 
   const heroItems = items.length > 0 ? items : [];
@@ -186,8 +187,16 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
   const ytUrl = current?.youtube_url || current?.youtube_music_url;
   const ytId = getYoutubeId(ytUrl);
 
-  // Inject modal opener into current item
   if (current) current._openModal = () => setShowModal(true);
+
+  // Audio should only play when:
+  // 1. Hero is scrolled into view
+  // 2. No card modal open (YouTube embed in cards)
+  // 3. No YouTube modal open in hero
+  // 4. Tab is visible (not background)
+  const [tabVisible, setTabVisible] = useState(!document.hidden);
+
+  const shouldPlayAudio = isHeroVisible && !cardModalOpen && !showModal && tabVisible;
 
   const goTo = (idx) => {
     if (idx === activeIdx || transitioning) return;
@@ -195,7 +204,7 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
     setTimeout(() => {
       setActiveIdx(idx);
       setTransitioning(false);
-    }, 250); // mitad del fade — cambia el slide en el punto más oscuro
+    }, 250);
     resetInterval();
   };
 
@@ -216,55 +225,43 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
     return () => clearInterval(intervalRef.current);
   }, [heroItems.length]);
 
-  // Intersection Observer para controlar reproducción según visibilidad
+  // Track tab visibility (single listener)
+  useEffect(() => {
+    const handleVisibility = () => {
+      const visible = !document.hidden;
+      setTabVisible(visible);
+      // Pause all hero videos when tab hidden, resume when visible
+      document.querySelectorAll('[data-hero-video]').forEach(vid => {
+        if (document.hidden) {
+          vid.pause();
+        } else {
+          // Only resume if it's the active slide video
+          vid.play().catch(() => {});
+        }
+      });
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
+
+  // IntersectionObserver — hero visible only when >50% in viewport
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsHeroVisible(entry.isIntersecting && entry.intersectionRatio > 0.5);
+        setIsHeroVisible(entry.isIntersecting && entry.intersectionRatio >= 0.5);
       },
       { threshold: [0, 0.5] }
     );
-
-    if (heroRef.current) {
-      observer.observe(heroRef.current);
-    }
-
+    if (heroRef.current) observer.observe(heroRef.current);
     return () => observer.disconnect();
   }, []);
 
-  // Pausar audio cuando salga de la app web
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        const videos = document.querySelectorAll('[data-hero-video]');
-        videos.forEach(video => video.pause?.());
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
-
-  // Pausar video cuando la pestaña no está visible
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      const heroSlides = document.querySelectorAll('video[src]');
-      if (document.hidden) {
-        heroSlides.forEach(video => video.pause());
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
-
-  // For image slides: preload the image then show hero
-  // For video slides: hero shows via onVideoReady callback from the video element
+  // Preload logic for image vs video first slide
   useEffect(() => {
     if (heroItems.length === 0) return;
     const first = heroItems[0];
     const isVideo = first?.hero_media_type === "video" && first?.hero_media_url;
-    if (isVideo) return; // video reveals via onCanPlay
+    if (isVideo) return; // revealed via onCanPlay
     const src = first?.hero_media_url || first?.image;
     if (!src) { setHeroReady(true); return; }
     const img = new Image();
@@ -337,12 +334,10 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
         transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
         style={{ height: "85vh", minHeight: 520 }}
       >
-
-        {/* Todos los slides montados simultáneamente — solo el activo es visible */}
         {heroItems.map((item, idx) => (
           <div
             key={item.id || idx}
-            className="absolute inset-0 transition-opacity"
+            className="absolute inset-0"
             style={{
               opacity: idx === activeIdx ? 1 : 0,
               transitionDuration: "0ms",
@@ -354,14 +349,13 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
               artist={artists.find(a => a.id === item.artist_id)}
               onExplore={() => onExplore && onExplore(item)}
               active={idx === activeIdx && !transitioning}
-              cardModalOpen={cardModalOpen}
-              isVisible={isHeroVisible}
+              shouldPlayAudio={shouldPlayAudio}
               onVideoReady={idx === 0 ? () => setHeroReady(true) : undefined}
             />
           </div>
         ))}
 
-        {/* Cinematic curtain — fade oscuro de 0.5s al cambiar slide */}
+        {/* Cinematic curtain */}
         <motion.div
           className="absolute inset-0 z-10 pointer-events-none"
           style={{ background: "#080808" }}
@@ -372,16 +366,10 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
         {/* Nav arrows */}
         {heroItems.length > 1 && (
           <>
-            <button
-              onClick={prev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 border border-white/10 flex items-center justify-center transition-all backdrop-blur-sm"
-            >
+            <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 border border-white/10 flex items-center justify-center transition-all backdrop-blur-sm">
               <ChevronLeft className="w-5 h-5 text-white" />
             </button>
-            <button
-              onClick={next}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 border border-white/10 flex items-center justify-center transition-all backdrop-blur-sm"
-            >
+            <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 hover:bg-black/70 border border-white/10 flex items-center justify-center transition-all backdrop-blur-sm">
               <ChevronRight className="w-5 h-5 text-white" />
             </button>
           </>
