@@ -242,7 +242,7 @@ export default function Hero({ config }) {
           <p className="text-base sm:text-lg lg:text-xl font-light text-white/90 max-w-sm leading-snug">
             {heroSubtitle || "Un universo de música, cine y contenido en movimiento."}
           </p>
-          <p className="mt-3 text-xs text-white/30 tracking-wide">Descubre lo que está pasando dentro.</p>
+
         </div>
       </motion.div>
     </section>
