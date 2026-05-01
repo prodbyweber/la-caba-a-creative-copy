@@ -1,23 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Upload, Image as ImageIcon, Loader2, Check } from "lucide-react";
+import { X, Image as ImageIcon, Loader2, Check } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
-const PROJECT_TYPES = ["Single", "EP", "Album", "ContentPack", "MixMaster"];
+const PROJECT_TYPES = ["Single", "EP", "Album", "Film", "MiniFilm", "Serie"];
 const TYPE_LABELS = {
   Single: "Single",
   EP: "EP",
   Album: "Álbum",
-  ContentPack: "Content Pack",
-  MixMaster: "Mix & Master",
+  Film: "Film",
+  MiniFilm: "Mini Film",
+  Serie: "Serie",
 };
 
 const currentYear = new Date().getFullYear();
 const YEARS = Array.from({ length: 20 }, (_, i) => currentYear + 2 - i);
 
-const fieldClass = "w-full bg-transparent border-b border-white/[0.1] py-3 text-white text-sm focus:outline-none focus:border-white/40 transition-colors placeholder-white/20";
-const labelClass = "block text-[10px] font-semibold text-white/30 uppercase tracking-[0.18em] mb-1";
+const fieldClass =
+  "w-full bg-transparent border-b border-white/[0.1] py-3 text-white text-sm focus:outline-none focus:border-white/40 transition-colors placeholder-white/20";
+const labelClass =
+  "block text-[10px] font-semibold text-white/30 uppercase tracking-[0.18em] mb-1";
 
 export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, project = null }) {
   const [formData, setFormData] = useState({
@@ -26,7 +29,6 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
     year: currentYear,
     cover_url: "",
   });
-
   const [uploading, setUploading] = useState(false);
   const [coverPreview, setCoverPreview] = useState("");
 
@@ -48,9 +50,10 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (data) => project
-      ? base44.entities.Project.update(project.id, data)
-      : base44.entities.Project.create(data),
+    mutationFn: (data) =>
+      project
+        ? base44.entities.Project.update(project.id, data)
+        : base44.entities.Project.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["all-tracks"] });
@@ -64,7 +67,7 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
     setUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setFormData(f => ({ ...f, cover_url: file_url }));
+      setFormData((f) => ({ ...f, cover_url: file_url }));
       setCoverPreview(file_url);
     } finally {
       setUploading(false);
@@ -87,7 +90,6 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-        {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -96,7 +98,6 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
           className="absolute inset-0 bg-black/75 backdrop-blur-md"
         />
 
-        {/* Panel */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -113,7 +114,10 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
           <div className="flex items-center justify-between px-6 pt-6 pb-5 flex-shrink-0">
             <p
               className="text-base font-black text-white leading-none"
-              style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", letterSpacing: "-0.03em" }}
+              style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                letterSpacing: "-0.03em",
+              }}
             >
               {project ? "Editar proyecto" : "Nuevo proyecto"}
             </p>
@@ -126,25 +130,40 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
           </div>
 
           {/* Scrollable form */}
-          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto px-6 pb-8 space-y-7" style={{ scrollbarWidth: "none" }}>
-
+          <form
+            onSubmit={handleSubmit}
+            className="flex-1 overflow-y-auto px-6 pb-8 space-y-7"
+            style={{ scrollbarWidth: "none" }}
+          >
             {/* Cover */}
             <div>
               <label className={labelClass}>Portada</label>
               <label className="block cursor-pointer group">
-                <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} disabled={uploading} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                  disabled={uploading}
+                />
                 <div
                   className="relative w-full rounded-2xl overflow-hidden flex items-center justify-center transition-all"
-                  style={{ aspectRatio: "1/1", maxHeight: 200, background: "rgba(255,255,255,0.04)", border: "1px dashed rgba(255,255,255,0.1)" }}
+                  style={{
+                    aspectRatio: "1/1",
+                    maxHeight: 200,
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px dashed rgba(255,255,255,0.1)",
+                  }}
                 >
                   {coverPreview ? (
                     <img src={coverPreview} alt="Portada" className="w-full h-full object-cover" />
                   ) : (
                     <div className="flex flex-col items-center gap-2 py-8">
-                      {uploading
-                        ? <Loader2 className="w-6 h-6 text-white/20 animate-spin" />
-                        : <ImageIcon className="w-6 h-6 text-white/15 group-hover:text-white/30 transition-colors" />
-                      }
+                      {uploading ? (
+                        <Loader2 className="w-6 h-6 text-white/20 animate-spin" />
+                      ) : (
+                        <ImageIcon className="w-6 h-6 text-white/15 group-hover:text-white/30 transition-colors" />
+                      )}
                       <span className="text-[11px] text-white/20 group-hover:text-white/35 transition-colors">
                         {uploading ? "Subiendo..." : "Toca para añadir portada"}
                       </span>
@@ -152,7 +171,7 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
                   )}
                   {coverPreview && (
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-                      <Upload className="w-5 h-5 text-white" />
+                      <ImageIcon className="w-5 h-5 text-white" />
                     </div>
                   )}
                 </div>
@@ -165,7 +184,7 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
               <input
                 type="text"
                 value={formData.title}
-                onChange={e => setFormData(f => ({ ...f, title: e.target.value }))}
+                onChange={(e) => setFormData((f) => ({ ...f, title: e.target.value }))}
                 placeholder="Nombre del proyecto"
                 className={fieldClass}
                 required
@@ -177,18 +196,21 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
             <div>
               <label className={labelClass}>Tipo</label>
               <div className="flex flex-wrap gap-2 mt-2">
-                {PROJECT_TYPES.map(t => (
+                {PROJECT_TYPES.map((t) => (
                   <button
                     key={t}
                     type="button"
-                    onClick={() => setFormData(f => ({ ...f, type: t }))}
+                    onClick={() => setFormData((f) => ({ ...f, type: t }))}
                     className="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all"
                     style={{
                       fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                       letterSpacing: "0.04em",
                       background: formData.type === t ? "white" : "rgba(255,255,255,0.05)",
                       color: formData.type === t ? "black" : "rgba(255,255,255,0.4)",
-                      border: formData.type === t ? "1px solid white" : "1px solid rgba(255,255,255,0.08)",
+                      border:
+                        formData.type === t
+                          ? "1px solid white"
+                          : "1px solid rgba(255,255,255,0.08)",
                     }}
                   >
                     {TYPE_LABELS[t]}
@@ -202,12 +224,14 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
               <label className={labelClass}>Año</label>
               <select
                 value={formData.year}
-                onChange={e => setFormData(f => ({ ...f, year: e.target.value }))}
+                onChange={(e) => setFormData((f) => ({ ...f, year: e.target.value }))}
                 className={fieldClass + " bg-transparent appearance-none cursor-pointer"}
                 style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}
               >
-                {YEARS.map(y => (
-                  <option key={y} value={y} className="bg-[#0e0e0f]">{y}</option>
+                {YEARS.map((y) => (
+                  <option key={y} value={y} className="bg-[#0e0e0f]">
+                    {y}
+                  </option>
                 ))}
               </select>
             </div>
@@ -224,10 +248,17 @@ export default function CreateProjectModal({ isOpen, onClose, jlyArtistId, proje
                 color: "black",
               }}
             >
-              {createMutation.isPending
-                ? <><Loader2 className="w-4 h-4 animate-spin" /> {project ? "Guardando..." : "Creando..."}</>
-                : <><Check className="w-4 h-4" /> {project ? "Guardar cambios" : "Crear proyecto"}</>
-              }
+              {createMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  {project ? "Guardando..." : "Creando..."}
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  {project ? "Guardar cambios" : "Crear proyecto"}
+                </>
+              )}
             </button>
           </form>
         </motion.div>

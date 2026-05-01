@@ -1,147 +1,276 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import DashboardNav from "@/components/dashboard/DashboardNav";
-import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
-import { 
-  ArrowLeft, Plus, Music2, Edit, Trash2, 
-  Check, X, Image as ImageIcon, FileText, Play, Pause, GripVertical,
-  FolderPlus, Folder, Film
+import {
+  ArrowLeft, Plus, Music2, Film, Image as ImageIcon,
+  Play, Pause, Trash2, X, Check
 } from "lucide-react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { Link } from "react-router-dom";
-import { createPageUrl } from "@/utils";
-import ProjectClipsSection from "@/components/project/ProjectClipsSection";
-import TrackFilesSection from "@/components/project/TrackFilesSection";
+import ProjectAssetPicker from "@/components/project/ProjectAssetPicker";
 
+const FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif";
+
+function getYoutubeId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+const TYPE_LABELS = {
+  Single: "Single", EP: "EP", Album: "Álbum",
+  Film: "Film", MiniFilm: "Mini Film", Serie: "Serie",
+};
+
+// ── Mini audio player ────────────────────────────────────────────────────────
+function TrackRow({ track, index, playing, onPlay, onRemove }) {
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+    if (playing) {
+      audioRef.current.play().catch(() => {});
+    } else {
+      audioRef.current.pause();
+    }
+  }, [playing]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.04 }}
+      className="group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all"
+      style={{ background: playing ? "rgba(255,255,255,0.07)" : "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+    >
+      {track.audio_file_url && (
+        <audio ref={audioRef} src={track.audio_file_url} preload="metadata" onEnded={() => onPlay(null)} />
+      )}
+
+      {/* Cover / play */}
+      <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center"
+        style={{ background: "rgba(255,255,255,0.06)" }}>
+        {track.cover_url
+          ? <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
+          : <Music2 className="w-4 h-4 text-white/20" />}
+        {track.audio_file_url && (
+          <button
+            onClick={() => onPlay(playing ? null : track.id)}
+            className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            {playing
+              ? <Pause className="w-3.5 h-3.5 text-white" fill="white" />
+              : <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" />}
+          </button>
+        )}
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-white truncate font-semibold" style={{ fontFamily: FONT, letterSpacing: "-0.01em" }}>
+          {track.title}
+        </p>
+        {track.duration && (
+          <p className="text-[10px] text-white/30">
+            {Math.floor(track.duration / 60)}:{String(Math.floor(track.duration % 60)).padStart(2, "0")}
+          </p>
+        )}
+      </div>
+
+      <button
+        onClick={() => onRemove(track.id)}
+        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-500/20 text-white/30 hover:text-red-400 transition-all"
+      >
+        <X className="w-3.5 h-3.5" />
+      </button>
+    </motion.div>
+  );
+}
+
+// ── Video card ────────────────────────────────────────────────────────────────
+function VideoCard({ item, index, onRemove }) {
+  const ytId = getYoutubeId(item.youtube_url);
+  const thumb = item.thumbnail_url || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : null);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: index * 0.05 }}
+      className="group relative rounded-xl overflow-hidden"
+      style={{ aspectRatio: "16/9", background: "rgba(255,255,255,0.05)" }}
+    >
+      {thumb
+        ? <img src={thumb} alt={item.title} className="w-full h-full object-cover" />
+        : <div className="w-full h-full flex items-center justify-center"><Film className="w-8 h-8 text-white/15" /></div>}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 p-3">
+        <p className="text-xs font-bold text-white truncate" style={{ fontFamily: FONT }}>{item.title}</p>
+        {item.content_type && (
+          <p className="text-[9px] text-white/40 uppercase tracking-widest mt-0.5">{TYPE_LABELS[item.content_type] || item.content_type}</p>
+        )}
+      </div>
+      <button
+        onClick={() => onRemove(item.id)}
+        className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/70"
+      >
+        <X className="w-3 h-3 text-white" />
+      </button>
+    </motion.div>
+  );
+}
+
+// ── Photo card ────────────────────────────────────────────────────────────────
+function PhotoCard({ item, index, onRemove }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: index * 0.04 }}
+      className="group relative rounded-xl overflow-hidden aspect-square"
+      style={{ background: "rgba(255,255,255,0.05)" }}
+    >
+      {item.url
+        ? <img src={item.url} alt={item.title} className="w-full h-full object-cover" />
+        : <div className="w-full h-full flex items-center justify-center"><ImageIcon className="w-6 h-6 text-white/15" /></div>}
+      <button
+        onClick={() => onRemove(item.id)}
+        className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/70"
+      >
+        <X className="w-3 h-3 text-white" />
+      </button>
+    </motion.div>
+  );
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
 export default function ProjectDetail() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("tracks");
-  const [editingTrack, setEditingTrack] = useState(null);
-  const [showAddTrack, setShowAddTrack] = useState(false);
-  const [playingTrackId, setPlayingTrackId] = useState(null);
-  const audioRefs = React.useRef({});
-  const [moodboardImages, setMoodboardImages] = useState([]);
+  const [playingId, setPlayingId] = useState(null);
+  const [picker, setPicker] = useState(null); // "tracks" | "videos" | "photos" | null
 
   const urlParams = new URLSearchParams(window.location.search);
-  const projectId = urlParams.get('id');
-
+  const projectId = urlParams.get("id");
   const queryClient = useQueryClient();
 
+  // Current user
+  const [currentUser, setCurrentUser] = useState(null);
+  useEffect(() => {
+    base44.auth.me().then(setCurrentUser).catch(() => {});
+  }, []);
+
+  // Project
   const { data: project } = useQuery({
-    queryKey: ['project', projectId],
+    queryKey: ["project", projectId],
     queryFn: async () => {
-      const projects = await base44.entities.Project.filter({ id: projectId });
-      return projects[0];
+      const r = await base44.entities.Project.filter({ id: projectId });
+      return r[0];
     },
     enabled: !!projectId,
   });
 
-  const { data: tracks } = useQuery({
-    queryKey: ['tracks', projectId],
-    queryFn: () => base44.entities.Track.filter({ project_id: projectId }),
-    initialData: [],
-    enabled: !!projectId,
+  // Artist linked to user
+  const { data: selfArtist } = useQuery({
+    queryKey: ["self-artist", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      const r = await base44.entities.Artist.filter({ user_id: currentUser.id });
+      return r[0] || null;
+    },
+    enabled: !!currentUser?.id,
   });
 
+  // UserProfile for this user
+  const { data: userProfile } = useQuery({
+    queryKey: ["user-profile-me", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      const r = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
+      return r[0] || null;
+    },
+    enabled: !!currentUser?.id,
+  });
 
+  // All tracks of the artist/user
+  const { data: allUserTracks = [] } = useQuery({
+    queryKey: ["user-tracks", selfArtist?.id],
+    queryFn: () => selfArtist?.id
+      ? base44.entities.Track.filter({ artist_id: selfArtist.id })
+      : base44.entities.Track.list("-created_date", 200),
+    enabled: !!currentUser,
+  });
 
-  React.useEffect(() => {
-    if (project?.moodboard_urls && Array.isArray(project.moodboard_urls)) {
-      setMoodboardImages(project.moodboard_urls);
+  // All videos (ExplorarItems) of the artist/user
+  const { data: allUserVideos = [] } = useQuery({
+    queryKey: ["user-videos", selfArtist?.id, currentUser?.email],
+    queryFn: async () => {
+      let items = [];
+      if (selfArtist?.id) {
+        items = await base44.entities.ExplorarItem.filter({ artist_id: selfArtist.id });
+      } else {
+        const all = await base44.entities.ExplorarItem.list("-created_date", 100);
+        items = all.filter((i) => i.created_by === currentUser?.email);
+      }
+      return items.filter((i) => ["film", "minifilm", "series", "Film", "MiniFilm", "Serie"].includes(i.content_type));
+    },
+    enabled: !!currentUser,
+  });
+
+  // User photos from profile media_items
+  const userPhotos = (userProfile?.media_items || []).filter((m) => m.type === "image");
+
+  // Project linked asset IDs (stored in project.assets_links as JSON)
+  const [linkedAssets, setLinkedAssets] = useState({ tracks: [], videos: [], photos: [] });
+
+  useEffect(() => {
+    if (!project) return;
+    try {
+      const parsed = JSON.parse(project.assets_links?.[0] || "{}");
+      setLinkedAssets({
+        tracks: parsed.tracks || [],
+        videos: parsed.videos || [],
+        photos: parsed.photos || [],
+      });
+    } catch {
+      setLinkedAssets({ tracks: [], videos: [], photos: [] });
     }
   }, [project]);
 
-  const createTrackMutation = useMutation({
-    mutationFn: (data) => base44.entities.Track.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tracks', projectId] });
-      setShowAddTrack(false);
-    },
-  });
-
-  const updateTrackMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Track.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tracks', projectId] });
-      setEditingTrack(null);
-    },
-  });
-
-  const deleteTrackMutation = useMutation({
-    mutationFn: (id) => base44.entities.Track.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tracks', projectId] });
-    },
-  });
-
   const updateProjectMutation = useMutation({
     mutationFn: (data) => base44.entities.Project.update(projectId, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['project', projectId] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["project", projectId] }),
   });
 
-  const handleAddMoodboardSlot = async (file) => {
-    if (!file) return;
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    const newImages = [...moodboardImages, file_url];
-    setMoodboardImages(newImages);
-    updateProjectMutation.mutate({ moodboard_urls: newImages });
+  const saveAssets = (next) => {
+    setLinkedAssets(next);
+    updateProjectMutation.mutate({ assets_links: [JSON.stringify(next)] });
   };
 
-  const handleRemoveMoodboardSlot = (index) => {
-    const newImages = moodboardImages.filter((_, i) => i !== index);
-    setMoodboardImages(newImages);
-    updateProjectMutation.mutate({ moodboard_urls: newImages });
+  const handlePickerConfirm = (mode, ids) => {
+    const next = { ...linkedAssets, [mode]: ids };
+    saveAssets(next);
+    setPicker(null);
   };
 
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
-    const items = Array.from(moodboardImages);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-    setMoodboardImages(items);
-    updateProjectMutation.mutate({ moodboard_urls: items });
+  const removeAsset = (mode, id) => {
+    const next = { ...linkedAssets, [mode]: linkedAssets[mode].filter((x) => x !== id) };
+    saveAssets(next);
   };
 
-  const togglePlay = async (trackId) => {
-    const audio = audioRefs.current[trackId];
-    if (!audio) {
-      console.error('Audio element not found for track:', trackId);
-      return;
-    }
+  // Resolve linked items
+  const linkedTracks = allUserTracks.filter((t) => linkedAssets.tracks.includes(t.id));
+  const linkedVideos = allUserVideos.filter((v) => linkedAssets.videos.includes(v.id));
+  const linkedPhotos = userPhotos.filter((p) => linkedAssets.photos.includes(p.id));
 
-    try {
-      if (playingTrackId === trackId) {
-        audio.pause();
-        setPlayingTrackId(null);
-      } else {
-        // Pause any other playing track
-        if (playingTrackId && audioRefs.current[playingTrackId]) {
-          audioRefs.current[playingTrackId].pause();
-        }
-        
-        // Play audio
-        setPlayingTrackId(trackId);
-        await audio.play();
-      }
-    } catch (err) {
-      console.error('Error playing audio:', err);
-      setPlayingTrackId(null);
-    }
-  };
-
-  const tabs = [
-    { id: "tracks", label: "Tracks", icon: Music2 },
-    { id: "clips", label: "Clips", icon: Play },
+  const TABS = [
+    { id: "tracks", label: "Tracks", icon: Music2, count: linkedTracks.length },
+    { id: "videos", label: "Videos", icon: Film, count: linkedVideos.length },
+    { id: "photos", label: "Fotos", icon: ImageIcon, count: linkedPhotos.length },
   ];
 
   if (!project) {
     return (
       <div className="min-h-screen bg-[#0a0a0b] flex items-center justify-center">
-        <div className="text-white">Cargando proyecto...</div>
+        <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
       </div>
     );
   }
@@ -150,425 +279,228 @@ export default function ProjectDetail() {
     <div className="min-h-screen bg-[#0a0a0b] text-white">
       <DashboardNav />
 
-      <main className="pt-16">
-        <div className="px-3 sm:px-6 py-4 sm:py-6 max-w-5xl mx-auto w-full">
-          {/* Minimal Project Header */}
-          <div className="flex items-center justify-between mb-6 sm:mb-8">
-            <div className="flex-1 min-w-0">
-              <button 
-                onClick={() => window.history.back()} 
-                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-300 mb-2 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Volver</span>
-              </button>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">{project.title}</h1>
-              <div className="flex items-center gap-3 flex-wrap">
-                <span className={`px-2.5 py-0.5 rounded text-xs font-medium ${
-                  project.status === 'active' 
-                    ? 'bg-emerald-500/10 text-emerald-400' 
-                    : 'bg-gray-500/10 text-gray-400'
-                }`}>
-                  {project.status === 'active' ? 'Activo' : 'Completado'}
-                </span>
-                <span className="text-gray-500 text-xs">
-                  {tracks.length} track{tracks.length !== 1 ? 's' : ''}
-                </span>
+      <main className="pt-14">
+        {/* ── HERO ── */}
+        <div className="relative overflow-hidden" style={{ minHeight: 280 }}>
+          {/* Blurred cover bg */}
+          {project.cover_url && (
+            <div className="absolute inset-0">
+              <img src={project.cover_url} alt="" className="w-full h-full object-cover scale-110 blur-2xl opacity-25" />
+              <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(10,10,11,0.3), #0a0a0b)" }} />
+            </div>
+          )}
+          {!project.cover_url && (
+            <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 100%)" }} />
+          )}
+
+          <div className="relative z-10 px-5 sm:px-8 lg:px-12 pt-8 pb-10 max-w-5xl mx-auto">
+            <button
+              onClick={() => window.history.back()}
+              className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 mb-6 transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> Volver
+            </button>
+
+            <div className="flex items-end gap-5 sm:gap-8">
+              {/* Cover */}
+              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden flex-shrink-0 shadow-2xl"
+                style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                {project.cover_url
+                  ? <img src={project.cover_url} alt={project.title} className="w-full h-full object-cover" />
+                  : <div className="w-full h-full flex items-center justify-center"><Music2 className="w-10 h-10 text-white/15" /></div>}
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0 pb-1">
+                <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-2">
+                  {TYPE_LABELS[project.type] || project.type}
+                </p>
+                <h1
+                  className="text-3xl sm:text-5xl font-black text-white leading-[0.95] mb-3 truncate"
+                  style={{ fontFamily: FONT, letterSpacing: "-0.04em" }}
+                >
+                  {project.title}
+                </h1>
+                <div className="flex items-center gap-3 flex-wrap">
+                  {project.year && (
+                    <span className="text-sm text-white/40" style={{ fontFamily: FONT }}>{project.year}</span>
+                  )}
+                  <span className="w-1 h-1 rounded-full bg-white/20" />
+                  <span className="text-sm text-white/30">{linkedTracks.length} tracks · {linkedVideos.length} videos · {linkedPhotos.length} fotos</span>
+                </div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Tabs */}
-          <div className="flex gap-2 mb-6 border-b border-white/5 pb-3">
-            {tabs.map((tab) => (
+        {/* ── TABS ── */}
+        <div className="px-5 sm:px-8 lg:px-12 max-w-5xl mx-auto">
+          <div className="flex gap-0 border-b border-white/[0.07] mb-6">
+            {TABS.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-0 py-2 text-sm font-medium transition-colors border-b-2 ${
-                  activeTab === tab.id
-                    ? 'text-white border-emerald-500'
-                    : 'text-gray-500 border-transparent hover:text-gray-400'
-                }`}
+                className="relative flex items-center gap-1.5 px-4 pb-3 pt-1 text-xs font-semibold transition-colors mr-1"
+                style={{
+                  fontFamily: FONT,
+                  color: activeTab === tab.id ? "white" : "rgba(255,255,255,0.3)",
+                }}
               >
-                <tab.icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{tab.label}</span>
+                <tab.icon className="w-3.5 h-3.5" />
+                {tab.label}
+                {tab.count > 0 && (
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-white/10 text-white/40">{tab.count}</span>
+                )}
+                {activeTab === tab.id && (
+                  <motion.div
+                    layoutId="projectTabLine"
+                    className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
               </button>
             ))}
           </div>
 
-          {/* Content */}
-          {activeTab === "clips" ? (
-            <ProjectClipsSection projectId={projectId} tracks={tracks} />
-          ) : (
-            <div className="space-y-4">
-              {/* Add Track Button */}
-              <button
-                onClick={() => setShowAddTrack(!showAddTrack)}
-                className="w-full p-3 sm:p-4 rounded-lg border border-white/10 hover:border-white/20 bg-transparent hover:bg-white/5 flex items-center justify-center gap-2 text-xs sm:text-sm text-gray-500 hover:text-gray-300 transition-all"
-              >
-                <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-                Añadir Track
-              </button>
+          {/* ── CONTENT ── */}
+          <AnimatePresence mode="wait">
 
-              {/* Add Track Form */}
-              {showAddTrack && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  className="bg-[#141414] rounded-lg p-4 sm:p-6 border border-white/5"
-                >
-                  <TrackForm
-                    projectId={projectId}
-                    onSubmit={(data) => createTrackMutation.mutate(data)}
-                    onCancel={() => setShowAddTrack(false)}
-                  />
-                </motion.div>
-              )}
-
-              {/* Tracks List - Netflix Style Vertical */}
-              <div className="space-y-1.5">
-                {tracks.map((track, index) => (
-                  <motion.div
-                    key={track.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.03 }}
-                    className="group"
+            {/* TRACKS */}
+            {activeTab === "tracks" && (
+              <motion.div key="tracks" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-[10px] font-bold text-white/25 uppercase tracking-[0.18em]">Tracks del proyecto</p>
+                  <button
+                    onClick={() => setPicker("tracks")}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white/50 hover:text-white transition-all"
+                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
                   >
-                    {editingTrack?.id === track.id ? (
-                      <div className="bg-[#141414] rounded-xl border border-white/5 overflow-hidden p-4 sm:p-6">
-                        <TrackForm
-                          track={track}
-                          projectId={projectId}
-                          onSubmit={(data) => updateTrackMutation.mutate({ id: track.id, data })}
-                          onCancel={() => setEditingTrack(null)}
-                        />
-                      </div>
-                    ) : (
-                      <div className="bg-[#0f0f10] hover:bg-[#1a1a1c] rounded-lg border border-white/5 hover:border-white/8 overflow-hidden transition-all duration-200 flex gap-3 sm:gap-4 p-3 sm:p-3.5">
-                        {/* Track Number */}
-                        <div className="text-center font-bold text-gray-500 flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs sm:text-sm">
-                          {track.track_number || index + 1}
-                        </div>
+                    <Plus className="w-3 h-3" /> Añadir track
+                  </button>
+                </div>
 
-                        {/* Cover with Play Button */}
-                        <div className="relative flex-shrink-0">
-                          {track.audio_file_url && (
-                            <audio
-                              ref={(el) => { if (el) audioRefs.current[track.id] = el; }}
-                              src={track.audio_file_url}
-                              preload="metadata"
-                              playsInline
-                              onEnded={() => setPlayingTrackId(null)}
-                              onPause={() => { if (playingTrackId === track.id) setPlayingTrackId(null); }}
-                              onPlay={() => setPlayingTrackId(track.id)}
-                              onError={(e) => console.error('Audio load error:', e, track.audio_file_url)}
-                            />
-                          )}
+                {linkedTracks.length === 0 ? (
+                  <button
+                    onClick={() => setPicker("tracks")}
+                    className="w-full py-16 rounded-2xl border border-dashed border-white/[0.07] flex flex-col items-center gap-3 hover:border-white/15 transition-colors"
+                  >
+                    <Music2 className="w-8 h-8 text-white/10" />
+                    <p className="text-xs text-white/20">Añade tracks de tu catálogo a este proyecto</p>
+                  </button>
+                ) : (
+                  <div className="space-y-2 pb-8">
+                    {linkedTracks.map((t, i) => (
+                      <TrackRow
+                        key={t.id}
+                        track={t}
+                        index={i}
+                        playing={playingId === t.id}
+                        onPlay={setPlayingId}
+                        onRemove={(id) => removeAsset("tracks", id)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
 
-                          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 flex items-center justify-center overflow-hidden relative">
-                            {track.cover_url ? (
-                              <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
-                            ) : (
-                              <Music2 className="w-5 h-5 sm:w-6 sm:h-6 text-white/40" />
-                            )}
+            {/* VIDEOS */}
+            {activeTab === "videos" && (
+              <motion.div key="videos" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-[10px] font-bold text-white/25 uppercase tracking-[0.18em]">Videos del proyecto</p>
+                  <button
+                    onClick={() => setPicker("videos")}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white/50 hover:text-white transition-all"
+                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
+                  >
+                    <Plus className="w-3 h-3" /> Añadir video
+                  </button>
+                </div>
 
-                            {/* Play Button Overlay */}
-                            {track.audio_file_url && (
-                              <>
-                                <div className={`absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity ${playingTrackId === track.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`} />
-                                <button
-                                  type="button"
-                                  onTouchEnd={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    togglePlay(track.id);
-                                  }}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    togglePlay(track.id);
-                                  }}
-                                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/90 hover:bg-white active:scale-95 hover:scale-110 flex items-center justify-center transition-all shadow-lg z-10 touch-manipulation"
-                                >
-                                  {playingTrackId === track.id ? (
-                                    <Pause className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black" fill="black" />
-                                  ) : (
-                                    <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-black ml-0.5" fill="black" />
-                                  )}
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </div>
+                {linkedVideos.length === 0 ? (
+                  <button
+                    onClick={() => setPicker("videos")}
+                    className="w-full py-16 rounded-2xl border border-dashed border-white/[0.07] flex flex-col items-center gap-3 hover:border-white/15 transition-colors"
+                  >
+                    <Film className="w-8 h-8 text-white/10" />
+                    <p className="text-xs text-white/20">Añade videos de tu catálogo a este proyecto</p>
+                  </button>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-8">
+                    {linkedVideos.map((v, i) => (
+                      <VideoCard key={v.id} item={v} index={i} onRemove={(id) => removeAsset("videos", id)} />
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
 
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-white mb-0.5 sm:mb-1 line-clamp-1 text-sm sm:text-base">{track.title}</h4>
-                          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-gray-400">
-                            {track.composer && (
-                              <span className="truncate">{track.composer}</span>
-                            )}
-                            {track.composer && track.status && (
-                              <span className="text-gray-600">·</span>
-                            )}
-                            {track.status && (
-                              <span className={`px-1.5 sm:px-2 py-0.5 rounded font-medium ${
-                                track.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400' :
-                                track.status === 'mastering' ? 'bg-purple-500/10 text-purple-400' :
-                                'bg-gray-500/10 text-gray-400'
-                              }`}>
-                                {track.status}
-                              </span>
-                            )}
-                          </div>
-                        </div>
+            {/* PHOTOS */}
+            {activeTab === "photos" && (
+              <motion.div key="photos" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-[10px] font-bold text-white/25 uppercase tracking-[0.18em]">Fotos del proyecto</p>
+                  <button
+                    onClick={() => setPicker("photos")}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white/50 hover:text-white transition-all"
+                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
+                  >
+                    <Plus className="w-3 h-3" /> Añadir foto
+                  </button>
+                </div>
 
-                        {/* Duration - Hidden on mobile */}
-                        {track.duration && (
-                          <div className="text-xs sm:text-sm text-gray-500 flex-shrink-0 hidden sm:block">
-                            {Math.floor(track.duration / 60)}:{String(Math.floor(track.duration % 60)).padStart(2, '0')}
-                          </div>
-                        )}
-
-                        {/* Actions - Always visible on mobile, hover on desktop */}
-                        <div className="flex items-center gap-1 flex-shrink-0 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => setEditingTrack(track)}
-                            className="p-1.5 sm:p-2 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-                            title="Editar"
-                          >
-                            <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                          </button>
-                          <button
-                            onClick={() => {
-                              if (confirm('¿Eliminar este track?')) {
-                                deleteTrackMutation.mutate(track.id);
-                              }
-                            }}
-                            className="p-1.5 sm:p-2 rounded-lg hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-colors"
-                            title="Eliminar"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          )}
+                {linkedPhotos.length === 0 ? (
+                  <button
+                    onClick={() => setPicker("photos")}
+                    className="w-full py-16 rounded-2xl border border-dashed border-white/[0.07] flex flex-col items-center gap-3 hover:border-white/15 transition-colors"
+                  >
+                    <ImageIcon className="w-8 h-8 text-white/10" />
+                    <p className="text-xs text-white/20">Añade fotos de tu galería a este proyecto</p>
+                  </button>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 pb-8">
+                    {linkedPhotos.map((p, i) => (
+                      <PhotoCard key={p.id} item={p} index={i} onRemove={(id) => removeAsset("photos", id)} />
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </main>
+
+      {/* Asset Picker */}
+      <AnimatePresence>
+        {picker === "tracks" && (
+          <ProjectAssetPicker
+            mode="tracks"
+            items={allUserTracks}
+            selectedIds={linkedAssets.tracks}
+            onConfirm={(ids) => handlePickerConfirm("tracks", ids)}
+            onClose={() => setPicker(null)}
+          />
+        )}
+        {picker === "videos" && (
+          <ProjectAssetPicker
+            mode="videos"
+            items={allUserVideos}
+            selectedIds={linkedAssets.videos}
+            onConfirm={(ids) => handlePickerConfirm("videos", ids)}
+            onClose={() => setPicker(null)}
+          />
+        )}
+        {picker === "photos" && (
+          <ProjectAssetPicker
+            mode="photos"
+            items={userPhotos}
+            selectedIds={linkedAssets.photos}
+            onConfirm={(ids) => handlePickerConfirm("photos", ids)}
+            onClose={() => setPicker(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
-  );
-}
-
-function TrackForm({ track, projectId, onSubmit, onCancel }) {
-  const [formData, setFormData] = useState(track || {
-    title: "",
-    track_number: null,
-    composer: "",
-    mix_engineer: "",
-    master_engineer: "",
-    dolby_atmos: false,
-    genre: "",
-    status: "idea",
-    notes: "",
-    audio_file_url: "",
-    versions: {}
-  });
-  const [uploadingAudio, setUploadingAudio] = useState(false);
-
-  const handleAudioUpload = async (file) => {
-    if (!file) return;
-    setUploadingAudio(true);
-    try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setFormData({ ...formData, audio_file_url: file_url });
-    } catch (error) {
-      console.error('Error uploading audio:', error);
-    } finally {
-      setUploadingAudio(false);
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit({ ...formData, project_id: projectId });
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Título *</label>
-          <input
-            type="text"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Número de Track</label>
-          <input
-            type="number"
-            value={formData.track_number || ""}
-            onChange={(e) => setFormData({ ...formData, track_number: parseInt(e.target.value) || null })}
-            className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
-          />
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Compositor</label>
-          <input
-            type="text"
-            value={formData.composer}
-            onChange={(e) => setFormData({ ...formData, composer: e.target.value })}
-            className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Mix Engineer</label>
-          <input
-            type="text"
-            value={formData.mix_engineer}
-            onChange={(e) => setFormData({ ...formData, mix_engineer: e.target.value })}
-            className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Master Engineer</label>
-          <input
-            type="text"
-            value={formData.master_engineer}
-            onChange={(e) => setFormData({ ...formData, master_engineer: e.target.value })}
-            className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
-          />
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Género</label>
-          <input
-            type="text"
-            value={formData.genre}
-            onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
-            className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Estado</label>
-          <select
-            value={formData.status}
-            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-            className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50"
-          >
-            <option value="idea">Idea</option>
-            <option value="production">Producción</option>
-            <option value="mixing">Mezcla</option>
-            <option value="mastering">Masterización</option>
-            <option value="completed">Completado</option>
-          </select>
-        </div>
-        <div className="flex items-end">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.dolby_atmos}
-              onChange={(e) => setFormData({ ...formData, dolby_atmos: e.target.checked })}
-              className="w-5 h-5 rounded bg-white/5 border-white/10"
-            />
-            <span className="text-sm font-medium text-gray-300">Dolby Atmos</span>
-          </label>
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Notas</label>
-        <textarea
-          value={formData.notes}
-          onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-          rows={3}
-          className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-emerald-500/50 resize-none"
-        />
-      </div>
-
-      {/* Audio Files Section - Combined */}
-      <div className="space-y-4 bg-white/5 border border-white/10 rounded-lg p-4">
-        {/* Main Audio File */}
-        <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Archivo de Audio Principal</label>
-          {formData.audio_file_url ? (
-            <div className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-lg">
-              <Music2 className="w-5 h-5 text-emerald-400" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-white truncate">Audio cargado</p>
-                <audio controls src={formData.audio_file_url} className="w-full mt-2 h-8" />
-              </div>
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, audio_file_url: "" })}
-                className="px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm font-medium transition-colors"
-              >
-                Quitar
-              </button>
-            </div>
-          ) : (
-            <label className="block w-full p-4 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-emerald-500/50 hover:bg-white/5 transition-all">
-              <input
-                type="file"
-                accept="audio/*"
-                onChange={(e) => e.target.files?.[0] && handleAudioUpload(e.target.files[0])}
-                className="hidden"
-                disabled={uploadingAudio}
-              />
-              <div className="flex flex-col items-center gap-2 text-gray-400">
-                {uploadingAudio ? (
-                  <>
-                    <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-                    <span className="text-sm">Subiendo audio...</span>
-                  </>
-                ) : (
-                  <>
-                    <Music2 className="w-8 h-8" />
-                    <span className="text-sm">Haz clic para subir un archivo de audio</span>
-                    <span className="text-xs text-gray-500">MP3, WAV, M4A</span>
-                  </>
-                )}
-              </div>
-            </label>
-          )}
-        </div>
-
-        {/* Version Files */}
-        <TrackFilesSection 
-          versions={formData.versions || {}}
-          onChange={(versions) => setFormData({ ...formData, versions })}
-        />
-      </div>
-
-      <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex-1 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white font-medium transition-colors"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          className="flex-1 px-4 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-medium transition-colors"
-        >
-          {track ? 'Guardar' : 'Crear Track'}
-        </button>
-      </div>
-    </form>
   );
 }
