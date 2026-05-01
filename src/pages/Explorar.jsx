@@ -10,7 +10,6 @@ import ContentRow from "@/components/explorar/ContentRow";
 import ArtistProfileModal from "@/components/explorar/ArtistProfileModal";
 import UserProfilePanel from "@/components/explorar/UserProfilePanel";
 import PricingModal from "@/components/explorar/PricingModal";
-import LikesAndSavesBar from "@/components/explorar/LikesAndSavesBar";
 import { ExplorarProvider } from "@/context/ExplorarContext.jsx";
 import GlobalModals from "@/components/explorar/GlobalModals";
 
@@ -412,32 +411,12 @@ export default function Explorar() {
       {/* User profile panel */}
       <AnimatePresence>
         {profileOpen && currentUser && (
-          <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-white/10">
-              <h2 className="text-xl font-black text-white">Mi Cuenta</h2>
-              <button
-                onClick={() => setProfileOpen(false)}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-white/60" />
-              </button>
-            </div>
-            
-            {/* Likes and Saves Bar */}
-            <div className="px-6">
-              <LikesAndSavesBar userId={currentUser?.id} />
-            </div>
-
-            {/* Rest of profile content */}
-            <div className="flex-1 overflow-y-auto p-6">
-              <UserProfilePanel
-                currentUser={currentUser}
-                explorarItems={items}
-                artists={artists}
-                onClose={() => setProfileOpen(false)}
-              />
-            </div>
-          </div>
+          <UserProfilePanel
+            currentUser={currentUser}
+            explorarItems={items}
+            artists={artists}
+            onClose={() => setProfileOpen(false)}
+          />
         )}
       </AnimatePresence>
 
