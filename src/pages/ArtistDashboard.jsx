@@ -72,6 +72,10 @@ export default function ArtistDashboard() {
   // Determinar qué secciones mostrar según el tipo de cuenta
   // Si está en modo preview, usar el tipo de vista seleccionado; si no, usar el real
   const accountType = viewMode || userProfile?.account_type || "artist";
+  // Sync viewMode to real account type when profile loads (so admin toggle starts on the right tab)
+  React.useEffect(() => {
+    if (userProfile?.account_type && !viewMode) setViewMode(userProfile.account_type);
+  }, [userProfile?.account_type]);
   
   const showAudioSection = accountType === "artist";
   const showPhotosSection = accountType === "artist" || accountType === "creator" || accountType === "brand";
@@ -137,7 +141,7 @@ export default function ArtistDashboard() {
             <div className="flex justify-end mb-2">
               <div className="flex items-center gap-1 bg-white/[0.04] border border-white/[0.07] rounded-lg px-1.5 py-1">
                 <SlidersHorizontal className="w-3 h-3 text-white/25 mr-1" />
-                {[{label: "Real", value: null}, {label: "Artista", value: "artist"}, {label: "Creador", value: "creator"}, {label: "Marca", value: "brand"}].map(opt => (
+                {[{label: "Artista", value: "artist"}, {label: "Creador", value: "creator"}, {label: "Marca", value: "brand"}].map(opt => (
                   <button
                     key={String(opt.value)}
                     onClick={() => setViewMode(opt.value)}
