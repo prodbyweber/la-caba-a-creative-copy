@@ -38,7 +38,7 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-white/5 bg-[#0a0a0b]">
-      <div className="max-w-7xl mx-auto px-6 py-16">
+      <div className="max-w-7xl mx-auto px-6 pt-16 footer-inner-padding">
         
         {/* Contact Section — Premium */}
         <motion.div

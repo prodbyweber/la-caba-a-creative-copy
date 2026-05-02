@@ -77,6 +77,16 @@
 
 
 
+/* Footer bottom padding: extra space for mobile bottom nav */
+.footer-inner-padding {
+  padding-bottom: 4rem;
+}
+@media (max-width: 767px) {
+  .footer-inner-padding {
+    padding-bottom: calc(65px + env(safe-area-inset-bottom, 0px) + 2rem);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

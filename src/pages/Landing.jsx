@@ -39,8 +39,7 @@ export default function Landing() {
       {/* Mobile bottom nav — always visible on mobile */}
       <MobileBottomNav artistId={null} isAdmin={false} />
 
-      {/* Safe area spacer — evita fondo blanco bajo la bottom nav en iOS/Android */}
-      <div className="md:hidden" style={{ height: "calc(65px + env(safe-area-inset-bottom, 0px))", background: "#0a0a0b" }} />
+
     </div>
   );
 }
