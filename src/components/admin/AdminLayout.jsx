@@ -24,8 +24,6 @@ import { createPageUrl } from "@/utils";
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", page: "AdminDashboard" },
   { icon: Users, label: "Artists", page: "Artists" },
-  { icon: FolderKanban, label: "Projects", page: "Projects" },
-  { icon: Music2, label: "Tracks", page: "Tracks" },
   { icon: Calendar, label: "Calendars", page: "Calendars" },
   { icon: Settings, label: "Landing Editor", page: "LandingEditor" },
   { icon: Compass, label: "Explorar Editor", page: "ExplorarAdmin" },
