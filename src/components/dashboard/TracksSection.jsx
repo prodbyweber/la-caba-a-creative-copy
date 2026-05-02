@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
+import ReactDOM from "react-dom";
 import MobileTrackPoster, { MobileAudioProvider } from "./MobileTrackPoster";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Music2, Upload, Edit, Image as ImageIcon, Check, X } from "lucide-react";
+import { Plus, Music2, Upload, Edit, Image as ImageIcon, Check, X, Link } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import NetflixTrackCard from "./NetflixTrackCard";
@@ -147,17 +148,20 @@ export default function TracksSection({ jlyArtistId }) {
         </div>
       </motion.div>
 
-      {/* Create/Edit Modal */}
-      <TrackModal
-        isOpen={showCreateModal || !!editingTrack}
-        track={editingTrack}
-        projects={projects}
-        jlyArtistId={jlyArtistId}
-        onClose={() => {
-          setShowCreateModal(false);
-          setEditingTrack(null);
-        }}
-      />
+      {/* Create/Edit Modal — rendered via portal to avoid clipping */}
+      {(showCreateModal || !!editingTrack) && ReactDOM.createPortal(
+        <TrackModal
+          isOpen={true}
+          track={editingTrack}
+          projects={projects}
+          jlyArtistId={jlyArtistId}
+          onClose={() => {
+            setShowCreateModal(false);
+            setEditingTrack(null);
+          }}
+        />,
+        document.body
+      )}
     </>
   );
 }
@@ -184,6 +188,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
   });
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [audioMode, setAudioMode] = useState(track?.youtube_music_url ? "link" : "file");
   const [newComposer, setNewComposer] = useState("");
   const [newProducer, setNewProducer] = useState("");
 
@@ -192,6 +197,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
   useEffect(() => {
     if (track) {
       setFormData(track);
+      setAudioMode(track.youtube_music_url ? "link" : "file");
     } else {
       setFormData({
         title: "",
@@ -199,6 +205,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
         track_number: null,
         cover_url: "",
         audio_file_url: "",
+        youtube_music_url: "",
         composers: [],
         producers: [],
         mix_engineer: "",
@@ -211,6 +218,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
         notes: "",
         versions: {}
       });
+      setAudioMode("file");
     }
   }, [track, isOpen]);
 
@@ -394,34 +402,55 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
               </div>
             </div>
 
-            {/* Audio Upload — solo MP3 */}
+            {/* Audio — MP3 o link YouTube Music */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-3">Archivo de Audio <span className="text-white/30 font-normal">(MP3)</span></label>
-              <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-emerald-500/20 to-blue-500/20 flex items-center justify-center flex-shrink-0">
-                  {formData.audio_file_url
-                    ? <Check className="w-8 h-8 text-emerald-400" />
-                    : <Music2 className="w-8 h-8 text-white/40" />
-                  }
-                </div>
-                <div className="flex-1">
-                  <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium transition-colors">
-                    <Upload className="w-4 h-4" />
-                    {uploadingAudio ? 'Subiendo...' : formData.audio_file_url ? 'Cambiar MP3' : 'Subir MP3'}
-                    <input
-                      type="file"
-                      accept=".mp3,audio/mpeg"
-                      onChange={handleAudioUpload}
-                      className="hidden"
-                      disabled={uploadingAudio}
-                    />
-                  </label>
-                  <p className="text-xs text-gray-500 mt-2">Solo MP3. Máx 70MB.</p>
-                  {formData.audio_file_url && (
-                    <p className="text-xs text-emerald-400 mt-1">✓ MP3 cargado</p>
-                  )}
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium text-gray-300">Audio</label>
+                <div className="flex items-center gap-1 bg-white/5 rounded-lg p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setAudioMode("file")}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${audioMode === "file" ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"}`}
+                  >
+                    <Upload className="w-3 h-3" /> MP3
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAudioMode("link")}
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${audioMode === "link" ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"}`}
+                  >
+                    <Link className="w-3 h-3" /> YouTube Music
+                  </button>
                 </div>
               </div>
+
+              {audioMode === "file" ? (
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500/20 to-blue-500/20 flex items-center justify-center flex-shrink-0">
+                    {formData.audio_file_url ? <Check className="w-7 h-7 text-emerald-400" /> : <Music2 className="w-7 h-7 text-white/40" />}
+                  </div>
+                  <div className="flex-1">
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium transition-colors text-sm">
+                      <Upload className="w-4 h-4" />
+                      {uploadingAudio ? 'Subiendo...' : formData.audio_file_url ? 'Cambiar MP3' : 'Subir MP3'}
+                      <input type="file" accept=".mp3,audio/mpeg" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1.5">Solo MP3. Máx 70MB.</p>
+                    {formData.audio_file_url && <p className="text-xs text-emerald-400 mt-1">✓ MP3 cargado</p>}
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <input
+                    type="url"
+                    value={formData.youtube_music_url || ""}
+                    onChange={(e) => setFormData({ ...formData, youtube_music_url: e.target.value })}
+                    placeholder="https://music.youtube.com/watch?v=..."
+                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-red-500/50 transition-colors text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1.5">Link de YouTube Music o YouTube</p>
+                </div>
+              )}
             </div>
 
             {/* Basic Info */}

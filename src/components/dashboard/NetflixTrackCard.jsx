@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
@@ -178,6 +179,18 @@ function TrackDetailModal({ track, onClose, onEdit, playing, onTogglePlay }) {
                 ))}
               </div>
             </div>
+          )}
+          {track.youtube_music_url && (
+            <a
+              href={track.youtube_music_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/20 hover:bg-red-500/15 transition-colors"
+            >
+              <svg className="w-3.5 h-3.5 text-red-400 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+              <span className="text-xs text-red-400 font-medium truncate">Ver en YouTube Music</span>
+              <ExternalLink className="w-3 h-3 text-red-400/50 ml-auto flex-shrink-0" />
+            </a>
           )}
           {track.notes && <p className="text-xs text-white/35 leading-relaxed">{track.notes}</p>}
         </div>
@@ -436,8 +449,8 @@ function TrackCard({ track, onEdit, isFirst }) {
         </motion.div>
       </div>
 
-      <AnimatePresence>
-        {showDetail && (
+      {showDetail && ReactDOM.createPortal(
+        <AnimatePresence>
           <TrackDetailModal
             track={track}
             onClose={() => setShowDetail(false)}
@@ -445,8 +458,9 @@ function TrackCard({ track, onEdit, isFirst }) {
             playing={playing}
             onTogglePlay={togglePlay}
           />
-        )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 }
