@@ -20,6 +20,8 @@ const CONTENT_TYPES = [
   { value: "minifilm", label: "Mini Film" },
   { value: "film", label: "Film / Cortometraje" },
   { value: "series", label: "Serie" },
+  { value: "videoclip", label: "Videoclip" },
+  { value: "visualizer", label: "Visualizer" },
 ];
 
 const GENRES = [
@@ -147,7 +149,7 @@ function VideoFormModal({ onClose, onSave, artistId, allArtists = [], editingVid
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
-          <p className="text-sm font-bold text-white">{isEdit ? "Editar video" : "Nuevo video"}</p>
+          <p className="text-sm font-bold text-white">{isEdit ? "Editar film" : "Nuevo film"}</p>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors">
             <X className="w-4 h-4" />
           </button>
@@ -280,7 +282,7 @@ export default function VideosSection({ artistId, userProfileId }) {
         const me = await base44.auth.me();
         items = items.filter(i => i.created_by === me?.email);
       }
-      return items.filter(i => ["film", "minifilm", "series"].includes(i.content_type));
+      return items.filter(i => ["film", "minifilm", "series", "videoclip", "visualizer"].includes(i.content_type));
     },
     enabled: !!(artistId || userProfileId),
   });
@@ -306,12 +308,12 @@ export default function VideosSection({ artistId, userProfileId }) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Film className="w-4 h-4 text-white/30" />
-          <h3 className="text-sm font-bold text-white">Videos</h3>
+          <h3 className="text-sm font-bold text-white">Films</h3>
           {videos.length > 0 && <span className="text-[10px] text-white/25 px-1.5 py-0.5 bg-white/5 rounded-full">{videos.length}</span>}
         </div>
         <button onClick={() => { setEditingVideo(null); setShowModal(true); }}
           className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/60 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-all">
-          <Plus className="w-3 h-3" /> Nuevo video
+          <Plus className="w-3 h-3" /> Nuevo film
         </button>
       </div>
 
@@ -322,8 +324,8 @@ export default function VideosSection({ artistId, userProfileId }) {
           className="w-full py-16 rounded-2xl border border-dashed border-white/[0.06] flex flex-col items-center gap-3 hover:border-white/15 transition-colors">
           <Film className="w-8 h-8 text-white/10" />
           <div className="text-center">
-            <p className="text-xs text-white/25">Sin videos</p>
-            <p className="text-[10px] text-white/12 mt-0.5">Sube un mini film, cortometraje o serie</p>
+            <p className="text-xs text-white/25">Sin films</p>
+            <p className="text-[10px] text-white/12 mt-0.5">Sube un film, videoclip, visualizer o serie</p>
           </div>
         </button>
       ) : (
