@@ -4,6 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
 import { Music2, Film, Image, Zap, SlidersHorizontal, Camera } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
+import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
@@ -100,6 +101,9 @@ export default function ArtistDashboard() {
   const showProjectsSection = accountType === "artist" || accountType === "creator" || accountType === "brand";
   const showCampaignsSection = accountType === "brand";
   const showCreativeAdsSection = accountType === "brand";
+
+  // Mobile: single "Tu catálogo" view that stacks all sections
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   
   // Asignar catalogMode inicial basado en el tipo de cuenta
   useEffect(() => {
@@ -109,6 +113,14 @@ export default function ArtistDashboard() {
       else if (accountType === "brand") setCatalogMode("campaigns");
     }
   }, [userProfile, accountType, catalogMode]);
+
+  const [windowWidth, setWindowWidth] = React.useState(typeof window !== "undefined" ? window.innerWidth : 1024);
+  React.useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  const isMobileView = windowWidth < 768;
 
   // Mostrar loading mientras resolvemos artista
   const resolving = !artistIdParam && !selfArtist && !currentUser;
@@ -151,7 +163,55 @@ export default function ArtistDashboard() {
         <ArtistAvatarButton artist={effectiveArtist || { stageName: displayName, avatar_url: userProfile?.profile_photo_url || userProfile?.avatar_url }} onClick={() => setShowProfileDrawer(true)} />
       </DashboardNav>
 
+      {/* Mobile bottom nav */}
+      <MobileBottomNav artistId={effectiveArtist?.id} isAdmin={false} />
+
       <main className="pt-14">
+        {/* Mobile: "Tu Catálogo" — all sections stacked */}
+        {isMobileView && (
+          <div className="px-4 py-5 pb-36 space-y-8">
+            <div>
+              <h1 className="text-2xl font-black text-white mb-1" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.04em" }}>
+                Tu catálogo
+              </h1>
+              <p className="text-xs text-white/30">Todo tu contenido en un solo lugar</p>
+            </div>
+
+            {showAudioSection && (
+              <div>
+                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Audio</p>
+                <ProjectsSection jlyArtistId={effectiveArtist?.id} />
+                <div className="mt-4">
+                  <TracksSection jlyArtistId={effectiveArtist?.id || artistId} />
+                </div>
+              </div>
+            )}
+
+            {showVideoSection && (
+              <div>
+                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Video</p>
+                <VideosSection artistId={effectiveArtist?.id} userProfileId={userProfile?.id} />
+              </div>
+            )}
+
+            {showPhotosSection && (
+              <div>
+                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Fotos</p>
+                <PhotosGallery userProfileId={userProfile?.id} />
+              </div>
+            )}
+
+            {showCampaignsSection && (
+              <div>
+                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Campañas</p>
+                <BrandCampaignsSection userProfileId={userProfile?.id} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Desktop: original tab layout */}
+        {!isMobileView && (
         <div className="px-4 sm:px-8 lg:px-12 py-5 [&_.mobile-carousel]:!-mx-4">
           {/* Admin: vista previa compacta — no ocupa espacio de contenido */}
           {currentUser?.role === "admin" && (
@@ -348,6 +408,7 @@ export default function ArtistDashboard() {
             )}
           </AnimatePresence>
         </div>
+        )}
       </main>
 
       <ArtistProfileDrawer
