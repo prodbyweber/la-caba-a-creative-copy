@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music2, Film, Image, Zap, SlidersHorizontal, Camera } from "lucide-react";
+import { Music2, Film, Image, Zap, SlidersHorizontal, Camera, GripVertical } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
@@ -12,6 +12,7 @@ import ClipsLibrary from "@/components/clips/ClipsLibrary";
 import BrandCampaignsSection from "@/components/dashboard/BrandCampaignsSection";
 import PhotosGallery from "@/components/dashboard/PhotosGallery";
 import VideosSection from "@/components/dashboard/VideosSection";
+import CatalogSectionOrder, { DEFAULT_SECTION_ORDER } from "@/components/dashboard/CatalogSectionOrder";
 
 
 export default function ArtistDashboard() {
@@ -122,6 +123,21 @@ export default function ArtistDashboard() {
   }, []);
   const isMobileView = windowWidth < 768;
 
+  // Section order — persisted in localStorage per user
+  const storageKey = `catalog_order_${currentUser?.id || "default"}`;
+  const [sectionOrder, setSectionOrder] = useState(() => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? JSON.parse(saved) : DEFAULT_SECTION_ORDER;
+    } catch { return DEFAULT_SECTION_ORDER; }
+  });
+  const [showOrderMenu, setShowOrderMenu] = useState(false);
+
+  const handleOrderChange = (newOrder) => {
+    setSectionOrder(newOrder);
+    try { localStorage.setItem(storageKey, JSON.stringify(newOrder)); } catch {}
+  };
+
   // Mostrar loading mientras resolvemos artista
   const resolving = !artistIdParam && !selfArtist && !currentUser;
   if (isLoading || resolving) {
@@ -167,39 +183,69 @@ export default function ArtistDashboard() {
       <MobileBottomNav artistId={effectiveArtist?.id} isAdmin={false} />
 
       <main className="pt-14">
-        {/* Mobile: "Tu Catálogo" — all sections stacked */}
+        {/* Mobile: "Tu Catálogo" — all sections stacked, reorderable */}
         {isMobileView && (
           <div className="px-4 py-5 pb-36 space-y-8">
-            <div>
-              <h1 className="text-2xl font-black text-white mb-1" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.04em" }}>
-                Tu catálogo
-              </h1>
-              <p className="text-xs text-white/30">Todo tu contenido en un solo lugar</p>
+            {/* Header with reorder button */}
+            <div className="flex items-end justify-between">
+              <div>
+                <h1 className="text-2xl font-black text-white mb-1" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.04em" }}>
+                  Tu catálogo
+                </h1>
+                <p className="text-xs text-white/30">Todo tu contenido en un solo lugar</p>
+              </div>
+              <div className="relative">
+                <button
+                  onClick={() => setShowOrderMenu(v => !v)}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[10px] font-medium transition-all ${
+                    showOrderMenu
+                      ? "border-white/20 bg-white/[0.08] text-white/70"
+                      : "border-white/[0.08] bg-transparent text-white/30 hover:text-white/60 hover:border-white/15"
+                  }`}
+                >
+                  <GripVertical className="w-3 h-3" />
+                  Ordenar
+                </button>
+                <AnimatePresence>
+                  {showOrderMenu && (
+                    <CatalogSectionOrder
+                      order={sectionOrder}
+                      onChange={handleOrderChange}
+                      onClose={() => setShowOrderMenu(false)}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
 
-            {showAudioSection && (
-              <div>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Audio</p>
-                <ProjectsSection jlyArtistId={effectiveArtist?.id} />
-                <div className="mt-4">
+            {/* Sections rendered in user-defined order */}
+            {sectionOrder.map(key => {
+              if (key === "tracks" && showAudioSection) return (
+                <div key="tracks">
+                  <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Tracks</p>
                   <TracksSection jlyArtistId={effectiveArtist?.id || artistId} />
                 </div>
-              </div>
-            )}
-
-            {showVideoSection && (
-              <div>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Video</p>
-                <VideosSection artistId={effectiveArtist?.id} userProfileId={userProfile?.id} />
-              </div>
-            )}
-
-            {showPhotosSection && (
-              <div>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Fotos</p>
-                <PhotosGallery userProfileId={userProfile?.id} />
-              </div>
-            )}
+              );
+              if (key === "video" && showVideoSection) return (
+                <div key="video">
+                  <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Video</p>
+                  <VideosSection artistId={effectiveArtist?.id} userProfileId={userProfile?.id} />
+                </div>
+              );
+              if (key === "projects" && showProjectsSection) return (
+                <div key="projects">
+                  <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Proyectos</p>
+                  <ProjectsSection jlyArtistId={effectiveArtist?.id} />
+                </div>
+              );
+              if (key === "photos" && showPhotosSection) return (
+                <div key="photos">
+                  <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Fotos</p>
+                  <PhotosGallery userProfileId={userProfile?.id} />
+                </div>
+              );
+              return null;
+            })}
 
             {showCampaignsSection && (
               <div>
@@ -236,9 +282,9 @@ export default function ArtistDashboard() {
           )}
 
           {/* Header — selector dinámico según tipo de cuenta */}
-           <div className="mb-5 flex items-center justify-between">
+           <div className="mb-5 flex items-center justify-between gap-4">
              {/* Selector dinámico — estilo cinematico minimalista */}
-             <div className="flex items-center gap-0 border-b border-white/10 w-fit overflow-x-auto">
+             <div className="flex items-center gap-0 border-b border-white/10 w-fit overflow-x-auto flex-1">
                {showAudioSection && (
                  <button
                    onClick={() => setCatalogMode("audio")}
@@ -327,11 +373,34 @@ export default function ArtistDashboard() {
                )}
                </div>
 
+               {/* Reorder button — desktop */}
+               <div className="relative flex-shrink-0 self-start">
+                 <button
+                   onClick={() => setShowOrderMenu(v => !v)}
+                   className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[10px] font-medium transition-all ${
+                     showOrderMenu
+                       ? "border-white/20 bg-white/[0.08] text-white/70"
+                       : "border-white/[0.06] bg-transparent text-white/20 hover:text-white/50 hover:border-white/12"
+                   }`}
+                 >
+                   <GripVertical className="w-3 h-3" />
+                   Ordenar
+                 </button>
+                 <AnimatePresence>
+                   {showOrderMenu && (
+                     <CatalogSectionOrder
+                       order={sectionOrder}
+                       onChange={handleOrderChange}
+                       onClose={() => setShowOrderMenu(false)}
+                     />
+                   )}
+                 </AnimatePresence>
+               </div>
                </div>
 
           {/* ── CONTENIDO DINÁMICO POR TIPO DE CUENTA ── */}
           <AnimatePresence mode="wait">
-            {/* ARTISTA: Audio + Video */}
+            {/* ARTISTA: Tracks + Proyectos (respeta sectionOrder) */}
             {showAudioSection && catalogMode === "audio" && (
               <motion.div
                 key="audio"
@@ -341,8 +410,18 @@ export default function ArtistDashboard() {
                 transition={{ duration: 0.25 }}
               >
                 <div className="space-y-4">
-                  <ProjectsSection jlyArtistId={effectiveArtist?.id} />
-                  <TracksSection jlyArtistId={effectiveArtist?.id || artistId} />
+                  {/* tracks before projects by default, respects order */}
+                  {sectionOrder.indexOf("tracks") <= sectionOrder.indexOf("projects") ? (
+                    <>
+                      <TracksSection jlyArtistId={effectiveArtist?.id || artistId} />
+                      <ProjectsSection jlyArtistId={effectiveArtist?.id} />
+                    </>
+                  ) : (
+                    <>
+                      <ProjectsSection jlyArtistId={effectiveArtist?.id} />
+                      <TracksSection jlyArtistId={effectiveArtist?.id || artistId} />
+                    </>
+                  )}
                 </div>
               </motion.div>
             )}
