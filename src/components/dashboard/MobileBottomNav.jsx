@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import { Home, BookOpen, BarChart3, Compass } from "lucide-react";
+import { Home, BookOpen, Compass } from "lucide-react";
 import { createPageUrl } from "@/utils";
 
 export default function MobileBottomNav({ artistId, isAdmin }) {
@@ -23,13 +23,8 @@ export default function MobileBottomNav({ artistId, isAdmin }) {
     {
       icon: BookOpen,
       label: "Tu catálogo",
-      page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard",
+      page: artistId ? `ArtistDashboard?artistId=${artistId}` : "ArtistDashboard",
       highlight: true,
-    },
-    {
-      icon: BarChart3,
-      label: "Análisis",
-      page: artistId ? `Analytics?artistId=${artistId}` : "Analytics",
     },
   ];
 

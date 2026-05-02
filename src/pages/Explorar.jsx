@@ -27,6 +27,7 @@ export default function Explorar() {
   const [selectedArtist, setSelectedArtist] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const [myArtistId, setMyArtistId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("inicio"); // inicio | musica | films
@@ -36,9 +37,15 @@ export default function Explorar() {
   const isAdmin = currentUser?.role === "admin";
 
   useEffect(() => {
-    base44.auth.me().then(u => {
+    base44.auth.me().then(async u => {
       setCurrentUser(u);
       setAuthChecked(true);
+      if (u?.id) {
+        try {
+          const myArtists = await base44.entities.Artist.filter({ user_id: u.id });
+          if (myArtists[0]) setMyArtistId(myArtists[0].id);
+        } catch {}
+      }
     }).catch(() => {
       setAuthChecked(true);
     });
@@ -234,6 +241,7 @@ export default function Explorar() {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         onProfileOpen={() => setProfileOpen(true)}
+        artistId={myArtistId}
       />
 
       {/* Admin shortcut */}
@@ -324,7 +332,7 @@ export default function Explorar() {
       )}
 
       {/* Content rows */}
-      <div className="relative z-10 -mt-16 pb-24">
+      <div className={`relative z-10 -mt-16 ${currentUser ? "pb-36" : "pb-24"}`}>
         {/* Sombreado gradual con viñeta oscura */}
         <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent via-transparent to-black/40 pointer-events-none" />
         <div className="absolute top-0 left-0 right-0 h-36" style={{

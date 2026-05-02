@@ -1,17 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Search, User, Home, BookOpen, Compass } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
-export default function ExplorarNav({ currentUser, activeSection, setActiveSection, searchOpen, setSearchOpen, searchQuery, setSearchQuery, onProfileOpen }) {
+export default function ExplorarNav({ currentUser, activeSection, setActiveSection, searchOpen, setSearchOpen, searchQuery, setSearchQuery, onProfileOpen, artistId }) {
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const bottomNavItems = [
+    { icon: Home,     label: "Inicio",      page: "Landing" },
+    { icon: Compass,  label: "Explorar",    page: "Explorar" },
+    { icon: BookOpen, label: "Tu catálogo", page: artistId ? `ArtistDashboard?artistId=${artistId}` : "ArtistDashboard", highlight: true },
+  ];
+
+  const isActiveNav = (page) => location.pathname.includes(page.split("?")[0]);
 
   const navLinks = [
     { label: "Inicio", key: "inicio" },
@@ -24,6 +33,7 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
     : "U";
 
   return (
+    <>
     <nav
       className="fixed top-0 left-0 right-0 z-40 transition-all duration-500"
       style={{
@@ -85,5 +95,67 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
         </div>
       </div>
     </nav>
+
+      {/* Mobile bottom nav — only for logged-in users */}
+      {currentUser && (
+        <nav
+          className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
+          style={{
+            background: "rgba(10,10,11,0.96)",
+            borderTop: "1px solid rgba(255,255,255,0.06)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          }}
+        >
+          <div className="flex items-center justify-around px-2 pt-2 pb-3">
+            {bottomNavItems.map((item) => {
+              const active = isActiveNav(item.page);
+              const Icon = item.icon;
+              return (
+                <Link key={item.label} to={createPageUrl(item.page)} className="flex-1">
+                  <button className="flex flex-col items-center gap-1 w-full py-1">
+                    <div className="relative">
+                      {item.highlight && (
+                        <div
+                          className="absolute inset-0 rounded-full blur-md opacity-40"
+                          style={{ background: "rgba(255,88,51,0.5)", transform: "scale(1.8)" }}
+                        />
+                      )}
+                      <Icon
+                        className="w-6 h-6 relative z-10 transition-colors"
+                        style={{
+                          color: active
+                            ? item.highlight ? "#ff5833" : "white"
+                            : "rgba(255,255,255,0.35)",
+                        }}
+                      />
+                      {active && (
+                        <motion.div
+                          layoutId="explorarBottomNavDot"
+                          className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                          style={{ background: item.highlight ? "#ff5833" : "white" }}
+                        />
+                      )}
+                    </div>
+                    <span
+                      className="text-[10px] font-medium transition-colors leading-tight"
+                      style={{
+                        color: active
+                          ? item.highlight ? "#ff5833" : "white"
+                          : "rgba(255,255,255,0.35)",
+                        fontFamily: "'Helvetica Neue', sans-serif",
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  </button>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+      )}
+    </>
   );
 }
