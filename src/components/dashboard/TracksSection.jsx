@@ -91,14 +91,14 @@ export default function TracksSection({ jlyArtistId }) {
             <div className="hidden sm:flex w-8 h-8 rounded-lg bg-white/5 items-center justify-center">
               <Music2 className="w-4 h-4 text-white/40" />
             </div>
-            <h3 className="text-base font-bold text-white">Tracks</h3>
+            <h3 className="text-base font-bold text-white">Soundtracks</h3>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
             className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/60 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-all"
           >
             <Plus className="w-3 h-3" />
-            <span className="hidden lg:inline">Nuevo</span>
+            <span className="hidden lg:inline">Nuevo soundtrack</span>
           </button>
         </div>
 
@@ -107,10 +107,10 @@ export default function TracksSection({ jlyArtistId }) {
           {tracks.length === 0 ? (
             <div className="text-center py-8 px-4">
               <Music2 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm mb-3">No tienes tracks aún</p>
+              <p className="text-gray-500 text-sm mb-3">No tienes soundtracks aún</p>
               <button onClick={() => setShowCreateModal(true)}
                 className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors">
-                Crear tu primer track
+                Crear tu primer soundtrack
               </button>
             </div>
           ) : (
@@ -132,10 +132,10 @@ export default function TracksSection({ jlyArtistId }) {
           {tracks.length === 0 ? (
             <div className="text-center py-8 px-4">
               <Music2 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm mb-3">No tienes tracks aún</p>
+              <p className="text-gray-500 text-sm mb-3">No tienes soundtracks aún</p>
               <button onClick={() => setShowCreateModal(true)}
                 className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-medium transition-colors">
-                Crear tu primer track
+                Crear tu primer soundtrack
               </button>
             </div>
           ) : (
@@ -364,9 +364,9 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white">
-                  {track ? 'Editar Track' : 'Nuevo Track'}
+                  {track ? 'Editar Soundtrack' : 'Nuevo Soundtrack'}
                 </h3>
-                <p className="text-sm text-gray-500">Completa la información del track</p>
+                <p className="text-sm text-gray-500">Completa la información del soundtrack</p>
               </div>
             </div>
             <button
@@ -717,12 +717,12 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
                 className="flex-1 px-4 py-3 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {saveMutation.isPending ? (
-                  'Guardando...'
+                'Guardando...'
                 ) : (
-                  <>
-                    <Check className="w-4 h-4" />
-                    {track ? 'Guardar Cambios' : 'Crear Track'}
-                  </>
+                <>
+                  <Check className="w-4 h-4" />
+                  {track ? 'Guardar Cambios' : 'Crear Soundtrack'}
+                </>
                 )}
               </button>
             </div>

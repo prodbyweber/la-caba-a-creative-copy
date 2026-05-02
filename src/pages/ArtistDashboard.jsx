@@ -222,13 +222,13 @@ export default function ArtistDashboard() {
             {sectionOrder.map(key => {
               if (key === "tracks" && showAudioSection) return (
                 <div key="tracks">
-                  <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Tracks</p>
+                  <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Soundtracks</p>
                   <TracksSection jlyArtistId={effectiveArtist?.id || artistId} />
                 </div>
               );
               if (key === "video" && showVideoSection) return (
                 <div key="video">
-                  <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Video</p>
+                  <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Films</p>
                   <VideosSection artistId={effectiveArtist?.id} userProfileId={userProfile?.id} />
                 </div>
               );
@@ -292,7 +292,7 @@ export default function ArtistDashboard() {
                    style={{ color: catalogMode === "audio" ? "#fff" : "rgba(255,255,255,0.3)" }}
                  >
                    <Music2 className="w-3.5 h-3.5" />
-                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Audio</span>
+                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Soundtracks</span>
                    {catalogMode === "audio" && (
                      <motion.div
                        layoutId="catalogUnderline"
@@ -309,7 +309,7 @@ export default function ArtistDashboard() {
                    style={{ color: catalogMode === "video" ? "#fff" : "rgba(255,255,255,0.3)" }}
                  >
                    <Film className="w-3.5 h-3.5" />
-                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Video</span>
+                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Films</span>
                    {catalogMode === "video" && (
                      <motion.div
                        layoutId="catalogUnderline"
