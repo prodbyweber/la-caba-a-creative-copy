@@ -82,13 +82,20 @@
     @apply border-border outline-ring/50;
   }
 
-  body {
-    @apply bg-background text-foreground;
-    background-color: #080808;
+  html {
+    background-color: #0a0a0b;
     overscroll-behavior: none;
   }
 
-  html {
-    background-color: #080808;
+  body {
+    @apply text-foreground;
+    background-color: #0a0a0b;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #root {
+    background-color: #0a0a0b;
+    min-height: 100dvh;
   }
 }

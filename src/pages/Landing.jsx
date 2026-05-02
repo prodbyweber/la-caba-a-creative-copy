@@ -25,7 +25,7 @@ export default function Landing() {
     <div className="min-h-screen bg-[#0a0a0b] text-white overflow-x-hidden">
       <LandingNav />
       
-      <main className="pb-16 md:pb-0">
+      <main className="pb-0">
         <Hero config={config} />
         <BrandsCarousel logos={config?.brand_logos} />
         <ExplorarPreview />
@@ -38,6 +38,9 @@ export default function Landing() {
 
       {/* Mobile bottom nav — always visible on mobile */}
       <MobileBottomNav artistId={null} isAdmin={false} />
+
+      {/* Safe area spacer — evita fondo blanco bajo la bottom nav en iOS/Android */}
+      <div className="md:hidden" style={{ height: "calc(65px + env(safe-area-inset-bottom, 0px))", background: "#0a0a0b" }} />
     </div>
   );
 }
