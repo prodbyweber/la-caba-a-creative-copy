@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect, createContext, useContext, useCallback } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Info } from "lucide-react";
+import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Globe, Lock } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
+import { base44 } from "@/api/base44Client";
+import { useQueryClient } from "@tanstack/react-query";
 
 // ─── Fallback local audio context (deprecado, usar useGlobalAudio) ───────────
 const AudioContext = createContext(null);
@@ -66,9 +68,10 @@ const FOLDER_DEFS = [
 ];
 
 // ─── Bottom-sheet detail (with shared play state) ─────────────────────────────
-function MobileTrackDetail({ track, onClose, onEdit, playing, onTogglePlay }) {
+function MobileTrackDetail({ track, onClose, onEdit, playing, onTogglePlay, onTogglePublic }) {
   const status = statusConfig[track.status] || statusConfig.idea;
   const folders = FOLDER_DEFS.filter(f => track.versions?.[f.key]);
+  const isPublic = track.is_public === true;
 
   // Lock body scroll while open
   useEffect(() => {
@@ -128,7 +131,7 @@ function MobileTrackDetail({ track, onClose, onEdit, playing, onTogglePlay }) {
         </div>
 
         <div className="px-4 pb-8 pt-4 space-y-4">
-          {/* Play + Edit row */}
+          {/* Play + Edit + Toggle public row */}
           <div className="flex items-center gap-2">
             {track.audio_file_url && (
               <button
@@ -146,6 +149,14 @@ function MobileTrackDetail({ track, onClose, onEdit, playing, onTogglePlay }) {
             <button onClick={() => { onClose(); onEdit(track); }}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold flex-1 justify-center hover:bg-white/15 transition-colors">
               <Edit className="w-4 h-4" /> Editar
+            </button>
+            {/* Toggle público/privado */}
+            <button
+              onClick={onTogglePublic}
+              title={isPublic ? "Público — toca para privado" : "Privado — toca para público"}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors flex-shrink-0 ${isPublic ? "bg-emerald-500/20 border border-emerald-500/30" : "bg-white/[0.06] border border-white/10"}`}
+            >
+              {isPublic ? <Globe className="w-4 h-4 text-emerald-400" /> : <Lock className="w-4 h-4 text-white/30" />}
             </button>
           </div>
 
@@ -208,6 +219,7 @@ export default function MobileTrackPoster({ track, onEdit }) {
   const [showDetail, setShowDetail] = useState(false);
   const globalAudio = useGlobalAudio();
   const isPlaying = globalAudio?.playingTrack?.id === track.id;
+  const queryClient = useQueryClient();
 
   const status = statusConfig[track.status] || statusConfig.idea;
   const hasAudio = !!track.audio_file_url;
@@ -216,13 +228,17 @@ export default function MobileTrackPoster({ track, onEdit }) {
   const handleTogglePlay = useCallback((e) => {
     if (e) e.stopPropagation();
     if (!hasAudio) return;
-
     if (isPlaying) {
       globalAudio.pauseTrack();
     } else {
       globalAudio.playTrack(track);
     }
   }, [isPlaying, hasAudio, globalAudio, track]);
+
+  const handleTogglePublic = useCallback(async () => {
+    await base44.entities.Track.update(track.id, { is_public: !track.is_public });
+    queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
+  }, [track, queryClient]);
 
   return (
     <>
@@ -312,6 +328,7 @@ export default function MobileTrackPoster({ track, onEdit }) {
             onEdit={onEdit}
             playing={isPlaying}
             onTogglePlay={handleTogglePlay}
+            onTogglePublic={handleTogglePublic}
           />,
           document.body
         )}

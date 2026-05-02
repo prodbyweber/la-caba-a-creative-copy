@@ -26,6 +26,10 @@
       "type": "string",
       "description": "URL del archivo de audio MP3/WAV"
     },
+    "youtube_music_url": {
+      "type": "string",
+      "description": "URL de YouTube Music o YouTube"
+    },
     "composers": {
       "type": "array",
       "items": {
@@ -93,6 +97,11 @@
       ],
       "default": "idea",
       "description": "Estado del track"
+    },
+    "is_public": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si el track est\u00e1 disponible p\u00fablicamente en Explorar"
     },
     "versions": {
       "type": "object",

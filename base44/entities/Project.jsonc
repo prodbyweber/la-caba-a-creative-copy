@@ -1,0 +1,127 @@
+{
+  "name": "Project",
+  "type": "object",
+  "properties": {
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista principal"
+    },
+    "collaborator_artist_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs de artistas colaboradores (featuring)"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo del proyecto"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Single",
+        "EP",
+        "Album",
+        "ContentPack",
+        "MixMaster"
+      ],
+      "default": "Single",
+      "description": "Tipo de proyecto"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Draft",
+        "Recording",
+        "Producing",
+        "Mixing",
+        "Mastering",
+        "Delivered",
+        "Archived"
+      ],
+      "default": "Draft",
+      "description": "Estado del proyecto"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High"
+      ],
+      "default": "Medium",
+      "description": "Prioridad"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de inicio"
+    },
+    "target_delivery_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha objetivo de entrega"
+    },
+    "studio_hours_booked": {
+      "type": "number",
+      "default": 0,
+      "description": "Horas de estudio reservadas"
+    },
+    "assets_links": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Enlaces a assets (Drive, stems, referencias)"
+    },
+    "bpm": {
+      "type": "number",
+      "description": "BPM del proyecto"
+    },
+    "key": {
+      "type": "string",
+      "description": "Tonalidad"
+    },
+    "genre": {
+      "type": "string",
+      "description": "G\u00e9nero musical"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n detallada del proyecto"
+    },
+    "moodboard_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs de im\u00e1genes del moodboard visual del proyecto"
+    },
+    "cover_url": {
+      "type": "string",
+      "description": "URL de la portada del proyecto"
+    },
+    "producer": {
+      "type": "string",
+      "description": "Productor(es) del proyecto"
+    },
+    "mix_engineer": {
+      "type": "string",
+      "description": "Ingeniero de mezcla"
+    },
+    "master_engineer": {
+      "type": "string",
+      "description": "Ingeniero de masterizaci\u00f3n"
+    },
+    "is_public": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si el proyecto est\u00e1 disponible p\u00fablicamente en Explorar"
+    }
+  },
+  "required": [
+    "artist_id",
+    "title"
+  ]
+}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, X, Trash2, Play, Loader2, Upload, Film, Check, ExternalLink } from "lucide-react";
+import { Plus, X, Trash2, Play, Loader2, Upload, Film, Check, ExternalLink, Pencil, Globe, Lock } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -43,20 +44,33 @@ const CREDIT_ROLES = [
 
 const ic = "w-full px-3 py-2.5 bg-white/5 border border-white/[0.08] rounded-xl text-white text-sm focus:outline-none focus:border-white/25 placeholder-white/20 transition-colors";
 
-// ── Modal ──────────────────────────────────────────────────────────────────
-function VideoFormModal({ onClose, onSave, artistId, allArtists = [] }) {
+// ── Form Modal (create or edit) ────────────────────────────────────────────
+function VideoFormModal({ onClose, onSave, artistId, allArtists = [], editingVideo = null }) {
+  const isEdit = !!editingVideo;
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [form, setForm] = useState({
-    title: "",
-    content_type: "minifilm",
-    genre: "",
-    year: new Date().getFullYear(),
-    description: "",
-    youtube_url: "",
-    video_file_url: "",
-    thumbnail_url: "",
-    credits: [],
+  const [form, setForm] = useState(() => {
+    if (editingVideo) {
+      return {
+        title: editingVideo.title || "",
+        content_type: editingVideo.content_type || "minifilm",
+        genre: editingVideo.genres?.[0] || editingVideo.subtitle || "",
+        year: editingVideo.year || new Date().getFullYear(),
+        description: editingVideo.description || "",
+        youtube_url: editingVideo.youtube_url || "",
+        video_file_url: editingVideo.preview_media_url || "",
+        thumbnail_url: editingVideo.thumbnail_url || "",
+        credits: (editingVideo.credits || []).map((c, i) => ({
+          ...c,
+          id: c.id || i.toString(),
+          role: CREDIT_ROLES.find(r => r.label === c.role)?.key || c.role || "",
+        })),
+      };
+    }
+    return {
+      title: "", content_type: "minifilm", genre: "", year: new Date().getFullYear(),
+      description: "", youtube_url: "", video_file_url: "", thumbnail_url: "", credits: [],
+    };
   });
   const [newCredit, setNewCredit] = useState({ role: "", name: "", artist_id: "" });
 
@@ -69,9 +83,7 @@ function VideoFormModal({ onClose, onSave, artistId, allArtists = [] }) {
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setForm(f => ({ ...f, [type === "video" ? "video_file_url" : "thumbnail_url"]: file_url }));
-    } finally {
-      setUploading(false);
-    }
+    } finally { setUploading(false); }
   };
 
   const addCredit = () => {
@@ -93,34 +105,36 @@ function VideoFormModal({ onClose, onSave, artistId, allArtists = [] }) {
     if (!form.title) { alert("El título es obligatorio"); return; }
     if (!form.youtube_url && !form.video_file_url) { alert("Añade un video (YouTube o archivo)"); return; }
     setLoading(true);
+    const payload = {
+      title: form.title,
+      content_type: form.content_type,
+      subtitle: form.genre,
+      genres: form.genre ? [form.genre] : [],
+      year: Number(form.year),
+      description: form.description,
+      youtube_url: form.youtube_url || undefined,
+      preview_media_url: form.video_file_url || undefined,
+      preview_media_type: form.video_file_url ? "video" : "image",
+      thumbnail_url: form.thumbnail_url || ytThumb || undefined,
+      artist_id: artistId || undefined,
+      credits: form.credits.map(c => ({
+        artist_id: c.artist_id || undefined,
+        role: CREDIT_ROLES.find(r => r.key === c.role)?.label || c.role,
+        name: c.name,
+      })),
+    };
     try {
-      await base44.entities.ExplorarItem.create({
-        title: form.title,
-        content_type: form.content_type,
-        subtitle: form.genre,
-        genres: form.genre ? [form.genre] : [],
-        year: Number(form.year),
-        description: form.description,
-        youtube_url: form.youtube_url || undefined,
-        preview_media_url: form.video_file_url || undefined,
-        preview_media_type: form.video_file_url ? "video" : "image",
-        thumbnail_url: form.thumbnail_url || ytThumb || undefined,
-        artist_id: artistId || undefined,
-        credits: form.credits.map(c => ({
-          artist_id: c.artist_id || undefined,
-          role: CREDIT_ROLES.find(r => r.key === c.role)?.label || c.role,
-          name: c.name,
-        })),
-        is_active: true,
-      });
+      if (isEdit) {
+        await base44.entities.ExplorarItem.update(editingVideo.id, payload);
+      } else {
+        await base44.entities.ExplorarItem.create({ ...payload, is_active: true });
+      }
       onSave();
       onClose();
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
-  return (
+  return ReactDOM.createPortal(
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[600] bg-black/90 backdrop-blur-xl flex items-end sm:items-center justify-center p-0 sm:p-4"
@@ -132,20 +146,17 @@ function VideoFormModal({ onClose, onSave, artistId, allArtists = [] }) {
         className="bg-[#111] border border-white/[0.08] rounded-t-2xl sm:rounded-2xl w-full sm:max-w-xl overflow-hidden max-h-[92vh] flex flex-col"
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
-          <p className="text-sm font-bold text-white">Nuevo Video</p>
+          <p className="text-sm font-bold text-white">{isEdit ? "Editar video" : "Nuevo video"}</p>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="overflow-y-auto flex-1 p-5 space-y-5">
-          {/* Info básica */}
           <div className="space-y-3">
             <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Información</p>
-            <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-              className={ic} placeholder="Título *" />
+            <input value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} className={ic} placeholder="Título *" />
             <div className="grid grid-cols-2 gap-2">
               <select value={form.content_type} onChange={e => setForm(f => ({ ...f, content_type: e.target.value }))} className={ic}>
                 {CONTENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
@@ -155,36 +166,24 @@ function VideoFormModal({ onClose, onSave, artistId, allArtists = [] }) {
                 {GENRES.map(g => <option key={g} value={g}>{g}</option>)}
               </select>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <input value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))}
-                className={ic} placeholder="Año" type="number" min={1990} max={2099} />
-            </div>
-            <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-              className={ic + " resize-none"} rows={2} placeholder="Descripción" />
+            <input value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))} className={ic} placeholder="Año" type="number" min={1990} max={2099} />
+            <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} className={ic + " resize-none"} rows={2} placeholder="Descripción" />
           </div>
 
-          {/* Video */}
           <div className="space-y-3">
             <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Contenido</p>
             <div>
               <label className="text-[10px] text-white/40 mb-1 block">URL de YouTube</label>
-              <input value={form.youtube_url} onChange={e => setForm(f => ({ ...f, youtube_url: e.target.value }))}
-                className={ic} placeholder="https://youtube.com/watch?v=..." />
-              {ytThumb && (
-                <div className="mt-2 rounded-lg overflow-hidden aspect-video bg-black/50">
-                  <img src={ytThumb} alt="" className="w-full h-full object-cover" />
-                </div>
-              )}
+              <input value={form.youtube_url} onChange={e => setForm(f => ({ ...f, youtube_url: e.target.value }))} className={ic} placeholder="https://youtube.com/watch?v=..." />
+              {ytThumb && <div className="mt-2 rounded-lg overflow-hidden aspect-video bg-black/50"><img src={ytThumb} alt="" className="w-full h-full object-cover" /></div>}
             </div>
-
             {!form.youtube_url && (
               <div>
                 <label className="text-[10px] text-white/40 mb-1 block">Archivo de video (máx. 100MB)</label>
                 {form.video_file_url ? (
                   <div className="relative rounded-lg overflow-hidden aspect-video bg-black/50">
                     <video src={form.video_file_url} className="w-full h-full object-cover" muted loop />
-                    <button onClick={() => setForm(f => ({ ...f, video_file_url: "" }))}
-                      className="absolute top-2 right-2 p-1.5 bg-black/70 rounded-lg"><X className="w-3.5 h-3.5 text-white" /></button>
+                    <button onClick={() => setForm(f => ({ ...f, video_file_url: "" }))} className="absolute top-2 right-2 p-1.5 bg-black/70 rounded-lg"><X className="w-3.5 h-3.5 text-white" /></button>
                   </div>
                 ) : (
                   <label className={`flex flex-col items-center justify-center gap-2 py-5 rounded-lg border border-dashed border-white/10 cursor-pointer hover:border-white/25 transition-colors ${uploading ? "opacity-50" : ""}`}>
@@ -195,14 +194,12 @@ function VideoFormModal({ onClose, onSave, artistId, allArtists = [] }) {
                 )}
               </div>
             )}
-
             <div>
               <label className="text-[10px] text-white/40 mb-1 block">Miniatura</label>
               {form.thumbnail_url ? (
                 <div className="relative rounded-lg overflow-hidden" style={{ aspectRatio: "16/9" }}>
                   <img src={form.thumbnail_url} alt="" className="w-full h-full object-cover" />
-                  <button onClick={() => setForm(f => ({ ...f, thumbnail_url: "" }))}
-                    className="absolute top-2 right-2 p-1.5 bg-black/70 rounded-lg"><X className="w-3.5 h-3.5 text-white" /></button>
+                  <button onClick={() => setForm(f => ({ ...f, thumbnail_url: "" }))} className="absolute top-2 right-2 p-1.5 bg-black/70 rounded-lg"><X className="w-3.5 h-3.5 text-white" /></button>
                 </div>
               ) : (
                 <label className="flex flex-col items-center justify-center gap-2 py-4 rounded-lg border border-dashed border-white/10 cursor-pointer hover:border-white/25 transition-colors">
@@ -214,7 +211,6 @@ function VideoFormModal({ onClose, onSave, artistId, allArtists = [] }) {
             </div>
           </div>
 
-          {/* Créditos */}
           <div className="space-y-3">
             <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Créditos</p>
             <div className="grid grid-cols-3 gap-2">
@@ -222,8 +218,7 @@ function VideoFormModal({ onClose, onSave, artistId, allArtists = [] }) {
                 <option value="">Rol</option>
                 {CREDIT_ROLES.map(r => <option key={r.key} value={r.key}>{r.label}</option>)}
               </select>
-              <input value={newCredit.name} onChange={e => setNewCredit(c => ({ ...c, name: e.target.value }))}
-                className={ic} placeholder="Nombre" />
+              <input value={newCredit.name} onChange={e => setNewCredit(c => ({ ...c, name: e.target.value }))} className={ic} placeholder="Nombre" />
               <select value={newCredit.artist_id} onChange={e => setNewCredit(c => ({ ...c, artist_id: e.target.value }))} className={ic}>
                 <option value="">Artista (opc.)</option>
                 {allArtists.map(a => <option key={a.id} value={a.id}>{a.stageName}</option>)}
@@ -252,36 +247,35 @@ function VideoFormModal({ onClose, onSave, artistId, allArtists = [] }) {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="flex gap-2 p-5 border-t border-white/[0.06]">
           <button onClick={onClose} className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-semibold transition-colors">
             Cancelar
           </button>
           <button onClick={handleSubmit} disabled={loading}
             className="flex-1 py-2.5 rounded-xl bg-white text-black text-sm font-bold hover:bg-white/90 disabled:opacity-30 flex items-center justify-center gap-2 transition-colors">
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4" /> Guardar video</>}
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4" /> {isEdit ? "Guardar cambios" : "Guardar video"}</>}
           </button>
         </div>
       </motion.div>
-    </motion.div>
+    </motion.div>,
+    document.body
   );
 }
 
 // ── Main ───────────────────────────────────────────────────────────────────
 export default function VideosSection({ artistId, userProfileId }) {
   const [showModal, setShowModal] = useState(false);
+  const [editingVideo, setEditingVideo] = useState(null);
   const [playingYt, setPlayingYt] = useState(null);
   const qc = useQueryClient();
 
   const { data: videos = [], isLoading, refetch } = useQuery({
     queryKey: ["artist-videos", artistId, userProfileId],
     queryFn: async () => {
-      // Fetch by artistId OR by created_by (own videos)
       let items = [];
       if (artistId) {
         items = await base44.entities.ExplorarItem.filter({ artist_id: artistId });
       } else {
-        // fallback: fetch all and filter by creator
         items = await base44.entities.ExplorarItem.list("-created_date", 100);
         const me = await base44.auth.me();
         items = items.filter(i => i.created_by === me?.email);
@@ -302,28 +296,27 @@ export default function VideosSection({ artistId, userProfileId }) {
     refetch();
   };
 
+  const handleTogglePublic = async (video) => {
+    await base44.entities.ExplorarItem.update(video.id, { is_active: !video.is_active });
+    refetch();
+  };
+
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Film className="w-4 h-4 text-white/30" />
           <h3 className="text-sm font-bold text-white">Videos</h3>
-          {videos.length > 0 && (
-            <span className="text-[10px] text-white/25 px-1.5 py-0.5 bg-white/5 rounded-full">{videos.length}</span>
-          )}
+          {videos.length > 0 && <span className="text-[10px] text-white/25 px-1.5 py-0.5 bg-white/5 rounded-full">{videos.length}</span>}
         </div>
-        <button onClick={() => setShowModal(true)}
+        <button onClick={() => { setEditingVideo(null); setShowModal(true); }}
           className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/60 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-all">
           <Plus className="w-3 h-3" /> Nuevo video
         </button>
       </div>
 
-      {/* Content */}
       {isLoading ? (
-        <div className="space-y-2">
-          {[...Array(3)].map((_, i) => <div key={i} className="h-20 bg-white/5 rounded-xl animate-pulse" />)}
-        </div>
+        <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-20 bg-white/5 rounded-xl animate-pulse" />)}</div>
       ) : videos.length === 0 ? (
         <button onClick={() => setShowModal(true)}
           className="w-full py-16 rounded-2xl border border-dashed border-white/[0.06] flex flex-col items-center gap-3 hover:border-white/15 transition-colors">
@@ -339,18 +332,13 @@ export default function VideosSection({ artistId, userProfileId }) {
             const thumb = video.thumbnail_url || getYoutubeThumbnail(video.youtube_url || video.youtube_music_url);
             const ytId = getYoutubeId(video.youtube_url);
             const typeLabel = CONTENT_TYPES.find(t => t.value === video.content_type)?.label || video.content_type;
+            const isPublic = video.is_active !== false;
             return (
               <motion.div key={video.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
                 className="group flex gap-3 items-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] transition-colors">
                 {/* Thumbnail */}
                 <div className="relative w-28 h-16 rounded-lg overflow-hidden bg-black/50 flex-shrink-0">
-                  {thumb ? (
-                    <img src={thumb} alt={video.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Film className="w-5 h-5 text-white/10" />
-                    </div>
-                  )}
+                  {thumb ? <img src={thumb} alt={video.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Film className="w-5 h-5 text-white/10" /></div>}
                   {ytId && (
                     <button onClick={() => setPlayingYt(ytId)}
                       className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50">
@@ -364,27 +352,34 @@ export default function VideosSection({ artistId, userProfileId }) {
                   <p className="text-xs font-semibold text-white truncate">{video.title}</p>
                   <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                     {typeLabel && <span className="text-[9px] text-white/30 uppercase tracking-wider">{typeLabel}</span>}
-                    {(video.subtitle || video.genres?.[0]) && (
-                      <span className="text-[9px] text-white/20">· {video.subtitle || video.genres?.[0]}</span>
-                    )}
+                    {(video.subtitle || video.genres?.[0]) && <span className="text-[9px] text-white/20">· {video.subtitle || video.genres?.[0]}</span>}
                     {video.year && <span className="text-[9px] text-white/20">· {video.year}</span>}
                   </div>
-                  {video.credits?.length > 0 && (
-                    <p className="text-[9px] text-white/25 mt-1 truncate">
-                      {video.credits.slice(0, 2).map(c => c.name || c.role).filter(Boolean).join(", ")}
-                      {video.credits.length > 2 && "..."}
-                    </p>
-                  )}
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  {/* Toggle público/privado */}
+                  <button
+                    onClick={() => handleTogglePublic(video)}
+                    title={isPublic ? "Público — clic para privado" : "Privado — clic para público"}
+                    className={`p-1.5 rounded-lg transition-colors ${isPublic ? "bg-emerald-500/15 hover:bg-emerald-500/25" : "bg-white/5 hover:bg-white/10"}`}
+                  >
+                    {isPublic ? <Globe className="w-3 h-3 text-emerald-400" /> : <Lock className="w-3 h-3 text-white/30" />}
+                  </button>
+                  {/* Editar */}
+                  <button onClick={() => { setEditingVideo(video); setShowModal(true); }}
+                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+                    <Pencil className="w-3 h-3 text-white/40 hover:text-white" />
+                  </button>
+                  {/* Link externo */}
                   {video.youtube_url && (
                     <a href={video.youtube_url} target="_blank" rel="noopener noreferrer"
                       className="p-1.5 rounded-lg bg-black/40 hover:bg-black/70 transition-colors">
                       <ExternalLink className="w-3 h-3 text-white/40" />
                     </a>
                   )}
+                  {/* Eliminar */}
                   <button onClick={() => handleDelete(video.id)}
                     className="p-1.5 rounded-lg bg-black/40 hover:bg-red-900/60 transition-colors">
                     <Trash2 className="w-3 h-3 text-white/40 hover:text-red-400" />
@@ -396,20 +391,20 @@ export default function VideosSection({ artistId, userProfileId }) {
         </div>
       )}
 
-      {/* Modals */}
       <AnimatePresence>
-        {showModal && (
+        {(showModal) && (
           <VideoFormModal
-            onClose={() => setShowModal(false)}
+            onClose={() => { setShowModal(false); setEditingVideo(null); }}
             onSave={refetch}
             artistId={artistId}
             allArtists={allArtists}
+            editingVideo={editingVideo}
           />
         )}
       </AnimatePresence>
 
       <AnimatePresence>
-        {playingYt && (
+        {playingYt && ReactDOM.createPortal(
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-[700] bg-black/95 flex items-center justify-center p-4"
             onClick={() => setPlayingYt(null)}>
@@ -425,7 +420,8 @@ export default function VideosSection({ artistId, userProfileId }) {
                   allowFullScreen />
               </div>
             </motion.div>
-          </motion.div>
+          </motion.div>,
+          document.body
         )}
       </AnimatePresence>
     </motion.div>

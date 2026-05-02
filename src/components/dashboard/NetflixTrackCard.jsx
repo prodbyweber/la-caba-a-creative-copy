@@ -1,8 +1,10 @@
 import React, { useState, useRef } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X } from "lucide-react";
+import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
+import { base44 } from "@/api/base44Client";
+import { useQueryClient } from "@tanstack/react-query";
 
 const statusConfig = {
   idea:       { label: "Idea",          color: "#6b7280" },
@@ -60,9 +62,10 @@ function MetaRow({ label, value }) {
 }
 
 // Modal recibe el estado de playback externo para sincronizarlo
-function TrackDetailModal({ track, onClose, onEdit, playing, onTogglePlay }) {
+function TrackDetailModal({ track, onClose, onEdit, playing, onTogglePlay, onTogglePublic }) {
   const status = statusConfig[track.status] || statusConfig.idea;
   const folders = FOLDER_DEFS.filter(f => track.versions?.[f.key]);
+  const isPublic = track.is_public === true;
 
   // Lock body scroll while open
   React.useEffect(() => {
@@ -153,6 +156,15 @@ function TrackDetailModal({ track, onClose, onEdit, playing, onTogglePlay }) {
               className="flex items-center gap-2 px-4 py-2 rounded-md bg-white/10 text-white/70 text-sm font-bold hover:bg-white/20 transition-colors">
               <Edit className="w-3.5 h-3.5" /> Editar
             </button>
+            {/* Toggle público/privado */}
+            <button
+              onClick={onTogglePublic}
+              title={isPublic ? "Público — clic para privado" : "Privado — clic para público"}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-bold transition-colors ${isPublic ? "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25" : "bg-white/[0.06] text-white/30 hover:bg-white/10"}`}
+            >
+              {isPublic ? <Globe className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+              {isPublic ? "Público" : "Privado"}
+            </button>
             <div className="flex items-center gap-1.5 ml-1">
               <span className="px-2 py-1 rounded text-[10px] font-bold"
                 style={{ background: status.color + "22", color: status.color }}>
@@ -212,6 +224,9 @@ function TrackCard({ track, onEdit, isFirst }) {
   const [previewing, setPreviewing] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [showPreviewAnimation, setShowPreviewAnimation] = useState(false);
+  const [localTrack, setLocalTrack] = React.useState(track);
+
+  React.useEffect(() => { setLocalTrack(track); }, [track]);
 
   const previewRef = useRef(null);
   const playbackRef = useRef(null);
@@ -219,6 +234,7 @@ function TrackCard({ track, onEdit, isFirst }) {
   const hoverDelayRef = useRef(null);
 
   const globalAudio = useGlobalAudio();
+  const queryClient = useQueryClient();
 
   const status = statusConfig[track.status] || statusConfig.idea;
 
@@ -291,6 +307,12 @@ function TrackCard({ track, onEdit, isFirst }) {
 
   const handleCardClick = () => {
     setShowDetail(true);
+  };
+
+  const handleTogglePublic = async () => {
+    const updated = await base44.entities.Track.update(localTrack.id, { is_public: !localTrack.is_public });
+    setLocalTrack(t => ({ ...t, is_public: !t.is_public }));
+    queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
   };
 
   const handlePlaybackEnded = () => setPlaying(false);
@@ -459,11 +481,12 @@ function TrackCard({ track, onEdit, isFirst }) {
       {showDetail && ReactDOM.createPortal(
         <AnimatePresence>
           <TrackDetailModal
-            track={track}
+            track={localTrack}
             onClose={() => setShowDetail(false)}
             onEdit={(t) => { setShowDetail(false); onEdit(t); }}
             playing={playing}
             onTogglePlay={togglePlay}
+            onTogglePublic={handleTogglePublic}
           />
         </AnimatePresence>,
         document.body
