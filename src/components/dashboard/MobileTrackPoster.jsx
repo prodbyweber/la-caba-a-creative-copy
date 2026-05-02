@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, createContext, useContext, useCallback } from "react";
+import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Info } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
@@ -69,20 +70,29 @@ function MobileTrackDetail({ track, onClose, onEdit, playing, onTogglePlay }) {
   const status = statusConfig[track.status] || statusConfig.idea;
   const folders = FOLDER_DEFS.filter(f => track.versions?.[f.key]);
 
+  // Lock body scroll while open
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col justify-end">
+    <div className="fixed inset-0 z-[200] flex flex-col justify-end">
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
-        className="absolute inset-0 bg-black/80"
+        className="absolute inset-0 bg-black/90"
+        style={{ backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
       />
+      {/* bottom padding to clear mobile nav (65px) */}
       <motion.div
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+        transition={{ type: "spring", damping: 32, stiffness: 320 }}
         className="relative rounded-t-2xl overflow-hidden"
-        style={{ background: "#181818", maxHeight: "88vh", overflowY: "auto" }}
+        style={{ background: "#181818", maxHeight: "calc(100vh - 80px)", overflowY: "auto", paddingBottom: "calc(65px + env(safe-area-inset-bottom, 0px))" }}
       >
         {/* Cover banner with cinematic pan when playing */}
         <div className="relative overflow-hidden flex-shrink-0" style={{ height: 220 }}>
@@ -295,14 +305,15 @@ export default function MobileTrackPoster({ track, onEdit }) {
       </div>
 
       <AnimatePresence>
-        {showDetail && (
+        {showDetail && ReactDOM.createPortal(
           <MobileTrackDetail
             track={track}
             onClose={() => setShowDetail(false)}
             onEdit={onEdit}
             playing={isPlaying}
             onTogglePlay={handleTogglePlay}
-          />
+          />,
+          document.body
         )}
       </AnimatePresence>
     </>

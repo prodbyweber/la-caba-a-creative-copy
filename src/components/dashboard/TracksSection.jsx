@@ -167,6 +167,13 @@ export default function TracksSection({ jlyArtistId }) {
 }
 
 function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
+  // Lock body scroll while modal is open
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [isOpen]);
   // jlyArtistId es el ID del artista al que se vinculará el track al crearlo
   const [formData, setFormData] = useState(track || {
     title: "",
