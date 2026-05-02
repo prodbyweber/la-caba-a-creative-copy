@@ -107,10 +107,7 @@ export default function AdminDashboard() {
   const kpis = [
     { icon: Calendar, label: "Sessions Hoy", value: todaySessions.length, link: createPageUrl("Calendars") },
     { icon: Clock, label: "Entregables", value: dueDeliverables.length, link: createPageUrl("Calendars") },
-    { icon: AlertCircle, label: "Atrasados", value: overdueDeliverables.length, link: createPageUrl("Calendars") },
     { icon: GitPullRequest, label: "Revisiones", value: openRevisions.length, link: createPageUrl("Revisions") },
-    { icon: FolderKanban, label: "Proyectos", value: activeProjects.length, link: createPageUrl("Projects") },
-    { icon: Users, label: "Artistas", value: activeArtists.length, link: createPageUrl("Artists") }
   ];
 
   const openEditSession = (s) => { setEditSession(s); setShowSessionModal(true); };
@@ -134,7 +131,7 @@ export default function AdminDashboard() {
         {/* KPI Cards - arriba */}
         <div className="mb-6">
           <p className="text-[11px] font-semibold text-white/20 uppercase tracking-widest mb-3">Resumen General</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             {kpis.map((kpi, i) => (
               <Link key={i} to={kpi.link}>
                 <motion.div
