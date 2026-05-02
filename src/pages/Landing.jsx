@@ -6,14 +6,14 @@ import BrandsCarousel from "@/components/landing/BrandsCarousel";
 import HeroBanners from "@/components/landing/HeroBanners";
 import ExplorarPreview from "@/components/landing/ExplorarPreview";
 import StoriesSection from "@/components/landing/StoriesSection.jsx";
-
 import AboutSection from "@/components/landing/AboutSection.jsx";
 import MemberBanner from "@/components/landing/MemberBanner";
 import LandingNav from "@/components/landing/LandingNav";
 import Footer from "@/components/landing/Footer";
+import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 
 export default function Landing() {
-  const { data: config, isLoading } = useQuery({
+  const { data: config } = useQuery({
     queryKey: ['landingConfig'],
     queryFn: async () => {
       const configs = await base44.entities.LandingConfig.list();
@@ -25,17 +25,19 @@ export default function Landing() {
     <div className="min-h-screen bg-[#0a0a0b] text-white overflow-x-hidden">
       <LandingNav />
       
-      <main>
+      <main className="pb-16 md:pb-0">
         <Hero config={config} />
         <BrandsCarousel logos={config?.brand_logos} />
         <ExplorarPreview />
         <HeroBanners />
         <div id="about"><AboutSection /></div>
         <div id="stories"><StoriesSection /></div>
-
       </main>
 
       <Footer />
+
+      {/* Mobile bottom nav — always visible on mobile */}
+      <MobileBottomNav artistId={null} isAdmin={false} />
     </div>
   );
 }

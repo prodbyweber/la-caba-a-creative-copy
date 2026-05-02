@@ -6,8 +6,16 @@ import { useGlobalAudio } from "@/context/GlobalAudioContext";
 export default function GlobalAudioPlayer() {
   const { playingTrack, isPlaying, currentTime, duration, hidden, pauseTrack, resumeTrack, stopTrack, setHidden, seekTrack } = useGlobalAudio();
   const [isDragging, setIsDragging] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const progressRef = useRef(null);
   const playerRef = useRef(null);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   const performSeek = useCallback((clientX) => {
     if (!progressRef.current) return;
@@ -95,8 +103,11 @@ export default function GlobalAudioPlayer() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed bottom-0 left-0 right-0 z-[100] border-t border-white/10 backdrop-blur-xl"
-          style={{ background: "rgba(10, 10, 11, 0.95)" }}
+          className="fixed left-0 right-0 z-[100] border-t border-white/10 backdrop-blur-xl"
+          style={{
+            bottom: isMobile ? "65px" : "0px",
+            background: "rgba(10, 10, 11, 0.95)"
+          }}
           onMouseMove={handleMouseMove}
           onTouchMove={handleTouchMove}
           onMouseUp={handleSeekUp}

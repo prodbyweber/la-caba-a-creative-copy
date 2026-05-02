@@ -9,6 +9,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { base44 } from '@/api/base44Client';
+import GuestCatalogPreview from './pages/GuestCatalogPreview';
 import ContactLeads from './pages/ContactLeads';
 import ArtistPanelList from './pages/ArtistPanelList';
 import UserProfiles from './pages/UserProfiles';
@@ -130,6 +131,7 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
+      <Route path="/GuestCatalogPreview" element={<GuestCatalogPreview />} />
       <Route path="/ContactLeads" element={<ContactLeads />} />
       <Route path="/Pricing" element={<Pricing />} />
       <Route path="/AdminDashboard" element={<ProtectedAdminRoute element={<AdminDashboard />} />} />

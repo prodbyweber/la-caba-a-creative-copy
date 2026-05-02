@@ -14,10 +14,14 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const catalogPage = currentUser
+    ? (artistId ? `ArtistDashboard?artistId=${artistId}` : "ArtistDashboard")
+    : "GuestCatalogPreview";
+
   const bottomNavItems = [
     { icon: Home,     label: "Inicio",      page: "Landing" },
     { icon: Compass,  label: "Explorar",    page: "Explorar" },
-    { icon: BookOpen, label: "Tu catálogo", page: artistId ? `ArtistDashboard?artistId=${artistId}` : "ArtistDashboard", highlight: true },
+    { icon: BookOpen, label: "Tu catálogo", page: catalogPage, highlight: true },
   ];
 
   const isActiveNav = (page) => location.pathname.includes(page.split("?")[0]);
@@ -96,8 +100,8 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
       </div>
     </nav>
 
-      {/* Mobile bottom nav — only for logged-in users */}
-      {currentUser && (
+      {/* Mobile bottom nav — always visible */}
+      {(
         <nav
           className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
           style={{

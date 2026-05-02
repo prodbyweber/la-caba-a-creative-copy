@@ -1,13 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
 import { Home, BookOpen, Compass } from "lucide-react";
 import { createPageUrl } from "@/utils";
+import { base44 } from "@/api/base44Client";
 
 export default function MobileBottomNav({ artistId, isAdmin }) {
   const location = useLocation();
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
+
+  useEffect(() => {
+    base44.auth.isAuthenticated().then(auth => setIsLoggedIn(auth)).catch(() => setIsLoggedIn(false));
+  }, []);
 
   const isActive = (page) => location.pathname.includes(page.split("?")[0]);
+
+  const catalogPage = isLoggedIn
+    ? (artistId ? `ArtistDashboard?artistId=${artistId}` : "ArtistDashboard")
+    : "GuestCatalogPreview";
 
   const items = [
     {
@@ -23,7 +33,7 @@ export default function MobileBottomNav({ artistId, isAdmin }) {
     {
       icon: BookOpen,
       label: "Tu catálogo",
-      page: artistId ? `ArtistDashboard?artistId=${artistId}` : "ArtistDashboard",
+      page: catalogPage,
       highlight: true,
     },
   ];

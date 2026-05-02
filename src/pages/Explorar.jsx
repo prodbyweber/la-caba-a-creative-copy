@@ -332,7 +332,7 @@ export default function Explorar() {
       )}
 
       {/* Content rows */}
-      <div className={`relative z-10 -mt-16 ${currentUser ? "pb-36" : "pb-24"}`}>
+      <div className="relative z-10 -mt-16 pb-36">
         {/* Sombreado gradual con viñeta oscura */}
         <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-transparent via-transparent to-black/40 pointer-events-none" />
         <div className="absolute top-0 left-0 right-0 h-36" style={{
