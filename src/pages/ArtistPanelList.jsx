@@ -1,44 +1,49 @@
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { ArrowLeft, User, Music2, Calendar, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, User, ExternalLink, Music2, Camera, Briefcase, Search, Shield } from "lucide-react";
+
+const ACCOUNT_TYPES = [
+  { key: "all", label: "Todos" },
+  { key: "artist", label: "Artistas" },
+  { key: "creator", label: "Creadores" },
+  { key: "brand", label: "Marcas" },
+];
+
+const TYPE_CONFIG = {
+  artist: { label: "Artista", icon: Music2, color: "rgba(255,255,255,0.15)" },
+  creator: { label: "Creador", icon: Camera, color: "rgba(255,255,255,0.15)" },
+  brand: { label: "Marca", icon: Briefcase, color: "rgba(255,255,255,0.15)" },
+};
 
 export default function ArtistPanelList() {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = React.useState(null);
   const [authChecked, setAuthChecked] = React.useState(false);
+  const [filterType, setFilterType] = useState("all");
+  const [search, setSearch] = useState("");
 
   React.useEffect(() => {
     base44.auth.me().then(u => {
       setCurrentUser(u);
       setAuthChecked(true);
-      // Solo admins pueden ver esta página
-      if (u?.role !== 'admin') {
-        navigate('/');
-      }
-    }).catch(() => {
-      navigate('/');
-    });
+      if (u?.role !== 'admin') navigate('/');
+    }).catch(() => navigate('/'));
   }, []);
 
-  const { data: artists, isLoading } = useQuery({
+  const { data: artists = [], isLoading: loadingArtists } = useQuery({
     queryKey: ['artists'],
     queryFn: () => base44.entities.Artist.list('-created_date'),
     enabled: authChecked && currentUser?.role === 'admin'
   });
 
-  const { data: userProfile } = useQuery({
-    queryKey: ['adminProfile', currentUser?.id],
-    queryFn: async () => {
-      if (!currentUser?.id) return null;
-      const profiles = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
-      return profiles[0] || null;
-    },
-    enabled: !!currentUser?.id
+  const { data: userProfiles = [], isLoading: loadingProfiles } = useQuery({
+    queryKey: ['all-user-profiles'],
+    queryFn: () => base44.entities.UserProfile.list('-created_date', 100),
+    enabled: authChecked && currentUser?.role === 'admin'
   });
 
   const { data: myArtist } = useQuery({
@@ -51,181 +56,206 @@ export default function ArtistPanelList() {
     enabled: !!currentUser?.id
   });
 
+  const isLoading = loadingArtists || loadingProfiles;
+
+  // Merge artist + userProfile data
+  const allCreators = React.useMemo(() => {
+    const seen = new Set();
+    const result = [];
+
+    // Artists with linked profiles
+    for (const artist of artists) {
+      const profile = userProfiles.find(p => p.user_id === artist.user_id);
+      const accountType = profile?.account_type || "artist";
+      const key = artist.id;
+      if (!seen.has(key)) {
+        seen.add(key);
+        result.push({ artist, profile, accountType, displayName: artist.stageName, avatarUrl: artist.avatar_url || profile?.avatar_url || profile?.profile_photo_url });
+      }
+    }
+
+    // UserProfiles without linked artist
+    for (const profile of userProfiles) {
+      const linkedArtist = artists.find(a => a.user_id === profile.user_id);
+      if (!linkedArtist) {
+        const key = `profile-${profile.id}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          result.push({ artist: null, profile, accountType: profile.account_type || "creator", displayName: profile.display_name || profile.artist_name || profile.full_name || "—", avatarUrl: profile.avatar_url || profile.profile_photo_url });
+        }
+      }
+    }
+
+    return result;
+  }, [artists, userProfiles]);
+
+  const filtered = allCreators.filter(c => {
+    const matchType = filterType === "all" || c.accountType === filterType;
+    const matchSearch = !search || c.displayName?.toLowerCase().includes(search.toLowerCase()) || c.profile?.user_email?.toLowerCase().includes(search.toLowerCase());
+    return matchType && matchSearch;
+  });
+
+  const counts = {
+    all: allCreators.length,
+    artist: allCreators.filter(c => c.accountType === "artist").length,
+    creator: allCreators.filter(c => c.accountType === "creator").length,
+    brand: allCreators.filter(c => c.accountType === "brand").length,
+  };
+
   const handleViewDashboard = (artistId) => {
-    const url = createPageUrl("ArtistDashboard") + `?artistId=${artistId}`;
-    navigate(url);
+    navigate(createPageUrl("ArtistDashboard") + `?artistId=${artistId}`);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-black text-white">
+    <div className="min-h-screen bg-[#080809] text-white">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(createPageUrl("Landing"))}
-            className="text-gray-400 hover:text-white"
+      <div className="sticky top-0 z-40 bg-[#080809]/90 backdrop-blur-xl border-b border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 py-4 flex items-center gap-4">
+          <button
+            onClick={() => navigate(createPageUrl("AdminDashboard"))}
+            className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:border-white/20 transition-colors flex-shrink-0"
           >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-white">Panel de Artistas</h1>
-            <p className="text-sm text-gray-400">Accede al dashboard de cada artista</p>
+            <ArrowLeft className="w-4 h-4 text-white/50" />
+          </button>
+          <div className="flex-1">
+            <h1 className="text-lg font-black text-white tracking-tight" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.03em" }}>
+              Creadores
+            </h1>
+            <p className="text-[11px] text-white/30">{allCreators.length} perfiles registrados</p>
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Tu cuenta - Destacada */}
-        {currentUser && (
-          <div className="mb-12">
-            <p className="text-xs font-semibold text-emerald-400 uppercase tracking-widest mb-4">Tu Cuenta</p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl overflow-hidden border-2 border-emerald-500/50 bg-gradient-to-b from-emerald-950/40 to-black shadow-2xl shadow-emerald-500/20 p-6"
-            >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center border-2 border-emerald-500/50">
-                  <span className="text-2xl font-black text-white">{currentUser.full_name?.[0]?.toUpperCase() || "A"}</span>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-white">{currentUser.full_name}</h3>
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">Admin</span>
-                  </div>
-                  <p className="text-sm text-gray-400">{currentUser.email}</p>
-                </div>
-              </div>
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 py-8">
 
-              {myArtist && (
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                    <p className="text-xs text-gray-400 mb-1">Tu Artista Vinculado</p>
-                    <p className="text-sm font-bold text-emerald-400">{myArtist.stageName}</p>
-                  </div>
-                  <button
-                    onClick={() => handleViewDashboard(myArtist.id)}
-                    className="p-3 rounded-lg bg-emerald-500/20 border border-emerald-500/40 hover:bg-emerald-500/30 transition-colors"
-                  >
-                    <p className="text-xs text-gray-400 mb-1">Ver Mi Dashboard</p>
-                    <p className="text-sm font-bold text-emerald-400">Acceder →</p>
-                  </button>
-                </div>
-              )}
-
+        {/* Filtros + búsqueda */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-8">
+          {/* Type filter */}
+          <div className="flex items-center gap-1 bg-white/[0.04] border border-white/[0.07] rounded-xl p-1">
+            {ACCOUNT_TYPES.map(t => (
               <button
-                onClick={() => navigate(createPageUrl("AdminDashboard"))}
-                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-semibold transition-all"
+                key={t.key}
+                onClick={() => setFilterType(t.key)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${filterType === t.key ? "bg-white text-black" : "text-white/40 hover:text-white"}`}
               >
-                Panel de Admin
+                {t.label}
+                <span className={`ml-1.5 text-[9px] ${filterType === t.key ? "text-black/50" : "text-white/20"}`}>{counts[t.key]}</span>
               </button>
+            ))}
+          </div>
+
+          {/* Search */}
+          <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-white/[0.04] border border-white/[0.07] rounded-xl">
+            <Search className="w-4 h-4 text-white/25 flex-shrink-0" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar por nombre o email..."
+              className="flex-1 bg-transparent text-sm text-white placeholder-white/25 outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Admin card */}
+        {currentUser && myArtist && (
+          <div className="mb-8">
+            <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Tu cuenta</p>
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-3 p-4 bg-white/[0.04] border border-white/[0.1] rounded-xl"
+            >
+              <div className="w-10 h-10 rounded-full border border-white/15 overflow-hidden flex-shrink-0 flex items-center justify-center bg-[#1a1a1a]">
+                {myArtist.avatar_url ? (
+                  <img src={myArtist.avatar_url} alt={myArtist.stageName} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-xs font-black text-white/40">{myArtist.stageName?.[0]}</span>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-white truncate">{myArtist.stageName}</p>
+                <p className="text-[11px] text-white/30">{currentUser.email}</p>
+              </div>
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border border-white/15 text-white/40">
+                  <Shield className="w-2.5 h-2.5" /> Admin
+                </span>
+                <button
+                  onClick={() => handleViewDashboard(myArtist.id)}
+                  className="px-3 py-1.5 rounded-lg border border-white/15 text-xs font-semibold text-white/70 hover:text-white hover:border-white/30 transition-all"
+                >
+                  Dashboard
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
-        
-        {isLoading && (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
 
-        {!isLoading && artists?.length === 0 && (
+        {/* Creators grid */}
+        {isLoading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {[...Array(10)].map((_, i) => (
+              <div key={i} className="h-48 bg-white/[0.03] rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="text-center py-20">
-            <User className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-400 mb-2">No hay artistas registrados</h3>
-            <p className="text-sm text-gray-500">Los artistas aparecerán aquí cuando se registren en el sistema</p>
+            <User className="w-12 h-12 text-white/10 mx-auto mb-3" />
+            <p className="text-sm text-white/30">No hay creadores para este filtro</p>
           </div>
-        )}
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {filtered.map((c, idx) => {
+              const TypeIcon = TYPE_CONFIG[c.accountType]?.icon || User;
+              const typeLabel = TYPE_CONFIG[c.accountType]?.label || c.accountType;
 
-        {!isLoading && artists && artists.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {artists.map((artist, idx) => (
-              <motion.div
-                key={artist.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: idx * 0.05 }}
-                whileHover={{ y: -4 }}
-                className="relative rounded-2xl overflow-hidden border border-emerald-500/20 bg-gradient-to-b from-[#141414] to-black shadow-xl hover:shadow-emerald-500/10 transition-all"
-              >
-                <div className="p-6 space-y-4">
+              return (
+                <motion.div
+                  key={c.artist?.id || c.profile?.id || idx}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.03 }}
+                  className="group bg-white/[0.03] border border-white/[0.07] rounded-xl overflow-hidden hover:bg-white/[0.06] hover:border-white/[0.12] transition-all"
+                >
                   {/* Avatar */}
-                  <div className="flex items-center gap-4">
-                    {artist.avatar_url ? (
-                      <img
-                        src={artist.avatar_url}
-                        alt={artist.stageName}
-                        className="w-16 h-16 rounded-xl object-cover border-2 border-emerald-500/50"
-                      />
+                  <div className="relative aspect-square bg-[#111] overflow-hidden">
+                    {c.avatarUrl ? (
+                      <img src={c.avatarUrl} alt={c.displayName} className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
                     ) : (
-                      <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center border-2 border-emerald-500/50">
-                        <span className="text-2xl font-black text-white">
-                          {artist.stageName?.[0]?.toUpperCase() || "A"}
-                        </span>
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-3xl font-black text-white/20">{c.displayName?.[0]?.toUpperCase() || "?"}</span>
                       </div>
                     )}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-bold text-white truncate">{artist.stageName}</h3>
-                      {artist.genre && (
-                        <p className="text-sm text-gray-400 truncate">{artist.genre}</p>
-                      )}
-                      {artist.location && (
-                        <p className="text-xs text-gray-500 truncate">{artist.location}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="p-2 rounded-lg bg-white/5 border border-white/10">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <Music2 className="w-3 h-3 text-emerald-400" />
-                        <span className="text-xs text-gray-400">Status</span>
-                      </div>
-                      <span className={`text-xs font-bold ${
-                        artist.status === 'Active' ? 'text-emerald-400' :
-                        artist.status === 'Lead' ? 'text-yellow-400' :
-                        'text-gray-400'
-                      }`}>
-                        {artist.status || 'Lead'}
-                      </span>
-                    </div>
-                    <div className="p-2 rounded-lg bg-white/5 border border-white/10">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <Calendar className="w-3 h-3 text-purple-400" />
-                        <span className="text-xs text-gray-400">Creado</span>
-                      </div>
-                      <span className="text-xs font-bold text-purple-400">
-                        {new Date(artist.created_date).toLocaleDateString('es-ES', { 
-                          day: '2-digit', 
-                          month: 'short' 
-                        })}
+                    {/* Type badge */}
+                    <div className="absolute top-2 left-2">
+                      <span className="flex items-center gap-1 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-black/70 text-white/50 backdrop-blur-sm">
+                        <TypeIcon className="w-2.5 h-2.5" />
+                        {typeLabel}
                       </span>
                     </div>
                   </div>
 
-                  {/* Bio Preview */}
-                  {artist.bio && (
-                    <p className="text-xs text-gray-400 line-clamp-2">{artist.bio}</p>
-                  )}
+                  {/* Info */}
+                  <div className="p-3">
+                    <p className="text-xs font-bold text-white truncate leading-tight mb-0.5">{c.displayName}</p>
+                    {c.artist?.genre && <p className="text-[10px] text-white/30 truncate mb-2">{c.artist.genre}</p>}
+                    {c.profile?.username && <p className="text-[10px] text-white/20 truncate mb-2">@{c.profile.username}</p>}
 
-                  {/* Action Button */}
-                  <Button
-                    onClick={() => handleViewDashboard(artist.id)}
-                    className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-medium"
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Ver Dashboard
-                  </Button>
-                </div>
-
-                {/* Hover Glow Effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-purple-500/5 opacity-0 hover:opacity-100 transition-opacity pointer-events-none" />
-              </motion.div>
-            ))}
+                    {c.artist?.id ? (
+                      <button
+                        onClick={() => handleViewDashboard(c.artist.id)}
+                        className="w-full flex items-center justify-center gap-1 py-1.5 rounded-lg border border-white/10 text-[10px] font-semibold text-white/50 hover:text-white hover:border-white/25 transition-all"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        Ver Dashboard
+                      </button>
+                    ) : (
+                      <div className="py-1.5 text-center text-[10px] text-white/20">Sin dashboard</div>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         )}
       </div>
