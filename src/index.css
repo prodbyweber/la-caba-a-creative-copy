@@ -84,5 +84,11 @@
 
   body {
     @apply bg-background text-foreground;
+    background-color: #080808;
+    overscroll-behavior: none;
+  }
+
+  html {
+    background-color: #080808;
   }
 }
