@@ -6,12 +6,12 @@ import { Music2, Film, Image, Zap, SlidersHorizontal, Camera, GripVertical } fro
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
-import ProjectsSection from "@/components/dashboard/ProjectsSection";
+import ProjectsSection from "@/components/dashboard/ProjectsSection.jsx";
 import TracksSection from "@/components/dashboard/TracksSection";
 import ClipsLibrary from "@/components/clips/ClipsLibrary";
 import BrandCampaignsSection from "@/components/dashboard/BrandCampaignsSection";
 import PhotosGallery from "@/components/dashboard/PhotosGallery";
-import VideosSection from "@/components/dashboard/VideosSection";
+import FilmsSection from "@/components/dashboard/FilmsSection";
 import CatalogSectionOrder, { DEFAULT_SECTION_ORDER } from "@/components/dashboard/CatalogSectionOrder";
 
 
@@ -229,7 +229,7 @@ export default function ArtistDashboard() {
               if (key === "video" && showVideoSection) return (
                 <div key="video">
                   <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Films</p>
-                  <VideosSection artistId={effectiveArtist?.id} userProfileId={userProfile?.id} />
+                  <FilmsSection artistId={effectiveArtist?.id || artistId} userProfileId={userProfile?.id} />
                 </div>
               );
               if (key === "projects" && showProjectsSection) return (
@@ -446,7 +446,7 @@ export default function ArtistDashboard() {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.25 }}
               >
-                <VideosSection artistId={effectiveArtist?.id} userProfileId={userProfile?.id} />
+                <FilmsSection artistId={effectiveArtist?.id} userProfileId={userProfile?.id} />
               </motion.div>
             )}
 
