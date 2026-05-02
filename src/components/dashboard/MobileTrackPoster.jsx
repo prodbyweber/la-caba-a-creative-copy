@@ -67,11 +67,19 @@ const FOLDER_DEFS = [
   { key: "acapella",     label: "Acapella" },
 ];
 
+function getYoutubeId(url) {
+  if (!url) return null;
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/|music\.youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
 // ─── Bottom-sheet detail (with shared play state) ─────────────────────────────
 function MobileTrackDetail({ track, onClose, onEdit, playing, onTogglePlay, onTogglePublic }) {
   const status = statusConfig[track.status] || statusConfig.idea;
   const folders = FOLDER_DEFS.filter(f => track.versions?.[f.key]);
   const isPublic = track.is_public === true;
+  const hasYoutube = !!track.youtube_music_url;
+  const [showYtPlayer, setShowYtPlayer] = useState(false);
 
   // Lock body scroll while open
   useEffect(() => {
@@ -130,20 +138,50 @@ function MobileTrackDetail({ track, onClose, onEdit, playing, onTogglePlay, onTo
           </div>
         </div>
 
+        {/* YouTube player embed */}
+        {showYtPlayer && hasYoutube && (
+          <div className="px-4 pt-3 pb-2">
+            <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingBottom: "56.25%" }}>
+              <iframe
+                className="absolute inset-0 w-full h-full"
+                src={`https://www.youtube-nocookie.com/embed/${getYoutubeId(track.youtube_music_url)}?autoplay=1&rel=0&modestbranding=1`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        )}
+
         <div className="px-4 pb-8 pt-4 space-y-4">
           {/* Play + Edit + Toggle public row */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {track.audio_file_url && (
               <button
                 onClick={onTogglePlay}
                 className="w-10 h-10 rounded-full flex items-center justify-center transition-all flex-shrink-0"
                 style={{
                   background: playing ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.9)",
-                  color: playing ? "white" : "black",
                   border: playing ? "1px solid rgba(255,255,255,0.2)" : "none",
                 }}
               >
-                {playing ? <Pause className="w-4 h-4" fill={playing ? "white" : "black"} /> : <Play className="w-4 h-4 ml-0.5" fill={playing ? "white" : "black"} />}
+                {playing ? <Pause className="w-4 h-4 text-white" fill="white" /> : <Play className="w-4 h-4 text-black ml-0.5" fill="black" />}
+              </button>
+            )}
+            {/* YouTube Music button */}
+            {hasYoutube && (
+              <button
+                onClick={() => setShowYtPlayer(v => !v)}
+                className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl text-sm font-bold transition-colors flex-shrink-0"
+                style={{
+                  background: showYtPlayer ? "rgba(255,88,88,0.2)" : "rgba(255,88,88,0.1)",
+                  border: "1px solid rgba(255,88,88,0.3)",
+                  color: "#f87171",
+                }}
+              >
+                <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                </svg>
+                {showYtPlayer ? "Cerrar" : "YT Music"}
               </button>
             )}
             <button onClick={() => { onClose(); onEdit(track); }}
@@ -223,17 +261,23 @@ export default function MobileTrackPoster({ track, onEdit }) {
 
   const status = statusConfig[track.status] || statusConfig.idea;
   const hasAudio = !!track.audio_file_url;
+  const hasYoutube = !!track.youtube_music_url;
+  const hasPlayable = hasAudio || hasYoutube;
 
   // Toggle play/pause using global audio
   const handleTogglePlay = useCallback((e) => {
     if (e) e.stopPropagation();
-    if (!hasAudio) return;
-    if (isPlaying) {
-      globalAudio.pauseTrack();
-    } else {
-      globalAudio.playTrack(track);
+    if (hasAudio) {
+      if (isPlaying) {
+        globalAudio.pauseTrack();
+      } else {
+        globalAudio.playTrack(track);
+      }
+    } else if (hasYoutube) {
+      // For YouTube-only tracks, open the detail sheet
+      setShowDetail(true);
     }
-  }, [isPlaying, hasAudio, globalAudio, track]);
+  }, [isPlaying, hasAudio, hasYoutube, globalAudio, track]);
 
   const handleTogglePublic = useCallback(async () => {
     await base44.entities.Track.update(track.id, { is_public: !track.is_public });
@@ -270,7 +314,7 @@ export default function MobileTrackPoster({ track, onEdit }) {
           {/* Bottom gradient */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent" />
 
-          {/* Info button — top right, integrated in card */}
+          {/* Info button — top right */}
           <button
             onClick={(e) => { e.stopPropagation(); setShowDetail(true); }}
             className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center"
@@ -279,11 +323,21 @@ export default function MobileTrackPoster({ track, onEdit }) {
             <ChevronDown className="w-3 h-3 text-white/70" />
           </button>
 
+          {/* YT badge when only youtube (no mp3) */}
+          {!hasAudio && hasYoutube && (
+            <div className="absolute top-1.5 left-1.5 flex items-center gap-0.5 px-1 py-0.5 rounded"
+              style={{ background: "rgba(255,0,0,0.2)", border: "1px solid rgba(255,80,80,0.3)" }}>
+              <svg className="w-2.5 h-2.5 text-red-400" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+              </svg>
+            </div>
+          )}
+
           {/* Bottom area: title + play button */}
           <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 flex items-end justify-between gap-1">
             <p className="text-white font-bold text-[11px] leading-tight line-clamp-2 flex-1">{track.title}</p>
 
-            {hasAudio && (
+            {hasPlayable && (
               <button
                 onClick={handleTogglePlay}
                 className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all active:scale-90"
