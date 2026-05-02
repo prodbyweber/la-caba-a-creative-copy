@@ -349,8 +349,11 @@ function TrackCard({ track, onEdit, isFirst }) {
 
   const handlePlaybackEnded = () => setPlaying(false);
 
-  // Open detail — only if clicking on the card body, not the play button
-  const handleCardClick = () => setShowDetail(true);
+  // Abre el detalle al hacer click en la tarjeta (no en botones internos)
+  const handleCardClick = (e) => {
+    if (e.target.closest('button')) return;
+    setShowDetail(true);
+  };
 
   return (
     <>
@@ -413,30 +416,23 @@ function TrackCard({ track, onEdit, isFirst }) {
                 {status.label}
               </div>
 
-              {/* ChevronDown — opens detail, top-right, always visible on hover */}
-              <AnimatePresence>
-                {hovered && (
-                  <motion.button
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.15 }}
-                    onClick={(e) => { e.stopPropagation(); setShowDetail(true); }}
-                    className="absolute top-2 right-2 w-5 h-5 rounded-full flex items-center justify-center"
-                    style={{
-                      background: "rgba(20,20,20,0.80)",
-                      border: "1px solid rgba(255,255,255,0.18)",
-                      backdropFilter: "blur(6px)",
-                    }}
-                  >
-                    <ChevronDown className="w-2.5 h-2.5 text-white/70" />
-                  </motion.button>
-                )}
-              </AnimatePresence>
+              {/* ChevronDown — SIEMPRE visible, abre el detalle */}
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowDetail(true); }}
+                className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+                style={{
+                  background: "rgba(10,10,10,0.75)",
+                  border: "1px solid rgba(255,255,255,0.25)",
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter: "blur(8px)",
+                }}
+              >
+                <ChevronDown className="w-3 h-3 text-white/90" />
+              </button>
 
-              {/* YouTube Music badge (when no MP3, shows in cover) */}
+              {/* YouTube Music badge — sólo sin MP3, en top-left tras el status */}
               {!hasAudio && hasYoutube && (
-                <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded"
+                <div className="absolute top-2 left-14 flex items-center gap-1 px-1.5 py-0.5 rounded"
                   style={{ background: "rgba(255,0,0,0.18)", border: "1px solid rgba(255,80,80,0.25)" }}>
                   <svg className="w-2.5 h-2.5 text-red-400" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
@@ -536,16 +532,18 @@ function TrackCard({ track, onEdit, isFirst }) {
         </motion.div>
       </div>
 
-      {showDetail && ReactDOM.createPortal(
+      {ReactDOM.createPortal(
         <AnimatePresence>
-          <TrackDetailModal
-            track={localTrack}
-            onClose={() => setShowDetail(false)}
-            onEdit={(t) => { setShowDetail(false); onEdit(t); }}
-            playing={playing}
-            onTogglePlay={togglePlay}
-            onTogglePublic={handleTogglePublic}
-          />
+          {showDetail && (
+            <TrackDetailModal
+              track={localTrack}
+              onClose={() => setShowDetail(false)}
+              onEdit={(t) => { setShowDetail(false); onEdit(t); }}
+              playing={playing}
+              onTogglePlay={togglePlay}
+              onTogglePublic={handleTogglePublic}
+            />
+          )}
         </AnimatePresence>,
         document.body
       )}
