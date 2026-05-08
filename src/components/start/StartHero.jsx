@@ -36,6 +36,14 @@ const scrollTo = (id) => {
   if (el) el.scrollIntoView({ behavior: "smooth" });
 };
 
+const NAV_LINKS = [
+  { label: "Quiénes Somos", href: "#about" },
+  { label: "Artistas / Creadores", href: "#artists" },
+  { label: "Marcas", href: "#brands" },
+  { label: "Elige tu Camino", href: "#choose" },
+  { label: "Work With Us →", href: "#cta", highlight: true },
+];
+
 export default function StartHero() {
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
@@ -45,12 +53,6 @@ export default function StartHero() {
 
   const videoSrc = cfg?.hero_video_url || null;
   const fallbackImage = cfg?.hero_banner_1_image || "https://images.unsplash.com/photo-1598387993281-cecf8b71a8f8?w=1800&q=85";
-
-  const navLinks = [
-    { label: "Artistas", href: "#artists" },
-    { label: "Marcas", href: "#brands" },
-    { label: "Work With Us", href: "#cta" },
-  ];
 
   return (
     <section
@@ -68,24 +70,20 @@ export default function StartHero() {
       {videoSrc ? (
         <VideoBackground src={videoSrc} />
       ) : (
-        <img
-          src={fallbackImage}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
       )}
 
-      {/* Dark overlays — cinematic */}
+      {/* Dark overlays */}
       <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.45)" }} />
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, transparent 40%, rgba(0,0,0,0.75) 100%)"
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 40%, rgba(0,0,0,0.85) 100%)"
       }} />
 
-      {/* Center brand name */}
+      {/* Center tagline — centered */}
       <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.2, delay: 0.5 }}
         style={{
           position: "absolute",
           top: "50%",
@@ -95,24 +93,25 @@ export default function StartHero() {
           zIndex: 10,
           pointerEvents: "none",
           width: "100%",
+          padding: "0 24px",
         }}
       >
         <p
           style={{
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            fontWeight: 900,
-            fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)",
-            letterSpacing: "0.35em",
-            color: "rgba(240,237,232,0.5)",
+            fontWeight: 400,
+            fontSize: "clamp(0.55rem, 1.8vw, 0.75rem)",
+            letterSpacing: "0.4em",
+            color: "rgba(240,237,232,0.4)",
             textTransform: "uppercase",
-            marginBottom: "clamp(6px, 1.5vw, 12px)",
+            margin: 0,
           }}
         >
           Creative House for Artists &amp; Brands
         </p>
       </motion.div>
 
-      {/* Bottom content — COLORS STUDIOS style */}
+      {/* Bottom nav links — all 5 sections */}
       <div
         style={{
           position: "absolute",
@@ -120,43 +119,39 @@ export default function StartHero() {
           left: 0,
           right: 0,
           zIndex: 10,
-          padding: "clamp(24px, 5vw, 48px) clamp(24px, 6vw, 56px)",
+          padding: "0 clamp(20px, 5vw, 48px) clamp(28px, 5vw, 48px)",
         }}
       >
-        {/* Nav links — bottom left like COLORS */}
         <motion.nav
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          style={{ display: "flex", flexDirection: "column", gap: "2px", alignItems: "flex-start" }}
+          style={{ display: "flex", flexDirection: "column", gap: "0", alignItems: "flex-start" }}
         >
-          {navLinks.map((link, i) => (
+          {NAV_LINKS.map((link, i) => (
             <motion.a
               key={link.label}
               href={link.href}
               onClick={e => { e.preventDefault(); scrollTo(link.href); }}
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.8 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.55, delay: 0.75 + i * 0.07, ease: [0.22, 1, 0.36, 1] }}
               style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 900,
-                fontSize: "clamp(1.8rem, 5vw, 3rem)",
-                letterSpacing: "-0.03em",
-                color: i === 2 ? "#f0ede8" : "rgba(240,237,232,0.35)",
+                fontSize: "clamp(1.1rem, 3.5vw, 2rem)",
+                letterSpacing: "-0.025em",
+                color: link.highlight ? "#f0ede8" : "rgba(240,237,232,0.28)",
                 textDecoration: "none",
-                lineHeight: 1.05,
-                transition: "color 0.25s ease",
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
+                lineHeight: 1.2,
+                paddingBottom: "clamp(2px, 0.6vw, 5px)",
+                marginBottom: "clamp(2px, 0.6vw, 5px)",
+                transition: "color 0.2s ease, transform 0.2s ease",
+                display: "block",
               }}
-              onMouseEnter={e => e.currentTarget.style.color = "#f0ede8"}
-              onMouseLeave={e => e.currentTarget.style.color = i === 2 ? "#f0ede8" : "rgba(240,237,232,0.35)"}
+              onMouseEnter={e => { e.currentTarget.style.color = "#f0ede8"; e.currentTarget.style.transform = "translateX(5px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.color = link.highlight ? "#f0ede8" : "rgba(240,237,232,0.28)"; e.currentTarget.style.transform = "translateX(0)"; }}
             >
-              {i === 2 && (
-                <span style={{ fontSize: "clamp(1.8rem, 5vw, 3rem)", marginRight: "4px" }}>→</span>
-              )}
               {link.label}
             </motion.a>
           ))}

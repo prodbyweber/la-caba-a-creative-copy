@@ -41,24 +41,18 @@ export default function StartNav() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.2 }}
       >
-        {/* Logo */}
+        {/* Logo — same style as LandingNav */}
         <a
           href="/start"
           className="flex items-center gap-2 select-none"
           style={{ textDecoration: "none" }}
         >
-          <span
-            style={{
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-              fontWeight: 900,
-              fontSize: "clamp(0.85rem, 2vw, 1rem)",
-              letterSpacing: "0.08em",
-              color: "#f0ede8",
-              textTransform: "uppercase",
-            }}
-          >
-            Cabaña Creative
-          </span>
+          <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: "flex", flexDirection: "column" }}>
+            <span style={{ letterSpacing: "-0.04em", display: "inline-flex", alignItems: "flex-start", lineHeight: 1, color: "#ff5833", fontWeight: 900, fontSize: "1.1rem" }}>
+              Cabaña<sup style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.55rem", fontWeight: 400, marginLeft: "3px", verticalAlign: "top", position: "relative", top: "2px" }}>®</sup>
+            </span>
+            <span style={{ letterSpacing: "-0.04em", display: "block", lineHeight: 1, color: "white", fontWeight: 900, fontSize: "1.1rem" }}>Creative</span>
+          </div>
         </a>
 
         {/* Hamburger */}
