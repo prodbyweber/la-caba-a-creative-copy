@@ -4,15 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
 const DEFAULT = {
-  cta_headline: "Construyamos algo con identidad.",
-  cta_subtext: "Agenda una videollamada y conversemos sobre tu proyecto, marca o idea creativa.",
-  cta_btn1_label: "Agendar reunión", cta_btn1_link: "https://calendly.com",
-  cta_btn2_label: "Contactar", cta_btn2_link: "mailto:hola@cabanacreative.es",
+  cta_btn1_link: "https://calendly.com",
+  cta_btn2_link: "mailto:hola@cabanacreative.es",
 };
 
 export default function StartCTA() {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const inView = useInView(ref, { once: true, margin: "-60px" });
 
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
@@ -30,24 +28,27 @@ export default function StartCTA() {
         width: "100%",
         minHeight: "100dvh",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-start",
-        background: "#0c0c0c",
-        padding: "clamp(80px, 15vw, 160px) clamp(24px, 8vw, 100px)",
+        flexDirection: "column",
+        justifyContent: "center",
+        background: "#f0ede8",
         overflow: "hidden",
+        padding: "clamp(80px, 15vw, 160px) clamp(24px, 8vw, 100px)",
       }}
     >
-      {/* Subtle texture */}
+      {/* Subtle grain texture overlay */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background: "radial-gradient(ellipse 70% 50% at 20% 50%, rgba(240,237,232,0.02) 0%, transparent 70%)",
+          backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E\")",
           pointerEvents: "none",
+          opacity: 0.4,
         }}
       />
 
-      <div style={{ maxWidth: "680px", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: "780px", position: "relative", zIndex: 1 }}>
+
+        {/* Label */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
@@ -56,54 +57,76 @@ export default function StartCTA() {
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             fontWeight: 700,
             fontSize: "10px",
-            letterSpacing: "0.3em",
+            letterSpacing: "0.35em",
             textTransform: "uppercase",
-            color: "rgba(240,237,232,0.3)",
-            marginBottom: "clamp(20px, 4vw, 40px)",
+            color: "rgba(12,12,12,0.35)",
+            marginBottom: "clamp(20px, 4vw, 36px)",
           }}
         >
-          Empecemos
+          Siguiente paso
         </motion.p>
 
+        {/* Headline */}
         <motion.h2
-          initial={{ opacity: 0, y: 32 }}
+          initial={{ opacity: 0, y: 36 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 1.1, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           style={{
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             fontWeight: 900,
-            fontSize: "clamp(2.2rem, 6vw, 5rem)",
-            letterSpacing: "-0.04em",
-            lineHeight: 0.92,
-            color: "#f0ede8",
-            marginBottom: "clamp(20px, 4vw, 36px)",
+            fontSize: "clamp(2.8rem, 8vw, 7rem)",
+            letterSpacing: "-0.045em",
+            lineHeight: 0.88,
+            color: "#0c0c0c",
+            marginBottom: "clamp(24px, 5vw, 48px)",
+            margin: "0 0 clamp(12px, 3vw, 24px)",
           }}
         >
-          {c.cta_headline}
+          Let's make
+          <br />
+          <span style={{ color: "#ff5833" }}>something</span>
+          <br />
+          real.
         </motion.h2>
 
+        {/* Divider */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={inView ? { scaleX: 1 } : {}}
+          transition={{ duration: 1, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            height: "1px",
+            background: "rgba(12,12,12,0.15)",
+            transformOrigin: "left",
+            maxWidth: "100%",
+            marginBottom: "clamp(28px, 5vw, 52px)",
+            marginTop: "clamp(20px, 4vw, 40px)",
+          }}
+        />
+
+        {/* Subtext */}
         <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.35 }}
+          transition={{ duration: 0.8, delay: 0.45 }}
           style={{
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             fontWeight: 300,
-            fontSize: "clamp(0.85rem, 1.8vw, 1.05rem)",
-            color: "rgba(240,237,232,0.45)",
+            fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
+            color: "rgba(12,12,12,0.5)",
             lineHeight: 1.6,
-            marginBottom: "clamp(32px, 6vw, 60px)",
-            maxWidth: "440px",
+            marginBottom: "clamp(36px, 7vw, 72px)",
+            maxWidth: "420px",
           }}
         >
-          {c.cta_subtext}
+          Una videollamada. Sin compromiso.<br />Cuéntanos tu proyecto.
         </motion.p>
 
-        {/* Links — editorial style, no buttons */}
+        {/* CTA actions — editorial text links */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, delay: 0.5 }}
+          transition={{ duration: 0.7, delay: 0.6 }}
           style={{ display: "flex", flexDirection: "column", gap: "0" }}
         >
           <a
@@ -113,23 +136,23 @@ export default function StartCTA() {
             style={{
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               fontWeight: 900,
-              fontSize: "clamp(1.6rem, 4vw, 3rem)",
-              letterSpacing: "-0.03em",
-              color: "#f0ede8",
+              fontSize: "clamp(1.5rem, 4.5vw, 3.2rem)",
+              letterSpacing: "-0.035em",
+              color: "#0c0c0c",
               textDecoration: "none",
               display: "flex",
               alignItems: "center",
               gap: "16px",
-              paddingBottom: "clamp(10px, 2vw, 16px)",
-              borderBottom: "1px solid rgba(255,255,255,0.08)",
-              marginBottom: "clamp(10px, 2vw, 16px)",
-              transition: "color 0.25s ease, gap 0.25s ease",
+              paddingBottom: "clamp(10px, 2vw, 18px)",
+              borderBottom: "1px solid rgba(12,12,12,0.12)",
+              marginBottom: "clamp(10px, 2vw, 18px)",
+              transition: "gap 0.25s ease, color 0.2s ease",
             }}
-            onMouseEnter={e => { e.currentTarget.style.gap = "24px"; }}
-            onMouseLeave={e => { e.currentTarget.style.gap = "16px"; }}
+            onMouseEnter={e => { e.currentTarget.style.gap = "28px"; e.currentTarget.style.color = "#ff5833"; }}
+            onMouseLeave={e => { e.currentTarget.style.gap = "16px"; e.currentTarget.style.color = "#0c0c0c"; }}
           >
-            {c.cta_btn1_label}
-            <span style={{ opacity: 0.5 }}>→</span>
+            Agendar reunión
+            <span style={{ fontSize: "0.7em", opacity: 0.6 }}>→</span>
           </a>
           <a
             href={c.cta_btn2_link}
@@ -137,20 +160,20 @@ export default function StartCTA() {
             style={{
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               fontWeight: 900,
-              fontSize: "clamp(1.6rem, 4vw, 3rem)",
-              letterSpacing: "-0.03em",
-              color: "rgba(240,237,232,0.35)",
+              fontSize: "clamp(1.5rem, 4.5vw, 3.2rem)",
+              letterSpacing: "-0.035em",
+              color: "rgba(12,12,12,0.3)",
               textDecoration: "none",
               display: "flex",
               alignItems: "center",
               gap: "16px",
-              transition: "color 0.25s ease, gap 0.25s ease",
+              transition: "gap 0.25s ease, color 0.2s ease",
             }}
-            onMouseEnter={e => { e.currentTarget.style.color = "#f0ede8"; e.currentTarget.style.gap = "24px"; }}
-            onMouseLeave={e => { e.currentTarget.style.color = "rgba(240,237,232,0.35)"; e.currentTarget.style.gap = "16px"; }}
+            onMouseEnter={e => { e.currentTarget.style.gap = "28px"; e.currentTarget.style.color = "#0c0c0c"; }}
+            onMouseLeave={e => { e.currentTarget.style.gap = "16px"; e.currentTarget.style.color = "rgba(12,12,12,0.3)"; }}
           >
-            {c.cta_btn2_label}
-            <span style={{ opacity: 0.4 }}>→</span>
+            Contactar
+            <span style={{ fontSize: "0.7em", opacity: 0.5 }}>→</span>
           </a>
         </motion.div>
       </div>
