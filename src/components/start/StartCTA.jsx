@@ -1,12 +1,27 @@
 import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
+
+const DEFAULT = {
+  cta_headline: "Construyamos algo con identidad.",
+  cta_subtext: "Agenda una videollamada y conversemos sobre tu proyecto, marca o idea creativa.",
+  cta_btn1_label: "Agendar reunión", cta_btn1_link: "https://calendly.com",
+  cta_btn2_label: "Contactar", cta_btn2_link: "mailto:hola@cabanacreative.es",
+};
 
 const BG = "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1600&q=80";
 
 export default function StartCTA() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
+  const { data: cfg } = useQuery({
+    queryKey: ["landingConfig"],
+    queryFn: async () => { const c = await base44.entities.LandingConfig.list(); return c[0] || null; },
+    staleTime: 30000,
+  });
+  const c = { ...DEFAULT, ...(cfg?.start_page_config || {}) };
 
   return (
     <section id="cta" ref={ref} className="relative overflow-hidden" style={{ background: "#111110" }}>
@@ -32,7 +47,7 @@ export default function StartCTA() {
           className="font-black leading-[0.88] mb-8"
           style={{ fontSize: "clamp(2.5rem, 7vw, 5.5rem)", letterSpacing: "-0.035em", color: "#f0ede8" }}
         >
-          Construyamos algo con identidad.
+          {c.cta_headline}
         </motion.h2>
 
         <motion.p
@@ -41,7 +56,7 @@ export default function StartCTA() {
           className="text-sm sm:text-base leading-relaxed mb-14 font-light max-w-xl mx-auto"
           style={{ color: "rgba(240,237,232,0.45)" }}
         >
-          Agenda una videollamada y conversemos sobre tu proyecto, marca o idea creativa.
+          {c.cta_subtext}
         </motion.p>
 
         <motion.div
@@ -50,25 +65,26 @@ export default function StartCTA() {
           className="flex flex-col sm:flex-row items-center justify-center gap-3"
         >
           <a
-            href="https://calendly.com"
-            target="_blank"
+            href={c.cta_btn1_link}
+            target={c.cta_btn1_link?.startsWith("http") ? "_blank" : undefined}
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest transition-all group"
             style={{ background: "#f0ede8", color: "#0c0c0c", letterSpacing: "0.16em" }}
             onMouseEnter={e => e.currentTarget.style.background = "#fff"}
             onMouseLeave={e => e.currentTarget.style.background = "#f0ede8"}
           >
-            Agendar reunión
+            {c.cta_btn1_label}
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
           </a>
           <a
-            href="mailto:hola@cabanacreative.es"
+            href={c.cta_btn2_link}
+            target={c.cta_btn2_link?.startsWith("http") ? "_blank" : undefined}
             className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest border transition-all"
             style={{ borderColor: "rgba(240,237,232,0.22)", color: "#f0ede8", background: "transparent", letterSpacing: "0.16em" }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(240,237,232,0.45)"; e.currentTarget.style.background = "rgba(240,237,232,0.05)"; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(240,237,232,0.22)"; e.currentTarget.style.background = "transparent"; }}
           >
-            Contactar
+            {c.cta_btn2_label}
           </a>
         </motion.div>
 

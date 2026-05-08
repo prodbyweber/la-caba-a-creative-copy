@@ -1,11 +1,25 @@
 import React, { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 
-// Curated Unsplash cinematic stills as video bg fallback
 const BG_IMAGE = "https://images.unsplash.com/photo-1598387993281-cecf8b71a8f8?w=1800&q=85";
 
+const DEFAULT = {
+  hero_headline: "Creamos música, contenido y experiencias visuales para marcas y artistas modernos.",
+  hero_subtext: "Producción creativa, dirección visual y campañas diseñadas para proyectos con identidad.",
+  hero_btn1_label: "Agendar videollamada", hero_btn1_link: "#cta",
+  hero_btn2_label: "Explorar trabajos", hero_btn2_link: "/Explorar",
+};
+
 export default function StartHero() {
+  const { data: cfg } = useQuery({
+    queryKey: ["landingConfig"],
+    queryFn: async () => { const c = await base44.entities.LandingConfig.list(); return c[0] || null; },
+    staleTime: 30000,
+  });
+  const c = { ...DEFAULT, ...(cfg?.start_page_config || {}) };
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
@@ -68,7 +82,7 @@ export default function StartHero() {
             maxWidth: "820px",
           }}
         >
-          Creamos música, contenido y experiencias visuales para marcas y artistas modernos.
+          {c.hero_headline}
         </motion.h1>
 
         {/* Subtext */}
@@ -79,7 +93,7 @@ export default function StartHero() {
           className="text-sm sm:text-base leading-relaxed mb-10 max-w-xl font-light"
           style={{ color: "rgba(240,237,232,0.5)" }}
         >
-          Producción creativa, dirección visual y campañas diseñadas para proyectos con identidad.
+          {c.hero_subtext}
         </motion.p>
 
         {/* Buttons */}
@@ -90,23 +104,23 @@ export default function StartHero() {
           className="flex flex-wrap gap-3"
         >
           <a
-            href="#cta"
-            onClick={e => { e.preventDefault(); document.querySelector("#cta")?.scrollIntoView({ behavior: "smooth" }); }}
+            href={c.hero_btn1_link || "#cta"}
+            onClick={e => { if ((c.hero_btn1_link || "#cta").startsWith("#")) { e.preventDefault(); document.querySelector(c.hero_btn1_link || "#cta")?.scrollIntoView({ behavior: "smooth" }); } }}
             className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all"
             style={{ background: "#f0ede8", color: "#0c0c0c", letterSpacing: "0.16em" }}
             onMouseEnter={e => e.currentTarget.style.background = "#fff"}
             onMouseLeave={e => e.currentTarget.style.background = "#f0ede8"}
           >
-            Agendar videollamada
+            {c.hero_btn1_label}
           </a>
           <a
-            href="/Explorar"
+            href={c.hero_btn2_link || "/Explorar"}
             className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest border transition-all"
             style={{ borderColor: "rgba(240,237,232,0.25)", color: "#f0ede8", background: "rgba(240,237,232,0.04)", letterSpacing: "0.16em" }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(240,237,232,0.5)"; e.currentTarget.style.background = "rgba(240,237,232,0.08)"; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(240,237,232,0.25)"; e.currentTarget.style.background = "rgba(240,237,232,0.04)"; }}
           >
-            Explorar trabajos
+            {c.hero_btn2_label}
           </a>
         </motion.div>
 

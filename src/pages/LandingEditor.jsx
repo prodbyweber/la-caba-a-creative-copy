@@ -15,6 +15,7 @@ import ExploracionEditor from "@/components/admin/ExploracionEditor";
 import PlansEditor from "@/components/admin/PlansEditor";
 import BannersEditor from "@/components/admin/BannersEditor";
 import GuestPopupEditor from "@/components/admin/GuestPopupEditor";
+import StartPageEditor from "@/components/admin/StartPageEditor";
 import { Link } from "react-router-dom";
 import { 
   Eye, 
@@ -349,6 +350,11 @@ export default function LandingEditor() {
               <Settings className="w-5 h-5 text-emerald-400" />
               Editar Contenido de la Landing
             </h2>
+
+            {/* START PAGE EDITOR */}
+            <SectionEditor title="🚀 Página /start — Landing de Conversión" defaultOpen={true}>
+              <StartPageEditor />
+            </SectionEditor>
 
             {/* Guest Popup Editor */}
             <SectionEditor title="🔓 Popup para Invitados (no registrados)" defaultOpen={false}>
