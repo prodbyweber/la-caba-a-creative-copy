@@ -2,6 +2,7 @@ import React from "react";
 import StartNav from "@/components/start/StartNav";
 import StartHero from "@/components/start/StartHero";
 import StartWhatWeDo from "@/components/start/StartWhatWeDo";
+import StartBrandsCarousel from "@/components/start/StartBrandsCarousel";
 import StartArtists from "@/components/start/StartArtists";
 import StartBrands from "@/components/start/StartBrands";
 import StartChoosePath from "@/components/start/StartChoosePath";
@@ -22,6 +23,7 @@ export default function Start() {
       <StartNav />
       <StartHero />
       <StartWhatWeDo />
+      <StartBrandsCarousel />
       <StartArtists />
       <StartBrands />
       <StartChoosePath />
