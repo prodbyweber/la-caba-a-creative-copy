@@ -1,111 +1,163 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 
 const SERVICES = [
-  "Campañas creativas",
-  "Producción audiovisual",
-  "Creator marketing",
-  "Brand content",
-  "Social media y ads",
-  "Estrategia digital",
+  "Estrategia de marca",
+  "Producción de contenido",
+  "Campañas con narrativa",
+  "Creadores UGC",
+  "Posicionamiento",
 ];
 
-const IMAGES = [
-  "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80",
-  "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80",
-  "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
-  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-];
+function useAutoPlay(src) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || !src) return;
+    const play = () => { v.muted = true; v.play().catch(() => {}); };
+    play();
+    v.addEventListener("canplay", play);
+    v.addEventListener("pause", play);
+    return () => { v.removeEventListener("canplay", play); v.removeEventListener("pause", play); };
+  }, [src]);
+  return ref;
+}
+
+function isVideo(url) {
+  return url && /\.(mp4|webm|mov)(\?|$)/i.test(url);
+}
 
 export default function StartBrands() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
+  const { data: cfg } = useQuery({
+    queryKey: ["landingConfig"],
+    queryFn: async () => { const c = await base44.entities.LandingConfig.list(); return c[0] || null; },
+    staleTime: 30000,
+  });
+
+  // Use banner 3 (Films) as brands background
+  const mediaSrc = cfg?.hero_banner_3_image || "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1800&q=85";
+  const vidRef = useAutoPlay(isVideo(mediaSrc) ? mediaSrc : null);
+
   return (
-    <section id="brands" ref={ref} className="py-24 sm:py-36 px-6 sm:px-12 lg:px-20" style={{ background: "#0c0c0c" }}>
-      <div className="max-w-6xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-          {/* Left — image grid (reversed on desktop) */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.97 }} animate={inView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            className="grid grid-cols-2 gap-2.5 order-2 lg:order-1"
-          >
-            {IMAGES.map((src, i) => (
-              <div
-                key={i}
-                className="relative overflow-hidden rounded-lg"
-                style={{ aspectRatio: i === 1 ? "3/4" : i === 2 ? "3/4" : "1/1" }}
-              >
-                <img
-                  src={src}
-                  alt=""
-                  className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
-                  style={{ filter: "brightness(0.7) saturate(0.75)" }}
-                />
-              </div>
-            ))}
-          </motion.div>
+    <section
+      id="brands"
+      ref={ref}
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "100dvh",
+        minHeight: "600px",
+        overflow: "hidden",
+        background: "#080808",
+        display: "flex",
+        alignItems: "flex-end",
+      }}
+    >
+      {/* Background */}
+      {isVideo(mediaSrc) ? (
+        <video
+          ref={vidRef}
+          src={mediaSrc}
+          autoPlay muted loop playsInline preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ pointerEvents: "none" }}
+        />
+      ) : (
+        <img
+          src={mediaSrc}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ filter: "brightness(0.5) saturate(0.6)" }}
+        />
+      )}
 
-          {/* Right — text */}
-          <div className="order-1 lg:order-2">
-            <motion.p
-              initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}}
-              transition={{ duration: 0.6 }}
-              className="text-[10px] font-bold uppercase tracking-[0.3em] mb-6"
-              style={{ color: "rgba(240,237,232,0.3)" }}
-            >
-              Para marcas
-            </motion.p>
-            <motion.h2
-              initial={{ opacity: 0, y: 24 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="font-black leading-[0.88] mb-6"
-              style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)", letterSpacing: "-0.03em", color: "#f0ede8" }}
-            >
-              Producción creativa para marcas modernas.
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 16 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-sm leading-relaxed mb-10 font-light"
-              style={{ color: "rgba(240,237,232,0.45)" }}
-            >
-              Creamos campañas, contenido y experiencias visuales diseñadas para conectar con cultura y audiencia real.
-            </motion.p>
+      {/* Overlays */}
+      <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.5)" }} />
+      <div className="absolute inset-0" style={{
+        background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.25) 55%, transparent 100%)"
+      }} />
 
-            {/* Services */}
-            <div className="space-y-0 mb-12">
-              {SERVICES.map((s, i) => (
-                <motion.div
-                  key={s}
-                  initial={{ opacity: 0, x: 16 }} animate={inView ? { opacity: 1, x: 0 } : {}}
-                  transition={{ duration: 0.5, delay: 0.25 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
-                  className="flex items-center justify-between py-3.5"
-                  style={{ borderBottom: "1px solid rgba(240,237,232,0.07)" }}
-                >
-                  <span className="text-sm font-medium" style={{ color: "rgba(240,237,232,0.7)" }}>{s}</span>
-                  <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: "rgba(240,237,232,0.2)" }} />
-                </motion.div>
-              ))}
-            </div>
+      {/* Section tag — top */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={inView ? { opacity: 1 } : {}}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        style={{
+          position: "absolute",
+          top: "clamp(80px, 12vw, 120px)",
+          left: "clamp(24px, 6vw, 56px)",
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontWeight: 700,
+          fontSize: "10px",
+          letterSpacing: "0.3em",
+          textTransform: "uppercase",
+          color: "rgba(240,237,232,0.35)",
+          zIndex: 10,
+        }}
+      >
+        Marcas
+      </motion.p>
 
-            <motion.a
-              initial={{ opacity: 0, y: 12 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.7 }}
-              href="#cta"
-              onClick={e => { e.preventDefault(); document.querySelector("#cta")?.scrollIntoView({ behavior: "smooth" }); }}
-              className="inline-flex items-center gap-3 px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all group border"
-              style={{ borderColor: "rgba(240,237,232,0.25)", color: "#f0ede8", background: "transparent", letterSpacing: "0.14em" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "rgba(240,237,232,0.07)"; e.currentTarget.style.borderColor = "rgba(240,237,232,0.4)"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "rgba(240,237,232,0.25)"; }}
+      {/* Content — bottom */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 10,
+          padding: "0 clamp(24px, 6vw, 56px) clamp(40px, 8vw, 72px)",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: "clamp(20px, 4vw, 36px)",
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+          {SERVICES.map((service, i) => (
+            <motion.div
+              key={service}
+              initial={{ opacity: 0, x: -12 }}
+              animate={inView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.3 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontWeight: 900,
+                fontSize: "clamp(1.4rem, 4vw, 2.8rem)",
+                letterSpacing: "-0.025em",
+                color: "rgba(240,237,232,0.4)",
+                borderBottom: "1px solid rgba(255,255,255,0.06)",
+                paddingBottom: "clamp(6px, 1.5vw, 12px)",
+                marginBottom: "clamp(6px, 1.5vw, 12px)",
+                lineHeight: 1.1,
+                cursor: "default",
+                transition: "color 0.2s ease",
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = "#f0ede8"}
+              onMouseLeave={e => e.currentTarget.style.color = "rgba(240,237,232,0.4)"}
             >
-              Agenda una reunión estratégica
-              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-            </motion.a>
-          </div>
+              {service}
+            </motion.div>
+          ))}
         </div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.8, delay: 0.8 }}
+          style={{
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+            fontWeight: 300,
+            fontSize: "clamp(0.75rem, 1.5vw, 0.9rem)",
+            color: "rgba(240,237,232,0.35)",
+            maxWidth: "480px",
+            lineHeight: 1.5,
+          }}
+        >
+          Construimos campañas visuales que conectan cultura, estética y comunidad.
+        </motion.p>
       </div>
     </section>
   );

@@ -1,121 +1,171 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Menu } from "lucide-react";
 
-const NAV_LINKS = [
-  { label: "Artistas", href: "#artists" },
+const MENU_ITEMS = [
+  { label: "Quiénes Somos", href: "#about" },
+  { label: "Artistas / Creadores", href: "#artists" },
   { label: "Marcas", href: "#brands" },
-  { label: "Plataforma", href: "/Explorar" },
-  { label: "Contacto", href: "#cta" },
+  { label: "Elige tu Camino", href: "#choose" },
+  { label: "Work With Us", href: "#cta" },
 ];
 
 export default function StartNav() {
-  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const handleNavClick = (e, href) => {
+  const handleNav = (e, href) => {
     if (href.startsWith("#")) {
       e.preventDefault();
-      const el = document.querySelector(href);
-      if (el) el.scrollIntoView({ behavior: "smooth" });
+      setMenuOpen(false);
+      setTimeout(() => {
+        const el = document.querySelector(href);
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, menuOpen ? 400 : 0);
+    } else {
       setMenuOpen(false);
     }
   };
 
+  // Lock body scroll when menu open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
   return (
     <>
-      <motion.nav
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 sm:px-10 h-16"
-        style={{
-          background: scrolled ? "rgba(12,12,12,0.96)" : "transparent",
-          backdropFilter: scrolled ? "blur(16px)" : "none",
-          borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
-          transition: "background 0.4s ease, backdrop-filter 0.4s ease, border-bottom 0.4s ease",
-        }}
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      {/* Fixed nav bar */}
+      <motion.header
+        className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between"
+        style={{ padding: "clamp(20px, 4vw, 32px) clamp(24px, 6vw, 56px)", pointerEvents: "all" }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
       >
         {/* Logo */}
-        <a href="/" className="flex items-center gap-2 group">
-          <img
-            src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
-            alt="Cabaña Creative"
-            className="h-9 w-auto"
-          />
+        <a
+          href="/start"
+          className="flex items-center gap-2 select-none"
+          style={{ textDecoration: "none" }}
+        >
+          <span
+            style={{
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+              fontWeight: 900,
+              fontSize: "clamp(0.85rem, 2vw, 1rem)",
+              letterSpacing: "0.08em",
+              color: "#f0ede8",
+              textTransform: "uppercase",
+            }}
+          >
+            Cabaña Creative
+          </span>
         </a>
 
-        {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map(link => (
-            <a
-              key={link.label}
-              href={link.href}
-              onClick={link.href.startsWith("#") ? (e) => handleNavClick(e, link.href) : undefined}
-              className="text-xs font-semibold uppercase tracking-[0.18em] transition-colors"
-              style={{ color: "rgba(240,237,232,0.5)", letterSpacing: "0.18em" }}
-              onMouseEnter={e => e.target.style.color = "#f0ede8"}
-              onMouseLeave={e => e.target.style.color = "rgba(240,237,232,0.5)"}
-            >
-              {link.label}
-            </a>
-          ))}
-        </div>
+        {/* Hamburger */}
+        <button
+          onClick={() => setMenuOpen(v => !v)}
+          aria-label="Menu"
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: "8px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px",
+            alignItems: "flex-end",
+          }}
+        >
+          <motion.span
+            animate={menuOpen ? { rotate: 45, y: 7, width: "24px" } : { rotate: 0, y: 0, width: "24px" }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            style={{ display: "block", height: "1.5px", background: "#f0ede8", borderRadius: "2px", transformOrigin: "center" }}
+          />
+          <motion.span
+            animate={menuOpen ? { opacity: 0, x: 8 } : { opacity: 1, x: 0, width: "16px" }}
+            transition={{ duration: 0.2 }}
+            style={{ display: "block", height: "1.5px", background: "#f0ede8", borderRadius: "2px", width: "16px" }}
+          />
+          <motion.span
+            animate={menuOpen ? { rotate: -45, y: -7, width: "24px" } : { rotate: 0, y: 0, width: "24px" }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            style={{ display: "block", height: "1.5px", background: "#f0ede8", borderRadius: "2px", transformOrigin: "center" }}
+          />
+        </button>
+      </motion.header>
 
-        {/* CTA + Hamburger */}
-        <div className="flex items-center gap-4">
-          <a
-            href="#cta"
-            onClick={e => handleNavClick(e, "#cta")}
-            className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all border"
-            style={{
-              background: "rgba(240,237,232,0.07)",
-              borderColor: "rgba(240,237,232,0.15)",
-              color: "#f0ede8",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(240,237,232,0.15)"; e.currentTarget.style.borderColor = "rgba(240,237,232,0.3)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(240,237,232,0.07)"; e.currentTarget.style.borderColor = "rgba(240,237,232,0.15)"; }}
-          >
-            Contactar
-          </a>
-          <button onClick={() => setMenuOpen(v => !v)} className="md:hidden p-1">
-            {menuOpen ? <X className="w-5 h-5" style={{ color: "#f0ede8" }} /> : <Menu className="w-5 h-5" style={{ color: "#f0ede8" }} />}
-          </button>
-        </div>
-      </motion.nav>
-
-      {/* Mobile menu */}
+      {/* Fullscreen overlay menu */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="fixed top-16 left-0 right-0 z-40 flex flex-col px-6 py-6 gap-5"
-            style={{ background: "rgba(12,12,12,0.98)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+            key="overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-0 z-[99] flex flex-col justify-center"
+            style={{
+              background: "rgba(8,8,8,0.97)",
+              backdropFilter: "blur(24px)",
+              WebkitBackdropFilter: "blur(24px)",
+            }}
+            onClick={() => setMenuOpen(false)}
           >
-            {NAV_LINKS.map(link => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={link.href.startsWith("#") ? (e) => handleNavClick(e, link.href) : undefined}
-                className="text-sm font-semibold uppercase tracking-widest"
-                style={{ color: "rgba(240,237,232,0.7)" }}
-              >
-                {link.label}
-              </a>
-            ))}
-            <a href="#cta" onClick={e => handleNavClick(e, "#cta")}
-              className="mt-2 py-3 text-center rounded-full text-xs font-bold uppercase tracking-wider border"
-              style={{ borderColor: "rgba(240,237,232,0.2)", color: "#f0ede8" }}>
-              Agendar reunión
-            </a>
+            <nav
+              className="flex flex-col"
+              style={{ padding: "0 clamp(32px, 8vw, 80px)" }}
+              onClick={e => e.stopPropagation()}
+            >
+              {MENU_ITEMS.map((item, i) => (
+                <motion.a
+                  key={item.label}
+                  href={item.href}
+                  onClick={e => handleNav(e, item.href)}
+                  initial={{ opacity: 0, x: -24 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -16 }}
+                  transition={{ duration: 0.45, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ x: 8, color: "#ffffff" }}
+                  style={{
+                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                    fontWeight: 900,
+                    fontSize: "clamp(2rem, 6vw, 4.5rem)",
+                    letterSpacing: "-0.03em",
+                    color: "rgba(240,237,232,0.55)",
+                    textDecoration: "none",
+                    lineHeight: 1.1,
+                    paddingBottom: "clamp(12px, 2.5vw, 24px)",
+                    borderBottom: "1px solid rgba(255,255,255,0.05)",
+                    marginBottom: "clamp(12px, 2.5vw, 24px)",
+                    display: "block",
+                    transition: "color 0.2s ease",
+                  }}
+                >
+                  {item.label}
+                </motion.a>
+              ))}
+            </nav>
+
+            {/* Close hint */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.3 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 0.5 }}
+              style={{
+                position: "absolute",
+                bottom: "clamp(24px, 5vw, 48px)",
+                left: "clamp(32px, 8vw, 80px)",
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontSize: "10px",
+                fontWeight: 600,
+                letterSpacing: "0.25em",
+                textTransform: "uppercase",
+                color: "#f0ede8",
+              }}
+            >
+              Esc para cerrar
+            </motion.p>
           </motion.div>
         )}
       </AnimatePresence>
