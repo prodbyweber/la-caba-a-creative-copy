@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Menu, X, LogOut, Home } from "lucide-react";
+import { Menu, X, LogOut, Home, Rocket } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 
@@ -223,6 +223,14 @@ export default function LandingNav() {
                         <Home className="w-4 h-4" />
                         Dashboard
                       </button>
+                      <Link
+                        to="/start"
+                        onClick={() => setAccountMenuOpen(false)}
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#ff5833] hover:bg-white/10 transition-colors"
+                      >
+                        <Rocket className="w-4 h-4" />
+                        Ver página /start
+                      </Link>
                       <div className="border-t border-white/5" />
                       <button
                         onClick={() => { handleLogout(); setAccountMenuOpen(false); }}
@@ -276,7 +284,16 @@ export default function LandingNav() {
               </div>
 
               <div className="flex flex-col gap-6">
-                {navItems.map((item) => {
+                {/* Enlace /start — siempre visible en el menú mobile */}
+                <Link
+                  to="/start"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 text-2xl font-light text-left text-gray-300 hover:text-white transition-colors"
+                >
+                  <Rocket className="w-5 h-5 text-[#ff5833]" />
+                  <span>Start</span>
+                </Link>
+               {navItems.map((item) => {
                   const isExplorarButton = item.key === "comenzar" && item.label === "Explorar";
                   return isExplorarButton ? (
                     <button
