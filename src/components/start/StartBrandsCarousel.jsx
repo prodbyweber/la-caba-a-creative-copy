@@ -20,7 +20,7 @@ export default function StartBrandsCarousel() {
       style={{
         position: "relative",
         background: "#0c0c0c",
-        padding: "clamp(32px, 6vw, 56px) 0",
+        padding: "clamp(16px, 3vw, 28px) 0",
         overflow: "hidden",
       }}
     >
@@ -40,7 +40,7 @@ export default function StartBrandsCarousel() {
       `}</style>
 
       {/* Label */}
-      <div style={{ textAlign: "center", marginBottom: "clamp(20px, 4vw, 32px)" }}>
+      <div style={{ textAlign: "center", marginBottom: "clamp(12px, 2.5vw, 20px)" }}>
         <span
           style={{
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
@@ -75,12 +75,12 @@ export default function StartBrandsCarousel() {
                   maxWidth: "100%",
                   maxHeight: "100%",
                   objectFit: "contain",
-                  opacity: 0.35,
-                  filter: "grayscale(1) brightness(1.5)",
+                  opacity: 0.55,
+                  filter: "grayscale(0) brightness(1)",
                   transition: "opacity 0.3s ease, filter 0.3s ease",
                 }}
-                onMouseEnter={e => { e.currentTarget.style.opacity = "0.85"; e.currentTarget.style.filter = "grayscale(0) brightness(1)"; }}
-                onMouseLeave={e => { e.currentTarget.style.opacity = "0.35"; e.currentTarget.style.filter = "grayscale(1) brightness(1.5)"; }}
+                onMouseEnter={e => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.filter = "brightness(1.3) drop-shadow(0 0 10px rgba(255,255,255,0.5)) drop-shadow(0 0 24px rgba(255,88,51,0.35))"; }}
+                onMouseLeave={e => { e.currentTarget.style.opacity = "0.55"; e.currentTarget.style.filter = "grayscale(0) brightness(1)"; }}
               />
             </div>
           ))}
