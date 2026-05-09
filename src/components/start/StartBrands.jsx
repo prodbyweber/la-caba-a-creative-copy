@@ -125,7 +125,7 @@ export default function StartBrands() {
               style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 900,
-                fontSize: "clamp(1.4rem, 4vw, 2.8rem)",
+                fontSize: "clamp(1rem, 2.5vw, 1.8rem)",
                 letterSpacing: "-0.025em",
                 color: "rgba(240,237,232,0.4)",
                 borderBottom: "1px solid rgba(255,255,255,0.06)",
