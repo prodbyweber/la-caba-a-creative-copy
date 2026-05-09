@@ -228,6 +228,26 @@ export default function StartCTA() {
             )}
           </AnimatePresence>
 
+          {/* Email display */}
+          <div style={{ marginBottom: "clamp(10px, 2vw, 18px)" }}>
+            <a
+              href="mailto:hola@cabanacreative.es"
+              style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontSize: "clamp(0.75rem, 1.4vw, 0.9rem)",
+                fontWeight: 400,
+                color: "rgba(12,12,12,0.4)",
+                textDecoration: "none",
+                letterSpacing: "0.01em",
+                transition: "color 0.2s ease",
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = "#ff5833"}
+              onMouseLeave={e => e.currentTarget.style.color = "rgba(12,12,12,0.4)"}
+            >
+              hola@cabanacreative.es
+            </a>
+          </div>
+
           {/* Contactar — toggle form */}
           <button
             onClick={() => { setShowForm(v => !v); setShowCalendly(false); setSent(false); setError(""); }}
