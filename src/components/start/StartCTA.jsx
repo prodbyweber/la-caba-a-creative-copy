@@ -11,6 +11,7 @@ export default function StartCTA() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
 
+  const [showCalendly, setShowCalendly] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
@@ -150,36 +151,69 @@ export default function StartCTA() {
           transition={{ duration: 0.7, delay: 0.6 }}
           style={{ display: "flex", flexDirection: "column", gap: "0" }}
         >
-          {/* Agendar reunión */}
-          <a
-            href={c.cta_btn1_link}
-            target={c.cta_btn1_link?.startsWith("http") ? "_blank" : undefined}
-            rel="noopener noreferrer"
+          {/* Agendar reunión — toggle Calendly */}
+          <button
+            onClick={() => { setShowCalendly(v => !v); setShowForm(false); }}
             style={{
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               fontWeight: 900,
               fontSize: "clamp(1.5rem, 4.5vw, 3.2rem)",
               letterSpacing: "-0.035em",
-              color: "#0c0c0c",
-              textDecoration: "none",
+              color: showCalendly ? "#ff5833" : "#0c0c0c",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
               display: "flex",
               alignItems: "center",
               gap: "16px",
+              textAlign: "left",
               paddingBottom: "clamp(10px, 2vw, 18px)",
               borderBottom: "1px solid rgba(12,12,12,0.12)",
               marginBottom: "clamp(10px, 2vw, 18px)",
               transition: "gap 0.25s ease, color 0.2s ease",
             }}
             onMouseEnter={e => { e.currentTarget.style.gap = "28px"; e.currentTarget.style.color = "#ff5833"; }}
-            onMouseLeave={e => { e.currentTarget.style.gap = "16px"; e.currentTarget.style.color = "#0c0c0c"; }}
+            onMouseLeave={e => { e.currentTarget.style.gap = "16px"; e.currentTarget.style.color = showCalendly ? "#ff5833" : "#0c0c0c"; }}
           >
             Agendar reunión
-            <span style={{ fontSize: "0.7em", opacity: 0.6 }}>→</span>
-          </a>
+            <motion.span
+              animate={{ rotate: showCalendly ? 90 : 0 }}
+              transition={{ duration: 0.3 }}
+              style={{ fontSize: "0.7em", opacity: 0.6, display: "inline-block" }}
+            >
+              →
+            </motion.span>
+          </button>
+
+          {/* Calendly inline widget */}
+          <AnimatePresence>
+            {showCalendly && (
+              <motion.div
+                key="calendly-widget"
+                initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                animate={{ opacity: 1, height: "auto", marginTop: "clamp(20px, 3vw, 32px)" }}
+                exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                style={{ overflow: "hidden", marginBottom: "clamp(10px, 2vw, 18px)" }}
+              >
+                <div
+                  className="calendly-inline-widget"
+                  data-url="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200"
+                  style={{ minWidth: "320px", height: "700px", borderRadius: "8px", overflow: "hidden" }}
+                />
+                <script
+                  type="text/javascript"
+                  src="https://assets.calendly.com/assets/external/widget.js"
+                  async
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Contactar — toggle form */}
           <button
-            onClick={() => { setShowForm(v => !v); setSent(false); setError(""); }}
+            onClick={() => { setShowForm(v => !v); setShowCalendly(false); setSent(false); setError(""); }}
             style={{
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               fontWeight: 900,
