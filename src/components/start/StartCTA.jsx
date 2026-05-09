@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -12,6 +12,18 @@ export default function StartCTA() {
   const inView = useInView(ref, { once: true, margin: "-60px" });
 
   const [showCalendly, setShowCalendly] = useState(false);
+
+  useEffect(() => {
+    if (!showCalendly) return;
+    if (document.querySelector('script[src="https://assets.calendly.com/assets/external/widget.js"]')) {
+      if (window.Calendly) window.Calendly.initInlineWidgets();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://assets.calendly.com/assets/external/widget.js";
+    script.async = true;
+    document.head.appendChild(script);
+  }, [showCalendly]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
@@ -197,13 +209,10 @@ export default function StartCTA() {
                 transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                 style={{ overflow: "hidden", marginBottom: "clamp(10px, 2vw, 18px)", borderRadius: "8px" }}
               >
-                <iframe
-                  src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&embed_domain=cabanacreative.com&embed_type=Inline"
-                  width="100%"
-                  height="700"
-                  frameBorder="0"
-                  title="Agendar reunión"
-                  style={{ border: "none", borderRadius: "8px", display: "block" }}
+                <div
+                  className="calendly-inline-widget"
+                  data-url="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200"
+                  style={{ minWidth: "320px", height: "700px" }}
                 />
               </motion.div>
             )}
