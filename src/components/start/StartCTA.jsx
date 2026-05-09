@@ -192,20 +192,18 @@ export default function StartCTA() {
               <motion.div
                 key="calendly-widget"
                 initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                animate={{ opacity: 1, height: "auto", marginTop: "clamp(20px, 3vw, 32px)" }}
+                animate={{ opacity: 1, height: 700, marginTop: "clamp(20px, 3vw, 32px)" }}
                 exit={{ opacity: 0, height: 0, marginTop: 0 }}
                 transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                style={{ overflow: "hidden", marginBottom: "clamp(10px, 2vw, 18px)" }}
+                style={{ overflow: "hidden", marginBottom: "clamp(10px, 2vw, 18px)", borderRadius: "8px" }}
               >
-                <div
-                  className="calendly-inline-widget"
-                  data-url="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200"
-                  style={{ minWidth: "320px", height: "700px", borderRadius: "8px", overflow: "hidden" }}
-                />
-                <script
-                  type="text/javascript"
-                  src="https://assets.calendly.com/assets/external/widget.js"
-                  async
+                <iframe
+                  src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&embed_domain=cabanacreative.com&embed_type=Inline"
+                  width="100%"
+                  height="700"
+                  frameBorder="0"
+                  title="Agendar reunión"
+                  style={{ border: "none", borderRadius: "8px", display: "block" }}
                 />
               </motion.div>
             )}
