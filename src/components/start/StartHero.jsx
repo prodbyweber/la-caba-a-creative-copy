@@ -73,45 +73,10 @@ export default function StartHero() {
         <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
       )}
 
-      {/* Dark overlays */}
-      <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.45)" }} />
+      {/* Minimal overlay — just enough for bottom nav readability */}
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 40%, rgba(0,0,0,0.85) 100%)"
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 50%, rgba(0,0,0,0.7) 100%)"
       }} />
-
-      {/* Center tagline — centered */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2, delay: 0.5 }}
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          textAlign: "center",
-          zIndex: 10,
-          pointerEvents: "none",
-          width: "100%",
-          padding: "0 24px",
-        }}
-      >
-        <p
-          style={{
-            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            fontWeight: 400,
-            fontSize: "clamp(0.55rem, 1.8vw, 0.75rem)",
-            letterSpacing: "0.4em",
-            color: "rgba(240,237,232,0.4)",
-            textTransform: "uppercase",
-            margin: 0,
-          }}
-        >
-          Producción creativa para marcas y artistas
-          <br />
-          Sonido · Visuales · Narrativa
-        </p>
-      </motion.div>
 
       {/* Bottom nav links — all 5 sections */}
       <div

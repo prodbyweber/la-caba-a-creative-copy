@@ -71,14 +71,12 @@ export default function StartArtists() {
           src={mediaSrc}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ filter: "brightness(0.55) saturate(0.7)" }}
         />
       )}
 
-      {/* Overlays */}
-      <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.5)" }} />
+      {/* Minimal overlay */}
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)"
+        background: "linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)"
       }} />
 
       {/* Section tag — top */}

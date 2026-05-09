@@ -84,13 +84,12 @@ export default function StartChoosePath() {
           src={bgSrc}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ filter: "brightness(0.45) saturate(0.65)" }}
         />
       )}
 
-      <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.55)" }} />
+      {/* Minimal overlay */}
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)"
+        background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)"
       }} />
 
       {/* Main content — bottom */}
