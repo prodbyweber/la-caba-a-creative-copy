@@ -57,20 +57,51 @@ export default function StartWhatWeDo() {
           style={{
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             fontWeight: 900,
-            fontSize: "clamp(2rem, 5vw, 4rem)",
+            fontSize: "clamp(1.6rem, 3.5vw, 2.8rem)",
             letterSpacing: "-0.03em",
-            lineHeight: 1.0,
+            lineHeight: 1.05,
             color: "#f0ede8",
-            marginBottom: "clamp(24px, 5vw, 48px)",
+            marginBottom: "clamp(24px, 4vw, 40px)",
           }}
         >
-          Creamos experiencias visuales y sonoras con dirección creativa.
+          Cabaña Creative es una compañía de producción creativa y sello discográfico con base en Madrid.
         </motion.h2>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.35 }}
+          style={{ display: "flex", flexDirection: "column", gap: "clamp(14px, 2.5vw, 22px)", marginBottom: "clamp(24px, 5vw, 48px)" }}
+        >
+          {[
+            "Fundada en 2020 en Venezuela, surge con la intención de conectar con una nueva generación de creadores independientes a través de la música, la narrativa visual y la cultura. Lo que comenzó como una visión impulsada por crear oportunidades para talentos emergentes en Latinoamérica, evolucionó hasta convertirse en una compañía de producción creativa y sello discográfico con base en Madrid.",
+            "Hoy, Cabaña Creative reúne música, moda y producción audiovisual dentro de una estética moderna influenciada por la cultura latina y afro, incorporando matices y tendencias contemporáneas de la escena europea. En una industria cada vez más saturada, buscamos crear proyectos con identidad, claridad y dirección artística, dando espacio a creadores con visión para expresarse de manera auténtica.",
+            "Creemos en los jóvenes con grandes sueños, en las ideas que nacen desde la pasión y en las personas que siguen creando incluso cuando todo parece imposible. Esa energía es el combustible que mueve todo lo que hacemos.",
+          ].map((text, i) => (
+            <motion.p
+              key={i}
+              initial={{ opacity: 0, y: 10 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.7, delay: 0.45 + i * 0.12 }}
+              style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontWeight: 300,
+                fontSize: "clamp(0.8rem, 1.5vw, 0.95rem)",
+                lineHeight: 1.7,
+                color: "rgba(240,237,232,0.45)",
+                margin: 0,
+                maxWidth: "680px",
+              }}
+            >
+              {text}
+            </motion.p>
+          ))}
+        </motion.div>
 
         <motion.div
           initial={{ scaleX: 0 }}
           animate={inView ? { scaleX: 1 } : {}}
-          transition={{ duration: 1, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 1, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
           style={{
             height: "1px",
             background: "rgba(240,237,232,0.12)",
