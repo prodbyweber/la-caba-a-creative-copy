@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import PhoneInput from "./PhoneInput";
 
 const DEFAULT = {
   cta_btn1_link: "https://calendly.com",
@@ -23,7 +24,7 @@ export default function StartCTA() {
     document.head.appendChild(script);
   }, [showCalendly]);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState({ name: "", lastName: "", email: "", phone: "", message: "" });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
@@ -41,9 +42,9 @@ export default function StartCTA() {
     setSending(true);
     setError("");
     await base44.entities.ContactLead.create({
-      name: form.name,
+      name: `${form.name} ${form.lastName}`.trim(),
       email: form.email,
-      message: form.message,
+      message: form.message + (form.phone ? `\n\nTeléfono: ${form.phone}` : ""),
       status: "Nuevo",
     });
     setSending(false);
@@ -307,8 +308,9 @@ export default function StartCTA() {
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "clamp(16px, 3vw, 28px)", paddingBottom: "32px" }}>
+                    {/* Nombre + Apellidos */}
                     <div style={{ display: "flex", gap: "clamp(16px, 4vw, 40px)", flexWrap: "wrap" }}>
-                      <div style={{ flex: "1 1 200px" }}>
+                      <div style={{ flex: "1 1 180px" }}>
                         <label style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(12,12,12,0.35)", display: "block", marginBottom: "8px" }}>
                           Nombre
                         </label>
@@ -319,7 +321,21 @@ export default function StartCTA() {
                           onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                         />
                       </div>
-                      <div style={{ flex: "1 1 200px" }}>
+                      <div style={{ flex: "1 1 180px" }}>
+                        <label style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(12,12,12,0.35)", display: "block", marginBottom: "8px" }}>
+                          Apellidos
+                        </label>
+                        <input
+                          style={inputStyle}
+                          placeholder="Tus apellidos"
+                          value={form.lastName}
+                          onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                    {/* Email + Teléfono */}
+                    <div style={{ display: "flex", gap: "clamp(16px, 4vw, 40px)", flexWrap: "wrap" }}>
+                      <div style={{ flex: "1 1 180px" }}>
                         <label style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(12,12,12,0.35)", display: "block", marginBottom: "8px" }}>
                           Email
                         </label>
@@ -329,6 +345,16 @@ export default function StartCTA() {
                           placeholder="tu@email.com"
                           value={form.email}
                           onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                        />
+                      </div>
+                      <div style={{ flex: "1 1 180px" }}>
+                        <label style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(12,12,12,0.35)", display: "block", marginBottom: "8px" }}>
+                          Teléfono
+                        </label>
+                        <PhoneInput
+                          value={form.phone}
+                          onChange={val => setForm(f => ({ ...f, phone: val }))}
+                          inputStyle={inputStyle}
                         />
                       </div>
                     </div>
