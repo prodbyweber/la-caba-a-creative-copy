@@ -80,7 +80,7 @@ export default function StartCTA() {
         padding: "clamp(80px, 15vw, 160px) clamp(24px, 8vw, 100px)",
       }}
     >
-      <div style={{ maxWidth: "900px", position: "relative", zIndex: 1, width: "100%" }}>
+      <div style={{ maxWidth: "1100px", position: "relative", zIndex: 1, width: "100%" }}>
 
         {/* Label */}
         <motion.p
@@ -213,18 +213,16 @@ export default function StartCTA() {
                   background: "#fff",
                   boxShadow: "0 4px 40px rgba(0,0,0,0.08)",
                   width: "100%",
-                  minWidth: "320px",
-                  height: "700px",
                 }}
               >
                 <iframe
-                  src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1"
+                  src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&hide_event_type_details=0"
                   width="100%"
-                  height="100%"
+                  height="1080"
                   frameBorder="0"
-                  scrolling="yes"
+                  scrolling="no"
                   title="Agendar reunión — Cabaña Creative"
-                  style={{ display: "block", border: "none", width: "100%", height: "100%" }}
+                  style={{ display: "block", border: "none", width: "100%", minHeight: "1080px" }}
                 />
               </motion.div>
             )}
