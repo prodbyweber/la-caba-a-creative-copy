@@ -80,7 +80,7 @@ export default function StartCTA() {
         padding: "clamp(80px, 15vw, 160px) clamp(24px, 8vw, 100px)",
       }}
     >
-      <div style={{ maxWidth: "780px", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: "900px", position: "relative", zIndex: 1, width: "100%" }}>
 
         {/* Label */}
         <motion.p
@@ -201,16 +201,30 @@ export default function StartCTA() {
             {showCalendly && (
               <motion.div
                 key="calendly-widget"
-                initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                animate={{ opacity: 1, height: 700, marginTop: "clamp(20px, 3vw, 32px)" }}
-                exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                style={{ overflow: "hidden", marginBottom: "clamp(10px, 2vw, 18px)", borderRadius: "8px" }}
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                style={{
+                  marginTop: "clamp(16px, 3vw, 28px)",
+                  marginBottom: "clamp(16px, 3vw, 28px)",
+                  borderRadius: "12px",
+                  overflow: "hidden",
+                  background: "#fff",
+                  boxShadow: "0 4px 40px rgba(0,0,0,0.08)",
+                  width: "100%",
+                  minWidth: "320px",
+                  height: "700px",
+                }}
               >
-                <div
-                  className="calendly-inline-widget"
-                  data-url="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200"
-                  style={{ minWidth: "320px", height: "700px" }}
+                <iframe
+                  src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1"
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  scrolling="yes"
+                  title="Agendar reunión — Cabaña Creative"
+                  style={{ display: "block", border: "none", width: "100%", height: "100%" }}
                 />
               </motion.div>
             )}
