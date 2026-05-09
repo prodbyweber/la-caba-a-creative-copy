@@ -228,26 +228,6 @@ export default function StartCTA() {
             )}
           </AnimatePresence>
 
-          {/* Email display */}
-          <div style={{ marginBottom: "clamp(10px, 2vw, 18px)" }}>
-            <a
-              href="mailto:hola@cabanacreative.es"
-              style={{
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                fontSize: "clamp(0.75rem, 1.4vw, 0.9rem)",
-                fontWeight: 400,
-                color: "rgba(12,12,12,0.4)",
-                textDecoration: "none",
-                letterSpacing: "0.01em",
-                transition: "color 0.2s ease",
-              }}
-              onMouseEnter={e => e.currentTarget.style.color = "#ff5833"}
-              onMouseLeave={e => e.currentTarget.style.color = "rgba(12,12,12,0.4)"}
-            >
-              hola@cabanacreative.es
-            </a>
-          </div>
-
           {/* Contactar — toggle form */}
           <button
             onClick={() => { setShowForm(v => !v); setShowCalendly(false); setSent(false); setError(""); }}
@@ -286,11 +266,30 @@ export default function StartCTA() {
               <motion.div
                 key="contact-form"
                 initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                animate={{ opacity: 1, height: "auto", marginTop: "clamp(28px, 5vw, 48px)" }}
+                animate={{ opacity: 1, height: "auto", marginTop: "clamp(20px, 4vw, 36px)" }}
                 exit={{ opacity: 0, height: 0, marginTop: 0 }}
                 transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                 style={{ overflow: "hidden" }}
               >
+                {/* Email */}
+                <a
+                  href="mailto:hola@cabanacreative.es"
+                  style={{
+                    display: "inline-block",
+                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                    fontSize: "clamp(0.75rem, 1.4vw, 0.9rem)",
+                    fontWeight: 400,
+                    color: "rgba(12,12,12,0.4)",
+                    textDecoration: "none",
+                    letterSpacing: "0.01em",
+                    marginBottom: "clamp(20px, 4vw, 32px)",
+                    transition: "color 0.2s ease",
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = "#ff5833"}
+                  onMouseLeave={e => e.currentTarget.style.color = "rgba(12,12,12,0.4)"}
+                >
+                  hola@cabanacreative.es
+                </a>
                 {sent ? (
                   <motion.div
                     initial={{ opacity: 0, y: 12 }}
