@@ -107,7 +107,9 @@ export default function StartHero() {
             margin: 0,
           }}
         >
-          Producción creativa para marcas y artistas &nbsp;·&nbsp; Música · Visuales · Estrategia
+          Producción creativa para marcas y artistas
+          <br />
+          Sonido · Visuales · Narrativa
         </p>
       </motion.div>
 

@@ -64,7 +64,7 @@ export default function StartWhatWeDo() {
             marginBottom: "clamp(24px, 5vw, 48px)",
           }}
         >
-          Creamos universos visuales, musicales y narrativos para artistas y marcas que quieren diferenciarse.
+          Creamos experiencias visuales y sonoras con dirección creativa.
         </motion.h2>
 
         <motion.div
