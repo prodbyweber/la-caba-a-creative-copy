@@ -15,10 +15,8 @@ export default function StartCTA() {
 
   useEffect(() => {
     if (!showCalendly) return;
-    if (document.querySelector('script[src="https://assets.calendly.com/assets/external/widget.js"]')) {
-      if (window.Calendly) window.Calendly.initInlineWidgets();
-      return;
-    }
+    const existing = document.querySelector('script[src="https://assets.calendly.com/assets/external/widget.js"]');
+    if (existing) return;
     const script = document.createElement("script");
     script.src = "https://assets.calendly.com/assets/external/widget.js";
     script.async = true;
