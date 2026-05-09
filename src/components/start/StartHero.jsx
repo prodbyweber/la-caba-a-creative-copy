@@ -107,7 +107,7 @@ export default function StartHero() {
             margin: 0,
           }}
         >
-          Creative House for Artists &amp; Brands
+          Producción creativa para marcas y artistas &nbsp;·&nbsp; Música · Visuales · Estrategia
         </p>
       </motion.div>
 
