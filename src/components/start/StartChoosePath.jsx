@@ -39,27 +39,28 @@ const inputStyle = {
 function CalendlyEmbed() {
   const [loaded, setLoaded] = React.useState(false);
   // Calendly needs ~660px on desktop, ~700px on mobile (no side panel)
+  // Clip the Calendly logo banner at the top (~60px) while keeping profile pics + meeting info
+  const CLIP_TOP = 60;
   const isMobile = typeof window !== "undefined" && window.innerWidth < 600;
-  const embedHeight = isMobile ? 620 : 580;
+  const iframeHeight = isMobile ? 700 : 680;
+  const containerHeight = iframeHeight - CLIP_TOP;
 
   return (
     <div
       style={{
         marginTop: "12px",
         marginBottom: "12px",
-        borderRadius: "12px",
-        overflow: "hidden",
-        background: "transparent",
         width: "100%",
         position: "relative",
-        minHeight: `${embedHeight}px`,
-        marginTop: "0",
+        height: `${containerHeight}px`,
+        overflow: "hidden",
+        borderRadius: "8px",
       }}
     >
       {!loaded && (
         <div style={{
           position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
-          background: "rgba(12,12,12,0.6)", zIndex: 1, borderRadius: "12px",
+          background: "rgba(12,12,12,0.8)", zIndex: 1, borderRadius: "8px",
         }}>
           <div style={{
             width: "24px", height: "24px", borderRadius: "50%",
@@ -69,15 +70,22 @@ function CalendlyEmbed() {
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       )}
+      {/* iframe shifted up by CLIP_TOP to hide the logo banner */}
       <iframe
-        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1&background_color=0c0c0c&text_color=f0ede8"
+        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&background_color=0c0c0c&text_color=f0ede8"
         width="100%"
         frameBorder="0"
         scrolling="no"
         loading="eager"
         title="Agendar reunión"
         onLoad={() => setLoaded(true)}
-        style={{ display: "block", border: "none", width: "100%", height: `${embedHeight}px` }}
+        style={{
+          display: "block",
+          border: "none",
+          width: "100%",
+          height: `${iframeHeight}px`,
+          marginTop: `-${CLIP_TOP}px`,
+        }}
       />
     </div>
   );
