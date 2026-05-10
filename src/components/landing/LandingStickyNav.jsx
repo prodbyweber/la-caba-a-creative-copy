@@ -105,7 +105,7 @@ export default function LandingStickyNav() {
                   }}
                 >
                   {item.label}
-                  {isActive && (
+                  {isActive && isChoose && (
                     <motion.span
                       initial={{ opacity: 0, x: isChooseSection ? 4 : -4 }}
                       animate={{ opacity: 1, x: 0 }}

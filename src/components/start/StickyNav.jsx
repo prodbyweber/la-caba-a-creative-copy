@@ -107,7 +107,7 @@ export default function StickyNav({ showMoreInfo = false }) {
                   }}
                 >
                   {item.label}
-                  {isActive && (
+                  {isActive && (isChoose || item.key === "artists" || item.key === "brands") && (
                     <motion.span
                       initial={{ opacity: 0, x: isChooseSection ? 4 : -4 }}
                       animate={{ opacity: 1, x: 0 }}
