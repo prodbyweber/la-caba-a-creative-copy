@@ -16,6 +16,7 @@ import PlansEditor from "@/components/admin/PlansEditor";
 import BannersEditor from "@/components/admin/BannersEditor";
 import GuestPopupEditor from "@/components/admin/GuestPopupEditor";
 import StartPageEditor from "@/components/admin/StartPageEditor";
+import StartCreadoresEditor from "@/components/admin/StartCreadoresEditor";
 import { Link } from "react-router-dom";
 import { 
   Eye, 
@@ -354,6 +355,11 @@ export default function LandingEditor() {
             {/* START PAGE EDITOR */}
             <SectionEditor title="🚀 Página /start — Landing de Conversión" defaultOpen={true}>
               <StartPageEditor />
+            </SectionEditor>
+
+            {/* CREADORES SECTION EDITOR */}
+            <SectionEditor title="🎬 /start — Sección Creadores (carrusel + servicios)" defaultOpen={false}>
+              <StartCreadoresEditor />
             </SectionEditor>
 
             {/* Guest Popup Editor */}
