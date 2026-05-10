@@ -173,6 +173,25 @@ function FakeNav() {
   );
 }
 
+const FEATURES = [
+  {
+    title: "Accede gratis a Cabaña Creative",
+    subtitle: "Explora una nueva generación de música, cine y cultura visual.",
+  },
+  {
+    title: "Contenido exclusivo",
+    subtitle: "Descubre artistas emergentes y proyectos seleccionados desde nuestra plataforma.",
+  },
+  {
+    title: "Membresía — 8€/mes",
+    subtitle: "Alertas de campañas, descuentos de hasta 20% y acceso prioritario a lanzamientos.",
+  },
+  {
+    title: "Impulsa tu presencia",
+    subtitle: "Nuestro Explorer te ayuda a posicionar contenido, potenciar Shorts y monetizar.",
+  },
+];
+
 export default function StartExplorar() {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-60px" });
@@ -207,129 +226,163 @@ export default function StartExplorar() {
       style={{
         position: "relative",
         width: "100%",
-        minHeight: "100dvh",
+        minHeight: "auto",
         background: "#0a0a0b",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
-        padding: "clamp(80px, 12vw, 140px) clamp(24px, 6vw, 56px) clamp(48px, 8vw, 80px)",
+        justifyContent: "flex-start",
+        padding: "clamp(40px, 8vw, 80px) clamp(24px, 6vw, 56px)",
+        gap: "clamp(28px, 5vw, 48px)",
       }}
     >
-      {/* Ambient glow */}
-      <div style={{
-        position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
-        width: "700px", height: "300px", pointerEvents: "none",
-        background: "radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,88,51,0.05) 0%, transparent 70%)"
-      }} />
-
       {/* Label + headline */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        style={{ marginBottom: "clamp(32px, 5vw, 56px)", position: "relative", zIndex: 1 }}
+        style={{ position: "relative", zIndex: 1 }}
       >
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 700, fontSize: "10px", letterSpacing: "0.35em",
           textTransform: "uppercase", color: "#ff5833",
-          marginBottom: "clamp(12px, 2vw, 20px)",
+          marginBottom: "clamp(10px, 2vw, 16px)",
         }}>
           Explorar
         </p>
         <h2 style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 900,
-          fontSize: "clamp(2.4rem, 7vw, 5.5rem)",
+          fontSize: "clamp(2rem, 5vw, 3.5rem)",
           letterSpacing: "-0.04em",
-          lineHeight: 0.88,
+          lineHeight: 0.95,
           color: "#f0ede8",
-          marginBottom: "clamp(16px, 3vw, 28px)",
+          marginBottom: "clamp(12px, 2vw, 20px)",
         }}>
-          Atrévete a<br />explorar
+          Atrévete a explorar
         </h2>
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 300,
-          fontSize: "clamp(0.85rem, 1.8vw, 1.05rem)",
+          fontSize: "clamp(0.8rem, 1.5vw, 0.95rem)",
           color: "rgba(240,237,232,0.5)",
-          maxWidth: "560px",
-          lineHeight: 1.65,
+          maxWidth: "520px",
+          lineHeight: 1.6,
         }}>
-          Curamos música, films y contenido audiovisual con criterio. Cada pieza forma parte de un catálogo en evolución, pensado con intención y dirección.{" "}
-          <span style={{ color: "rgba(240,237,232,0.3)", fontStyle: "italic" }}>
-            Explorar es donde las ideas dejan de ser ideas y empiezan a tomar forma.
-          </span>
+          Curamos música, films y contenido audiovisual con criterio. Cada pieza forma parte de un catálogo en evolución.
         </p>
       </motion.div>
 
-      {/* Platform window */}
-      <motion.div
-        initial={{ opacity: 0, y: 40, scale: 0.97 }}
-        animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-        transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        style={{
-          position: "relative", zIndex: 1,
-          borderRadius: "16px", overflow: "hidden",
-          border: "1px solid rgba(255,255,255,0.07)",
-          boxShadow: "0 48px 120px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.03)",
-        }}
-      >
-        {/* Fake browser chrome */}
+      {/* Platform preview + Features grid */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "clamp(24px, 4vw, 40px)", position: "relative", zIndex: 1 }}>
+        {/* Mini platform window */}
+        <motion.div
+          initial={{ opacity: 0, y: 30, scale: 0.97 }}
+          animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+          transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            position: "relative",
+            borderRadius: "12px", overflow: "hidden",
+            border: "1px solid rgba(255,255,255,0.05)",
+            boxShadow: "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.02)",
+            maxHeight: "280px",
+          }}
+        >
+        {/* Compact browser chrome */}
         <div style={{
-          display: "flex", alignItems: "center", gap: "8px",
-          padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)",
-          background: "#0a0a0b",
+          display: "flex", alignItems: "center", gap: "6px",
+          padding: "8px 14px", borderBottom: "1px solid rgba(255,255,255,0.05)",
+          background: "rgba(8,8,8,0.8)",
         }}>
-          <div style={{ display: "flex", gap: "6px" }}>
+          <div style={{ display: "flex", gap: "5px" }}>
             {[0, 1, 2].map(i => (
-              <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
+              <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
             ))}
           </div>
           <div style={{
-            flex: 1, maxWidth: 260, height: 20, borderRadius: 4,
-            background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", padding: "0 10px",
+            flex: 1, maxWidth: 200, height: 18, borderRadius: 3,
+            background: "rgba(255,255,255,0.03)", display: "flex", alignItems: "center", padding: "0 8px",
           }}>
-            <span style={{ fontFamily: "monospace", fontSize: "9px", color: "rgba(255,255,255,0.18)" }}>
-              cabanacreative.es/Explorar
+            <span style={{ fontFamily: "monospace", fontSize: "8px", color: "rgba(255,255,255,0.15)" }}>
+              cabanacreative.es
             </span>
           </div>
         </div>
 
-        {/* App content */}
-        <div style={{ position: "relative", background: "#080808" }}>
-          <FakeNav />
-          <MiniHero items={items} />
-
-          <div style={{ position: "relative", paddingBottom: "clamp(24px, 4vw, 40px)", paddingTop: "8px" }}>
-            {row1.length > 0 && <NetflixRow label="En Tendencia" items={row1} rowIndex={0} />}
-            {row2.length > 0 && <NetflixRow label="Nuevos Lanzamientos" items={row2} rowIndex={1} />}
-            {row3.length > 0 && <NetflixRow label="Mini Films" items={row3} rowIndex={2} />}
-
-            {items.length === 0 && (
-              <div style={{ padding: "0 20px 24px" }}>
-                {[0, 1, 2].map(ri => (
-                  <div key={ri} style={{ marginBottom: "16px" }}>
-                    <div style={{ height: 8, width: 96, borderRadius: 4, background: "rgba(255,255,255,0.06)", marginBottom: 8 }} />
-                    <div style={{ display: "flex", gap: 8 }}>
-                      {[...Array(5)].map((_, i) => (
-                        <div key={i} style={{ flexShrink: 0, width: 180, aspectRatio: "16/9", borderRadius: 8, background: "rgba(255,255,255,0.03)" }} />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* Compact app content */}
+        <div style={{ position: "relative", background: "rgba(8,8,8,0.4)", maxHeight: "240px", overflow: "hidden" }}>
+          <div style={{ opacity: 0.4 }}>
+            <MiniHero items={items} />
           </div>
-
-          {/* Bottom fade */}
           <div style={{
-            position: "absolute", bottom: 0, left: 0, right: 0, height: 96, pointerEvents: "none",
-            background: "linear-gradient(to top, #0a0a0b 0%, transparent 100%)"
+            position: "absolute", inset: 0, pointerEvents: "none",
+            background: "linear-gradient(to bottom, transparent 0%, rgba(8,8,8,0.7) 60%, rgba(8,8,8,0.95) 100%)"
           }} />
         </div>
-      </motion.div>
+        </motion.div>
+
+        {/* Features grid - 4 horizontal cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: "clamp(16px, 2vw, 24px)",
+            width: "100%",
+          }}
+        >
+          {FEATURES.map((feature, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 16 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.35 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                padding: "clamp(16px, 3vw, 24px)",
+                borderRadius: "8px",
+                border: "1px solid rgba(255,255,255,0.08)",
+                background: "rgba(255,255,255,0.02)",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                transition: "border-color 0.3s ease, background 0.3s ease",
+                cursor: "default",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = "rgba(255,88,51,0.3)";
+                e.currentTarget.style.background = "rgba(255,88,51,0.03)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
+                e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+              }}
+            >
+              <h3 style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontWeight: 700,
+                fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
+                color: "#f0ede8",
+                marginBottom: "clamp(8px, 1.5vw, 12px)",
+                lineHeight: 1.3,
+              }}>
+                {feature.title}
+              </h3>
+              <p style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontWeight: 300,
+                fontSize: "clamp(0.75rem, 1.4vw, 0.85rem)",
+                color: "rgba(240,237,232,0.5)",
+                lineHeight: 1.5,
+                margin: 0,
+              }}>
+                {feature.subtitle}
+              </p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
     </section>
   );
 }
