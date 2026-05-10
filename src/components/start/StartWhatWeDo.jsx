@@ -102,7 +102,7 @@ export default function StartWhatWeDo() {
       </div>
 
       {/* Brands Carousel */}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, width: "100%", zIndex: 5 }}>
+      <div style={{ position: "absolute", bottom: "clamp(20px, 3vw, 40px)", left: 0, right: 0, width: "100%", zIndex: 5 }}>
         <StartBrandsCarousel />
       </div>
     </section>
