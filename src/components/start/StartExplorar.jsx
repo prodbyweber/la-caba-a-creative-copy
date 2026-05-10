@@ -173,7 +173,7 @@ function FakeNav() {
   );
 }
 
-export default function StartExplorar() {
+export default function StartExplorar({ showButton = true, allowMobileScroll = false }) {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-60px" });
 
@@ -233,6 +233,7 @@ export default function StartExplorar() {
         flexDirection: "column",
         justifyContent: "center",
         padding: "clamp(60px, 10vw, 100px) clamp(24px, 6vw, 56px)",
+        scrollSnapStop: allowMobileScroll ? "auto" : "always",
       }}
     >
       {/* Ambient glow */}
@@ -401,46 +402,48 @@ export default function StartExplorar() {
       </div>
 
       {/* CTA Button — premium cinematic style */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={isInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "center", marginTop: "clamp(12px, 2vw, 24px)" }}
-      >
-        <button
-          onClick={() => base44.auth.redirectToLogin(window.location.href)}
-          style={{
-            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            fontWeight: 900,
-            fontSize: "clamp(1rem, 2vw, 1.3rem)",
-            letterSpacing: "-0.02em",
-            background: "rgba(240,237,232,0.08)",
-            color: "#f0ede8",
-            border: "1.5px solid rgba(240,237,232,0.3)",
-            padding: "clamp(14px, 2.5vw, 20px) clamp(40px, 7vw, 60px)",
-            borderRadius: "8px",
-            cursor: "pointer",
-            transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            boxShadow: "0 8px 32px rgba(240,237,232,0.04), inset 0 1px 1px rgba(255,255,255,0.1)",
-          }}
-          onMouseEnter={e => { 
-            e.currentTarget.style.background = "rgba(240,237,232,0.12)"; 
-            e.currentTarget.style.borderColor = "rgba(240,237,232,0.5)";
-            e.currentTarget.style.boxShadow = "0 12px 40px rgba(240,237,232,0.08), inset 0 1px 1px rgba(255,255,255,0.15)";
-            e.currentTarget.style.transform = "translateY(-2px)";
-          }}
-          onMouseLeave={e => { 
-            e.currentTarget.style.background = "rgba(240,237,232,0.08)"; 
-            e.currentTarget.style.borderColor = "rgba(240,237,232,0.3)";
-            e.currentTarget.style.boxShadow = "0 8px 32px rgba(240,237,232,0.04), inset 0 1px 1px rgba(255,255,255,0.1)";
-            e.currentTarget.style.transform = "translateY(0)";
-          }}
+      {showButton && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "center", marginTop: "clamp(12px, 2vw, 24px)" }}
         >
-          Acceder
-        </button>
-      </motion.div>
+          <button
+            onClick={() => base44.auth.redirectToLogin(window.location.href)}
+            style={{
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+              fontWeight: 900,
+              fontSize: "clamp(1rem, 2vw, 1.3rem)",
+              letterSpacing: "-0.02em",
+              background: "rgba(240,237,232,0.08)",
+              color: "#f0ede8",
+              border: "1.5px solid rgba(240,237,232,0.3)",
+              padding: "clamp(14px, 2.5vw, 20px) clamp(40px, 7vw, 60px)",
+              borderRadius: "8px",
+              cursor: "pointer",
+              transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              boxShadow: "0 8px 32px rgba(240,237,232,0.04), inset 0 1px 1px rgba(255,255,255,0.1)",
+            }}
+            onMouseEnter={e => { 
+              e.currentTarget.style.background = "rgba(240,237,232,0.12)"; 
+              e.currentTarget.style.borderColor = "rgba(240,237,232,0.5)";
+              e.currentTarget.style.boxShadow = "0 12px 40px rgba(240,237,232,0.08), inset 0 1px 1px rgba(255,255,255,0.15)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={e => { 
+              e.currentTarget.style.background = "rgba(240,237,232,0.08)"; 
+              e.currentTarget.style.borderColor = "rgba(240,237,232,0.3)";
+              e.currentTarget.style.boxShadow = "0 8px 32px rgba(240,237,232,0.04), inset 0 1px 1px rgba(255,255,255,0.1)";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
+          >
+            Acceder
+          </button>
+        </motion.div>
+      )}
     </section>
   );
 }

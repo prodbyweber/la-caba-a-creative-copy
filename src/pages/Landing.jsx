@@ -77,7 +77,7 @@ export default function Landing() {
 
       <div className="snap-scroll-container">
         <SnapSection><StartHero bottomOffset="clamp(90px, 12vw, 140px)" /></SnapSection>
-        <SnapSection><StartExplorar /></SnapSection>
+        <SnapSection><StartExplorar showButton={true} allowMobileScroll={true} /></SnapSection>
         <SnapSection><StartCreadores /></SnapSection>
         <SnapSection><StartWhatWeDo /></SnapSection>
         <SnapSection><StartChoosePath /></SnapSection>
