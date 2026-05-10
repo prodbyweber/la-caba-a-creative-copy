@@ -16,12 +16,12 @@ export default function StartWhatWeDo() {
         height: "100dvh",
         minHeight: "500px",
         display: "flex",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "flex-start",
         background: "#0c0c0c",
         overflow: "hidden",
         overflowY: "auto",
-        padding: "clamp(80px, 10vw, 120px) clamp(24px, 8vw, 100px) 0",
+        padding: "clamp(40px, 6vw, 80px) clamp(24px, 8vw, 100px) 0",
       }}
     >
       {/* Subtle background texture */}
