@@ -1,15 +1,11 @@
 import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import StartBrandsCarousel from "./StartBrandsCarousel";
 
 export default function StartWhatWeDo() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
-  const brandsRef = useRef(null);
-  const brandsInView = useInView(brandsRef, { once: true, margin: "-100px" });
 
   return (
-    <>
     <section
       id="about"
       ref={ref}
@@ -103,59 +99,5 @@ export default function StartWhatWeDo() {
         />
       </div>
     </section>
-
-    {/* Brands Carousel Section */}
-    <section
-      id="brands-carousel"
-      ref={brandsRef}
-      style={{
-        position: "relative",
-        width: "100%",
-        minHeight: "auto",
-        background: "#0c0c0c",
-        padding: "clamp(60px, 12vw, 120px) clamp(24px, 8vw, 100px)",
-        overflow: "hidden",
-      }}
-    >
-      <motion.div
-        initial={{ opacity: 0, y: 32 }}
-        animate={brandsInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        style={{ marginBottom: "clamp(40px, 8vw, 60px)" }}
-      >
-        <p
-          style={{
-            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            fontWeight: 700,
-            fontSize: "10px",
-            letterSpacing: "0.3em",
-            textTransform: "uppercase",
-            color: "rgba(240,237,232,0.3)",
-            margin: 0,
-            marginBottom: "clamp(20px, 4vw, 32px)",
-          }}
-        >
-          Marcas con las que hemos colaborado
-        </p>
-        <p
-          style={{
-            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            fontWeight: 300,
-            fontSize: "clamp(0.8rem, 1.6vw, 0.95rem)",
-            color: "rgba(240,237,232,0.5)",
-            lineHeight: 1.5,
-            maxWidth: "600px",
-            margin: 0,
-          }}
-        >
-          Trabajamos con marcas líderes en cultura, moda y tecnología para crear experiencias únicas.
-        </p>
-      </motion.div>
-
-      <div style={{ overflow: "hidden" }}>
-        {brandsInView && <StartBrandsCarousel />}
-      </div>
-    </section>
-    </>
   );
 }

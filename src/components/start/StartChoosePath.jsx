@@ -395,7 +395,7 @@ export default function StartChoosePath() {
       style={{
         position: "relative",
         width: "100%",
-        minHeight: "auto",
+        minHeight: "100dvh",
         overflow: "visible",
         background: "#080808",
         display: "flex",
