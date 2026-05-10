@@ -192,7 +192,7 @@ const FEATURES = [
   },
 ];
 
-function CinematicCard({ item, index, rowIndex }) {
+function CinematicCard({ item, index, rowIndex, customStyle }) {
   const [hovered, setHovered] = useState(false);
   const thumb = item.thumbnail_url || getYtThumb(item.youtube_url || item.youtube_music_url);
   
@@ -205,10 +205,10 @@ function CinematicCard({ item, index, rowIndex }) {
       onMouseLeave={() => setHovered(false)}
       className="relative rounded-lg overflow-hidden cursor-default"
       style={{
-        aspectRatio: "16/10",
-        transform: hovered ? "scale(1.05)" : "scale(1)",
+        ...customStyle,
+        transform: hovered ? "scale(1.02)" : "scale(1)",
         transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
-        boxShadow: hovered ? "0 20px 40px rgba(255,88,51,0.15)" : "0 8px 24px rgba(0,0,0,0.3)",
+        boxShadow: hovered ? "0 16px 32px rgba(0,0,0,0.4)" : "0 8px 20px rgba(0,0,0,0.25)",
       }}
     >
       {/* Image/Video background */}
@@ -218,25 +218,24 @@ function CinematicCard({ item, index, rowIndex }) {
           alt="" 
           className="absolute inset-0 w-full h-full object-cover"
           style={{ 
-            filter: hovered ? "brightness(1.15) saturate(1.3) contrast(1.1)" : "brightness(0.8) saturate(0.85)",
+            filter: hovered ? "brightness(0.9) saturate(1.1)" : "brightness(0.8) saturate(0.85)",
             transition: "filter 0.3s ease"
           }}
         />
       ) : (
-        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(255,88,51,0.12) 0%, rgba(8,8,8,0.6) 100%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(100,100,100,0.1) 0%, rgba(8,8,8,0.4) 100%)" }} />
       )}
       
-      {/* Premium cinematic overlay */}
+      {/* Cinematic overlay - no orange tint */}
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.3) 40%, rgba(8,8,8,0.85) 100%)",
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.25) 40%, rgba(8,8,8,0.8) 100%)",
         transition: "all 0.3s ease"
       }} />
       
-      {/* Border accent on hover */}
+      {/* Border accent on hover - subtle gray */}
       {hovered && (
         <div className="absolute inset-0 rounded-lg pointer-events-none" style={{
-          border: "1.5px solid rgba(255,88,51,0.3)",
-          animation: "none",
+          border: "1px solid rgba(240,237,232,0.2)",
         }} />
       )}
       
@@ -262,14 +261,12 @@ export default function StartExplorar() {
   });
 
   const withThumb = items.filter(i => i.thumbnail_url || i.youtube_url || i.youtube_music_url);
-  const row1 = withThumb.slice(0, 7);
-  const row2 = withThumb.slice(7, 14);
-  const row3 = withThumb.slice(14, 21);
+  const mosaicItems = withThumb.slice(0, 7);
 
   // Preload hero images
   React.useEffect(() => {
     if (items.length > 0) {
-      items.slice(0, 4).forEach(item => {
+      items.slice(0, 7).forEach(item => {
         if (item.thumbnail_url || item.youtube_url) {
           const img = new Image();
           img.src = item.thumbnail_url || `https://img.youtube.com/vi/${item.youtube_url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1]}/hqdefault.jpg`;
@@ -321,43 +318,57 @@ export default function StartExplorar() {
         </h2>
       </motion.div>
 
-      {/* Two column layout: Cards left, Features right */}
+      {/* Mosaic layout with features on right */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "clamp(24px, 4vw, 48px)",
+        gridTemplateColumns: "1.2fr 1fr",
+        gap: "clamp(20px, 3vw, 32px)",
         position: "relative",
         zIndex: 1,
         alignItems: "start",
       }}>
-        {/* LEFT: Cinematic cards grid */}
+        {/* LEFT: Prime Video style mosaic - 7 cards with overflow */}
         <motion.div
-          initial={{ opacity: 0, x: -40 }}
+          initial={{ opacity: 0, x: -50 }}
           animate={isInView ? { opacity: 1, x: 0 } : {}}
           transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: "clamp(10px, 2vw, 16px)",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gridTemplateRows: "auto auto",
+            gap: "clamp(10px, 1.8vw, 14px)",
             width: "100%",
+            overflow: "hidden",
+            position: "relative",
           }}
         >
-          {withThumb.slice(0, 8).map((item, i) => (
-            <CinematicCard key={item.id || i} item={item} index={i} rowIndex={Math.floor(i / 2)} />
-          ))}
+          {mosaicItems.map((item, i) => {
+            let style = {};
+            if (i === 0) style = { gridColumn: "1 / 2", gridRow: "1 / 3", aspectRatio: "9/16" };
+            else if (i === 1) style = { gridColumn: "2 / 4", gridRow: "1", aspectRatio: "16/9" };
+            else if (i === 2) style = { gridColumn: "2 / 3", gridRow: "2", aspectRatio: "9/16" };
+            else if (i === 3) style = { gridColumn: "3 / 4", gridRow: "2", aspectRatio: "9/16" };
+            else if (i === 4) style = { gridColumn: "1 / 2", gridRow: "3", aspectRatio: "9/16" };
+            else if (i === 5) style = { gridColumn: "2 / 3", gridRow: "3", aspectRatio: "9/16" };
+            else if (i === 6) style = { gridColumn: "3 / 4", gridRow: "3", aspectRatio: "1/1", marginRight: "-30%", zIndex: 5, maskImage: "linear-gradient(to right, black 0%, black 70%, transparent 100%)" };
+            
+            return (
+              <CinematicCard key={item.id || i} item={item} index={i} rowIndex={0} customStyle={style} />
+            );
+          })}
         </motion.div>
 
-        {/* RIGHT: Features premium cards */}
+        {/* RIGHT: Features as clean square blocks */}
         <motion.div
           initial={{ opacity: 0, x: 40 }}
           animate={isInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "clamp(12px, 2vw, 16px)",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "clamp(10px, 1.8vw, 14px)",
             width: "100%",
-            height: "100%",
+            height: "fit-content",
           }}
         >
           {FEATURES.map((feature, i) => (
@@ -365,46 +376,46 @@ export default function StartExplorar() {
               key={i}
               initial={{ opacity: 0, y: 16 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.3 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.6, delay: 0.3 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
               style={{
-                padding: "clamp(14px, 2.5vw, 18px)",
-                borderRadius: "8px",
-                border: "1px solid rgba(255,88,51,0.25)",
-                background: "linear-gradient(135deg, rgba(255,88,51,0.06) 0%, rgba(255,88,51,0.02) 100%)",
-                backdropFilter: "blur(10px)",
-                WebkitBackdropFilter: "blur(10px)",
+                padding: "clamp(16px, 2vw, 20px)",
+                borderRadius: "6px",
+                border: "1px solid rgba(240,237,232,0.12)",
+                background: "rgba(255,255,255,0.04)",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
                 transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
                 cursor: "default",
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = "rgba(255,88,51,0.45)";
-                e.currentTarget.style.background = "linear-gradient(135deg, rgba(255,88,51,0.12) 0%, rgba(255,88,51,0.06) 100%)";
-                e.currentTarget.style.transform = "translateX(6px)";
+                e.currentTarget.style.borderColor = "rgba(240,237,232,0.25)";
+                e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                e.currentTarget.style.transform = "translateY(-2px)";
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.borderColor = "rgba(255,88,51,0.25)";
-                e.currentTarget.style.background = "linear-gradient(135deg, rgba(255,88,51,0.06) 0%, rgba(255,88,51,0.02) 100%)";
-                e.currentTarget.style.transform = "translateX(0)";
+                e.currentTarget.style.borderColor = "rgba(240,237,232,0.12)";
+                e.currentTarget.style.background = "rgba(255,255,255,0.04)";
+                e.currentTarget.style.transform = "translateY(0)";
               }}
             >
               <h3 style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 700,
-                fontSize: "clamp(0.85rem, 1.8vw, 1rem)",
+                fontSize: "clamp(0.8rem, 1.6vw, 0.95rem)",
                 color: "#f0ede8",
-                marginBottom: "clamp(4px, 1vw, 8px)",
+                marginBottom: "clamp(6px, 1.2vw, 10px)",
                 lineHeight: 1.3,
                 letterSpacing: "-0.01em",
-                margin: "0 0 clamp(4px, 1vw, 8px) 0",
+                margin: "0 0 clamp(6px, 1.2vw, 10px) 0",
               }}>
                 {feature.title}
               </h3>
               <p style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 300,
-                fontSize: "clamp(0.7rem, 1.2vw, 0.8rem)",
-                color: "rgba(240,237,232,0.55)",
-                lineHeight: 1.4,
+                fontSize: "clamp(0.65rem, 1vw, 0.75rem)",
+                color: "rgba(240,237,232,0.5)",
+                lineHeight: 1.35,
                 margin: 0,
               }}>
                 {feature.subtitle}
