@@ -74,7 +74,7 @@ export default function StartHero() {
         transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
         style={{
           position: "absolute",
-          bottom: "clamp(32px, 7vw, 56px)",
+          bottom: "clamp(80px, 15vw, 140px)",
           right: "clamp(24px, 6vw, 56px)",
           zIndex: 20,
           textAlign: "right",
