@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const ROTATING_WORDS = ["artistas", "modelos", "creadoras", "creadores"];
+const ROTATING_WORDS = ["Artistas", "Modelos", "Creadoras", "Creadores"];
 
 function isVideo(url) {
   return url && /\.(mp4|webm|mov)(\?|$)/i.test(url);

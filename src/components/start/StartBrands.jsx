@@ -1,7 +1,15 @@
-import React, { useRef, useEffect } from "react";
-import { motion, useInView } from "framer-motion";
+import React, { useRef, useEffect, useState } from "react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+
+const BUSINESS_TYPES = [
+  "Marcas de ropa",
+  "Eventos y experiencias",
+  "Bares y restaurantes",
+  "Accesorios y diseño",
+  "Sesiones y workshops",
+];
 
 const SERVICES = [
   "Estrategia de marca",
@@ -32,6 +40,7 @@ function isVideo(url) {
 export default function StartBrands() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
+  const [businessIdx, setBusinessIdx] = useState(0);
 
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
@@ -42,6 +51,15 @@ export default function StartBrands() {
   // Use banner 3 (Films) as brands background
   const mediaSrc = cfg?.hero_banner_3_image || "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1800&q=85";
   const vidRef = useAutoPlay(isVideo(mediaSrc) ? mediaSrc : null);
+
+  // Rotate business types
+  useEffect(() => {
+    if (!inView) return;
+    const id = setInterval(() => {
+      setBusinessIdx(i => (i + 1) % BUSINESS_TYPES.length);
+    }, 2800);
+    return () => clearInterval(id);
+  }, [inView]);
 
   return (
     <section
@@ -116,6 +134,30 @@ export default function StartBrands() {
           gap: "clamp(20px, 4vw, 36px)",
         }}
       >
+        {/* Rotating business type */}
+        <div style={{ minHeight: "clamp(2rem, 4vw, 3rem)", display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={businessIdx}
+              initial={{ opacity: 0, y: 12, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -12, filter: "blur(8px)" }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontWeight: 900,
+                fontSize: "clamp(1.6rem, 4.5vw, 3rem)",
+                letterSpacing: "-0.04em",
+                color: "#f0ede8",
+                lineHeight: 1,
+                textAlign: "right",
+              }}
+            >
+              {BUSINESS_TYPES[businessIdx]}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
         <div style={{ display: "flex", flexDirection: "column", gap: "0", width: "100%", alignItems: "flex-end" }}>
           {SERVICES.map((service, i) => (
             <motion.div
