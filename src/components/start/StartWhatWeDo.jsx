@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import StartBrandsCarousel from "./StartBrandsCarousel";
 
 export default function StartWhatWeDo() {
   const ref = useRef(null);
@@ -97,6 +98,11 @@ export default function StartWhatWeDo() {
             maxWidth: "200px",
           }}
         />
+      </div>
+
+      {/* Brands Carousel */}
+      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, width: "100%", zIndex: 5 }}>
+        <StartBrandsCarousel />
       </div>
     </section>
   );

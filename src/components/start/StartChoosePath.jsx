@@ -432,6 +432,9 @@ export default function StartChoosePath() {
           zIndex: 10,
           padding: "clamp(120px, 20vw, 200px) clamp(24px, 6vw, 56px) clamp(40px, 8vw, 72px)",
           width: "100%",
+          overflowY: "auto",
+          maxHeight: "100dvh",
+          paddingBottom: "clamp(80px, 12vw, 120px)",
         }}
       >
         {/* Label */}
@@ -537,7 +540,7 @@ export default function StartChoosePath() {
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                    style={{ overflow: "clip", marginBottom: "clamp(10px, 2vw, 16px)" }}
+                    style={{ overflow: "visible", marginBottom: "clamp(10px, 2vw, 16px)" }}
                   >
                     {path.key === "artist" ? <CalendlyPanel /> : <ContactPanel />}
                   </motion.div>
