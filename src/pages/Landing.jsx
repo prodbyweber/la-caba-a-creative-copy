@@ -8,7 +8,7 @@ import StartCreadores from "@/components/start/StartCreadores";
 import StartExplorar from "@/components/start/StartExplorar";
 import StartChoosePath from "@/components/start/StartChoosePath";
 import StartFooter from "@/components/start/StartFooter";
-import StickyNav from "@/components/start/StickyNav";
+import LandingStickyNav from "@/components/landing/LandingStickyNav";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 
 const SnapSection = ({ children }) => (
@@ -31,8 +31,8 @@ export default function Landing() {
       {/* Nav original de la landing (con menú hamburguesa, botón Explorar, perfil, registro) */}
       <LandingNav />
 
-      {/* Sticky scroll nav del Start */}
-      <StickyNav showMoreInfo={true} />
+      {/* Sticky scroll nav de Landing */}
+      <LandingStickyNav />
 
       <style>{`
         .snap-scroll-container {

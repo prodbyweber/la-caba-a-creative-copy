@@ -61,7 +61,7 @@ export default function Start() {
         <div className="snap-section-full"><StartWhatWeDo /></div>
         <div className="snap-section-full"><StartCreadores /></div>
         <div className="snap-section-full"><StartBrands /></div>
-        <div className="snap-section-auto"><StartExplorar /></div>
+        <div className="snap-section-full"><StartExplorar /></div>
         <div className="snap-section-full"><StartChoosePath /></div>
         <div className="snap-section-full"><StartContact /></div>
         <div className="snap-section-auto"><StartFooter /></div>

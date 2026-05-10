@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import useActiveSection, { SECTIONS } from "./useActiveSection";
+import useActiveSection, { SECTIONS } from "@/components/start/useActiveSection";
 
 const NAV_ITEMS = [
   { key: "hero",     label: "Inicio" },
-  { key: "about",    label: "Quiénes Somos" },
-  { key: "artists",  label: "Creadores" },
-  { key: "brands",   label: "Marcas" },
   { key: "explorar", label: "Explorar" },
+  { key: "artists",  label: "Creadores" },
+  { key: "about",    label: "Quiénes Somos" },
   { key: "choose",   label: "Comenzar" },
 ];
 
@@ -17,12 +16,11 @@ const scrollTo = (id) => {
   if (el) el.scrollIntoView({ behavior: "smooth" });
 };
 
-export default function StickyNav({ showMoreInfo = false }) {
+export default function LandingStickyNav() {
   const active = useActiveSection();
   const isChooseSection = active === "choose";
   const navigate = useNavigate();
   const [panelOpen, setPanelOpen] = useState(false);
-
   const [storiesOpen, setStoriesOpen] = useState(false);
 
   useEffect(() => {
@@ -111,7 +109,7 @@ export default function StickyNav({ showMoreInfo = false }) {
             </button>
 
             {/* Botón Más información — solo en Landing y en sección "Comenzar" */}
-            {showMoreInfo && isChoose && isActive && (
+            {isChoose && isActive && (
               <motion.button
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
