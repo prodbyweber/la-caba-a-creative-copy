@@ -6,7 +6,6 @@ import StartBrandsCarousel from "@/components/start/StartBrandsCarousel";
 import StartArtists from "@/components/start/StartArtists";
 import StartBrands from "@/components/start/StartBrands";
 import StartChoosePath from "@/components/start/StartChoosePath";
-import StartCTA from "@/components/start/StartCTA";
 import StartFooter from "@/components/start/StartFooter";
 
 export default function Start() {
@@ -27,7 +26,6 @@ export default function Start() {
       <StartArtists />
       <StartBrands />
       <StartChoosePath />
-      <StartCTA />
       <StartFooter />
     </div>
   );

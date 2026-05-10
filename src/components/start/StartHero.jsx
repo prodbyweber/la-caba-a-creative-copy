@@ -40,8 +40,7 @@ const NAV_LINKS = [
   { label: "Quiénes Somos", href: "#about" },
   { label: "Artistas / Creadores", href: "#artists" },
   { label: "Marcas", href: "#brands" },
-  { label: "Elige tu Camino", href: "#choose" },
-  { label: "Work With Us →", href: "#cta", highlight: true },
+  { label: "Comenzar →", href: "#choose", highlight: true },
 ];
 
 export default function StartHero() {

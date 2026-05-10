@@ -5,8 +5,7 @@ const MENU_ITEMS = [
   { label: "Quiénes Somos", href: "#about" },
   { label: "Artistas / Creadores", href: "#artists" },
   { label: "Marcas", href: "#brands" },
-  { label: "Elige tu Camino", href: "#choose" },
-  { label: "Work With Us", href: "#cta" },
+  { label: "Comenzar", href: "#choose" },
 ];
 
 export default function StartNav() {
