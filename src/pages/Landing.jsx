@@ -28,7 +28,7 @@ export default function Landing() {
       <LandingNav />
 
       {/* Sticky scroll nav del Start */}
-      <StickyNav />
+      <StickyNav showMoreInfo={true} />
 
       <style>{`
         @media (max-width: 767px) {

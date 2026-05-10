@@ -6,14 +6,16 @@ const inputStyle = {
   fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
   fontSize: "clamp(0.9rem, 2vw, 1rem)",
   fontWeight: 400,
-  background: "white",
-  border: "none",
+  background: "#f9f8f7",
+  border: "1px solid rgba(12,12,12,0.08)",
   outline: "none",
   color: "#0c0c0c",
   padding: "12px 16px",
   width: "100%",
-  borderRadius: "8px",
+  borderRadius: "10px",
   letterSpacing: "-0.01em",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+  transition: "border-color 0.2s ease, box-shadow 0.2s ease",
 };
 
 export default function StartContact() {
@@ -52,14 +54,40 @@ export default function StartContact() {
         position: "relative",
         width: "100%",
         minHeight: "100dvh",
-        background: "white",
+        background: "linear-gradient(135deg, #fafaf9 0%, #f5f3f0 100%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: "clamp(40px, 8vw, 80px) clamp(24px, 6vw, 56px)",
+        overflow: "hidden",
       }}
     >
-      <div style={{ maxWidth: "720px", width: "100%" }}>
+      {/* Decorative elements */}
+      <div
+        style={{
+          position: "absolute",
+          top: "-40%",
+          right: "-20%",
+          width: "600px",
+          height: "600px",
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(255,88,51,0.08) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          bottom: "-30%",
+          left: "-10%",
+          width: "400px",
+          height: "400px",
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(255,88,51,0.05) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }}
+      />
+      <div style={{ maxWidth: "720px", width: "100%", position: "relative", zIndex: 1 }}>
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -155,6 +183,14 @@ export default function StartContact() {
                     placeholder="Tu nombre"
                     value={form.name}
                     onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = "#ff5833";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(255,88,51,0.12)";
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(12,12,12,0.08)";
+                      e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.04)";
+                    }}
                   />
                 </div>
                 <div style={{ flex: "1 1 160px" }}>
@@ -178,6 +214,14 @@ export default function StartContact() {
                     placeholder="tu@email.com"
                     value={form.email}
                     onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                    onFocus={(e) => {
+                      e.currentTarget.style.borderColor = "#ff5833";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(255,88,51,0.12)";
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.borderColor = "rgba(12,12,12,0.08)";
+                      e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.04)";
+                    }}
                   />
                 </div>
               </div>
@@ -207,6 +251,14 @@ export default function StartContact() {
                   placeholder="Cuéntanos tu proyecto..."
                   value={form.message}
                   onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#ff5833";
+                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(255,88,51,0.12)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "rgba(12,12,12,0.08)";
+                    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.04)";
+                  }}
                 />
               </div>
 
