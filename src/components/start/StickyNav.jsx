@@ -17,21 +17,26 @@ const scrollTo = (id) => {
 
 export default function StickyNav() {
   const active = useActiveSection();
+  const isChooseSection = active === "choose";
 
   return (
     <motion.nav
       initial={{ opacity: 0, x: -12 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.7, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
+      animate={{
+        opacity: 1,
+        x: 0,
+        left: isChooseSection ? "auto" : "clamp(20px, 5vw, 48px)",
+        right: isChooseSection ? "clamp(20px, 5vw, 48px)" : "auto",
+        alignItems: isChooseSection ? "flex-end" : "flex-start",
+      }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: active === "hero" ? 1.2 : 0 }}
       style={{
         position: "fixed",
         bottom: "clamp(28px, 5vw, 48px)",
-        left: "clamp(20px, 5vw, 48px)",
         zIndex: 100,
         display: "flex",
         flexDirection: "column",
         gap: "0",
-        alignItems: "flex-start",
         pointerEvents: "all",
       }}
     >
@@ -64,19 +69,20 @@ export default function StickyNav() {
               alignItems: "center",
               gap: isActive ? "10px" : "0px",
               transition: "font-size 0.35s ease, color 0.35s ease, gap 0.35s ease",
-              textAlign: "left",
+              textAlign: isChooseSection ? "right" : "left",
+              flexDirection: isChooseSection ? "row-reverse" : "row",
               textShadow: isActive ? "0 1px 8px rgba(0,0,0,0.6)" : "none",
             }}
           >
             {item.label}
             {isActive && (
               <motion.span
-                initial={{ opacity: 0, x: -4 }}
+                initial={{ opacity: 0, x: isChooseSection ? 4 : -4 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.25 }}
                 style={{ fontSize: "0.7em", opacity: 0.7 }}
               >
-                →
+                {isChooseSection ? "←" : "→"}
               </motion.span>
             )}
           </button>

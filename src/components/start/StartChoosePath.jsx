@@ -442,7 +442,7 @@ export default function StartChoosePath() {
             marginBottom: "clamp(12px, 2vw, 20px)",
           }}
         >
-          Siguiente paso
+          Trabaja con nosotros
         </motion.p>
 
         {/* Headline */}
