@@ -220,40 +220,6 @@ export default function StartCreadores() {
       ref={sectionRef}
       style={{ position: "relative", width: "100%", height: "100dvh", minHeight: "600px", overflow: "hidden", background: "#080808" }}
     >
-      {/* Tab buttons — top right */}
-      <div style={{ position: "absolute", top: "clamp(80px, 12vw, 120px)", right: "clamp(24px, 6vw, 56px)", zIndex: 30, display: "flex", gap: "12px" }}>
-        {[
-          { key: "creadores", label: "Creadores" },
-          { key: "stories", label: "Historias" },
-        ].map((tab) => (
-          <motion.button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            style={{
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-              fontWeight: 900,
-              fontSize: "clamp(0.7rem, 1.6vw, 0.85rem)",
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              background: activeTab === tab.key ? "#ff5833" : "transparent",
-              color: activeTab === tab.key ? "white" : "rgba(240,237,232,0.4)",
-              border: `1px solid ${activeTab === tab.key ? "#ff5833" : "rgba(240,237,232,0.2)"}`,
-              borderRadius: "99px",
-              padding: "8px 18px",
-              cursor: "pointer",
-              transition: "all 0.25s ease",
-              whiteSpace: "nowrap",
-            }}
-            whileHover={{
-              borderColor: "#ff5833",
-              color: "#f0ede8",
-            }}
-          >
-            {tab.label}
-          </motion.button>
-        ))}
-      </div>
-
       {/* ── Creadores Panel ── */}
       <AnimatePresence mode="wait">
         {activeTab === "creadores" && (
@@ -262,7 +228,7 @@ export default function StartCreadores() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.5 }}
             style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-end" }}
           >
       <div style={{ position: "relative", width: "100%", height: "100dvh", minHeight: "600px", overflow: "hidden", display: "flex", alignItems: "flex-end" }}>
@@ -276,17 +242,34 @@ export default function StartCreadores() {
         {/* Overlay */}
         <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)" }} />
 
-        {/* Slide dots */}
-        {slides.length > 1 && (
-          <div style={{ position: "absolute", top: "clamp(80px, 12vw, 120px)", right: "clamp(24px, 6vw, 56px)", zIndex: 10, display: "flex", flexDirection: "column", gap: "6px", alignItems: "flex-end" }}>
-            <p style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 700, fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,237,232,0.35)", marginBottom: "8px" }}>Creadores</p>
-            <div style={{ display: "flex", gap: "5px" }}>
-              {slides.map((_, i) => (
-                <button key={i} onClick={() => setSlideIdx(i)} style={{ width: i === slideIdx ? 16 : 5, height: 2, borderRadius: 2, background: i === slideIdx ? "#ff5833" : "rgba(240,237,232,0.25)", border: "none", cursor: "pointer", transition: "width 0.4s ease, background 0.3s ease", padding: 0 }} />
-              ))}
-            </div>
+        {/* Navigation dots and label — top right */}
+        <div style={{ position: "absolute", top: "clamp(80px, 12vw, 120px)", right: "clamp(24px, 6vw, 56px)", zIndex: 10, display: "flex", flexDirection: "column", gap: "12px", alignItems: "flex-end" }}>
+          <p style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 700, fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,237,232,0.35)", marginBottom: "0" }}>Creadores</p>
+          <div style={{ display: "flex", gap: "6px" }}>
+            {[
+              { key: "creadores", label: "Creadores" },
+              { key: "stories", label: "Historias" },
+            ].map((tab, idx) => (
+              <motion.button
+                key={tab.key}
+                onClick={() => { setActiveTab(tab.key); if (tab.key === "stories") setStoryCurrent(0); else setSlideIdx(0); }}
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.9 }}
+                style={{
+                  width: activeTab === tab.key ? 16 : 5,
+                  height: 2,
+                  borderRadius: 2,
+                  background: activeTab === tab.key ? "#ff5833" : "rgba(240,237,232,0.25)",
+                  border: "none",
+                  cursor: "pointer",
+                  transition: "width 0.4s ease, background 0.3s ease",
+                  padding: 0,
+                }}
+                title={tab.label}
+              />
+            ))}
           </div>
-        )}
+        </div>
 
         {/* Content — bottom */}
         <div style={{ position: "relative", zIndex: 10, padding: "0 clamp(24px, 6vw, 56px) clamp(40px, 8vw, 72px)", width: "100%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "clamp(16px, 3vw, 28px)" }}>
@@ -330,7 +313,7 @@ export default function StartCreadores() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.5 }}
             className="absolute inset-0 w-full overflow-hidden bg-black"
             onMouseEnter={() => setStoryPaused(true)}
             onMouseLeave={() => setStoryPaused(false)}
