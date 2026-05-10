@@ -26,7 +26,7 @@ export default function Landing() {
         splash.style.opacity = "0";
         splash.style.pointerEvents = "none";
       }
-    }, 1200);
+    }, 900);
     return () => clearTimeout(timer);
   }, []);
 
