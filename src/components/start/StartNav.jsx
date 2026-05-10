@@ -15,7 +15,7 @@ export default function StartNav() {
       >
         {/* Logo — same style as LandingNav */}
         <a
-          href="/start"
+          href="/"
           className="flex items-center select-none"
           style={{ textDecoration: "none", gap: "clamp(8px, 1.5vw, 14px)" }}
         >
