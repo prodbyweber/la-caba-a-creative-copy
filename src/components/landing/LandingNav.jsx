@@ -95,8 +95,9 @@ export default function LandingNav() {
         {/* Right side: Explorar + perfil/registro + hamburger mobile */}
         <div className="flex items-center" style={{ gap: "clamp(10px, 2vw, 20px)" }}>
 
-          {/* Explorar button — visible on all sizes */}
+          {/* Explorar button — desktop only */}
           <button
+            className="hidden sm:block"
             onClick={() => {
               if (user) {
                 navigate("/Explorar");
