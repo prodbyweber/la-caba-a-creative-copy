@@ -516,19 +516,32 @@ export default function StartChoosePath() {
                   paddingBottom: "clamp(10px, 2vw, 16px)",
                   borderBottom: "1px solid rgba(255,255,255,0.08)",
                   marginBottom: openPanel === path.key ? "0" : "clamp(10px, 2vw, 16px)",
-                  transition: "color 0.25s ease, gap 0.25s ease, textShadow 0.25s ease",
+                  transition: "color 0.35s cubic-bezier(0.22, 1, 0.36, 1), gap 0.35s cubic-bezier(0.22, 1, 0.36, 1), textShadow 0.35s ease",
                   textShadow: btnColor(path.key) === "#ff5833"
                     ? "0 0 16px rgba(255,88,51,0.5), 0 0 32px rgba(255,88,51,0.25)"
                     : "none",
                 }}
-                onMouseEnter={e => { e.currentTarget.style.color = "#f0ede8"; e.currentTarget.style.gap = "28px"; }}
-                onMouseLeave={e => { e.currentTarget.style.color = btnColor(path.key); e.currentTarget.style.gap = "16px"; }}
+                onMouseEnter={e => { 
+                  e.currentTarget.style.color = "#f0ede8"; 
+                  e.currentTarget.style.gap = "24px";
+                  e.currentTarget.style.textShadow = "0 0 20px rgba(255,88,51,0.6), 0 0 40px rgba(255,88,51,0.3)";
+                }}
+                onMouseLeave={e => { 
+                  e.currentTarget.style.color = btnColor(path.key); 
+                  e.currentTarget.style.gap = "16px";
+                  e.currentTarget.style.textShadow = btnColor(path.key) === "#ff5833"
+                    ? "0 0 16px rgba(255,88,51,0.5), 0 0 32px rgba(255,88,51,0.25)"
+                    : "none";
+                }}
               >
                 {path.label}
                 <motion.span
-                  animate={{ rotate: openPanel === path.key ? 90 : 0 }}
-                  transition={{ duration: 0.3 }}
-                  style={{ fontSize: "clamp(1.2rem, 3vw, 2rem)", opacity: 0.5, display: "inline-block" }}
+                  animate={{ 
+                    rotate: openPanel === path.key ? 90 : 0,
+                    x: openPanel === path.key ? 4 : 0,
+                  }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ fontSize: "clamp(1.2rem, 3vw, 2rem)", opacity: 0.6, display: "inline-block" }}
                 >
                   →
                 </motion.span>
