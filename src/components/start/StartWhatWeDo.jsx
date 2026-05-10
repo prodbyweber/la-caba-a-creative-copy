@@ -20,7 +20,8 @@ export default function StartWhatWeDo() {
         justifyContent: "flex-start",
         background: "#0c0c0c",
         overflow: "hidden",
-        padding: "0 clamp(24px, 8vw, 100px)",
+        overflowY: "auto",
+        padding: "clamp(80px, 10vw, 120px) clamp(24px, 8vw, 100px) 0",
       }}
     >
       {/* Subtle background texture */}
@@ -102,7 +103,7 @@ export default function StartWhatWeDo() {
       </div>
 
       {/* Brands Carousel */}
-      <div style={{ position: "absolute", bottom: "clamp(20px, 3vw, 40px)", left: 0, right: 0, width: "100%", zIndex: 5 }}>
+      <div style={{ position: "absolute", bottom: "clamp(60px, 8vw, 100px)", left: 0, right: 0, width: "100%", zIndex: 5 }}>
         <StartBrandsCarousel />
       </div>
     </section>
