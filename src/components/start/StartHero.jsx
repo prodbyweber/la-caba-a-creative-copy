@@ -31,17 +31,7 @@ function VideoBackground({ src }) {
   );
 }
 
-const scrollTo = (id) => {
-  const el = document.querySelector(id);
-  if (el) el.scrollIntoView({ behavior: "smooth" });
-};
 
-const NAV_LINKS = [
-  { label: "Quiénes Somos", href: "#about" },
-  { label: "Artistas / Creadores", href: "#artists" },
-  { label: "Marcas", href: "#brands" },
-  { label: "Comenzar →", href: "#choose", highlight: true },
-];
 
 export default function StartHero() {
   const { data: cfg } = useQuery({
@@ -77,52 +67,7 @@ export default function StartHero() {
         background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 50%, rgba(0,0,0,0.7) 100%)"
       }} />
 
-      {/* Bottom nav links — all 5 sections */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          zIndex: 10,
-          padding: "0 clamp(20px, 5vw, 48px) clamp(28px, 5vw, 48px)",
-        }}
-      >
-        <motion.nav
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          style={{ display: "flex", flexDirection: "column", gap: "0", alignItems: "flex-start" }}
-        >
-          {NAV_LINKS.map((link, i) => (
-            <motion.a
-              key={link.label}
-              href={link.href}
-              onClick={e => { e.preventDefault(); scrollTo(link.href); }}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.55, delay: 0.75 + i * 0.07, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                fontWeight: 900,
-                fontSize: "clamp(1.1rem, 3.5vw, 2rem)",
-                letterSpacing: "-0.025em",
-                color: link.highlight ? "#f0ede8" : "rgba(240,237,232,0.28)",
-                textDecoration: "none",
-                lineHeight: 1.2,
-                paddingBottom: "clamp(2px, 0.6vw, 5px)",
-                marginBottom: "clamp(2px, 0.6vw, 5px)",
-                transition: "color 0.2s ease, transform 0.2s ease",
-                display: "block",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.color = "#f0ede8"; e.currentTarget.style.transform = "translateX(5px)"; }}
-              onMouseLeave={e => { e.currentTarget.style.color = link.highlight ? "#f0ede8" : "rgba(240,237,232,0.28)"; e.currentTarget.style.transform = "translateX(0)"; }}
-            >
-              {link.label}
-            </motion.a>
-          ))}
-        </motion.nav>
-      </div>
+
     </section>
   );
 }

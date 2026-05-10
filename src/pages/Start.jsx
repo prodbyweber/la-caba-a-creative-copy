@@ -7,6 +7,7 @@ import StartArtists from "@/components/start/StartArtists";
 import StartBrands from "@/components/start/StartBrands";
 import StartChoosePath from "@/components/start/StartChoosePath";
 import StartFooter from "@/components/start/StartFooter";
+import StickyNav from "@/components/start/StickyNav";
 
 export default function Start() {
   return (
@@ -20,6 +21,7 @@ export default function Start() {
       }}
     >
       <StartNav />
+      <StickyNav />
       <StartHero />
       <StartWhatWeDo />
       <StartBrandsCarousel />
