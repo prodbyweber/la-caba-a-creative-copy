@@ -58,7 +58,6 @@ export default function Start() {
       <div className="snap-scroll-container">
         <div className="snap-section-full"><StartHero /></div>
         <div className="snap-section-full"><StartWhatWeDo /></div>
-        <div className="snap-section-auto"><StartBrandsCarousel /></div>
         <div className="snap-section-full"><StartCreadores /></div>
         <div className="snap-section-full"><StartBrands /></div>
         <div className="snap-section-auto"><StartExplorar /></div>
