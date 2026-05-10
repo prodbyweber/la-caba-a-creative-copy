@@ -108,7 +108,7 @@ export default function StartBrands() {
         style={{
           position: "relative",
           zIndex: 10,
-          padding: "0 clamp(24px, 6vw, 56px) clamp(80px, 10vw, 120px)",
+          padding: "0 clamp(24px, 6vw, 56px) clamp(140px, 16vw, 200px)",
           width: "100%",
           display: "flex",
           flexDirection: "column",

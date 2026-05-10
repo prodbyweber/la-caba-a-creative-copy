@@ -283,7 +283,7 @@ export default function StartCreadores() {
         </div>
 
         {/* Content — bottom */}
-        <div style={{ position: "relative", zIndex: 10, padding: "0 clamp(24px, 6vw, 56px) clamp(80px, 10vw, 120px)", width: "100%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "clamp(16px, 3vw, 28px)" }}>
+        <div style={{ position: "relative", zIndex: 10, padding: "0 clamp(24px, 6vw, 56px) clamp(140px, 16vw, 200px)", width: "100%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "clamp(16px, 3vw, 28px)" }}>
           {/* Rotating word */}
           <div style={{ textAlign: "right", minHeight: "clamp(2.8rem, 7vw, 5rem)", display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
             <AnimatePresence mode="wait">
