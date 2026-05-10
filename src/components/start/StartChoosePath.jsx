@@ -377,7 +377,11 @@ export default function StartChoosePath() {
     { key: "brand", label: "Marca" },
   ];
 
-  const toggle = (key) => setOpenPanel(v => v === key ? null : key);
+  const toggle = (key) => {
+    const next = openPanel === key ? null : key;
+    setOpenPanel(next);
+    window.dispatchEvent(new CustomEvent("choose-panel-change", { detail: { open: !!next } }));
+  };
 
   const btnColor = (key) => openPanel === key ? "#ff5833" : "rgba(240,237,232,0.6)";
 

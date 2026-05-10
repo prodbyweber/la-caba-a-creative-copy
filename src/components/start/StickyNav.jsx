@@ -1,5 +1,5 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import useActiveSection, { SECTIONS } from "./useActiveSection";
 
 const NAV_ITEMS = [
@@ -18,25 +18,37 @@ const scrollTo = (id) => {
 export default function StickyNav() {
   const active = useActiveSection();
   const isChooseSection = active === "choose";
+  const [panelOpen, setPanelOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = (e) => setPanelOpen(e.detail.open);
+    window.addEventListener("choose-panel-change", handler);
+    return () => window.removeEventListener("choose-panel-change", handler);
+  }, []);
+
+  const hidden = isChooseSection && panelOpen;
 
   return (
+    <AnimatePresence>
+      {!hidden && (
     <motion.nav
-      initial={{ opacity: 0, x: -12 }}
+      initial={{ opacity: 0, x: isChooseSection ? 12 : -12 }}
       animate={{
         opacity: 1,
         x: 0,
-        left: isChooseSection ? "auto" : "clamp(20px, 5vw, 48px)",
-        right: isChooseSection ? "clamp(20px, 5vw, 48px)" : "auto",
-        alignItems: isChooseSection ? "flex-end" : "flex-start",
       }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: active === "hero" ? 1.2 : 0 }}
+      exit={{ opacity: 0, x: isChooseSection ? 12 : -12, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: active === "hero" && !panelOpen ? 1.2 : 0 }}
       style={{
         position: "fixed",
         bottom: "clamp(28px, 5vw, 48px)",
+        left: isChooseSection ? "auto" : "clamp(20px, 5vw, 48px)",
+        right: isChooseSection ? "clamp(20px, 5vw, 48px)" : "auto",
         zIndex: 100,
         display: "flex",
         flexDirection: "column",
         gap: "0",
+        alignItems: isChooseSection ? "flex-end" : "flex-start",
         pointerEvents: "all",
       }}
     >
@@ -89,5 +101,7 @@ export default function StickyNav() {
         );
       })}
     </motion.nav>
+      )}
+    </AnimatePresence>
   );
 }
