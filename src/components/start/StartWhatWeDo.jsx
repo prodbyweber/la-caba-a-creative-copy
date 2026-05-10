@@ -64,21 +64,22 @@ export default function StartWhatWeDo() {
           }}
         >
           {[
-            "Fundada en 2020 en Venezuela y actualmente con base en Madrid, España, Cabaña Creative nace con la visión de conectar a una nueva generación de creadores independientes a través de la música, el cine, la moda y la cultura.",
+            "Cabaña Creative es una compañía de producción creativa y sello discográfico con base en Madrid, España.",
+            "Fundada en 2020 en Venezuela, nace con la visión de conectar a una nueva generación de creadores independientes a través de la música, el cine, la moda y la cultura.",
             "Hoy, se ha consolidado como una plataforma creativa donde convergen influencias latinas, afro y contemporáneas de la escena europea, desarrollando proyectos con identidad, dirección artística y una estética moderna y cinematográfica.",
-            "Creemos en las grandes ideas, en los jóvenes soñadores y en quienes siguen creando incluso cuando todo parece imposible.",
+            "Creemos en las grandes ideas, en los jóvenes soñadores y en quienes siguen creando",
           ].map((p, i) => (
             <p
               key={i}
               style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 900,
-                fontSize: i === 0
+                fontSize: i === 0 || i === 1
                   ? "clamp(1rem, 2.2vw, 1.5rem)"
                   : "clamp(0.8rem, 1.4vw, 1rem)",
                 lineHeight: 1.45,
-                letterSpacing: i === 0 ? "-0.03em" : "-0.015em",
-                color: i === 0 ? "#f0ede8" : "rgba(240,237,232,0.6)",
+                letterSpacing: i === 0 || i === 1 ? "-0.03em" : "-0.015em",
+                color: i === 0 || i === 1 ? "#f0ede8" : "rgba(240,237,232,0.6)",
                 margin: 0,
               }}
             >
