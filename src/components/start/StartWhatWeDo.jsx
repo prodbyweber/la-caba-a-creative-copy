@@ -63,9 +63,9 @@ export default function StartWhatWeDo() {
           }}
         >
           {[
-            "Fundada en 2020 en Venezuela, Cabaña Creative nace con la visión de conectar a una nueva generación de creadores independientes a través de la música, el cine, la moda y la cultura.",
-            "Hoy, se ha convertido en una plataforma creativa donde convergen influencias latinas, afro y contemporáneas de la escena europea, desarrollando proyectos con identidad, dirección artística y una estética moderna.",
-            "Creemos en las grandes ideas, en los jóvenes soñadores y en quienes siguen creando incluso cuando parece todo parece imposible.",
+            "Fundada en 2020 en Venezuela y actualmente con base en Madrid, España, Cabaña Creative nace con la visión de conectar a una nueva generación de creadores independientes a través de la música, el cine, la moda y la cultura.",
+            "Hoy, se ha consolidado como una plataforma creativa donde convergen influencias latinas, afro y contemporáneas de la escena europea, desarrollando proyectos con identidad, dirección artística y una estética moderna y cinematográfica.",
+            "Creemos en las grandes ideas, en los jóvenes soñadores y en quienes siguen creando incluso cuando todo parece imposible.",
           ].map((p, i) => (
             <p
               key={i}
