@@ -48,10 +48,10 @@ export default function StickyNav() {
               fontWeight: 900,
               fontSize: isActive ? "clamp(1.4rem, 4vw, 2.4rem)" : "clamp(1rem, 2.8vw, 1.6rem)",
               letterSpacing: "-0.025em",
-              color: isActive
-                ? (isChoose ? "#ff5833" : "#f0ede8")
-                : isChoose
-                  ? "rgba(255,88,51,0.45)"
+              color: isChoose
+                ? "#ff5833"
+                : isActive
+                  ? "#f0ede8"
                   : "rgba(240,237,232,0.38)",
               background: "none",
               border: "none",
