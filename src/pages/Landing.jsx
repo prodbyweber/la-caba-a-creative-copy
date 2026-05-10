@@ -11,6 +11,12 @@ import StartFooter from "@/components/start/StartFooter";
 import StickyNav from "@/components/start/StickyNav";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 
+const SnapSection = ({ children }) => (
+  <div style={{ scrollSnapAlign: "start", scrollSnapStop: "always" }}>
+    {children}
+  </div>
+);
+
 export default function Landing() {
   return (
     <div
@@ -53,12 +59,12 @@ export default function Landing() {
       `}</style>
 
       <div className="snap-scroll-container">
-        <div className="snap-section-full"><StartHero /></div>
-        <div className="snap-section-auto"><StartExplorar /></div>
-        <div className="snap-section-full"><StartCreadores /></div>
-        <div className="snap-section-full"><StartWhatWeDo /></div>
-        <div className="snap-section-full"><StartChoosePath /></div>
-        <div className="snap-section-auto"><StartFooter /></div>
+        <SnapSection><StartHero /></SnapSection>
+        <SnapSection><StartExplorar /></SnapSection>
+        <SnapSection><StartCreadores /></SnapSection>
+        <SnapSection><StartWhatWeDo /></SnapSection>
+        <SnapSection><StartChoosePath /></SnapSection>
+        <SnapSection><StartFooter /></SnapSection>
       </div>
 
       <MobileBottomNav artistId={null} isAdmin={false} />

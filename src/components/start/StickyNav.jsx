@@ -5,10 +5,9 @@ import useActiveSection, { SECTIONS } from "./useActiveSection";
 
 const NAV_ITEMS = [
   { key: "hero",     label: "Inicio" },
-  { key: "about",    label: "Quiénes Somos" },
-  { key: "artists",  label: "Creadores" },
-  { key: "brands",   label: "Marcas" },
   { key: "explorar", label: "Explorar" },
+  { key: "artists",  label: "Creadores" },
+  { key: "about",    label: "Quiénes Somos" },
   { key: "choose",   label: "Comenzar" },
 ];
 
