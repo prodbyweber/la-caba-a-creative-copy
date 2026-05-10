@@ -73,7 +73,7 @@ function CalendlyEmbed() {
         </div>
       )}
       <iframe
-        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5833&hide_gdpr_banner=0&background_color=ffffff&text_color=000000&hide_event_type_details=1"
+        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5833&hide_gdpr_banner=0&background_color=080808&text_color=f0ede8&hide_event_type_details=1"
         width="100%"
         frameBorder="0"
         scrolling={isMobile ? "auto" : "no"}
@@ -84,9 +84,9 @@ function CalendlyEmbed() {
           display: "block",
           border: "none",
           width: "100%",
-          height: isMobile ? "420px" : "400px",
+          height: isMobile ? "560px" : "540px",
           marginTop: "0",
-          minHeight: isMobile ? "420px" : "400px",
+          minHeight: isMobile ? "560px" : "540px",
         }}
       />
     </div>
@@ -121,7 +121,6 @@ function CalendlyPanel() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      style={{ background: "#ffffff", borderRadius: "12px", padding: "clamp(20px, 3vw, 32px)" }}
     >
       <CalendlyEmbed />
 
@@ -252,7 +251,7 @@ function ContactPanel() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      style={{ marginTop: "clamp(16px, 3vw, 28px)", marginBottom: "clamp(16px, 3vw, 28px)", background: "#ffffff", borderRadius: "12px", padding: "clamp(20px, 3vw, 32px)" }}
+      style={{ marginTop: "clamp(24px, 4vw, 40px)", marginBottom: "clamp(24px, 4vw, 40px)" }}
     >
       {/* Calendly para Marca */}
       <CalendlyEmbed />
