@@ -280,15 +280,15 @@ export default function StartExplorar() {
         </p>
       </motion.div>
 
-      {/* Main container: compact platform + features */}
-      <div style={{ display: "flex", gap: "clamp(24px, 4vw, 40px)", alignItems: "stretch", position: "relative", zIndex: 1, flexWrap: "wrap", minHeight: "500px" }}>
-        {/* Platform window — compact */}
+      {/* Main container: compact platform + features — same line */}
+      <div style={{ display: "flex", gap: "clamp(24px, 3vw, 32px)", alignItems: "flex-start", position: "relative", zIndex: 1, marginBottom: "clamp(40px, 6vw, 60px)" }}>
+        {/* Platform window — left side, compact */}
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.97 }}
           animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
           transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           style={{
-            flex: "1 1 minmax(300px, 1fr)", maxWidth: "800px",
+            flex: "0 1 45%", minWidth: "320px",
             borderRadius: "16px", overflow: "hidden",
             border: "1px solid rgba(255,255,255,0.07)",
             boxShadow: "0 48px 120px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.03)",
@@ -306,7 +306,7 @@ export default function StartExplorar() {
               ))}
             </div>
             <div style={{
-              flex: 1, maxWidth: 200, height: 16, borderRadius: 3,
+              flex: 1, maxWidth: 180, height: 16, borderRadius: 3,
               background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", padding: "0 8px",
             }}>
               <span style={{ fontFamily: "monospace", fontSize: "7px", color: "rgba(255,255,255,0.18)" }}>
@@ -320,18 +320,18 @@ export default function StartExplorar() {
             <FakeNav />
             <MiniHero items={items} />
 
-            <div style={{ position: "relative", paddingBottom: "clamp(16px, 3vw, 28px)", paddingTop: "6px" }}>
-              {row1.length > 0 && <NetflixRow label="En Tendencia" items={row1.slice(0, 4)} rowIndex={0} />}
-              {row2.length > 0 && <NetflixRow label="Nuevos Lanzamientos" items={row2.slice(0, 4)} rowIndex={1} />}
+            <div style={{ position: "relative", paddingBottom: "clamp(16px, 2vw, 20px)", paddingTop: "4px" }}>
+              {row1.length > 0 && <NetflixRow label="En Tendencia" items={row1.slice(0, 3)} rowIndex={0} />}
+              {row2.length > 0 && <NetflixRow label="Nuevos Lanzamientos" items={row2.slice(0, 3)} rowIndex={1} />}
 
               {items.length === 0 && (
-                <div style={{ padding: "0 16px 16px" }}>
-                  {[0, 1].map(ri => (
-                    <div key={ri} style={{ marginBottom: "12px" }}>
-                      <div style={{ height: 6, width: 80, borderRadius: 3, background: "rgba(255,255,255,0.06)", marginBottom: 6 }} />
-                      <div style={{ display: "flex", gap: 6 }}>
-                        {[...Array(4)].map((_, i) => (
-                          <div key={i} style={{ flexShrink: 0, width: 140, aspectRatio: "16/9", borderRadius: 6, background: "rgba(255,255,255,0.03)" }} />
+                <div style={{ padding: "0 12px 12px" }}>
+                  {[0].map(ri => (
+                    <div key={ri} style={{ marginBottom: "8px" }}>
+                      <div style={{ height: 6, width: 60, borderRadius: 3, background: "rgba(255,255,255,0.06)", marginBottom: 6 }} />
+                      <div style={{ display: "flex", gap: 4 }}>
+                        {[...Array(3)].map((_, i) => (
+                          <div key={i} style={{ flexShrink: 0, width: 100, aspectRatio: "16/9", borderRadius: 5, background: "rgba(255,255,255,0.03)" }} />
                         ))}
                       </div>
                     </div>
@@ -342,14 +342,14 @@ export default function StartExplorar() {
 
             {/* Bottom fade */}
             <div style={{
-              position: "absolute", bottom: 0, left: 0, right: 0, height: 60, pointerEvents: "none",
+              position: "absolute", bottom: 0, left: 0, right: 0, height: 50, pointerEvents: "none",
               background: "linear-gradient(to top, #0a0a0b 0%, transparent 100%)"
             }} />
           </div>
         </motion.div>
 
-        {/* Features panel — 2x2 grid */}
-        <div style={{ flex: "1 1 minmax(280px, 400px)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(16px, 2vw, 20px)" }}>
+        {/* Features panel — right side, 2x2 grid */}
+        <div style={{ flex: "1 1 48%", minWidth: "300px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(14px, 2vw, 18px)" }}>
           {features.map((feature, i) => (
             <motion.div
               key={i}
@@ -360,10 +360,10 @@ export default function StartExplorar() {
                 background: "linear-gradient(135deg, rgba(255,88,51,0.08) 0%, rgba(255,255,255,0.02) 100%)",
                 border: "1px solid rgba(255,88,51,0.2)",
                 borderRadius: "12px",
-                padding: "clamp(20px, 3vw, 28px)",
+                padding: "clamp(18px, 2.5vw, 24px)",
                 display: "flex",
                 flexDirection: "column",
-                gap: "10px",
+                gap: "8px",
                 backdropFilter: "blur(8px)",
                 WebkitBackdropFilter: "blur(8px)",
               }}
@@ -371,21 +371,21 @@ export default function StartExplorar() {
               <h3 style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 900,
-                fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
+                fontSize: "clamp(0.8rem, 1.6vw, 1rem)",
                 letterSpacing: "-0.02em",
                 color: "#f0ede8",
                 margin: 0,
-                lineHeight: 1.2,
+                lineHeight: 1.25,
               }}>
                 {feature.title}
               </h3>
               <p style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 300,
-                fontSize: "clamp(0.7rem, 1.3vw, 0.85rem)",
+                fontSize: "clamp(0.65rem, 1.1vw, 0.8rem)",
                 color: "rgba(240,237,232,0.55)",
                 margin: 0,
-                lineHeight: 1.5,
+                lineHeight: 1.4,
               }}>
                 {feature.desc}
               </p>
@@ -393,6 +393,36 @@ export default function StartExplorar() {
           ))}
         </div>
       </div>
+
+      {/* CTA Button */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.7, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "center" }}
+      >
+        <button
+          onClick={() => base44.auth.redirectToLogin(window.location.href)}
+          style={{
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+            fontWeight: 900,
+            fontSize: "clamp(0.85rem, 1.8vw, 1rem)",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+            background: "#ff5833",
+            color: "#fff",
+            border: "none",
+            padding: "clamp(12px, 2vw, 16px) clamp(32px, 6vw, 48px)",
+            borderRadius: "99px",
+            cursor: "pointer",
+            transition: "background 0.3s ease, transform 0.2s ease",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#e04a20"; e.currentTarget.style.transform = "scale(1.05)"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.transform = "scale(1)"; }}
+        >
+          Regístrate gratis
+        </button>
+      </motion.div>
     </section>
   );
 }
