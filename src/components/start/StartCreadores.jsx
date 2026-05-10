@@ -272,9 +272,9 @@ export default function StartCreadores() {
         </div>
 
         {/* Content — bottom */}
-        <div style={{ position: "relative", zIndex: 10, padding: "0 clamp(24px, 6vw, 56px) clamp(40px, 8vw, 72px)", width: "100%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "clamp(16px, 3vw, 28px)" }}>
+        <div style={{ position: "relative", zIndex: 10, padding: "0 clamp(24px, 6vw, 56px) clamp(40px, 8vw, 72px)", width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: "clamp(16px, 3vw, 28px)" }}>
           {/* Rotating word */}
-          <div style={{ textAlign: "right", minHeight: "clamp(2.8rem, 7vw, 5rem)", display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+          <div style={{ textAlign: "center", minHeight: "clamp(2.8rem, 7vw, 5rem)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <AnimatePresence mode="wait">
               <motion.span key={wordIdx} initial={{ opacity: 0, y: 14, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} exit={{ opacity: 0, y: -14, filter: "blur(8px)" }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                 style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: "clamp(2rem, 6vw, 4.5rem)", letterSpacing: "-0.04em", color: "#f0ede8", lineHeight: 1, display: "block" }}>
@@ -284,10 +284,10 @@ export default function StartCreadores() {
           </div>
 
           {/* Services */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "0", width: "100%", alignItems: "flex-end" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0", width: "100%", alignItems: "center", maxWidth: "600px" }}>
             {SERVICES.map((service, i) => (
               <motion.div key={service} initial={{ opacity: 0, x: 12 }} animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.6, delay: 0.3 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: "clamp(1rem, 2.5vw, 1.8rem)", letterSpacing: "-0.025em", color: "rgba(240,237,232,0.4)", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: "clamp(6px, 1.5vw, 12px)", marginBottom: "clamp(6px, 1.5vw, 12px)", lineHeight: 1.1, cursor: "default", transition: "color 0.2s ease", textAlign: "right", width: "100%" }}
+                style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: "clamp(1rem, 2.5vw, 1.8rem)", letterSpacing: "-0.025em", color: "rgba(240,237,232,0.4)", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: "clamp(6px, 1.5vw, 12px)", marginBottom: "clamp(6px, 1.5vw, 12px)", lineHeight: 1.1, cursor: "default", transition: "color 0.2s ease", textAlign: "center", width: "100%" }}
                 onMouseEnter={e => e.currentTarget.style.color = "#f0ede8"}
                 onMouseLeave={e => e.currentTarget.style.color = "rgba(240,237,232,0.4)"}>
                 {service}
@@ -296,7 +296,7 @@ export default function StartCreadores() {
           </div>
 
           <motion.p initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.8, delay: 0.9 }}
-            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 300, fontSize: "clamp(0.75rem, 1.5vw, 0.9rem)", color: "rgba(240,237,232,0.35)", maxWidth: "480px", lineHeight: 1.5, textAlign: "right", display: window.innerWidth < 768 ? "none" : "block" }}>
+            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 300, fontSize: "clamp(0.75rem, 1.5vw, 0.9rem)", color: "rgba(240,237,232,0.35)", maxWidth: "480px", lineHeight: 1.5, textAlign: "center", display: window.innerWidth < 768 ? "none" : "block" }}>
             Desarrollamos creadores con dirección artística, identidad y visión.
           </motion.p>
         </div>

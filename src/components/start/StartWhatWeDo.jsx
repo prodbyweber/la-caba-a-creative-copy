@@ -46,7 +46,7 @@ export default function StartWhatWeDo() {
             letterSpacing: "0.3em",
             textTransform: "uppercase",
             color: "rgba(240,237,232,0.3)",
-            marginBottom: "clamp(20px, 4vw, 40px)",
+            marginBottom: "clamp(8px, 2vw, 16px)",
           }}
         >
           Quiénes Somos
