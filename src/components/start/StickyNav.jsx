@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import useActiveSection, { SECTIONS } from "./useActiveSection";
 
 const NAV_ITEMS = [
-  { key: "hero",    label: "Inicio" },
-  { key: "about",   label: "Quiénes Somos" },
-  { key: "artists", label: "Artistas" },
-  { key: "brands",  label: "Marcas" },
-  { key: "choose",  label: "Comenzar" },
+  { key: "hero",     label: "Inicio" },
+  { key: "about",    label: "Quiénes Somos" },
+  { key: "artists",  label: "Artistas" },
+  { key: "brands",   label: "Marcas" },
+  { key: "explorar", label: "Explorar" },
+  { key: "choose",   label: "Comenzar" },
 ];
 
 const scrollTo = (id) => {

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 
 const SECTIONS = [
-  { key: "hero",    href: "#hero" },
-  { key: "about",   href: "#about" },
-  { key: "artists", href: "#artists" },
-  { key: "brands",  href: "#brands" },
-  { key: "choose",  href: "#choose" },
+  { key: "hero",     href: "#hero" },
+  { key: "about",    href: "#about" },
+  { key: "artists",  href: "#artists" },
+  { key: "brands",   href: "#brands" },
+  { key: "explorar", href: "#explorar" },
+  { key: "choose",   href: "#choose" },
 ];
 
 export { SECTIONS };
