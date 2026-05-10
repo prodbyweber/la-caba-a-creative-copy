@@ -280,15 +280,16 @@ export default function StartExplorar() {
         </p>
       </motion.div>
 
-      {/* Main container: compact platform + features — same line */}
-      <div style={{ display: "flex", gap: "clamp(24px, 3vw, 32px)", alignItems: "flex-start", position: "relative", zIndex: 1, marginBottom: "clamp(40px, 6vw, 60px)" }}>
+      {/* Main container: desktop layout (platform left, features right as column) */}
+      <div style={{ display: "flex", gap: "clamp(24px, 3vw, 32px)", alignItems: "flex-start", position: "relative", zIndex: 1, marginBottom: "clamp(40px, 6vw, 60px)", flexWrap: "wrap", justifyContent: "center" }}>
         {/* Platform window — left side, compact */}
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.97 }}
           animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
           transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           style={{
-            flex: "0 1 45%", minWidth: "320px",
+            flex: window.innerWidth >= 1024 ? "0 1 45%" : "1 1 100%",
+            minWidth: "320px",
             borderRadius: "16px", overflow: "hidden",
             border: "1px solid rgba(255,255,255,0.07)",
             boxShadow: "0 48px 120px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.03)",
@@ -348,8 +349,14 @@ export default function StartExplorar() {
           </div>
         </motion.div>
 
-        {/* Features panel — right side, 2x2 grid */}
-        <div style={{ flex: "1 1 48%", minWidth: "300px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(14px, 2vw, 18px)" }}>
+        {/* Features panel — vertical column, same width as platform */}
+        <div style={{ 
+          flex: window.innerWidth >= 1024 ? "0 1 45%" : "1 1 100%",
+          minWidth: "320px",
+          display: "flex", 
+          flexDirection: "column", 
+          gap: "clamp(16px, 2.5vw, 20px)" 
+        }}>
           {features.map((feature, i) => (
             <motion.div
               key={i}
@@ -360,10 +367,10 @@ export default function StartExplorar() {
                 background: "linear-gradient(135deg, rgba(255,88,51,0.08) 0%, rgba(255,255,255,0.02) 100%)",
                 border: "1px solid rgba(255,88,51,0.2)",
                 borderRadius: "12px",
-                padding: "clamp(18px, 2.5vw, 24px)",
+                padding: "clamp(20px, 3vw, 28px)",
                 display: "flex",
                 flexDirection: "column",
-                gap: "8px",
+                gap: "12px",
                 backdropFilter: "blur(8px)",
                 WebkitBackdropFilter: "blur(8px)",
               }}
@@ -371,21 +378,21 @@ export default function StartExplorar() {
               <h3 style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 900,
-                fontSize: "clamp(0.8rem, 1.6vw, 1rem)",
-                letterSpacing: "-0.02em",
+                fontSize: "clamp(0.95rem, 1.8vw, 1.15rem)",
+                letterSpacing: "-0.025em",
                 color: "#f0ede8",
                 margin: 0,
-                lineHeight: 1.25,
+                lineHeight: 1.3,
               }}>
                 {feature.title}
               </h3>
               <p style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 300,
-                fontSize: "clamp(0.65rem, 1.1vw, 0.8rem)",
+                fontSize: "clamp(0.75rem, 1.3vw, 0.9rem)",
                 color: "rgba(240,237,232,0.55)",
                 margin: 0,
-                lineHeight: 1.4,
+                lineHeight: 1.5,
               }}>
                 {feature.desc}
               </p>
@@ -394,33 +401,42 @@ export default function StartExplorar() {
         </div>
       </div>
 
-      {/* CTA Button */}
+      {/* CTA Button — premium minimal style */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.7, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "center" }}
+        style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "center", marginTop: "clamp(20px, 3vw, 40px)" }}
       >
         <button
           onClick={() => base44.auth.redirectToLogin(window.location.href)}
           style={{
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            fontWeight: 900,
-            fontSize: "clamp(0.85rem, 1.8vw, 1rem)",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            background: "#ff5833",
-            color: "#fff",
-            border: "none",
-            padding: "clamp(12px, 2vw, 16px) clamp(32px, 6vw, 48px)",
+            fontWeight: 700,
+            fontSize: "clamp(0.8rem, 1.5vw, 0.95rem)",
+            letterSpacing: "0.05em",
+            background: "transparent",
+            color: "#f0ede8",
+            border: "1px solid rgba(240,237,232,0.25)",
+            padding: "clamp(10px, 1.8vw, 14px) clamp(28px, 5vw, 42px)",
             borderRadius: "99px",
             cursor: "pointer",
-            transition: "background 0.3s ease, transform 0.2s ease",
+            transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = "#e04a20"; e.currentTarget.style.transform = "scale(1.05)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.transform = "scale(1)"; }}
+          onMouseEnter={e => { 
+            e.currentTarget.style.background = "rgba(240,237,232,0.05)"; 
+            e.currentTarget.style.borderColor = "rgba(240,237,232,0.45)";
+            e.currentTarget.style.color = "#fff";
+          }}
+          onMouseLeave={e => { 
+            e.currentTarget.style.background = "transparent"; 
+            e.currentTarget.style.borderColor = "rgba(240,237,232,0.25)";
+            e.currentTarget.style.color = "#f0ede8";
+          }}
         >
-          Regístrate gratis
+          Acceder
         </button>
       </motion.div>
     </section>
