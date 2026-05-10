@@ -92,6 +92,26 @@ function CalendlyEmbed() {
 }
 
 function CalendlyPanel() {
+  const [form, setForm] = useState({ name: "", lastName: "", email: "", phone: "", message: "" });
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.name || !form.email || !form.message) { setError("Completa todos los campos."); return; }
+    setSending(true);
+    setError("");
+    await base44.entities.ContactLead.create({
+      name: `${form.name} ${form.lastName}`.trim(),
+      email: form.email,
+      message: form.message + (form.phone ? `\n\nTeléfono: ${form.phone}` : ""),
+      status: "Nuevo",
+    });
+    setSending(false);
+    setSent(true);
+  };
+
   return (
     <motion.div
       key="calendly"
@@ -101,6 +121,102 @@ function CalendlyPanel() {
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
       <CalendlyEmbed />
+
+      {/* Divider */}
+      <div style={{ height: "1px", background: "rgba(240,237,232,0.08)", margin: "clamp(20px, 3vw, 32px) 0" }} />
+
+      {/* Email */}
+      <p style={{
+        fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        fontWeight: 300,
+        fontSize: "clamp(0.8rem, 1.5vw, 0.95rem)",
+        color: "rgba(240,237,232,0.45)",
+        lineHeight: 1.5,
+        marginBottom: "clamp(6px, 1.5vw, 10px)",
+      }}>
+        ¿Prefieres escribirnos? Envíanos tu proyecto o brief a{" "}
+        <a
+          href="mailto:hola@cabanacreative.es"
+          style={{ color: "#ff5833", textDecoration: "none", fontWeight: 600, transition: "opacity 0.2s ease" }}
+          onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
+          onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+        >
+          hola@cabanacreative.es
+        </a>
+      </p>
+
+      {/* Divider */}
+      <div style={{ height: "1px", background: "rgba(240,237,232,0.08)", margin: "clamp(20px, 3vw, 32px) 0" }} />
+
+      {/* Form */}
+      {sent ? (
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+            fontWeight: 700,
+            fontSize: "clamp(1rem, 2.5vw, 1.3rem)",
+            color: "#f0ede8",
+            letterSpacing: "-0.02em",
+            paddingBottom: "32px",
+          }}
+        >
+          Recibido. Te contactamos pronto.
+        </motion.p>
+      ) : (
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "clamp(16px, 3vw, 24px)", paddingBottom: "32px" }}>
+          <div style={{ display: "flex", gap: "clamp(16px, 4vw, 40px)", flexWrap: "wrap" }}>
+            <div style={{ flex: "1 1 180px" }}>
+              <label style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,237,232,0.3)", display: "block", marginBottom: "8px" }}>Nombre</label>
+              <input style={inputStyle} placeholder="Tu nombre" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+            </div>
+            <div style={{ flex: "1 1 180px" }}>
+              <label style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,237,232,0.3)", display: "block", marginBottom: "8px" }}>Apellidos</label>
+              <input style={inputStyle} placeholder="Tus apellidos" value={form.lastName} onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))} />
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: "clamp(16px, 4vw, 40px)", flexWrap: "wrap" }}>
+            <div style={{ flex: "1 1 180px" }}>
+              <label style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,237,232,0.3)", display: "block", marginBottom: "8px" }}>Email</label>
+              <input type="email" style={inputStyle} placeholder="tu@email.com" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
+            </div>
+            <div style={{ flex: "1 1 180px" }}>
+              <label style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,237,232,0.3)", display: "block", marginBottom: "8px" }}>Teléfono</label>
+              <PhoneInput value={form.phone} onChange={val => setForm(f => ({ ...f, phone: val }))} inputStyle={{ ...inputStyle }} />
+            </div>
+          </div>
+          <div>
+            <label style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,237,232,0.3)", display: "block", marginBottom: "8px" }}>Cuéntanos tu proyecto</label>
+            <textarea rows={4} style={{ ...inputStyle, resize: "none", borderBottom: "1px solid rgba(240,237,232,0.15)" }} placeholder="¿Quién eres? ¿Qué quieres crear? ¿Cuándo te gustaría empezar?" value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} />
+          </div>
+          {error && <p style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "12px", color: "#ff5833", margin: 0 }}>{error}</p>}
+          <div>
+            <button
+              type="submit"
+              disabled={sending}
+              style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontWeight: 900,
+                fontSize: "clamp(0.8rem, 1.8vw, 1rem)",
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                background: "#f0ede8",
+                color: "#0c0c0c",
+                border: "none",
+                padding: "clamp(12px, 2vw, 16px) clamp(24px, 4vw, 40px)",
+                cursor: sending ? "wait" : "pointer",
+                opacity: sending ? 0.5 : 1,
+                transition: "background 0.2s ease",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.color = "#fff"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#f0ede8"; e.currentTarget.style.color = "#0c0c0c"; }}
+            >
+              {sending ? "Enviando..." : "Enviar →"}
+            </button>
+          </div>
+        </form>
+      )}
     </motion.div>
   );
 }
