@@ -88,7 +88,8 @@ export default function StartBrands() {
         style={{
           position: "absolute",
           top: "clamp(80px, 12vw, 120px)",
-          left: "clamp(24px, 6vw, 56px)",
+          right: "clamp(24px, 6vw, 56px)",
+          left: "auto",
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 700,
           fontSize: "10px",
@@ -96,6 +97,7 @@ export default function StartBrands() {
           textTransform: "uppercase",
           color: "rgba(240,237,232,0.35)",
           zIndex: 10,
+          textAlign: "right",
         }}
       >
         Marcas
@@ -110,14 +112,15 @@ export default function StartBrands() {
           width: "100%",
           display: "flex",
           flexDirection: "column",
+          alignItems: "flex-end",
           gap: "clamp(20px, 4vw, 36px)",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0", width: "100%", alignItems: "flex-end" }}>
           {SERVICES.map((service, i) => (
             <motion.div
               key={service}
-              initial={{ opacity: 0, x: -12 }}
+              initial={{ opacity: 0, x: 12 }}
               animate={inView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.3 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
               style={{
@@ -132,6 +135,8 @@ export default function StartBrands() {
                 lineHeight: 1.1,
                 cursor: "default",
                 transition: "color 0.2s ease",
+                textAlign: "right",
+                width: "100%",
               }}
               onMouseEnter={e => e.currentTarget.style.color = "#f0ede8"}
               onMouseLeave={e => e.currentTarget.style.color = "rgba(240,237,232,0.4)"}
@@ -152,6 +157,7 @@ export default function StartBrands() {
             color: "rgba(240,237,232,0.35)",
             maxWidth: "480px",
             lineHeight: 1.5,
+            textAlign: "right",
           }}
         >
           Construimos campañas visuales que conectan cultura, estética y comunidad.

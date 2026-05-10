@@ -39,28 +39,29 @@ export default function Start() {
             -webkit-overflow-scrolling: touch;
             overscroll-behavior-y: contain;
           }
-          .snap-scroll-container > div {
+          .snap-section-full {
             scroll-snap-align: start;
             scroll-snap-stop: always;
             height: 100dvh;
             overflow: hidden;
           }
-        }
-        @media (min-width: 768px) {
-          .snap-scroll-container {
-            /* no snap on desktop */
+          .snap-section-auto {
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            height: auto;
+            overflow: hidden;
           }
         }
       `}</style>
 
       <div className="snap-scroll-container">
-        <div><StartHero /></div>
-        <div><StartWhatWeDo /></div>
-        <div><StartBrandsCarousel /></div>
-        <div><StartArtists /></div>
-        <div><StartBrands /></div>
-        <div><StartChoosePath /></div>
-        <div><StartFooter /></div>
+        <div className="snap-section-full"><StartHero /></div>
+        <div className="snap-section-full"><StartWhatWeDo /></div>
+        <div className="snap-section-auto"><StartBrandsCarousel /></div>
+        <div className="snap-section-full"><StartArtists /></div>
+        <div className="snap-section-full"><StartBrands /></div>
+        <div className="snap-section-full"><StartChoosePath /></div>
+        <div className="snap-section-auto"><StartFooter /></div>
       </div>
     </div>
   );
