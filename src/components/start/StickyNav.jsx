@@ -52,7 +52,7 @@ export default function StickyNav({ showMoreInfo = false }) {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: active === "hero" && !panelOpen ? 1.2 : 0 }}
       style={{
         position: "fixed",
-        bottom: "max(calc(65px + env(safe-area-inset-bottom, 0px) + 12px), clamp(28px, 5vw, 48px))",
+        bottom: "max(calc(65px + env(safe-area-inset-bottom, 0px) + 12px), clamp(48px, 8vw, 72px))",
         left: isChooseSection ? "auto" : "clamp(20px, 5vw, 48px)",
         right: isChooseSection ? "clamp(20px, 5vw, 48px)" : "auto",
         zIndex: 100,
@@ -74,7 +74,7 @@ export default function StickyNav({ showMoreInfo = false }) {
               style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 900,
-                fontSize: isActive ? "clamp(1.4rem, 4vw, 2.4rem)" : "clamp(1rem, 2.8vw, 1.6rem)",
+                fontSize: isActive ? "clamp(1.6rem, 5.5vw, 2.8rem)" : "clamp(1.2rem, 3.5vw, 1.8rem)",
                 letterSpacing: "-0.025em",
                 color: isChoose
                   ? "#ff5833"
@@ -86,8 +86,8 @@ export default function StickyNav({ showMoreInfo = false }) {
                 cursor: "pointer",
                 padding: 0,
                 lineHeight: 1.2,
-                paddingBottom: "clamp(2px, 0.5vw, 5px)",
-                marginBottom: "clamp(1px, 0.4vw, 4px)",
+                paddingBottom: "clamp(3px, 0.7vw, 6px)",
+                marginBottom: "clamp(2px, 0.6vw, 6px)",
                 display: "flex",
                 alignItems: "center",
                 gap: isActive ? "10px" : "0px",

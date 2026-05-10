@@ -296,7 +296,7 @@ export default function StartCreadores() {
           </div>
 
           <motion.p initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}} transition={{ duration: 0.8, delay: 0.9 }}
-            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 300, fontSize: "clamp(0.75rem, 1.5vw, 0.9rem)", color: "rgba(240,237,232,0.35)", maxWidth: "480px", lineHeight: 1.5, textAlign: "right" }}>
+            style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 300, fontSize: "clamp(0.75rem, 1.5vw, 0.9rem)", color: "rgba(240,237,232,0.35)", maxWidth: "480px", lineHeight: 1.5, textAlign: "right", display: window.innerWidth < 768 ? "none" : "block" }}>
             Desarrollamos creadores con dirección artística, identidad y visión.
           </motion.p>
         </div>

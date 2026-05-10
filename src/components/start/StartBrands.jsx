@@ -158,6 +158,7 @@ export default function StartBrands() {
             maxWidth: "480px",
             lineHeight: 1.5,
             textAlign: "right",
+            display: window.innerWidth < 768 ? "none" : "block",
           }}
         >
           Construimos campañas visuales que conectan cultura, estética y comunidad.
