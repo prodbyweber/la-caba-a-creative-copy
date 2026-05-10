@@ -198,46 +198,55 @@ function CinematicCard({ item, index, rowIndex }) {
   
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: rowIndex * 0.05 + index * 0.03, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.6, delay: rowIndex * 0.04 + index * 0.05, ease: [0.22, 1, 0.36, 1] }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="relative rounded-lg overflow-hidden cursor-default group"
+      className="relative rounded-lg overflow-hidden cursor-default"
       style={{
-        aspectRatio: "16/9",
-        transform: hovered ? "scale(1.04)" : "scale(1)",
-        transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)",
+        aspectRatio: "16/10",
+        transform: hovered ? "scale(1.05)" : "scale(1)",
+        transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
+        boxShadow: hovered ? "0 20px 40px rgba(255,88,51,0.15)" : "0 8px 24px rgba(0,0,0,0.3)",
       }}
     >
+      {/* Image/Video background */}
       {thumb ? (
         <img 
           src={thumb} 
           alt="" 
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ filter: hovered ? "brightness(1.1) saturate(1.2)" : "brightness(0.85) saturate(0.9)" }}
+          style={{ 
+            filter: hovered ? "brightness(1.15) saturate(1.3) contrast(1.1)" : "brightness(0.8) saturate(0.85)",
+            transition: "filter 0.3s ease"
+          }}
         />
       ) : (
-        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(255,88,51,0.1) 0%, rgba(8,8,8,0.5) 100%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(255,88,51,0.12) 0%, rgba(8,8,8,0.6) 100%)" }} />
       )}
       
-      {/* Cinematic gradient overlay */}
+      {/* Premium cinematic overlay */}
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(180deg, transparent 0%, rgba(8,8,8,0.4) 50%, rgba(8,8,8,0.9) 100%)"
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.3) 40%, rgba(8,8,8,0.85) 100%)",
+        transition: "all 0.3s ease"
       }} />
       
-      {/* Bottom content on hover */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={hovered ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-        transition={{ duration: 0.2 }}
-        className="absolute bottom-0 left-0 right-0 p-3 sm:p-4"
-      >
-        <h3 className="text-white font-bold text-xs sm:text-sm line-clamp-2"
-          style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.01em" }}>
+      {/* Border accent on hover */}
+      {hovered && (
+        <div className="absolute inset-0 rounded-lg pointer-events-none" style={{
+          border: "1.5px solid rgba(255,88,51,0.3)",
+          animation: "none",
+        }} />
+      )}
+      
+      {/* Bottom content - Always visible */}
+      <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3" style={{ zIndex: 2 }}>
+        <h3 className="text-white font-bold text-xs line-clamp-2 leading-tight"
+          style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.015em", fontSize: "clamp(0.65rem, 1.2vw, 0.85rem)" }}>
           {item.title}
         </h3>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
@@ -281,9 +290,8 @@ export default function StartExplorar() {
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "flex-start",
-        padding: "clamp(40px, 8vw, 80px) clamp(24px, 6vw, 56px)",
-        gap: "clamp(28px, 5vw, 48px)",
+        padding: "clamp(40px, 6vw, 80px) clamp(24px, 6vw, 56px)",
+        gap: "clamp(20px, 4vw, 40px)",
       }}
     >
       {/* Label + headline */}
@@ -297,101 +305,106 @@ export default function StartExplorar() {
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 700, fontSize: "10px", letterSpacing: "0.35em",
           textTransform: "uppercase", color: "#ff5833",
-          marginBottom: "clamp(10px, 2vw, 16px)",
+          marginBottom: "8px",
         }}>
           Explorar
         </p>
         <h2 style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 900,
-          fontSize: "clamp(2rem, 5vw, 3.5rem)",
+          fontSize: "clamp(2rem, 5vw, 3.2rem)",
           letterSpacing: "-0.04em",
           lineHeight: 0.95,
           color: "#f0ede8",
-          marginBottom: "clamp(12px, 2vw, 20px)",
         }}>
           Atrévete a explorar
         </h2>
       </motion.div>
 
-      {/* Cinematic cards grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={isInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(clamp(140px, 20vw, 200px), 1fr))",
-          gap: "clamp(12px, 2vw, 20px)",
-          width: "100%",
-          position: "relative",
-          zIndex: 1,
-          marginBottom: "clamp(40px, 6vw, 80px)",
-        }}
-      >
-        {withThumb.slice(0, 12).map((item, i) => (
-          <CinematicCard key={item.id || i} item={item} index={i} rowIndex={Math.floor(i / 4)} />
-        ))}
-      </motion.div>
+      {/* Two column layout: Cards left, Features right */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: "clamp(24px, 4vw, 48px)",
+        position: "relative",
+        zIndex: 1,
+        alignItems: "start",
+      }}>
+        {/* LEFT: Cinematic cards grid */}
+        <motion.div
+          initial={{ opacity: 0, x: -40 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: "clamp(10px, 2vw, 16px)",
+            width: "100%",
+          }}
+        >
+          {withThumb.slice(0, 8).map((item, i) => (
+            <CinematicCard key={item.id || i} item={item} index={i} rowIndex={Math.floor(i / 2)} />
+          ))}
+        </motion.div>
 
-      {/* Features grid - 4 premium cards */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={isInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          gap: "clamp(16px, 2vw, 24px)",
-          width: "100%",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
+        {/* RIGHT: Features premium cards */}
+        <motion.div
+          initial={{ opacity: 0, x: 40 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "clamp(12px, 2vw, 16px)",
+            width: "100%",
+            height: "100%",
+          }}
+        >
           {FEATURES.map((feature, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 16 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.4 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.6, delay: 0.3 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
               style={{
-                padding: "clamp(20px, 3vw, 28px)",
-                borderRadius: "10px",
-                border: "1px solid rgba(255,88,51,0.2)",
-                background: "linear-gradient(135deg, rgba(255,88,51,0.05) 0%, rgba(255,88,51,0.02) 100%)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
+                padding: "clamp(14px, 2.5vw, 18px)",
+                borderRadius: "8px",
+                border: "1px solid rgba(255,88,51,0.25)",
+                background: "linear-gradient(135deg, rgba(255,88,51,0.06) 0%, rgba(255,88,51,0.02) 100%)",
+                backdropFilter: "blur(10px)",
+                WebkitBackdropFilter: "blur(10px)",
                 transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
                 cursor: "default",
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = "rgba(255,88,51,0.4)";
+                e.currentTarget.style.borderColor = "rgba(255,88,51,0.45)";
                 e.currentTarget.style.background = "linear-gradient(135deg, rgba(255,88,51,0.12) 0%, rgba(255,88,51,0.06) 100%)";
-                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.transform = "translateX(6px)";
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.borderColor = "rgba(255,88,51,0.2)";
-                e.currentTarget.style.background = "linear-gradient(135deg, rgba(255,88,51,0.05) 0%, rgba(255,88,51,0.02) 100%)";
-                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.borderColor = "rgba(255,88,51,0.25)";
+                e.currentTarget.style.background = "linear-gradient(135deg, rgba(255,88,51,0.06) 0%, rgba(255,88,51,0.02) 100%)";
+                e.currentTarget.style.transform = "translateX(0)";
               }}
             >
               <h3 style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 700,
-                fontSize: "clamp(1rem, 2.2vw, 1.2rem)",
+                fontSize: "clamp(0.85rem, 1.8vw, 1rem)",
                 color: "#f0ede8",
-                marginBottom: "clamp(10px, 2vw, 16px)",
-                lineHeight: 1.35,
+                marginBottom: "clamp(4px, 1vw, 8px)",
+                lineHeight: 1.3,
                 letterSpacing: "-0.01em",
+                margin: "0 0 clamp(4px, 1vw, 8px) 0",
               }}>
                 {feature.title}
               </h3>
               <p style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 300,
-                fontSize: "clamp(0.8rem, 1.5vw, 0.95rem)",
-                color: "rgba(240,237,232,0.6)",
-                lineHeight: 1.6,
+                fontSize: "clamp(0.7rem, 1.2vw, 0.8rem)",
+                color: "rgba(240,237,232,0.55)",
+                lineHeight: 1.4,
                 margin: 0,
               }}>
                 {feature.subtitle}
@@ -399,6 +412,7 @@ export default function StartExplorar() {
             </motion.div>
           ))}
         </motion.div>
+      </div>
     </section>
   );
 }
