@@ -85,7 +85,7 @@ export default function StickyNav({ showMoreInfo = false }) {
                     fontWeight: 900,
                     fontSize: isActive ? "clamp(1.6rem, 5.5vw, 2.8rem)" : "clamp(1.2rem, 3.5vw, 1.8rem)",
                     letterSpacing: "-0.025em",
-                    color: isChoose
+                    color: (isChoose || item.key === "artists" || item.key === "brands")
                       ? "#ff5833"
                       : isActive
                         ? "#f0ede8"
@@ -103,11 +103,15 @@ export default function StickyNav({ showMoreInfo = false }) {
                     transition: "font-size 0.35s ease, color 0.35s ease, gap 0.35s ease",
                     textAlign: isChooseSection ? "right" : "left",
                     flexDirection: isChooseSection ? "row-reverse" : "row",
-                    textShadow: isActive ? "0 1px 8px rgba(0,0,0,0.6)" : "none",
+                    textShadow: (isChoose || item.key === "artists" || item.key === "brands") && isActive 
+                      ? "0 0 12px rgba(255,88,51,0.4), 0 1px 8px rgba(0,0,0,0.6)" 
+                      : isActive 
+                        ? "0 1px 8px rgba(0,0,0,0.6)" 
+                        : "none",
                   }}
                 >
                   {item.label}
-                  {isActive && (isChoose || item.key === "artists" || item.key === "brands") && (
+                  {isActive && isChoose && (
                     <motion.span
                       initial={{ opacity: 0, x: isChooseSection ? 4 : -4 }}
                       animate={{ opacity: 1, x: 0 }}
