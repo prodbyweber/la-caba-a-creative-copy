@@ -20,13 +20,21 @@ export default function StickyNav() {
   const isChooseSection = active === "choose";
   const [panelOpen, setPanelOpen] = useState(false);
 
+  const [storiesOpen, setStoriesOpen] = useState(false);
+
   useEffect(() => {
     const handler = (e) => setPanelOpen(e.detail.open);
     window.addEventListener("choose-panel-change", handler);
     return () => window.removeEventListener("choose-panel-change", handler);
   }, []);
 
-  const hidden = isChooseSection && panelOpen;
+  useEffect(() => {
+    const handler = (e) => setStoriesOpen(e.detail.open);
+    window.addEventListener("stories-panel-change", handler);
+    return () => window.removeEventListener("stories-panel-change", handler);
+  }, []);
+
+  const hidden = (isChooseSection && panelOpen) || storiesOpen;
 
   return (
     <AnimatePresence>

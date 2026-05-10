@@ -10,7 +10,6 @@ import StartBrands from "@/components/start/StartBrands";
 import StartExplorar from "@/components/start/StartExplorar";
 import StartChoosePath from "@/components/start/StartChoosePath";
 import StartFooter from "@/components/start/StartFooter";
-import StoriesSection from "@/components/landing/StoriesSection.jsx";
 import StickyNav from "@/components/start/StickyNav";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 
@@ -62,11 +61,6 @@ export default function Landing() {
         <div className="snap-section-auto"><StartBrandsCarousel /></div>
         <div className="snap-section-full"><StartCreadores /></div>
         <div className="snap-section-full"><StartChoosePath /></div>
-
-        {/* Historias que hemos contado — preservado de la landing original */}
-        <div id="stories" className="snap-section-full">
-          <StoriesSection />
-        </div>
 
         <div className="snap-section-auto"><StartFooter /></div>
       </div>
