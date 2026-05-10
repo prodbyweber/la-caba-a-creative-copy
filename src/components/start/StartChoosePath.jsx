@@ -40,7 +40,7 @@ function CalendlyEmbed() {
   const [loaded, setLoaded] = React.useState(false);
   // Calendly needs ~660px on desktop, ~700px on mobile (no side panel)
   const isMobile = typeof window !== "undefined" && window.innerWidth < 600;
-  const embedHeight = isMobile ? 680 : 660;
+  const embedHeight = isMobile ? 620 : 580;
 
   return (
     <div
@@ -53,6 +53,7 @@ function CalendlyEmbed() {
         width: "100%",
         position: "relative",
         minHeight: `${embedHeight}px`,
+        marginTop: "0",
       }}
     >
       {!loaded && (
@@ -69,7 +70,7 @@ function CalendlyEmbed() {
         </div>
       )}
       <iframe
-        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&hide_event_type_details=0&background_color=0c0c0c&text_color=f0ede8"
+        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1&background_color=0c0c0c&text_color=f0ede8"
         width="100%"
         frameBorder="0"
         scrolling="no"
