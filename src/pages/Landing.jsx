@@ -35,6 +35,9 @@ export default function Landing() {
       <StickyNav showMoreInfo={true} />
 
       <style>{`
+        .snap-scroll-container {
+          overflow-x: hidden;
+        }
         @media (max-width: 767px) {
           .snap-scroll-container {
             height: 100dvh;
