@@ -214,6 +214,17 @@ export default function StartCreadores() {
   const currentUrl = typeof slides[slideIdx] === "string" ? slides[slideIdx] : slides[slideIdx]?.url;
   const story = stories[storyCurrent];
 
+  // Preload carousel images
+  React.useEffect(() => {
+    slides.slice(0, 3).forEach(slide => {
+      const url = typeof slide === "string" ? slide : slide?.url;
+      if (url && !isVideo(url)) {
+        const img = new Image();
+        img.src = url;
+      }
+    });
+  }, [slides]);
+
   return (
     <section
       id="artists"

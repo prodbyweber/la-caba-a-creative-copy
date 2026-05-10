@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import StartNav from "@/components/start/StartNav";
 import StartHero from "@/components/start/StartHero";
 import StartWhatWeDo from "@/components/start/StartWhatWeDo";
@@ -10,6 +10,7 @@ import StartChoosePath from "@/components/start/StartChoosePath";
 
 import StartFooter from "@/components/start/StartFooter";
 import StickyNav from "@/components/start/StickyNav";
+import SplashScreen from "@/components/common/SplashScreen";
 
 const SnapSection = ({ children }) => (
   <div style={{ scrollSnapAlign: "start", scrollSnapStop: "always" }}>
@@ -18,6 +19,17 @@ const SnapSection = ({ children }) => (
 );
 
 export default function Start() {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const splash = document.getElementById("cabana-splash");
+      if (splash) {
+        splash.style.opacity = "0";
+        splash.style.pointerEvents = "none";
+      }
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div
       style={{
@@ -28,6 +40,8 @@ export default function Start() {
         minHeight: "100dvh",
       }}
     >
+      <SplashScreen />
+      
       <StartNav />
       <StickyNav />
 

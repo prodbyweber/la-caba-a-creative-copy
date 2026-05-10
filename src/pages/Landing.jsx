@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import LandingNav from "@/components/landing/LandingNav";
@@ -10,6 +10,7 @@ import StartChoosePath from "@/components/start/StartChoosePath";
 import StartFooter from "@/components/start/StartFooter";
 import LandingStickyNav from "@/components/landing/LandingStickyNav";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
+import SplashScreen from "@/components/common/SplashScreen";
 
 const SnapSection = ({ children }) => (
   <div style={{ scrollSnapAlign: "start", scrollSnapStop: "always" }}>
@@ -18,6 +19,17 @@ const SnapSection = ({ children }) => (
 );
 
 export default function Landing() {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const splash = document.getElementById("cabana-splash");
+      if (splash) {
+        splash.style.opacity = "0";
+        splash.style.pointerEvents = "none";
+      }
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div
       style={{
@@ -28,6 +40,8 @@ export default function Landing() {
         minHeight: "100dvh",
       }}
     >
+      <SplashScreen />
+      
       {/* Nav original de la landing (con menú hamburguesa, botón Explorar, perfil, registro) */}
       <LandingNav />
 

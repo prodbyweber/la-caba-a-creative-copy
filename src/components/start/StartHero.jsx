@@ -55,11 +55,14 @@ export default function StartHero() {
         background: "#080808",
       }}
     >
+      {/* Preload image */}
+      <link rel="preload" as="image" href={fallbackImage} />
+      
       {/* Background media */}
       {videoSrc ? (
         <VideoBackground src={videoSrc} />
       ) : (
-        <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover" loading="eager" />
       )}
 
       {/* Overlay */}

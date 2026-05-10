@@ -188,6 +188,18 @@ export default function StartExplorar() {
   const row2 = withThumb.slice(7, 14);
   const row3 = withThumb.slice(14, 21);
 
+  // Preload hero images
+  React.useEffect(() => {
+    if (items.length > 0) {
+      items.slice(0, 4).forEach(item => {
+        if (item.thumbnail_url || item.youtube_url) {
+          const img = new Image();
+          img.src = item.thumbnail_url || `https://img.youtube.com/vi/${item.youtube_url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1]}/hqdefault.jpg`;
+        }
+      });
+    }
+  }, [items]);
+
   return (
     <section
       id="explorar"
