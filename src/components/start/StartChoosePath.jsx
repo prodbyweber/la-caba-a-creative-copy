@@ -38,23 +38,32 @@ const inputStyle = {
 
 function CalendlyEmbed() {
   const [loaded, setLoaded] = React.useState(false);
-  // Calendly needs ~660px on desktop, ~700px on mobile (no side panel)
-  // Clip the Calendly logo banner at the top (~60px) while keeping profile pics + meeting info
+  const [isMobile, setIsMobile] = React.useState(typeof window !== "undefined" && window.innerWidth < 768);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const CLIP_TOP = 60;
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 600;
-  const iframeHeight = isMobile ? 700 : 680;
-  const containerHeight = iframeHeight - CLIP_TOP;
+  const iframeHeight = isMobile ? 800 : 720;
+  const containerHeight = isMobile ? "auto" : `${iframeHeight - CLIP_TOP}px`;
 
   return (
     <div
       style={{
-        marginTop: "12px",
-        marginBottom: "12px",
+        marginTop: "clamp(12px, 2vw, 20px)",
+        marginBottom: "clamp(12px, 2vw, 20px)",
         width: "100%",
-        position: "relative",
-        height: `${containerHeight}px`,
-        overflow: "hidden",
+        position: isMobile ? "relative" : "relative",
+        minHeight: isMobile ? "auto" : `${containerHeight}`,
+        height: isMobile ? "auto" : containerHeight,
+        overflow: isMobile ? "auto" : "hidden",
         borderRadius: "8px",
+        WebkitOverflowScrolling: "touch",
       }}
     >
       {!loaded && (
@@ -70,12 +79,11 @@ function CalendlyEmbed() {
           <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       )}
-      {/* iframe shifted up by CLIP_TOP to hide the logo banner */}
       <iframe
-        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&background_color=0c0c0c&text_color=f0ede8"
+        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5833&hide_gdpr_banner=0&background_color=080808&text_color=f0ede8"
         width="100%"
         frameBorder="0"
-        scrolling="no"
+        scrolling={isMobile ? "auto" : "no"}
         loading="eager"
         title="Agendar reunión"
         onLoad={() => setLoaded(true)}
@@ -83,8 +91,9 @@ function CalendlyEmbed() {
           display: "block",
           border: "none",
           width: "100%",
-          height: `${iframeHeight}px`,
-          marginTop: `-${CLIP_TOP}px`,
+          height: isMobile ? `${iframeHeight}px` : `${iframeHeight}px`,
+          marginTop: isMobile ? "0" : `-${CLIP_TOP}px`,
+          minHeight: isMobile ? "600px" : "auto",
         }}
       />
     </div>
