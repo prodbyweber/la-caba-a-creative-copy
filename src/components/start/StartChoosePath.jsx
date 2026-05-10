@@ -364,7 +364,6 @@ export default function StartChoosePath() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const [openPanel, setOpenPanel] = useState(null); // "artist" | "brand" | null
-  const [contactOpen, setContactOpen] = useState(false);
 
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
@@ -550,82 +549,7 @@ export default function StartChoosePath() {
           ))}
         </div>
 
-        {/* Minimal Contact Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            marginTop: "clamp(40px, 8vw, 80px)",
-            paddingTop: "clamp(24px, 4vw, 40px)",
-            borderTop: "1px solid rgba(240,237,232,0.08)",
-          }}
-        >
-          <motion.button
-            onClick={() => setContactOpen(!contactOpen)}
-            style={{
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-              fontWeight: 700,
-              fontSize: "clamp(0.9rem, 1.8vw, 1.1rem)",
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-              color: "#f0ede8",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: 0,
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              transition: "opacity 0.2s ease",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.opacity = "0.7"; }}
-            onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
-          >
-            Contacto
-            <motion.span
-              animate={{ rotate: contactOpen ? 90 : 0 }}
-              transition={{ duration: 0.3 }}
-              style={{ fontSize: "0.9em", display: "inline-block" }}
-            >
-              →
-            </motion.span>
-          </motion.button>
 
-          <AnimatePresence>
-            {contactOpen && (
-              <motion.div
-                key="contact-collapsible"
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                style={{ overflow: "clip", marginTop: "clamp(16px, 3vw, 24px)" }}
-              >
-                <div style={{ display: "flex", flexDirection: "column", gap: "clamp(12px, 2vw, 16px)" }}>
-                  <p style={{
-                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                    fontWeight: 300,
-                    fontSize: "clamp(0.75rem, 1.4vw, 0.9rem)",
-                    color: "rgba(240,237,232,0.5)",
-                    lineHeight: 1.5,
-                    margin: 0,
-                  }}>
-                    ¿Prefieres escribirnos? Envíanos tu proyecto o brief a{" "}
-                    <a
-                      href="mailto:hola@cabanacreative.es"
-                      style={{ color: "#ff5833", textDecoration: "none", fontWeight: 600 }}
-                      onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
-                      onMouseLeave={e => e.currentTarget.style.opacity = "1"}
-                    >
-                      hola@cabanacreative.es
-                    </a>
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
       </div>
     </section>
   );
