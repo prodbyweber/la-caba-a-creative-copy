@@ -38,27 +38,30 @@ const inputStyle = {
 
 function CalendlyEmbed() {
   const [loaded, setLoaded] = React.useState(false);
+  // Calendly needs ~660px on desktop, ~700px on mobile (no side panel)
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 600;
+  const embedHeight = isMobile ? 680 : 660;
+
   return (
     <div
       style={{
-        marginTop: "16px",
-        marginBottom: "16px",
-        borderRadius: "10px",
+        marginTop: "12px",
+        marginBottom: "12px",
+        borderRadius: "12px",
         overflow: "hidden",
-        background: "#fff",
-        boxShadow: "0 2px 24px rgba(0,0,0,0.25)",
+        background: "transparent",
         width: "100%",
         position: "relative",
-        minHeight: "580px",
+        minHeight: `${embedHeight}px`,
       }}
     >
       {!loaded && (
         <div style={{
           position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
-          background: "#f8f8f8", zIndex: 1,
+          background: "rgba(12,12,12,0.6)", zIndex: 1, borderRadius: "12px",
         }}>
           <div style={{
-            width: "28px", height: "28px", borderRadius: "50%",
+            width: "24px", height: "24px", borderRadius: "50%",
             border: "2px solid #ff5200", borderTopColor: "transparent",
             animation: "spin 0.7s linear infinite",
           }} />
@@ -66,14 +69,14 @@ function CalendlyEmbed() {
         </div>
       )}
       <iframe
-        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&hide_event_type_details=0"
+        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&hide_event_type_details=0&background_color=0c0c0c&text_color=f0ede8"
         width="100%"
         frameBorder="0"
         scrolling="no"
         loading="eager"
         title="Agendar reunión"
         onLoad={() => setLoaded(true)}
-        style={{ display: "block", border: "none", width: "100%", height: "580px" }}
+        style={{ display: "block", border: "none", width: "100%", height: `${embedHeight}px` }}
       />
     </div>
   );
