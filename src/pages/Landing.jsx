@@ -76,7 +76,7 @@ export default function Landing() {
       `}</style>
 
       <div className="snap-scroll-container">
-        <SnapSection><StartHero bottomOffset={typeof window !== "undefined" && window.innerWidth >= 768 ? "clamp(180px, 20vw, 280px)" : "clamp(90px, 12vw, 140px)"} /></SnapSection>
+        <SnapSection><StartHero bottomOffset="clamp(90px, 12vw, 140px)" /></SnapSection>
         <SnapSection><StartExplorar /></SnapSection>
         <SnapSection><StartCreadores /></SnapSection>
         <SnapSection><StartWhatWeDo /></SnapSection>

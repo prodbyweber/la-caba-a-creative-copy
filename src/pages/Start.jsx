@@ -19,10 +19,6 @@ const SnapSection = ({ children }) => (
 );
 
 export default function Start() {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
     <div
       style={{
