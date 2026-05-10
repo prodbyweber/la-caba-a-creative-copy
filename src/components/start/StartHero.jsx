@@ -33,7 +33,7 @@ function VideoBackground({ src }) {
 
 
 
-export default function StartHero() {
+export default function StartHero({ bottomOffset = "clamp(50px, 8vw, 100px)" }) {
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
     queryFn: async () => { const c = await base44.entities.LandingConfig.list(); return c[0] || null; },
@@ -77,7 +77,7 @@ export default function StartHero() {
         transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
         style={{
           position: "absolute",
-          bottom: "clamp(50px, 8vw, 100px)",
+          bottom: bottomOffset,
           right: "clamp(24px, 6vw, 56px)",
           zIndex: 20,
           textAlign: "right",
