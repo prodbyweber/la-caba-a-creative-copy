@@ -48,22 +48,15 @@ function CalendlyEmbed() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const CLIP_TOP = 60;
-  const iframeHeight = isMobile ? 800 : 720;
-  const containerHeight = isMobile ? "auto" : `${iframeHeight - CLIP_TOP}px`;
-
   return (
     <div
       style={{
-        marginTop: "clamp(12px, 2vw, 20px)",
+        marginTop: "0",
         marginBottom: "clamp(12px, 2vw, 20px)",
         width: "100%",
-        position: isMobile ? "relative" : "relative",
-        minHeight: isMobile ? "auto" : `${containerHeight}`,
-        height: isMobile ? "auto" : containerHeight,
-        overflow: isMobile ? "auto" : "hidden",
+        position: "relative",
+        overflow: "visible",
         borderRadius: "8px",
-        WebkitOverflowScrolling: "touch",
       }}
     >
       {!loaded && (
@@ -80,7 +73,7 @@ function CalendlyEmbed() {
         </div>
       )}
       <iframe
-        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5833&hide_gdpr_banner=0&background_color=080808&text_color=f0ede8&hide_event_type_details=1"
+        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5833&hide_gdpr_banner=0&background_color=ffffff&text_color=000000&hide_event_type_details=1"
         width="100%"
         frameBorder="0"
         scrolling={isMobile ? "auto" : "no"}
@@ -91,9 +84,9 @@ function CalendlyEmbed() {
           display: "block",
           border: "none",
           width: "100%",
-          height: isMobile ? "520px" : "480px",
+          height: isMobile ? "420px" : "400px",
           marginTop: "0",
-          minHeight: isMobile ? "520px" : "480px",
+          minHeight: isMobile ? "420px" : "400px",
         }}
       />
     </div>
@@ -128,6 +121,7 @@ function CalendlyPanel() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      style={{ background: "#ffffff", borderRadius: "12px", padding: "clamp(20px, 3vw, 32px)" }}
     >
       <CalendlyEmbed />
 
@@ -258,7 +252,7 @@ function ContactPanel() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      style={{ marginTop: "clamp(16px, 3vw, 28px)", marginBottom: "clamp(16px, 3vw, 28px)" }}
+      style={{ marginTop: "clamp(16px, 3vw, 28px)", marginBottom: "clamp(16px, 3vw, 28px)", background: "#ffffff", borderRadius: "12px", padding: "clamp(20px, 3vw, 32px)" }}
     >
       {/* Calendly para Marca */}
       <CalendlyEmbed />
