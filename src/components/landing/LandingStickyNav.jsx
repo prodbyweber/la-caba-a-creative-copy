@@ -50,7 +50,7 @@ export default function LandingStickyNav() {
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay: active === "hero" && !panelOpen ? 1.2 : 0 }}
       style={{
         position: "fixed",
-        bottom: "max(calc(65px + env(safe-area-inset-bottom, 0px) + 12px), clamp(28px, 5vw, 48px))",
+        bottom: `${typeof window !== "undefined" && window.innerWidth >= 768 ? "clamp(120px, 12vw, 160px)" : "max(calc(65px + env(safe-area-inset-bottom, 0px) + 12px), clamp(28px, 5vw, 48px))"}`,
         left: isChooseSection ? "auto" : "clamp(20px, 5vw, 48px)",
         right: isChooseSection ? "clamp(20px, 5vw, 48px)" : "auto",
         zIndex: 100,
