@@ -281,7 +281,7 @@ export default function StartExplorar() {
       </motion.div>
 
       {/* Main container: desktop layout (platform left, features right as column) */}
-      <div style={{ display: "flex", gap: "clamp(24px, 3vw, 32px)", alignItems: "flex-start", position: "relative", zIndex: 1, marginBottom: "clamp(40px, 6vw, 60px)", flexWrap: "wrap", justifyContent: "center" }}>
+      <div style={{ display: "flex", gap: "clamp(24px, 3vw, 32px)", alignItems: "flex-start", position: "relative", zIndex: 1, marginBottom: "clamp(28px, 4vw, 40px)", flexWrap: "wrap", justifyContent: "center" }}>
         {/* Platform window — left side, compact */}
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.97 }}
@@ -321,14 +321,13 @@ export default function StartExplorar() {
             <FakeNav />
             <MiniHero items={items} />
 
-            <div style={{ position: "relative", paddingBottom: "clamp(16px, 2vw, 20px)", paddingTop: "4px" }}>
+            <div style={{ position: "relative", paddingBottom: "clamp(12px, 1.5vw, 16px)", paddingTop: "2px" }}>
               {row1.length > 0 && <NetflixRow label="En Tendencia" items={row1.slice(0, 3)} rowIndex={0} />}
-              {row2.length > 0 && <NetflixRow label="Nuevos Lanzamientos" items={row2.slice(0, 3)} rowIndex={1} />}
 
               {items.length === 0 && (
                 <div style={{ padding: "0 12px 12px" }}>
                   {[0].map(ri => (
-                    <div key={ri} style={{ marginBottom: "8px" }}>
+                    <div key={ri} style={{ marginBottom: "6px" }}>
                       <div style={{ height: 6, width: 60, borderRadius: 3, background: "rgba(255,255,255,0.06)", marginBottom: 6 }} />
                       <div style={{ display: "flex", gap: 4 }}>
                         {[...Array(3)].map((_, i) => (
@@ -401,39 +400,42 @@ export default function StartExplorar() {
         </div>
       </div>
 
-      {/* CTA Button — premium minimal style */}
+      {/* CTA Button — premium cinematic style */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.7, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "center", marginTop: "clamp(20px, 3vw, 40px)" }}
+        transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "center", marginTop: "clamp(12px, 2vw, 24px)" }}
       >
         <button
           onClick={() => base44.auth.redirectToLogin(window.location.href)}
           style={{
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            fontWeight: 700,
-            fontSize: "clamp(0.8rem, 1.5vw, 0.95rem)",
-            letterSpacing: "0.05em",
-            background: "transparent",
+            fontWeight: 900,
+            fontSize: "clamp(1rem, 2vw, 1.3rem)",
+            letterSpacing: "-0.02em",
+            background: "rgba(240,237,232,0.08)",
             color: "#f0ede8",
-            border: "1px solid rgba(240,237,232,0.25)",
-            padding: "clamp(10px, 1.8vw, 14px) clamp(28px, 5vw, 42px)",
-            borderRadius: "99px",
+            border: "1.5px solid rgba(240,237,232,0.3)",
+            padding: "clamp(14px, 2.5vw, 20px) clamp(40px, 7vw, 60px)",
+            borderRadius: "8px",
             cursor: "pointer",
-            transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
+            transition: "all 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            boxShadow: "0 8px 32px rgba(240,237,232,0.04), inset 0 1px 1px rgba(255,255,255,0.1)",
           }}
           onMouseEnter={e => { 
-            e.currentTarget.style.background = "rgba(240,237,232,0.05)"; 
-            e.currentTarget.style.borderColor = "rgba(240,237,232,0.45)";
-            e.currentTarget.style.color = "#fff";
+            e.currentTarget.style.background = "rgba(240,237,232,0.12)"; 
+            e.currentTarget.style.borderColor = "rgba(240,237,232,0.5)";
+            e.currentTarget.style.boxShadow = "0 12px 40px rgba(240,237,232,0.08), inset 0 1px 1px rgba(255,255,255,0.15)";
+            e.currentTarget.style.transform = "translateY(-2px)";
           }}
           onMouseLeave={e => { 
-            e.currentTarget.style.background = "transparent"; 
-            e.currentTarget.style.borderColor = "rgba(240,237,232,0.25)";
-            e.currentTarget.style.color = "#f0ede8";
+            e.currentTarget.style.background = "rgba(240,237,232,0.08)"; 
+            e.currentTarget.style.borderColor = "rgba(240,237,232,0.3)";
+            e.currentTarget.style.boxShadow = "0 8px 32px rgba(240,237,232,0.04), inset 0 1px 1px rgba(255,255,255,0.1)";
+            e.currentTarget.style.transform = "translateY(0)";
           }}
         >
           Acceder
