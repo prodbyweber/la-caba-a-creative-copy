@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Menu, X, LogOut, Home } from "lucide-react";
+import { Menu, X, LogOut, Home, Compass } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 export default function LandingNav() {
@@ -230,15 +230,18 @@ export default function LandingNav() {
 
               {/* User profile if logged in */}
               {user && (
-                <div className="flex items-center gap-4 p-4 bg-white/5 rounded-lg mb-6">
+                <button
+                  onClick={() => { handleAccountClick(); setMobileOpen(false); }}
+                  className="w-full flex items-center gap-4 p-4 bg-white/5 rounded-lg mb-6 hover:bg-white/10 transition-colors text-left"
+                >
                   {user.avatar_url ? (
                     <img
                       src={user.avatar_url}
                       alt={user.full_name}
-                      className="w-12 h-12 rounded-full object-cover border-2 border-[#ff5833]/60"
+                      className="w-12 h-12 rounded-full object-cover border-2 border-[#ff5833]/60 flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#ff5833] to-orange-400 flex items-center justify-center text-white font-bold">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#ff5833] to-orange-400 flex items-center justify-center text-white font-bold flex-shrink-0">
                       {user.full_name?.[0]?.toUpperCase() || "U"}
                     </div>
                   )}
@@ -248,8 +251,24 @@ export default function LandingNav() {
                       <p className="text-[#ff5833] text-xs font-bold uppercase tracking-wide">Admin</p>
                     )}
                   </div>
-                </div>
+                </button>
               )}
+
+              {/* Explorar button */}
+              <button
+                onClick={() => {
+                  if (user) {
+                    navigate("/Explorar");
+                  } else {
+                    base44.auth.redirectToLogin("/Explorar");
+                  }
+                  setMobileOpen(false);
+                }}
+                className="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-lg bg-[#ff5833] text-white font-medium hover:bg-[#e04a20] transition-colors mb-3"
+              >
+                <Compass className="w-4 h-4" />
+                Explorar
+              </button>
 
               {/* Auth buttons */}
               <div className="space-y-3">
