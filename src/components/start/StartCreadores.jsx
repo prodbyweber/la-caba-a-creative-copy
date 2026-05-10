@@ -298,7 +298,7 @@ export default function StartCreadores() {
           <div style={{ display: "flex", flexDirection: "column", gap: "0", width: "100%", alignItems: "flex-end" }}>
             {SERVICES.map((service, i) => (
               <motion.div key={service} initial={{ opacity: 0, x: 12 }} animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ duration: 0.6, delay: 0.3 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: "clamp(1rem, 2.5vw, 1.8rem)", letterSpacing: "-0.025em", color: "rgba(240,237,232,0.4)", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: "clamp(6px, 1.5vw, 12px)", marginBottom: "clamp(6px, 1.5vw, 12px)", lineHeight: 1.1, cursor: "default", transition: "color 0.2s ease", textAlign: "right", width: "100%" }}
+                style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, fontSize: "clamp(1rem, 2.5vw, 1.8rem)", letterSpacing: "-0.025em", color: "rgba(240,237,232,0.4)", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: "clamp(6px, 1.5vw, 12px)", marginBottom: "clamp(6px, 1.5vw, 12px)", lineHeight: 1.1, cursor: "default", transition: "color 0.2s ease", textAlign: "right", width: "fit-content", marginLeft: "auto" }}
                 onMouseEnter={e => e.currentTarget.style.color = "#f0ede8"}
                 onMouseLeave={e => e.currentTarget.style.color = "rgba(240,237,232,0.4)"}>
                 {service}

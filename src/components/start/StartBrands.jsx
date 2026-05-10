@@ -136,7 +136,8 @@ export default function StartBrands() {
                 cursor: "default",
                 transition: "color 0.2s ease",
                 textAlign: "right",
-                width: "100%",
+                width: "fit-content",
+                marginLeft: "auto",
               }}
               onMouseEnter={e => e.currentTarget.style.color = "#f0ede8"}
               onMouseLeave={e => e.currentTarget.style.color = "rgba(240,237,232,0.4)"}
