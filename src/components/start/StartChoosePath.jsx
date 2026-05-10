@@ -36,17 +36,12 @@ const inputStyle = {
   letterSpacing: "-0.01em",
 };
 
-function CalendlyPanel() {
+function CalendlyEmbed() {
   return (
-    <motion.div
-      key="calendly"
-      initial={{ opacity: 0, y: -8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+    <div
       style={{
-        marginTop: "clamp(16px, 3vw, 28px)",
-        marginBottom: "clamp(16px, 3vw, 28px)",
+        marginTop: "clamp(16px, 3vw, 24px)",
+        marginBottom: "clamp(16px, 3vw, 24px)",
         borderRadius: "12px",
         overflow: "hidden",
         background: "#fff",
@@ -57,12 +52,26 @@ function CalendlyPanel() {
       <iframe
         src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&hide_event_type_details=0"
         width="100%"
-        height="1080"
+        height="700"
         frameBorder="0"
-        scrolling="no"
+        scrolling="yes"
         title="Agendar reunión — Cabaña Creative"
-        style={{ display: "block", border: "none", width: "100%", minHeight: "1080px" }}
+        style={{ display: "block", border: "none", width: "100%", height: "700px" }}
       />
+    </div>
+  );
+}
+
+function CalendlyPanel() {
+  return (
+    <motion.div
+      key="calendly"
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <CalendlyEmbed />
     </motion.div>
   );
 }
@@ -97,6 +106,12 @@ function ContactPanel() {
       transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       style={{ marginTop: "clamp(16px, 3vw, 28px)", marginBottom: "clamp(16px, 3vw, 28px)" }}
     >
+      {/* Calendly para Marca */}
+      <CalendlyEmbed />
+
+      {/* Divider */}
+      <div style={{ height: "1px", background: "rgba(240,237,232,0.08)", margin: "clamp(20px, 3vw, 32px) 0" }} />
+
       {/* Email breve */}
       <p style={{
         fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
@@ -265,7 +280,6 @@ export default function StartChoosePath() {
           zIndex: 10,
           padding: "0 clamp(24px, 6vw, 56px) clamp(40px, 8vw, 72px)",
           width: "100%",
-          maxWidth: "900px",
         }}
       >
         {/* Label */}
