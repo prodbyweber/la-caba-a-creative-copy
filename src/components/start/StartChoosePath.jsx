@@ -80,7 +80,7 @@ function CalendlyEmbed() {
         </div>
       )}
       <iframe
-        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5833&hide_gdpr_banner=0&background_color=080808&text_color=f0ede8"
+        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5833&hide_gdpr_banner=0&background_color=080808&text_color=f0ede8&hide_event_type_details=1"
         width="100%"
         frameBorder="0"
         scrolling={isMobile ? "auto" : "no"}
@@ -91,9 +91,9 @@ function CalendlyEmbed() {
           display: "block",
           border: "none",
           width: "100%",
-          height: isMobile ? `${iframeHeight}px` : `${iframeHeight}px`,
-          marginTop: isMobile ? "0" : `-${CLIP_TOP}px`,
-          minHeight: isMobile ? "600px" : "auto",
+          height: isMobile ? "520px" : "480px",
+          marginTop: "0",
+          minHeight: isMobile ? "520px" : "480px",
         }}
       />
     </div>
@@ -486,11 +486,11 @@ export default function StartChoosePath() {
             fontSize: "clamp(0.8rem, 1.8vw, 1rem)",
             color: "rgba(240,237,232,0.45)",
             marginBottom: "clamp(24px, 5vw, 48px)",
-            maxWidth: "400px",
-            lineHeight: 1.5,
+            maxWidth: "600px",
+            lineHeight: 1.65,
           }}
         >
-          Selecciona tu camino y construyamos algo extraordinario.
+          Una reunión para conocer tu visión creativa, analizar tu proyecto y explorar cómo podemos ayudarte a desarrollar tu sonido, identidad visual y dirección artística a través de Cabaña Creative.
         </motion.p>
 
         {/* Paths */}
