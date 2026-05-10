@@ -5,7 +5,6 @@ const SECTIONS = [
   { key: "explorar", href: "#explorar" },
   { key: "about",    href: "#about" },
   { key: "artists",  href: "#artists" },
-  { key: "brands",   href: "#brands" },
   { key: "choose",   href: "#choose" },
 ];
 

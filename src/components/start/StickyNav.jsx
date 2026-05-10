@@ -7,7 +7,6 @@ const NAV_ITEMS = [
   { key: "explorar", label: "Explorar" },
   { key: "about",    label: "Quiénes Somos" },
   { key: "artists",  label: "Creadores" },
-  { key: "brands",   label: "Marcas" },
   { key: "choose",   label: "Comenzar" },
 ];
 

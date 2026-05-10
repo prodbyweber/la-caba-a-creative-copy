@@ -61,7 +61,6 @@ export default function Landing() {
         <div className="snap-section-full"><StartWhatWeDo /></div>
         <div className="snap-section-auto"><StartBrandsCarousel /></div>
         <div className="snap-section-full"><StartCreadores /></div>
-        <div className="snap-section-full"><StartBrands /></div>
         <div className="snap-section-full"><StartChoosePath /></div>
 
         {/* Historias que hemos contado — preservado de la landing original */}
