@@ -216,7 +216,7 @@ export default function LandingNav() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] bg-[#080808]/97 backdrop-blur-xl md:hidden"
           >
-            <div className="p-6">
+            <div className="p-6 flex flex-col h-full">
               <div className="flex justify-between items-center mb-12">
                 <img
                   src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
@@ -228,55 +228,55 @@ export default function LandingNav() {
                 </button>
               </div>
 
-              <div className="flex flex-col gap-6">
-                {/* Nav items — solo los del menú lateral sticky */}
-                {[
-                  { label: "Inicio", id: "hero" },
-                  { label: "Quiénes Somos", id: "about" },
-                  { label: "Creadores", id: "artists" },
-                  { label: "Marcas", id: "brands" },
-                  { label: "Explorar", id: "explorar" },
-                  { label: "Comenzar", id: "choose" },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      const el = document.getElementById(item.id);
-                      if (el) el.scrollIntoView({ behavior: "smooth" });
-                      setMobileOpen(false);
-                    }}
-                    className="text-2xl font-light text-left text-gray-300 hover:text-white transition-colors"
-                    style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, letterSpacing: "-0.02em" }}
-                  >
-                    {item.label}
-                  </button>
-                ))}
+              <div className="flex-1 flex flex-col gap-6">
+                {/* User profile if logged in */}
+                {user && (
+                  <div className="flex items-center gap-4 p-4 bg-white/5 rounded-lg mb-4">
+                    {user.avatar_url ? (
+                      <img
+                        src={user.avatar_url}
+                        alt={user.full_name}
+                        className="w-12 h-12 rounded-full object-cover border-2 border-[#ff5833]/60"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#ff5833] to-orange-400 flex items-center justify-center text-white font-bold">
+                        {user.full_name?.[0]?.toUpperCase() || "U"}
+                      </div>
+                    )}
+                    <div className="flex flex-col">
+                      <p className="text-white font-semibold text-sm">{user.full_name}</p>
+                      {user.role === "admin" && (
+                        <p className="text-[#ff5833] text-xs font-bold uppercase tracking-wide">Admin</p>
+                      )}
+                    </div>
+                  </div>
+                )}
 
-                <div className="pt-6 border-t border-white/10 space-y-2">
+                {/* Auth buttons at bottom */}
+                <div className="mt-auto space-y-3">
                   {user ? (
+                    <button
+                      onClick={() => { handleLogout(); setMobileOpen(false); }}
+                      className="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-lg bg-red-500/10 text-red-400 font-medium hover:bg-red-500/20 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Cerrar Sesión
+                    </button>
+                  ) : (
                     <>
                       <button
-                        onClick={() => { handleAccountClick(); setMobileOpen(false); }}
-                        className="flex items-center gap-3 w-full py-3 px-4 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition-colors"
+                        onClick={() => { base44.auth.redirectToLogin(window.location.href); setMobileOpen(false); }}
+                        className="block w-full py-3 rounded-lg bg-white text-black text-center font-medium hover:bg-gray-100 transition-colors"
                       >
-                        <Home className="w-4 h-4" />
-                        Dashboard
+                        Iniciar Sesión
                       </button>
                       <button
-                        onClick={() => { handleLogout(); setMobileOpen(false); }}
-                        className="flex items-center gap-3 w-full py-3 px-4 rounded-lg bg-red-500/10 text-red-400 font-medium hover:bg-red-500/20 transition-colors"
+                        onClick={() => { base44.auth.redirectToLogin(window.location.href); setMobileOpen(false); }}
+                        className="block w-full py-3 rounded-lg bg-transparent border border-white/20 text-white text-center font-medium hover:bg-white/10 transition-colors"
                       >
-                        <LogOut className="w-4 h-4" />
-                        Cerrar Sesión
+                        Registrarse
                       </button>
                     </>
-                  ) : (
-                    <button
-                      onClick={() => base44.auth.redirectToLogin(window.location.href)}
-                      className="block w-full py-3 rounded-lg bg-white text-black text-center font-medium hover:bg-gray-100 transition-colors"
-                    >
-                      Registrarse / Iniciar Sesión
-                    </button>
                   )}
                 </div>
               </div>
