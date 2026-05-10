@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, lazy } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -37,25 +37,43 @@ const inputStyle = {
 };
 
 function CalendlyEmbed() {
+  const [loaded, setLoaded] = React.useState(false);
   return (
     <div
       style={{
-        marginTop: "clamp(16px, 3vw, 24px)",
-        marginBottom: "clamp(16px, 3vw, 24px)",
-        borderRadius: "12px",
+        marginTop: "16px",
+        marginBottom: "16px",
+        borderRadius: "10px",
         overflow: "hidden",
         background: "#fff",
-        boxShadow: "0 4px 40px rgba(0,0,0,0.3)",
+        boxShadow: "0 2px 24px rgba(0,0,0,0.25)",
         width: "100%",
+        position: "relative",
+        minHeight: "580px",
       }}
     >
+      {!loaded && (
+        <div style={{
+          position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
+          background: "#f8f8f8", zIndex: 1,
+        }}>
+          <div style={{
+            width: "28px", height: "28px", borderRadius: "50%",
+            border: "2px solid #ff5200", borderTopColor: "transparent",
+            animation: "spin 0.7s linear infinite",
+          }} />
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      )}
       <iframe
-        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&hide_event_type_details=0&hide_landing_page_details=0"
+        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&hide_event_type_details=0"
         width="100%"
         frameBorder="0"
         scrolling="no"
-        title="Agendar reunión — Cabaña Creative"
-        style={{ display: "block", border: "none", width: "100%", height: "780px" }}
+        loading="eager"
+        title="Agendar reunión"
+        onLoad={() => setLoaded(true)}
+        style={{ display: "block", border: "none", width: "100%", height: "580px" }}
       />
     </div>
   );
