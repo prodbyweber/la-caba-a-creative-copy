@@ -385,7 +385,7 @@ export default function StartChoosePath() {
     window.dispatchEvent(new CustomEvent("choose-panel-change", { detail: { open: !!next } }));
   };
 
-  const btnColor = (key) => openPanel === key ? "#ff5833" : "rgba(240,237,232,0.6)";
+  const btnColor = (key) => (key === "artist" || key === "brand") ? "#ff5833" : "rgba(240,237,232,0.6)";
 
   return (
     <section
@@ -517,8 +517,8 @@ export default function StartChoosePath() {
                   borderBottom: "1px solid rgba(255,255,255,0.08)",
                   marginBottom: openPanel === path.key ? "0" : "clamp(10px, 2vw, 16px)",
                   transition: "color 0.25s ease, gap 0.25s ease, textShadow 0.25s ease",
-                  textShadow: openPanel === path.key || btnColor(path.key) === "#ff5833"
-                    ? "0 0 12px rgba(255,88,51,0.4)"
+                  textShadow: btnColor(path.key) === "#ff5833"
+                    ? "0 0 16px rgba(255,88,51,0.5), 0 0 32px rgba(255,88,51,0.25)"
                     : "none",
                 }}
                 onMouseEnter={e => { e.currentTarget.style.color = "#f0ede8"; e.currentTarget.style.gap = "28px"; }}
