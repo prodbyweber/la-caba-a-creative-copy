@@ -103,7 +103,7 @@ function MiniHero({ items }) {
   );
 }
 
-function NetflixCard({ item, index, rowIndex, compact }) {
+function NetflixCard({ item, index, rowIndex }) {
   const [hovered, setHovered] = useState(false);
   const thumb = item.thumbnail_url || getYtThumb(item.youtube_url || item.youtube_music_url);
   return (
@@ -115,9 +115,9 @@ function NetflixCard({ item, index, rowIndex, compact }) {
       onMouseLeave={() => setHovered(false)}
       className="relative flex-shrink-0 rounded-lg overflow-hidden cursor-default"
       style={{
-        width: compact ? "clamp(80px, 12vw, 120px)" : "clamp(120px, 15vw, 180px)",
+        width: "clamp(120px, 15vw, 180px)",
         aspectRatio: "16/9",
-        transform: hovered ? "scale(1.05)" : "scale(1)",
+        transform: hovered ? "scale(1.06)" : "scale(1)",
         transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)",
         zIndex: hovered ? 10 : 1,
       }}>
@@ -135,75 +135,14 @@ function NetflixCard({ item, index, rowIndex, compact }) {
   );
 }
 
-function PremiumCard({ item, feature, index }) {
-  const [hovered, setHovered] = useState(false);
-  const thumb = item.thumbnail_url || getYtThumb(item.youtube_url || item.youtube_music_url);
-  
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="relative overflow-hidden rounded-lg cursor-default"
-      style={{
-        aspectRatio: "1/1.2",
-        transform: hovered ? "scale(1.03)" : "scale(1)",
-        transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
-        boxShadow: hovered ? "0 20px 40px rgba(0,0,0,0.5)" : "0 8px 20px rgba(0,0,0,0.3)",
-      }}
-    >
-      {/* Background image */}
-      {thumb ? (
-        <img 
-          src={thumb} 
-          alt="" 
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ 
-            filter: hovered ? "brightness(0.95) saturate(1.15)" : "brightness(0.8) saturate(0.9)",
-            transition: "filter 0.3s ease"
-          }}
-        />
-      ) : (
-        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(100,100,100,0.1) 0%, rgba(8,8,8,0.4) 100%)" }} />
-      )}
-      
-      {/* Premium overlay */}
-      <div className="absolute inset-0" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.3) 50%, rgba(8,8,8,0.85) 100%)"
-      }} />
-      
-      {/* Content overlay - bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-        <h3 className="text-white font-bold text-sm line-clamp-2 leading-tight mb-2"
-          style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.01em" }}>
-          {item.title}
-        </h3>
-        <p className="text-white/70 text-xs leading-tight line-clamp-2"
-          style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300 }}>
-          {feature.title}
-        </p>
-      </div>
-      
-      {/* Border on hover */}
-      {hovered && (
-        <div className="absolute inset-0 rounded-lg pointer-events-none" style={{
-          border: "1px solid rgba(240,237,232,0.15)",
-        }} />
-      )}
-    </motion.div>
-  );
-}
-
-function NetflixRow({ label, items, rowIndex, compact }) {
+function NetflixRow({ label, items, rowIndex }) {
   if (!items?.length) return null;
   return (
-    <div className={compact ? "mb-2 px-2" : "mb-3 sm:mb-4 px-4 sm:px-8"}>
-      <p className={compact ? "text-[7px] font-bold text-white/35 uppercase tracking-[0.12em] mb-1" : "text-[8px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.15em] sm:tracking-[0.18em] mb-1.5 sm:mb-2"}
+    <div className="mb-3 sm:mb-4 px-4 sm:px-8">
+      <p className="text-[8px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.15em] sm:tracking-[0.18em] mb-1.5 sm:mb-2"
         style={{ fontFamily: "'Helvetica Neue', sans-serif" }}>{label}</p>
-      <div className={compact ? "flex gap-1 overflow-x-auto pb-1" : "flex gap-1.5 sm:gap-2 overflow-x-auto pb-2"} style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-        {items.map((item, i) => <NetflixCard key={item.id} item={item} index={i} rowIndex={rowIndex} compact={compact} />)}
+      <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+        {items.map((item, i) => <NetflixCard key={item.id} item={item} index={i} rowIndex={rowIndex} />)}
       </div>
     </div>
   );
@@ -234,83 +173,6 @@ function FakeNav() {
   );
 }
 
-const FEATURES = [
-  {
-    title: "Accede gratis a Cabaña Creative",
-    subtitle: "Explora una nueva generación de música, cine y cultura visual.",
-  },
-  {
-    title: "Contenido exclusivo",
-    subtitle: "Descubre artistas emergentes y proyectos seleccionados desde nuestra plataforma.",
-  },
-  {
-    title: "Membresía — 8€/mes",
-    subtitle: "Alertas de campañas, oportunidades creativas, descuentos de hasta 20% y acceso prioritario a nuevos lanzamientos.",
-  },
-  {
-    title: "Impulsa tu presencia en YouTube",
-    subtitle: "Si tu proyecto conecta con nuestra visión, nuestro Explorer puede ayudarte a posicionar contenido, potenciar Shorts y abrir nuevas oportunidades de monetización.",
-  },
-];
-
-function CinematicCard({ item, index, rowIndex, customStyle }) {
-  const [hovered, setHovered] = useState(false);
-  const thumb = item.thumbnail_url || getYtThumb(item.youtube_url || item.youtube_music_url);
-  
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: rowIndex * 0.04 + index * 0.05, ease: [0.22, 1, 0.36, 1] }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="relative rounded-lg overflow-hidden cursor-default"
-      style={{
-        ...customStyle,
-        transform: hovered ? "scale(1.02)" : "scale(1)",
-        transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
-        boxShadow: hovered ? "0 16px 32px rgba(0,0,0,0.4)" : "0 8px 20px rgba(0,0,0,0.25)",
-      }}
-    >
-      {/* Image/Video background */}
-      {thumb ? (
-        <img 
-          src={thumb} 
-          alt="" 
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ 
-            filter: hovered ? "brightness(0.9) saturate(1.1)" : "brightness(0.8) saturate(0.85)",
-            transition: "filter 0.3s ease"
-          }}
-        />
-      ) : (
-        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(100,100,100,0.1) 0%, rgba(8,8,8,0.4) 100%)" }} />
-      )}
-      
-      {/* Cinematic overlay - no orange tint */}
-      <div className="absolute inset-0" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.25) 40%, rgba(8,8,8,0.8) 100%)",
-        transition: "all 0.3s ease"
-      }} />
-      
-      {/* Border accent on hover - subtle gray */}
-      {hovered && (
-        <div className="absolute inset-0 rounded-lg pointer-events-none" style={{
-          border: "1px solid rgba(240,237,232,0.2)",
-        }} />
-      )}
-      
-      {/* Bottom content - Always visible */}
-      <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3" style={{ zIndex: 2 }}>
-        <h3 className="text-white font-bold text-xs line-clamp-2 leading-tight"
-          style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.015em", fontSize: "clamp(0.65rem, 1.2vw, 0.85rem)" }}>
-          {item.title}
-        </h3>
-      </div>
-    </motion.div>
-  );
-}
-
 export default function StartExplorar() {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-60px" });
@@ -322,12 +184,14 @@ export default function StartExplorar() {
   });
 
   const withThumb = items.filter(i => i.thumbnail_url || i.youtube_url || i.youtube_music_url);
-  const mosaicItems = withThumb.slice(0, 7);
+  const row1 = withThumb.slice(0, 7);
+  const row2 = withThumb.slice(7, 14);
+  const row3 = withThumb.slice(14, 21);
 
   // Preload hero images
   React.useEffect(() => {
     if (items.length > 0) {
-      items.slice(0, 7).forEach(item => {
+      items.slice(0, 4).forEach(item => {
         if (item.thumbnail_url || item.youtube_url) {
           const img = new Image();
           img.src = item.thumbnail_url || `https://img.youtube.com/vi/${item.youtube_url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1]}/hqdefault.jpg`;
@@ -343,88 +207,129 @@ export default function StartExplorar() {
       style={{
         position: "relative",
         width: "100%",
-        minHeight: "auto",
+        minHeight: "100dvh",
         background: "#0a0a0b",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        padding: "clamp(40px, 6vw, 80px) clamp(24px, 6vw, 56px)",
-        gap: "clamp(20px, 4vw, 40px)",
+        justifyContent: "center",
+        padding: "clamp(80px, 12vw, 140px) clamp(24px, 6vw, 56px) clamp(48px, 8vw, 80px)",
       }}
     >
+      {/* Ambient glow */}
+      <div style={{
+        position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
+        width: "700px", height: "300px", pointerEvents: "none",
+        background: "radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,88,51,0.05) 0%, transparent 70%)"
+      }} />
+
       {/* Label + headline */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        style={{ position: "relative", zIndex: 1 }}
+        style={{ marginBottom: "clamp(32px, 5vw, 56px)", position: "relative", zIndex: 1 }}
       >
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 700, fontSize: "10px", letterSpacing: "0.35em",
           textTransform: "uppercase", color: "#ff5833",
-          marginBottom: "8px",
+          marginBottom: "clamp(12px, 2vw, 20px)",
         }}>
           Explorar
         </p>
         <h2 style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 900,
-          fontSize: "clamp(2rem, 5vw, 3.2rem)",
+          fontSize: "clamp(2.4rem, 7vw, 5.5rem)",
           letterSpacing: "-0.04em",
-          lineHeight: 0.95,
+          lineHeight: 0.88,
           color: "#f0ede8",
+          marginBottom: "clamp(16px, 3vw, 28px)",
         }}>
-          Atrévete a explorar
+          Atrévete a<br />explorar
         </h2>
+        <p style={{
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontWeight: 300,
+          fontSize: "clamp(0.85rem, 1.8vw, 1.05rem)",
+          color: "rgba(240,237,232,0.5)",
+          maxWidth: "560px",
+          lineHeight: 1.65,
+        }}>
+          Curamos música, films y contenido audiovisual con criterio. Cada pieza forma parte de un catálogo en evolución, pensado con intención y dirección.{" "}
+          <span style={{ color: "rgba(240,237,232,0.3)", fontStyle: "italic" }}>
+            Explorar es donde las ideas dejan de ser ideas y empiezan a tomar forma.
+          </span>
+        </p>
       </motion.div>
 
-      {/* Two column: Compact platform preview left, Premium cards right */}
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "0.8fr 1.2fr",
-        gap: "clamp(24px, 4vw, 40px)",
-        position: "relative",
-        zIndex: 1,
-        alignItems: "start",
-      }}>
-        {/* LEFT: Compact fake platform preview */}
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          animate={isInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            borderRadius: "8px",
-            border: "1px solid rgba(240,237,232,0.08)",
-            background: "rgba(8,8,8,0.6)",
-            backdropFilter: "blur(12px)",
-            overflow: "hidden",
-          }}
-        >
-          <FakeNav />
-          <div style={{ padding: "clamp(10px, 2vw, 14px)", maxHeight: "320px", overflowY: "auto" }}>
-            <NetflixRow label="Destacados" items={withThumb.slice(0, 4)} rowIndex={0} compact />
+      {/* Platform window */}
+      <motion.div
+        initial={{ opacity: 0, y: 40, scale: 0.97 }}
+        animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+        transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: "relative", zIndex: 1,
+          borderRadius: "16px", overflow: "hidden",
+          border: "1px solid rgba(255,255,255,0.07)",
+          boxShadow: "0 48px 120px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.03)",
+        }}
+      >
+        {/* Fake browser chrome */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: "8px",
+          padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)",
+          background: "#0a0a0b",
+        }}>
+          <div style={{ display: "flex", gap: "6px" }}>
+            {[0, 1, 2].map(i => (
+              <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
+            ))}
           </div>
-        </motion.div>
+          <div style={{
+            flex: 1, maxWidth: 260, height: 20, borderRadius: 4,
+            background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", padding: "0 10px",
+          }}>
+            <span style={{ fontFamily: "monospace", fontSize: "9px", color: "rgba(255,255,255,0.18)" }}>
+              cabanacreative.es/Explorar
+            </span>
+          </div>
+        </div>
 
-        {/* RIGHT: Premium Netflix-style cards grid */}
-        <motion.div
-          initial={{ opacity: 0, x: 40 }}
-          animate={isInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "clamp(12px, 2vw, 16px)",
-            width: "100%",
-          }}
-        >
-          {/* Top 4 premium cards - 2x2 */}
-          {withThumb.slice(0, 4).map((item, i) => (
-            <PremiumCard key={item.id || i} item={item} feature={FEATURES[i]} index={i} />
-          ))}
-        </motion.div>
-      </div>
+        {/* App content */}
+        <div style={{ position: "relative", background: "#080808" }}>
+          <FakeNav />
+          <MiniHero items={items} />
+
+          <div style={{ position: "relative", paddingBottom: "clamp(24px, 4vw, 40px)", paddingTop: "8px" }}>
+            {row1.length > 0 && <NetflixRow label="En Tendencia" items={row1} rowIndex={0} />}
+            {row2.length > 0 && <NetflixRow label="Nuevos Lanzamientos" items={row2} rowIndex={1} />}
+            {row3.length > 0 && <NetflixRow label="Mini Films" items={row3} rowIndex={2} />}
+
+            {items.length === 0 && (
+              <div style={{ padding: "0 20px 24px" }}>
+                {[0, 1, 2].map(ri => (
+                  <div key={ri} style={{ marginBottom: "16px" }}>
+                    <div style={{ height: 8, width: 96, borderRadius: 4, background: "rgba(255,255,255,0.06)", marginBottom: 8 }} />
+                    <div style={{ display: "flex", gap: 8 }}>
+                      {[...Array(5)].map((_, i) => (
+                        <div key={i} style={{ flexShrink: 0, width: 180, aspectRatio: "16/9", borderRadius: 8, background: "rgba(255,255,255,0.03)" }} />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Bottom fade */}
+          <div style={{
+            position: "absolute", bottom: 0, left: 0, right: 0, height: 96, pointerEvents: "none",
+            background: "linear-gradient(to top, #0a0a0b 0%, transparent 100%)"
+          }} />
+        </div>
+      </motion.div>
     </section>
   );
 }
