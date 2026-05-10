@@ -34,7 +34,7 @@ export default function StartWhatWeDo() {
         }}
       />
 
-      <div style={{ maxWidth: "760px", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: "760px", position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: "clamp(28px, 5vw, 48px)" }}>
         <motion.p
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
@@ -60,7 +60,6 @@ export default function StartWhatWeDo() {
             display: "flex",
             flexDirection: "column",
             gap: "clamp(16px, 3vw, 28px)",
-            marginBottom: "clamp(24px, 5vw, 48px)",
             maxWidth: "720px",
           }}
         >
@@ -100,11 +99,11 @@ export default function StartWhatWeDo() {
             maxWidth: "200px",
           }}
         />
-      </div>
 
-      {/* Brands Carousel */}
-      <div style={{ position: "absolute", bottom: "clamp(60px, 8vw, 100px)", left: 0, right: 0, width: "100%", zIndex: 5 }}>
-        <StartBrandsCarousel />
+        {/* Brands Carousel - Now part of content flow */}
+        <div style={{ position: "relative", zIndex: 5, width: "100vw", marginLeft: "calc(-50vw + 50%)" }}>
+          <StartBrandsCarousel />
+        </div>
       </div>
     </section>
   );
