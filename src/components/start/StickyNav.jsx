@@ -110,37 +110,7 @@ export default function StickyNav() {
               )}
             </button>
 
-            {/* Botón Más información — sólo en sección "Comenzar" */}
-            {isChoose && isActive && (
-              <motion.button
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 6 }}
-                transition={{ duration: 0.3, delay: 0.1 }}
-                onClick={() => navigate("/start")}
-                style={{
-                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                  fontWeight: 900,
-                  fontSize: "clamp(0.7rem, 1.6vw, 0.85rem)",
-                  letterSpacing: "0.12em",
-                  textTransform: "uppercase",
-                  background: "#ff5833",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "99px",
-                  padding: "8px 20px",
-                  cursor: "pointer",
-                  marginTop: "clamp(6px, 1.5vw, 12px)",
-                  alignSelf: isChooseSection ? "flex-end" : "flex-start",
-                  transition: "background 0.2s ease",
-                  whiteSpace: "nowrap",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = "#e04a20"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; }}
-              >
-                Más información →
-              </motion.button>
-            )}
+
           </React.Fragment>
         );
       })}
