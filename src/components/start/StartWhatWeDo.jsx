@@ -17,7 +17,7 @@ export default function StartWhatWeDo() {
         minHeight: "500px",
         display: "flex",
         alignItems: "flex-start",
-        justifyContent: "flex-start",
+        justifyContent: "center",
         background: "#0c0c0c",
         overflow: "hidden",
         overflowY: "auto",
@@ -34,7 +34,7 @@ export default function StartWhatWeDo() {
         }}
       />
 
-      <div style={{ maxWidth: "760px", position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: "clamp(28px, 5vw, 48px)" }}>
+      <div style={{ maxWidth: "720px", width: "100%", position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: "clamp(28px, 5vw, 48px)" }}>
         <motion.p
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
