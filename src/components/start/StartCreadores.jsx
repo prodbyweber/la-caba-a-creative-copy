@@ -161,8 +161,8 @@ export default function StartCreadores() {
 
   const stories = (cfg?.testimonials?.length > 0 ? cfg.testimonials : defaultStories);
 
-  const SLIDE_DURATION = 4500;
-  const WORD_DURATION = 2200;
+  const SLIDE_DURATION = 2800;
+  const WORD_DURATION = 1200;
 
   // Slide carousel
   useEffect(() => {

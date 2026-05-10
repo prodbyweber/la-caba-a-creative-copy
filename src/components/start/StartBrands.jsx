@@ -57,7 +57,7 @@ export default function StartBrands() {
     if (!inView) return;
     const id = setInterval(() => {
       setBusinessIdx(i => (i + 1) % BUSINESS_TYPES.length);
-    }, 2800);
+    }, 1600);
     return () => clearInterval(id);
   }, [inView]);
 
