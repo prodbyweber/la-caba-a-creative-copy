@@ -3,7 +3,7 @@ import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
-const ROTATING_WORDS = ["artistas", "modelos", "actores", "creadoras", "creadores"];
+const ROTATING_WORDS = ["artistas", "modelos", "creadoras", "creadores"];
 
 function isVideo(url) {
   return url && /\.(mp4|webm|mov)(\?|$)/i.test(url);
