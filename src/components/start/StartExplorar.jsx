@@ -200,6 +200,25 @@ export default function StartExplorar() {
     }
   }, [items]);
 
+  const features = [
+    {
+      title: "Accede gratis a Cabaña Creative",
+      desc: "Explora una nueva generación de música, cine y cultura visual."
+    },
+    {
+      title: "Contenido exclusivo",
+      desc: "Descubre artistas emergentes y proyectos seleccionados desde nuestra plataforma."
+    },
+    {
+      title: "Membresía — 8€/mes",
+      desc: "Alertas de campañas, descuentos hasta 20% y acceso prioritario a nuevos lanzamientos."
+    },
+    {
+      title: "Impulsa tu presencia",
+      desc: "Posiciona contenido en YouTube y abre nuevas oportunidades de monetización."
+    },
+  ];
+
   return (
     <section
       id="explorar"
@@ -213,7 +232,7 @@ export default function StartExplorar() {
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        padding: "clamp(80px, 12vw, 140px) clamp(24px, 6vw, 56px) clamp(48px, 8vw, 80px)",
+        padding: "clamp(60px, 10vw, 100px) clamp(24px, 6vw, 56px)",
       }}
     >
       {/* Ambient glow */}
@@ -228,108 +247,152 @@ export default function StartExplorar() {
         initial={{ opacity: 0, y: 20 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        style={{ marginBottom: "clamp(32px, 5vw, 56px)", position: "relative", zIndex: 1 }}
+        style={{ marginBottom: "clamp(24px, 4vw, 40px)", position: "relative", zIndex: 1 }}
       >
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 700, fontSize: "10px", letterSpacing: "0.35em",
           textTransform: "uppercase", color: "#ff5833",
-          marginBottom: "clamp(12px, 2vw, 20px)",
+          marginBottom: "clamp(10px, 1.5vw, 16px)",
         }}>
           Explorar
         </p>
         <h2 style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 900,
-          fontSize: "clamp(2.4rem, 7vw, 5.5rem)",
+          fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
           letterSpacing: "-0.04em",
-          lineHeight: 0.88,
+          lineHeight: 0.9,
           color: "#f0ede8",
-          marginBottom: "clamp(16px, 3vw, 28px)",
+          marginBottom: "clamp(12px, 2vw, 20px)",
         }}>
-          Atrévete a<br />explorar
+          Atrévete a explorar
         </h2>
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 300,
-          fontSize: "clamp(0.85rem, 1.8vw, 1.05rem)",
+          fontSize: "clamp(0.75rem, 1.4vw, 0.95rem)",
           color: "rgba(240,237,232,0.5)",
-          maxWidth: "560px",
-          lineHeight: 1.65,
+          maxWidth: "480px",
+          lineHeight: 1.6,
         }}>
-          Curamos música, films y contenido audiovisual con criterio. Cada pieza forma parte de un catálogo en evolución, pensado con intención y dirección.{" "}
-          <span style={{ color: "rgba(240,237,232,0.3)", fontStyle: "italic" }}>
-            Explorar es donde las ideas dejan de ser ideas y empiezan a tomar forma.
-          </span>
+          Curamos música, films y contenido audiovisual con criterio.
         </p>
       </motion.div>
 
-      {/* Platform window */}
-      <motion.div
-        initial={{ opacity: 0, y: 40, scale: 0.97 }}
-        animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-        transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        style={{
-          position: "relative", zIndex: 1,
-          borderRadius: "16px", overflow: "hidden",
-          border: "1px solid rgba(255,255,255,0.07)",
-          boxShadow: "0 48px 120px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.03)",
-        }}
-      >
-        {/* Fake browser chrome */}
-        <div style={{
-          display: "flex", alignItems: "center", gap: "8px",
-          padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)",
-          background: "#0a0a0b",
-        }}>
-          <div style={{ display: "flex", gap: "6px" }}>
-            {[0, 1, 2].map(i => (
-              <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
-            ))}
-          </div>
+      {/* Main container: compact platform + features */}
+      <div style={{ display: "flex", gap: "clamp(24px, 4vw, 40px)", alignItems: "stretch", position: "relative", zIndex: 1, flexWrap: "wrap", minHeight: "500px" }}>
+        {/* Platform window — compact */}
+        <motion.div
+          initial={{ opacity: 0, y: 40, scale: 0.97 }}
+          animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+          transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            flex: "1 1 minmax(300px, 1fr)", maxWidth: "800px",
+            borderRadius: "16px", overflow: "hidden",
+            border: "1px solid rgba(255,255,255,0.07)",
+            boxShadow: "0 48px 120px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.03)",
+          }}
+        >
+          {/* Fake browser chrome */}
           <div style={{
-            flex: 1, maxWidth: 260, height: 20, borderRadius: 4,
-            background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", padding: "0 10px",
+            display: "flex", alignItems: "center", gap: "8px",
+            padding: "8px 12px", borderBottom: "1px solid rgba(255,255,255,0.06)",
+            background: "#0a0a0b",
           }}>
-            <span style={{ fontFamily: "monospace", fontSize: "9px", color: "rgba(255,255,255,0.18)" }}>
-              cabanacreative.es/Explorar
-            </span>
+            <div style={{ display: "flex", gap: "6px" }}>
+              {[0, 1, 2].map(i => (
+                <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
+              ))}
+            </div>
+            <div style={{
+              flex: 1, maxWidth: 200, height: 16, borderRadius: 3,
+              background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", padding: "0 8px",
+            }}>
+              <span style={{ fontFamily: "monospace", fontSize: "7px", color: "rgba(255,255,255,0.18)" }}>
+                cabanacreative.es/Explorar
+              </span>
+            </div>
           </div>
-        </div>
 
-        {/* App content */}
-        <div style={{ position: "relative", background: "#080808" }}>
-          <FakeNav />
-          <MiniHero items={items} />
+          {/* App content */}
+          <div style={{ position: "relative", background: "#080808" }}>
+            <FakeNav />
+            <MiniHero items={items} />
 
-          <div style={{ position: "relative", paddingBottom: "clamp(24px, 4vw, 40px)", paddingTop: "8px" }}>
-            {row1.length > 0 && <NetflixRow label="En Tendencia" items={row1} rowIndex={0} />}
-            {row2.length > 0 && <NetflixRow label="Nuevos Lanzamientos" items={row2} rowIndex={1} />}
-            {row3.length > 0 && <NetflixRow label="Mini Films" items={row3} rowIndex={2} />}
+            <div style={{ position: "relative", paddingBottom: "clamp(16px, 3vw, 28px)", paddingTop: "6px" }}>
+              {row1.length > 0 && <NetflixRow label="En Tendencia" items={row1.slice(0, 4)} rowIndex={0} />}
+              {row2.length > 0 && <NetflixRow label="Nuevos Lanzamientos" items={row2.slice(0, 4)} rowIndex={1} />}
 
-            {items.length === 0 && (
-              <div style={{ padding: "0 20px 24px" }}>
-                {[0, 1, 2].map(ri => (
-                  <div key={ri} style={{ marginBottom: "16px" }}>
-                    <div style={{ height: 8, width: 96, borderRadius: 4, background: "rgba(255,255,255,0.06)", marginBottom: 8 }} />
-                    <div style={{ display: "flex", gap: 8 }}>
-                      {[...Array(5)].map((_, i) => (
-                        <div key={i} style={{ flexShrink: 0, width: 180, aspectRatio: "16/9", borderRadius: 8, background: "rgba(255,255,255,0.03)" }} />
-                      ))}
+              {items.length === 0 && (
+                <div style={{ padding: "0 16px 16px" }}>
+                  {[0, 1].map(ri => (
+                    <div key={ri} style={{ marginBottom: "12px" }}>
+                      <div style={{ height: 6, width: 80, borderRadius: 3, background: "rgba(255,255,255,0.06)", marginBottom: 6 }} />
+                      <div style={{ display: "flex", gap: 6 }}>
+                        {[...Array(4)].map((_, i) => (
+                          <div key={i} style={{ flexShrink: 0, width: 140, aspectRatio: "16/9", borderRadius: 6, background: "rgba(255,255,255,0.03)" }} />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-          {/* Bottom fade */}
-          <div style={{
-            position: "absolute", bottom: 0, left: 0, right: 0, height: 96, pointerEvents: "none",
-            background: "linear-gradient(to top, #0a0a0b 0%, transparent 100%)"
-          }} />
+            {/* Bottom fade */}
+            <div style={{
+              position: "absolute", bottom: 0, left: 0, right: 0, height: 60, pointerEvents: "none",
+              background: "linear-gradient(to top, #0a0a0b 0%, transparent 100%)"
+            }} />
+          </div>
+        </motion.div>
+
+        {/* Features panel — 2x2 grid */}
+        <div style={{ flex: "1 1 minmax(280px, 400px)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(16px, 2vw, 20px)" }}>
+          {features.map((feature, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 24 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.7, delay: 0.3 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                background: "linear-gradient(135deg, rgba(255,88,51,0.08) 0%, rgba(255,255,255,0.02) 100%)",
+                border: "1px solid rgba(255,88,51,0.2)",
+                borderRadius: "12px",
+                padding: "clamp(20px, 3vw, 28px)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+              }}
+            >
+              <h3 style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontWeight: 900,
+                fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
+                letterSpacing: "-0.02em",
+                color: "#f0ede8",
+                margin: 0,
+                lineHeight: 1.2,
+              }}>
+                {feature.title}
+              </h3>
+              <p style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontWeight: 300,
+                fontSize: "clamp(0.7rem, 1.3vw, 0.85rem)",
+                color: "rgba(240,237,232,0.55)",
+                margin: 0,
+                lineHeight: 1.5,
+              }}>
+                {feature.desc}
+              </p>
+            </motion.div>
+          ))}
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }
