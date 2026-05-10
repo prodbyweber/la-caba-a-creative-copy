@@ -26,7 +26,7 @@ export default function Start() {
         splash.style.opacity = "0";
         splash.style.pointerEvents = "none";
       }
-    }, 2500);
+    }, 1200);
     return () => clearTimeout(timer);
   }, []);
 
