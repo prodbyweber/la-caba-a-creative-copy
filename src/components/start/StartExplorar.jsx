@@ -184,13 +184,63 @@ const FEATURES = [
   },
   {
     title: "Membresía — 8€/mes",
-    subtitle: "Alertas de campañas, descuentos de hasta 20% y acceso prioritario a lanzamientos.",
+    subtitle: "Alertas de campañas, oportunidades creativas, descuentos de hasta 20% y acceso prioritario a nuevos lanzamientos.",
   },
   {
-    title: "Impulsa tu presencia",
-    subtitle: "Nuestro Explorer te ayuda a posicionar contenido, potenciar Shorts y monetizar.",
+    title: "Impulsa tu presencia en YouTube",
+    subtitle: "Si tu proyecto conecta con nuestra visión, nuestro Explorer puede ayudarte a posicionar contenido, potenciar Shorts y abrir nuevas oportunidades de monetización.",
   },
 ];
+
+function CinematicCard({ item, index, rowIndex }) {
+  const [hovered, setHovered] = useState(false);
+  const thumb = item.thumbnail_url || getYtThumb(item.youtube_url || item.youtube_music_url);
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: rowIndex * 0.05 + index * 0.03, ease: [0.22, 1, 0.36, 1] }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative rounded-lg overflow-hidden cursor-default group"
+      style={{
+        aspectRatio: "16/9",
+        transform: hovered ? "scale(1.04)" : "scale(1)",
+        transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)",
+      }}
+    >
+      {thumb ? (
+        <img 
+          src={thumb} 
+          alt="" 
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ filter: hovered ? "brightness(1.1) saturate(1.2)" : "brightness(0.85) saturate(0.9)" }}
+        />
+      ) : (
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(255,88,51,0.1) 0%, rgba(8,8,8,0.5) 100%)" }} />
+      )}
+      
+      {/* Cinematic gradient overlay */}
+      <div className="absolute inset-0" style={{
+        background: "linear-gradient(180deg, transparent 0%, rgba(8,8,8,0.4) 50%, rgba(8,8,8,0.9) 100%)"
+      }} />
+      
+      {/* Bottom content on hover */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={hovered ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+        transition={{ duration: 0.2 }}
+        className="absolute bottom-0 left-0 right-0 p-3 sm:p-4"
+      >
+        <h3 className="text-white font-bold text-xs sm:text-sm line-clamp-2"
+          style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.01em" }}>
+          {item.title}
+        </h3>
+      </motion.div>
+    </motion.div>
+  );
+}
 
 export default function StartExplorar() {
   const sectionRef = useRef(null);
@@ -262,119 +312,86 @@ export default function StartExplorar() {
         }}>
           Atrévete a explorar
         </h2>
-        <p style={{
-          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontWeight: 300,
-          fontSize: "clamp(0.8rem, 1.5vw, 0.95rem)",
-          color: "rgba(240,237,232,0.5)",
-          maxWidth: "520px",
-          lineHeight: 1.6,
-        }}>
-          Curamos música, films y contenido audiovisual con criterio. Cada pieza forma parte de un catálogo en evolución.
-        </p>
       </motion.div>
 
-      {/* Platform preview + Features grid */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "clamp(24px, 4vw, 40px)", position: "relative", zIndex: 1 }}>
-        {/* Mini platform window */}
-        <motion.div
-          initial={{ opacity: 0, y: 30, scale: 0.97 }}
-          animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-          transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            position: "relative",
-            borderRadius: "12px", overflow: "hidden",
-            border: "1px solid rgba(255,255,255,0.05)",
-            boxShadow: "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.02)",
-            maxHeight: "280px",
-          }}
-        >
-        {/* Compact browser chrome */}
-        <div style={{
-          display: "flex", alignItems: "center", gap: "6px",
-          padding: "8px 14px", borderBottom: "1px solid rgba(255,255,255,0.05)",
-          background: "rgba(8,8,8,0.8)",
-        }}>
-          <div style={{ display: "flex", gap: "5px" }}>
-            {[0, 1, 2].map(i => (
-              <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
-            ))}
-          </div>
-          <div style={{
-            flex: 1, maxWidth: 200, height: 18, borderRadius: 3,
-            background: "rgba(255,255,255,0.03)", display: "flex", alignItems: "center", padding: "0 8px",
-          }}>
-            <span style={{ fontFamily: "monospace", fontSize: "8px", color: "rgba(255,255,255,0.15)" }}>
-              cabanacreative.es
-            </span>
-          </div>
-        </div>
+      {/* Cinematic cards grid */}
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(clamp(140px, 20vw, 200px), 1fr))",
+          gap: "clamp(12px, 2vw, 20px)",
+          width: "100%",
+          position: "relative",
+          zIndex: 1,
+          marginBottom: "clamp(40px, 6vw, 80px)",
+        }}
+      >
+        {withThumb.slice(0, 12).map((item, i) => (
+          <CinematicCard key={item.id || i} item={item} index={i} rowIndex={Math.floor(i / 4)} />
+        ))}
+      </motion.div>
 
-        {/* Compact app content */}
-        <div style={{ position: "relative", background: "rgba(8,8,8,0.4)", maxHeight: "240px", overflow: "hidden" }}>
-          <div style={{ opacity: 0.4 }}>
-            <MiniHero items={items} />
-          </div>
-          <div style={{
-            position: "absolute", inset: 0, pointerEvents: "none",
-            background: "linear-gradient(to bottom, transparent 0%, rgba(8,8,8,0.7) 60%, rgba(8,8,8,0.95) 100%)"
-          }} />
-        </div>
-        </motion.div>
-
-        {/* Features grid - 4 horizontal cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: "clamp(16px, 2vw, 24px)",
-            width: "100%",
-          }}
-        >
+      {/* Features grid - 4 premium cards */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gap: "clamp(16px, 2vw, 24px)",
+          width: "100%",
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
           {FEATURES.map((feature, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 16 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.35 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.6, delay: 0.4 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
               style={{
-                padding: "clamp(16px, 3vw, 24px)",
-                borderRadius: "8px",
-                border: "1px solid rgba(255,255,255,0.08)",
-                background: "rgba(255,255,255,0.02)",
-                backdropFilter: "blur(8px)",
-                WebkitBackdropFilter: "blur(8px)",
-                transition: "border-color 0.3s ease, background 0.3s ease",
+                padding: "clamp(20px, 3vw, 28px)",
+                borderRadius: "10px",
+                border: "1px solid rgba(255,88,51,0.2)",
+                background: "linear-gradient(135deg, rgba(255,88,51,0.05) 0%, rgba(255,88,51,0.02) 100%)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
                 cursor: "default",
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = "rgba(255,88,51,0.3)";
-                e.currentTarget.style.background = "rgba(255,88,51,0.03)";
+                e.currentTarget.style.borderColor = "rgba(255,88,51,0.4)";
+                e.currentTarget.style.background = "linear-gradient(135deg, rgba(255,88,51,0.12) 0%, rgba(255,88,51,0.06) 100%)";
+                e.currentTarget.style.transform = "translateY(-4px)";
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
-                e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+                e.currentTarget.style.borderColor = "rgba(255,88,51,0.2)";
+                e.currentTarget.style.background = "linear-gradient(135deg, rgba(255,88,51,0.05) 0%, rgba(255,88,51,0.02) 100%)";
+                e.currentTarget.style.transform = "translateY(0)";
               }}
             >
               <h3 style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 700,
-                fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
+                fontSize: "clamp(1rem, 2.2vw, 1.2rem)",
                 color: "#f0ede8",
-                marginBottom: "clamp(8px, 1.5vw, 12px)",
-                lineHeight: 1.3,
+                marginBottom: "clamp(10px, 2vw, 16px)",
+                lineHeight: 1.35,
+                letterSpacing: "-0.01em",
               }}>
                 {feature.title}
               </h3>
               <p style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 300,
-                fontSize: "clamp(0.75rem, 1.4vw, 0.85rem)",
-                color: "rgba(240,237,232,0.5)",
-                lineHeight: 1.5,
+                fontSize: "clamp(0.8rem, 1.5vw, 0.95rem)",
+                color: "rgba(240,237,232,0.6)",
+                lineHeight: 1.6,
                 margin: 0,
               }}>
                 {feature.subtitle}
@@ -382,7 +399,6 @@ export default function StartExplorar() {
             </motion.div>
           ))}
         </motion.div>
-      </div>
     </section>
   );
 }
