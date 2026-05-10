@@ -18,6 +18,12 @@ export default function StartNav() {
           href="/"
           className="flex items-center select-none"
           style={{ textDecoration: "none", gap: "clamp(8px, 1.5vw, 14px)" }}
+          onClick={() => {
+            const splash = document.getElementById("cabana-splash");
+            if (splash) {
+              splash.style.display = "none";
+            }
+          }}
         >
           <img
             src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
