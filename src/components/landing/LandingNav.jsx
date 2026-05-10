@@ -2,34 +2,24 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Menu, X, LogOut, Home, Rocket } from "lucide-react";
+import { Menu, X, LogOut, Home } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
 
 export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [scrollingDown, setScrollingDown] = useState(false);
-  const [logoVisible, setLogoVisible] = useState(false);
   const lastScrollY = useRef(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  const { data: config } = useQuery({
-    queryKey: ['landingConfig'],
-    queryFn: async () => {
-      const configs = await base44.entities.LandingConfig.list();
-      return configs.length > 0 ? configs[0] : null;
-    }
-  });
-
   useEffect(() => {
     const checkUser = async () => {
       try {
         const currentUser = await base44.auth.me();
         setUser(currentUser);
-      } catch (error) {
+      } catch {
         setUser(null);
       }
     };
@@ -39,12 +29,12 @@ export default function LandingNav() {
   const handleAccountClick = async () => {
     try {
       const currentUser = await base44.auth.me();
-      if (currentUser?.role === 'admin') {
+      if (currentUser?.role === "admin") {
         navigate(createPageUrl("AdminDashboard"));
       } else {
         navigate(createPageUrl("Dashboard"));
       }
-    } catch (error) {
+    } catch {
       base44.auth.redirectToLogin(window.location.href);
     }
   };
@@ -56,10 +46,7 @@ export default function LandingNav() {
   useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY;
-      const heroHeight = window.innerHeight;
       setScrolled(currentY > 60);
-      setLogoVisible(currentY >= heroHeight * 0.5);
-      // Transparente al bajar, opaco al subir
       if (currentY > lastScrollY.current && currentY > 80) {
         setScrollingDown(true);
       } else {
@@ -71,273 +58,204 @@ export default function LandingNav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const offset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
-    }
-    setMobileOpen(false);
-  };
-
-  const visibleMenuButtons = config?.menu_buttons || {
-    quienes_somos: true,
-    artistas: true,
-    adn_marca: false,
-    exploracion: true,
-    startups: true,
-    comenzar: true
-  };
-
-  const adnMarcaLink = config?.adn_marca_link || createPageUrl("ADNdeMarca");
-
-  const navItems = [
-    { label: "Servicios", url: createPageUrl("Services"), key: "servicios" },
-    { label: "Acerca de Nosotros", id: "about", key: "quienes_somos" },
-    { label: "Creadores", id: "stories", key: "artistas" },
-    { label: "Explorar", url: "/Explorar", highlight: true, key: "comenzar" }
-  ].filter(item => visibleMenuButtons[item.key] !== false);
-
   return (
     <>
       <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        className={`fixed top-0 left-0 right-0 z-[90] transition-all duration-500 ${
           scrollingDown
-            ? "bg-transparent border-transparent backdrop-blur-none"
+            ? "bg-transparent backdrop-blur-none"
             : scrolled
-              ? "bg-[#0a0a0b]/80 backdrop-blur-xl border-b border-white/5"
+              ? "bg-[#080808]/80 backdrop-blur-xl border-b border-white/5"
               : "bg-transparent"
         }`}
+        style={{ padding: "clamp(20px, 4vw, 32px) clamp(24px, 6vw, 56px)", display: "flex", alignItems: "center", justifyContent: "space-between" }}
       >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to={createPageUrl("Landing")} className="flex items-center gap-2">
-            <motion.div
-              className="flex items-center gap-2"
-              initial={{ opacity: 0, x: -16, scale: 0.85 }}
-              animate={logoVisible
-                ? { opacity: 1, x: 0, scale: 1 }
-                : { opacity: 0, x: -16, scale: 0.85 }
+        {/* Logo — siempre visible, grande */}
+        <Link
+          to={createPageUrl("Landing")}
+          className="flex items-center select-none"
+          style={{ textDecoration: "none", gap: "clamp(8px, 1.5vw, 14px)" }}
+        >
+          <img
+            src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
+            alt="Cabaña Creative"
+            style={{ height: "clamp(2.2rem, 5vw, 3rem)", width: "auto" }}
+          />
+          <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: "flex", flexDirection: "column" }}>
+            <span style={{ letterSpacing: "-0.04em", display: "inline-flex", alignItems: "flex-start", lineHeight: 1, color: "#ff5833", fontWeight: 900, fontSize: "clamp(1rem, 2.5vw, 1.4rem)" }}>
+              Cabaña<sup style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.5em", fontWeight: 400, marginLeft: "3px", verticalAlign: "super" }}>®</sup>
+            </span>
+            <span style={{ letterSpacing: "-0.04em", display: "block", lineHeight: 1, color: "white", fontWeight: 900, fontSize: "clamp(1rem, 2.5vw, 1.4rem)" }}>Creative</span>
+          </div>
+        </Link>
+
+        {/* Right side: Explorar + perfil/registro + hamburger mobile */}
+        <div className="flex items-center" style={{ gap: "clamp(10px, 2vw, 20px)" }}>
+
+          {/* Explorar button — visible on all sizes */}
+          <button
+            onClick={() => {
+              if (user) {
+                navigate("/Explorar");
+              } else {
+                base44.auth.redirectToLogin("/Explorar");
               }
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <img 
-                src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png" 
-                alt="La Cabaña Creative"
-                className="h-10 w-auto"
-              />
-              <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: 'flex', flexDirection: 'column' }}>
-                <span style={{ letterSpacing: '-0.04em', display: 'inline-flex', alignItems: 'flex-start', lineHeight: 1, color: '#ff5833', fontWeight: 900, fontSize: '1.1rem' }}>
-                  Cabaña<sup style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.55rem', fontWeight: 400, marginLeft: '3px', verticalAlign: 'top', position: 'relative', top: '2px' }}>®</sup>
-                </span>
-                <span style={{ letterSpacing: '-0.04em', display: 'block', lineHeight: 1, color: 'white', fontWeight: 900, fontSize: '1.1rem' }}>Creative</span>
-              </div>
-            </motion.div>
-          </Link>
+            }}
+            style={{
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+              fontWeight: 700,
+              fontSize: "clamp(0.75rem, 1.5vw, 0.9rem)",
+              letterSpacing: "0.05em",
+              background: "rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.2)",
+              color: "#f0ede8",
+              padding: "8px 18px",
+              borderRadius: "99px",
+              cursor: "pointer",
+              transition: "background 0.2s ease, border-color 0.2s ease",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.18)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
+          >
+            Explorar
+          </button>
 
-          <div className="hidden md:flex items-center gap-6">
-            {navItems.map((item) => {
-              const isExplorarButton = item.key === "comenzar" && item.label === "Explorar";
-              return isExplorarButton ? (
-                <button
-                  key={item.key}
-                  onClick={() => {
-                    if (user) {
-                      navigate("/Explorar");
-                    } else {
-                      base44.auth.redirectToLogin(window.location.href);
-                    }
-                  }}
-                  className="px-5 py-2 rounded-full bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
-                >
-                  {item.label}
-                </button>
-              ) : item.highlight ? (
-                <button
-                  key={item.key}
-                  onClick={() => scrollToSection(item.id)}
-                  className="px-5 py-2 rounded-full bg-white text-black text-sm font-medium hover:bg-white/90 transition-all"
-                >
-                  {item.label}
-                </button>
-              ) : item.url ? (
-                <Link
-                  key={item.key}
-                  to={item.url}
-                  className="text-sm text-gray-400 hover:text-white transition-colors font-medium"
-                >
-                  {item.label}
-                </Link>
-              ) : (
-                <button
-                  key={item.key}
-                  onClick={() => scrollToSection(item.id)}
-                  className="text-sm text-gray-400 hover:text-white transition-colors font-medium"
-                >
-                  {item.label}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="flex items-center gap-4">
-            {/* Desktop Account Menu */}
-            {user ? (
-              <div className="hidden sm:relative sm:flex sm:items-center">
-                <button
-                  onClick={() => setAccountMenuOpen(!accountMenuOpen)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors"
-                >
-                  {user.avatar_url ? (
-                    <img
-                      src={user.avatar_url}
-                      alt={user.full_name}
-                      className="w-8 h-8 rounded-full object-cover border-2 border-emerald-500"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold text-sm">
-                      {user.full_name?.[0]?.toUpperCase() || "U"}
-                    </div>
-                  )}
-                  <span className="text-gray-400 text-sm">{user.full_name?.split(' ')[0]}</span>
-                </button>
-
-                <AnimatePresence>
-                  {accountMenuOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute right-0 top-12 bg-[#1a1a1c] border border-white/10 rounded-xl shadow-xl overflow-hidden z-50 min-w-[180px]"
-                    >
-                      <button
-                        onClick={() => { handleAccountClick(); setAccountMenuOpen(false); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-400 hover:bg-white/10 hover:text-white transition-colors text-left"
-                      >
-                        <Home className="w-4 h-4" />
-                        Dashboard
-                      </button>
-                      <Link
-                        to="/start"
-                        onClick={() => setAccountMenuOpen(false)}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#ff5833] hover:bg-white/10 transition-colors"
-                      >
-                        <Rocket className="w-4 h-4" />
-                        Ver página /start
-                      </Link>
-                      <div className="border-t border-white/5" />
-                      <button
-                        onClick={() => { handleLogout(); setAccountMenuOpen(false); }}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-left"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        Cerrar Sesión
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
+          {/* Profile or Login button — desktop */}
+          {user ? (
+            <div className="relative hidden sm:block">
               <button
-                onClick={() => base44.auth.redirectToLogin(window.location.href)}
-                className="hidden sm:block px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-gray-100 transition-colors"
+                onClick={() => setAccountMenuOpen(!accountMenuOpen)}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
               >
-                Iniciar Sesión
+                {user.avatar_url ? (
+                  <img
+                    src={user.avatar_url}
+                    alt={user.full_name}
+                    className="w-9 h-9 rounded-full object-cover border-2 border-[#ff5833]/60"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#ff5833] to-orange-400 flex items-center justify-center text-white font-bold text-sm">
+                    {user.full_name?.[0]?.toUpperCase() || "U"}
+                  </div>
+                )}
               </button>
-            )}
-            <button 
-              onClick={() => setMobileOpen(true)}
-              className="md:hidden p-2 text-gray-400 hover:text-white"
+
+              <AnimatePresence>
+                {accountMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute right-0 top-12 bg-[#1a1a1c] border border-white/10 rounded-xl shadow-xl overflow-hidden z-50 min-w-[180px]"
+                  >
+                    <button
+                      onClick={() => { handleAccountClick(); setAccountMenuOpen(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-400 hover:bg-white/10 hover:text-white transition-colors text-left"
+                    >
+                      <Home className="w-4 h-4" />
+                      Dashboard
+                    </button>
+                    <div className="border-t border-white/5" />
+                    <button
+                      onClick={() => { handleLogout(); setAccountMenuOpen(false); }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-left"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Cerrar Sesión
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <button
+              onClick={() => base44.auth.redirectToLogin(window.location.href)}
+              className="hidden sm:block"
+              style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontWeight: 700,
+                fontSize: "clamp(0.75rem, 1.5vw, 0.9rem)",
+                letterSpacing: "0.05em",
+                background: "#f0ede8",
+                color: "#0c0c0c",
+                border: "none",
+                padding: "8px 18px",
+                borderRadius: "99px",
+                cursor: "pointer",
+                transition: "background 0.2s ease",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.color = "#fff"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#f0ede8"; e.currentTarget.style.color = "#0c0c0c"; }}
             >
-              <Menu className="w-6 h-6" />
+              Registrarse
             </button>
-          </div>
+          )}
+
+          {/* Hamburger — mobile only */}
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="md:hidden p-2 text-white/70 hover:text-white transition-colors"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
         </div>
       </motion.nav>
 
+      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#0a0a0b]/95 backdrop-blur-xl md:hidden"
+            className="fixed inset-0 z-[100] bg-[#080808]/97 backdrop-blur-xl md:hidden"
           >
             <div className="p-6">
               <div className="flex justify-between items-center mb-12">
-                <div className="flex items-center gap-3">
-                  <img 
-                    src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png" 
-                    alt="La Cabaña Creative"
-                    className="h-12 w-auto"
-                  />
-                </div>
+                <img
+                  src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
+                  alt="Cabaña Creative"
+                  className="h-12 w-auto"
+                />
                 <button onClick={() => setMobileOpen(false)} className="p-2 text-gray-400">
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
               <div className="flex flex-col gap-6">
-                {/* Enlace /start — siempre visible en el menú mobile */}
-                <Link
-                  to="/start"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-2 text-2xl font-light text-left text-gray-300 hover:text-white transition-colors"
-                >
-                  <Rocket className="w-5 h-5 text-[#ff5833]" />
-                  <span>Start</span>
-                </Link>
-               {navItems.map((item) => {
-                  const isExplorarButton = item.key === "comenzar" && item.label === "Explorar";
-                  return isExplorarButton ? (
-                    <button
-                      key={item.key}
-                      onClick={() => {
-                        if (user) {
-                          navigate("/Explorar");
-                        } else {
-                          base44.auth.redirectToLogin(window.location.href);
-                        }
-                        setMobileOpen(false);
-                      }}
-                      className="text-2xl font-light text-left text-white font-semibold transition-colors"
-                    >
-                      {item.label}
-                    </button>
-                  ) : item.url ? (
-                    <Link
-                      key={item.key}
-                      to={item.url}
-                      onClick={() => setMobileOpen(false)}
-                      className="text-2xl font-light text-left text-gray-300 hover:text-white transition-colors"
-                    >
-                      {item.label}
-                    </Link>
-                  ) : (
-                    <button
-                      key={item.key}
-                      onClick={() => scrollToSection(item.id)}
-                      className={`text-2xl font-light text-left transition-colors ${
-                        item.highlight 
-                          ? 'text-white font-semibold' 
-                          : 'text-gray-300 hover:text-white'
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                  );
-                })}
+                {/* Nav items — solo los del menú lateral sticky */}
+                {[
+                  { label: "Inicio", id: "hero" },
+                  { label: "Quiénes Somos", id: "about" },
+                  { label: "Creadores", id: "artists" },
+                  { label: "Marcas", id: "brands" },
+                  { label: "Explorar", id: "explorar" },
+                  { label: "Comenzar", id: "choose" },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      const el = document.getElementById(item.id);
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                      setMobileOpen(false);
+                    }}
+                    className="text-2xl font-light text-left text-gray-300 hover:text-white transition-colors"
+                    style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, letterSpacing: "-0.02em" }}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+
                 <div className="pt-6 border-t border-white/10 space-y-2">
                   {user ? (
                     <>
                       <button
-                        onClick={handleAccountClick}
+                        onClick={() => { handleAccountClick(); setMobileOpen(false); }}
                         className="flex items-center gap-3 w-full py-3 px-4 rounded-lg bg-white/10 text-white font-medium hover:bg-white/20 transition-colors"
                       >
                         <Home className="w-4 h-4" />
@@ -356,7 +274,7 @@ export default function LandingNav() {
                       onClick={() => base44.auth.redirectToLogin(window.location.href)}
                       className="block w-full py-3 rounded-lg bg-white text-black text-center font-medium hover:bg-gray-100 transition-colors"
                     >
-                      Iniciar Sesión
+                      Registrarse / Iniciar Sesión
                     </button>
                   )}
                 </div>
