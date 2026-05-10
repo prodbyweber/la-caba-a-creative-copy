@@ -62,12 +62,92 @@ export default function StartHero() {
         <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
       )}
 
-      {/* Minimal overlay — just enough for bottom nav readability */}
+      {/* Overlay */}
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 50%, rgba(0,0,0,0.7) 100%)"
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 50%, rgba(0,0,0,0.75) 100%)"
       }} />
 
+      {/* Top-left: isotipo + wordmark */}
+      <motion.div
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: "absolute",
+          top: "clamp(80px, 14vw, 130px)",
+          left: "clamp(24px, 6vw, 56px)",
+          zIndex: 20,
+          display: "flex",
+          alignItems: "center",
+          gap: "clamp(10px, 2vw, 16px)",
+          pointerEvents: "none",
+          userSelect: "none",
+        }}
+      >
+        <img
+          src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
+          alt=""
+          style={{ height: "clamp(2.8rem, 9vw, 6rem)", width: "auto" }}
+        />
+        <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", lineHeight: 1 }}>
+          <div style={{
+            fontWeight: 900,
+            fontSize: "clamp(1.4rem, 4vw, 3rem)",
+            letterSpacing: "-0.04em",
+            color: "#ff5833",
+            lineHeight: 1,
+          }}>
+            Cabaña<sup style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.3em", fontWeight: 400, marginLeft: "2px", verticalAlign: "super" }}>®</sup>
+          </div>
+          <div style={{
+            fontWeight: 900,
+            fontSize: "clamp(1.4rem, 4vw, 3rem)",
+            letterSpacing: "-0.04em",
+            color: "#ffffff",
+            lineHeight: 1,
+          }}>
+            Creative
+          </div>
+        </div>
+      </motion.div>
 
+      {/* Bottom-right: slogan */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: "absolute",
+          bottom: "clamp(32px, 7vw, 56px)",
+          right: "clamp(24px, 6vw, 56px)",
+          zIndex: 20,
+          textAlign: "right",
+          pointerEvents: "none",
+        }}
+      >
+        <p style={{
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontSize: "9px",
+          fontWeight: 700,
+          letterSpacing: "0.3em",
+          textTransform: "uppercase",
+          color: "rgba(240,237,232,0.4)",
+          marginBottom: "6px",
+        }}>
+          Música · Films · Creadores
+        </p>
+        <p style={{
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontSize: "clamp(1rem, 2.5vw, 1.4rem)",
+          fontWeight: 300,
+          color: "rgba(240,237,232,0.85)",
+          letterSpacing: "-0.01em",
+          lineHeight: 1.3,
+          maxWidth: "320px",
+        }}>
+          Más que lo que se escucha.
+        </p>
+      </motion.div>
     </section>
   );
 }
