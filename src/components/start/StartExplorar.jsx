@@ -173,25 +173,6 @@ function FakeNav() {
   );
 }
 
-const FEATURES = [
-  {
-    title: "Accede gratis a Cabaña Creative.",
-    desc: "Explora una nueva generación de música, cine y cultura visual.",
-  },
-  {
-    title: "Descubre contenido exclusivo",
-    desc: "artistas emergentes y proyectos seleccionados desde nuestra plataforma.",
-  },
-  {
-    title: "Membresía — 8€/mes",
-    desc: "Alertas de campañas, oportunidades creativas, descuentos de hasta 20% y acceso prioritario a nuevos lanzamientos.",
-  },
-  {
-    title: "Impulsa tu presencia en YouTube.",
-    desc: "Si tu proyecto conecta con nuestra visión, nuestro Explorer puede ayudarte a posicionar contenido, potenciar Shorts y abrir nuevas oportunidades de monetización.",
-  },
-];
-
 export default function StartExplorar() {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-60px" });
@@ -203,18 +184,21 @@ export default function StartExplorar() {
   });
 
   const withThumb = items.filter(i => i.thumbnail_url || i.youtube_url || i.youtube_music_url);
-  const featuredItems = withThumb.slice(0, 6);
+  const row1 = withThumb.slice(0, 7);
+  const row2 = withThumb.slice(7, 14);
+  const row3 = withThumb.slice(14, 21);
 
+  // Preload hero images
   React.useEffect(() => {
-    if (featuredItems.length > 0) {
-      featuredItems.forEach(item => {
+    if (items.length > 0) {
+      items.slice(0, 4).forEach(item => {
         if (item.thumbnail_url || item.youtube_url) {
           const img = new Image();
           img.src = item.thumbnail_url || `https://img.youtube.com/vi/${item.youtube_url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1]}/hqdefault.jpg`;
         }
       });
     }
-  }, [featuredItems]);
+  }, [items]);
 
   return (
     <section
@@ -223,19 +207,20 @@ export default function StartExplorar() {
       style={{
         position: "relative",
         width: "100%",
-        minHeight: "auto",
+        minHeight: "100dvh",
         background: "#0a0a0b",
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
-        padding: "clamp(60px, 10vw, 100px) clamp(24px, 6vw, 56px)",
+        justifyContent: "center",
+        padding: "clamp(80px, 12vw, 140px) clamp(24px, 6vw, 56px) clamp(48px, 8vw, 80px)",
       }}
     >
       {/* Ambient glow */}
       <div style={{
         position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
-        width: "600px", height: "250px", pointerEvents: "none",
-        background: "radial-gradient(ellipse 50% 50% at 50% 0%, rgba(255,88,51,0.04) 0%, transparent 70%)"
+        width: "700px", height: "300px", pointerEvents: "none",
+        background: "radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,88,51,0.05) 0%, transparent 70%)"
       }} />
 
       {/* Label + headline */}
@@ -243,195 +228,107 @@ export default function StartExplorar() {
         initial={{ opacity: 0, y: 20 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        style={{ marginBottom: "clamp(24px, 4vw, 40px)", position: "relative", zIndex: 1 }}
+        style={{ marginBottom: "clamp(32px, 5vw, 56px)", position: "relative", zIndex: 1 }}
       >
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontWeight: 700, fontSize: "9px", letterSpacing: "0.3em",
+          fontWeight: 700, fontSize: "10px", letterSpacing: "0.35em",
           textTransform: "uppercase", color: "#ff5833",
-          marginBottom: "clamp(8px, 1.5vw, 16px)",
+          marginBottom: "clamp(12px, 2vw, 20px)",
         }}>
           Explorar
         </p>
         <h2 style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 900,
-          fontSize: "clamp(1.8rem, 5vw, 3.5rem)",
+          fontSize: "clamp(2.4rem, 7vw, 5.5rem)",
           letterSpacing: "-0.04em",
-          lineHeight: 1,
+          lineHeight: 0.88,
           color: "#f0ede8",
-          marginBottom: "clamp(12px, 2vw, 20px)",
+          marginBottom: "clamp(16px, 3vw, 28px)",
         }}>
-          Atrévete a explorar
+          Atrévete a<br />explorar
         </h2>
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 300,
-          fontSize: "clamp(0.8rem, 1.5vw, 0.95rem)",
+          fontSize: "clamp(0.85rem, 1.8vw, 1.05rem)",
           color: "rgba(240,237,232,0.5)",
-          maxWidth: "500px",
-          lineHeight: 1.6,
+          maxWidth: "560px",
+          lineHeight: 1.65,
         }}>
-          Curamos música, films y contenido con criterio. Una plataforma donde convergen creadores, marcas y cultura.
+          Curamos música, films y contenido audiovisual con criterio. Cada pieza forma parte de un catálogo en evolución, pensado con intención y dirección.{" "}
+          <span style={{ color: "rgba(240,237,232,0.3)", fontStyle: "italic" }}>
+            Explorar es donde las ideas dejan de ser ideas y empiezan a tomar forma.
+          </span>
         </p>
       </motion.div>
 
-      {/* Platform Preview + Features Grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(20px, 3vw, 36px)", position: "relative", zIndex: 1, alignItems: "stretch" }}>
-        
-        {/* Left: Compact Platform Preview */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={isInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            position: "relative",
-            borderRadius: "12px", overflow: "hidden",
-            border: "1px solid rgba(255,255,255,0.08)",
-            boxShadow: "0 24px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.03)",
-            minHeight: "320px",
-          }}
-        >
-          {/* Browser chrome */}
-          <div style={{
-            display: "flex", alignItems: "center", gap: "6px",
-            padding: "8px 12px", borderBottom: "1px solid rgba(255,255,255,0.05)",
-            background: "rgba(0,0,0,0.5)",
-          }}>
-            <div style={{ display: "flex", gap: "4px" }}>
-              {[0, 1, 2].map(i => (
-                <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
-              ))}
-            </div>
+      {/* Platform window */}
+      <motion.div
+        initial={{ opacity: 0, y: 40, scale: 0.97 }}
+        animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+        transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: "relative", zIndex: 1,
+          borderRadius: "16px", overflow: "hidden",
+          border: "1px solid rgba(255,255,255,0.07)",
+          boxShadow: "0 48px 120px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.03)",
+        }}
+      >
+        {/* Fake browser chrome */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: "8px",
+          padding: "10px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)",
+          background: "#0a0a0b",
+        }}>
+          <div style={{ display: "flex", gap: "6px" }}>
+            {[0, 1, 2].map(i => (
+              <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
+            ))}
           </div>
+          <div style={{
+            flex: 1, maxWidth: 260, height: 20, borderRadius: 4,
+            background: "rgba(255,255,255,0.04)", display: "flex", alignItems: "center", padding: "0 10px",
+          }}>
+            <span style={{ fontFamily: "monospace", fontSize: "9px", color: "rgba(255,255,255,0.18)" }}>
+              cabanacreative.es/Explorar
+            </span>
+          </div>
+        </div>
 
-          {/* Content */}
-          <div style={{ position: "relative", background: "linear-gradient(135deg, #0a0a0b 0%, #0f0f11 100%)", minHeight: "280px", display: "flex", flexDirection: "column", padding: "clamp(16px, 3vw, 24px)" }}>
-            {/* Platform bg mockup */}
-            <div style={{ position: "absolute", inset: 0, opacity: 0.3, pointerEvents: "none" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px", padding: "16px", height: "100%" }}>
-                {[0, 1, 2, 3, 4, 5].map(i => (
-                  <div key={i} style={{ background: "rgba(255,255,255,0.05)", borderRadius: "6px" }} />
+        {/* App content */}
+        <div style={{ position: "relative", background: "#080808" }}>
+          <FakeNav />
+          <MiniHero items={items} />
+
+          <div style={{ position: "relative", paddingBottom: "clamp(24px, 4vw, 40px)", paddingTop: "8px" }}>
+            {row1.length > 0 && <NetflixRow label="En Tendencia" items={row1} rowIndex={0} />}
+            {row2.length > 0 && <NetflixRow label="Nuevos Lanzamientos" items={row2} rowIndex={1} />}
+            {row3.length > 0 && <NetflixRow label="Mini Films" items={row3} rowIndex={2} />}
+
+            {items.length === 0 && (
+              <div style={{ padding: "0 20px 24px" }}>
+                {[0, 1, 2].map(ri => (
+                  <div key={ri} style={{ marginBottom: "16px" }}>
+                    <div style={{ height: 8, width: 96, borderRadius: 4, background: "rgba(255,255,255,0.06)", marginBottom: 8 }} />
+                    <div style={{ display: "flex", gap: 8 }}>
+                      {[...Array(5)].map((_, i) => (
+                        <div key={i} style={{ flexShrink: 0, width: 180, aspectRatio: "16/9", borderRadius: 8, background: "rgba(255,255,255,0.03)" }} />
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
-            </div>
-
-            {/* Fake nav */}
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "clamp(12px, 2vw, 20px)", position: "relative", zIndex: 1 }}>
-              <div style={{ width: 18, height: 6, background: "rgba(255,255,255,0.08)", borderRadius: "1px" }} />
-              <div style={{ fontSize: "7px", color: "rgba(255,255,255,0.2)", fontFamily: "monospace" }}>Inicio • Música • Films</div>
-            </div>
-
-            {/* Featured cards */}
-            <div style={{ display: "flex", gap: "8px", position: "relative", zIndex: 2, overflow: "hidden" }}>
-              {featuredItems.map((item, i) => {
-                const thumb = item.thumbnail_url || getYtThumb(item.youtube_url || item.youtube_music_url);
-                return (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                    transition={{ duration: 0.5, delay: 0.3 + i * 0.05 }}
-                    style={{
-                      flex: "0 0 auto",
-                      width: "60px",
-                      aspectRatio: "2/3",
-                      borderRadius: "4px",
-                      overflow: "hidden",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      background: thumb ? `url(${thumb})` : "rgba(255,255,255,0.05)",
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                    }}
-                  />
-                );
-              })}
-            </div>
+            )}
           </div>
-        </motion.div>
 
-        {/* Right: Features Cards (2x2 grid) */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={isInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "clamp(14px, 2.5vw, 24px)", alignContent: "start" }}
-        >
-          {FEATURES.map((feature, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 12 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.4 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                background: "rgba(255,88,51,0.04)",
-                border: "1px solid rgba(255,88,51,0.15)",
-                borderRadius: "10px",
-                padding: "clamp(16px, 2.5vw, 22px)",
-                backdropFilter: "blur(8px)",
-                WebkitBackdropFilter: "blur(8px)",
-              }}
-            >
-              <h3 style={{
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                fontWeight: 900,
-                fontSize: "clamp(0.85rem, 1.8vw, 1rem)",
-                letterSpacing: "-0.02em",
-                color: "#f0ede8",
-                marginBottom: "clamp(6px, 1vw, 10px)",
-                lineHeight: 1.2,
-              }}>
-                {feature.title}
-              </h3>
-              <p style={{
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                fontWeight: 300,
-                fontSize: "clamp(0.7rem, 1.2vw, 0.85rem)",
-                color: "rgba(240,237,232,0.5)",
-                lineHeight: 1.4,
-                margin: 0,
-              }}>
-                {feature.desc}
-              </p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-
-      {/* CTA Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={isInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.7, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        style={{ marginTop: "clamp(32px, 5vw, 48px)", position: "relative", zIndex: 1 }}
-      >
-        <a
-          href="/Explorar"
-          onClick={(e) => { e.preventDefault(); base44.auth.redirectToLogin("/Explorar"); }}
-          className="group relative inline-flex items-center gap-2 overflow-hidden"
-          style={{
-            padding: "clamp(10px, 1.8vw, 14px) clamp(24px, 4vw, 36px)",
-            borderRadius: "99px",
-            background: "#ff5833",
-            border: "none",
-            cursor: "pointer",
-            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            fontWeight: 900,
-            fontSize: "clamp(0.8rem, 1.5vw, 0.95rem)",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            color: "#fff",
-            textDecoration: "none",
-            transition: "background 0.2s ease",
-          }}
-          onMouseEnter={e => e.currentTarget.style.background = "#e04a20"}
-          onMouseLeave={e => e.currentTarget.style.background = "#ff5833"}
-        >
-          Acceder
-          <svg style={{ width: "clamp(14px, 2vw, 18px)", height: "clamp(14px, 2vw, 18px)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-          </svg>
-        </a>
+          {/* Bottom fade */}
+          <div style={{
+            position: "absolute", bottom: 0, left: 0, right: 0, height: 96, pointerEvents: "none",
+            background: "linear-gradient(to top, #0a0a0b 0%, transparent 100%)"
+          }} />
+        </div>
       </motion.div>
     </section>
   );
