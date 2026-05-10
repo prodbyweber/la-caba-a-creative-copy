@@ -121,8 +121,10 @@ function ProgressBar({ total, current, onSelect }) {
 
 export default function StartCreadores() {
   const sectionRef = useRef(null);
-  const storiesRef = useRef(null);
   const inView = useInView(sectionRef, { once: false, margin: "-30%" });
+
+  // Tab state
+  const [activeTab, setActiveTab] = useState("creadores"); // "creadores" | "stories"
 
   // Creadores carousel state
   const [slideIdx, setSlideIdx] = useState(0);
@@ -135,9 +137,6 @@ export default function StartCreadores() {
   const [storyPaused, setStoryPaused] = useState(false);
   const storyAutoRef = useRef(null);
   const touchStartX = useRef(null);
-
-  // Track if we're in the stories sub-section to hide StickyNav
-  const [showingStories, setShowingStories] = useState(false);
 
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
@@ -204,21 +203,7 @@ export default function StartCreadores() {
     touchStartX.current = null;
   };
 
-  // Observe stories panel visibility to hide StickyNav
-  useEffect(() => {
-    const el = storiesRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        const visible = entry.isIntersecting && entry.intersectionRatio > 0.4;
-        setShowingStories(visible);
-        window.dispatchEvent(new CustomEvent("stories-panel-change", { detail: { open: visible } }));
-      },
-      { threshold: [0.4] }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
+
 
   const storyVariants = {
     enter: (dir) => ({ x: dir > 0 ? "6%" : "-6%", opacity: 0, scale: 1.02 }),
@@ -233,9 +218,53 @@ export default function StartCreadores() {
     <section
       id="artists"
       ref={sectionRef}
-      style={{ position: "relative", width: "100%", background: "#080808" }}
+      style={{ position: "relative", width: "100%", height: "100dvh", minHeight: "600px", overflow: "hidden", background: "#080808" }}
     >
-      {/* ── PANEL 1: Creadores carousel ── */}
+      {/* Tab buttons — top right */}
+      <div style={{ position: "absolute", top: "clamp(80px, 12vw, 120px)", right: "clamp(24px, 6vw, 56px)", zIndex: 30, display: "flex", gap: "12px" }}>
+        {[
+          { key: "creadores", label: "Creadores" },
+          { key: "stories", label: "Historias" },
+        ].map((tab) => (
+          <motion.button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            style={{
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+              fontWeight: 900,
+              fontSize: "clamp(0.7rem, 1.6vw, 0.85rem)",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              background: activeTab === tab.key ? "#ff5833" : "transparent",
+              color: activeTab === tab.key ? "white" : "rgba(240,237,232,0.4)",
+              border: `1px solid ${activeTab === tab.key ? "#ff5833" : "rgba(240,237,232,0.2)"}`,
+              borderRadius: "99px",
+              padding: "8px 18px",
+              cursor: "pointer",
+              transition: "all 0.25s ease",
+              whiteSpace: "nowrap",
+            }}
+            whileHover={{
+              borderColor: "#ff5833",
+              color: "#f0ede8",
+            }}
+          >
+            {tab.label}
+          </motion.button>
+        ))}
+      </div>
+
+      {/* ── Creadores Panel ── */}
+      <AnimatePresence mode="wait">
+        {activeTab === "creadores" && (
+          <motion.div
+            key="creadores"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-end" }}
+          >
       <div style={{ position: "relative", width: "100%", height: "100dvh", minHeight: "600px", overflow: "hidden", display: "flex", alignItems: "flex-end" }}>
         {/* Background slides */}
         <AnimatePresence mode="crossfade">
@@ -289,17 +318,25 @@ export default function StartCreadores() {
           </motion.p>
         </div>
       </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* ── PANEL 2: Historias que hemos contado ── */}
-      <div
-        ref={storiesRef}
-        className="relative w-full overflow-hidden bg-black"
-        style={{ height: "100dvh", minHeight: 560 }}
-        onMouseEnter={() => setStoryPaused(true)}
-        onMouseLeave={() => setStoryPaused(false)}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
+      {/* ── Historias Panel ── */}
+      <AnimatePresence mode="wait">
+        {activeTab === "stories" && (
+          <motion.div
+            key="stories"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="absolute inset-0 w-full overflow-hidden bg-black"
+            onMouseEnter={() => setStoryPaused(true)}
+            onMouseLeave={() => setStoryPaused(false)}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
         {/* Slides */}
         <AnimatePresence custom={storyDirection} mode="sync">
           <motion.div key={storyCurrent} custom={storyDirection} variants={storyVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }} className="absolute inset-0">
@@ -354,7 +391,9 @@ export default function StartCreadores() {
 
         {/* Film grain */}
         <div className="absolute inset-0 pointer-events-none z-10 opacity-[0.03]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`, backgroundRepeat: "repeat", backgroundSize: "128px 128px" }} />
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
