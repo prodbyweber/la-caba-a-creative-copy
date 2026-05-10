@@ -216,8 +216,8 @@ export default function LandingNav() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] bg-[#080808]/97 backdrop-blur-xl md:hidden"
           >
-            <div className="p-6 flex flex-col h-full">
-              <div className="flex justify-between items-center mb-12">
+            <div className="p-6 flex flex-col">
+              <div className="flex justify-between items-center mb-8">
                 <img
                   src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
                   alt="Cabaña Creative"
@@ -228,32 +228,31 @@ export default function LandingNav() {
                 </button>
               </div>
 
-              <div className="flex-1 flex flex-col gap-6">
-                {/* User profile if logged in */}
-                {user && (
-                  <div className="flex items-center gap-4 p-4 bg-white/5 rounded-lg mb-4">
-                    {user.avatar_url ? (
-                      <img
-                        src={user.avatar_url}
-                        alt={user.full_name}
-                        className="w-12 h-12 rounded-full object-cover border-2 border-[#ff5833]/60"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#ff5833] to-orange-400 flex items-center justify-center text-white font-bold">
-                        {user.full_name?.[0]?.toUpperCase() || "U"}
-                      </div>
-                    )}
-                    <div className="flex flex-col">
-                      <p className="text-white font-semibold text-sm">{user.full_name}</p>
-                      {user.role === "admin" && (
-                        <p className="text-[#ff5833] text-xs font-bold uppercase tracking-wide">Admin</p>
-                      )}
+              {/* User profile if logged in */}
+              {user && (
+                <div className="flex items-center gap-4 p-4 bg-white/5 rounded-lg mb-6">
+                  {user.avatar_url ? (
+                    <img
+                      src={user.avatar_url}
+                      alt={user.full_name}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-[#ff5833]/60"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#ff5833] to-orange-400 flex items-center justify-center text-white font-bold">
+                      {user.full_name?.[0]?.toUpperCase() || "U"}
                     </div>
+                  )}
+                  <div className="flex flex-col">
+                    <p className="text-white font-semibold text-sm">{user.full_name}</p>
+                    {user.role === "admin" && (
+                      <p className="text-[#ff5833] text-xs font-bold uppercase tracking-wide">Admin</p>
+                    )}
                   </div>
-                )}
+                </div>
+              )}
 
-                {/* Auth buttons at bottom */}
-                <div className="mt-auto space-y-3">
+              {/* Auth buttons */}
+              <div className="space-y-3">
                   {user ? (
                     <button
                       onClick={() => { handleLogout(); setMobileOpen(false); }}
@@ -278,10 +277,9 @@ export default function LandingNav() {
                       </button>
                     </>
                   )}
-                </div>
-              </div>
-            </div>
-          </motion.div>
+                  </div>
+                  </div>
+                  </motion.div>
         )}
       </AnimatePresence>
     </>
