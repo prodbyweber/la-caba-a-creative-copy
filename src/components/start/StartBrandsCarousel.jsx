@@ -78,8 +78,8 @@ export default function StartBrandsCarousel() {
                   maxWidth: "100%",
                   maxHeight: "100%",
                   objectFit: "contain",
-                  opacity: 0.7,
-                  filter: "grayscale(0) brightness(1.1) saturate(1.2)",
+                  opacity: 1,
+                  filter: "brightness(1) saturate(1)",
                   transition: "opacity 0.3s ease, filter 0.3s ease",
                 }}
                 onMouseEnter={e => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.filter = "brightness(1.3) drop-shadow(0 0 10px rgba(255,255,255,0.5)) drop-shadow(0 0 24px rgba(255,88,51,0.35))"; }}
