@@ -103,7 +103,7 @@ function MiniHero({ items }) {
   );
 }
 
-function NetflixCard({ item, index, rowIndex }) {
+function NetflixCard({ item, index, rowIndex, compact }) {
   const [hovered, setHovered] = useState(false);
   const thumb = item.thumbnail_url || getYtThumb(item.youtube_url || item.youtube_music_url);
   return (
@@ -115,9 +115,9 @@ function NetflixCard({ item, index, rowIndex }) {
       onMouseLeave={() => setHovered(false)}
       className="relative flex-shrink-0 rounded-lg overflow-hidden cursor-default"
       style={{
-        width: "clamp(120px, 15vw, 180px)",
+        width: compact ? "clamp(80px, 12vw, 120px)" : "clamp(120px, 15vw, 180px)",
         aspectRatio: "16/9",
-        transform: hovered ? "scale(1.06)" : "scale(1)",
+        transform: hovered ? "scale(1.05)" : "scale(1)",
         transition: "transform 0.3s cubic-bezier(0.22,1,0.36,1)",
         zIndex: hovered ? 10 : 1,
       }}>
@@ -135,14 +135,75 @@ function NetflixCard({ item, index, rowIndex }) {
   );
 }
 
-function NetflixRow({ label, items, rowIndex }) {
+function PremiumCard({ item, feature, index }) {
+  const [hovered, setHovered] = useState(false);
+  const thumb = item.thumbnail_url || getYtThumb(item.youtube_url || item.youtube_music_url);
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative overflow-hidden rounded-lg cursor-default"
+      style={{
+        aspectRatio: "1/1.2",
+        transform: hovered ? "scale(1.03)" : "scale(1)",
+        transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
+        boxShadow: hovered ? "0 20px 40px rgba(0,0,0,0.5)" : "0 8px 20px rgba(0,0,0,0.3)",
+      }}
+    >
+      {/* Background image */}
+      {thumb ? (
+        <img 
+          src={thumb} 
+          alt="" 
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ 
+            filter: hovered ? "brightness(0.95) saturate(1.15)" : "brightness(0.8) saturate(0.9)",
+            transition: "filter 0.3s ease"
+          }}
+        />
+      ) : (
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(100,100,100,0.1) 0%, rgba(8,8,8,0.4) 100%)" }} />
+      )}
+      
+      {/* Premium overlay */}
+      <div className="absolute inset-0" style={{
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.3) 50%, rgba(8,8,8,0.85) 100%)"
+      }} />
+      
+      {/* Content overlay - bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+        <h3 className="text-white font-bold text-sm line-clamp-2 leading-tight mb-2"
+          style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.01em" }}>
+          {item.title}
+        </h3>
+        <p className="text-white/70 text-xs leading-tight line-clamp-2"
+          style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300 }}>
+          {feature.title}
+        </p>
+      </div>
+      
+      {/* Border on hover */}
+      {hovered && (
+        <div className="absolute inset-0 rounded-lg pointer-events-none" style={{
+          border: "1px solid rgba(240,237,232,0.15)",
+        }} />
+      )}
+    </motion.div>
+  );
+}
+
+function NetflixRow({ label, items, rowIndex, compact }) {
   if (!items?.length) return null;
   return (
-    <div className="mb-3 sm:mb-4 px-4 sm:px-8">
-      <p className="text-[8px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.15em] sm:tracking-[0.18em] mb-1.5 sm:mb-2"
+    <div className={compact ? "mb-2 px-2" : "mb-3 sm:mb-4 px-4 sm:px-8"}>
+      <p className={compact ? "text-[7px] font-bold text-white/35 uppercase tracking-[0.12em] mb-1" : "text-[8px] sm:text-[10px] font-bold text-white/40 uppercase tracking-[0.15em] sm:tracking-[0.18em] mb-1.5 sm:mb-2"}
         style={{ fontFamily: "'Helvetica Neue', sans-serif" }}>{label}</p>
-      <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-        {items.map((item, i) => <NetflixCard key={item.id} item={item} index={i} rowIndex={rowIndex} />)}
+      <div className={compact ? "flex gap-1 overflow-x-auto pb-1" : "flex gap-1.5 sm:gap-2 overflow-x-auto pb-2"} style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+        {items.map((item, i) => <NetflixCard key={item.id} item={item} index={i} rowIndex={rowIndex} compact={compact} />)}
       </div>
     </div>
   );
@@ -318,47 +379,35 @@ export default function StartExplorar() {
         </h2>
       </motion.div>
 
-      {/* Mosaic layout with features on right */}
+      {/* Two column: Compact platform preview left, Premium cards right */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "1.2fr 1fr",
-        gap: "clamp(20px, 3vw, 32px)",
+        gridTemplateColumns: "0.8fr 1.2fr",
+        gap: "clamp(24px, 4vw, 40px)",
         position: "relative",
         zIndex: 1,
         alignItems: "start",
       }}>
-        {/* LEFT: Prime Video style mosaic - 7 cards with overflow */}
+        {/* LEFT: Compact fake platform preview */}
         <motion.div
-          initial={{ opacity: 0, x: -50 }}
+          initial={{ opacity: 0, x: -40 }}
           animate={isInView ? { opacity: 1, x: 0 } : {}}
           transition={{ duration: 0.9, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gridTemplateRows: "auto auto",
-            gap: "clamp(10px, 1.8vw, 14px)",
-            width: "100%",
+            borderRadius: "8px",
+            border: "1px solid rgba(240,237,232,0.08)",
+            background: "rgba(8,8,8,0.6)",
+            backdropFilter: "blur(12px)",
             overflow: "hidden",
-            position: "relative",
           }}
         >
-          {mosaicItems.map((item, i) => {
-            let style = {};
-            if (i === 0) style = { gridColumn: "1 / 2", gridRow: "1 / 3", aspectRatio: "9/16" };
-            else if (i === 1) style = { gridColumn: "2 / 4", gridRow: "1", aspectRatio: "16/9" };
-            else if (i === 2) style = { gridColumn: "2 / 3", gridRow: "2", aspectRatio: "9/16" };
-            else if (i === 3) style = { gridColumn: "3 / 4", gridRow: "2", aspectRatio: "9/16" };
-            else if (i === 4) style = { gridColumn: "1 / 2", gridRow: "3", aspectRatio: "9/16" };
-            else if (i === 5) style = { gridColumn: "2 / 3", gridRow: "3", aspectRatio: "9/16" };
-            else if (i === 6) style = { gridColumn: "3 / 4", gridRow: "3", aspectRatio: "1/1", marginRight: "-30%", zIndex: 5, maskImage: "linear-gradient(to right, black 0%, black 70%, transparent 100%)" };
-            
-            return (
-              <CinematicCard key={item.id || i} item={item} index={i} rowIndex={0} customStyle={style} />
-            );
-          })}
+          <FakeNav />
+          <div style={{ padding: "clamp(10px, 2vw, 14px)", maxHeight: "320px", overflowY: "auto" }}>
+            <NetflixRow label="Destacados" items={withThumb.slice(0, 4)} rowIndex={0} compact />
+          </div>
         </motion.div>
 
-        {/* RIGHT: Features as clean square blocks */}
+        {/* RIGHT: Premium Netflix-style cards grid */}
         <motion.div
           initial={{ opacity: 0, x: 40 }}
           animate={isInView ? { opacity: 1, x: 0 } : {}}
@@ -366,61 +415,13 @@ export default function StartExplorar() {
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "clamp(10px, 1.8vw, 14px)",
+            gap: "clamp(12px, 2vw, 16px)",
             width: "100%",
-            height: "fit-content",
           }}
         >
-          {FEATURES.map((feature, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 16 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.3 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                padding: "clamp(16px, 2vw, 20px)",
-                borderRadius: "6px",
-                border: "1px solid rgba(240,237,232,0.12)",
-                background: "rgba(255,255,255,0.04)",
-                backdropFilter: "blur(8px)",
-                WebkitBackdropFilter: "blur(8px)",
-                transition: "all 0.3s cubic-bezier(0.22,1,0.36,1)",
-                cursor: "default",
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = "rgba(240,237,232,0.25)";
-                e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                e.currentTarget.style.transform = "translateY(-2px)";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = "rgba(240,237,232,0.12)";
-                e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-            >
-              <h3 style={{
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                fontWeight: 700,
-                fontSize: "clamp(0.8rem, 1.6vw, 0.95rem)",
-                color: "#f0ede8",
-                marginBottom: "clamp(6px, 1.2vw, 10px)",
-                lineHeight: 1.3,
-                letterSpacing: "-0.01em",
-                margin: "0 0 clamp(6px, 1.2vw, 10px) 0",
-              }}>
-                {feature.title}
-              </h3>
-              <p style={{
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                fontWeight: 300,
-                fontSize: "clamp(0.65rem, 1vw, 0.75rem)",
-                color: "rgba(240,237,232,0.5)",
-                lineHeight: 1.35,
-                margin: 0,
-              }}>
-                {feature.subtitle}
-              </p>
-            </motion.div>
+          {/* Top 4 premium cards - 2x2 */}
+          {withThumb.slice(0, 4).map((item, i) => (
+            <PremiumCard key={item.id || i} item={item} feature={FEATURES[i]} index={i} />
           ))}
         </motion.div>
       </div>
