@@ -255,7 +255,6 @@ export default function StartCreadores() {
 
         {/* Navigation dots and label — top right */}
         <div style={{ position: "absolute", top: "clamp(140px, 18vw, 180px)", right: "clamp(24px, 6vw, 56px)", zIndex: 10, display: "flex", flexDirection: "column", gap: "12px", alignItems: "flex-end" }}>
-          <p style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 700, fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,237,232,0.35)", marginBottom: "0" }}>Creadores</p>
           <div style={{ display: "flex", gap: "6px" }}>
             {[
               { key: "creadores", label: "Creadores" },

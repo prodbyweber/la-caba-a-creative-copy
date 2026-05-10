@@ -4,11 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
 const BUSINESS_TYPES = [
-  "Marcas de ropa",
-  "Eventos y experiencias",
-  "Bares y restaurantes",
-  "Accesorios y diseño",
-  "Sesiones y workshops",
+  "Audio",
+  "Cultura",
+  "Eventos",
+  "Visuales",
+  "Lifestyle",
 ];
 
 const SERVICES = [
@@ -98,28 +98,7 @@ export default function StartBrands() {
         background: "linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)"
       }} />
 
-      {/* Section tag — top */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={inView ? { opacity: 1 } : {}}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        style={{
-          position: "absolute",
-          top: "clamp(80px, 12vw, 120px)",
-          right: "clamp(24px, 6vw, 56px)",
-          left: "auto",
-          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontWeight: 700,
-          fontSize: "10px",
-          letterSpacing: "0.3em",
-          textTransform: "uppercase",
-          color: "rgba(240,237,232,0.35)",
-          zIndex: 10,
-          textAlign: "right",
-        }}
-      >
-        Marcas
-      </motion.p>
+
 
       {/* Content — bottom */}
       <div
