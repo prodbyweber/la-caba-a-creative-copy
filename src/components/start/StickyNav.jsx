@@ -46,7 +46,7 @@ export default function StickyNav() {
             style={{
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               fontWeight: 900,
-              fontSize: isActive ? "clamp(1.1rem, 3.5vw, 2rem)" : "clamp(0.75rem, 2.2vw, 1.2rem)",
+              fontSize: isActive ? "clamp(1.4rem, 4vw, 2.4rem)" : "clamp(1rem, 2.8vw, 1.6rem)",
               letterSpacing: "-0.025em",
               color: isActive
                 ? (isChoose ? "#ff5833" : "#f0ede8")
