@@ -33,7 +33,7 @@ function VideoBackground({ src }) {
 
 
 
-export default function StartHero({ bottomOffset = "clamp(50px, 8vw, 180px)" }) {
+export default function StartHero({ bottomOffset = "clamp(50px, 8vw, 80px)" }) {
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
     queryFn: async () => { const c = await base44.entities.LandingConfig.list(); return c[0] || null; },
