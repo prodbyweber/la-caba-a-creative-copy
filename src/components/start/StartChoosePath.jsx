@@ -84,9 +84,9 @@ function CalendlyEmbed() {
           display: "block",
           border: "none",
           width: "100%",
-          height: isMobile ? "560px" : "540px",
+          height: isMobile ? "450px" : "480px",
           marginTop: "0",
-          minHeight: isMobile ? "560px" : "540px",
+          minHeight: isMobile ? "450px" : "480px",
         }}
       />
     </div>
