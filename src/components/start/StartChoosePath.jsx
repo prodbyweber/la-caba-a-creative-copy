@@ -50,12 +50,12 @@ function CalendlyEmbed() {
       }}
     >
       <iframe
-        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1"
+        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&hide_event_type_details=0&hide_landing_page_details=0"
         width="100%"
         frameBorder="0"
         scrolling="no"
         title="Agendar reunión — Cabaña Creative"
-        style={{ display: "block", border: "none", width: "100%", height: "630px" }}
+        style={{ display: "block", border: "none", width: "100%", height: "780px" }}
       />
     </div>
   );
