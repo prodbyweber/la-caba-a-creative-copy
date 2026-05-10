@@ -110,9 +110,9 @@ export default function LandingNav() {
               fontWeight: 700,
               fontSize: "clamp(0.75rem, 1.5vw, 0.9rem)",
               letterSpacing: "0.05em",
-              background: "rgba(255,255,255,0.1)",
-              border: "1px solid rgba(255,255,255,0.2)",
-              color: "#f0ede8",
+              background: "#ff5833",
+              border: "1px solid #ff5833",
+              color: "#fff",
               padding: "8px 18px",
               borderRadius: "99px",
               cursor: "pointer",
@@ -120,8 +120,8 @@ export default function LandingNav() {
               backdropFilter: "blur(8px)",
               WebkitBackdropFilter: "blur(8px)",
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.18)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#e04a20"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; }}
           >
             Explorar
           </button>
@@ -140,7 +140,7 @@ export default function LandingNav() {
                     className="w-9 h-9 rounded-full object-cover border-2 border-[#ff5833]/60"
                   />
                 ) : (
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#ff5833] to-orange-400 flex items-center justify-center text-white font-bold text-sm">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center text-[#ff5833] font-bold text-sm border-2 border-[#ff5833]/60">
                     {user.full_name?.[0]?.toUpperCase() || "U"}
                   </div>
                 )}
