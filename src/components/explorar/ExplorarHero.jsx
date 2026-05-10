@@ -16,31 +16,35 @@ function HeroSlide({ item, artist, onExplore, active, shouldPlayAudio, onVideoRe
   const isVideo = item?.hero_media_type === "video" && item?.hero_media_url;
   const audioEnabled = isVideo && !!(item?.raw?.hero_audio_enabled ?? item?.hero_audio_enabled);
   const videoRef = useRef(null);
+  // Audio always starts muted by default
   const [muted, setMuted] = useState(true);
 
-  // Control play/pause and mute based on external state
+  // Control play/pause — always muted until user explicitly toggles
   useEffect(() => {
     const vid = videoRef.current;
     if (!vid) return;
 
     if (active) {
       vid.play().catch(() => {});
-      // Only unmute if audio is enabled for this slide AND conditions allow
-      const wantAudio = audioEnabled && shouldPlayAudio;
-      vid.muted = !wantAudio;
-      setMuted(!wantAudio);
+      // If tab hidden or card modal open, force mute
+      if (!shouldPlayAudio) {
+        vid.muted = true;
+        setMuted(true);
+      }
+      // Don't auto-unmute — user controls mute via button
     } else {
       vid.pause();
       vid.muted = true;
       setMuted(true);
     }
-  }, [active, shouldPlayAudio, audioEnabled]);
+  }, [active, shouldPlayAudio]);
 
   const handleToggleMute = () => {
     const vid = videoRef.current;
     if (!vid) return;
     const next = !muted;
     vid.muted = next;
+    vid.volume = 1;
     setMuted(next);
   };
 
@@ -76,8 +80,8 @@ function HeroSlide({ item, artist, onExplore, active, shouldPlayAudio, onVideoRe
               onCanPlay={() => onVideoReady?.()}
               data-hero-video
             />
-            {/* Audio toggle — only shown when audio is enabled for this slide */}
-            {audioEnabled && (
+            {/* Audio toggle — shown on all video slides */}
+            {isVideo && (
               <motion.button
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}

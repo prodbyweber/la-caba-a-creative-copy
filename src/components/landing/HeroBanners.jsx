@@ -113,7 +113,8 @@ function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEna
   const isMobile = useMobile();
   const navigate = useNavigate();
   const objectPos = isMobile && mobilePosition ? mobilePosition : "center center";
-  const [isAudioActive, setIsAudioActive] = useState(audioEnabled === true);
+  // Audio always starts muted by default, regardless of config
+  const [isAudioActive, setIsAudioActive] = useState(false);
 
   const handleCta = () => {
     const link = ctaLink || banner.defaultLink;
@@ -125,10 +126,14 @@ function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEna
     }
   };
 
-  // Forzar actualización cuando audioEnabled cambia desde props
+  // When tab becomes hidden, mute audio
   useEffect(() => {
-    setIsAudioActive(audioEnabled === true);
-  }, [audioEnabled]);
+    const handleVisibility = () => {
+      if (document.hidden) setIsAudioActive(false);
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, []);
 
   return (
     <motion.div
@@ -162,7 +167,7 @@ function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEna
       {/* Bottom gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
-      {/* Audio Control Button — cinemático */}
+      {/* Audio Control Button — siempre visible en videos */}
       {isVideoUrl(image) && (
         <motion.button
           initial={{ opacity: 0, scale: 0.8 }}
