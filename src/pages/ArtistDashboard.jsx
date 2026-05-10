@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Music2, Film, Image, Zap, SlidersHorizontal, Camera, GripVertical } from "lucide-react";
+import { SlidersHorizontal, GripVertical, Compass } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
@@ -14,12 +14,12 @@ import PhotosGallery from "@/components/dashboard/PhotosGallery";
 import FilmsSection from "@/components/dashboard/FilmsSection";
 import CatalogSectionOrder, { DEFAULT_SECTION_ORDER } from "@/components/dashboard/CatalogSectionOrder";
 
-
 export default function ArtistDashboard() {
   const [showProfileDrawer, setShowProfileDrawer] = useState(false);
-  const [catalogMode, setCatalogMode] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [viewMode, setViewMode] = useState(null);
+  const [activeTab, setActiveTab] = useState("catalog"); // "catalog" | "explorar"
+  const [showOrderMenu, setShowOrderMenu] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
   const artistIdParam = urlParams.get("artistId") || urlParams.get("id");
@@ -28,9 +28,8 @@ export default function ArtistDashboard() {
     base44.auth.me().then(u => setCurrentUser(u)).catch(() => {});
   }, []);
 
-  // Si no hay artistId en URL, buscar artista vinculado al usuario actual
   const { data: selfArtist } = useQuery({
-    queryKey: ['self-artist', currentUser?.id],
+    queryKey: ["self-artist", currentUser?.id],
     queryFn: async () => {
       if (!currentUser?.id) return null;
       const artists = await base44.entities.Artist.filter({ user_id: currentUser.id });
@@ -41,16 +40,8 @@ export default function ArtistDashboard() {
 
   const artistId = artistIdParam || selfArtist?.id;
 
-  const clipsFilters = {
-    status: "all",
-    platform: [],
-    artist: artistId || "all",
-    dateRange: null,
-    search: ""
-  };
-
   const { data: artist, isLoading } = useQuery({
-    queryKey: ['artist', artistId],
+    queryKey: ["artist", artistId],
     queryFn: async () => {
       if (!artistId) return null;
       const results = await base44.entities.Artist.filter({ id: artistId });
@@ -59,20 +50,17 @@ export default function ArtistDashboard() {
     enabled: !!artistId,
   });
 
-  // UserProfile: buscar por user_id del artista, o por el usuario actual
   const { data: userProfile } = useQuery({
-    queryKey: ['userProfile', artist?.user_id || currentUser?.id],
+    queryKey: ["userProfile", artist?.user_id || currentUser?.id],
     queryFn: async () => {
       const uid = artist?.user_id || currentUser?.id;
       if (!uid) return null;
       const profiles = await base44.entities.UserProfile.filter({ user_id: uid });
       if (profiles.length > 0) return profiles[0];
-      // Si no existe perfil de usuario, crear uno con datos generados
       if (artist && !artist?.user_id) {
-        const firstInitial = artist.stageName?.charAt(0) || "U";
-        const lastInitial = artist.stageName?.split(" ")[1]?.charAt(0) || artist.stageName?.charAt(1) || "S";
-        const generatedUsername = artist.stageName?.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "").slice(0, 20) || "artist_" + Math.random().toString(36).substr(2, 9);
-        
+        const generatedUsername =
+          artist.stageName?.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "").slice(0, 20) ||
+          "artist_" + Math.random().toString(36).substr(2, 9);
         const created = await base44.entities.UserProfile.create({
           user_id: uid,
           username: generatedUsername,
@@ -88,34 +76,21 @@ export default function ArtistDashboard() {
     enabled: !!(artist?.user_id || currentUser?.id),
   });
 
-  // Determinar qué secciones mostrar según el tipo de cuenta
-  // Si está en modo preview, usar el tipo de vista seleccionado; si no, usar el real
   const accountType = viewMode || userProfile?.account_type || "artist";
-  // Sync viewMode to real account type when profile loads (so admin toggle starts on the right tab)
   React.useEffect(() => {
     if (userProfile?.account_type && !viewMode) setViewMode(userProfile.account_type);
   }, [userProfile?.account_type]);
-  
+
   const showAudioSection = accountType === "artist";
-  const showPhotosSection = accountType === "artist" || accountType === "creator" || accountType === "brand";
-  const showVideoSection = accountType === "artist" || accountType === "creator" || accountType === "brand";
-  const showProjectsSection = accountType === "artist" || accountType === "creator" || accountType === "brand";
+  const showPhotosSection = true;
+  const showVideoSection = true;
+  const showProjectsSection = true;
+  const showShortsSection = true;
   const showCampaignsSection = accountType === "brand";
-  const showCreativeAdsSection = accountType === "brand";
 
-  // Mobile: single "Tu catálogo" view that stacks all sections
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-  
-  // Asignar catalogMode inicial basado en el tipo de cuenta
-  useEffect(() => {
-    if (!catalogMode && userProfile) {
-      if (accountType === "artist") setCatalogMode("audio");
-      else if (accountType === "creator") setCatalogMode("photos");
-      else if (accountType === "brand") setCatalogMode("campaigns");
-    }
-  }, [userProfile, accountType, catalogMode]);
-
-  const [windowWidth, setWindowWidth] = React.useState(typeof window !== "undefined" ? window.innerWidth : 1024);
+  const [windowWidth, setWindowWidth] = React.useState(
+    typeof window !== "undefined" ? window.innerWidth : 1024
+  );
   React.useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
@@ -123,22 +98,21 @@ export default function ArtistDashboard() {
   }, []);
   const isMobileView = windowWidth < 768;
 
-  // Section order — persisted in localStorage per user
   const storageKey = `catalog_order_${currentUser?.id || "default"}`;
   const [sectionOrder, setSectionOrder] = useState(() => {
     try {
       const saved = localStorage.getItem(storageKey);
       return saved ? JSON.parse(saved) : DEFAULT_SECTION_ORDER;
-    } catch { return DEFAULT_SECTION_ORDER; }
+    } catch {
+      return DEFAULT_SECTION_ORDER;
+    }
   });
-  const [showOrderMenu, setShowOrderMenu] = useState(false);
 
   const handleOrderChange = (newOrder) => {
     setSectionOrder(newOrder);
     try { localStorage.setItem(storageKey, JSON.stringify(newOrder)); } catch {}
   };
 
-  // Mostrar loading mientras resolvemos artista
   const resolving = !artistIdParam && !selfArtist && !currentUser;
   if (isLoading || resolving) {
     return (
@@ -154,8 +128,6 @@ export default function ArtistDashboard() {
     );
   }
 
-  // Si aún no hay artista pero sí hay usuario, mostramos el dashboard igual (para admin sin artista vinculado)
-  // Solo mostramos "no encontrado" si se pasó artistId explícito y no existe
   if (!artist && artistIdParam) {
     return (
       <div className="min-h-screen bg-[#0a0a0b] text-white">
@@ -169,109 +141,90 @@ export default function ArtistDashboard() {
     );
   }
 
-  // Artista efectivo — puede ser null para admin sin artista vinculado
   const effectiveArtist = artist || null;
-  const displayName = effectiveArtist?.stageName || userProfile?.artist_name || userProfile?.display_name || currentUser?.full_name || "Dashboard";
+  const displayName =
+    effectiveArtist?.stageName ||
+    userProfile?.artist_name ||
+    userProfile?.display_name ||
+    currentUser?.full_name ||
+    "Dashboard";
+
+  // Render a catalog section by key
+  const renderSection = (key) => {
+    switch (key) {
+      case "tracks":
+        if (!showAudioSection) return null;
+        return (
+          <div key="tracks">
+            <SectionLabel label="Soundtracks" />
+            <TracksSection jlyArtistId={effectiveArtist?.id || artistId} />
+          </div>
+        );
+      case "video":
+        if (!showVideoSection) return null;
+        return (
+          <div key="video">
+            <SectionLabel label="Films" />
+            <FilmsSection artistId={effectiveArtist?.id || artistId} userProfileId={userProfile?.id} />
+          </div>
+        );
+      case "shorts":
+        if (!showShortsSection) return null;
+        return (
+          <div key="shorts">
+            <SectionLabel label="Shorts" />
+            <ClipsLibrary
+              artistId={effectiveArtist?.id || artistId}
+              filters={{ status: "all", platform: [], artist: effectiveArtist?.id || artistId || "all", dateRange: null, search: "" }}
+            />
+          </div>
+        );
+      case "projects":
+        if (!showProjectsSection) return null;
+        return (
+          <div key="projects">
+            <SectionLabel label="Proyectos" />
+            <ProjectsSection jlyArtistId={effectiveArtist?.id} />
+          </div>
+        );
+      case "photos":
+        if (!showPhotosSection) return null;
+        return (
+          <div key="photos">
+            <SectionLabel label="Fotos" />
+            <PhotosGallery userProfileId={userProfile?.id} />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
       <DashboardNav artistName={displayName} artistId={effectiveArtist?.id}>
-        <ArtistAvatarButton artist={effectiveArtist || { stageName: displayName, avatar_url: userProfile?.profile_photo_url || userProfile?.avatar_url }} onClick={() => setShowProfileDrawer(true)} />
+        <ArtistAvatarButton
+          artist={effectiveArtist || { stageName: displayName, avatar_url: userProfile?.profile_photo_url || userProfile?.avatar_url }}
+          onClick={() => setShowProfileDrawer(true)}
+        />
       </DashboardNav>
 
-      {/* Mobile bottom nav */}
       <MobileBottomNav artistId={effectiveArtist?.id} isAdmin={false} />
 
-      <main className="pt-14">
-        {/* Mobile: "Tu Catálogo" — all sections stacked, reorderable */}
-        {isMobileView && (
-          <div className="px-4 py-5 pb-36 space-y-8">
-            {/* Header with reorder button */}
-            <div className="flex items-end justify-between">
-              <div>
-                <h1 className="text-2xl font-black text-white mb-1" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.04em" }}>
-                  Tu catálogo
-                </h1>
-                <p className="text-xs text-white/30">Todo tu contenido en un solo lugar</p>
-              </div>
-              <div className="relative">
-                <button
-                  onClick={() => setShowOrderMenu(v => !v)}
-                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[10px] font-medium transition-all ${
-                    showOrderMenu
-                      ? "border-white/20 bg-white/[0.08] text-white/70"
-                      : "border-white/[0.08] bg-transparent text-white/30 hover:text-white/60 hover:border-white/15"
-                  }`}
-                >
-                  <GripVertical className="w-3 h-3" />
-                  Ordenar
-                </button>
-                <AnimatePresence>
-                  {showOrderMenu && (
-                    <CatalogSectionOrder
-                      order={sectionOrder}
-                      onChange={handleOrderChange}
-                      onClose={() => setShowOrderMenu(false)}
-                    />
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
+      <main className="pt-14 pb-32">
+        <div className="px-4 sm:px-8 lg:px-12">
 
-            {/* Sections rendered in user-defined order */}
-            {sectionOrder.map(key => {
-              if (key === "tracks" && showAudioSection) return (
-                <div key="tracks">
-                  <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Soundtracks</p>
-                  <TracksSection jlyArtistId={effectiveArtist?.id || artistId} />
-                </div>
-              );
-              if (key === "video" && showVideoSection) return (
-                <div key="video">
-                  <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Films</p>
-                  <FilmsSection artistId={effectiveArtist?.id || artistId} userProfileId={userProfile?.id} />
-                </div>
-              );
-              if (key === "projects" && showProjectsSection) return (
-                <div key="projects">
-                  <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Proyectos</p>
-                  <ProjectsSection jlyArtistId={effectiveArtist?.id} />
-                </div>
-              );
-              if (key === "photos" && showPhotosSection) return (
-                <div key="photos">
-                  <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Fotos</p>
-                  <PhotosGallery userProfileId={userProfile?.id} />
-                </div>
-              );
-              return null;
-            })}
-
-            {showCampaignsSection && (
-              <div>
-                <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.25em] mb-3">Campañas</p>
-                <BrandCampaignsSection userProfileId={userProfile?.id} />
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Desktop: original tab layout */}
-        {!isMobileView && (
-        <div className="px-4 sm:px-8 lg:px-12 py-5 [&_.mobile-carousel]:!-mx-4">
-          {/* Admin: vista previa compacta — no ocupa espacio de contenido */}
+          {/* Admin view mode toggle */}
           {currentUser?.role === "admin" && (
-            <div className="flex justify-end mb-2">
+            <div className="flex justify-end pt-4 mb-2">
               <div className="flex items-center gap-1 bg-white/[0.04] border border-white/[0.07] rounded-lg px-1.5 py-1">
                 <SlidersHorizontal className="w-3 h-3 text-white/25 mr-1" />
-                {[{label: "Artista", value: "artist"}, {label: "Creador", value: "creator"}, {label: "Marca", value: "brand"}].map(opt => (
+                {[{ label: "Artista", value: "artist" }, { label: "Creador", value: "creator" }, { label: "Marca", value: "brand" }].map(opt => (
                   <button
-                    key={String(opt.value)}
+                    key={opt.value}
                     onClick={() => setViewMode(opt.value)}
                     className={`text-[10px] px-2 py-0.5 rounded-md transition-all ${
-                      viewMode === opt.value
-                        ? 'bg-white/15 text-white font-semibold'
-                        : 'text-white/30 hover:text-white/60'
+                      viewMode === opt.value ? "bg-white/15 text-white font-semibold" : "text-white/30 hover:text-white/60"
                     }`}
                   >
                     {opt.label}
@@ -281,213 +234,75 @@ export default function ArtistDashboard() {
             </div>
           )}
 
-          {/* Header — selector dinámico según tipo de cuenta */}
-           <div className="mb-5 flex items-center justify-between gap-4">
-             {/* Selector dinámico — estilo cinematico minimalista */}
-             <div className="flex items-center gap-0 border-b border-white/10 w-fit overflow-x-auto flex-1">
-               {showAudioSection && (
-                 <button
-                   onClick={() => setCatalogMode("audio")}
-                   className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-                   style={{ color: catalogMode === "audio" ? "#fff" : "rgba(255,255,255,0.3)" }}
-                 >
-                   <Music2 className="w-3.5 h-3.5" />
-                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Soundtracks</span>
-                   {catalogMode === "audio" && (
-                     <motion.div
-                       layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
-                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                     />
-                   )}
-                 </button>
-               )}
-               {showVideoSection && (
-                 <button
-                   onClick={() => setCatalogMode("video")}
-                   className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-                   style={{ color: catalogMode === "video" ? "#fff" : "rgba(255,255,255,0.3)" }}
-                 >
-                   <Film className="w-3.5 h-3.5" />
-                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Films</span>
-                   {catalogMode === "video" && (
-                     <motion.div
-                       layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
-                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                     />
-                   )}
-                 </button>
-               )}
-               {showPhotosSection && (
-                 <button
-                   onClick={() => setCatalogMode("photos")}
-                   className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-                   style={{ color: catalogMode === "photos" ? "#fff" : "rgba(255,255,255,0.3)" }}
-                 >
-                   <Camera className="w-3.5 h-3.5" />
-                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Fotos</span>
-                   {catalogMode === "photos" && (
-                     <motion.div
-                       layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
-                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                     />
-                   )}
-                 </button>
-               )}
+          {/* ── TAB NAV ── */}
+          <div className="flex items-center gap-0 border-b border-white/10 mt-4 mb-6">
+            <TabButton label="Tu catálogo" active={activeTab === "catalog"} onClick={() => setActiveTab("catalog")} />
+            <TabButton label="Explorar" active={activeTab === "explorar"} onClick={() => { window.location.href = "/Explorar"; }} icon={<Compass className="w-3.5 h-3.5" />} />
+          </div>
 
-               {showCampaignsSection && (
-                 <button
-                   onClick={() => setCatalogMode("campaigns")}
-                   className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-                   style={{ color: catalogMode === "campaigns" ? "#fff" : "rgba(255,255,255,0.3)" }}
-                 >
-                   <Zap className="w-3.5 h-3.5" />
-                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Campañas</span>
-                   {catalogMode === "campaigns" && (
-                     <motion.div
-                       layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
-                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                     />
-                   )}
-                 </button>
-               )}
-               {showCreativeAdsSection && (
-                 <button
-                   onClick={() => setCatalogMode("creative-ads")}
-                   className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-                   style={{ color: catalogMode === "creative-ads" ? "#fff" : "rgba(255,255,255,0.3)" }}
-                 >
-                   <Image className="w-3.5 h-3.5" />
-                   <span style={{ letterSpacing: "0.08em", fontFamily: "'Helvetica Neue', sans-serif" }}>Creative Ads</span>
-                   {catalogMode === "creative-ads" && (
-                     <motion.div
-                       layoutId="catalogUnderline"
-                       className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
-                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                     />
-                   )}
-                 </button>
-               )}
-               </div>
-
-               {/* Reorder button — desktop */}
-               <div className="relative flex-shrink-0 self-start">
-                 <button
-                   onClick={() => setShowOrderMenu(v => !v)}
-                   className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[10px] font-medium transition-all ${
-                     showOrderMenu
-                       ? "border-white/20 bg-white/[0.08] text-white/70"
-                       : "border-white/[0.06] bg-transparent text-white/20 hover:text-white/50 hover:border-white/12"
-                   }`}
-                 >
-                   <GripVertical className="w-3 h-3" />
-                   Ordenar
-                 </button>
-                 <AnimatePresence>
-                   {showOrderMenu && (
-                     <CatalogSectionOrder
-                       order={sectionOrder}
-                       onChange={handleOrderChange}
-                       onClose={() => setShowOrderMenu(false)}
-                     />
-                   )}
-                 </AnimatePresence>
-               </div>
-               </div>
-
-          {/* ── CONTENIDO DINÁMICO POR TIPO DE CUENTA ── */}
-          <AnimatePresence mode="wait">
-            {/* ARTISTA: Tracks + Proyectos (respeta sectionOrder) */}
-            {showAudioSection && catalogMode === "audio" && (
-              <motion.div
-                key="audio"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.25 }}
-              >
-                <div className="space-y-4">
-                  {/* tracks before projects by default, respects order */}
-                  {sectionOrder.indexOf("tracks") <= sectionOrder.indexOf("projects") ? (
-                    <>
-                      <TracksSection jlyArtistId={effectiveArtist?.id || artistId} />
-                      <ProjectsSection jlyArtistId={effectiveArtist?.id} />
-                    </>
-                  ) : (
-                    <>
-                      <ProjectsSection jlyArtistId={effectiveArtist?.id} />
-                      <TracksSection jlyArtistId={effectiveArtist?.id || artistId} />
-                    </>
-                  )}
+          {/* ── CATÁLOGO ── */}
+          {activeTab === "catalog" && (
+            <div>
+              {/* Header row */}
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h1
+                    className="font-black text-white"
+                    style={{
+                      fontFamily: "'Helvetica Neue', sans-serif",
+                      letterSpacing: "-0.04em",
+                      fontSize: isMobileView ? "1.5rem" : "2rem",
+                    }}
+                  >
+                    Tu catálogo
+                  </h1>
+                  <p className="text-[11px] text-white/25 mt-0.5">Todo tu contenido en un solo lugar</p>
                 </div>
-              </motion.div>
-            )}
 
-            {showPhotosSection && catalogMode === "photos" && (
-              <motion.div
-                key="photos"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.25 }}
-              >
-                <PhotosGallery userProfileId={userProfile?.id} />
-              </motion.div>
-            )}
+                {/* Reorder button */}
+                <div className="relative flex-shrink-0">
+                  <button
+                    onClick={() => setShowOrderMenu(v => !v)}
+                    className="flex items-center gap-1.5 rounded-xl border transition-all"
+                    style={{
+                      padding: isMobileView ? "9px 12px" : "8px 14px",
+                      fontSize: isMobileView ? "12px" : "11px",
+                      fontFamily: "'Helvetica Neue', sans-serif",
+                      fontWeight: 600,
+                      background: showOrderMenu ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)",
+                      borderColor: showOrderMenu ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.08)",
+                      color: showOrderMenu ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.35)",
+                    }}
+                  >
+                    <GripVertical style={{ width: isMobileView ? 15 : 13, height: isMobileView ? 15 : 13 }} />
+                    Ordenar
+                  </button>
+                  <AnimatePresence>
+                    {showOrderMenu && (
+                      <CatalogSectionOrder
+                        order={sectionOrder}
+                        onChange={handleOrderChange}
+                        onClose={() => setShowOrderMenu(false)}
+                        isMobile={isMobileView}
+                      />
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
 
-            {showVideoSection && catalogMode === "video" && (
-              <motion.div
-                key="video"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.25 }}
-              >
-                <FilmsSection artistId={effectiveArtist?.id} userProfileId={userProfile?.id} />
-              </motion.div>
-            )}
-
-
-
-            {/* MARCA: Campañas activas */}
-            {showCampaignsSection && catalogMode === "campaigns" && (
-              <motion.div
-                key="campaigns"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.25 }}
-              >
-                <div className="space-y-6">
-                  <BrandCampaignsSection userProfileId={userProfile?.id} />
-                  <div className="pt-4 border-t border-white/10">
-                    <h3 className="text-lg font-bold text-white mb-4">Proyectos y contenido</h3>
-                    <ProjectsSection jlyArtistId={effectiveArtist?.id} />
+              {/* Sections stacked in user order */}
+              <div className="space-y-10">
+                {sectionOrder.map(key => renderSection(key))}
+                {showCampaignsSection && (
+                  <div key="campaigns">
+                    <SectionLabel label="Campañas" />
+                    <BrandCampaignsSection userProfileId={userProfile?.id} />
                   </div>
-                </div>
-              </motion.div>
-            )}
-
-            {showCreativeAdsSection && catalogMode === "creative-ads" && (
-              <motion.div
-                key="creative-ads"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.25 }}
-              >
-                <div className="text-center py-16">
-                  <Image className="w-12 h-12 text-white/20 mx-auto mb-4" />
-                  <p className="text-white/40 text-sm">Creative Ads — proximamente</p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-        )}
       </main>
 
       <ArtistProfileDrawer
@@ -497,5 +312,44 @@ export default function ArtistDashboard() {
         onClose={() => setShowProfileDrawer(false)}
       />
     </div>
+  );
+}
+
+function SectionLabel({ label }) {
+  return (
+    <p
+      className="text-[10px] font-bold uppercase mb-3"
+      style={{
+        fontFamily: "'Helvetica Neue', sans-serif",
+        letterSpacing: "0.28em",
+        color: "rgba(255,255,255,0.2)",
+      }}
+    >
+      {label}
+    </p>
+  );
+}
+
+function TabButton({ label, active, onClick, icon }) {
+  return (
+    <button
+      onClick={onClick}
+      className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
+      style={{
+        fontFamily: "'Helvetica Neue', sans-serif",
+        letterSpacing: "0.06em",
+        color: active ? "#fff" : "rgba(255,255,255,0.3)",
+      }}
+    >
+      {icon}
+      {label}
+      {active && (
+        <motion.div
+          layoutId="dashTabUnderline"
+          className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
+          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        />
+      )}
+    </button>
   );
 }
