@@ -50,13 +50,12 @@ function CalendlyEmbed() {
       }}
     >
       <iframe
-        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&hide_event_type_details=0"
+        src="https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5200&hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1"
         width="100%"
-        height="700"
         frameBorder="0"
-        scrolling="yes"
+        scrolling="no"
         title="Agendar reunión — Cabaña Creative"
-        style={{ display: "block", border: "none", width: "100%", height: "700px" }}
+        style={{ display: "block", border: "none", width: "100%", height: "630px" }}
       />
     </div>
   );
@@ -244,7 +243,7 @@ export default function StartChoosePath() {
         position: "relative",
         width: "100%",
         minHeight: "100dvh",
-        overflow: "hidden",
+        overflow: "visible",
         background: "#080808",
         display: "flex",
         alignItems: "flex-end",
@@ -278,7 +277,7 @@ export default function StartChoosePath() {
         style={{
           position: "relative",
           zIndex: 10,
-          padding: "0 clamp(24px, 6vw, 56px) clamp(40px, 8vw, 72px)",
+          padding: "clamp(120px, 20vw, 200px) clamp(24px, 6vw, 56px) clamp(40px, 8vw, 72px)",
           width: "100%",
         }}
       >
@@ -385,7 +384,7 @@ export default function StartChoosePath() {
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                    style={{ overflow: "hidden", marginBottom: "clamp(10px, 2vw, 16px)" }}
+                    style={{ overflow: "clip", marginBottom: "clamp(10px, 2vw, 16px)" }}
                   >
                     {path.key === "artist" ? <CalendlyPanel /> : <ContactPanel />}
                   </motion.div>
