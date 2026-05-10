@@ -7,7 +7,7 @@ import StartCreadores from "@/components/start/StartCreadores";
 import StartBrands from "@/components/start/StartBrands";
 import StartExplorar from "@/components/start/StartExplorar";
 import StartChoosePath from "@/components/start/StartChoosePath";
-import StartContact from "@/components/start/StartContact";
+
 import StartFooter from "@/components/start/StartFooter";
 import StickyNav from "@/components/start/StickyNav";
 
@@ -63,7 +63,6 @@ export default function Start() {
         <div className="snap-section-full"><StartBrands /></div>
         <div className="snap-section-full"><StartExplorar /></div>
         <div className="snap-section-full"><StartChoosePath /></div>
-        <div className="snap-section-full"><StartContact /></div>
         <div className="snap-section-auto"><StartFooter /></div>
       </div>
     </div>
