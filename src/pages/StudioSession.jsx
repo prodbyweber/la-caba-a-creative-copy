@@ -76,20 +76,13 @@ export default function StudioSession() {
     >
       {/* ── Cinematic background ── */}
       <div className="absolute inset-0 z-0">
-        {videoSrc ? (
+        {videoSrc && (
           <video
             ref={vidRef1}
             src={videoSrc}
             autoPlay muted loop playsInline preload="auto"
             className="absolute inset-0 w-full h-full object-cover"
             style={{ pointerEvents: "none", filter: "brightness(0.35) saturate(0.7) blur(2px)" }}
-          />
-        ) : (
-          <img
-            src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=1800&q=80"
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ filter: "brightness(0.3) saturate(0.6) blur(2px)" }}
           />
         )}
 
