@@ -51,11 +51,17 @@ export default function StudioSession() {
 
   // Inject Calendly script once
   useEffect(() => {
-    if (document.querySelector('script[src="https://assets.calendly.com/assets/external/widget.js"]')) return;
+    if (document.getElementById("calendly-script")) return;
     const s = document.createElement("script");
+    s.id = "calendly-script";
     s.src = "https://assets.calendly.com/assets/external/widget.js";
     s.async = true;
-    document.body.appendChild(s);
+    s.onload = () => {
+      if (window.Calendly) {
+        window.Calendly.initInlineWidgets();
+      }
+    };
+    document.head.appendChild(s);
   }, []);
 
   return (
@@ -199,7 +205,7 @@ export default function StudioSession() {
             marginBottom: "clamp(28px, 4vw, 44px)",
           }}
         >
-          Reserva tu sesión en el estudio. Producción, mezcla, masterización y dirección creativa.
+          Reserva tu sesión en el estudio.
         </motion.p>
 
         {/* Calendly widget */}
