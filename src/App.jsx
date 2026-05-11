@@ -11,6 +11,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { base44 } from '@/api/base44Client';
 import GuestCatalogPreview from './pages/GuestCatalogPreview';
 import StudioSession from './pages/StudioSession';
+import Meeting from './pages/Meeting';
 import Start from './pages/Start';
 import ContactLeads from './pages/ContactLeads';
 import ArtistPanelList from './pages/ArtistPanelList';
@@ -145,6 +146,7 @@ const AuthenticatedApp = () => {
       <Route path="/ArtistPanelList" element={<ProtectedAdminRoute element={<ArtistPanelList />} />} />
       <Route path="/ADNdeMarca" element={<ProtectedAdminRoute element={<ADNdeMarca />} />} />
       <Route path="/StudioSession" element={<StudioSession />} />
+      <Route path="/meeting" element={<Meeting />} />
       <Route path="/PublicProfile" element={<PublicProfile />} />
       <Route path="/creator/:username" element={<CreatorProfile />} />
       <Route path="/:username" element={<UserPublicProfile />} />

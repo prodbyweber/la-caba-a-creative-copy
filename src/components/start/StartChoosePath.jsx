@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, lazy } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import { useNavigate } from "react-router-dom";
 import PhoneInput from "./PhoneInput";
 
 function useAutoPlay(src) {
@@ -364,6 +365,7 @@ export default function StartChoosePath() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const [openPanel, setOpenPanel] = useState(null); // "artist" | "brand" | null
+  const navigate = useNavigate();
 
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
@@ -380,9 +382,7 @@ export default function StartChoosePath() {
   ];
 
   const toggle = (key) => {
-    const next = openPanel === key ? null : key;
-    setOpenPanel(next);
-    window.dispatchEvent(new CustomEvent("choose-panel-change", { detail: { open: !!next } }));
+    navigate("/meeting");
   };
 
   const btnColor = (key) => (key === "artist" || key === "brand") ? "#ff5833" : "rgba(240,237,232,0.6)";
