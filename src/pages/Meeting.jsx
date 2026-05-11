@@ -215,7 +215,7 @@ export default function Meeting() {
             marginBottom: "clamp(28px, 4vw, 44px)",
           }}
         >
-          Reserva una llamada con nuestro equipo. Sin compromisos — solo una conversación sobre tu proyecto.
+          Reserva una llamada con nuestro equipo y cuéntanos tu proyecto.
         </motion.p>
 
         {/* Calendly widget */}
