@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom";
 import useActiveSection, { SECTIONS } from "./useActiveSection";
 
 const NAV_ITEMS = [
-  { key: "hero",     label: "Inicio" },
-  { key: "about",    label: "Quiénes Somos" },
-  { key: "artists",  label: "Creadores" },
-  { key: "brands",   label: "Marcas" },
-  { key: "explorar", label: "Explorar" },
-  { key: "choose",   label: "Comenzar" },
+  { key: "hero",     label: "Inicio",        hideOnExplorar: true },
+  { key: "about",    label: "Quiénes Somos", hideOnExplorar: true },
+  { key: "artists",  label: "Creadores",     hideOnExplorar: true },
+  { key: "brands",   label: "Marcas",        hideOnExplorar: true },
+  { key: "explorar", label: "Explorar",      hideOnExplorar: false },
+  { key: "choose",   label: "Comenzar",      hideOnExplorar: false },
 ];
 
 const scrollTo = (id) => {
@@ -37,6 +37,7 @@ export default function StickyNav({ showMoreInfo = false }) {
     return () => window.removeEventListener("stories-panel-change", handler);
   }, []);
 
+  const isExplorarSection = active === "explorar";
   const hidden = (isChooseSection && panelOpen) || storiesOpen;
 
   return (
@@ -66,7 +67,11 @@ export default function StickyNav({ showMoreInfo = false }) {
       {NAV_ITEMS.map((item) => {
         const isActive = active === item.key;
         const isChoose = item.key === "choose";
-        const shouldShow = !isChooseSection || isChoose;
+        const shouldShow = isChooseSection
+          ? isChoose
+          : isExplorarSection
+            ? !item.hideOnExplorar
+            : true;
 
         return (
           <AnimatePresence key={item.key}>

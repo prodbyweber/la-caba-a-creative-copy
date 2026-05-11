@@ -202,20 +202,20 @@ export default function StartExplorar({ showButton = true, allowMobileScroll = f
 
   const features = [
     {
-      title: "Accede gratis a Cabaña Creative",
-      desc: "Explora una nueva generación de música, cine y cultura visual."
+      title: "Atrévete a explorar",
+      desc: "Accede al universo creativo de Cabaña Creative y conecta con proyectos diseñados para artistas, marcas y creadores que buscan destacar con una identidad real."
     },
     {
-      title: "Contenido exclusivo",
-      desc: "Descubre artistas emergentes y proyectos seleccionados desde nuestra plataforma."
+      title: "Producción & Dirección Creativa",
+      desc: "Desarrollamos experiencias visuales, musicales y cinematográficas con enfoque premium y dirección artística integral."
     },
     {
-      title: "Membresía — 8€/mes",
-      desc: "Alertas de campañas, descuentos hasta 20% y acceso prioritario a nuevos lanzamientos."
+      title: "Experiencias exclusivas",
+      desc: "Accede a sesiones, eventos, networking y oportunidades creativas dentro de una comunidad en constante movimiento."
     },
     {
-      title: "Impulsa tu presencia",
-      desc: "Posiciona contenido en YouTube y abre nuevas oportunidades de monetización."
+      title: "Impulsa tu proyecto",
+      desc: "Desde branding y contenido hasta música y marketing, convertimos ideas en proyectos listos para crecer y monetizar."
     },
   ];
 
