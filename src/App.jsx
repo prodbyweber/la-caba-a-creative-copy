@@ -144,7 +144,7 @@ const AuthenticatedApp = () => {
       <Route path="/UserProfiles" element={<ProtectedAdminRoute element={<UserProfiles />} />} />
       <Route path="/ArtistPanelList" element={<ProtectedAdminRoute element={<ArtistPanelList />} />} />
       <Route path="/ADNdeMarca" element={<ProtectedAdminRoute element={<ADNdeMarca />} />} />
-      <Route path="/StudioSession" element={<ProtectedAdminRoute element={<StudioSession />} />} />
+      <Route path="/StudioSession" element={<StudioSession />} />
       <Route path="/PublicProfile" element={<PublicProfile />} />
       <Route path="/creator/:username" element={<CreatorProfile />} />
       <Route path="/:username" element={<UserPublicProfile />} />
