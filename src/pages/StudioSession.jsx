@@ -49,13 +49,18 @@ export default function StudioSession() {
   const vidRef1 = useAutoPlay(videoSrc);
   const vidRef2 = useAutoPlay(fallbackSrc && fallbackSrc !== videoSrc ? fallbackSrc : null);
 
-  // Inject Calendly script once — the script auto-initializes .calendly-inline-widget elements
+  // Inject Calendly script once
   useEffect(() => {
     if (document.getElementById("calendly-script")) return;
     const s = document.createElement("script");
     s.id = "calendly-script";
     s.src = "https://assets.calendly.com/assets/external/widget.js";
     s.async = true;
+    s.onload = () => {
+      if (window.Calendly) {
+        window.Calendly.initInlineWidgets();
+      }
+    };
     document.head.appendChild(s);
   }, []);
 
@@ -202,46 +207,6 @@ export default function StudioSession() {
         >
           Reserva tu sesión en el estudio.
         </motion.p>
-
-        {/* Handwritten arrow hint */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.85, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            alignSelf: "flex-start",
-            marginLeft: "clamp(0px, 2vw, 40px)",
-            marginBottom: "8px",
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            maxWidth: "720px",
-            width: "100%",
-          }}
-        >
-          <span style={{
-            fontFamily: "'Caveat', 'Segoe Script', 'Bradley Hand', cursive",
-            fontSize: "clamp(1rem, 2.2vw, 1.25rem)",
-            color: "#ff5833",
-            letterSpacing: "0.01em",
-            lineHeight: 1,
-          }}>
-            cantidad de horas
-          </span>
-          {/* Hand-drawn arrow SVG pointing right */}
-          <svg width="54" height="28" viewBox="0 0 54 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path
-              d="M2 20 C10 18, 22 10, 38 8"
-              stroke="#ff5833" strokeWidth="1.8" strokeLinecap="round" fill="none"
-              style={{ strokeDasharray: "60", strokeDashoffset: "0" }}
-            />
-            <path
-              d="M34 4 C36 6, 40 7, 38 8 C39 10, 40 13, 38 8"
-              stroke="#ff5833" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"
-            />
-          </svg>
-          <style>{`@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500&display=swap');`}</style>
-        </motion.div>
 
         {/* Calendly widget */}
         <motion.div
