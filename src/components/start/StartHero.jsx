@@ -41,7 +41,7 @@ export default function StartHero({ bottomOffset = `${typeof window !== "undefin
   });
 
   const videoSrc = cfg?.hero_video_url || null;
-  const fallbackImage = cfg?.hero_banner_1_image || "https://images.unsplash.com/photo-1598387993281-cecf8b71a8f8?w=1800&q=85";
+  const fallbackImage = cfg?.hero_banner_1_image || null;
 
   return (
     <section
@@ -55,15 +55,12 @@ export default function StartHero({ bottomOffset = `${typeof window !== "undefin
         background: "#080808",
       }}
     >
-      {/* Preload image */}
-      <link rel="preload" as="image" href={fallbackImage} />
-      
-      {/* Background media */}
+      {/* Background media — solo cuando el config ya cargó */}
       {videoSrc ? (
         <VideoBackground src={videoSrc} />
-      ) : (
+      ) : fallbackImage ? (
         <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover" loading="eager" />
-      )}
+      ) : null}
 
       {/* Overlay */}
       <div className="absolute inset-0" style={{
