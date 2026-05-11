@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -30,6 +30,14 @@ function isVideo(url) {
 }
 
 export default function StudioSession() {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    base44.auth.me().then(u => {
+      if (u?.role === "admin") setIsAdmin(true);
+    }).catch(() => {});
+  }, []);
+
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
     queryFn: async () => {
@@ -105,22 +113,24 @@ export default function StudioSession() {
         <div className="absolute bottom-0 left-0 right-0 h-[3px] sm:h-[5px]" style={{ background: "rgba(8,8,8,0.95)" }} />
       </div>
 
-      {/* ── Back button ── */}
-      <motion.div
-        initial={{ opacity: 0, x: -12 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="absolute top-6 left-6 z-30"
-      >
-        <Link
-          to="/AdminDashboard"
-          className="flex items-center gap-2 text-white/40 hover:text-white/80 transition-colors"
-          style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase" }}
+      {/* ── Back button — solo admin ── */}
+      {isAdmin && (
+        <motion.div
+          initial={{ opacity: 0, x: -12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="absolute top-6 left-6 z-30"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          Dashboard
-        </Link>
-      </motion.div>
+          <Link
+            to="/AdminDashboard"
+            className="flex items-center gap-2 text-white/40 hover:text-white/80 transition-colors"
+            style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase" }}
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Dashboard
+          </Link>
+        </motion.div>
+      )}
 
       {/* ── Logo ── */}
       <motion.div
