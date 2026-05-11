@@ -94,7 +94,7 @@ export default function StickyNav({ showMoreInfo = false }) {
                       ? "#ff5833"
                       : isActive
                         ? "#f0ede8"
-                        : "rgba(240,237,232,0.38)",
+                        : "rgba(240,237,232,0.15)",
                     background: "none",
                     border: "none",
                     cursor: "pointer",
