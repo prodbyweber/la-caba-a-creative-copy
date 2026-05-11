@@ -10,7 +10,7 @@ import CreateRevisionModal from "@/components/admin/CreateRevisionModal";
 import StatusButton from "@/components/admin/StatusButton";
 import {
   Calendar, Clock, AlertCircle, GitPullRequest, FolderKanban,
-  TrendingUp, Users, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal
+  TrendingUp, Users, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal, Music2
 } from "lucide-react";
 import { format, isToday, parseISO } from "date-fns";
 import { Link } from "react-router-dom";
@@ -126,6 +126,22 @@ export default function AdminDashboard() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Admin Dashboard</h1>
           <p className="text-sm text-white/30">Actividades prioritarias de hoy</p>
+        </motion.div>
+
+        {/* Studio Session shortcut */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-5">
+          <Link to="/StudioSession">
+            <div className="flex items-center justify-between px-5 py-4 rounded-xl border border-[#ff5833]/20 bg-[#ff5833]/[0.05] hover:bg-[#ff5833]/[0.1] hover:border-[#ff5833]/40 transition-all cursor-pointer group">
+              <div className="flex items-center gap-3">
+                <Music2 className="w-4 h-4 text-[#ff5833]/70 group-hover:text-[#ff5833] transition-colors" />
+                <div>
+                  <p className="text-sm font-bold text-white">Studio Session</p>
+                  <p className="text-[10px] text-white/30">Reservar sesión en el estudio</p>
+                </div>
+              </div>
+              <span className="text-[#ff5833]/50 group-hover:text-[#ff5833] text-sm transition-colors">→</span>
+            </div>
+          </Link>
         </motion.div>
 
         {/* KPI Cards - arriba */}

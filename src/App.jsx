@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { base44 } from '@/api/base44Client';
 import GuestCatalogPreview from './pages/GuestCatalogPreview';
+import StudioSession from './pages/StudioSession';
 import Start from './pages/Start';
 import ContactLeads from './pages/ContactLeads';
 import ArtistPanelList from './pages/ArtistPanelList';
@@ -143,6 +144,7 @@ const AuthenticatedApp = () => {
       <Route path="/UserProfiles" element={<ProtectedAdminRoute element={<UserProfiles />} />} />
       <Route path="/ArtistPanelList" element={<ProtectedAdminRoute element={<ArtistPanelList />} />} />
       <Route path="/ADNdeMarca" element={<ProtectedAdminRoute element={<ADNdeMarca />} />} />
+      <Route path="/StudioSession" element={<ProtectedAdminRoute element={<StudioSession />} />} />
       <Route path="/PublicProfile" element={<PublicProfile />} />
       <Route path="/creator/:username" element={<CreatorProfile />} />
       <Route path="/:username" element={<UserPublicProfile />} />
