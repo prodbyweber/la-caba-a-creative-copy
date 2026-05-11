@@ -187,7 +187,7 @@ export default function StudioSession() {
             marginBottom: "clamp(8px, 1.5vw, 14px)",
           }}
         >
-          Studio Session
+          La Cabaña
         </motion.h1>
 
         {/* Subline */}
