@@ -127,7 +127,7 @@ export default function StartHero({ bottomOffset = `${typeof window !== "undefin
           maxWidth: "380px",
         }}>
           Descubre quiénes somos antes de{" "}
-          <span style={{ color: "#f97316", fontWeight: 500 }}>comenzar</span>
+          <span style={{ color: "#ff5833", fontWeight: 500 }}>comenzar</span>
         </p>
       </motion.div>
     </section>
