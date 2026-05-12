@@ -10,7 +10,7 @@ import CreateRevisionModal from "@/components/admin/CreateRevisionModal";
 import StatusButton from "@/components/admin/StatusButton";
 import {
   Calendar, Clock, AlertCircle, GitPullRequest, FolderKanban,
-  TrendingUp, Users, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal, Music2
+  TrendingUp, Users, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal, Music2, UserRound
 } from "lucide-react";
 import { format, isToday, parseISO } from "date-fns";
 import { Link } from "react-router-dom";
@@ -105,9 +105,9 @@ export default function AdminDashboard() {
   const archiveRevision = useMutation({ mutationFn: (id) => base44.entities.Revision.update(id, { status: 'Closed' }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['revisions'] }) });
 
   const kpis = [
-    { icon: Calendar, label: "Sessions Hoy", value: todaySessions.length, link: createPageUrl("Calendars") },
-    { icon: Clock, label: "Entregables", value: dueDeliverables.length, link: createPageUrl("Calendars") },
-    { icon: GitPullRequest, label: "Revisiones", value: openRevisions.length, link: createPageUrl("Revisions") },
+    { icon: Calendar, label: "Sessions Hoy", value: todaySessions.length, link: createPageUrl("Calendars"), accent: null },
+    { icon: UserRound, label: "Creadores", value: artists.length, link: "/UserProfiles", accent: "#f97316" },
+    { icon: GitPullRequest, label: "Revisiones", value: openRevisions.length, link: createPageUrl("Revisions"), accent: null },
   ];
 
   const openEditSession = (s) => { setEditSession(s); setShowSessionModal(true); };
@@ -154,11 +154,30 @@ export default function AdminDashboard() {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.04 }}
-                  className="bg-[#111113] border border-white/[0.06] rounded-xl p-4 hover:border-white/[0.14] hover:bg-white/[0.04] transition-all cursor-pointer"
+                  className="rounded-xl p-4 transition-all cursor-pointer"
+                  style={kpi.accent ? {
+                    background: `${kpi.accent}10`,
+                    border: `1px solid ${kpi.accent}30`,
+                  } : {
+                    background: "#111113",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                  }}
+                  onMouseEnter={e => {
+                    if (kpi.accent) {
+                      e.currentTarget.style.background = `${kpi.accent}1a`;
+                      e.currentTarget.style.borderColor = `${kpi.accent}50`;
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (kpi.accent) {
+                      e.currentTarget.style.background = `${kpi.accent}10`;
+                      e.currentTarget.style.borderColor = `${kpi.accent}30`;
+                    }
+                  }}
                 >
-                  <kpi.icon className="w-4 h-4 text-white/25 mb-3" />
-                  <div className="text-2xl font-black text-white mb-0.5">{kpi.value}</div>
-                  <div className="text-[10px] text-white/25 font-medium">{kpi.label}</div>
+                  <kpi.icon className="w-4 h-4 mb-3" style={{ color: kpi.accent || "rgba(255,255,255,0.25)" }} />
+                  <div className="text-2xl font-black mb-0.5" style={{ color: kpi.accent || "white" }}>{kpi.value}</div>
+                  <div className="text-[10px] font-medium" style={{ color: kpi.accent ? `${kpi.accent}cc` : "rgba(255,255,255,0.25)" }}>{kpi.label}</div>
                 </motion.div>
               </Link>
             ))}
