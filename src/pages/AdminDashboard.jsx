@@ -132,22 +132,6 @@ export default function AdminDashboard() {
           <p className="text-sm text-white/30">Actividades prioritarias de hoy</p>
         </motion.div>
 
-        {/* Studio Session shortcut */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-5">
-          <Link to="/StudioSession">
-            <div className="flex items-center justify-between px-5 py-4 rounded-xl border border-[#ff5833]/20 bg-[#ff5833]/[0.05] hover:bg-[#ff5833]/[0.1] hover:border-[#ff5833]/40 transition-all cursor-pointer group">
-              <div className="flex items-center gap-3">
-                <Music2 className="w-4 h-4 text-[#ff5833]/70 group-hover:text-[#ff5833] transition-colors" />
-                <div>
-                  <p className="text-sm font-bold text-white">Studio Session</p>
-                  <p className="text-[10px] text-white/30">Reservar sesión en el estudio</p>
-                </div>
-              </div>
-              <span className="text-[#ff5833]/50 group-hover:text-[#ff5833] text-sm transition-colors">→</span>
-            </div>
-          </Link>
-        </motion.div>
-
         {/* KPI Cards - arriba */}
         <div className="mb-6">
           <p className="text-[11px] font-semibold text-white/20 uppercase tracking-widest mb-3">Resumen General</p>
@@ -387,6 +371,14 @@ export default function AdminDashboard() {
         </motion.div>
 
       </div>
+
+        {/* Studio Session — acceso discreto al final */}
+        <div className="px-3 sm:px-8 lg:px-14 xl:px-20 pb-8">
+          <Link to="/StudioSession" className="inline-flex items-center gap-2 text-xs text-white/20 hover:text-white/50 transition-colors">
+            <Music2 className="w-3 h-3" />
+            Studio Session
+          </Link>
+        </div>
 
       {/* Modals */}
       <CreateSessionModal isOpen={showSessionModal} onClose={handleCloseSession} editData={editSession} />
