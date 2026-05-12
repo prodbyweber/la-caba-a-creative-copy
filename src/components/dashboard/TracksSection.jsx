@@ -342,7 +342,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 999999 }}>
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -686,7 +686,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
                 value={formData.versions?.drive_folder || ""}
                 onChange={(e) => setFormData({
                   ...formData,
-                  versions: { drive_folder: e.target.value }
+                  versions: { ...(formData.versions || {}), drive_folder: e.target.value }
                 })}
                 placeholder="https://drive.google.com/drive/folders/..."
                 className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-xs placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
