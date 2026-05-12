@@ -67,41 +67,59 @@ export default function StartHero({ bottomOffset = `${typeof window !== "undefin
         background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 50%, rgba(0,0,0,0.75) 100%)"
       }} />
 
-      {/* Bottom-right: slogan */}
+      {/* Center hero text */}
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
         style={{
           position: "absolute",
-          bottom: bottomOffset,
-          right: "clamp(24px, 6vw, 56px)",
+          inset: 0,
           zIndex: 20,
-          textAlign: "right",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "0 clamp(24px, 8vw, 80px)",
           pointerEvents: "none",
         }}
       >
+        <h1 style={{
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontSize: "clamp(1.6rem, 4vw, 2.8rem)",
+          fontWeight: 300,
+          color: "rgba(240,237,232,0.95)",
+          letterSpacing: "-0.02em",
+          lineHeight: 1.25,
+          marginBottom: "clamp(16px, 2.5vw, 24px)",
+          maxWidth: "720px",
+        }}>
+          Un espacio para creadores y marcas con visión
+        </h1>
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "9px",
-          fontWeight: 700,
-          letterSpacing: "0.3em",
-          textTransform: "uppercase",
-          color: "rgba(240,237,232,0.4)",
-          marginBottom: "6px",
+          fontSize: "clamp(0.85rem, 1.5vw, 1.05rem)",
+          fontWeight: 300,
+          color: "rgba(240,237,232,0.55)",
+          letterSpacing: "0.01em",
+          lineHeight: 1.6,
+          marginBottom: "clamp(20px, 3vw, 32px)",
+          maxWidth: "520px",
         }}>
-          Música · Films · Creadores
+          Producción, contenido y experiencias creativas desarrolladas para destacar.
         </p>
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "clamp(1rem, 2.5vw, 1.4rem)",
-          fontWeight: 300,
-          color: "rgba(240,237,232,0.85)",
-          letterSpacing: "-0.01em",
-          lineHeight: 1.3,
-          maxWidth: "320px",
+          fontSize: "clamp(0.7rem, 1.1vw, 0.85rem)",
+          fontWeight: 400,
+          color: "rgba(240,237,232,0.3)",
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+          maxWidth: "480px",
+          lineHeight: 1.7,
         }}>
-          más que lo que se escucha.
+          Descubre quiénes somos y lo que ofrecemos a creadores y marcas antes de Comenzar.
         </p>
       </motion.div>
     </section>
