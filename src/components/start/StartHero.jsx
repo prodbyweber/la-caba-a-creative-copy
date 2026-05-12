@@ -64,7 +64,7 @@ export default function StartHero({ bottomOffset = `${typeof window !== "undefin
 
       {/* Overlay */}
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 50%, rgba(0,0,0,0.75) 100%)"
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8) 100%)"
       }} />
 
       {/* Center hero text */}
@@ -85,41 +85,49 @@ export default function StartHero({ bottomOffset = `${typeof window !== "undefin
           pointerEvents: "none",
         }}
       >
+        {/* Eyebrow */}
+        <p style={{
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontSize: "9px",
+          fontWeight: 700,
+          letterSpacing: "0.3em",
+          textTransform: "uppercase",
+          color: "rgba(240,237,232,0.3)",
+          marginBottom: "18px",
+        }}>
+          Creadores · Marcas · Producción
+        </p>
+
+        {/* Main title */}
         <h1 style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "clamp(1.6rem, 4vw, 2.8rem)",
+          fontSize: "clamp(1.5rem, 3.5vw, 2.6rem)",
           fontWeight: 300,
           color: "rgba(240,237,232,0.95)",
           letterSpacing: "-0.02em",
-          lineHeight: 1.25,
-          marginBottom: "clamp(16px, 2.5vw, 24px)",
-          maxWidth: "720px",
+          lineHeight: 1.2,
+          marginBottom: "clamp(14px, 2vw, 20px)",
+          maxWidth: "640px",
         }}>
-          Un espacio para creadores y marcas con visión
+          Un espacio para creadores<br />y marcas con visión
         </h1>
+
+        {/* Divider */}
+        <div style={{ width: "32px", height: "1px", background: "rgba(240,237,232,0.15)", marginBottom: "clamp(14px, 2vw, 20px)" }} />
+
+        {/* Subtitle */}
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "clamp(0.85rem, 1.5vw, 1.05rem)",
+          fontSize: "clamp(0.78rem, 1.3vw, 0.95rem)",
           fontWeight: 300,
-          color: "rgba(240,237,232,0.55)",
+          color: "rgba(240,237,232,0.45)",
           letterSpacing: "0.01em",
-          lineHeight: 1.6,
-          marginBottom: "clamp(20px, 3vw, 32px)",
-          maxWidth: "520px",
-        }}>
-          Producción, contenido y experiencias creativas desarrolladas para destacar.
-        </p>
-        <p style={{
-          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "clamp(0.7rem, 1.1vw, 0.85rem)",
-          fontWeight: 400,
-          color: "rgba(240,237,232,0.3)",
-          letterSpacing: "0.15em",
-          textTransform: "uppercase",
-          maxWidth: "480px",
           lineHeight: 1.7,
+          maxWidth: "420px",
         }}>
-          Descubre quiénes somos y lo que ofrecemos a creadores y marcas antes de Comenzar.
+          Producción, contenido y experiencias<br />desarrolladas para destacar.
+          <br /><br />
+          Descubre lo que ofrecemos antes de comenzar.
         </p>
       </motion.div>
     </section>
