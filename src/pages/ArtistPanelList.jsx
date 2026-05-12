@@ -188,11 +188,11 @@ export default function ArtistPanelList() {
           </div>
         )}
 
-        {/* Creators list */}
+        {/* Creators grid */}
         {isLoading ? (
-          <div className="space-y-2">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-14 bg-white/[0.03] rounded-xl animate-pulse" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+            {[...Array(10)].map((_, i) => (
+              <div key={i} className="h-48 bg-white/[0.03] rounded-xl animate-pulse" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
@@ -201,7 +201,7 @@ export default function ArtistPanelList() {
             <p className="text-sm text-white/30">No hay creadores para este filtro</p>
           </div>
         ) : (
-          <div className="space-y-1">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
             {filtered.map((c, idx) => {
               const TypeIcon = TYPE_CONFIG[c.accountType]?.icon || User;
               const typeLabel = TYPE_CONFIG[c.accountType]?.label || c.accountType;
@@ -209,47 +209,47 @@ export default function ArtistPanelList() {
               return (
                 <motion.div
                   key={c.artist?.id || c.profile?.id || idx}
-                  initial={{ opacity: 0, y: 6 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.015 }}
-                  className="group flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.04] transition-all"
+                  transition={{ delay: idx * 0.03 }}
+                  className="group bg-white/[0.03] border border-white/[0.07] rounded-xl overflow-hidden hover:bg-white/[0.06] hover:border-white/[0.12] transition-all"
                 >
                   {/* Avatar */}
-                  <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-[#1a1a1a] border border-white/[0.08]">
+                  <div className="relative aspect-square bg-[#111] overflow-hidden">
                     {c.avatarUrl ? (
-                      <img src={c.avatarUrl} alt={c.displayName} className="w-full h-full object-cover" />
+                      <img src={c.avatarUrl} alt={c.displayName} className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="text-sm font-black text-white/25">{c.displayName?.[0]?.toUpperCase() || "?"}</span>
+                        <span className="text-3xl font-black text-white/20">{c.displayName?.[0]?.toUpperCase() || "?"}</span>
                       </div>
                     )}
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate leading-tight">{c.displayName}</p>
-                    <div className="flex items-center gap-2">
-                      {c.profile?.username && <span className="text-[11px] text-white/30">@{c.profile.username}</span>}
-                      {!c.profile?.username && c.profile?.user_email && <span className="text-[11px] text-white/25 truncate">{c.profile.user_email}</span>}
-                      <span className="flex items-center gap-0.5 text-[9px] font-semibold uppercase tracking-wider text-white/20">
-                        <TypeIcon className="w-2.5 h-2.5" />{typeLabel}
+                    {/* Type badge */}
+                    <div className="absolute top-2 left-2">
+                      <span className="flex items-center gap-1 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-black/70 text-white/50 backdrop-blur-sm">
+                        <TypeIcon className="w-2.5 h-2.5" />
+                        {typeLabel}
                       </span>
-                      {c.artist?.genre && <span className="text-[10px] text-white/20 truncate">{c.artist.genre}</span>}
                     </div>
                   </div>
 
-                  {/* Action */}
-                  {c.artist?.id ? (
-                    <button
-                      onClick={() => handleViewDashboard(c.artist.id)}
-                      className="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-lg border border-white/10 text-[10px] font-semibold text-white/40 hover:text-white hover:border-white/25 transition-all opacity-0 group-hover:opacity-100"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      Dashboard
-                    </button>
-                  ) : (
-                    <span className="flex-shrink-0 text-[10px] text-white/15">—</span>
-                  )}
+                  {/* Info */}
+                  <div className="p-3">
+                    <p className="text-xs font-bold text-white truncate leading-tight mb-0.5">{c.displayName}</p>
+                    {c.artist?.genre && <p className="text-[10px] text-white/30 truncate mb-2">{c.artist.genre}</p>}
+                    {c.profile?.username && <p className="text-[10px] text-white/20 truncate mb-2">@{c.profile.username}</p>}
+
+                    {c.artist?.id ? (
+                      <button
+                        onClick={() => handleViewDashboard(c.artist.id)}
+                        className="w-full flex items-center justify-center gap-1 py-1.5 rounded-lg border border-white/10 text-[10px] font-semibold text-white/50 hover:text-white hover:border-white/25 transition-all"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        Ver Dashboard
+                      </button>
+                    ) : (
+                      <div className="py-1.5 text-center text-[10px] text-white/20">Sin dashboard</div>
+                    )}
+                  </div>
                 </motion.div>
               );
             })}
