@@ -64,70 +64,44 @@ export default function StartHero({ bottomOffset = `${typeof window !== "undefin
 
       {/* Overlay */}
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.8) 100%)"
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 50%, rgba(0,0,0,0.75) 100%)"
       }} />
 
-      {/* Center hero text */}
+      {/* Bottom-right: slogan */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
         style={{
           position: "absolute",
-          inset: 0,
+          bottom: bottomOffset,
+          right: "clamp(24px, 6vw, 56px)",
           zIndex: 20,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          padding: "0 clamp(24px, 8vw, 80px)",
-          paddingBottom: "8vh",
+          textAlign: "right",
           pointerEvents: "none",
         }}
       >
-        {/* Main title */}
-        <h1 style={{
-          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "clamp(1.5rem, 3.5vw, 2.6rem)",
-          fontWeight: 300,
-          color: "rgba(240,237,232,0.95)",
-          letterSpacing: "-0.02em",
-          lineHeight: 1.2,
-          marginBottom: "clamp(14px, 2vw, 20px)",
-          maxWidth: "640px",
-        }}>
-          Un espacio para creadores<br />y marcas con visión
-        </h1>
-
-        {/* Divider */}
-        <div style={{ width: "32px", height: "1px", background: "rgba(240,237,232,0.15)", marginBottom: "clamp(14px, 2vw, 20px)" }} />
-
-        {/* Subtitle */}
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "clamp(0.78rem, 1.3vw, 0.95rem)",
-          fontWeight: 300,
-          color: "rgba(240,237,232,0.45)",
-          letterSpacing: "0.01em",
-          lineHeight: 1.7,
-          maxWidth: "420px",
-          marginBottom: "clamp(12px, 2vw, 18px)",
+          fontSize: "9px",
+          fontWeight: 700,
+          letterSpacing: "0.3em",
+          textTransform: "uppercase",
+          color: "rgba(240,237,232,0.4)",
+          marginBottom: "6px",
         }}>
-          Producción, contenido y experiencias<br />desarrolladas para destacar.
+          Música · Films · Creadores
         </p>
-
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "clamp(0.72rem, 1.1vw, 0.85rem)",
-          fontWeight: 400,
-          color: "rgba(240,237,232,0.3)",
-          letterSpacing: "0.02em",
-          lineHeight: 1.6,
-          maxWidth: "380px",
+          fontSize: "clamp(1rem, 2.5vw, 1.4rem)",
+          fontWeight: 300,
+          color: "rgba(240,237,232,0.85)",
+          letterSpacing: "-0.01em",
+          lineHeight: 1.3,
+          maxWidth: "320px",
         }}>
-          Descubre quiénes somos antes de{" "}
-          <span style={{ color: "#ff5833", fontWeight: 500 }}>comenzar</span>
+          más que lo que se escucha.
         </p>
       </motion.div>
     </section>
