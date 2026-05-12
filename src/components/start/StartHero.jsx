@@ -82,22 +82,10 @@ export default function StartHero({ bottomOffset = `${typeof window !== "undefin
           justifyContent: "center",
           textAlign: "center",
           padding: "0 clamp(24px, 8vw, 80px)",
+          paddingBottom: "8vh",
           pointerEvents: "none",
         }}
       >
-        {/* Eyebrow */}
-        <p style={{
-          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "9px",
-          fontWeight: 700,
-          letterSpacing: "0.3em",
-          textTransform: "uppercase",
-          color: "rgba(240,237,232,0.3)",
-          marginBottom: "18px",
-        }}>
-          Creadores · Marcas · Producción
-        </p>
-
         {/* Main title */}
         <h1 style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
