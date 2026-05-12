@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock } from "lucide-react";
+import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock, Trash2 } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -84,7 +84,7 @@ function YoutubePlayer({ url, autoplay = false }) {
 }
 
 // ── Detail Modal ──────────────────────────────────────────────────────────────
-function TrackDetailModal({ track, onClose, onEdit, playing, onTogglePlay, onTogglePublic }) {
+function TrackDetailModal({ track, onClose, onEdit, onDelete, playing, onTogglePlay, onTogglePublic }) {
   const status = statusConfig[track.status] || statusConfig.idea;
   const folders = FOLDER_DEFS.filter(f => track.versions?.[f.key]);
   const isPublic = track.is_public === true;
@@ -100,7 +100,7 @@ function TrackDetailModal({ track, onClose, onEdit, playing, onTogglePlay, onTog
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
@@ -219,6 +219,13 @@ function TrackDetailModal({ track, onClose, onEdit, playing, onTogglePlay, onTog
             >
               {isPublic ? <Globe className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
               {isPublic ? "Público" : "Privado"}
+            </button>
+
+            <button
+              onClick={onDelete}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-bold bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Eliminar
             </button>
           </div>
 
@@ -345,6 +352,13 @@ function TrackCard({ track, onEdit, isFirst }) {
   const handleTogglePublic = async () => {
     await base44.entities.Track.update(localTrack.id, { is_public: !localTrack.is_public });
     setLocalTrack(t => ({ ...t, is_public: !t.is_public }));
+    queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
+  };
+
+  const handleDelete = async () => {
+    if (!confirm(`¿Eliminar "${localTrack.title}"?`)) return;
+    await base44.entities.Track.delete(localTrack.id);
+    setShowDetail(false);
     queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
   };
 
@@ -541,6 +555,7 @@ function TrackCard({ track, onEdit, isFirst }) {
               track={localTrack}
               onClose={() => setShowDetail(false)}
               onEdit={(t) => { setShowDetail(false); onEdit(t); }}
+              onDelete={handleDelete}
               playing={playing}
               onTogglePlay={togglePlay}
               onTogglePublic={handleTogglePublic}
