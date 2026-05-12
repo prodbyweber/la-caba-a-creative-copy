@@ -124,10 +124,22 @@ export default function StartHero({ bottomOffset = `${typeof window !== "undefin
           letterSpacing: "0.01em",
           lineHeight: 1.7,
           maxWidth: "420px",
+          marginBottom: "clamp(12px, 2vw, 18px)",
         }}>
           Producción, contenido y experiencias<br />desarrolladas para destacar.
-          <br /><br />
-          Descubre lo que ofrecemos antes de comenzar.
+        </p>
+
+        <p style={{
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontSize: "clamp(0.72rem, 1.1vw, 0.85rem)",
+          fontWeight: 400,
+          color: "rgba(240,237,232,0.3)",
+          letterSpacing: "0.02em",
+          lineHeight: 1.6,
+          maxWidth: "380px",
+        }}>
+          Descubre quiénes somos antes de{" "}
+          <span style={{ color: "#f97316", fontWeight: 500 }}>comenzar</span>
         </p>
       </motion.div>
     </section>
