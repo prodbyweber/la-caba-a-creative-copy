@@ -10,7 +10,7 @@ import CreateRevisionModal from "@/components/admin/CreateRevisionModal";
 import StatusButton from "@/components/admin/StatusButton";
 import {
   Calendar, Clock, AlertCircle, GitPullRequest, FolderKanban,
-  TrendingUp, Users, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal, Music2, UserRound
+  TrendingUp, Users, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal, Music2, UserRound, Mail
 } from "lucide-react";
 import { format, isToday, parseISO } from "date-fns";
 import { Link } from "react-router-dom";
@@ -69,6 +69,7 @@ export default function AdminDashboard() {
   const { data: revisions = [] } = useQuery({ queryKey: ['revisions'], queryFn: () => base44.entities.Revision.list('-created_date') });
   const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => base44.entities.Project.list('-created_date') });
   const { data: artists = [] } = useQuery({ queryKey: ['artists'], queryFn: () => base44.entities.Artist.list('-created_date') });
+  const { data: contactLeads = [] } = useQuery({ queryKey: ['contactLeads'], queryFn: () => base44.entities.ContactLead.list('-created_date') });
 
   // KPI calculations
   const todaySessions = sessions.filter(s => s.start_time && isToday(parseISO(s.start_time)));
@@ -104,10 +105,12 @@ export default function AdminDashboard() {
   const archiveDeliverable = useMutation({ mutationFn: (id) => base44.entities.Deliverable.update(id, { status: 'Approved' }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['deliverables'] }) });
   const archiveRevision = useMutation({ mutationFn: (id) => base44.entities.Revision.update(id, { status: 'Closed' }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['revisions'] }) });
 
+  const newLeads = contactLeads.filter(l => l.status === 'Nuevo' || !l.status);
+
   const kpis = [
     { icon: Calendar, label: "Sessions Hoy", value: todaySessions.length, link: createPageUrl("Calendars"), accent: null },
-    { icon: UserRound, label: "Creadores", value: artists.length, link: "/UserProfiles", accent: "#f97316" },
-    { icon: GitPullRequest, label: "Revisiones", value: openRevisions.length, link: createPageUrl("Revisions"), accent: null },
+    { icon: UserRound, label: "Creadores", value: activeArtists.length, link: "/ArtistPanelList", accent: "#f97316" },
+    { icon: Mail, label: "Solicitudes", value: newLeads.length, link: "/ContactLeads", accent: null },
   ];
 
   const openEditSession = (s) => { setEditSession(s); setShowSessionModal(true); };
