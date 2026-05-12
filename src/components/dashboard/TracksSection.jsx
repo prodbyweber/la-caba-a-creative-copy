@@ -81,9 +81,11 @@ export default function TracksSection({ jlyArtistId }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="sm:bg-gradient-to-br sm:from-[#141414] sm:to-black sm:rounded-2xl sm:border sm:border-white/5"
         style={{ overflow: "visible" }}
       >
+        {/* Visual wrapper — border/bg only, no overflow clipping */}
+        <div className="sm:bg-gradient-to-br sm:from-[#141414] sm:to-black sm:rounded-2xl sm:border sm:border-white/5" style={{ overflow: "visible" }}>
+
         {/* Header */}
         <div className="px-0 sm:px-4 sm:py-3 sm:border-b sm:border-white/5 flex items-center justify-between mb-3 sm:mb-0"
           style={{ borderRadius: "1rem 1rem 0 0" }}>
@@ -128,7 +130,7 @@ export default function TracksSection({ jlyArtistId }) {
         </div>
 
         {/* DESKTOP: existing Netflix hover cards */}
-        <div className="hidden sm:block" style={{ overflowX: "auto", overflowY: "visible", padding: "60px 16px 200px", margin: "-60px 0 -200px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
+        <div className="hidden sm:block" style={{ overflowX: "auto", overflowY: "visible", padding: "80px 16px 240px", margin: "-80px 0 -240px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
           {tracks.length === 0 ? (
             <div className="text-center py-8 px-4">
               <Music2 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
@@ -146,6 +148,7 @@ export default function TracksSection({ jlyArtistId }) {
             </div>
           )}
         </div>
+        </div>{/* end visual wrapper */}
       </motion.div>
 
       {/* Create/Edit Modal — rendered via portal to avoid clipping */}

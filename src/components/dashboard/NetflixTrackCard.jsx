@@ -430,7 +430,7 @@ function TrackCard({ track, onEdit, isFirst }) {
     <>
       {/* Outer wrapper — z-index elevates on hover */}
       <div
-        style={{ width: 240, flexShrink: 0, position: "relative", zIndex: hovered ? 50 : 1 }}
+        style={{ width: 240, flexShrink: 0, position: "relative", zIndex: hovered ? 200 : 1 }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
@@ -464,7 +464,7 @@ function TrackCard({ track, onEdit, isFirst }) {
             </div>
           </div>
 
-          <div className="rounded-xl overflow-hidden shadow-2xl" style={{ background: "#1a1a1c" }}>
+          <div className="rounded-xl shadow-2xl" style={{ background: "#1a1a1c", overflow: "visible" }}>
             {hasAudio && (
               <>
                 <audio ref={previewRef} src={track.audio_file_url} preload="metadata" />
@@ -473,7 +473,7 @@ function TrackCard({ track, onEdit, isFirst }) {
             )}
 
             {/* Cover */}
-            <div style={{ height: 150, overflow: "hidden", position: "relative" }}>
+            <div style={{ height: 150, overflow: "hidden", position: "relative", borderRadius: "0.75rem 0.75rem 0 0" }}>
               <motion.div
                 style={{ width: "100%", height: "100%" }}
                 animate={
@@ -551,8 +551,7 @@ function TrackCard({ track, onEdit, isFirst }) {
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.22 }}
-                  className="overflow-hidden"
-                  style={{ background: "#1a1a1c" }}
+                  style={{ background: "#1a1a1c", overflow: "hidden", borderRadius: "0 0 0.75rem 0.75rem" }}
                 >
                   <div className="px-2.5 pt-2 pb-3 space-y-1.5">
                     <div className="flex items-center justify-between">
