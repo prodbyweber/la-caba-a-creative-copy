@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { SlidersHorizontal, GripVertical, Compass } from "lucide-react";
+import { GripVertical } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
@@ -18,7 +18,6 @@ export default function ArtistDashboard() {
   const [showProfileDrawer, setShowProfileDrawer] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [viewMode, setViewMode] = useState(null);
-  const [activeTab, setActiveTab] = useState("catalog"); // "catalog" | "explorar"
   const [showOrderMenu, setShowOrderMenu] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -214,35 +213,8 @@ export default function ArtistDashboard() {
       <main className="pt-14 pb-32">
         <div className="px-4 sm:px-8 lg:px-12">
 
-          {/* Admin view mode toggle */}
-          {currentUser?.role === "admin" && (
-            <div className="flex justify-end pt-4 mb-2">
-              <div className="flex items-center gap-1 bg-white/[0.04] border border-white/[0.07] rounded-lg px-1.5 py-1">
-                <SlidersHorizontal className="w-3 h-3 text-white/25 mr-1" />
-                {[{ label: "Artista", value: "artist" }, { label: "Creador", value: "creator" }, { label: "Marca", value: "brand" }].map(opt => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setViewMode(opt.value)}
-                    className={`text-[10px] px-2 py-0.5 rounded-md transition-all ${
-                      viewMode === opt.value ? "bg-white/15 text-white font-semibold" : "text-white/30 hover:text-white/60"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* ── TAB NAV ── */}
-          <div className="flex items-center gap-0 border-b border-white/10 mt-4 mb-6">
-            <TabButton label="Tu catálogo" active={activeTab === "catalog"} onClick={() => setActiveTab("catalog")} />
-            <TabButton label="Explorar" active={activeTab === "explorar"} onClick={() => { window.location.href = "/Explorar"; }} icon={<Compass className="w-3.5 h-3.5" />} />
-          </div>
-
           {/* ── CATÁLOGO ── */}
-          {activeTab === "catalog" && (
-            <div>
+          <div className="mt-4">
               {/* Header row */}
               <div className="flex items-center justify-between mb-6">
                 <div>
@@ -301,7 +273,6 @@ export default function ArtistDashboard() {
                 )}
               </div>
             </div>
-          )}
         </div>
       </main>
 
@@ -327,29 +298,5 @@ function SectionLabel({ label }) {
     >
       {label}
     </p>
-  );
-}
-
-function TabButton({ label, active, onClick, icon }) {
-  return (
-    <button
-      onClick={onClick}
-      className="relative flex items-center gap-2 px-4 pb-2.5 pt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex-shrink-0"
-      style={{
-        fontFamily: "'Helvetica Neue', sans-serif",
-        letterSpacing: "0.06em",
-        color: active ? "#fff" : "rgba(255,255,255,0.3)",
-      }}
-    >
-      {icon}
-      {label}
-      {active && (
-        <motion.div
-          layoutId="dashTabUnderline"
-          className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
-          transition={{ type: "spring", stiffness: 400, damping: 30 }}
-        />
-      )}
-    </button>
   );
 }
