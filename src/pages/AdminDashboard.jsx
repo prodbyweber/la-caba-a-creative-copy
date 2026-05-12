@@ -111,6 +111,7 @@ export default function AdminDashboard() {
     { icon: Calendar, label: "Sessions Hoy", value: todaySessions.length, link: createPageUrl("Calendars"), accent: null },
     { icon: UserRound, label: "Creadores", value: activeArtists.length, link: "/ArtistPanelList", accent: "#f97316" },
     { icon: Mail, label: "Solicitudes", value: newLeads.length, link: "/ContactLeads", accent: null },
+    { icon: Calendar, label: "Calendario", value: upcomingSessions.length, link: "/Calendars", accent: "#22c55e" },
   ];
 
   const openEditSession = (s) => { setEditSession(s); setShowSessionModal(true); };
@@ -150,7 +151,7 @@ export default function AdminDashboard() {
         {/* KPI Cards - arriba */}
         <div className="mb-6">
           <p className="text-[11px] font-semibold text-white/20 uppercase tracking-widest mb-3">Resumen General</p>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {kpis.map((kpi, i) => (
               <Link key={i} to={kpi.link}>
                 <motion.div
