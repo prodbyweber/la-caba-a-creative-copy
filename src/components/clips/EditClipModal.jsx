@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { X, Save, Loader, Upload, Image as ImageIcon, Youtube, Check } from "lucide-react";
+import { X, Save, Loader, Youtube, Check } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 function getYoutubeId(url) {
@@ -11,27 +11,11 @@ function getYoutubeId(url) {
 
 export default function EditClipModal({ clip, onClose, onUpdate }) {
   const [saving, setSaving] = useState(false);
-  const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   const [title, setTitle] = useState(clip.title || "");
   const [youtubeUrl, setYoutubeUrl] = useState(clip.file_url || "");
-  const [thumbnailUrl, setThumbnailUrl] = useState(clip.thumbnail_url || "");
-  const fileInputRef = useRef(null);
 
   const ytId = getYoutubeId(youtubeUrl);
   const ytThumb = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : null;
-  const previewThumb = thumbnailUrl || ytThumb;
-
-  const handleThumbnailUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingThumbnail(true);
-    try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setThumbnailUrl(file_url);
-    } finally {
-      setUploadingThumbnail(false);
-    }
-  };
 
   const handleSave = async () => {
     if (!title.trim()) { alert("El título es obligatorio"); return; }
@@ -40,7 +24,7 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
       await base44.entities.Clip.update(clip.id, {
         title: title.trim(),
         file_url: youtubeUrl,
-        thumbnail_url: thumbnailUrl || ytThumb || clip.thumbnail_url || "",
+        thumbnail_url: ytThumb || clip.thumbnail_url || "",
       });
       onUpdate();
     } finally {
@@ -55,6 +39,7 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         className="bg-[#111113] rounded-2xl border border-white/10 w-full max-w-sm overflow-hidden"
+        onClick={e => e.stopPropagation()}
       >
         {/* Header */}
         <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
@@ -65,6 +50,13 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
         </div>
 
         <div className="p-5 space-y-4">
+          {/* Preview miniatura YouTube */}
+          {ytThumb && (
+            <div className="rounded-xl overflow-hidden bg-black mx-auto" style={{ aspectRatio: "16/9" }}>
+              <img src={ytThumb} alt="Portada" className="w-full h-full object-cover" />
+            </div>
+          )}
+
           {/* Título */}
           <div>
             <label className="block text-[10px] font-semibold text-white/35 uppercase tracking-widest mb-1.5">Título *</label>
@@ -96,25 +88,6 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
               </p>
             )}
           </div>
-
-          {/* Portada */}
-          <div>
-            <label className="block text-[10px] font-semibold text-white/35 uppercase tracking-widest mb-1.5">Portada</label>
-            {previewThumb && (
-              <div className="relative mb-2 rounded-xl overflow-hidden bg-black mx-auto" style={{ aspectRatio: "9/16", maxWidth: 120 }}>
-                <img src={previewThumb} alt="Portada" className="w-full h-full object-cover" />
-              </div>
-            )}
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleThumbnailUpload} className="hidden" />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploadingThumbnail}
-              className="w-full py-2.5 rounded-xl border border-dashed border-white/10 hover:border-white/25 transition-all flex items-center justify-center gap-2 text-xs text-white/40 disabled:opacity-50"
-            >
-              {uploadingThumbnail ? <Loader className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
-              {uploadingThumbnail ? "Subiendo..." : "Cambiar portada"}
-            </button>
-          </div>
         </div>
 
         {/* Footer */}
@@ -131,7 +104,7 @@ export default function EditClipModal({ clip, onClose, onUpdate }) {
             disabled={saving || !title.trim()}
             className="flex-1 py-2.5 rounded-xl bg-white text-black text-sm font-bold transition-all disabled:opacity-40 flex items-center justify-center gap-2"
           >
-            {saving ? <Loader className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            {saving ? <Loader className="w-4 h-4 animate-spin text-black" /> : <Save className="w-4 h-4" />}
             {saving ? "Guardando..." : "Guardar"}
           </button>
         </div>
