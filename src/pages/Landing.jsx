@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import LandingNav from "@/components/landing/LandingNav";
-import StartHero from "@/components/start/StartHero";
+import Hero from "@/components/landing/Hero";
 import StartWhatWeDo from "@/components/start/StartWhatWeDo";
 import StartCreadores from "@/components/start/StartCreadores";
 import StartExplorar from "@/components/start/StartExplorar";
@@ -19,6 +19,12 @@ const SnapSection = ({ children }) => (
 );
 
 export default function Landing() {
+  const { data: config } = useQuery({
+    queryKey: ["landingConfig"],
+    queryFn: async () => { const c = await base44.entities.LandingConfig.list(); return c[0] || null; },
+    staleTime: 30000,
+  });
+
   useEffect(() => {
     const timer = setTimeout(() => {
       const splash = document.getElementById("cabana-splash");
@@ -76,7 +82,7 @@ export default function Landing() {
       `}</style>
 
       <div className="snap-scroll-container">
-        <SnapSection><StartHero bottomOffset="clamp(90px, 12vw, 140px)" /></SnapSection>
+        <SnapSection><Hero config={config} /></SnapSection>
         <SnapSection><StartExplorar showButton={true} allowMobileScroll={true} /></SnapSection>
         <SnapSection><StartCreadores /></SnapSection>
         <SnapSection><StartWhatWeDo /></SnapSection>
