@@ -151,7 +151,7 @@ export default function AdminDashboard() {
         {/* KPI Cards - arriba */}
         <div className="mb-6">
           <p className="text-[11px] font-semibold text-white/20 uppercase tracking-widest mb-3">Resumen General</p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-4 gap-3">
             {kpis.map((kpi, i) => (
               <Link key={i} to={kpi.link}>
                 <motion.div
