@@ -364,17 +364,11 @@ function TrackCard({ track, onEdit, isFirst }) {
 
   const handlePlaybackEnded = () => setPlaying(false);
 
-  // Abre el detalle al hacer click en la tarjeta (no en botones internos)
-  const handleCardClick = (e) => {
-    if (e.target.closest('button')) return;
-    setShowDetail(true);
-  };
-
   return (
     <>
       <div
         className="relative flex-shrink-0"
-        style={{ width: 240, zIndex: hovered ? 50 : 1 }}
+        style={{ width: 240, zIndex: hovered ? 50 : 1, position: "relative" }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
@@ -383,8 +377,22 @@ function TrackCard({ track, onEdit, isFirst }) {
           transition={{ duration: 0.28, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="rounded-xl cursor-pointer shadow-2xl"
           style={{ width: 240, transformOrigin: isFirst ? "left center" : "center center", overflow: "visible" }}
-          onClick={handleCardClick}
+          onClick={() => setShowDetail(true)}
         >
+          {/* ChevronDown — fuera del overflow-hidden para que el área de toque no sea recortada */}
+          <button
+            onClick={(e) => { e.stopPropagation(); setShowDetail(true); }}
+            className="absolute top-2 right-2 z-20 w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+            style={{
+              background: "rgba(10,10,10,0.75)",
+              border: "1px solid rgba(255,255,255,0.25)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
+          >
+            <ChevronDown className="w-3 h-3 text-white/90" />
+          </button>
+
           <div className="rounded-xl overflow-hidden" style={{ background: "#1a1a1c" }}>
             {hasAudio && (
               <>
@@ -432,20 +440,6 @@ function TrackCard({ track, onEdit, isFirst }) {
                 {status.label}
               </div>
 
-              {/* ChevronDown — SIEMPRE visible, abre el detalle */}
-              <button
-                onClick={(e) => { e.stopPropagation(); setShowDetail(true); }}
-                className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
-                style={{
-                  background: "rgba(10,10,10,0.75)",
-                  border: "1px solid rgba(255,255,255,0.25)",
-                  backdropFilter: "blur(8px)",
-                  WebkitBackdropFilter: "blur(8px)",
-                }}
-              >
-                <ChevronDown className="w-3 h-3 text-white/90" />
-              </button>
-
               {/* YouTube Music badge — sólo sin MP3, en top-left tras el status */}
               {!hasAudio && hasYoutube && (
                 <div className="absolute top-2 left-14 flex items-center gap-1 px-1.5 py-0.5 rounded"
@@ -469,13 +463,11 @@ function TrackCard({ track, onEdit, isFirst }) {
                 {hasPlayable && (
                   <button
                     onClick={(e) => {
-                      e.stopPropagation();
                       if (hasAudio) {
+                        e.stopPropagation();
                         togglePlay(e);
-                      } else {
-                        // YouTube only: open detail with player
-                        setShowDetail(true);
                       }
+                      // YouTube only: let click bubble up to open modal
                     }}
                     className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center"
                     style={{
