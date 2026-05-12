@@ -140,8 +140,9 @@ function TrackDetailModal({ track, onClose, onEdit, playing, onTogglePlay, onTog
                   {track.cover_url ? (
                     <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
-                      <Music2 className="w-16 h-16 text-white/10" />
+                    <div className="w-full h-full bg-gradient-to-br from-[#1e1a3e] via-[#1a1a2e] to-[#0a0a0b] flex flex-col items-center justify-center gap-3">
+                      <Music2 className="w-16 h-16 text-white/15" />
+                      <p className="text-sm text-white/20 font-medium text-center px-4">{track.title}</p>
                     </div>
                   )}
                 </motion.div>
@@ -402,8 +403,9 @@ function TrackCard({ track, onEdit, isFirst }) {
                 {track.cover_url ? (
                   <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[#1e1e2e] to-[#0a0a0b] flex items-center justify-center">
-                    <Music2 className="w-8 h-8 text-white/10" />
+                  <div className="w-full h-full bg-gradient-to-br from-[#1e1a3e] via-[#1a1a2e] to-[#0a0a0b] flex flex-col items-center justify-center gap-1.5">
+                    <Music2 className="w-10 h-10 text-white/15" />
+                    <p className="text-[9px] text-white/15 font-medium text-center px-2 line-clamp-2 leading-tight">{track.title}</p>
                   </div>
                 )}
               </motion.div>

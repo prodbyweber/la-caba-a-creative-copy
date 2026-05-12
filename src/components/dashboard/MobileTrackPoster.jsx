@@ -305,8 +305,9 @@ export default function MobileTrackPoster({ track, onEdit }) {
             {track.cover_url ? (
               <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-[#1e1e2e] to-[#0a0a0b] flex items-center justify-center">
-                <Music2 className="w-8 h-8 text-white/15" />
+              <div className="w-full h-full bg-gradient-to-br from-[#1e1a3e] via-[#1a1a2e] to-[#0a0a0b] flex flex-col items-center justify-center gap-1.5">
+                <Music2 className="w-7 h-7 text-white/15" />
+                <p className="text-[8px] text-white/15 font-medium text-center px-1.5 line-clamp-2 leading-tight">{track.title}</p>
               </div>
             )}
           </motion.div>

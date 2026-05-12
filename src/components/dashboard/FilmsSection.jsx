@@ -462,17 +462,23 @@ function SeriesCard({ film, onEdit, onDelete, onTogglePublic }) {
       style={{ background: "#141414" }}>
       {/* Cover */}
       <div className="relative aspect-video overflow-hidden">
-        {thumb ? <img src={thumb} alt={film.title} className="w-full h-full object-cover" />
-          : <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center"><Tv className="w-12 h-12 text-white/10" /></div>}
+        {thumb ? (
+          <img src={thumb} alt={film.title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] via-[#12122a] to-[#0a0a0b] flex flex-col items-center justify-center gap-2">
+            <Tv className="w-12 h-12 text-white/15" />
+            <p className="text-[10px] text-white/20 font-medium">{film.title}</p>
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
         <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
           <div>
             <h3 className="text-white font-black text-base leading-tight">{film.title}</h3>
             {film.genres?.length > 0 && <p className="text-white/40 text-[10px] mt-0.5">{film.genres.join(" · ")}</p>}
           </div>
-          {currentEp && ytId && (
+          {(ytId || getYoutubeId(film.youtube_url)) && (
             <button onClick={() => setShowPlayer(true)}
-              className="w-10 h-10 rounded-full bg-white flex items-center justify-center flex-shrink-0 hover:bg-white/90 transition-colors">
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center flex-shrink-0 hover:bg-white/90 active:scale-95 transition-all shadow-lg">
               <Play className="w-4 h-4 text-black ml-0.5" fill="black" />
             </button>
           )}
@@ -579,11 +585,19 @@ function FilmRow({ film, onEdit, onDelete, onTogglePublic, onPlay }) {
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       className="group flex gap-3 items-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] transition-colors">
       <div className="relative w-28 h-16 rounded-lg overflow-hidden bg-black/50 flex-shrink-0">
-        {thumb ? <img src={thumb} alt={film.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Film className="w-5 h-5 text-white/10" /></div>}
+        {thumb ? (
+          <img src={thumb} alt={film.title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
+            <Film className="w-6 h-6 text-white/15" />
+          </div>
+        )}
         {ytId && (
           <button onClick={() => onPlay(ytId)}
-            className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50">
-            <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+            className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors">
+            <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
+              <Play className="w-3.5 h-3.5 text-black ml-0.5" fill="black" />
+            </div>
           </button>
         )}
       </div>
