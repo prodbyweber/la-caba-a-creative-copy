@@ -2,31 +2,30 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { Film, Search, Upload, X, Plus } from "lucide-react";
+import { Film, Upload, X, Plus } from "lucide-react";
 import UploadClipModal from "./UploadClipModal.jsx";
 import NetflixClipCard from "./NetflixClipCard.jsx";
 
-export default function ClipsLibrary({ filters }) {
+export default function ClipsLibrary({ filters, artistId }) {
   const [search, setSearch] = useState("");
   const [uploadOpen, setUploadOpen] = useState(false);
 
+  // Resolve effective artist id from prop or filters
+  const effectiveArtistId = artistId || (filters?.artist !== "all" ? filters?.artist : null);
+
   const { data: clips = [], isLoading, refetch } = useQuery({
-    queryKey: ['clips', filters],
+    queryKey: ['clips', effectiveArtistId, filters],
     queryFn: async () => {
       const allClips = await base44.entities.Clip.list('-created_date');
       return allClips.filter(clip => {
-        // Filtrar por estado published
-        if (clip.status !== "published") return false;
-        
-        // Filtrar por artista (principal o featuring)
-        if (filters.artist !== "all") {
-          const isMainArtist = clip.artist_id === filters.artist;
-          const isFeaturing = clip.featuring_artists?.includes(filters.artist);
-          if (!isMainArtist && !isFeaturing) return false;
+        // Filtrar por artista si hay id específico
+        if (effectiveArtistId) {
+          const isMain = clip.artist_id === effectiveArtistId;
+          const isFeat = clip.featuring_artists?.includes(effectiveArtistId);
+          if (!isMain && !isFeat) return false;
         }
-        
-        if (filters.platform?.length > 0 && !filters.platform.some(p => clip.platforms?.includes(p))) return false;
-        if (filters.search) {
+        if (filters?.platform?.length > 0 && !filters.platform.some(p => clip.platforms?.includes(p))) return false;
+        if (filters?.search) {
           const s = filters.search.toLowerCase();
           if (!clip.title?.toLowerCase().includes(s) && !clip.tags?.some(t => t.toLowerCase().includes(s))) return false;
         }
@@ -41,34 +40,19 @@ export default function ClipsLibrary({ filters }) {
 
   return (
     <div>
-      {/* Toolbar */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="relative flex-1 max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/25" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar clips..."
-            className="w-full bg-white/[0.04] border border-white/[0.07] rounded-lg py-2 pl-9 pr-4 text-xs text-white placeholder:text-white/25 focus:outline-none focus:border-white/20 transition-colors"
-          />
-          {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/70">
-              <X className="w-3 h-3" />
-            </button>
-          )}
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Film className="w-4 h-4 text-white/30" />
+          <h3 className="text-sm font-bold text-white">Shorts</h3>
+          {clips.length > 0 && <span className="text-[10px] text-white/25 px-1.5 py-0.5 bg-white/5 rounded-full">{clips.length}</span>}
         </div>
-
-        <div className="ml-auto text-xs text-white/20">
-          {filtered.length} clip{filtered.length !== 1 ? "s" : ""}
-        </div>
-
         <button
           onClick={() => setUploadOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/70 hover:text-white text-xs font-medium transition-all"
+          className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/60 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-all"
         >
-          <Plus className="w-3.5 h-3.5" />
-          Nuevo clip
+          <Plus className="w-3 h-3" />
+          <span className="hidden lg:inline">Nuevo short</span>
         </button>
       </div>
 
@@ -80,26 +64,16 @@ export default function ClipsLibrary({ filters }) {
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col items-center justify-center py-24 text-center"
-        >
-          <div className="w-16 h-16 rounded-2xl border border-white/10 flex items-center justify-center mb-4">
-            <Film className="w-7 h-7 text-white/20" />
+        <button onClick={() => setUploadOpen(true)}
+          className="w-full py-16 rounded-2xl border border-dashed border-white/[0.06] flex flex-col items-center gap-3 hover:border-white/15 transition-colors">
+          <Film className="w-8 h-8 text-white/10" />
+          <div className="text-center">
+            <p className="text-xs text-white/25">Sin shorts</p>
+            <p className="text-[10px] text-white/12 mt-0.5">Sube tu primer short</p>
           </div>
-          <p className="text-white/30 text-sm mb-1">Sin clips todavía</p>
-          <p className="text-white/15 text-xs mb-6">Sube tu primer clip para empezar</p>
-          <button
-            onClick={() => setUploadOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/60 hover:text-white text-xs font-medium transition-all"
-          >
-            <Upload className="w-3.5 h-3.5" />
-            Subir clip
-          </button>
-        </motion.div>
+        </button>
       ) : (
-        <div style={{ overflowX: "auto", overflowY: "visible", padding: "60px 16px 200px", margin: "-60px -16px -200px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
+        <div style={{ overflowX: "auto", overflowY: "visible", padding: "60px 16px 200px", margin: "-60px 0 -200px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
           <div className="flex gap-3" style={{ width: "max-content" }}>
             {filtered.map((clip, i) => (
               <NetflixClipCard key={clip.id} clip={clip} index={i} onUpdate={refetch} isFirst={i === 0} />
@@ -111,7 +85,7 @@ export default function ClipsLibrary({ filters }) {
       {uploadOpen && (
         <UploadClipModal
           onClose={() => { setUploadOpen(false); refetch(); }}
-          artistId={filters.artist !== "all" ? filters.artist : undefined}
+          artistId={effectiveArtistId || undefined}
         />
       )}
     </div>
