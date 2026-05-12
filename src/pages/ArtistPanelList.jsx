@@ -8,9 +8,6 @@ import { ArrowLeft, User, ExternalLink, Music2, Camera, Briefcase, Search, Shiel
 
 const ACCOUNT_TYPES = [
   { key: "all", label: "Todos" },
-  { key: "artist", label: "Artistas" },
-  { key: "creator", label: "Creadores" },
-  { key: "brand", label: "Marcas" },
 ];
 
 const TYPE_CONFIG = {
