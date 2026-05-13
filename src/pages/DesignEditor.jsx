@@ -46,8 +46,10 @@ export default function DesignEditor() {
       {/* Divider */}
       <div className="mt-4 border-t border-white/[0.05]" />
 
-      {/* Content */}
-      {active === "landing" ? <LandingEditorInner /> : <ExplorarAdminContent />}
+      {/* Content — full width */}
+      <div className="w-full">
+        {active === "landing" ? <LandingEditorInner /> : <ExplorarAdminContent />}
+      </div>
     </AdminLayout>
   );
 }
