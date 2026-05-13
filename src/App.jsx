@@ -96,22 +96,23 @@ const AuthenticatedApp = () => {
     }
   }
 
-  // Redirect authenticated users to /Explorar from root
+  // Redirect authenticated users: admin → /AdminDashboard, others → /Explorar
   const AuthRedirect = () => {
-    const { isAuthenticated } = useAuth();
     const [checked, setChecked] = React.useState(false);
-    const [redirect, setRedirect] = React.useState(false);
     React.useEffect(() => {
-      base44.auth.isAuthenticated().then(auth => {
-        setRedirect(auth);
+      base44.auth.isAuthenticated().then(async (auth) => {
+        if (auth) {
+          const user = await base44.auth.me();
+          if (user?.role === 'admin') {
+            window.location.replace('/AdminDashboard');
+          } else {
+            window.location.replace('/Explorar');
+          }
+        }
         setChecked(true);
       });
     }, []);
     if (!checked) return null;
-    if (redirect) {
-      window.location.replace('/Explorar');
-      return null;
-    }
     return (
       <LayoutWrapper currentPageName={mainPageKey}>
         <MainPage />
