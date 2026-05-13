@@ -47,7 +47,7 @@ export default function Artists() {
 
   return (
     <AdminLayout activePage="Artists">
-      <div className="px-4 sm:px-8 lg:px-12 py-6 max-w-3xl mx-auto">
+      <div className="px-4 sm:px-8 lg:px-12 py-6 max-w-3xl lg:max-w-none mx-auto">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
@@ -93,7 +93,7 @@ export default function Artists() {
             <p className="text-sm text-white/20">Sin resultados</p>
           </div>
         ) : (
-          <div className="space-y-px">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-px">
             {filtered.map((artist, i) => (
               <motion.div
                 key={artist.id}
