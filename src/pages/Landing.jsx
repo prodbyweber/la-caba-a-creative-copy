@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import LandingNav from "@/components/landing/LandingNav";
-import StartHero from "@/components/start/StartHero";
+import LandingHero from "@/components/landing/LandingHero";
 import StartWhatWeDo from "@/components/start/StartWhatWeDo";
 import StartCreadores from "@/components/start/StartCreadores";
 import StartExplorar from "@/components/start/StartExplorar";
@@ -76,7 +76,7 @@ export default function Landing() {
       `}</style>
 
       <div className="snap-scroll-container">
-        <SnapSection><StartHero bottomOffset="clamp(90px, 12vw, 140px)" /></SnapSection>
+        <SnapSection><LandingHero bottomOffset="clamp(90px, 12vw, 140px)" /></SnapSection>
         <SnapSection><StartExplorar showButton={true} allowMobileScroll={true} /></SnapSection>
         <SnapSection><StartCreadores /></SnapSection>
         <SnapSection><StartWhatWeDo /></SnapSection>

@@ -31,7 +31,7 @@ function VideoBackground({ src }) {
   );
 }
 
-export default function StartHero() {
+export default function LandingHero({ bottomOffset = "clamp(90px, 12vw, 140px)" }) {
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
     queryFn: async () => { const c = await base44.entities.LandingConfig.list(); return c[0] || null; },
@@ -60,52 +60,46 @@ export default function StartHero() {
         <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover" loading="eager" />
       ) : null}
 
-      {/* Overlay — cinematic, subtle */}
+      {/* Overlay */}
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.18) 40%, rgba(0,0,0,0.55) 100%)"
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 50%, rgba(0,0,0,0.75) 100%)"
       }} />
 
-      {/* Center: headline + paragraph */}
+      {/* Bottom-right: slogan */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
         style={{
           position: "absolute",
-          inset: 0,
+          bottom: bottomOffset,
+          right: "clamp(24px, 6vw, 56px)",
           zIndex: 20,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          padding: "0 clamp(24px, 8vw, 120px)",
+          textAlign: "right",
           pointerEvents: "none",
         }}
       >
-        <h1 style={{
-          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "clamp(1.6rem, 4.5vw, 3.2rem)",
-          fontWeight: 300,
-          color: "rgba(240,237,232,0.92)",
-          letterSpacing: "-0.02em",
-          lineHeight: 1.2,
-          marginBottom: "clamp(14px, 2vw, 22px)",
-          maxWidth: "700px",
-        }}>
-          Un espacio para creadores y marcas con visión
-        </h1>
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "clamp(0.75rem, 1.4vw, 0.95rem)",
-          fontWeight: 400,
-          color: "rgba(240,237,232,0.45)",
-          letterSpacing: "0.01em",
-          lineHeight: 1.7,
-          maxWidth: "480px",
+          fontSize: "9px",
+          fontWeight: 700,
+          letterSpacing: "0.3em",
+          textTransform: "uppercase",
+          color: "rgba(240,237,232,0.4)",
+          marginBottom: "6px",
         }}>
-          Descubre quiénes somos y cómo ayudamos a creadores y marcas a desarrollar proyectos con identidad antes de{" "}
-          <span style={{ color: "#ff5833", fontWeight: 500 }}>Comenzar</span>.
+          Música · Films · Creadores
+        </p>
+        <p style={{
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontSize: "clamp(1rem, 2.5vw, 1.4rem)",
+          fontWeight: 300,
+          color: "rgba(240,237,232,0.85)",
+          letterSpacing: "-0.01em",
+          lineHeight: 1.3,
+          maxWidth: "320px",
+        }}>
+          más que lo que se escucha.
         </p>
       </motion.div>
     </section>
