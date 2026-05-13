@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
-import VoiceAssistant from "@/components/admin/VoiceAssistant";
 import CreateSessionModal from "@/components/admin/CreateSessionModal";
 import CreateDeliverableModal from "@/components/admin/CreateDeliverableModal";
 import CreateRevisionModal from "@/components/admin/CreateRevisionModal";
@@ -384,8 +383,15 @@ export default function AdminDashboard() {
       <CreateSessionModal isOpen={showSessionModal} onClose={handleCloseSession} editData={editSession} />
       <CreateDeliverableModal isOpen={showDeliverableModal} onClose={handleCloseDeliverable} editData={editDeliverable} />
       <CreateRevisionModal isOpen={showRevisionModal} onClose={handleCloseRevision} editData={editRevision} />
-      
-      <VoiceAssistant />
+
+      {/* FAB — Nueva Sesión */}
+      <button
+        onClick={() => { setEditSession(null); setShowSessionModal(true); }}
+        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-500/30 flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+        title="Nueva Sesión"
+      >
+        <Calendar className="w-6 h-6 text-black" />
+      </button>
     </AdminLayout>
   );
 }

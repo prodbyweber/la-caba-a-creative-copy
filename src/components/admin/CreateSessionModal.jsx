@@ -192,22 +192,13 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
               <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className={inputCls} placeholder="Ej: Grabación de Voces" />
             </div>
 
-            {/* Artista & Proyecto */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className={labelCls}>Artista</label>
-                <select value={formData.artist_id} onChange={(e) => handleArtistChange(e.target.value)} className={inputCls} style={{ colorScheme: 'dark' }}>
-                  <option value="">Sin asignar</option>
-                  {artists.map(a => <option key={a.id} value={a.id}>{a.stageName}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className={labelCls}>Proyecto</label>
-                <select value={formData.project_id} onChange={(e) => setFormData({ ...formData, project_id: e.target.value })} className={inputCls} style={{ colorScheme: 'dark' }}>
-                  <option value="">Sin asignar</option>
-                  {projects.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
-                </select>
-              </div>
+            {/* Artista */}
+            <div>
+              <label className={labelCls}>Artista</label>
+              <select value={formData.artist_id} onChange={(e) => handleArtistChange(e.target.value)} className={inputCls} style={{ colorScheme: 'dark' }}>
+                <option value="">Sin asignar</option>
+                {artists.map(a => <option key={a.id} value={a.id}>{a.stageName}</option>)}
+              </select>
             </div>
 
             {/* Fechas — datetime-local usa tu hora local automáticamente */}
@@ -235,11 +226,9 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
               <div>
                 <label className={labelCls}>Estado</label>
                 <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className={inputCls} style={{ colorScheme: 'dark' }}>
+                  <option value="Scheduled">Programado</option>
                   <option value="Pending">Pendiente</option>
                   <option value="Confirmed">Confirmado</option>
-                  <option value="Scheduled">Programado</option>
-                  <option value="Done">Completado</option>
-                  <option value="Cancelled">Cancelado</option>
                 </select>
               </div>
             </div>
