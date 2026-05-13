@@ -21,6 +21,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import BannersAdmin from './pages/BannersAdmin';
 import Explorar from './pages/Explorar';
 import ExplorarAdmin from './pages/ExplorarAdmin';
+import DesignEditor from './pages/DesignEditor';
 import ADNdeMarca from './pages/ADNdeMarca';
 import PublicProfile from './pages/PublicProfile';
 import UserPublicProfile from './pages/UserPublicProfile';
@@ -144,6 +145,7 @@ const AuthenticatedApp = () => {
       <Route path="/Explorar" element={<Explorar />} />
       <Route path="/ExplorarAdmin" element={<ProtectedAdminRoute element={<ExplorarAdmin />} />} />
       <Route path="/UserProfiles" element={<ProtectedAdminRoute element={<UserProfiles />} />} />
+      <Route path="/DesignEditor" element={<ProtectedAdminRoute element={<DesignEditor />} />} />
       <Route path="/ArtistPanelList" element={<ProtectedAdminRoute element={<ArtistPanelList />} />} />
       <Route path="/ADNdeMarca" element={<ProtectedAdminRoute element={<ADNdeMarca />} />} />
       <Route path="/StudioSession" element={<StudioSession />} />

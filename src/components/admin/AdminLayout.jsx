@@ -25,10 +25,8 @@ const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", page: "AdminDashboard" },
   { icon: Users, label: "Creadores", page: "Artists" },
   { icon: Calendar, label: "Calendars", page: "Calendars" },
-  { icon: Settings, label: "Landing Editor", page: "LandingEditor" },
-  { icon: Compass, label: "Explorar Editor", page: "ExplorarAdmin" },
+  { icon: Monitor, label: "Design Editor", page: "DesignEditor" },
   { icon: Inbox, label: "Solicitudes", page: "ContactLeads" },
-  { icon: Monitor, label: "Perfiles", page: "UserProfiles" },
 ];
 
 export default function AdminLayout({ children, activePage }) {

@@ -123,8 +123,16 @@ export default function Artists() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-white truncate leading-tight">{artist.stageName}</p>
                   <p className="text-[11px] text-white/25 truncate">
-                    {artist._profile?.username ? `@${artist._profile.username}` : artist.email || artist.genre || "—"}
+                    {artist._profile?.username
+                      ? `@${artist._profile.username}`
+                      : artist._profile?.user_email || artist.email || artist.genre || "—"}
                   </p>
+                  {(artist._profile?.nationality || artist._profile?.account_type) && (
+                    <p className="text-[10px] text-white/15 truncate">
+                      {artist._profile?.account_type === "brand" ? "Marca" : artist._profile?.account_type === "artist" ? "Artista" : ""}
+                      {artist._profile?.nationality ? ` · ${artist._profile.nationality}` : ""}
+                    </p>
+                  )}
                 </div>
 
                 {/* Status dot + arrow */}
