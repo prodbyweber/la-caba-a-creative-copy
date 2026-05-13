@@ -118,12 +118,12 @@ export default function ArtistPanelList() {
         {/* List */}
         <div className="px-5 sm:px-10 pb-20">
           {isLoading ? (
-            <div className="space-y-2 max-w-4xl">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] animate-pulse">
-                  <div className="w-14 h-14 rounded-full bg-white/[0.06] flex-shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-3.5 bg-white/[0.06] rounded w-1/3" />
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-px bg-white/[0.05] rounded-2xl overflow-hidden border border-white/[0.07]">
+              {[...Array(12)].map((_, i) => (
+                <div key={i} className="flex items-center gap-3 px-4 py-3 bg-[#080809] animate-pulse">
+                  <div className="w-10 h-10 rounded-full bg-white/[0.06] flex-shrink-0" />
+                  <div className="flex-1 space-y-1.5">
+                    <div className="h-3 bg-white/[0.06] rounded w-2/5" />
                     <div className="h-2.5 bg-white/[0.04] rounded w-1/4" />
                   </div>
                 </div>
@@ -135,72 +135,49 @@ export default function ArtistPanelList() {
               <p className="text-sm text-white/25">No hay creadores para esta búsqueda</p>
             </div>
           ) : (
-            /* Desktop: 2-col list | Mobile: 1-col list */
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 max-w-5xl lg:max-w-none">
+            /* Desktop: 3-col | Mobile: 1-col — estilo Instagram row */
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-px bg-white/[0.05] rounded-2xl overflow-hidden border border-white/[0.07]">
               <AnimatePresence>
                 {filtered.map((c, idx) => (
                   <motion.div
                     key={c.artist?.id || c.profile?.id || idx}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ delay: idx * 0.015 }}
+                    transition={{ delay: idx * 0.01 }}
                     onClick={() => c.artist?.id && navigate(createPageUrl("ArtistDashboard") + `?artistId=${c.artist.id}`)}
-                    className={`group flex items-center gap-4 p-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/[0.12] transition-all ${c.artist?.id ? "cursor-pointer" : "cursor-default"}`}
+                    className={`group flex items-center gap-3 px-4 py-3 bg-[#080809] hover:bg-white/[0.04] transition-colors ${c.artist?.id ? "cursor-pointer" : "cursor-default"}`}
                   >
-                    {/* Avatar */}
-                    <div className="relative w-14 h-14 rounded-full overflow-hidden bg-[#1a1a1c] flex-shrink-0">
+                    {/* Avatar circular pequeño */}
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden bg-[#1a1a1c] flex-shrink-0 ring-1 ring-white/10">
                       {c.avatarUrl ? (
                         <img
                           src={c.avatarUrl}
                           alt={c.displayName}
-                          className="w-full h-full object-cover group-hover:scale-[1.06] transition-transform duration-500"
+                          className="w-full h-full object-cover"
                           style={{ objectPosition: c.artist?.photo_position || "center center" }}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <span className="text-xl font-black text-white/20">
+                          <span className="text-sm font-black text-white/20">
                             {c.displayName?.[0]?.toUpperCase() || "?"}
                           </span>
                         </div>
                       )}
                     </div>
 
-                    {/* Info */}
+                    {/* Info compacta */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-white truncate leading-tight">
+                      <p className="text-[13px] font-semibold text-white truncate leading-tight">
                         {c.displayName}
                       </p>
-                      <div className="flex items-center gap-3 mt-1 flex-wrap">
-                        {c.username && (
-                          <span className="flex items-center gap-1 text-[11px] text-white/35">
-                            <AtSign className="w-3 h-3" />
-                            {c.username}
-                          </span>
-                        )}
-                        {c.genre && (
-                          <span className="text-[11px] text-white/25">{c.genre}</span>
-                        )}
-                        {c.email && !c.username && (
-                          <span className="flex items-center gap-1 text-[11px] text-white/25">
-                            <Mail className="w-3 h-3" />
-                            {c.email}
-                          </span>
-                        )}
-                      </div>
+                      <p className="text-[11px] text-white/35 truncate">
+                        {c.username ? `@${c.username}` : c.genre || c.email || "—"}
+                      </p>
                     </div>
 
-                    {/* Action */}
-                    {c.artist?.id ? (
-                      <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.08] border border-white/10 text-[10px] font-semibold text-white/70">
-                          <ExternalLink className="w-3 h-3" />
-                          <span className="hidden sm:inline">Dashboard</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <ChevronRight className="w-4 h-4 text-white/10 flex-shrink-0" />
-                    )}
+                    {/* Chevron / link */}
+                    <ChevronRight className="w-3.5 h-3.5 text-white/15 flex-shrink-0 group-hover:text-white/40 transition-colors" />
                   </motion.div>
                 ))}
               </AnimatePresence>
