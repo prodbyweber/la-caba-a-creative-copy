@@ -104,7 +104,7 @@ export default function StartHero() {
           lineHeight: 1.7,
           maxWidth: "480px",
         }}>
-          Descubre quiénes somos y cómo ayudamos a creadores y marcas a desarrollar proyectos con identidad antes de{" "}
+          Descubre quiénes somos y cómo ayudamos a creadores y marcas antes de{" "}
           <span style={{ color: "#ff5833", fontWeight: 500 }}>Comenzar</span>.
         </p>
       </motion.div>
