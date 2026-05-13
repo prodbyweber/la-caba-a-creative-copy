@@ -82,6 +82,7 @@ export default function StartHero() {
           padding: "0 clamp(24px, 8vw, 120px)",
           pointerEvents: "none",
         }}
+
       >
         <h1 style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
@@ -105,7 +106,21 @@ export default function StartHero() {
           maxWidth: "480px",
         }}>
           Descubre quiénes somos y cómo ayudamos a creadores y marcas antes de{" "}
-          <span style={{ color: "#ff5833", fontWeight: 500 }}>Comenzar</span>.
+          <motion.span
+            onClick={() => {
+              const el = document.getElementById("about");
+              if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            whileHover={{ textShadow: "0 0 12px rgba(255,88,51,0.7), 0 0 24px rgba(255,88,51,0.4)" }}
+            whileTap={{ scale: 0.95, textShadow: "0 0 18px rgba(255,88,51,0.9), 0 0 36px rgba(255,88,51,0.5)" }}
+            style={{
+              color: "#ff5833",
+              fontWeight: 500,
+              cursor: "pointer",
+              pointerEvents: "auto",
+              transition: "color 0.2s ease",
+            }}
+          >Comenzar</motion.span>.
         </p>
       </motion.div>
     </section>
