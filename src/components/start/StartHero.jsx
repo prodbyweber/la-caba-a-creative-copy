@@ -62,10 +62,54 @@ export default function StartHero({ bottomOffset = `${typeof window !== "undefin
         <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover" loading="eager" />
       ) : null}
 
-      {/* Overlay */}
+      {/* Overlay — cinematic, subtle */}
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 50%, rgba(0,0,0,0.75) 100%)"
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.18) 40%, rgba(0,0,0,0.55) 100%)"
       }} />
+
+      {/* Center: headline + paragraph */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 20,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "0 clamp(24px, 8vw, 120px)",
+          pointerEvents: "none",
+        }}
+      >
+        <h1 style={{
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontSize: "clamp(1.6rem, 4.5vw, 3.2rem)",
+          fontWeight: 300,
+          color: "rgba(240,237,232,0.92)",
+          letterSpacing: "-0.02em",
+          lineHeight: 1.2,
+          marginBottom: "clamp(14px, 2vw, 22px)",
+          maxWidth: "700px",
+        }}>
+          Un espacio para creadores y marcas con visión
+        </h1>
+        <p style={{
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontSize: "clamp(0.75rem, 1.4vw, 0.95rem)",
+          fontWeight: 400,
+          color: "rgba(240,237,232,0.45)",
+          letterSpacing: "0.01em",
+          lineHeight: 1.7,
+          maxWidth: "480px",
+        }}>
+          Descubre quiénes somos y cómo ayudamos a creadores y marcas a desarrollar proyectos con identidad antes de{" "}
+          <span style={{ color: "rgba(240,237,232,0.75)", fontWeight: 500 }}>Comenzar</span>.
+        </p>
+      </motion.div>
 
       {/* Bottom-right: slogan */}
       <motion.div
