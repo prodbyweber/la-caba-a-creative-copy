@@ -126,12 +126,15 @@ export default function AdminDashboard() {
     <AdminLayout activePage="AdminDashboard">
       <div className="px-3 sm:px-8 lg:px-14 xl:px-20 py-6 max-w-[1600px] mx-auto">
 
-        {/* Header + KPI Cards */}
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-sm font-semibold text-white/40">Admin Dashboard</h1>
-        </div>
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Admin Dashboard</h1>
+          <p className="text-sm text-white/30">Actividades prioritarias de hoy</p>
+        </motion.div>
 
+        {/* KPI Cards - arriba */}
         <div className="mb-6">
+          <p className="text-[11px] font-semibold text-white/20 uppercase tracking-widest mb-3">Resumen General</p>
           <div className="grid grid-cols-4 gap-3">
             {kpis.map((kpi, i) => (
               <Link key={i} to={kpi.link}>
