@@ -62,7 +62,11 @@ export default function StartHero() {
 
       {/* Overlay — cinematic, subtle */}
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.18) 40%, rgba(0,0,0,0.55) 100%)"
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.28) 40%, rgba(0,0,0,0.65) 100%)"
+      }} />
+      {/* Extra vignette centrada en el texto */}
+      <div className="absolute inset-0" style={{
+        background: "radial-gradient(ellipse 70% 50% at 50% 55%, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.0) 100%)"
       }} />
 
       {/* Center: headline + paragraph */}
