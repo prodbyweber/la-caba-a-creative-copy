@@ -217,6 +217,7 @@ export default function Calendars() {
           deliverables={deliverables}
           artists={artists}
           projects={projects}
+          currentDate={currentDate}
           onSessionClick={setSelectedSession}
           onDeleteSession={(s) => { if (window.confirm(`¿Eliminar "${s.title}"?`)) deleteSessionMutation.mutate(s); }}
         />
@@ -241,10 +242,21 @@ export default function Calendars() {
   );
 }
 
-function AgendaView({ sessions, deliverables, artists, projects, onSessionClick, onDeleteSession }) {
+function AgendaView({ sessions, deliverables, artists, projects, currentDate, onSessionClick, onDeleteSession }) {
+  const monthStart = startOfMonth(currentDate);
+  const monthEnd = endOfMonth(currentDate);
+
   const allItems = [
-    ...sessions.filter(s => s.start_time).map(s => ({ ...s, _kind: 'session', _date: parseISO(s.start_time) })),
-    ...deliverables.filter(d => d.due_date_time).map(d => ({ ...d, _kind: 'deliverable', _date: parseISO(d.due_date_time) })),
+    ...sessions.filter(s => {
+      if (!s.start_time) return false;
+      const d = parseISO(s.start_time);
+      return d >= monthStart && d <= monthEnd;
+    }).map(s => ({ ...s, _kind: 'session', _date: parseISO(s.start_time) })),
+    ...deliverables.filter(d => {
+      if (!d.due_date_time) return false;
+      const dt = parseISO(d.due_date_time);
+      return dt >= monthStart && dt <= monthEnd;
+    }).map(d => ({ ...d, _kind: 'deliverable', _date: parseISO(d.due_date_time) })),
   ].sort((a, b) => a._date - b._date);
 
   // Group by date
