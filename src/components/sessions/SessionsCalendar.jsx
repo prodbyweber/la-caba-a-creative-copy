@@ -185,7 +185,7 @@ export default function SessionsCalendar() {
                         </div>
                         <div className="truncate text-[9px] md:text-xs leading-tight">{session.title}</div>
                         {isDone && (
-                          <div className="text-[8px] md:text-[10px] mt-0.5 font-semibold">✓</div>
+                          <div className="text-[8px] md:text-[10px] mt-0.5 font-semibold">·</div>
                         )}
                       </button>
                     );
