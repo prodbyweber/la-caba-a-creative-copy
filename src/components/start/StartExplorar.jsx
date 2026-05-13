@@ -207,7 +207,7 @@ export default function StartExplorar({ showButton = true, allowMobileScroll = f
     },
     {
       title: "Producción & Dirección Creativa",
-      desc: "Desarrollamos experiencias visuales, musicales y cinematográficas con enfoque premium y dirección artística integral."
+      desc: "Desarrollamos experiencias visuales, musicales con enfoque y dirección artística integral."
     },
     {
       title: "Experiencias exclusivas",
