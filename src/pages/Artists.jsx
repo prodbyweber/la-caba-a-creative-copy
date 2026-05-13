@@ -3,33 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Plus, Search, User, X, MoreHorizontal, Pencil, Trash2, Music2, Camera, Briefcase } from "lucide-react";
+import { Plus, Search, User, X, MoreHorizontal, Pencil, Trash2, ChevronRight } from "lucide-react";
 import ArtistProfilePanel from "@/components/admin/ArtistProfilePanel";
-
-const TYPE_FILTERS = [
-  { key: "all", label: "Todos" },
-  { key: "artist", label: "Artista" },
-  { key: "creator", label: "Creador" },
-  { key: "brand", label: "Marca" },
-];
-
-const TYPE_LABEL = {
-  artist: "Artista",
-  creator: "Creador",
-  brand: "Marca",
-};
-
-const TYPE_ICON = {
-  artist: Music2,
-  creator: Camera,
-  brand: Briefcase,
-};
 
 const ic = "w-full px-3.5 py-2.5 bg-white/[0.05] border border-white/[0.08] rounded-xl text-white text-sm focus:outline-none focus:border-white/25 placeholder-white/20 transition-colors";
 
 export default function Artists() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [typeFilter, setTypeFilter] = useState("all");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedArtist, setSelectedArtist] = useState(null);
   const [editArtist, setEditArtist] = useState(null);
@@ -51,110 +31,113 @@ export default function Artists() {
     queryFn: () => base44.entities.UserProfile.list('-created_date', 200),
   });
 
-  // Merge artist with their userProfile account_type
   const enriched = useMemo(() => {
     return artists.map(artist => {
       const profile = userProfiles.find(p => p.user_id === artist.user_id);
-      const accountType = profile?.account_type || "artist";
-      return { ...artist, _accountType: accountType, _profile: profile };
+      return { ...artist, _profile: profile };
     });
   }, [artists, userProfiles]);
 
   const filtered = useMemo(() => {
-    return enriched.filter(a => {
-      const matchType = typeFilter === "all" || a._accountType === typeFilter;
-      const q = searchQuery.toLowerCase();
-      const matchSearch = !searchQuery || a.stageName?.toLowerCase().includes(q) || a.legalName?.toLowerCase().includes(q) || a.email?.toLowerCase().includes(q);
-      return matchType && matchSearch;
-    });
-  }, [enriched, typeFilter, searchQuery]);
-
-  const counts = useMemo(() => ({
-    all: enriched.length,
-    artist: enriched.filter(a => a._accountType === "artist").length,
-    creator: enriched.filter(a => a._accountType === "creator").length,
-    brand: enriched.filter(a => a._accountType === "brand").length,
-  }), [enriched]);
+    const q = searchQuery.toLowerCase();
+    return enriched.filter(a =>
+      !searchQuery || a.stageName?.toLowerCase().includes(q) || a.legalName?.toLowerCase().includes(q) || a.email?.toLowerCase().includes(q)
+    );
+  }, [enriched, searchQuery]);
 
   return (
     <AdminLayout activePage="Artists">
-      <div className="px-4 sm:px-8 lg:px-12 py-6 max-w-[1600px] mx-auto">
+      <div className="px-4 sm:px-8 lg:px-12 py-6 max-w-3xl mx-auto">
 
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div className="flex items-center justify-between mb-5">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Creadores</h1>
-            <p className="text-xs text-white/30 mt-0.5">{enriched.length} perfiles registrados</p>
+            <h1 className="text-base font-bold text-white tracking-tight">Creadores</h1>
+            <p className="text-[11px] text-white/25 mt-0.5">{enriched.length} perfiles</p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-white/15 text-white text-sm font-medium hover:border-white/30 hover:bg-white/[0.05] transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 text-white/60 text-xs font-medium hover:border-white/25 hover:text-white hover:bg-white/[0.04] transition-all"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 h-3.5" />
             Nuevo
           </button>
         </div>
 
-        {/* Filters row */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          {/* Type pills */}
-          <div className="flex items-center gap-1 bg-white/[0.03] border border-white/[0.07] rounded-xl p-1 flex-shrink-0">
-            {TYPE_FILTERS.map(f => (
-              <button
-                key={f.key}
-                onClick={() => setTypeFilter(f.key)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${typeFilter === f.key ? "bg-white text-black" : "text-white/35 hover:text-white/70"}`}
-              >
-                {f.label}
-                <span className={`ml-1.5 text-[9px] ${typeFilter === f.key ? "text-black/40" : "text-white/15"}`}>{counts[f.key]}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Search */}
-          <div className="flex-1 flex items-center gap-2.5 px-3.5 py-2.5 bg-white/[0.03] border border-white/[0.07] rounded-xl">
-            <Search className="w-4 h-4 text-white/20 flex-shrink-0" />
-            <input
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Buscar por nombre o email..."
-              className="flex-1 bg-transparent text-sm text-white placeholder-white/20 outline-none"
-            />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery("")} className="text-white/20 hover:text-white/50 transition-colors">
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
+        {/* Search */}
+        <div className="flex items-center gap-2.5 px-3.5 py-2.5 bg-white/[0.03] border border-white/[0.07] rounded-xl mb-4">
+          <Search className="w-3.5 h-3.5 text-white/20 flex-shrink-0" />
+          <input
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Buscar creador..."
+            className="flex-1 bg-transparent text-sm text-white placeholder-white/20 outline-none"
+          />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery("")} className="text-white/20 hover:text-white/50 transition-colors">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
-        {/* Grid */}
+        {/* List */}
         {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-            {[...Array(12)].map((_, i) => (
-              <div key={i} className="h-52 bg-white/[0.03] rounded-xl animate-pulse" />
+          <div className="space-y-1">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="h-14 bg-white/[0.03] rounded-xl animate-pulse" />
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-24">
-            <User className="w-10 h-10 text-white/10 mx-auto mb-3" />
-            <p className="text-sm text-white/25">No hay creadores para este filtro</p>
+          <div className="text-center py-20">
+            <User className="w-8 h-8 text-white/10 mx-auto mb-2" />
+            <p className="text-sm text-white/20">Sin resultados</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-            {filtered.map((artist, i) => {
-              const TypeIcon = TYPE_ICON[artist._accountType] || User;
-              const typeLabel = TYPE_LABEL[artist._accountType] || "Artista";
-              return (
-                <motion.div
-                  key={artist.id}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: Math.min(i * 0.03, 0.3) }}
-                  className="group relative bg-[#0f0f10] border border-white/[0.07] rounded-xl overflow-hidden hover:border-white/[0.16] transition-all duration-300"
-                  style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.35)" }}
-                >
-                  {/* 3-dot menu */}
+          <div className="space-y-px">
+            {filtered.map((artist, i) => (
+              <motion.div
+                key={artist.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(i * 0.02, 0.25) }}
+                className="group flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.04] transition-all cursor-pointer"
+                onClick={() => setSelectedArtist(artist)}
+              >
+                {/* Avatar circle */}
+                <div className="w-9 h-9 rounded-full overflow-hidden bg-white/[0.06] flex-shrink-0">
+                  {artist.avatar_url ? (
+                    <img
+                      src={artist.avatar_url}
+                      alt={artist.stageName}
+                      className="w-full h-full object-cover"
+                      style={{ objectPosition: artist.photo_position || "center top" }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-sm font-bold text-white/20">{artist.stageName?.[0]?.toUpperCase() || "?"}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-white truncate leading-tight">{artist.stageName}</p>
+                  <p className="text-[11px] text-white/25 truncate">
+                    {artist._profile?.username ? `@${artist._profile.username}` : artist.email || artist.genre || "—"}
+                  </p>
+                </div>
+
+                {/* Status dot + arrow */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className={`w-1.5 h-1.5 rounded-full ${
+                    artist.status === 'Active' ? 'bg-emerald-400' :
+                    artist.status === 'Lead' ? 'bg-[#ff5833]' : 'bg-white/15'
+                  }`} />
+                  <ChevronRight className="w-3.5 h-3.5 text-white/15 group-hover:text-white/40 transition-colors" />
+                </div>
+
+                {/* 3-dot menu */}
+                <div onClick={e => e.stopPropagation()}>
                   <ArtistCardMenu
                     onView={() => setSelectedArtist(artist)}
                     onEdit={() => setEditArtist(artist)}
@@ -162,50 +145,9 @@ export default function Artists() {
                       if (confirm(`¿Eliminar a ${artist.stageName}?`)) deleteArtistMutation.mutate(artist.id);
                     }}
                   />
-
-                  {/* Clickable area */}
-                  <div onClick={() => setSelectedArtist(artist)} className="cursor-pointer">
-                    {/* Avatar — square aspect */}
-                    <div className="relative w-full aspect-square bg-[#171718] overflow-hidden">
-                      {artist.avatar_url ? (
-                        <img
-                          src={artist.avatar_url}
-                          alt={artist.stageName}
-                          className="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500"
-                          style={{ objectPosition: artist.photo_position || "center top" }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <span className="text-4xl font-black text-white/10">{artist.stageName?.[0]?.toUpperCase() || "?"}</span>
-                        </div>
-                      )}
-                      {/* Subtle bottom gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-
-                      {/* Type badge — bottom left */}
-                      <div className="absolute bottom-2 left-2">
-                        <span className="flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-black/70 text-white/45 backdrop-blur-sm border border-white/[0.08]">
-                          <TypeIcon className="w-2.5 h-2.5" />
-                          {typeLabel}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Info */}
-                    <div className="p-3">
-                      <h3 className="text-xs font-bold text-white truncate leading-tight mb-0.5">
-                        {artist.stageName}
-                      </h3>
-                      {artist.genre ? (
-                        <p className="text-[10px] text-white/30 truncate">{artist.genre}</p>
-                      ) : artist._profile?.username ? (
-                        <p className="text-[10px] text-white/20 truncate">@{artist._profile.username}</p>
-                      ) : null}
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+                </div>
+              </motion.div>
+            ))}
           </div>
         )}
       </div>
