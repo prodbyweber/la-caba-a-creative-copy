@@ -62,46 +62,58 @@ export default function StartHero({ bottomOffset = `${typeof window !== "undefin
         <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover" loading="eager" />
       ) : null}
 
-      {/* Overlay */}
+      {/* Cinematic overlay — top + bottom gradient + central vignette */}
       <div className="absolute inset-0" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 50%, rgba(0,0,0,0.75) 100%)"
+        background: "linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.72) 100%)"
+      }} />
+      {/* Radial vignette for extra depth */}
+      <div className="absolute inset-0" style={{
+        background: "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.45) 100%)"
       }} />
 
-      {/* Bottom-right: slogan */}
+      {/* Center: headline + paragraph */}
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 0.85, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
         style={{
           position: "absolute",
-          bottom: bottomOffset,
-          right: "clamp(24px, 6vw, 56px)",
+          inset: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
           zIndex: 20,
-          textAlign: "right",
+          padding: "0 clamp(24px, 8vw, 120px)",
           pointerEvents: "none",
         }}
       >
-        <p style={{
+        <h1 style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "9px",
-          fontWeight: 700,
-          letterSpacing: "0.3em",
-          textTransform: "uppercase",
-          color: "rgba(240,237,232,0.4)",
-          marginBottom: "6px",
-        }}>
-          Música · Films · Creadores
-        </p>
-        <p style={{
-          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "clamp(1rem, 2.5vw, 1.4rem)",
+          fontSize: "clamp(1.6rem, 4vw, 2.8rem)",
           fontWeight: 300,
-          color: "rgba(240,237,232,0.85)",
-          letterSpacing: "-0.01em",
-          lineHeight: 1.3,
-          maxWidth: "320px",
+          color: "rgba(240,237,232,0.95)",
+          letterSpacing: "-0.02em",
+          lineHeight: 1.15,
+          marginBottom: "clamp(16px, 2.5vw, 28px)",
+          maxWidth: "720px",
         }}>
-          más que lo que se escucha.
+          Un espacio para creadores y marcas con visión
+        </h1>
+        <p style={{
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontSize: "clamp(0.8rem, 1.4vw, 1rem)",
+          fontWeight: 300,
+          color: "rgba(240,237,232,0.55)",
+          letterSpacing: "0.01em",
+          lineHeight: 1.7,
+          maxWidth: "520px",
+        }}>
+          Producción, contenido y experiencias creativas desarrolladas para destacar.
+          <br /><br />
+          Descubre quiénes somos y cómo ayudamos a creadores y marcas a desarrollar proyectos con identidad antes de{" "}
+          <span style={{ color: "rgba(240,237,232,0.88)", fontWeight: 400 }}>Comenzar</span>.
         </p>
       </motion.div>
     </section>
