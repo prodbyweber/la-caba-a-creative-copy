@@ -108,7 +108,7 @@ export default function AdminDashboard() {
 
   const kpis = [
     { icon: Calendar, label: "Sessions Hoy", value: todaySessions.length, link: createPageUrl("Calendars"), accent: null },
-    { icon: UserRound, label: "Creadores", value: activeArtists.length, link: "/ArtistPanelList", accent: "#f97316" },
+    { icon: UserRound, label: "Creadores", value: activeArtists.length, link: "/ArtistPanelList", accent: "#f97316", exact: true },
     { icon: Mail, label: "Solicitudes", value: newLeads.length, link: "/ContactLeads", accent: null },
     { icon: Calendar, label: "Calendario", value: upcomingSessions.length, link: "/Calendars", accent: "#22c55e" },
   ];
