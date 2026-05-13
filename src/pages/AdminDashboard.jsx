@@ -5,11 +5,9 @@ import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import CreateSessionModal from "@/components/admin/CreateSessionModal";
 import CreateDeliverableModal from "@/components/admin/CreateDeliverableModal";
-import CreateRevisionModal from "@/components/admin/CreateRevisionModal";
 import StatusButton from "@/components/admin/StatusButton";
 import {
-  Calendar, Clock, AlertCircle, GitPullRequest, FolderKanban,
-  TrendingUp, Users, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal, Music2, UserRound, Mail
+  Calendar, Clock, Package, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal, Music2, UserRound, Mail
 } from "lucide-react";
 import { format, isToday, parseISO } from "date-fns";
 import { Link } from "react-router-dom";
@@ -56,33 +54,25 @@ function ItemMenu({ onEdit, onDelete, onArchive, showArchive = false }) {
 export default function AdminDashboard() {
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [showDeliverableModal, setShowDeliverableModal] = useState(false);
-  const [showRevisionModal, setShowRevisionModal] = useState(false);
   const [editSession, setEditSession] = useState(null);
   const [editDeliverable, setEditDeliverable] = useState(null);
-  const [editRevision, setEditRevision] = useState(null);
 
   const queryClient = useQueryClient();
 
   const { data: sessions = [] } = useQuery({ queryKey: ['sessions'], queryFn: () => base44.entities.Session.list('-start_time') });
   const { data: deliverables = [] } = useQuery({ queryKey: ['deliverables'], queryFn: () => base44.entities.Deliverable.list('-due_date_time') });
-  const { data: revisions = [] } = useQuery({ queryKey: ['revisions'], queryFn: () => base44.entities.Revision.list('-created_date') });
-  const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => base44.entities.Project.list('-created_date') });
   const { data: artists = [] } = useQuery({ queryKey: ['artists'], queryFn: () => base44.entities.Artist.list('-created_date') });
   const { data: contactLeads = [] } = useQuery({ queryKey: ['contactLeads'], queryFn: () => base44.entities.ContactLead.list('-created_date') });
 
   // KPI calculations
   const todaySessions = sessions.filter(s => s.start_time && isToday(parseISO(s.start_time)));
   const upcomingSessions = sessions.filter(s => s.start_time && new Date(s.start_time) >= new Date() && s.status !== 'Done' && s.status !== 'Cancelled').sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
-  const dueDeliverables = deliverables.filter(d => d.status === 'Pending' || d.status === 'Overdue');
-  const overdueDeliverables = deliverables.filter(d => d.status === 'Overdue' || (d.due_date_time && new Date(d.due_date_time) < new Date() && d.status === 'Pending'));
-  const openRevisions = revisions.filter(r => r.status === 'Open' || r.status === 'InProgress');
-  const activeProjects = projects.filter(p => p.status !== 'Delivered' && p.status !== 'Archived');
+  const pendingDeliverables = deliverables.filter(d => d.status === 'Pending' || d.status === 'Overdue');
   const activeArtists = artists.filter(a => a.status === 'Active');
 
   // Mutations - status
   const updateSessionStatus = useMutation({ mutationFn: ({ id, status }) => base44.entities.Session.update(id, { status }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] }) });
   const updateDeliverableStatus = useMutation({ mutationFn: ({ id, status }) => base44.entities.Deliverable.update(id, { status }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['deliverables'] }) });
-  const updateRevisionStatus = useMutation({ mutationFn: ({ id, status }) => base44.entities.Revision.update(id, { status }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['revisions'] }) });
 
   // Mutations - delete
   const deleteSession = useMutation({
@@ -97,12 +87,10 @@ export default function AdminDashboard() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] })
   });
   const deleteDeliverable = useMutation({ mutationFn: (id) => base44.entities.Deliverable.delete(id), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['deliverables'] }) });
-  const deleteRevision = useMutation({ mutationFn: (id) => base44.entities.Revision.delete(id), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['revisions'] }) });
 
   // Mutations - archive
   const archiveSession = useMutation({ mutationFn: (id) => base44.entities.Session.update(id, { status: 'Done' }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] }) });
   const archiveDeliverable = useMutation({ mutationFn: (id) => base44.entities.Deliverable.update(id, { status: 'Approved' }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['deliverables'] }) });
-  const archiveRevision = useMutation({ mutationFn: (id) => base44.entities.Revision.update(id, { status: 'Closed' }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['revisions'] }) });
 
   const newLeads = contactLeads.filter(l => l.status === 'Nuevo' || !l.status);
 
@@ -115,11 +103,9 @@ export default function AdminDashboard() {
 
   const openEditSession = (s) => { setEditSession(s); setShowSessionModal(true); };
   const openEditDeliverable = (d) => { setEditDeliverable(d); setShowDeliverableModal(true); };
-  const openEditRevision = (r) => { setEditRevision(r); setShowRevisionModal(true); };
 
   const handleCloseSession = () => { setShowSessionModal(false); setEditSession(null); };
   const handleCloseDeliverable = () => { setShowDeliverableModal(false); setEditDeliverable(null); };
-  const handleCloseRevision = () => { setShowRevisionModal(false); setEditRevision(null); };
 
   return (
     <AdminLayout activePage="AdminDashboard">
@@ -188,12 +174,6 @@ export default function AdminDashboard() {
                 className="flex items-center gap-1.5 text-xs px-3.5 py-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl hover:bg-blue-500/20 transition-all font-medium"
               >
                 <Plus className="w-3.5 h-3.5" /> Entregable
-              </button>
-              <button
-                onClick={() => { setEditRevision(null); setShowRevisionModal(true); }}
-                className="flex items-center gap-1.5 text-xs px-3.5 py-2 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-xl hover:bg-purple-500/20 transition-all font-medium"
-              >
-                <Plus className="w-3.5 h-3.5" /> Revisión
               </button>
               <Link to={createPageUrl("Calendars")}>
                 <button className="text-xs px-3.5 py-2 bg-white/[0.04] text-white/40 border border-white/[0.07] rounded-xl hover:bg-white/[0.08] transition-all">
@@ -304,7 +284,7 @@ export default function AdminDashboard() {
           </div>
         </motion.div>
 
-        {/* Revisiones */}
+        {/* Entregables Pendientes */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -313,47 +293,51 @@ export default function AdminDashboard() {
         >
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
-              <GitPullRequest className="w-4 h-4 text-purple-400" />
-              <h3 className="text-sm font-semibold text-white">Revisiones Pendientes</h3>
-              {openRevisions.length > 0 && (
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                  {openRevisions.length}
+              <Package className="w-4 h-4 text-blue-400" />
+              <h3 className="text-sm font-semibold text-white">Entregables Pendientes</h3>
+              {pendingDeliverables.length > 0 && (
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  {pendingDeliverables.length}
                 </span>
               )}
             </div>
-            <Link to={createPageUrl("Revisions")}>
-              <button className="text-xs text-white/35 hover:text-white/70 transition-colors">Ver todas →</button>
-            </Link>
+            <button
+              onClick={() => { setEditDeliverable(null); setShowDeliverableModal(true); }}
+              className="text-xs text-white/35 hover:text-white/70 transition-colors"
+            >
+              + Nuevo
+            </button>
           </div>
 
-          {openRevisions.length === 0 ? (
+          {pendingDeliverables.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 rounded-xl border border-white/[0.05] bg-white/[0.02]">
               <CheckCircle2 className="w-10 h-10 text-white/10 mb-2" />
-              <p className="text-sm text-white/25">No hay revisiones pendientes</p>
+              <p className="text-sm text-white/25">No hay entregables pendientes</p>
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 gap-2">
-              {openRevisions.slice(0, 6).map((r) => (
-                <div key={r.id} className="group p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all">
+              {pendingDeliverables.slice(0, 6).map((d) => (
+                <div key={d.id} className="group p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all">
                   <div className="flex items-start gap-2 mb-2">
-                    <p className="text-sm text-white font-medium flex-1 line-clamp-2">{r.request_text}</p>
+                    <p className="text-sm text-white font-medium flex-1 line-clamp-2">{d.title}</p>
                     <ItemMenu
-                      onEdit={() => openEditRevision(r)}
-                      onDelete={() => deleteRevision.mutate(r.id)}
-                      onArchive={() => archiveRevision.mutate(r.id)}
+                      onEdit={() => openEditDeliverable(d)}
+                      onDelete={() => deleteDeliverable.mutate(d.id)}
+                      onArchive={() => archiveDeliverable.mutate(d.id)}
                       showArchive
                     />
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-400 font-medium">{r.revision_type}</span>
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-                      r.severity === 'Critical' ? 'bg-red-500/10 text-red-400' :
-                      r.severity === 'Medium' ? 'bg-yellow-500/10 text-yellow-400' :
-                      'bg-blue-500/10 text-blue-400'
-                    }`}>{r.severity}</span>
-                    <span className="text-[10px] text-white/25">{r.timecode}</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-medium">{d.deliverable_type}</span>
+                    {d.due_date_time && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                        new Date(d.due_date_time) < new Date() ? 'bg-red-500/10 text-red-400' : 'bg-white/[0.05] text-white/30'
+                      }`}>
+                        {format(parseISO(d.due_date_time), 'MMM d')}
+                      </span>
+                    )}
                     <div className="ml-auto">
-                      <StatusButton status={r.status} onStatusChange={(id, status) => updateRevisionStatus.mutate({ id, status })} entity="revision" id={r.id} />
+                      <StatusButton status={d.status} onStatusChange={(id, status) => updateDeliverableStatus.mutate({ id, status })} entity="deliverable" id={d.id} />
                     </div>
                   </div>
                 </div>
@@ -375,7 +359,6 @@ export default function AdminDashboard() {
       {/* Modals */}
       <CreateSessionModal isOpen={showSessionModal} onClose={handleCloseSession} editData={editSession} />
       <CreateDeliverableModal isOpen={showDeliverableModal} onClose={handleCloseDeliverable} editData={editDeliverable} />
-      <CreateRevisionModal isOpen={showRevisionModal} onClose={handleCloseRevision} editData={editRevision} />
 
       {/* FAB — Nueva Sesión */}
       <button
