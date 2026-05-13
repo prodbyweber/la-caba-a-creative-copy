@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -243,8 +243,20 @@ export default function Calendars() {
 }
 
 function AgendaView({ sessions, deliverables, artists, projects, currentDate, onSessionClick, onDeleteSession }) {
+  const todayRef = useRef(null);
+  const scrollRef = useRef(null);
+
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
+
+  useEffect(() => {
+    if (todayRef.current && scrollRef.current) {
+      const container = scrollRef.current;
+      const el = todayRef.current;
+      const top = el.offsetTop - container.offsetTop;
+      container.scrollTo({ top, behavior: 'smooth' });
+    }
+  }, [currentDate]);
 
   const allItems = [
     ...sessions.filter(s => {
@@ -279,12 +291,12 @@ function AgendaView({ sessions, deliverables, artists, projects, currentDate, on
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div ref={scrollRef} className="flex-1 overflow-y-auto">
       {Object.entries(byDate).map(([dateKey, items]) => {
         const date = parseISO(dateKey);
         const isTodayDate = isToday(date);
         return (
-          <div key={dateKey} className="flex border-b border-white/[0.06]">
+          <div key={dateKey} ref={isTodayDate ? todayRef : null} className="flex border-b border-white/[0.06]">
             {/* Date column */}
             <div className={`w-24 flex-shrink-0 p-4 text-right sticky left-0 ${isTodayDate ? 'bg-blue-500/5' : ''}`}>
               <div className={`text-xs font-semibold uppercase tracking-wide ${isTodayDate ? 'text-blue-400' : 'text-gray-500'}`}>
