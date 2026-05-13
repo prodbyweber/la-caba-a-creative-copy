@@ -3,20 +3,12 @@ import { motion } from "framer-motion";
 import { 
   LayoutDashboard, 
   Users, 
-  FolderKanban, 
   Calendar,
-  MessageSquare,
-  GitPullRequest,
-  Video,
-  Settings,
   Menu,
   X,
-  Search,
-  Music2,
   Home,
   Inbox,
   Monitor,
-  Compass
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -83,14 +75,13 @@ export default function AdminLayout({ children, activePage }) {
 
           {/* Right actions */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Link to={createPageUrl("Settings")}>
-              <button className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white transition-all">
-                <Settings className="w-4 h-4" />
-              </button>
-            </Link>
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-[10px] font-bold cursor-pointer">
-              W
-            </div>
+            <button
+              onClick={() => { window.scrollTo(0,0); window.location.href = "/start"; }}
+              className="w-8 h-8 rounded-full border border-white/10 hover:border-white/25 bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-center transition-all cursor-pointer"
+              title="Ir a la landing"
+            >
+              <Home className="w-4 h-4 text-white/50" strokeWidth={1.5} />
+            </button>
           </div>
         </div>
       </nav>

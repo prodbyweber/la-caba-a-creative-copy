@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import StartNav from "@/components/start/StartNav";
 import StartHero from "@/components/start/StartHero";
 import StartWhatWeDo from "@/components/start/StartWhatWeDo";
@@ -19,6 +19,16 @@ const SnapSection = ({ children }) => (
 );
 
 export default function Start() {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    // Scroll to top instantly on mount — both window and snap container
+    window.scrollTo(0, 0);
+    if (containerRef.current) {
+      containerRef.current.scrollTop = 0;
+    }
+  }, []);
+
   return (
     <div
       style={{
@@ -58,7 +68,7 @@ export default function Start() {
         }
       `}</style>
 
-      <div className="snap-scroll-container">
+      <div className="snap-scroll-container" ref={containerRef}>
         <div className="snap-section-full"><StartHero /></div>
         <div className="snap-section-full"><StartWhatWeDo /></div>
         <div className="snap-section-full"><StartCreadores /></div>
