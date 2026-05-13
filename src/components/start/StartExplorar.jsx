@@ -203,7 +203,7 @@ export default function StartExplorar({ showButton = true, allowMobileScroll = f
   const features = [
     {
       title: "Atrévete a explorar",
-      desc: "Accede al universo creativo de Cabaña Creative y conecta con proyectos diseñados para artistas, marcas y creadores que buscan destacar con una identidad real."
+      desc: "Sumérgete en el universo de Cabaña Creative: una plataforma donde convergen música, contenido, proyectos y experiencias creadas para inspirar, conectar y desarrollar artistas, marcas y creadores."
     },
     {
       title: "Producción & Dirección Creativa",
