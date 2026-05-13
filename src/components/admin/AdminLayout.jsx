@@ -21,7 +21,6 @@ const navItems = [
   { icon: Users, label: "Creadores", page: "ArtistPanelList" },
   { icon: Calendar, label: "Calendars", page: "Calendars" },
   { icon: Monitor, label: "Design Editor", page: "DesignEditor" },
-  { icon: Inbox, label: "Solicitudes", page: "ContactLeads" },
 ];
 
 export default function AdminLayout({ children, activePage }) {
@@ -79,10 +78,10 @@ export default function AdminLayout({ children, activePage }) {
               return (
                 <Link key={i} to={createPageUrl(item.page)}>
                   <button
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all ${
+                    className={`flex items-center gap-1.5 px-3 py-2 text-[11px] font-medium whitespace-nowrap transition-all border-b-2 ${
                       isActive
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                        ? 'text-white border-white'
+                        : 'text-white/35 border-transparent hover:text-white/60'
                     }`}
                   >
                     <item.icon className="w-3.5 h-3.5 flex-shrink-0" />
@@ -157,8 +156,8 @@ export default function AdminLayout({ children, activePage }) {
                     <button
                       className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                         isActive
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                          : 'text-gray-400 hover:text-white hover:bg-white/5'
+                          ? 'text-white bg-white/[0.07]'
+                          : 'text-white/35 hover:text-white/60 hover:bg-white/5'
                       }`}
                     >
                       <item.icon className="w-4 h-4 flex-shrink-0" />
