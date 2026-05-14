@@ -7,7 +7,7 @@ import { createPageUrl } from "@/utils";
 const items = [
   { icon: LayoutDashboard, label: "Dashboard", page: "AdminDashboard" },
   { icon: Users,           label: "Creadores",  page: "ArtistPanelList" },
-  { icon: Calendar,        label: "Calendars",  page: "Calendars" },
+  { icon: Calendar,        label: "Calendario",  page: "Calendars" },
   { icon: Inbox,           label: "Solicitudes", page: "ContactLeads" },
   { icon: Monitor,         label: "Design",     page: "DesignEditor" },
 ];
