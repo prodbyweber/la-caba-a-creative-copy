@@ -20,7 +20,7 @@ const SESSION_COLORS = {
 };
 
 export default function Calendars() {
-  const [viewMode, setViewMode] = useState("month"); // month | agenda
+  const [viewMode, setViewMode] = useState(() => window.innerWidth < 640 ? "agenda" : "month"); // month | agenda
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [showDeliverableModal, setShowDeliverableModal] = useState(false);
@@ -223,6 +223,16 @@ export default function Calendars() {
         />
       )}
 
+      {/* FAB móvil — solo en agenda */}
+      {viewMode === "agenda" && (
+        <button
+          onClick={() => setShowSessionModal(true)}
+          className="sm:hidden fixed bottom-6 right-5 z-40 w-14 h-14 rounded-2xl bg-[#c7d0f5] flex items-center justify-center shadow-xl active:scale-95 transition-transform"
+        >
+          <Plus className="w-7 h-7 text-[#1a237e]" />
+        </button>
+      )}
+
       {/* Modals */}
       <CreateSessionModal isOpen={showSessionModal} onClose={() => setShowSessionModal(false)} editData={null} />
       {!artistId && <CreateDeliverableModal isOpen={showDeliverableModal} onClose={() => setShowDeliverableModal(false)} editData={null} />}
@@ -242,32 +252,53 @@ export default function Calendars() {
   );
 }
 
+const AGENDA_COLORS = {
+  Session:     { bg: "#e8452c", text: "#fff" },
+  Meeting:     { bg: "#3b82f6", text: "#fff" },
+  StudioWork:  { bg: "#8b5cf6", text: "#fff" },
+  Deliverable: { bg: "#0d9488", text: "#fff" },
+};
+
+function getWeekLabel(date) {
+  const weekStart = startOfWeek(date, { weekStartsOn: 1 });
+  const weekEnd = addDays(weekStart, 6);
+  const monthName = (d) => format(d, 'MMMM', { locale: es }).toUpperCase();
+  if (weekStart.getMonth() === weekEnd.getMonth()) {
+    return `${format(weekStart, 'd')}–${format(weekEnd, 'd')} DE ${monthName(weekStart)}`;
+  }
+  return `${format(weekStart, 'd')} ${monthName(weekStart)} – ${format(weekEnd, 'd')} ${monthName(weekEnd)}`;
+}
+
 function AgendaView({ sessions, deliverables, artists, projects, currentDate, onSessionClick, onDeleteSession }) {
   const todayRef = useRef(null);
   const scrollRef = useRef(null);
 
-  const monthStart = startOfMonth(currentDate);
-  const monthEnd = endOfMonth(currentDate);
+  // Show from 3 months before current to 6 months after
+  const rangeStart = new Date(currentDate.getFullYear(), currentDate.getMonth() - 3, 1);
+  const rangeEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 6, 0);
 
   useEffect(() => {
-    if (todayRef.current && scrollRef.current) {
-      const container = scrollRef.current;
-      const el = todayRef.current;
-      const top = el.offsetTop - container.offsetTop;
-      container.scrollTo({ top, behavior: 'smooth' });
-    }
+    // Scroll to today after render
+    const frame = requestAnimationFrame(() => {
+      if (todayRef.current && scrollRef.current) {
+        const container = scrollRef.current;
+        const el = todayRef.current;
+        container.scrollTop = el.offsetTop - container.offsetTop - 8;
+      }
+    });
+    return () => cancelAnimationFrame(frame);
   }, [currentDate]);
 
   const allItems = [
     ...sessions.filter(s => {
       if (!s.start_time) return false;
       const d = parseISO(s.start_time);
-      return d >= monthStart && d <= monthEnd;
+      return d >= rangeStart && d <= rangeEnd;
     }).map(s => ({ ...s, _kind: 'session', _date: parseISO(s.start_time) })),
     ...deliverables.filter(d => {
       if (!d.due_date_time) return false;
       const dt = parseISO(d.due_date_time);
-      return dt >= monthStart && dt <= monthEnd;
+      return dt >= rangeStart && dt <= rangeEnd;
     }).map(d => ({ ...d, _kind: 'deliverable', _date: parseISO(d.due_date_time) })),
   ].sort((a, b) => a._date - b._date);
 
@@ -290,88 +321,98 @@ function AgendaView({ sessions, deliverables, artists, projects, currentDate, on
     );
   }
 
+  // Build ordered list with week separators
+  const entries = Object.entries(byDate).sort(([a], [b]) => a.localeCompare(b));
+  let lastWeekKey = null;
+  const rows = [];
+
+  entries.forEach(([dateKey, items]) => {
+    const date = parseISO(dateKey);
+    const weekKey = format(startOfWeek(date, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+    if (weekKey !== lastWeekKey) {
+      rows.push({ type: 'week', key: 'w-' + weekKey, label: getWeekLabel(date) });
+      lastWeekKey = weekKey;
+    }
+    rows.push({ type: 'day', key: dateKey, date, items });
+  });
+
   return (
-    <div ref={scrollRef} className="flex-1 overflow-y-auto">
-      {Object.entries(byDate).map(([dateKey, items]) => {
-        const date = parseISO(dateKey);
+    <div ref={scrollRef} className="flex-1 overflow-y-auto bg-[#0a0a0b]">
+      {rows.map(row => {
+        if (row.type === 'week') {
+          return (
+            <div key={row.key} className="px-4 pt-4 pb-1">
+              <span className="text-[10px] font-semibold text-gray-500 tracking-widest uppercase">{row.label}</span>
+            </div>
+          );
+        }
+
+        const { date, items } = row;
         const isTodayDate = isToday(date);
+        const dayAbbr = format(date, 'EEE', { locale: es }).toUpperCase().slice(0, 3);
+
         return (
-          <div key={dateKey} ref={isTodayDate ? todayRef : null} className="flex border-b border-white/[0.06]">
-            {/* Date column */}
-            <div className={`w-24 flex-shrink-0 p-4 text-right sticky left-0 ${isTodayDate ? 'bg-blue-500/5' : ''}`}>
-              <div className={`text-xs font-semibold uppercase tracking-wide ${isTodayDate ? 'text-blue-400' : 'text-gray-500'}`}>
-                {format(date, 'EEE', { locale: es })}
-              </div>
-              <div className={`text-2xl font-bold mt-0.5 ${isTodayDate ? 'text-blue-400' : 'text-white'}`}>
+          <div
+            key={row.key}
+            ref={isTodayDate ? todayRef : null}
+            className="flex items-start px-2 sm:px-4 py-1 gap-3"
+          >
+            {/* Date column — fixed width, compact */}
+            <div className="flex-shrink-0 w-12 flex flex-col items-center pt-1">
+              <span className={`text-[11px] font-semibold uppercase tracking-wide leading-none ${isTodayDate ? 'text-blue-400' : 'text-gray-500'}`}>
+                {dayAbbr}
+              </span>
+              <span className={`text-xl font-bold leading-tight mt-0.5 w-8 h-8 flex items-center justify-center rounded-full ${
+                isTodayDate ? 'bg-blue-500 text-white' : 'text-white'
+              }`}>
                 {format(date, 'd')}
-              </div>
-              <div className="text-[10px] text-gray-600 mt-0.5">{format(date, 'MMM', { locale: es })}</div>
+              </span>
             </div>
 
             {/* Events column */}
-            <div className="flex-1 p-3 space-y-2">
+            <div className="flex-1 min-w-0 space-y-1.5 pb-2">
               {items.map((item, idx) => {
                 const isSession = item._kind === 'session';
-                const colors = isSession ? SESSION_COLORS[item.type] || SESSION_COLORS.Session : SESSION_COLORS.Deliverable;
+                const colorKey = isSession ? (item.type || 'Session') : 'Deliverable';
+                const color = AGENDA_COLORS[colorKey] || AGENDA_COLORS.Session;
                 const artist = artists.find(a => a.id === item.artist_id);
                 const project = projects.find(p => p.id === item.project_id);
-                const duration = isSession && item.end_time ? differenceInHours(parseISO(item.end_time), parseISO(item.start_time)) : null;
+
+                let timeStr = '';
+                if (isSession && item.start_time) {
+                  timeStr = format(parseISO(item.start_time), 'H:mm');
+                  if (item.end_time) timeStr += `–${format(parseISO(item.end_time), 'H:mm')} p. m.`;
+                  if (item.location) timeStr += ` en ${item.location}`;
+                } else if (!isSession && item.due_date_time) {
+                  timeStr = `Hasta las ${format(parseISO(item.due_date_time), 'H:mm')} p. m.`;
+                }
+
+                const subtitle = [
+                  timeStr,
+                  artist ? artist.stageName : null,
+                  project ? project.title : null,
+                ].filter(Boolean).join(' · ');
 
                 return (
-                  <motion.div
+                  <div
                     key={idx}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.03 }}
                     onClick={() => isSession && onSessionClick(item)}
-                    className={`flex items-start gap-3 p-3 rounded-xl border transition-all ${isSession ? 'cursor-pointer hover:brightness-110' : ''}`}
-                    style={{ backgroundColor: colors.light, borderColor: colors.border }}
+                    className={`w-full rounded-lg px-3 py-2 ${isSession ? 'cursor-pointer active:opacity-80' : ''}`}
+                    style={{ backgroundColor: color.bg }}
                   >
-                    <div className="w-1 self-stretch rounded-full flex-shrink-0" style={{ backgroundColor: colors.bg }} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="font-semibold text-sm text-white truncate">{item.title}</p>
-                          <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-gray-400">
-                            {isSession && item.start_time && (
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {format(parseISO(item.start_time), 'HH:mm')}
-                                {item.end_time && ` - ${format(parseISO(item.end_time), 'HH:mm')}`}
-                                {duration !== null && duration > 0 && ` (${duration}h)`}
-                              </span>
-                            )}
-                            {item.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{item.location}</span>}
-                            {artist && <span className="flex items-center gap-1"><User className="w-3 h-3" />{artist.stageName}</span>}
-                            {project && <span className="opacity-60">{project.title}</span>}
-                          </div>
-                          {item.google_event_link && (
-                            <a href={item.google_event_link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}
-                              className="mt-1 inline-flex items-center gap-1 text-[10px] text-blue-400 hover:text-blue-300">
-                              <ExternalLink className="w-2.5 h-2.5" />Google Calendar
-                            </a>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: colors.light, color: colors.text }}>
-                            {isSession ? item.type : item.deliverable_type || 'Entregable'}
-                          </span>
-                          {isSession && (
-                            <button onClick={e => { e.stopPropagation(); onDeleteSession(item); }}
-                              className="p-1 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-500/10 transition-colors">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
+                    <p className="text-sm font-semibold text-white leading-tight truncate">{item.title}</p>
+                    {subtitle && (
+                      <p className="text-[11px] text-white/80 mt-0.5 leading-tight truncate">{subtitle}</p>
+                    )}
+                  </div>
                 );
               })}
             </div>
           </div>
         );
       })}
+      {/* Bottom padding */}
+      <div className="h-24" />
     </div>
   );
 }
