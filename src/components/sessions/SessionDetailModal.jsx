@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { X, Save, Clock, MapPin, Link as LinkIcon, Calendar, FileText, Trash2, Video, HardDrive } from "lucide-react";
+import { X, Save, Clock, MapPin, Link as LinkIcon, Calendar, FileText, Trash2, Video, HardDrive, ChevronDown, ChevronUp } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
+
+const DESC_LIMIT = 120;
 
 export default function SessionDetailModal({ session, onClose, artists, readOnly = false }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [descExpanded, setDescExpanded] = useState(false);
   const [formData, setFormData] = useState({
     title: session.title || "",
     description: session.description || "",
@@ -38,366 +42,212 @@ export default function SessionDetailModal({ session, onClose, artists, readOnly
     }
   });
 
-  const handleStatusChange = (newStatus) => {
-    updateMutation.mutate({ status: newStatus });
-    setFormData({ ...formData, status: newStatus });
-  };
+  const handleSave = () => updateMutation.mutate(formData);
 
-  const handleSave = () => {
-    updateMutation.mutate(formData);
-  };
+  const artist = artists?.find(a => a.id === formData.artist_id);
 
-  const getStatusColor = (status) => {
-    switch(status) {
-      case "Pending": return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-      case "Confirmed": return "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
-      case "Done": return "bg-red-500/20 text-red-400 border-red-500/30";
-      case "Cancelled": return "bg-gray-500/20 text-gray-400 border-gray-500/30";
-      default: return "bg-gray-500/20 text-gray-400 border-gray-500/30";
-    }
-  };
+  const descText = session.description || "";
+  const descLong = descText.length > DESC_LIMIT;
+  const descShown = descLong && !descExpanded ? descText.slice(0, DESC_LIMIT) + "…" : descText;
 
-  const calculateDuration = () => {
-    if (!session.start_time || !session.end_time) return null;
-    const start = parseISO(session.start_time);
-    const end = parseISO(session.end_time);
-    const hours = Math.abs(end - start) / 36e5;
-    return hours.toFixed(1);
-  };
-
-  const artist = artists.find(a => a.id === formData.artist_id);
+  const Row = ({ icon: Icon, label, children }) => (
+    <div className="flex items-start gap-2.5 py-2.5 border-b border-white/[0.05] last:border-0">
+      <Icon className="w-3.5 h-3.5 text-gray-500 mt-0.5 flex-shrink-0" />
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] text-gray-500 uppercase tracking-wide leading-none mb-0.5">{label}</p>
+        {children}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/70 backdrop-blur-sm">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-[#111113] rounded-2xl border border-white/10 w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 30 }}
+        className="bg-[#111113] rounded-t-2xl sm:rounded-2xl border border-white/10 w-full sm:max-w-md max-h-[90vh] overflow-hidden flex flex-col"
       >
         {/* Header */}
-        <div className="p-4 sm:p-6 border-b border-white/5 bg-gradient-to-br from-white/5 to-transparent">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              {isEditing && !readOnly ? (
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full text-2xl sm:text-3xl font-bold bg-white/5 border border-white/10 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-500/50"
-                />
-              ) : (
-                <h2 className="text-2xl sm:text-3xl font-bold mb-3">{session.title}</h2>
+        <div className="px-4 pt-4 pb-3 border-b border-white/[0.06] flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            {isEditing ? (
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full text-base font-semibold bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500/50"
+              />
+            ) : (
+              <h2 className="text-base font-semibold text-white leading-tight">{session.title}</h2>
+            )}
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              <span className="text-[11px] text-gray-500">{session.type}</span>
+              {artist && (
+                <>
+                  <span className="text-gray-700 text-[10px]">·</span>
+                  <span className="text-[11px] text-gray-400">{artist.stageName}</span>
+                </>
               )}
-              
-              {/* Status, Duration & Time */}
-              <div className="flex flex-wrap items-center gap-3 mt-3">
-                <span className={`px-4 py-1.5 rounded-xl text-sm font-bold border ${getStatusColor(formData.status)}`}>
-                  {formData.status === "Done" ? "🔴 FINALIZADO" : formData.status === "Confirmed" ? "✅ Confirmado" : "⏳ Pendiente"}
-                </span>
-                
-                {session.start_time && session.end_time && (
-                  <>
-                    <div className="flex items-center gap-2 text-white bg-white/10 px-3 py-1.5 rounded-xl">
-                      <Clock className="w-4 h-4" />
-                      <span className="font-semibold">
-                        {format(parseISO(session.start_time), "HH:mm")} - {format(parseISO(session.end_time), "HH:mm")}
-                      </span>
-                    </div>
-                    {calculateDuration() && (
-                      <div className="text-sm text-emerald-400 font-semibold bg-emerald-500/10 px-3 py-1.5 rounded-xl">
-                        {calculateDuration()} horas
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-              
-              <div className="flex flex-wrap items-center gap-2 mt-3 text-sm text-gray-400">
-                <span>{session.type}</span>
-                {artist && (
-                  <>
-                    <span>•</span>
-                    <span className="text-white font-medium">{artist.stageName}</span>
-                  </>
-                )}
-              </div>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-lg transition-colors flex-shrink-0">
-              <X className="w-5 h-5" />
-            </button>
           </div>
+          <button onClick={onClose} className="p-1.5 hover:bg-white/5 rounded-lg transition-colors flex-shrink-0">
+            <X className="w-4 h-4 text-gray-400" />
+          </button>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-          {/* Status Buttons - Solo para admins */}
-          {!readOnly && (
-            <div>
-              <label className="text-sm font-medium text-gray-400 mb-3 block">Estado de la Sesión</label>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => handleStatusChange("Pending")}
-                  disabled={updateMutation.isPending}
-                  className={`py-2.5 px-4 rounded-xl font-medium text-sm transition-all ${
-                    formData.status === "Pending"
-                      ? 'bg-yellow-500 text-black'
-                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                  }`}
-                >
-                  Pendiente
-                </button>
-                <button
-                  onClick={() => handleStatusChange("Confirmed")}
-                  disabled={updateMutation.isPending}
-                  className={`py-2.5 px-4 rounded-xl font-medium text-sm transition-all ${
-                    formData.status === "Confirmed"
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                  }`}
-                >
-                  Confirmado
-                </button>
-                <button
-                  onClick={() => handleStatusChange("Done")}
-                  disabled={updateMutation.isPending}
-                  className="py-2.5 px-4 rounded-xl font-medium text-sm bg-white/5 text-gray-400 hover:bg-red-500/20 hover:text-red-400 transition-all"
-                >
-                  Finalizado
-                </button>
-              </div>
-            </div>
-          )}
+        <div className="flex-1 overflow-y-auto px-4 py-2">
+          <div className="divide-y divide-white/[0.05]">
 
-          {/* Date & Time */}
-          <div className="bg-white/5 rounded-xl p-4 space-y-3">
-            <div className="flex items-center gap-2 text-emerald-400">
-              <Calendar className="w-5 h-5" />
-              <span className="font-semibold">Fecha y Horario</span>
-            </div>
-            
-            {isEditing ? (
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Inicio</label>
-                  <input
-                    type="datetime-local"
-                    value={formData.start_time}
+            {/* Fecha y horario */}
+            <Row icon={Calendar} label="Fecha y horario">
+              {isEditing ? (
+                <div className="space-y-2 mt-1">
+                  <input type="datetime-local" value={formData.start_time}
                     onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500/50"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Fin</label>
-                  <input
-                    type="datetime-local"
-                    value={formData.end_time}
+                    className="w-full bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-500/50" />
+                  <input type="datetime-local" value={formData.end_time}
                     onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-emerald-500/50"
-                  />
+                    className="w-full bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-500/50" />
                 </div>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm">
-                    {session.start_time && format(parseISO(session.start_time), "HH:mm")} - 
-                    {session.end_time && format(parseISO(session.end_time), "HH:mm")}
-                  </span>
-                </div>
-                <div className="text-sm text-gray-400">
-                  {session.start_time && format(parseISO(session.start_time), "EEEE, d 'de' MMMM yyyy")}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Location */}
-          <div>
-            <label className="text-sm font-medium text-gray-400 mb-2 block flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
-              Ubicación
-            </label>
-            {isEditing ? (
-              <select
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500/50"
-              >
-                <option value="Studio">Studio</option>
-                <option value="Online">Online</option>
-                <option value="External">External</option>
-              </select>
-            ) : (
-              <p className="text-white">{session.location || "No especificado"}</p>
-            )}
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="text-sm font-medium text-gray-400 mb-2 block flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              Descripción
-            </label>
-            {isEditing ? (
-              <textarea
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 h-24 resize-none focus:outline-none focus:border-emerald-500/50"
-                placeholder="Detalles de la sesión..."
-              />
-            ) : (
-              <p className="text-gray-300">{session.description || "Sin descripción"}</p>
-            )}
-          </div>
-
-          {/* Links */}
-          <div className="space-y-3">
-            <div>
-              <label className="text-sm font-medium text-gray-400 mb-2 block flex items-center gap-2">
-                <Video className="w-4 h-4" />
-                Google Meet (opcional)
-              </label>
-              {isEditing ? (
-                <input
-                  type="url"
-                  value={formData.google_meet_link}
-                  onChange={(e) => setFormData({ ...formData, google_meet_link: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500/50"
-                  placeholder="https://meet.google.com/..."
-                />
               ) : (
-                formData.google_meet_link ? (
-                  <a 
-                    href={formData.google_meet_link} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-emerald-400 hover:text-emerald-300 flex items-center gap-2 text-sm"
-                  >
-                    <LinkIcon className="w-4 h-4" />
-                    Unirse a la reunión
-                  </a>
-                ) : (
-                  <p className="text-gray-500 text-sm">No configurado</p>
-                )
+                <div>
+                  {session.start_time && (
+                    <p className="text-[13px] text-white font-medium">
+                      {format(parseISO(session.start_time), "EEEE, d 'de' MMMM", { locale: es })}
+                    </p>
+                  )}
+                  {session.start_time && session.end_time && (
+                    <p className="text-[12px] text-gray-400 flex items-center gap-1 mt-0.5">
+                      <Clock className="w-3 h-3" />
+                      {format(parseISO(session.start_time), "HH:mm")} – {format(parseISO(session.end_time), "HH:mm")}
+                    </p>
+                  )}
+                </div>
               )}
-            </div>
+            </Row>
 
-            <div>
-              <label className="text-sm font-medium text-gray-400 mb-2 block flex items-center gap-2">
-                <HardDrive className="w-4 h-4" />
-                Drive / WeTransfer (opcional)
-              </label>
+            {/* Ubicación */}
+            <Row icon={MapPin} label="Ubicación">
               {isEditing ? (
-                <input
-                  type="url"
-                  value={formData.drive_link}
-                  onChange={(e) => setFormData({ ...formData, drive_link: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500/50"
-                  placeholder="https://drive.google.com/... o https://wetransfer.com/..."
-                />
+                <select value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  className="mt-1 w-full bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-500/50">
+                  <option value="Studio">Studio</option>
+                  <option value="Online">Online</option>
+                  <option value="External">External</option>
+                </select>
               ) : (
-                formData.drive_link ? (
-                  <a 
-                    href={formData.drive_link} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-purple-400 hover:text-purple-300 flex items-center gap-2 text-sm"
-                  >
-                    <LinkIcon className="w-4 h-4" />
-                    Ver archivos
-                  </a>
-                ) : (
-                  <p className="text-gray-500 text-sm">No configurado</p>
-                )
+                <p className="text-[13px] text-white">{session.location || "No especificado"}</p>
               )}
-            </div>
-          </div>
+            </Row>
 
-          {/* Notes */}
-          <div>
-            <label className="text-sm font-medium text-gray-400 mb-2 block">Notas</label>
-            {isEditing ? (
-              <textarea
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 h-32 resize-none focus:outline-none focus:border-emerald-500/50"
-                placeholder="Notas adicionales sobre la sesión..."
-              />
-            ) : (
-              <p className="text-gray-300">{session.notes || "Sin notas"}</p>
+            {/* Descripción */}
+            {(session.description || isEditing) && (
+              <Row icon={FileText} label="Descripción">
+                {isEditing ? (
+                  <textarea value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="mt-1 w-full bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs h-20 resize-none focus:outline-none focus:border-emerald-500/50"
+                    placeholder="Detalles de la sesión..." />
+                ) : (
+                  <div>
+                    <p className="text-[12px] text-gray-300 leading-relaxed">{descShown}</p>
+                    {descLong && (
+                      <button onClick={() => setDescExpanded(v => !v)}
+                        className="flex items-center gap-1 mt-1 text-[11px] text-emerald-400 hover:text-emerald-300">
+                        {descExpanded ? <><ChevronUp className="w-3 h-3" />Ver menos</> : <><ChevronDown className="w-3 h-3" />Ver más</>}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </Row>
+            )}
+
+            {/* Google Meet */}
+            {(formData.google_meet_link || isEditing) && (
+              <Row icon={Video} label="Google Meet">
+                {isEditing ? (
+                  <input type="url" value={formData.google_meet_link}
+                    onChange={(e) => setFormData({ ...formData, google_meet_link: e.target.value })}
+                    className="mt-1 w-full bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-500/50"
+                    placeholder="https://meet.google.com/..." />
+                ) : formData.google_meet_link ? (
+                  <a href={formData.google_meet_link} target="_blank" rel="noopener noreferrer"
+                    className="text-[12px] text-emerald-400 hover:text-emerald-300 flex items-center gap-1">
+                    <LinkIcon className="w-3 h-3" />Unirse a la reunión
+                  </a>
+                ) : null}
+              </Row>
+            )}
+
+            {/* Drive */}
+            {(formData.drive_link || isEditing) && (
+              <Row icon={HardDrive} label="Drive / WeTransfer">
+                {isEditing ? (
+                  <input type="url" value={formData.drive_link}
+                    onChange={(e) => setFormData({ ...formData, drive_link: e.target.value })}
+                    className="mt-1 w-full bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-emerald-500/50"
+                    placeholder="https://drive.google.com/..." />
+                ) : formData.drive_link ? (
+                  <a href={formData.drive_link} target="_blank" rel="noopener noreferrer"
+                    className="text-[12px] text-purple-400 hover:text-purple-300 flex items-center gap-1">
+                    <LinkIcon className="w-3 h-3" />Ver archivos
+                  </a>
+                ) : null}
+              </Row>
+            )}
+
+            {/* Notas */}
+            {(session.notes || isEditing) && (
+              <Row icon={FileText} label="Notas">
+                {isEditing ? (
+                  <textarea value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    className="mt-1 w-full bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs h-20 resize-none focus:outline-none focus:border-emerald-500/50"
+                    placeholder="Notas adicionales..." />
+                ) : (
+                  <p className="text-[12px] text-gray-300 leading-relaxed">{session.notes}</p>
+                )}
+              </Row>
             )}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-4 sm:p-6 border-t border-white/5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {!readOnly ? (
-            <>
-              <button
-                onClick={() => {
-                  if (window.confirm("¿Estás seguro de eliminar esta sesión?")) {
-                    deleteMutation.mutate();
-                  }
-                }}
-                disabled={deleteMutation.isPending}
-                className="px-4 py-2.5 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
-              >
-                <Trash2 className="w-4 h-4" />
-                Eliminar
-              </button>
-              
-              <div className="flex gap-3">
-                {isEditing ? (
-                  <>
-                    <button
-                      onClick={() => {
-                        setIsEditing(false);
-                        setFormData({
-                          title: session.title || "",
-                          description: session.description || "",
-                          notes: session.notes || "",
-                          start_time: session.start_time ? format(parseISO(session.start_time), "yyyy-MM-dd'T'HH:mm") : "",
-                          end_time: session.end_time ? format(parseISO(session.end_time), "yyyy-MM-dd'T'HH:mm") : "",
-                          location: session.location || "Studio",
-                          status: session.status || "Pending",
-                          google_meet_link: session.google_meet_link || "",
-                          drive_link: session.drive_link || ""
-                        });
-                      }}
-                      disabled={updateMutation.isPending}
-                      className="flex-1 px-6 py-2.5 rounded-xl border border-white/10 font-medium text-sm hover:bg-white/5 transition-colors"
-                    >
-                      Cancelar
-                    </button>
-                    <button
-                      onClick={handleSave}
-                      disabled={updateMutation.isPending}
-                      className="flex-1 px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-purple-500 font-medium text-sm hover:shadow-lg transition-all flex items-center justify-center gap-2"
-                    >
-                      <Save className="w-4 h-4" />
-                      {updateMutation.isPending ? "Guardando..." : "Guardar"}
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="flex-1 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 font-medium text-sm transition-colors"
-                  >
-                    Editar
-                  </button>
-                )}
-              </div>
-            </>
-          ) : (
+        {!readOnly && (
+          <div className="px-4 py-3 border-t border-white/[0.06] flex items-center justify-between gap-2">
             <button
-              onClick={onClose}
-              className="w-full px-6 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 font-medium text-sm transition-colors"
+              onClick={() => { if (window.confirm("¿Eliminar esta sesión?")) deleteMutation.mutate(); }}
+              disabled={deleteMutation.isPending}
+              className="p-2 rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 transition-colors"
             >
-              Cerrar
+              <Trash2 className="w-3.5 h-3.5" />
             </button>
-          )}
-        </div>
+
+            <div className="flex gap-2">
+              {isEditing ? (
+                <>
+                  <button onClick={() => setIsEditing(false)}
+                    className="px-4 py-1.5 rounded-lg border border-white/10 text-xs text-gray-400 hover:bg-white/5 transition-colors">
+                    Cancelar
+                  </button>
+                  <button onClick={handleSave} disabled={updateMutation.isPending}
+                    className="px-4 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-medium transition-colors flex items-center gap-1">
+                    <Save className="w-3 h-3" />
+                    {updateMutation.isPending ? "Guardando..." : "Guardar"}
+                  </button>
+                </>
+              ) : (
+                <button onClick={() => setIsEditing(true)}
+                  className="px-4 py-1.5 rounded-lg bg-white/8 hover:bg-white/12 border border-white/10 text-xs text-white font-medium transition-colors">
+                  Editar
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </motion.div>
     </div>
   );
