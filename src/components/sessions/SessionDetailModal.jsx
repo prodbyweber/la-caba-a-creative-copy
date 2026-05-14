@@ -66,7 +66,8 @@ export default function SessionDetailModal({ session, onClose, artists, readOnly
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 30 }}
-        className="bg-[#111113] rounded-t-2xl sm:rounded-2xl border border-white/10 w-full sm:max-w-md max-h-[90vh] overflow-hidden flex flex-col"
+        className="bg-[#111113] rounded-t-2xl sm:rounded-2xl border border-white/10 w-full sm:max-w-md overflow-hidden flex flex-col"
+        style={{ maxHeight: 'calc(100dvh - 80px)' }}
       >
         {/* Header */}
         <div className="px-4 pt-4 pb-3 border-b border-white/[0.06] flex items-start justify-between gap-3">

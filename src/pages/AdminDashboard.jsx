@@ -51,30 +51,45 @@ function ItemMenu({ onEdit, onDelete, onArchive, showArchive = false }) {
   );
 }
 
+const SESSION_CARD_COLORS = {
+  Session:    "#10b981",
+  Meeting:    "#3b82f6",
+  StudioWork: "#8b5cf6",
+};
+
 function SessionRow({ s, onEdit, onDelete, onArchive, onStatusChange, showDate }) {
-  const typeClass = s.type === 'Session' ? 'bg-emerald-500/10 text-emerald-400' :
-    s.type === 'Meeting' ? 'bg-blue-500/10 text-blue-400' : 'bg-purple-500/10 text-purple-400';
+  const color = SESSION_CARD_COLORS[s.type] || SESSION_CARD_COLORS.Session;
   const typeLabel = s.type === 'StudioWork' ? 'Studio Work' : s.type;
 
+  const timeStr = s.start_time
+    ? showDate
+      ? format(parseISO(s.start_time), 'MMM d · h:mm a') + (s.end_time ? ` – ${format(parseISO(s.end_time), 'h:mm a')}` : '')
+      : format(parseISO(s.start_time), 'h:mm a') + (s.end_time ? ` – ${format(parseISO(s.end_time), 'h:mm a')}` : '')
+    : '';
+
+  const subtitle = [timeStr, s.location].filter(Boolean).join(' · ');
+
   return (
-    <div className="group p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all">
-      {/* Fila 1: título + menu */}
-      <div className="flex items-start gap-2 mb-2">
-        <p className="text-sm text-white font-medium flex-1 min-w-0 line-clamp-1">{s.title}</p>
-        <ItemMenu onEdit={() => onEdit(s)} onDelete={() => onDelete.mutate(s)} onArchive={() => onArchive.mutate(s.id)} showArchive />
-      </div>
-      {/* Fila 2: tipo + hora + location + status */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${typeClass}`}>{typeLabel}</span>
-        {s.location && (
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.05] text-white/30 font-medium">{s.location}</span>
+    <div
+      className="group flex items-stretch rounded-xl overflow-hidden cursor-default transition-opacity hover:opacity-90"
+      style={{ backgroundColor: color }}
+    >
+      {/* Content */}
+      <div className="flex-1 px-3 py-2.5 min-w-0">
+        <p className="text-sm font-semibold text-white leading-tight truncate">{s.title}</p>
+        {subtitle && (
+          <p className="text-[11px] text-white/80 mt-0.5 leading-tight truncate">{subtitle}</p>
         )}
-        <span className="text-[10px] text-white/30">
-          {showDate ? format(parseISO(s.start_time), 'MMM d · h:mm a') : format(parseISO(s.start_time), 'h:mm a')}
-        </span>
-        <div className="ml-auto">
-          <StatusButton status={s.status} onStatusChange={(id, status) => onStatusChange.mutate({ id, status })} entity="session" id={s.id} />
+        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-black/20 text-white/80 font-medium">{typeLabel}</span>
+          <div className="ml-auto">
+            <StatusButton status={s.status} onStatusChange={(id, status) => onStatusChange.mutate({ id, status })} entity="session" id={s.id} />
+          </div>
         </div>
+      </div>
+      {/* Actions menu */}
+      <div className="flex items-start pt-1.5 pr-1.5">
+        <ItemMenu onEdit={() => onEdit(s)} onDelete={() => onDelete.mutate(s)} onArchive={() => onArchive.mutate(s.id)} showArchive />
       </div>
     </div>
   );
