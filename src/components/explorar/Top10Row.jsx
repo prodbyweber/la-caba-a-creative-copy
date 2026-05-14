@@ -15,7 +15,7 @@ function BigNumber({ rank }) {
     <div
       style={{
         position: "absolute",
-        bottom: 0,
+        bottom: "-22%",
         left: "-28%",
         zIndex: 0,
         lineHeight: 0.85,
@@ -60,7 +60,7 @@ function Top10Card({ item, rank, onClick, currentUser, allItems }) {
         width: "clamp(90px, 28vw, 165px)",
         // Extra left margin to accommodate the number bleeding in from left
         marginLeft: rank === 1 ? "clamp(24px, 8vw, 44px)" : "clamp(32px, 9vw, 52px)",
-        paddingBottom: "2px",
+        paddingBottom: "clamp(36px, 8vw, 56px)",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
