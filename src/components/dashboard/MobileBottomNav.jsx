@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import { Home, BookOpen, Compass } from "lucide-react";
+import { Home, BookOpen, Compass, LayoutDashboard } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 
@@ -19,23 +19,14 @@ export default function MobileBottomNav({ artistId, isAdmin }) {
     ? (artistId ? `ArtistDashboard?artistId=${artistId}` : "ArtistDashboard")
     : "GuestCatalogPreview";
 
+  const thirdItem = isAdmin
+    ? { icon: LayoutDashboard, label: "Admin", page: "AdminDashboard", highlight: true }
+    : { icon: BookOpen, label: "Tu catálogo", page: catalogPage, highlight: true };
+
   const items = [
-    {
-      icon: Home,
-      label: "Inicio",
-      page: "Landing",
-    },
-    {
-      icon: Compass,
-      label: "Explorar",
-      page: "Explorar",
-    },
-    {
-      icon: BookOpen,
-      label: "Tu catálogo",
-      page: catalogPage,
-      highlight: true,
-    },
+    { icon: Home, label: "Inicio", page: "Landing" },
+    { icon: Compass, label: "Explorar", page: "Explorar" },
+    thirdItem,
   ];
 
   return (

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import LandingNav from "@/components/landing/LandingNav";
@@ -19,7 +19,10 @@ const SnapSection = ({ children }) => (
 );
 
 export default function Landing() {
+  const [isAdmin, setIsAdmin] = useState(false);
+
   useEffect(() => {
+    base44.auth.me().then(u => { if (u?.role === 'admin') setIsAdmin(true); }).catch(() => {});
     const timer = setTimeout(() => {
       const splash = document.getElementById("cabana-splash");
       if (splash) {
@@ -84,7 +87,7 @@ export default function Landing() {
         <SnapSection><StartFooter /></SnapSection>
       </div>
 
-      <MobileBottomNav artistId={null} isAdmin={false} />
+      <MobileBottomNav artistId={null} isAdmin={isAdmin} />
     </div>
   );
 }
