@@ -13,6 +13,7 @@ import UserProfilePanel from "@/components/explorar/UserProfilePanel";
 import PricingModal from "@/components/explorar/PricingModal";
 import { ExplorarProvider } from "@/context/ExplorarContext.jsx";
 import GlobalModals from "@/components/explorar/GlobalModals";
+import ParaTiFeed from "@/components/explorar/ParaTiFeed";
 
 // Legacy fallback labels (for items with row_category but no ExplorarSection yet)
 const LEGACY_ROW_LABELS = {
@@ -34,6 +35,7 @@ export default function Explorar() {
   const [activeSection, setActiveSection] = useState("inicio"); // inicio | musica | films
   const [profileOpen, setProfileOpen] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
+  const [showParaTi, setShowParaTi] = useState(false);
   const [guestLocked, setGuestLocked] = useState(false);
   const isAdmin = currentUser?.role === "admin";
 
@@ -243,6 +245,7 @@ export default function Explorar() {
         setSearchQuery={setSearchQuery}
         onProfileOpen={() => setProfileOpen(true)}
         artistId={myArtistId}
+        onParaTiOpen={() => setShowParaTi(true)}
       />
 
       {/* Admin shortcut */}
@@ -491,6 +494,16 @@ export default function Explorar() {
       <AnimatePresence>
         {showPricingModal && guestBlocked && (
           <PricingModal onClose={handleGuestModalClose} />
+        )}
+      </AnimatePresence>
+
+      {/* Para Ti feed */}
+      <AnimatePresence>
+        {showParaTi && (
+          <ParaTiFeed
+            currentUser={currentUser}
+            onClose={() => setShowParaTi(false)}
+          />
         )}
       </AnimatePresence>
     </div>
