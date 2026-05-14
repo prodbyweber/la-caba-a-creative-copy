@@ -7,9 +7,9 @@ import CreateSessionModal from "@/components/admin/CreateSessionModal";
 import CreateDeliverableModal from "@/components/admin/CreateDeliverableModal";
 import StatusButton from "@/components/admin/StatusButton";
 import {
-  Calendar, Clock, Package, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal, Music2, UserRound, Mail
+  Calendar, Clock, Package, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal, Music2
 } from "lucide-react";
-import { format, isToday, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -61,14 +61,10 @@ export default function AdminDashboard() {
 
   const { data: sessions = [] } = useQuery({ queryKey: ['sessions'], queryFn: () => base44.entities.Session.list('-start_time') });
   const { data: deliverables = [] } = useQuery({ queryKey: ['deliverables'], queryFn: () => base44.entities.Deliverable.list('-due_date_time') });
-  const { data: artists = [] } = useQuery({ queryKey: ['artists'], queryFn: () => base44.entities.Artist.list('-created_date') });
-  const { data: contactLeads = [] } = useQuery({ queryKey: ['contactLeads'], queryFn: () => base44.entities.ContactLead.list('-created_date') });
 
   // KPI calculations
-  const todaySessions = sessions.filter(s => s.start_time && isToday(parseISO(s.start_time)));
   const upcomingSessions = sessions.filter(s => s.start_time && new Date(s.start_time) >= new Date() && s.status !== 'Done' && s.status !== 'Cancelled').sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
   const pendingDeliverables = deliverables.filter(d => d.status === 'Pending' || d.status === 'Overdue');
-  const activeArtists = artists.filter(a => a.status === 'Active');
 
   // Mutations - status
   const updateSessionStatus = useMutation({ mutationFn: ({ id, status }) => base44.entities.Session.update(id, { status }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] }) });
@@ -92,15 +88,6 @@ export default function AdminDashboard() {
   const archiveSession = useMutation({ mutationFn: (id) => base44.entities.Session.update(id, { status: 'Done' }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['sessions'] }) });
   const archiveDeliverable = useMutation({ mutationFn: (id) => base44.entities.Deliverable.update(id, { status: 'Approved' }), onSuccess: () => queryClient.invalidateQueries({ queryKey: ['deliverables'] }) });
 
-  const newLeads = contactLeads.filter(l => l.status === 'Nuevo' || !l.status);
-
-  const kpis = [
-    { icon: Calendar, label: "Sessions Hoy", value: todaySessions.length, link: createPageUrl("Calendars"), accent: null },
-    { icon: UserRound, label: "Creadores", value: activeArtists.length, link: "/ArtistPanelList", accent: "#f97316", exact: true },
-    { icon: Mail, label: "Solicitudes", value: newLeads.length, link: "/ContactLeads", accent: null },
-    { icon: Calendar, label: "Calendario", value: upcomingSessions.length, link: "/Calendars", accent: "#22c55e" },
-  ];
-
   const openEditSession = (s) => { setEditSession(s); setShowSessionModal(true); };
   const openEditDeliverable = (d) => { setEditDeliverable(d); setShowDeliverableModal(true); };
 
@@ -110,45 +97,6 @@ export default function AdminDashboard() {
   return (
     <AdminLayout activePage="AdminDashboard">
       <div className="px-3 sm:px-8 lg:px-14 xl:px-20 pt-4 pb-6 max-w-[1600px] mx-auto">
-
-        {/* KPI Cards - arriba */}
-        <div className="mb-6">
-          <div className="grid grid-cols-4 gap-3">
-            {kpis.map((kpi, i) => (
-              <Link key={i} to={kpi.link}>
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                  className="rounded-xl p-4 transition-all cursor-pointer"
-                  style={kpi.accent ? {
-                    background: `${kpi.accent}10`,
-                    border: `1px solid ${kpi.accent}30`,
-                  } : {
-                    background: "#111113",
-                    border: "1px solid rgba(255,255,255,0.06)",
-                  }}
-                  onMouseEnter={e => {
-                    if (kpi.accent) {
-                      e.currentTarget.style.background = `${kpi.accent}1a`;
-                      e.currentTarget.style.borderColor = `${kpi.accent}50`;
-                    }
-                  }}
-                  onMouseLeave={e => {
-                    if (kpi.accent) {
-                      e.currentTarget.style.background = `${kpi.accent}10`;
-                      e.currentTarget.style.borderColor = `${kpi.accent}30`;
-                    }
-                  }}
-                >
-                  <kpi.icon className="w-4 h-4 mb-3" style={{ color: kpi.accent || "rgba(255,255,255,0.25)" }} />
-                  <div className="text-2xl font-black mb-0.5" style={{ color: kpi.accent || "white" }}>{kpi.value}</div>
-                  <div className="text-[10px] font-medium" style={{ color: kpi.accent ? `${kpi.accent}cc` : "rgba(255,255,255,0.25)" }}>{kpi.label}</div>
-                </motion.div>
-              </Link>
-            ))}
-          </div>
-        </div>
 
         {/* Task Management Panel */}
         <motion.div
@@ -183,63 +131,14 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-4 sm:gap-7 w-full min-w-0">
-            {/* Sesiones */}
-            <div className="min-w-0 w-full">
-              <div className="flex items-center gap-2 mb-4">
-                <Calendar className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-sm font-semibold text-white">Sesiones de Hoy</h3>
-                {todaySessions.length > 0 && (
-                  <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    {todaySessions.length}
-                  </span>
-                )}
-              </div>
-              {todaySessions.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-10 rounded-xl border border-white/[0.05] bg-white/[0.02]">
-                  <Calendar className="w-10 h-10 text-white/10 mb-2" />
-                  <p className="text-sm text-white/25">No hay sesiones para hoy</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {todaySessions.slice(0, 5).map((s) => (
-                    <div key={s.id} className="group p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all">
-                      <div className="flex items-start justify-between gap-2 mb-1.5">
-                        <h4 className="font-semibold text-white text-sm truncate flex-1 min-w-0">{s.title}</h4>
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                          <span className="text-[10px] text-white/30">{format(parseISO(s.start_time), 'HH:mm')}</span>
-                          <ItemMenu
-                            onEdit={() => openEditSession(s)}
-                            onDelete={() => deleteSession.mutate(s)}
-                            onArchive={() => archiveSession.mutate(s.id)}
-                            showArchive
-                          />
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${
-                            s.type === 'Session' ? 'bg-emerald-500/10 text-emerald-400' :
-                            s.type === 'Meeting' ? 'bg-blue-500/10 text-blue-400' :
-                            'bg-purple-500/10 text-purple-400'
-                          }`}>{s.type}</span>
-                          <span className="text-[10px] text-white/30 truncate">{s.location}</span>
-                        </div>
-                        <StatusButton status={s.status} onStatusChange={(id, status) => updateSessionStatus.mutate({ id, status })} entity="session" id={s.id} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
+          <div className="w-full min-w-0">
             {/* Próximas Sesiones */}
             <div className="min-w-0 w-full">
               <div className="flex items-center gap-2 mb-4">
-                <Clock className="w-4 h-4 text-blue-400" />
+                <Clock className="w-4 h-4 text-emerald-400" />
                 <h3 className="text-sm font-semibold text-white">Próximas Sesiones</h3>
                 {upcomingSessions.length > 0 && (
-                  <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                     {upcomingSessions.length}
                   </span>
                 )}
@@ -250,8 +149,8 @@ export default function AdminDashboard() {
                   <p className="text-sm text-white/25">No hay sesiones próximas</p>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  {upcomingSessions.slice(0, 5).map((s) => (
+                <div className="grid sm:grid-cols-2 gap-2">
+                  {upcomingSessions.slice(0, 6).map((s) => (
                     <div key={s.id} className="group p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all">
                       <div className="flex items-start justify-between gap-2 mb-1.5">
                         <h4 className="font-semibold text-white text-sm truncate flex-1 min-w-0">{s.title}</h4>
