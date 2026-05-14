@@ -142,38 +142,33 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout activePage="AdminDashboard">
-      <div className="px-3 sm:px-8 lg:px-14 xl:px-20 pt-4 pb-6 max-w-[1600px] mx-auto">
+      <div className="px-3 sm:px-8 lg:px-14 xl:px-20 pt-2 pb-6 max-w-[1600px] mx-auto">
 
         {/* Task Management Panel */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#111113] border border-white/[0.07] rounded-2xl p-4 sm:p-7 mb-6"
+          className="bg-[#111113] border border-white/[0.07] rounded-2xl p-4 sm:p-5 mb-6"
         >
           {/* Panel Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-7">
+          <div className="flex items-center justify-between gap-3 mb-5">
             <div>
-              <h2 className="text-lg font-bold text-white">Lista de Tareas y Sesiones</h2>
-              <p className="text-xs text-white/30 mt-0.5">Gestiona sesiones, entregables y revisiones</p>
+              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest">Panel de Control</p>
+              <h2 className="text-base font-bold text-white leading-tight">Sesiones & Entregables</h2>
             </div>
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => { setEditSession(null); setShowSessionModal(true); }}
-                className="flex items-center gap-1.5 text-xs px-3.5 py-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl hover:bg-emerald-500/20 transition-all font-medium"
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl hover:bg-emerald-500/20 transition-all font-medium"
               >
                 <Plus className="w-3.5 h-3.5" /> Sesión
               </button>
               <button
                 onClick={() => { setEditDeliverable(null); setShowDeliverableModal(true); }}
-                className="flex items-center gap-1.5 text-xs px-3.5 py-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl hover:bg-blue-500/20 transition-all font-medium"
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl hover:bg-blue-500/20 transition-all font-medium"
               >
                 <Plus className="w-3.5 h-3.5" /> Entregable
               </button>
-              <Link to={createPageUrl("Calendars")}>
-                <button className="text-xs px-3.5 py-2 bg-white/[0.04] text-white/40 border border-white/[0.07] rounded-xl hover:bg-white/[0.08] transition-all">
-                  Ver Calendario
-                </button>
-              </Link>
             </div>
           </div>
 
