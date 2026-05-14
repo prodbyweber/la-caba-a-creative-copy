@@ -24,7 +24,7 @@ function BigNumber({ rank }) {
         fontFamily: "'Arial Black', 'Helvetica Neue', Helvetica, Arial, sans-serif",
         fontWeight: 900,
         fontSize: "clamp(90px, 22vw, 160px)",
-        color: "transparent",
+        color: "#000000",
         WebkitTextStroke: rank <= 3
           ? "3px rgba(255,255,255,0.90)"
           : "2.5px rgba(255,255,255,0.55)",
