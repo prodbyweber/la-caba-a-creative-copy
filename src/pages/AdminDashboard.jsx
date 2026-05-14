@@ -9,7 +9,7 @@ import StatusButton from "@/components/admin/StatusButton";
 import {
   Calendar, Clock, Package, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal, Music2
 } from "lucide-react";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isToday } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -51,6 +51,33 @@ function ItemMenu({ onEdit, onDelete, onArchive, showArchive = false }) {
   );
 }
 
+function SessionRow({ s, onEdit, onDelete, onArchive, onStatusChange, showDate }) {
+  const typeClass = s.type === 'Session' ? 'bg-emerald-500/10 text-emerald-400' :
+    s.type === 'Meeting' ? 'bg-blue-500/10 text-blue-400' : 'bg-purple-500/10 text-purple-400';
+  const typeLabel = s.type === 'StudioWork' ? 'Studio' : s.type;
+
+  return (
+    <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.10] transition-all w-full min-w-0">
+      {/* Tipo badge */}
+      <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-semibold flex-shrink-0 ${typeClass}`}>{typeLabel}</span>
+      {/* Título */}
+      <span className="text-xs text-white font-medium truncate flex-1 min-w-0">{s.title}</span>
+      {/* Hora / fecha */}
+      <span className="text-[10px] text-white/30 flex-shrink-0 whitespace-nowrap">
+        {showDate ? format(parseISO(s.start_time), 'MMM d · HH:mm') : format(parseISO(s.start_time), 'HH:mm')}
+      </span>
+      {/* Status */}
+      <div className="flex-shrink-0">
+        <StatusButton status={s.status} onStatusChange={(id, status) => onStatusChange.mutate({ id, status })} entity="session" id={s.id} />
+      </div>
+      {/* Menu */}
+      <div className="flex-shrink-0">
+        <ItemMenu onEdit={() => onEdit(s)} onDelete={() => onDelete.mutate(s)} onArchive={() => onArchive.mutate(s.id)} showArchive />
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [showDeliverableModal, setShowDeliverableModal] = useState(false);
@@ -63,7 +90,9 @@ export default function AdminDashboard() {
   const { data: deliverables = [] } = useQuery({ queryKey: ['deliverables'], queryFn: () => base44.entities.Deliverable.list('-due_date_time') });
 
   // KPI calculations
-  const upcomingSessions = sessions.filter(s => s.start_time && new Date(s.start_time) >= new Date() && s.status !== 'Done' && s.status !== 'Cancelled').sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+  const now = new Date();
+  const todaySessions = sessions.filter(s => s.start_time && isToday(parseISO(s.start_time))).sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+  const upcomingSessions = sessions.filter(s => s.start_time && new Date(s.start_time) > now && !isToday(parseISO(s.start_time)) && s.status !== 'Done' && s.status !== 'Cancelled').sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
   const pendingDeliverables = deliverables.filter(d => d.status === 'Pending' || d.status === 'Overdue');
 
   // Mutations - status
@@ -131,51 +160,51 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="w-full min-w-0">
+          <div className="w-full space-y-6">
+
+            {/* Sesiones de Hoy */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Calendar className="w-4 h-4 text-emerald-400" />
+                <h3 className="text-sm font-semibold text-white">Sesiones de Hoy</h3>
+                {todaySessions.length > 0 && (
+                  <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    {todaySessions.length}
+                  </span>
+                )}
+              </div>
+              {todaySessions.length === 0 ? (
+                <div className="flex items-center justify-center py-6 rounded-xl border border-white/[0.05] bg-white/[0.02]">
+                  <p className="text-xs text-white/25">No hay sesiones para hoy</p>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  {todaySessions.slice(0, 5).map((s) => (
+                    <SessionRow key={s.id} s={s} onEdit={openEditSession} onDelete={deleteSession} onArchive={archiveSession} onStatusChange={updateSessionStatus} showDate={false} />
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Próximas Sesiones */}
-            <div className="min-w-0 w-full">
-              <div className="flex items-center gap-2 mb-4">
-                <Clock className="w-4 h-4 text-emerald-400" />
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Clock className="w-4 h-4 text-blue-400" />
                 <h3 className="text-sm font-semibold text-white">Próximas Sesiones</h3>
                 {upcomingSessions.length > 0 && (
-                  <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
                     {upcomingSessions.length}
                   </span>
                 )}
               </div>
               {upcomingSessions.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-10 rounded-xl border border-white/[0.05] bg-white/[0.02]">
-                  <Calendar className="w-10 h-10 text-white/10 mb-2" />
-                  <p className="text-sm text-white/25">No hay sesiones próximas</p>
+                <div className="flex items-center justify-center py-6 rounded-xl border border-white/[0.05] bg-white/[0.02]">
+                  <p className="text-xs text-white/25">No hay sesiones próximas</p>
                 </div>
               ) : (
-                <div className="grid sm:grid-cols-2 gap-2">
+                <div className="space-y-1.5">
                   {upcomingSessions.slice(0, 6).map((s) => (
-                    <div key={s.id} className="group p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all">
-                      <div className="flex items-start justify-between gap-2 mb-1.5">
-                        <h4 className="font-semibold text-white text-sm truncate flex-1 min-w-0">{s.title}</h4>
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                          <span className="text-[10px] text-white/30">{format(parseISO(s.start_time), 'MMM d, HH:mm')}</span>
-                          <ItemMenu
-                            onEdit={() => openEditSession(s)}
-                            onDelete={() => deleteSession.mutate(s)}
-                            onArchive={() => archiveSession.mutate(s.id)}
-                            showArchive
-                          />
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium flex-shrink-0 ${
-                            s.type === 'Session' ? 'bg-emerald-500/10 text-emerald-400' :
-                            s.type === 'Meeting' ? 'bg-blue-500/10 text-blue-400' :
-                            'bg-purple-500/10 text-purple-400'
-                          }`}>{s.type === 'StudioWork' ? 'Studio Work' : s.type}</span>
-                          <span className="text-[10px] text-white/30 truncate">{s.location}</span>
-                        </div>
-                        <StatusButton status={s.status} onStatusChange={(id, status) => updateSessionStatus.mutate({ id, status })} entity="session" id={s.id} />
-                      </div>
-                    </div>
+                    <SessionRow key={s.id} s={s} onEdit={openEditSession} onDelete={deleteSession} onArchive={archiveSession} onStatusChange={updateSessionStatus} showDate={true} />
                   ))}
                 </div>
               )}
