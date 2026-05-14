@@ -5,9 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, Trash2, Edit, Eye, EyeOff,
   Star, Film, ExternalLink,
-  Layers, Image as ImageIcon, LayoutGrid, X
+  Layers, Image as ImageIcon, LayoutGrid, X, GripVertical
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import HeroSlideModal from "@/components/explorar/HeroSlideModal";
 import ProjectModal from "@/components/explorar/admin/ProjectModal";
 import ProjectsLibrary from "@/components/explorar/admin/ProjectsLibrary";
@@ -83,6 +84,29 @@ export default function ExplorarAdminContent() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["explorar-sections"] }); qc.invalidateQueries({ queryKey: ["section-assignments"] }); },
   });
 
+  const reorderSectionsMutation = useMutation({
+    mutationFn: async (reordered) => {
+      await Promise.all(
+        reordered.map((section, idx) =>
+          !section._isDefault ? base44.entities.ExplorarSection.update(section.id, { order: idx }) : Promise.resolve()
+        )
+      );
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["explorar-sections"] }),
+  });
+
+  const [localSections, setLocalSections] = useState(null);
+  const displaySections = localSections ?? sections;
+
+  const handleSectionDragEnd = (result) => {
+    if (!result.destination || result.destination.index === result.source.index) return;
+    const reordered = Array.from(displaySections);
+    const [moved] = reordered.splice(result.source.index, 1);
+    reordered.splice(result.destination.index, 0, moved);
+    setLocalSections(reordered);
+    reorderSectionsMutation.mutate(reordered);
+  };
+
   const heroItems = items.filter(i => i.is_hero).sort((a, b) => (a.hero_order ?? 0) - (b.hero_order ?? 0));
 
   const TABS = [
@@ -121,63 +145,84 @@ export default function ExplorarAdminContent() {
       {activeTab === "sections" && (
         <div className="space-y-3">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-xs text-white/30">Cada sección es una fila en la página Explorar.</p>
+            <p className="text-xs text-white/30">Arrastra las secciones para reordenarlas. Cada sección es una fila en Explorar.</p>
             <button onClick={() => addSectionMutation.mutate()}
               className="flex items-center gap-1.5 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/60 hover:text-white rounded-xl text-xs font-medium transition-colors">
               <Plus className="w-3.5 h-3.5" /> Nueva sección
             </button>
           </div>
-          {sections.map((section) => {
-            const sectionAssignments = assignments.filter(a => a.section_id === section.id).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-            const sectionItems = sectionAssignments.map(a => items.find(i => i.id === a.item_id)).filter(Boolean);
-            return (
-              <div key={section.id || section.key} className="rounded-2xl border border-white/[0.07] bg-white/[0.02] overflow-hidden">
-                <div className="flex items-center gap-3 px-5 py-4 border-b border-white/[0.05]">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-bold text-white">{section.label}</p>
-                      {section.section_type === "top10" && (
-                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded" style={{ background: "#E50914", color: "white" }}>TOP 10</span>
-                      )}
-                    </div>
-                    <p className="text-[10px] text-white/25 mt-0.5">{sectionItems.length} proyectos</p>
-                  </div>
-                  <button onClick={() => { setEditingSection({ section, assignments: sectionAssignments }); setShowSectionModal(true); }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/[0.08] text-white/50 hover:text-white text-xs font-medium transition-colors">
-                    <Edit className="w-3.5 h-3.5" /> Editar
-                  </button>
-                  {!section._isDefault && (
-                    <button onClick={() => { if (confirm(`¿Eliminar sección "${section.label}"?`)) deleteSectionMutation.mutate(section.id); }}
-                      className="p-1.5 rounded-lg hover:bg-red-500/10 transition-colors">
-                      <Trash2 className="w-3.5 h-3.5 text-white/20 hover:text-red-400" />
-                    </button>
-                  )}
-                </div>
-                <div className="px-5 py-4">
-                  {sectionItems.length === 0 ? (
-                    <p className="text-xs text-white/15 text-center py-4">Sin proyectos — haz clic en "Editar" para añadir</p>
-                  ) : (
-                    <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-                      {sectionItems.map((item, idx) => {
-                        const thumb = item.thumbnail_url || getYoutubeThumbnail(item.youtube_url || item.youtube_music_url);
-                        return (
-                          <div key={item.id} className="flex-shrink-0 relative">
-                            <div className="w-20 h-14 rounded-lg overflow-hidden bg-white/5">
-                              {thumb ? <img src={thumb} alt={item.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Film className="w-4 h-4 text-white/10" /></div>}
+          <DragDropContext onDragEnd={handleSectionDragEnd}>
+            <Droppable droppableId="sections-list">
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps} className="space-y-2">
+                  {displaySections.map((section, index) => {
+                    const sectionAssignments = assignments.filter(a => a.section_id === section.id).sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+                    const sectionItems = sectionAssignments.map(a => items.find(i => i.id === a.item_id)).filter(Boolean);
+                    return (
+                      <Draggable key={section.id || section.key} draggableId={String(section.id || section.key)} index={index}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            className={`rounded-2xl border overflow-hidden transition-all ${snapshot.isDragging ? "border-white/20 bg-white/[0.06] shadow-2xl" : "border-white/[0.07] bg-white/[0.02]"}`}
+                          >
+                            <div className="flex items-center gap-3 px-4 py-4 border-b border-white/[0.05]">
+                              {/* Drag handle */}
+                              <div {...provided.dragHandleProps} className="flex-shrink-0 cursor-grab active:cursor-grabbing p-1 rounded hover:bg-white/10 transition-colors">
+                                <GripVertical className="w-4 h-4 text-white/25 hover:text-white/60" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-bold text-white">{section.label}</p>
+                                  {section.section_type === "top10" && (
+                                    <span className="text-[9px] font-black px-1.5 py-0.5 rounded" style={{ background: "#E50914", color: "white" }}>TOP 10</span>
+                                  )}
+                                </div>
+                                <p className="text-[10px] text-white/25 mt-0.5">{sectionItems.length} proyectos · posición {index + 1}</p>
+                              </div>
+                              <button onClick={() => { setEditingSection({ section, assignments: sectionAssignments }); setShowSectionModal(true); }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/[0.08] text-white/50 hover:text-white text-xs font-medium transition-colors">
+                                <Edit className="w-3.5 h-3.5" /> Editar
+                              </button>
+                              {!section._isDefault && (
+                                <button onClick={() => { if (confirm(`¿Eliminar sección "${section.label}"?`)) deleteSectionMutation.mutate(section.id); }}
+                                  className="p-1.5 rounded-lg hover:bg-red-500/10 transition-colors">
+                                  <Trash2 className="w-3.5 h-3.5 text-white/20 hover:text-red-400" />
+                                </button>
+                              )}
                             </div>
-                            <div className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-black/80 border border-white/10 flex items-center justify-center">
-                              <span className="text-[8px] text-white/50 font-bold">{idx + 1}</span>
+                            <div className="px-5 py-3">
+                              {sectionItems.length === 0 ? (
+                                <p className="text-xs text-white/15 text-center py-3">Sin proyectos — haz clic en "Editar" para añadir</p>
+                              ) : (
+                                <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+                                  {sectionItems.map((item, idx) => {
+                                    const thumb = item.thumbnail_url || getYoutubeThumbnail(item.youtube_url || item.youtube_music_url);
+                                    return (
+                                      <div key={item.id} className="flex-shrink-0 relative">
+                                        <div className="w-20 h-14 rounded-lg overflow-hidden bg-white/5">
+                                          {thumb ? <img src={thumb} alt={item.title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><Film className="w-4 h-4 text-white/10" /></div>}
+                                        </div>
+                                        <div className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-black/80 border border-white/10 flex items-center justify-center">
+                                          <span className="text-[8px] text-white/50 font-bold">{idx + 1}</span>
+                                        </div>
+                                        <p className="text-[9px] text-white/30 truncate mt-1 w-20 text-center">{item.title}</p>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
                             </div>
-                            <p className="text-[9px] text-white/30 truncate mt-1 w-20 text-center">{item.title}</p>
                           </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                        )}
+                      </Draggable>
+                    );
+                  })}
+                  {provided.placeholder}
                 </div>
-              </div>
-            );
-          })}
+              )}
+            </Droppable>
+          </DragDropContext>
         </div>
       )}
 
