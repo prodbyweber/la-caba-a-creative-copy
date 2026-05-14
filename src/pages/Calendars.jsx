@@ -280,17 +280,26 @@ function getWeekLabel(date) {
 }
 
 function AgendaView({ sessions, deliverables, artists, projects, currentDate, onSessionClick, onDeleteSession }) {
-  const firstRef = useRef(null);
+  const todayRef = useRef(null);
   const scrollRef = useRef(null);
+  const today = new Date();
+  const isCurrentMonth =
+    currentDate.getFullYear() === today.getFullYear() &&
+    currentDate.getMonth() === today.getMonth();
 
   // Solo mostrar el mes seleccionado
   const rangeStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
   const rangeEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59);
 
   useEffect(() => {
-    // Scroll al inicio del mes al cambiar de mes
     const frame = requestAnimationFrame(() => {
-      if (scrollRef.current) {
+      if (isCurrentMonth && todayRef.current && scrollRef.current) {
+        // Scroll hasta el día de hoy
+        const container = scrollRef.current;
+        const el = todayRef.current;
+        container.scrollTop = el.offsetTop - container.offsetTop - 16;
+      } else if (scrollRef.current) {
+        // Otro mes: scroll al inicio
         scrollRef.current.scrollTop = 0;
       }
     });
@@ -362,6 +371,7 @@ function AgendaView({ sessions, deliverables, artists, projects, currentDate, on
         return (
           <div
             key={row.key}
+            ref={isTodayDate ? todayRef : null}
             className="flex items-start px-2 sm:px-4 py-1 gap-3"
           >
             {/* Date column — fixed width, compact */}
