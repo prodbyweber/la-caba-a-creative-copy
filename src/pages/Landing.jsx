@@ -18,6 +18,13 @@ const SnapSection = ({ children }) => (
   </div>
 );
 
+// Sección libre: entra en el snap flow pero NO fuerza stop, permite scroll libre interno
+const FreeSection = ({ children }) => (
+  <div style={{ scrollSnapAlign: "none" }}>
+    {children}
+  </div>
+);
+
 export default function Landing() {
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -59,28 +66,16 @@ export default function Landing() {
           .snap-scroll-container {
             height: 100dvh;
             overflow-y: scroll;
-            scroll-snap-type: y mandatory;
+            scroll-snap-type: y proximity;
             -webkit-overflow-scrolling: touch;
             overscroll-behavior-y: contain;
-          }
-          .snap-section-full {
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            height: 100dvh;
-            overflow: hidden;
-          }
-          .snap-section-auto {
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            height: auto;
-            overflow: hidden;
           }
         }
       `}</style>
 
       <div className="snap-scroll-container">
         <SnapSection><LandingHero bottomOffset="clamp(90px, 12vw, 140px)" /></SnapSection>
-        <SnapSection><StartExplorar showButton={true} allowMobileScroll={true} /></SnapSection>
+        <FreeSection><StartExplorar showButton={true} allowMobileScroll={true} /></FreeSection>
         <SnapSection><StartCreadores /></SnapSection>
         <SnapSection><StartWhatWeDo /></SnapSection>
         <SnapSection><StartChoosePath /></SnapSection>

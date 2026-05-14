@@ -233,7 +233,7 @@ export default function StartExplorar({ showButton = true, allowMobileScroll = f
         flexDirection: "column",
         justifyContent: "center",
         padding: "clamp(60px, 10vw, 100px) clamp(24px, 6vw, 56px)",
-        scrollSnapStop: allowMobileScroll ? "auto" : "always",
+        scrollSnapStop: "normal",
       }}
     >
       {/* Ambient glow */}
