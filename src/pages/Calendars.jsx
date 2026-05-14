@@ -196,7 +196,7 @@ export default function Calendars() {
                           style={{ backgroundColor: colors.bg, color: '#fff', borderLeft: `2px solid ${colors.bg}` }}
                         >
                           <span className="hidden sm:inline opacity-80 mr-0.5">
-                            {isSession && item.start_time ? format(parseISO(item.start_time), 'HH:mm') : ''}
+                            {isSession && item.start_time ? format(parseISO(item.start_time), 'h:mm a') : ''}
                           </span>
                           {item.title}
                         </button>
@@ -380,11 +380,11 @@ function AgendaView({ sessions, deliverables, artists, projects, currentDate, on
 
                 let timeStr = '';
                 if (isSession && item.start_time) {
-                  timeStr = format(parseISO(item.start_time), 'H:mm');
-                  if (item.end_time) timeStr += `–${format(parseISO(item.end_time), 'H:mm')} p. m.`;
-                  if (item.location) timeStr += ` en ${item.location}`;
+                  timeStr = format(parseISO(item.start_time), 'h:mm a');
+                  if (item.end_time) timeStr += ` – ${format(parseISO(item.end_time), 'h:mm a')}`;
+                  if (item.location) timeStr += ` · ${item.location}`;
                 } else if (!isSession && item.due_date_time) {
-                  timeStr = `Hasta las ${format(parseISO(item.due_date_time), 'H:mm')} p. m.`;
+                  timeStr = `Hasta las ${format(parseISO(item.due_date_time), 'h:mm a')}`;
                 }
 
                 const subtitle = [
