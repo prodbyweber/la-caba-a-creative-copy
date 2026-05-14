@@ -228,12 +228,11 @@ export default function StartExplorar({ showButton = true, allowMobileScroll = f
         width: "100%",
         minHeight: "100dvh",
         background: "#0a0a0b",
-        overflow: "hidden",
+        overflowX: "hidden",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        padding: "clamp(60px, 10vw, 100px) clamp(24px, 6vw, 56px)",
-        scrollSnapStop: "normal",
+        padding: "clamp(80px, 10vw, 120px) clamp(24px, 6vw, 56px) clamp(80px, 10vw, 120px)",
       }}
     >
       {/* Ambient glow */}

@@ -58,28 +58,13 @@ export default function Landing() {
       {/* Sticky scroll nav de Landing */}
       <LandingStickyNav />
 
-      <style>{`
-        .snap-scroll-container {
-          overflow-x: hidden;
-        }
-        @media (max-width: 767px) {
-          .snap-scroll-container {
-            height: 100dvh;
-            overflow-y: scroll;
-            scroll-snap-type: y proximity;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior-y: contain;
-          }
-        }
-      `}</style>
-
-      <div className="snap-scroll-container">
-        <SnapSection><LandingHero bottomOffset="clamp(90px, 12vw, 140px)" /></SnapSection>
-        <FreeSection><StartExplorar showButton={true} allowMobileScroll={true} /></FreeSection>
-        <SnapSection><StartCreadores /></SnapSection>
-        <SnapSection><StartWhatWeDo /></SnapSection>
-        <SnapSection><StartChoosePath /></SnapSection>
-        <SnapSection><StartFooter /></SnapSection>
+      <div>
+        <LandingHero bottomOffset="clamp(90px, 12vw, 140px)" />
+        <StartExplorar showButton={true} allowMobileScroll={true} />
+        <StartCreadores />
+        <StartWhatWeDo />
+        <StartChoosePath />
+        <StartFooter />
       </div>
 
       <MobileBottomNav artistId={null} isAdmin={isAdmin} />
