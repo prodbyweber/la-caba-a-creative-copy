@@ -161,11 +161,21 @@ export default function Calendars() {
               const maxVisible = 3;
               const overflow = allItems.length - maxVisible;
 
+              // Celdas fuera del mes actual: vacías, sin número ni eventos
+              if (!isCurrentMonth) {
+                return (
+                  <div
+                    key={i}
+                    className="border-b border-r border-white/[0.04] bg-[#050506]"
+                  />
+                );
+              }
+
               return (
                 <div
                   key={i}
                   className={`border-b border-r border-white/[0.06] p-0.5 sm:p-1 flex flex-col min-h-0 cursor-pointer transition-colors ${
-                    isDragOver ? 'bg-emerald-500/10' : isCurrentMonth ? 'bg-transparent hover:bg-white/[0.02]' : 'bg-white/[0.01]'
+                    isDragOver ? 'bg-emerald-500/10' : 'bg-transparent hover:bg-white/[0.02]'
                   }`}
                   onDragOver={(e) => { e.preventDefault(); setDragOverDay(day); }}
                   onDragLeave={() => setDragOverDay(null)}
@@ -174,7 +184,7 @@ export default function Calendars() {
                   {/* Day number */}
                   <div className="flex items-center justify-center sm:justify-start mb-0.5 sm:mb-1 px-0.5">
                     <span className={`text-[10px] sm:text-xs font-bold w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full ${
-                      isTodayDate ? 'bg-blue-500 text-white' : isCurrentMonth ? 'text-gray-200' : 'text-gray-600'
+                      isTodayDate ? 'bg-blue-500 text-white' : 'text-gray-200'
                     }`}>
                       {format(day, 'd')}
                     </span>
@@ -270,20 +280,18 @@ function getWeekLabel(date) {
 }
 
 function AgendaView({ sessions, deliverables, artists, projects, currentDate, onSessionClick, onDeleteSession }) {
-  const todayRef = useRef(null);
+  const firstRef = useRef(null);
   const scrollRef = useRef(null);
 
-  // Show from 3 months before current to 6 months after
-  const rangeStart = new Date(currentDate.getFullYear(), currentDate.getMonth() - 3, 1);
-  const rangeEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 6, 0);
+  // Solo mostrar el mes seleccionado
+  const rangeStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const rangeEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59);
 
   useEffect(() => {
-    // Scroll to today after render
+    // Scroll al inicio del mes al cambiar de mes
     const frame = requestAnimationFrame(() => {
-      if (todayRef.current && scrollRef.current) {
-        const container = scrollRef.current;
-        const el = todayRef.current;
-        container.scrollTop = el.offsetTop - container.offsetTop - 8;
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = 0;
       }
     });
     return () => cancelAnimationFrame(frame);
@@ -354,7 +362,6 @@ function AgendaView({ sessions, deliverables, artists, projects, currentDate, on
         return (
           <div
             key={row.key}
-            ref={isTodayDate ? todayRef : null}
             className="flex items-start px-2 sm:px-4 py-1 gap-3"
           >
             {/* Date column — fixed width, compact */}
