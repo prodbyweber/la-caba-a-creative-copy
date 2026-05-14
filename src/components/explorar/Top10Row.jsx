@@ -38,7 +38,7 @@ function Top10Card({ item, rank, onClick, currentUser, allItems }) {
         // The total slot width = card + left space for the number peek
         // We give extra left margin so the number from the PREVIOUS card
         // can peek into this slot naturally
-        marginLeft: rank === 1 ? "clamp(80px, 18vw, 120px)" : "clamp(44px, 12vw, 68px)",
+        marginLeft: rank === 1 ? "clamp(44px, 11vw, 72px)" : "clamp(44px, 12vw, 68px)",
         width: CARD_W,
       }}
       onMouseEnter={() => setHovered(true)}
