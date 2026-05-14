@@ -12,16 +12,15 @@ import LandingStickyNav from "@/components/landing/LandingStickyNav";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import SplashScreen from "@/components/common/SplashScreen";
 
-// Sección snap: ocupa exactamente 100dvh y centra el contenido
 const SnapSection = ({ children }) => (
-  <div style={{
-    scrollSnapAlign: "start",
-    scrollSnapStop: "always",
-    height: "100dvh",
-    overflow: "hidden",
-    display: "flex",
-    flexDirection: "column",
-  }}>
+  <div style={{ scrollSnapAlign: "start", scrollSnapStop: "always" }}>
+    {children}
+  </div>
+);
+
+// Sección libre: entra en el snap flow pero NO fuerza stop, permite scroll libre interno
+const FreeSection = ({ children }) => (
+  <div style={{ scrollSnapAlign: "none" }}>
     {children}
   </div>
 );
@@ -48,35 +47,25 @@ export default function Landing() {
         color: "#f0ede8",
         fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
         overflowX: "hidden",
-        // Contenedor principal con snap scroll estilo TikTok
-        height: "100dvh",
-        overflowY: "scroll",
-        scrollSnapType: "y mandatory",
-        scrollBehavior: "smooth",
-        WebkitOverflowScrolling: "touch",
+        minHeight: "100dvh",
       }}
     >
       <SplashScreen />
-
-      {/* Nav fijo sobre el contenido */}
+      
+      {/* Nav original de la landing (con menú hamburguesa, botón Explorar, perfil, registro) */}
       <LandingNav />
+
+      {/* Sticky scroll nav de Landing */}
       <LandingStickyNav />
 
-      {/* Hero — snap */}
-      <SnapSection>
+      <div>
         <LandingHero bottomOffset="clamp(90px, 12vw, 140px)" />
-      </SnapSection>
-
-      {/* Explorar — scroll libre, sin snap */}
-      <div style={{ scrollSnapAlign: "none" }}>
         <StartExplorar showButton={true} allowMobileScroll={true} />
+        <StartCreadores />
+        <StartWhatWeDo />
+        <StartChoosePath />
+        <StartFooter />
       </div>
-
-      {/* Resto de secciones — snap */}
-      <SnapSection><StartCreadores /></SnapSection>
-      <SnapSection><StartWhatWeDo /></SnapSection>
-      <SnapSection><StartChoosePath /></SnapSection>
-      <SnapSection><StartFooter /></SnapSection>
 
       <MobileBottomNav artistId={null} isAdmin={isAdmin} />
     </div>
