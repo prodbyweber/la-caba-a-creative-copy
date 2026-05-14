@@ -4,14 +4,12 @@ import {
   LayoutDashboard, 
   Users, 
   Calendar,
-  Menu,
-  X,
-  Inbox,
   Monitor,
   User,
   LogOut,
   ChevronRight,
 } from "lucide-react";
+import AdminBottomNav from "@/components/admin/AdminBottomNav";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
@@ -24,7 +22,6 @@ const navItems = [
 ];
 
 export default function AdminLayout({ children, activePage }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const profileRef = useRef(null);
@@ -50,14 +47,6 @@ export default function AdminLayout({ children, activePage }) {
         {/* First row: logo + actions */}
         <div className="flex items-center justify-between px-2 sm:px-4 h-14">
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Mobile hamburger */}
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 text-gray-400 hover:text-white"
-            >
-              {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-
             <Link to={createPageUrl("Landing")}>
               <img
                 src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png"
@@ -142,53 +131,13 @@ export default function AdminLayout({ children, activePage }) {
         </div>
       </nav>
 
-      {/* Mobile Sidebar */}
-      <aside className={`fixed left-0 top-14 bottom-0 w-56 bg-[#0a0a0b] border-r border-white/5 z-40 transition-transform lg:hidden ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <div className="flex flex-col h-full">
-          <div className="flex-1 px-3 py-3 overflow-y-auto">
-            <nav className="space-y-0.5">
-              {navItems.map((item, i) => {
-                const isActive = activePage === item.page;
-                return (
-                  <Link key={i} to={createPageUrl(item.page)} onClick={() => setSidebarOpen(false)}>
-                    <button
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
-                        isActive
-                          ? 'text-white bg-white/[0.07]'
-                          : 'text-white/35 hover:text-white/60 hover:bg-white/5'
-                      }`}
-                    >
-                      <item.icon className="w-4 h-4 flex-shrink-0" />
-                      <span className="truncate">{item.label}</span>
-                    </button>
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-          <div className="p-2.5 border-t border-white/5">
-            <div className="px-3 py-2 rounded-lg bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20">
-              <div className="text-[10px] font-semibold text-white mb-0.5">Admin</div>
-              <div className="text-[8px] text-gray-400">Full Access</div>
-            </div>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content — no left padding on desktop */}
-      <main className="pt-14">
+      {/* Main Content */}
+      <main className="pt-14 pb-[calc(60px+env(safe-area-inset-bottom,0px))] lg:pb-0">
         {children}
       </main>
 
-      {/* Mobile Overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {/* Admin Bottom Nav — mobile only */}
+      <AdminBottomNav />
     </div>
   );
 }

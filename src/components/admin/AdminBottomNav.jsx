@@ -1,0 +1,63 @@
+import React from "react";
+import { motion } from "framer-motion";
+import { Link, useLocation } from "react-router-dom";
+import { LayoutDashboard, Users, Calendar, Inbox, Monitor } from "lucide-react";
+import { createPageUrl } from "@/utils";
+
+const items = [
+  { icon: LayoutDashboard, label: "Dashboard", page: "AdminDashboard" },
+  { icon: Users,           label: "Creadores",  page: "ArtistPanelList" },
+  { icon: Calendar,        label: "Calendars",  page: "Calendars" },
+  { icon: Inbox,           label: "Solicitudes", page: "ContactLeads" },
+  { icon: Monitor,         label: "Design",     page: "DesignEditor" },
+];
+
+export default function AdminBottomNav() {
+  const location = useLocation();
+
+  const isActive = (page) => location.pathname.toLowerCase().includes(page.toLowerCase());
+
+  return (
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 lg:hidden"
+      style={{
+        background: "#0a0a0b",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        paddingBottom: "max(env(safe-area-inset-bottom, 0px), 0px)",
+      }}
+    >
+      <div className="flex items-center justify-around px-1 pt-1.5 pb-2">
+        {items.map((item) => {
+          const active = isActive(item.page);
+          const Icon = item.icon;
+          return (
+            <Link key={item.label} to={createPageUrl(item.page)} className="flex-1">
+              <button className="flex flex-col items-center gap-0.5 w-full py-1">
+                <div className="relative">
+                  <Icon
+                    className="w-5 h-5 relative z-10 transition-colors"
+                    style={{ color: active ? "white" : "rgba(255,255,255,0.3)" }}
+                  />
+                  {active && (
+                    <motion.div
+                      layoutId="adminNavDot"
+                      className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white"
+                    />
+                  )}
+                </div>
+                <span
+                  className="text-[9px] font-medium transition-colors leading-tight"
+                  style={{ color: active ? "white" : "rgba(255,255,255,0.3)" }}
+                >
+                  {item.label}
+                </span>
+              </button>
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
