@@ -12,14 +12,6 @@ import LandingStickyNav from "@/components/landing/LandingStickyNav";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import SplashScreen from "@/components/common/SplashScreen";
 
-const SECTION_COMPONENTS = {
-  explorar:    <StartExplorar key="explorar" showButton={true} allowMobileScroll={true} />,
-  creadores:   <StartCreadores key="creadores" />,
-  whatwedo:    <StartWhatWeDo key="whatwedo" />,
-  choosepath:  <StartChoosePath key="choosepath" />,
-  footer:      <StartFooter key="footer" />,
-};
-
 const SnapSection = ({ children }) => (
   <div style={{ scrollSnapAlign: "start", scrollSnapStop: "always" }}>
     {children}
@@ -36,12 +28,6 @@ const FreeSection = ({ children }) => (
 export default function Landing() {
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const { data: config } = useQuery({
-    queryKey: ["landingConfig"],
-    queryFn: async () => { const c = await base44.entities.LandingConfig.list(); return c[0] || null; },
-    staleTime: 60000,
-  });
-
   useEffect(() => {
     base44.auth.me().then(u => { if (u?.role === 'admin') setIsAdmin(true); }).catch(() => {});
     const timer = setTimeout(() => {
@@ -53,16 +39,6 @@ export default function Landing() {
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
-
-  // Build ordered section list from config
-  const sectionsOrder = config?.sections_order?.length > 0
-    ? config.sections_order
-    : ["explorar", "creadores", "whatwedo", "choosepath", "footer"];
-  const sectionsEnabled = config?.sections_enabled || {};
-  const orderedSections = sectionsOrder
-    .filter(key => sectionsEnabled[key] !== false)
-    .map(key => SECTION_COMPONENTS[key])
-    .filter(Boolean);
 
   return (
     <div
@@ -84,7 +60,11 @@ export default function Landing() {
 
       <div>
         <LandingHero bottomOffset="clamp(90px, 12vw, 140px)" />
-        {orderedSections}
+        <StartExplorar showButton={true} allowMobileScroll={true} />
+        <StartCreadores />
+        <StartWhatWeDo />
+        <StartChoosePath />
+        <StartFooter />
       </div>
 
       <MobileBottomNav artistId={null} isAdmin={isAdmin} />

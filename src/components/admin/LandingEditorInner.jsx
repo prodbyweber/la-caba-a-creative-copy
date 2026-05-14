@@ -9,7 +9,6 @@ import StartCreadoresEditor from "@/components/admin/StartCreadoresEditor";
 import PlansEditor from "@/components/admin/PlansEditor";
 import FormsEditor from "@/components/admin/FormsEditor";
 import StoriesEditor from "@/components/admin/StoriesEditor.jsx";
-import SectionsOrderEditor from "@/components/admin/SectionsOrderEditor.jsx";
 import { Link } from "react-router-dom";
 import { Upload, Save, Trash2, ZoomIn, X, ExternalLink } from "lucide-react";
 
@@ -81,16 +80,6 @@ export default function LandingEditorInner() {
 
       {/* Sections grid — 2 columns on large screens */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-
-        {/* ── Orden de Secciones ── */}
-        <div className="xl:col-span-2">
-          <SectionCard title="Orden de Secciones de la Landing" accent="violet" collapsible defaultOpen={true}>
-            <SectionsOrderEditor
-              config={config}
-              onSave={(data) => updateMutation.mutate(data)}
-            />
-          </SectionCard>
-        </div>
 
         {/* ── Hero Principal ── */}
         <SectionCard title="Hero Principal" accent="emerald">
