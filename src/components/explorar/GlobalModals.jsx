@@ -82,6 +82,19 @@ function CreditsModalInner() {
     }
   }, [creditsModal?.item?.id]);
 
+  // Re-fetch raw item from DB and update currentItem (called after gallery upload)
+  const handleUploaded = async () => {
+    qc.invalidateQueries({ queryKey: ["explorar-items"] });
+    if (!currentItem?.raw?.id) return;
+    const results = await base44.entities.ExplorarItem.filter({ id: currentItem.raw.id });
+    if (results[0]) {
+      setCurrentItem(prev => ({
+        ...prev,
+        raw: results[0],
+      }));
+    }
+  };
+
   const item = currentItem;
   const currentUser = creditsModal?.currentUser;
   const allItems = creditsModal?.allItems;
@@ -246,7 +259,7 @@ function CreditsModalInner() {
             currentUser={currentUser}
             linkedArtistId={linkedArtist?.id}
             onOpenFeed={() => setShowFeed(true)}
-            onUploaded={() => qc.invalidateQueries({ queryKey: ["explorar-items"] })}
+            onUploaded={handleUploaded}
           />
         </div>
 
@@ -260,7 +273,7 @@ function CreditsModalInner() {
         <AnimatePresence>
           {showFeed && (
             <ForYouFeed
-              initialItem={{ ...item, gallery: item.raw?.gallery || [] }}
+              initialItem={{ ...item, gallery: item.raw?.gallery || [], raw: item.raw }}
               allItems={allItems}
               currentUser={currentUser}
               linkedArtistId={linkedArtist?.id}
