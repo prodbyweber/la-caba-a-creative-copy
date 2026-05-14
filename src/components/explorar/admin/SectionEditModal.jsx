@@ -14,6 +14,8 @@ function getYoutubeThumbnail(url) {
 export default function SectionEditModal({ section, assignments, allItems, artists, onClose, onSave }) {
   // Local state: label + ordered list of item IDs in this section
   const [label, setLabel] = useState(section?.label || "");
+  const [sectionType, setSectionType] = useState(section?.section_type || "standard");
+  // Note: section prop contains the full ExplorarSection record including section_type
   const [orderedItems, setOrderedItems] = useState(
     assignments
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -50,6 +52,7 @@ export default function SectionEditModal({ section, assignments, allItems, artis
   const handleSave = () => {
     onSave({
       label,
+      sectionType,
       orderedItems, // [{assignmentId, itemId}] in order
     });
   };
@@ -84,6 +87,41 @@ export default function SectionEditModal({ section, assignments, allItems, artis
               className={ic}
               placeholder="Ej: En Tendencia"
             />
+          </div>
+
+          {/* Section type */}
+          <div>
+            <label className={lc}>Tipo de sección</label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSectionType("standard")}
+                className={`flex-1 py-2.5 px-3 rounded-xl border text-xs font-semibold transition-all ${sectionType === "standard" ? "border-white/40 bg-white/10 text-white" : "border-white/[0.08] bg-white/[0.02] text-white/40 hover:text-white/60"}`}
+              >
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex gap-1">
+                    {[1,2,3].map(i => <div key={i} className="w-6 h-4 rounded bg-white/20" />)}
+                  </div>
+                  <span>Fila estándar</span>
+                </div>
+              </button>
+              <button
+                onClick={() => setSectionType("top10")}
+                className={`flex-1 py-2.5 px-3 rounded-xl border text-xs font-semibold transition-all ${sectionType === "top10" ? "border-[#E50914]/60 bg-[#E50914]/10 text-white" : "border-white/[0.08] bg-white/[0.02] text-white/40 hover:text-white/60"}`}
+              >
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex items-end gap-0.5">
+                    <span className="text-[16px] font-black leading-none" style={{ WebkitTextStroke: "1px rgba(229,9,20,0.8)", color: "transparent" }}>1</span>
+                    <div className="w-5 h-7 rounded bg-white/20" />
+                    <span className="text-[13px] font-black leading-none ml-1" style={{ WebkitTextStroke: "1px rgba(229,9,20,0.6)", color: "transparent" }}>2</span>
+                    <div className="w-5 h-7 rounded bg-white/20" />
+                  </div>
+                  <span>Top 10</span>
+                </div>
+              </button>
+            </div>
+            {sectionType === "top10" && (
+              <p className="text-[10px] text-white/25 mt-1.5">Muestra hasta 10 ítems con número gigante estilo Netflix</p>
+            )}
           </div>
 
           {/* Ordered project list */}

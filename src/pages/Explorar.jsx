@@ -7,6 +7,7 @@ import ExplorarNav from "@/components/explorar/ExplorarNav";
 import { Link } from "react-router-dom";
 import ExplorarHero from "@/components/explorar/ExplorarHero";
 import ContentRow from "@/components/explorar/ContentRow";
+import Top10Row from "@/components/explorar/Top10Row";
 import ArtistProfileModal from "@/components/explorar/ArtistProfileModal";
 import UserProfilePanel from "@/components/explorar/UserProfilePanel";
 import PricingModal from "@/components/explorar/PricingModal";
@@ -356,8 +357,10 @@ export default function Explorar() {
                 .filter(Boolean);
               const filtered = applyFilters(sectionCards).map(mapItemToCard);
               if (filtered.length === 0) return null;
+              const isTop10 = section.section_type === "top10";
+              const RowComponent = isTop10 ? Top10Row : ContentRow;
               return (
-                <ContentRow
+                <RowComponent
                   key={section.id}
                   title={section.label}
                   items={filtered}

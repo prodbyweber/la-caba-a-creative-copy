@@ -19,6 +19,15 @@
       "type": "boolean",
       "default": true,
       "description": "Si la secci\u00f3n est\u00e1 visible"
+    },
+    "section_type": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "top10"
+      ],
+      "default": "standard",
+      "description": "Tipo de visualizaci\u00f3n: fila est\u00e1ndar o Top 10 estilo Netflix"
     }
   },
   "required": [

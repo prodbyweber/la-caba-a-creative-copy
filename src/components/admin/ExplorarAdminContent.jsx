@@ -54,13 +54,13 @@ export default function ExplorarAdminContent() {
   const toggleItemMutation = useMutation({ mutationFn: (item) => base44.entities.ExplorarItem.update(item.id, { is_active: !item.is_active }), onSuccess: () => qc.invalidateQueries({ queryKey: ["explorar-items"] }) });
 
   const saveSectionMutation = useMutation({
-    mutationFn: async ({ section, label, orderedItems }) => {
+    mutationFn: async ({ section, label, sectionType, orderedItems }) => {
       let sectionId = section.id;
       if (section._isDefault) {
-        const created = await base44.entities.ExplorarSection.create({ key: section.key, label, order: section.order ?? 0, is_active: true });
+        const created = await base44.entities.ExplorarSection.create({ key: section.key, label, order: section.order ?? 0, is_active: true, section_type: sectionType || "standard" });
         sectionId = created.id;
       } else {
-        await base44.entities.ExplorarSection.update(sectionId, { label });
+        await base44.entities.ExplorarSection.update(sectionId, { label, section_type: sectionType || "standard" });
       }
       const existing = assignments.filter(a => a.section_id === sectionId);
       await Promise.all(existing.map(a => base44.entities.SectionAssignment.delete(a.id)));
@@ -134,7 +134,12 @@ export default function ExplorarAdminContent() {
               <div key={section.id || section.key} className="rounded-2xl border border-white/[0.07] bg-white/[0.02] overflow-hidden">
                 <div className="flex items-center gap-3 px-5 py-4 border-b border-white/[0.05]">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-white">{section.label}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-bold text-white">{section.label}</p>
+                      {section.section_type === "top10" && (
+                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded" style={{ background: "#E50914", color: "white" }}>TOP 10</span>
+                      )}
+                    </div>
                     <p className="text-[10px] text-white/25 mt-0.5">{sectionItems.length} proyectos</p>
                   </div>
                   <button onClick={() => { setEditingSection({ section, assignments: sectionAssignments }); setShowSectionModal(true); }}
@@ -236,7 +241,7 @@ export default function ExplorarAdminContent() {
         {showSectionModal && editingSection && (
           <SectionEditModal section={editingSection.section} assignments={editingSection.assignments} allItems={items} artists={artists}
             onClose={() => { setShowSectionModal(false); setEditingSection(null); }}
-            onSave={({ label, orderedItems }) => saveSectionMutation.mutate({ section: editingSection.section, label, orderedItems })} />
+            onSave={({ label, sectionType, orderedItems }) => saveSectionMutation.mutate({ section: editingSection.section, label, sectionType, orderedItems })} />
         )}
       </AnimatePresence>
     </div>
