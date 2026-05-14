@@ -9,7 +9,7 @@ function getYoutubeId(url) {
   return match ? match[1] : null;
 }
 
-// Netflix-style big outline number — sits BELOW and to the LEFT of the poster
+// Netflix-style big outline number — in FRONT of the poster, bottom-left
 function BigNumber({ rank }) {
   return (
     <div
@@ -17,7 +17,7 @@ function BigNumber({ rank }) {
         position: "absolute",
         bottom: 0,
         left: "-28%",
-        zIndex: 0,
+        zIndex: 20,
         lineHeight: 0.85,
         pointerEvents: "none",
         userSelect: "none",
@@ -69,7 +69,7 @@ function Top10Card({ item, rank, onClick, currentUser, allItems }) {
       {/* Big rank number — positioned behind and below the poster */}
       <BigNumber rank={rank} />
 
-      {/* Poster card — above the number */}
+      {/* Poster card — behind the number */}
       <motion.div
         className="relative rounded-md overflow-hidden bg-[#1a1a1c] z-10"
         style={{ aspectRatio: "2/3" }}
