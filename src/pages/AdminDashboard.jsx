@@ -70,7 +70,7 @@ function SessionRow({ s, onEdit, onDelete, onArchive, onStatusChange, showDate }
           <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.05] text-white/30 font-medium">{s.location}</span>
         )}
         <span className="text-[10px] text-white/30">
-          {showDate ? format(parseISO(s.start_time), 'MMM d · HH:mm') : format(parseISO(s.start_time), 'HH:mm')}
+          {showDate ? format(parseISO(s.start_time), 'MMM d · h:mm a') : format(parseISO(s.start_time), 'h:mm a')}
         </span>
         <div className="ml-auto">
           <StatusButton status={s.status} onStatusChange={(id, status) => onStatusChange.mutate({ id, status })} entity="session" id={s.id} />

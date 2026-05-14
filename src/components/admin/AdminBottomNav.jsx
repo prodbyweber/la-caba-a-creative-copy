@@ -25,30 +25,30 @@ export default function AdminBottomNav() {
         borderTop: "1px solid rgba(255,255,255,0.06)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        paddingBottom: "max(env(safe-area-inset-bottom, 0px), 0px)",
+        paddingBottom: "max(env(safe-area-inset-bottom, 0px), 8px)",
       }}
     >
-      <div className="flex items-center justify-around px-1 pt-1.5 pb-2">
+      <div className="flex items-center justify-around px-2 pt-3 pb-3">
         {items.map((item) => {
           const active = isActive(item.page);
           const Icon = item.icon;
           return (
             <Link key={item.label} to={createPageUrl(item.page)} className="flex-1">
-              <button className="flex flex-col items-center gap-0.5 w-full py-1">
+              <button className="flex flex-col items-center gap-1 w-full py-1.5">
                 <div className="relative">
                   <Icon
-                    className="w-5 h-5 relative z-10 transition-colors"
+                    className="w-6 h-6 relative z-10 transition-colors"
                     style={{ color: active ? "white" : "rgba(255,255,255,0.3)" }}
                   />
                   {active && (
                     <motion.div
                       layoutId="adminNavDot"
-                      className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white"
+                      className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-white"
                     />
                   )}
                 </div>
                 <span
-                  className="text-[9px] font-medium transition-colors leading-tight"
+                  className="text-[10px] font-medium transition-colors leading-tight"
                   style={{ color: active ? "white" : "rgba(255,255,255,0.3)" }}
                 >
                   {item.label}
