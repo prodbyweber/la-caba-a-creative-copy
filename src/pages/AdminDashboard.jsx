@@ -54,25 +54,27 @@ function ItemMenu({ onEdit, onDelete, onArchive, showArchive = false }) {
 function SessionRow({ s, onEdit, onDelete, onArchive, onStatusChange, showDate }) {
   const typeClass = s.type === 'Session' ? 'bg-emerald-500/10 text-emerald-400' :
     s.type === 'Meeting' ? 'bg-blue-500/10 text-blue-400' : 'bg-purple-500/10 text-purple-400';
-  const typeLabel = s.type === 'StudioWork' ? 'Studio' : s.type;
+  const typeLabel = s.type === 'StudioWork' ? 'Studio Work' : s.type;
 
   return (
-    <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.10] transition-all w-full min-w-0">
-      {/* Tipo badge */}
-      <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-semibold flex-shrink-0 ${typeClass}`}>{typeLabel}</span>
-      {/* Título */}
-      <span className="text-xs text-white font-medium truncate flex-1 min-w-0">{s.title}</span>
-      {/* Hora / fecha */}
-      <span className="text-[10px] text-white/30 flex-shrink-0 whitespace-nowrap">
-        {showDate ? format(parseISO(s.start_time), 'MMM d · HH:mm') : format(parseISO(s.start_time), 'HH:mm')}
-      </span>
-      {/* Status */}
-      <div className="flex-shrink-0">
-        <StatusButton status={s.status} onStatusChange={(id, status) => onStatusChange.mutate({ id, status })} entity="session" id={s.id} />
-      </div>
-      {/* Menu */}
-      <div className="flex-shrink-0">
+    <div className="group p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all">
+      {/* Fila 1: título + menu */}
+      <div className="flex items-start gap-2 mb-2">
+        <p className="text-sm text-white font-medium flex-1 min-w-0 line-clamp-1">{s.title}</p>
         <ItemMenu onEdit={() => onEdit(s)} onDelete={() => onDelete.mutate(s)} onArchive={() => onArchive.mutate(s.id)} showArchive />
+      </div>
+      {/* Fila 2: tipo + hora + location + status */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${typeClass}`}>{typeLabel}</span>
+        {s.location && (
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.05] text-white/30 font-medium">{s.location}</span>
+        )}
+        <span className="text-[10px] text-white/30">
+          {showDate ? format(parseISO(s.start_time), 'MMM d · HH:mm') : format(parseISO(s.start_time), 'HH:mm')}
+        </span>
+        <div className="ml-auto">
+          <StatusButton status={s.status} onStatusChange={(id, status) => onStatusChange.mutate({ id, status })} entity="session" id={s.id} />
+        </div>
       </div>
     </div>
   );
@@ -243,7 +245,7 @@ export default function AdminDashboard() {
               <p className="text-sm text-white/25">No hay entregables pendientes</p>
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 gap-2">
+            <div className="space-y-1.5">
               {pendingDeliverables.slice(0, 6).map((d) => (
                 <div key={d.id} className="group p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] transition-all">
                   <div className="flex items-start gap-2 mb-2">
