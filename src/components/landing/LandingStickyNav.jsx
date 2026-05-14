@@ -13,7 +13,14 @@ const NAV_ITEMS = [
 
 const scrollTo = (id) => {
   const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: "smooth" });
+  if (!el) return;
+  // Para la sección "choose" el contenido está alineado al fondo (flex-end),
+  // así que scrolleamos al final del elemento en lugar del inicio.
+  if (id === "choose") {
+    el.scrollIntoView({ behavior: "smooth", block: "end" });
+  } else {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 };
 
 export default function LandingStickyNav() {
