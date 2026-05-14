@@ -25,7 +25,7 @@ export default function AdminBottomNav() {
         borderTop: "1px solid rgba(255,255,255,0.06)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        paddingBottom: "max(env(safe-area-inset-bottom, 0px), 16px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 14px)",
       }}
     >
       <div className="flex items-center justify-around px-2 pt-3 pb-3">

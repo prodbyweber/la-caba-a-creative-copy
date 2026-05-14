@@ -121,7 +121,7 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
             borderTop: "1px solid rgba(255,255,255,0.06)",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
-            paddingBottom: "max(env(safe-area-inset-bottom, 0px), 0px)",
+            paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)",
           }}
         >
           <div className="flex items-center justify-around px-2 pt-2 pb-3">
