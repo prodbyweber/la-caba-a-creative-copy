@@ -5,6 +5,7 @@ import {
   Users, 
   Calendar,
   Monitor,
+  Inbox,
   User,
   LogOut,
   ChevronRight,
@@ -18,6 +19,7 @@ const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", page: "AdminDashboard" },
   { icon: Users, label: "Creadores", page: "ArtistPanelList" },
   { icon: Calendar, label: "Calendars", page: "Calendars" },
+  { icon: Inbox, label: "Solicitudes", page: "ContactLeads" },
   { icon: Monitor, label: "Design Editor", page: "DesignEditor" },
 ];
 
