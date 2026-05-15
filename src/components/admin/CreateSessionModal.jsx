@@ -139,6 +139,8 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
           alignItems: "flex-end",
           paddingBottom: "calc(65px + env(safe-area-inset-bottom, 0px) + 16px)",
           paddingTop: "16px",
+          paddingLeft: "12px",
+          paddingRight: "12px",
         }}
       >
         <motion.div
