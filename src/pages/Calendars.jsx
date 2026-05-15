@@ -118,14 +118,7 @@ export default function Calendars() {
               </button>
             </div>
 
-            <button onClick={() => setShowSessionModal(true)} className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-[11px] font-medium transition-colors">
-              <Plus className="w-3.5 h-3.5" /><span className="hidden sm:inline">Sesión</span>
-            </button>
-            {!artistId && (
-              <button onClick={() => setShowDeliverableModal(true)} className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 hover:bg-amber-500/30 text-[11px] font-medium transition-colors">
-                <Plus className="w-3.5 h-3.5" /><span className="hidden sm:inline">Entregable</span>
-              </button>
-            )}
+
           </div>
         </div>
       </div>
@@ -233,15 +226,23 @@ export default function Calendars() {
         />
       )}
 
-      {/* FAB móvil — solo en agenda */}
-      {viewMode === "agenda" && (
-        <button
-          onClick={() => setShowSessionModal(true)}
-          className="sm:hidden fixed bottom-6 right-5 z-40 w-14 h-14 rounded-2xl bg-[#c7d0f5] flex items-center justify-center shadow-xl active:scale-95 transition-transform"
-        >
-          <Plus className="w-7 h-7 text-[#1a237e]" />
-        </button>
-      )}
+      {/* FAB — igual al AdminDashboard */}
+      <style>{`
+        .cal-fab {
+          bottom: calc(65px + env(safe-area-inset-bottom, 0px) + 35px);
+        }
+        @media (min-width: 1024px) {
+          .cal-fab { bottom: 47px; }
+        }
+      `}</style>
+      <button
+        onClick={() => setShowSessionModal(true)}
+        className="cal-fab fixed right-5 z-40 rounded-full hover:opacity-90 shadow-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+        style={{ background: "#ff5833", boxShadow: "0 8px 32px rgba(255,88,51,0.45)", width: 52, height: 52 }}
+        title="Nueva Sesión"
+      >
+        <Plus className="w-5 h-5 text-white" strokeWidth={2.5} />
+      </button>
 
       {/* Modals */}
       <CreateSessionModal isOpen={showSessionModal} onClose={() => setShowSessionModal(false)} editData={null} />
