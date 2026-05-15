@@ -151,25 +151,8 @@ export default function AdminDashboard() {
           className="bg-[#111113] border border-white/[0.07] rounded-2xl p-4 sm:p-5 mb-6"
         >
           {/* Panel Header */}
-          <div className="flex items-center justify-between gap-3 mb-5">
-            <div>
-              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-widest">Panel de Control</p>
-              <h2 className="text-base font-bold text-white leading-tight">Sesiones & Entregables</h2>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => { setEditSession(null); setShowSessionModal(true); }}
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl hover:bg-emerald-500/20 transition-all font-medium"
-              >
-                <Plus className="w-3.5 h-3.5" /> Sesión
-              </button>
-              <button
-                onClick={() => { setEditDeliverable(null); setShowDeliverableModal(true); }}
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl hover:bg-blue-500/20 transition-all font-medium"
-              >
-                <Plus className="w-3.5 h-3.5" /> Entregable
-              </button>
-            </div>
+          <div className="flex items-center mb-5">
+            <p className="text-sm font-bold text-white whitespace-nowrap">Sesiones y Entregables</p>
           </div>
 
           <div className="w-full space-y-6">
