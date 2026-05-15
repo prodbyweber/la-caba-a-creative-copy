@@ -183,30 +183,26 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
   return (
     <AnimatePresence>
       <div
-        className="fixed inset-0 z-50 flex justify-center"
+        className="fixed inset-0 z-50 flex justify-center items-end"
         style={{
           background: "rgba(0,0,0,0.75)",
           backdropFilter: "blur(8px)",
-          alignItems: "flex-end",
-          paddingBottom: "calc(65px + env(safe-area-inset-bottom, 0px) + 16px)",
-          paddingTop: "16px",
-          paddingLeft: "12px",
-          paddingRight: "12px",
         }}
       >
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 40 }}
-          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full sm:max-w-md overflow-y-auto"
+          exit={{ opacity: 0, y: 60 }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full sm:max-w-md flex flex-col"
           style={{
             background: "#0d0d0f",
             border: "1px solid rgba(255,255,255,0.07)",
-            borderRadius: "16px 16px 12px 12px",
+            borderRadius: "20px 20px 0 0",
             boxShadow: "0 -8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,88,51,0.08)",
-            maxHeight: "calc(100dvh - 65px - env(safe-area-inset-bottom, 0px) - 32px)",
+            height: "calc(100dvh - 60px)",
             overflowY: "auto",
+            paddingBottom: "calc(65px + env(safe-area-inset-bottom, 0px) + 8px)",
           }}
         >
           {/* Header */}
