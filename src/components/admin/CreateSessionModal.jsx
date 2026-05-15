@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Trash2 } from "lucide-react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
@@ -83,6 +83,28 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
   };
 
   const removeAttendee = (email) => setFormData(prev => ({ ...prev, attendees: prev.attendees.filter(e => e !== email) }));
+
+  const [showContacts, setShowContacts] = useState(false);
+  const [contactSearch, setContactSearch] = useState("");
+
+  // Construir lista de contactos: artistas con email + emails de sesiones recientes
+  const allContacts = useMemo(() => {
+    const map = new Map();
+    artists.forEach(a => { if (a.email) map.set(a.email, { email: a.email, name: a.stageName, avatar: a.avatar_url }); });
+    return Array.from(map.values());
+  }, [artists]);
+
+  const filteredContacts = contactSearch
+    ? allContacts.filter(c => c.name?.toLowerCase().includes(contactSearch.toLowerCase()) || c.email.toLowerCase().includes(contactSearch.toLowerCase()))
+    : allContacts;
+
+  const addContactAsAttendee = (email) => {
+    if (!formData.attendees.includes(email)) {
+      setFormData(prev => ({ ...prev, attendees: [...prev.attendees, email] }));
+    }
+    setShowContacts(false);
+    setContactSearch("");
+  };
 
   const syncToGCal = async (session, isUpdate = false) => {
     setGcalStatus('syncing');
@@ -332,7 +354,14 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
                       className={field} rows="1" placeholder="Objetivos, refs..." />
                   </div>
                   <div>
-                    <label className={label}>Invitado</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className={label} style={{ marginBottom: 0 }}>Invitado</label>
+                      <button type="button" onClick={() => { setShowContacts(v => !v); setContactSearch(""); }}
+                        className="text-[9px] font-semibold transition-colors px-1.5 py-0.5 rounded-md"
+                        style={{ color: showContacts ? "#ff5833" : "rgba(255,255,255,0.25)", background: showContacts ? "rgba(255,88,51,0.08)" : "transparent" }}>
+                        {showContacts ? "Cerrar" : "Contactos"}
+                      </button>
+                    </div>
                     <div className="flex gap-1.5">
                       <input type="email" value={newAttendee}
                         onChange={e => setNewAttendee(e.target.value)}
@@ -344,6 +373,43 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
                         <Plus className="w-3 h-3 text-white/40" />
                       </button>
                     </div>
+                    {/* Panel de contactos desplegable */}
+                    {showContacts && (
+                      <div className="mt-1.5 rounded-xl overflow-hidden" style={{ background: "#0a0a0c", border: "1px solid rgba(255,255,255,0.07)" }}>
+                        <div className="px-2 pt-2 pb-1.5">
+                          <input
+                            type="text" value={contactSearch}
+                            onChange={e => setContactSearch(e.target.value)}
+                            placeholder="Buscar..."
+                            className="w-full px-2.5 py-1.5 rounded-lg text-[10px] text-white placeholder-white/20 focus:outline-none"
+                            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)" }}
+                          />
+                        </div>
+                        <div className="overflow-y-auto" style={{ maxHeight: 140 }}>
+                          {filteredContacts.length === 0 ? (
+                            <p className="text-[10px] text-white/20 text-center py-3">Sin resultados</p>
+                          ) : filteredContacts.map(c => (
+                            <button key={c.email} type="button"
+                              onClick={() => addContactAsAttendee(c.email)}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-white/[0.04]"
+                              style={{ opacity: formData.attendees.includes(c.email) ? 0.35 : 1 }}
+                            >
+                              <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[8px] font-bold"
+                                style={{ background: "rgba(255,88,51,0.15)", color: "#ff5833" }}>
+                                {c.name ? c.name[0].toUpperCase() : c.email[0].toUpperCase()}
+                              </div>
+                              <div className="min-w-0">
+                                {c.name && <p className="text-[10px] font-semibold text-white/70 truncate leading-tight">{c.name}</p>}
+                                <p className="text-[9px] text-white/30 truncate leading-tight">{c.email}</p>
+                              </div>
+                              {formData.attendees.includes(c.email) && (
+                                <span className="ml-auto text-[8px] text-white/20 flex-shrink-0">✓</span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     {formData.attendees.length > 0 && (
                       <div className="mt-1 space-y-0.5">
                         {formData.attendees.map(email => {
