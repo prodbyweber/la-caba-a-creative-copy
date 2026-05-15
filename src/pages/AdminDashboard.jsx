@@ -312,11 +312,10 @@ export default function AdminDashboard() {
       <button
         onClick={() => { setEditSession(null); setShowSessionModal(true); }}
         className="admin-fab fixed right-5 z-40 rounded-full hover:opacity-90 shadow-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95"
-        style={{ background: "#ff5833", boxShadow: "0 8px 32px rgba(255,88,51,0.45)" }}
-        style={{ width: 52, height: 52 }}
+        style={{ background: "#ff5833", boxShadow: "0 8px 32px rgba(255,88,51,0.45)", width: 52, height: 52 }}
         title="Nueva Sesión"
       >
-        <Plus className="w-5 h-5 text-black" strokeWidth={2.5} />
+        <Plus className="w-5 h-5 text-white" strokeWidth={2.5} />
       </button>
     </AdminLayout>
   );
