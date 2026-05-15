@@ -345,106 +345,88 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
                   </div>
                 </div>
 
-                {/* Notas */}
-                <div>
-                  <label className={label}>Notas</label>
-                  <textarea value={formData.description}
-                    onChange={e => setFormData(f => ({ ...f, description: e.target.value }))}
-                    className={field} rows="1" placeholder="Objetivos, refs..." />
-                </div>
-
-                {/* Invitados — sección propia a ancho completo */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className={label} style={{ marginBottom: 0 }}>Invitados</label>
-                    <button type="button" onClick={() => { setShowContacts(v => !v); setContactSearch(""); }}
-                      className="flex items-center gap-1 text-[9px] font-semibold transition-all px-2 py-1 rounded-md"
-                      style={{
-                        color: showContacts ? "#ff5833" : "rgba(255,255,255,0.3)",
-                        background: showContacts ? "rgba(255,88,51,0.1)" : "rgba(255,255,255,0.04)",
-                        border: showContacts ? "1px solid rgba(255,88,51,0.25)" : "1px solid rgba(255,255,255,0.07)"
-                      }}>
-                      {showContacts ? "↑ Cerrar" : "↓ Contactos"}
-                    </button>
+                {/* Notas + Invitados */}
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className={label}>Notas</label>
+                    <textarea value={formData.description}
+                      onChange={e => setFormData(f => ({ ...f, description: e.target.value }))}
+                      className={field} rows="1" placeholder="Objetivos, refs..." />
                   </div>
-
-                  {/* Panel desplegable de contactos */}
-                  {showContacts && (
-                    <div className="mb-2 rounded-xl overflow-hidden" style={{ background: "#0a0a0c", border: "1px solid rgba(255,255,255,0.08)" }}>
-                      <div className="px-2.5 pt-2.5 pb-2">
-                        <input
-                          type="text" value={contactSearch}
-                          onChange={e => setContactSearch(e.target.value)}
-                          placeholder="Buscar nombre o email..."
-                          autoFocus
-                          className="w-full px-3 py-2 rounded-lg text-xs text-white placeholder-white/20 focus:outline-none focus:border-white/20 transition-all"
-                          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
-                        />
-                      </div>
-                      <div className="overflow-y-auto" style={{ maxHeight: 180 }}>
-                        {filteredContacts.length === 0 ? (
-                          <p className="text-xs text-white/20 text-center py-4">Sin resultados</p>
-                        ) : filteredContacts.map(c => (
-                          <button key={c.email} type="button"
-                            onClick={() => addContactAsAttendee(c.email)}
-                            className="w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-white/[0.05] active:bg-white/[0.08]"
-                            style={{ opacity: formData.attendees.includes(c.email) ? 0.4 : 1 }}
-                          >
-                            <div className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-[11px] font-bold"
-                              style={{ background: "rgba(255,88,51,0.12)", color: "#ff5833", border: "1px solid rgba(255,88,51,0.2)" }}>
-                              {c.name ? c.name[0].toUpperCase() : c.email[0].toUpperCase()}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              {c.name && <p className="text-xs font-semibold text-white/75 truncate leading-tight">{c.name}</p>}
-                              <p className="text-[10px] text-white/35 truncate leading-tight">{c.email}</p>
-                            </div>
-                            {formData.attendees.includes(c.email) && (
-                              <span className="text-[10px] text-white/25 flex-shrink-0 font-bold">✓</span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className={label} style={{ marginBottom: 0 }}>Invitado</label>
+                      <button type="button" onClick={() => { setShowContacts(v => !v); setContactSearch(""); }}
+                        className="text-[9px] font-semibold transition-colors px-1.5 py-0.5 rounded-md"
+                        style={{ color: showContacts ? "#ff5833" : "rgba(255,255,255,0.25)", background: showContacts ? "rgba(255,88,51,0.08)" : "transparent" }}>
+                        {showContacts ? "Cerrar" : "Contactos"}
+                      </button>
                     </div>
-                  )}
-
-                  {/* Input manual */}
-                  <div className="flex gap-1.5">
-                    <input type="email" value={newAttendee}
-                      onChange={e => setNewAttendee(e.target.value)}
-                      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addAttendee(); } }}
-                      className={field + " flex-1 min-w-0"} placeholder="Añadir por email..." />
-                    <button type="button" onClick={addAttendee}
-                      className="px-2.5 rounded-lg flex-shrink-0 transition-all"
-                      style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                      <Plus className="w-3.5 h-3.5 text-white/40" />
-                    </button>
-                  </div>
-
-                  {/* Lista de invitados añadidos */}
-                  {formData.attendees.length > 0 && (
-                    <div className="mt-2 space-y-1">
-                      {formData.attendees.map(email => {
-                        const isArtist = artists.find(a => a.id === formData.artist_id)?.email === email;
-                        const contact = allContacts.find(c => c.email === email);
-                        return (
-                          <div key={email} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg"
-                            style={{ background: isArtist ? "rgba(255,88,51,0.07)" : "rgba(255,255,255,0.04)", border: `1px solid ${isArtist ? "rgba(255,88,51,0.18)" : "rgba(255,255,255,0.06)"}` }}>
-                            <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[8px] font-bold"
-                              style={{ background: isArtist ? "rgba(255,88,51,0.2)" : "rgba(255,255,255,0.06)", color: isArtist ? "#ff5833" : "rgba(255,255,255,0.3)" }}>
-                              {(contact?.name || email)[0].toUpperCase()}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              {contact?.name && !isArtist && <p className="text-[10px] font-medium text-white/50 truncate leading-tight">{contact.name}</p>}
-                              <span className="text-[10px] truncate block" style={{ color: isArtist ? "#ff5833" : "rgba(255,255,255,0.4)" }}>{email}</span>
-                            </div>
-                            <button type="button" onClick={() => removeAttendee(email)} className="text-white/15 hover:text-red-400 transition-colors flex-shrink-0">
-                              <Trash2 className="w-3 h-3" />
+                    <div className="flex gap-1.5">
+                      <input type="email" value={newAttendee}
+                        onChange={e => setNewAttendee(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addAttendee(); } }}
+                        className={field + " flex-1 min-w-0"} placeholder="email" />
+                      <button type="button" onClick={addAttendee}
+                        className="px-2 rounded-lg flex-shrink-0 transition-all"
+                        style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                        <Plus className="w-3 h-3 text-white/40" />
+                      </button>
+                    </div>
+                    {/* Panel de contactos desplegable */}
+                    {showContacts && (
+                      <div className="mt-1.5 rounded-xl overflow-hidden" style={{ background: "#0a0a0c", border: "1px solid rgba(255,255,255,0.07)" }}>
+                        <div className="px-2 pt-2 pb-1.5">
+                          <input
+                            type="text" value={contactSearch}
+                            onChange={e => setContactSearch(e.target.value)}
+                            placeholder="Buscar..."
+                            className="w-full px-2.5 py-1.5 rounded-lg text-[10px] text-white placeholder-white/20 focus:outline-none"
+                            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)" }}
+                          />
+                        </div>
+                        <div className="overflow-y-auto" style={{ maxHeight: 140 }}>
+                          {filteredContacts.length === 0 ? (
+                            <p className="text-[10px] text-white/20 text-center py-3">Sin resultados</p>
+                          ) : filteredContacts.map(c => (
+                            <button key={c.email} type="button"
+                              onClick={() => addContactAsAttendee(c.email)}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-left transition-colors hover:bg-white/[0.04]"
+                              style={{ opacity: formData.attendees.includes(c.email) ? 0.35 : 1 }}
+                            >
+                              <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[8px] font-bold"
+                                style={{ background: "rgba(255,88,51,0.15)", color: "#ff5833" }}>
+                                {c.name ? c.name[0].toUpperCase() : c.email[0].toUpperCase()}
+                              </div>
+                              <div className="min-w-0">
+                                {c.name && <p className="text-[10px] font-semibold text-white/70 truncate leading-tight">{c.name}</p>}
+                                <p className="text-[9px] text-white/30 truncate leading-tight">{c.email}</p>
+                              </div>
+                              {formData.attendees.includes(c.email) && (
+                                <span className="ml-auto text-[8px] text-white/20 flex-shrink-0">✓</span>
+                              )}
                             </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {formData.attendees.length > 0 && (
+                      <div className="mt-1 space-y-0.5">
+                        {formData.attendees.map(email => {
+                          const isArtist = artists.find(a => a.id === formData.artist_id)?.email === email;
+                          return (
+                            <div key={email} className="flex items-center justify-between px-2 py-1 rounded-md"
+                              style={{ background: isArtist ? "rgba(255,88,51,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${isArtist ? "rgba(255,88,51,0.2)" : "rgba(255,255,255,0.06)"}` }}>
+                              <span className="text-[10px] truncate" style={{ color: isArtist ? "#ff5833" : "rgba(255,255,255,0.5)" }}>{email}</span>
+                              <button type="button" onClick={() => removeAttendee(email)} className="text-white/20 hover:text-red-400 transition-colors ml-1 flex-shrink-0">
+                                <Trash2 className="w-2.5 h-2.5" />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* GCal status */}
