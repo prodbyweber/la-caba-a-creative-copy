@@ -137,7 +137,8 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
           background: "rgba(0,0,0,0.75)",
           backdropFilter: "blur(8px)",
           alignItems: "flex-end",
-          paddingBottom: "calc(65px + env(safe-area-inset-bottom, 0px) + 90px)",
+          paddingBottom: "calc(65px + env(safe-area-inset-bottom, 0px) + 16px)",
+          paddingTop: "16px",
         }}
       >
         <motion.div
@@ -151,7 +152,8 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
             border: "1px solid rgba(255,255,255,0.07)",
             borderRadius: "16px 16px 12px 12px",
             boxShadow: "0 -8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,88,51,0.08)",
-            maxHeight: "calc(100dvh - 65px - env(safe-area-inset-bottom, 0px) - 100px)",
+            maxHeight: "calc(100dvh - 65px - env(safe-area-inset-bottom, 0px) - 32px)",
+            overflowY: "auto",
           }}
         >
           {/* Header */}
