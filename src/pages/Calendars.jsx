@@ -20,7 +20,7 @@ const SESSION_COLORS = {
 };
 
 export default function Calendars() {
-  const [viewMode, setViewMode] = useState(() => window.innerWidth < 640 ? "agenda" : "month"); // month | agenda
+  const [viewMode, setViewMode] = useState("agenda"); // month | agenda
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showSessionModal, setShowSessionModal] = useState(false);
   const [showDeliverableModal, setShowDeliverableModal] = useState(false);
@@ -104,21 +104,28 @@ export default function Calendars() {
             <button onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"><ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" /></button>
           </div>
 
-          {/* Derecha: view toggle + botones */}
-          <div className="flex items-center gap-1.5">
-            <button onClick={() => setCurrentDate(new Date())} className="px-2 py-1 rounded-lg border border-white/10 text-[11px] font-medium text-gray-300 hover:bg-white/10 transition-colors hidden sm:block">Hoy</button>
-
-            {/* View toggle */}
-            <div className="flex gap-0.5 bg-white/5 rounded-lg p-0.5">
-              <button onClick={() => setViewMode("month")} className={`flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium transition-all ${viewMode === "month" ? "bg-white/15 text-white" : "text-gray-400 hover:text-white"}`}>
-                <CalendarIcon className="w-3 h-3" /><span className="hidden sm:inline">Mes</span>
+          {/* Derecha: view toggle minimalista */}
+          <div className="flex items-center">
+            <div className="flex p-0.5 rounded-lg" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}>
+              <button
+                onClick={() => setViewMode("agenda")}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-semibold tracking-wide transition-all"
+                style={viewMode === "agenda"
+                  ? { background: "rgba(255,255,255,0.09)", color: "#fff" }
+                  : { color: "rgba(255,255,255,0.25)" }}
+              >
+                <List className="w-3 h-3" /><span>Agenda</span>
               </button>
-              <button onClick={() => setViewMode("agenda")} className={`flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium transition-all ${viewMode === "agenda" ? "bg-white/15 text-white" : "text-gray-400 hover:text-white"}`}>
-                <List className="w-3 h-3" /><span className="hidden sm:inline">Agenda</span>
+              <button
+                onClick={() => setViewMode("month")}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-semibold tracking-wide transition-all"
+                style={viewMode === "month"
+                  ? { background: "rgba(255,255,255,0.09)", color: "#fff" }
+                  : { color: "rgba(255,255,255,0.25)" }}
+              >
+                <CalendarIcon className="w-3 h-3" /><span>Mes</span>
               </button>
             </div>
-
-
           </div>
         </div>
       </div>
