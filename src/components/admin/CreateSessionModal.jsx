@@ -138,12 +138,13 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 32 }}
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full sm:max-w-md max-h-[94vh] overflow-y-auto"
+          className="w-full sm:max-w-md overflow-y-auto sm:rounded-2xl"
           style={{
             background: "#0d0d0f",
             border: "1px solid rgba(255,255,255,0.07)",
-            borderRadius: "20px 20px 20px 20px",
+            borderRadius: "20px 20px 0 0",
             boxShadow: "0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,88,51,0.08)",
+            maxHeight: "calc(100dvh - 60px - env(safe-area-inset-bottom, 0px) - 8px)",
           }}
         >
           {/* Header */}

@@ -300,13 +300,22 @@ export default function AdminDashboard() {
       <CreateSessionModal isOpen={showSessionModal} onClose={handleCloseSession} editData={editSession} />
       <CreateDeliverableModal isOpen={showDeliverableModal} onClose={handleCloseDeliverable} editData={editDeliverable} />
 
-      {/* FAB — Nueva Sesión */}
+      {/* FAB — Nueva Sesión: sobre el bottom nav en móvil, esquina inferior derecha en desktop */}
+      <style>{`
+        .admin-fab {
+          bottom: calc(60px + env(safe-area-inset-bottom, 0px) + 14px);
+        }
+        @media (min-width: 1024px) {
+          .admin-fab { bottom: 24px; }
+        }
+      `}</style>
       <button
         onClick={() => { setEditSession(null); setShowSessionModal(true); }}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-500/30 flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+        className="admin-fab fixed right-5 z-40 rounded-full bg-emerald-500 hover:bg-emerald-400 shadow-xl shadow-emerald-500/40 flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+        style={{ width: 52, height: 52 }}
         title="Nueva Sesión"
       >
-        <Calendar className="w-6 h-6 text-black" />
+        <Plus className="w-5 h-5 text-black" strokeWidth={2.5} />
       </button>
     </AdminLayout>
   );
