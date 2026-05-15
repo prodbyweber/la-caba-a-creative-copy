@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Package } from "lucide-react";
+import { X, Package, CalendarClock } from "lucide-react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
@@ -14,6 +14,7 @@ export default function CreateDeliverableModal({ isOpen, onClose, editData = nul
 
   const defaultForm = { artist_id: "", project_id: "", deliverable_type: "Demo", title: "", due_date_time: "", status: "Pending", notes: "" };
   const [formData, setFormData] = useState(defaultForm);
+  const [scheduleStatus, setScheduleStatus] = useState(null); // null | 'scheduling' | 'done' | 'error'
 
   useEffect(() => {
     if (editData) {
@@ -29,11 +30,30 @@ export default function CreateDeliverableModal({ isOpen, onClose, editData = nul
     } else {
       setFormData(defaultForm);
     }
+    setScheduleStatus(null);
   }, [editData, isOpen]);
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Deliverable.create(data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['deliverables'] }); onClose(); }
+    mutationFn: async (data) => {
+      const deliverable = await base44.entities.Deliverable.create(data);
+      queryClient.invalidateQueries({ queryKey: ['deliverables'] });
+      // Auto-schedule work sessions if due_date_time is set
+      if (data.due_date_time) {
+        setScheduleStatus('scheduling');
+        try {
+          await base44.functions.invoke('scheduleDeliverableWorkSessions', {
+            deliverable_title: data.title,
+            due_date_time: new Date(data.due_date_time).toISOString(),
+          });
+          queryClient.invalidateQueries({ queryKey: ['sessions'] });
+          setScheduleStatus('done');
+        } catch {
+          setScheduleStatus('error');
+        }
+      }
+      return deliverable;
+    },
+    onSuccess: () => { setTimeout(() => onClose(), scheduleStatus === 'error' ? 2000 : 1200); }
   });
 
   const updateMutation = useMutation({
@@ -118,12 +138,31 @@ export default function CreateDeliverableModal({ isOpen, onClose, editData = nul
               <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} className={inputCls} rows="3" placeholder="Notas adicionales..." />
             </div>
 
+            {/* Scheduling status */}
+            {scheduleStatus === 'scheduling' && (
+              <div className="flex items-center gap-2.5 px-3.5 py-3 rounded-xl text-xs" style={{ background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)", color: "rgba(167,139,250,0.9)" }}>
+                <div className="w-3.5 h-3.5 border-2 border-purple-400/30 border-t-purple-400 rounded-full animate-spin flex-shrink-0" />
+                Agendando sesiones de trabajo en Google Calendar...
+              </div>
+            )}
+            {scheduleStatus === 'done' && (
+              <div className="flex items-center gap-2.5 px-3.5 py-3 rounded-xl text-xs" style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", color: "#34d399" }}>
+                <CalendarClock className="w-3.5 h-3.5 flex-shrink-0" />
+                4 sesiones de trabajo agendadas automáticamente en tu calendario
+              </div>
+            )}
+            {scheduleStatus === 'error' && (
+              <div className="px-3.5 py-3 rounded-xl text-xs" style={{ background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.2)", color: "rgba(251,191,36,0.8)" }}>
+                ⚠ Entregable guardado. Error al agendar sesiones automáticas en Calendar.
+              </div>
+            )}
+
             <div className="flex gap-3 pt-2">
               <button type="button" onClick={onClose} className="flex-1 px-4 py-3 rounded-xl bg-white/[0.05] text-white/60 hover:bg-white/[0.08] transition-all text-sm font-medium">
                 Cancelar
               </button>
               <button type="submit" disabled={isPending} className="flex-1 px-4 py-3 rounded-xl bg-blue-500 hover:bg-blue-400 text-white font-bold text-sm transition-all disabled:opacity-50">
-                {isPending ? "Guardando..." : editData ? "Guardar Cambios" : "Crear Entregable"}
+                {isPending ? (scheduleStatus === 'scheduling' ? "Agendando..." : "Guardando...") : editData ? "Guardar Cambios" : "Crear Entregable"}
               </button>
             </div>
           </form>
