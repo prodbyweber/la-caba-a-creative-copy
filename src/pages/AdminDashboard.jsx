@@ -303,10 +303,10 @@ export default function AdminDashboard() {
       {/* FAB — Nueva Sesión: sobre el bottom nav en móvil, esquina inferior derecha en desktop */}
       <style>{`
         .admin-fab {
-          bottom: calc(60px + env(safe-area-inset-bottom, 0px) + 14px);
+          bottom: calc(65px + env(safe-area-inset-bottom, 0px) + 16px);
         }
         @media (min-width: 1024px) {
-          .admin-fab { bottom: 24px; }
+          .admin-fab { bottom: 28px; }
         }
       `}</style>
       <button

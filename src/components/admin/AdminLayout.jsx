@@ -134,7 +134,7 @@ export default function AdminLayout({ children, activePage }) {
       </nav>
 
       {/* Main Content */}
-      <main className="pt-14 pb-[calc(60px+env(safe-area-inset-bottom,0px))] lg:pb-0">
+      <main className="pt-14 pb-[calc(65px+env(safe-area-inset-bottom,0px)+16px)] lg:pb-8">
         {children}
       </main>
 

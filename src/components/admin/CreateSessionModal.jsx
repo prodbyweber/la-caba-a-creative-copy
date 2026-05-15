@@ -132,26 +132,26 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
   return (
     <AnimatePresence>
       <div
-        className="fixed inset-0 z-50 flex justify-center p-0"
+        className="fixed inset-0 z-50 flex justify-center"
         style={{
           background: "rgba(0,0,0,0.75)",
           backdropFilter: "blur(8px)",
           alignItems: "flex-end",
-          paddingBottom: "calc(60px + env(safe-area-inset-bottom, 0px) + 8px)",
+          paddingBottom: "calc(65px + env(safe-area-inset-bottom, 0px) + 12px)",
         }}
       >
         <motion.div
-          initial={{ opacity: 0, y: 32 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 32 }}
+          exit={{ opacity: 0, y: 40 }}
           transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           className="w-full sm:max-w-md overflow-y-auto"
           style={{
             background: "#0d0d0f",
             border: "1px solid rgba(255,255,255,0.07)",
-            borderRadius: "16px 16px 10px 10px",
-            boxShadow: "0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,88,51,0.08)",
-            maxHeight: "calc(100dvh - 60px - env(safe-area-inset-bottom, 0px) - 90px)",
+            borderRadius: "16px 16px 12px 12px",
+            boxShadow: "0 -8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,88,51,0.08)",
+            maxHeight: "calc(100dvh - 65px - env(safe-area-inset-bottom, 0px) - 100px)",
           }}
         >
           {/* Header */}
