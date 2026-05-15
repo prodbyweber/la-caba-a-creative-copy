@@ -214,12 +214,13 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
             {/* Fechas */}
             <div>
               <p className={label}>Horario</p>
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-2 gap-2">
                 <div>
                   <p className="text-[9px] text-white/20 uppercase tracking-widest mb-1">Inicio</p>
                   <input type="datetime-local" required value={formData.start_time}
                     onChange={e => handleStartChange(e.target.value)}
-                    className={field} style={{ colorScheme: 'dark' }} />
+                    className={field}
+                    style={{ colorScheme: 'dark', fontSize: '10px', padding: '6px 8px' }} />
                 </div>
                 <div>
                   <p className="text-[9px] text-white/20 uppercase tracking-widest mb-1">
@@ -227,7 +228,8 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
                   </p>
                   <input type="datetime-local" required value={formData.end_time}
                     onChange={e => setFormData(f => ({ ...f, end_time: e.target.value }))}
-                    className={field} style={{ colorScheme: 'dark' }} />
+                    className={field}
+                    style={{ colorScheme: 'dark', fontSize: '10px', padding: '6px 8px' }} />
                 </div>
               </div>
             </div>
