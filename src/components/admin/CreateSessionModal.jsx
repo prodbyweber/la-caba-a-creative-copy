@@ -137,7 +137,7 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
           background: "rgba(0,0,0,0.75)",
           backdropFilter: "blur(8px)",
           alignItems: "flex-end",
-          paddingBottom: "calc(65px + env(safe-area-inset-bottom, 0px) + 12px)",
+          paddingBottom: "calc(65px + env(safe-area-inset-bottom, 0px) + 90px)",
         }}
       >
         <motion.div
