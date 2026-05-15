@@ -11,10 +11,13 @@ function addHours(dateStr, hours) {
   if (!dateStr) return "";
   const d = new Date(dateStr);
   d.setHours(d.getHours() + hours);
-  // Format back to datetime-local (YYYY-MM-DDTHH:mm)
   const pad = n => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
+
+const SESSION_TYPES = ["Session", "Meeting", "StudioWork"];
+const typeLabels = { Session: "Sesión", Meeting: "Reunión", StudioWork: "Studio", Deliverable: "Entregable" };
+const DELIVERABLE_TYPES = ["Demo", "Beat", "Recording", "Mix", "Master", "Stems", "Visual", "ContentPack"];
 
 export default function CreateSessionModal({ isOpen, onClose, editData = null }) {
   const queryClient = useQueryClient();
@@ -24,12 +27,15 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
   const defaultForm = {
     type: "Session", title: "", artist_id: "", project_id: "",
     start_time: "", end_time: "", location: "Studio",
-    description: "", status: "Pending", attendees: []
+    description: "", status: "Pending", attendees: [],
+    deliverable_type: "Demo", due_date_time: "",
   };
 
   const [formData, setFormData] = useState(defaultForm);
   const [newAttendee, setNewAttendee] = useState("");
   const [gcalStatus, setGcalStatus] = useState(null);
+
+  const isDeliverable = formData.type === "Deliverable";
 
   useEffect(() => {
     if (editData) {
@@ -43,7 +49,9 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
         location: editData.location || "Studio",
         description: editData.description || "",
         status: editData.status || "Pending",
-        attendees: editData.attendees || []
+        attendees: editData.attendees || [],
+        deliverable_type: editData.deliverable_type || "Demo",
+        due_date_time: editData.due_date_time ? editData.due_date_time.slice(0, 16) : "",
       });
     } else {
       setFormData(defaultForm);
@@ -53,11 +61,7 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
   }, [editData, isOpen]);
 
   const handleStartChange = (val) => {
-    setFormData(prev => ({
-      ...prev,
-      start_time: val,
-      end_time: addHours(val, 2),
-    }));
+    setFormData(prev => ({ ...prev, start_time: val, end_time: addHours(val, 2) }));
   };
 
   const handleArtistChange = (artistId) => {
@@ -103,6 +107,19 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
+      if (data.type === "Deliverable") {
+        const d = await base44.entities.Deliverable.create({
+          title: data.title,
+          artist_id: data.artist_id,
+          project_id: data.project_id,
+          deliverable_type: data.deliverable_type,
+          due_date_time: data.due_date_time ? new Date(data.due_date_time).toISOString() : null,
+          notes: data.description,
+          status: "Pending",
+        });
+        queryClient.invalidateQueries({ queryKey: ['deliverables'] });
+        return d;
+      }
       const session = await base44.entities.Session.create({ ...data, source: 'cabana' });
       queryClient.invalidateQueries({ queryKey: ['sessions'] });
       await syncToGCal(session, false);
@@ -113,6 +130,18 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
 
   const updateMutation = useMutation({
     mutationFn: async (data) => {
+      if (data.type === "Deliverable") {
+        const d = await base44.entities.Deliverable.update(editData.id, {
+          title: data.title,
+          artist_id: data.artist_id,
+          project_id: data.project_id,
+          deliverable_type: data.deliverable_type,
+          due_date_time: data.due_date_time ? new Date(data.due_date_time).toISOString() : null,
+          notes: data.description,
+        });
+        queryClient.invalidateQueries({ queryKey: ['deliverables'] });
+        return d;
+      }
       const session = await base44.entities.Session.update(editData.id, data);
       queryClient.invalidateQueries({ queryKey: ['sessions'] });
       await syncToGCal({ ...data, id: editData.id, google_event_id: editData.google_event_id }, true);
@@ -126,8 +155,8 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
 
   if (!isOpen) return null;
 
-  const typeLabels = { Session: "Sesión", Meeting: "Reunión", StudioWork: "Studio Work" };
   const statusOpts = [{ v: "Scheduled", l: "Programado" }, { v: "Pending", l: "Pendiente" }, { v: "Confirmed", l: "Confirmado" }];
+  const allTypes = [...SESSION_TYPES, "Deliverable"];
 
   return (
     <AnimatePresence>
@@ -164,7 +193,7 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
             <div className="flex items-center gap-2">
               <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#ff5833", display: "inline-block", flexShrink: 0 }} />
               <h3 className="text-sm font-black text-white" style={{ letterSpacing: "-0.02em" }}>
-                {editData ? editData.title || "Editar sesión" : "Agendar sesión"}
+                {editData ? editData.title || "Editar" : "Agendar sesión"}
               </h3>
             </div>
             <button onClick={onClose}
@@ -179,10 +208,10 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
 
             {/* Tipo — pill selector */}
             <div className="flex gap-1.5">
-              {["Session", "Meeting", "StudioWork"].map(t => (
+              {allTypes.map(t => (
                 <button key={t} type="button"
                   onClick={() => setFormData(f => ({ ...f, type: t }))}
-                  className="flex-1 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
+                  className="flex-1 py-1.5 rounded-lg text-[10px] font-semibold transition-all"
                   style={{
                     background: formData.type === t ? "rgba(255,88,51,0.15)" : "rgba(255,255,255,0.04)",
                     border: formData.type === t ? "1px solid rgba(255,88,51,0.4)" : "1px solid rgba(255,255,255,0.07)",
@@ -197,7 +226,7 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
               <label className={label}>Título</label>
               <input type="text" required value={formData.title}
                 onChange={e => setFormData(f => ({ ...f, title: e.target.value }))}
-                className={field} placeholder="Ej: Grabación de Voces" />
+                className={field} placeholder={isDeliverable ? "Ej: Mix Voces v2" : "Ej: Grabación de Voces"} />
             </div>
 
             {/* Artista */}
@@ -211,110 +240,150 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
               </select>
             </div>
 
-            {/* Fechas */}
-            <div>
-              <p className={label}>Horario</p>
-              <div className="grid grid-cols-2 gap-2">
+            {/* Campos específicos de Entregable */}
+            {isDeliverable ? (
+              <>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className={label}>Tipo</label>
+                    <select value={formData.deliverable_type}
+                      onChange={e => setFormData(f => ({ ...f, deliverable_type: e.target.value }))}
+                      className={field} style={{ colorScheme: 'dark' }}>
+                      {DELIVERABLE_TYPES.map(dt => <option key={dt} value={dt}>{dt}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className={label}>Proyecto</label>
+                    <select value={formData.project_id}
+                      onChange={e => setFormData(f => ({ ...f, project_id: e.target.value }))}
+                      className={field} style={{ colorScheme: 'dark' }}>
+                      <option value="">Sin proyecto</option>
+                      {projects.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
+                    </select>
+                  </div>
+                </div>
                 <div>
-                  <p className="text-[9px] text-white/20 uppercase tracking-widest mb-1">Inicio</p>
-                  <input type="datetime-local" required value={formData.start_time}
-                    onChange={e => handleStartChange(e.target.value)}
+                  <label className={label}>Fecha límite</label>
+                  <input type="datetime-local" value={formData.due_date_time}
+                    onChange={e => setFormData(f => ({ ...f, due_date_time: e.target.value }))}
                     className={field}
                     style={{ colorScheme: 'dark', fontSize: '10px', padding: '6px 8px' }} />
                 </div>
                 <div>
-                  <p className="text-[9px] text-white/20 uppercase tracking-widest mb-1">
-                    Fin <span style={{ color: "rgba(255,88,51,0.5)", fontSize: 8 }}>+2h auto</span>
-                  </p>
-                  <input type="datetime-local" required value={formData.end_time}
-                    onChange={e => setFormData(f => ({ ...f, end_time: e.target.value }))}
-                    className={field}
-                    style={{ colorScheme: 'dark', fontSize: '10px', padding: '6px 8px' }} />
+                  <label className={label}>Notas</label>
+                  <textarea value={formData.description}
+                    onChange={e => setFormData(f => ({ ...f, description: e.target.value }))}
+                    className={field} rows="1" placeholder="Detalles del entregable..." />
                 </div>
-              </div>
-            </div>
-
-            {/* Ubicación & Estado */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <div>
-                <label className={label}>Ubicación</label>
-                <select value={formData.location}
-                  onChange={e => setFormData(f => ({ ...f, location: e.target.value }))}
-                  className={field} style={{ colorScheme: 'dark' }}>
-                  <option value="Studio">Estudio</option>
-                  <option value="Online">Online</option>
-                  <option value="External">Externo</option>
-                </select>
-              </div>
-              <div>
-                <label className={label}>Estado</label>
-                <select value={formData.status}
-                  onChange={e => setFormData(f => ({ ...f, status: e.target.value }))}
-                  className={field} style={{ colorScheme: 'dark' }}>
-                  {statusOpts.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
-                </select>
-              </div>
-            </div>
-
-            {/* Notas + Invitados en fila */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <div>
-                <label className={label}>Notas</label>
-                <textarea value={formData.description}
-                  onChange={e => setFormData(f => ({ ...f, description: e.target.value }))}
-                  className={field} rows="1" placeholder="Objetivos, refs..." />
-              </div>
-              <div>
-                <label className={label}>Invitado</label>
-                <div className="flex gap-1.5">
-                  <input type="email" value={newAttendee}
-                    onChange={e => setNewAttendee(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addAttendee(); } }}
-                    className={field + " flex-1 min-w-0"} placeholder="email" />
-                  <button type="button" onClick={addAttendee}
-                    className="px-2 rounded-lg flex-shrink-0 transition-all"
-                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                    <Plus className="w-3 h-3 text-white/40" />
-                  </button>
+              </>
+            ) : (
+              <>
+                {/* Fechas */}
+                <div>
+                  <p className={label}>Horario</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <p className="text-[9px] text-white/20 uppercase tracking-widest mb-1">Inicio</p>
+                      <input type="datetime-local" required value={formData.start_time}
+                        onChange={e => handleStartChange(e.target.value)}
+                        className={field}
+                        style={{ colorScheme: 'dark', fontSize: '10px', padding: '6px 8px' }} />
+                    </div>
+                    <div>
+                      <p className="text-[9px] text-white/20 uppercase tracking-widest mb-1">
+                        Fin <span style={{ color: "rgba(255,88,51,0.5)", fontSize: 8 }}>+2h auto</span>
+                      </p>
+                      <input type="datetime-local" required value={formData.end_time}
+                        onChange={e => setFormData(f => ({ ...f, end_time: e.target.value }))}
+                        className={field}
+                        style={{ colorScheme: 'dark', fontSize: '10px', padding: '6px 8px' }} />
+                    </div>
+                  </div>
                 </div>
-                {formData.attendees.length > 0 && (
-                  <div className="mt-1 space-y-0.5">
-                    {formData.attendees.map(email => {
-                      const isArtist = artists.find(a => a.id === formData.artist_id)?.email === email;
-                      return (
-                        <div key={email} className="flex items-center justify-between px-2 py-1 rounded-md"
-                          style={{ background: isArtist ? "rgba(255,88,51,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${isArtist ? "rgba(255,88,51,0.2)" : "rgba(255,255,255,0.06)"}` }}>
-                          <span className="text-[10px] truncate" style={{ color: isArtist ? "#ff5833" : "rgba(255,255,255,0.5)" }}>{email}</span>
-                          <button type="button" onClick={() => removeAttendee(email)} className="text-white/20 hover:text-red-400 transition-colors ml-1 flex-shrink-0">
-                            <Trash2 className="w-2.5 h-2.5" />
-                          </button>
-                        </div>
-                      );
-                    })}
+
+                {/* Ubicación & Estado */}
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className={label}>Ubicación</label>
+                    <select value={formData.location}
+                      onChange={e => setFormData(f => ({ ...f, location: e.target.value }))}
+                      className={field} style={{ colorScheme: 'dark' }}>
+                      <option value="Studio">Estudio</option>
+                      <option value="Online">Online</option>
+                      <option value="External">Externo</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={label}>Estado</label>
+                    <select value={formData.status}
+                      onChange={e => setFormData(f => ({ ...f, status: e.target.value }))}
+                      className={field} style={{ colorScheme: 'dark' }}>
+                      {statusOpts.map(o => <option key={o.v} value={o.v}>{o.l}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Notas + Invitados */}
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className={label}>Notas</label>
+                    <textarea value={formData.description}
+                      onChange={e => setFormData(f => ({ ...f, description: e.target.value }))}
+                      className={field} rows="1" placeholder="Objetivos, refs..." />
+                  </div>
+                  <div>
+                    <label className={label}>Invitado</label>
+                    <div className="flex gap-1.5">
+                      <input type="email" value={newAttendee}
+                        onChange={e => setNewAttendee(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addAttendee(); } }}
+                        className={field + " flex-1 min-w-0"} placeholder="email" />
+                      <button type="button" onClick={addAttendee}
+                        className="px-2 rounded-lg flex-shrink-0 transition-all"
+                        style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                        <Plus className="w-3 h-3 text-white/40" />
+                      </button>
+                    </div>
+                    {formData.attendees.length > 0 && (
+                      <div className="mt-1 space-y-0.5">
+                        {formData.attendees.map(email => {
+                          const isArtist = artists.find(a => a.id === formData.artist_id)?.email === email;
+                          return (
+                            <div key={email} className="flex items-center justify-between px-2 py-1 rounded-md"
+                              style={{ background: isArtist ? "rgba(255,88,51,0.08)" : "rgba(255,255,255,0.04)", border: `1px solid ${isArtist ? "rgba(255,88,51,0.2)" : "rgba(255,255,255,0.06)"}` }}>
+                              <span className="text-[10px] truncate" style={{ color: isArtist ? "#ff5833" : "rgba(255,255,255,0.5)" }}>{email}</span>
+                              <button type="button" onClick={() => removeAttendee(email)} className="text-white/20 hover:text-red-400 transition-colors ml-1 flex-shrink-0">
+                                <Trash2 className="w-2.5 h-2.5" />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* GCal status */}
+                {gcalStatus === 'syncing' && (
+                  <div className="flex items-center gap-2 text-xs rounded-lg px-3 py-2"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.4)" }}>
+                    <div className="w-3 h-3 border-2 border-white/30 border-t-white/80 rounded-full animate-spin flex-shrink-0" />
+                    Sincronizando con Google Calendar...
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* GCal status */}
-            {gcalStatus === 'syncing' && (
-              <div className="flex items-center gap-2 text-xs rounded-lg px-3 py-2"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.4)" }}>
-                <div className="w-3 h-3 border-2 border-white/30 border-t-white/80 rounded-full animate-spin flex-shrink-0" />
-                Sincronizando con Google Calendar...
-              </div>
-            )}
-            {gcalStatus === 'success' && (
-              <div className="text-xs rounded-lg px-3 py-2"
-                style={{ background: "rgba(255,88,51,0.08)", border: "1px solid rgba(255,88,51,0.2)", color: "#ff5833" }}>
-                ✓ Sincronizado en Google Calendar
-              </div>
-            )}
-            {gcalStatus === 'error' && (
-              <div className="text-xs rounded-lg px-3 py-2"
-                style={{ background: "rgba(255,200,0,0.06)", border: "1px solid rgba(255,200,0,0.15)", color: "rgba(255,200,0,0.7)" }}>
-                ⚠ Sesión guardada. Error al sincronizar con Calendar.
-              </div>
+                {gcalStatus === 'success' && (
+                  <div className="text-xs rounded-lg px-3 py-2"
+                    style={{ background: "rgba(255,88,51,0.08)", border: "1px solid rgba(255,88,51,0.2)", color: "#ff5833" }}>
+                    ✓ Sincronizado en Google Calendar
+                  </div>
+                )}
+                {gcalStatus === 'error' && (
+                  <div className="text-xs rounded-lg px-3 py-2"
+                    style={{ background: "rgba(255,200,0,0.06)", border: "1px solid rgba(255,200,0,0.15)", color: "rgba(255,200,0,0.7)" }}>
+                    ⚠ Sesión guardada. Error al sincronizar con Calendar.
+                  </div>
+                )}
+              </>
             )}
 
             {/* Buttons */}
@@ -335,7 +404,7 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
                 }}>
                 {isPending ? (
                   <><div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Guardando...</>
-                ) : editData ? "Guardar cambios" : "Crear sesión"}
+                ) : editData ? "Guardar cambios" : isDeliverable ? "Crear entregable" : "Crear sesión"}
               </button>
             </div>
           </form>
