@@ -258,11 +258,11 @@ export default function UserProfilePanel({ currentUser, onClose }) {
   const avatarUrl = userProfile?.avatar_url || linkedArtist?.avatar_url || "";
   const initials = displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
 
-  // Catalog URL: artist dashboard or admin dashboard
-  const catalogUrl = linkedArtist
-    ? `/ArtistDashboard?artistId=${linkedArtist.id}`
-    : currentUser?.role === "admin"
-      ? "/AdminDashboard"
+  // Catalog URL: admin → AdminDashboard, artist/user → ArtistDashboard
+  const catalogUrl = currentUser?.role === "admin"
+    ? "/AdminDashboard"
+    : linkedArtist
+      ? `/ArtistDashboard?artistId=${linkedArtist.id}`
       : null;
 
   // Library items list
@@ -373,19 +373,19 @@ export default function UserProfilePanel({ currentUser, onClose }) {
             <div className="px-5 mt-3">
               <Link to={catalogUrl} onClick={onClose}>
                 <button
-                  className="w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all group"
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all group"
                   style={{
                     background: "rgba(255,255,255,0.04)",
                     border: "1px solid rgba(255,255,255,0.08)",
                   }}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
                       style={{ background: "rgba(255,255,255,0.06)" }}>
-                      <Disc3 className="w-4 h-4 text-white/50 group-hover:text-white transition-colors" />
+                      <Disc3 className="w-3.5 h-3.5 text-white/50 group-hover:text-white transition-colors" />
                     </div>
                     <div className="text-left">
-                      <p className="text-sm font-bold text-white/80 group-hover:text-white transition-colors leading-tight">
+                      <p className="text-xs font-bold text-white/70 group-hover:text-white transition-colors leading-tight">
                         Tu catálogo
                       </p>
                       {linkedArtist && (
@@ -393,7 +393,7 @@ export default function UserProfilePanel({ currentUser, onClose }) {
                       )}
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors" />
+                  <ChevronRight className="w-3.5 h-3.5 text-white/20 group-hover:text-white/40 transition-colors" />
                 </button>
               </Link>
             </div>
