@@ -427,8 +427,6 @@ export default function Explorar() {
         {profileOpen && currentUser && (
           <UserProfilePanel
             currentUser={currentUser}
-            explorarItems={items}
-            artists={artists}
             onClose={() => setProfileOpen(false)}
           />
         )}
