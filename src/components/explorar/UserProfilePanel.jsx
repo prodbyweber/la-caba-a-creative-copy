@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  X, Heart, Bookmark, Plus, Play, Music2, Search,
-  ChevronRight, Loader2, Camera, ShieldCheck, LayoutDashboard, Film
+  X, Heart, Bookmark, Plus, Play, Music2,
+  ChevronRight, Loader2, ShieldCheck, Disc3
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
@@ -243,9 +243,27 @@ export default function UserProfilePanel({ currentUser, onClose }) {
     enabled: !!currentUser?.id,
   });
 
+  // Linked artist (creator/artist account)
+  const { data: linkedArtist } = useQuery({
+    queryKey: ["linked-artist-profile", currentUser?.id],
+    queryFn: async () => {
+      const results = await base44.entities.Artist.filter({ user_id: currentUser.id });
+      return results[0] || null;
+    },
+    enabled: !!currentUser?.id,
+    staleTime: 60000,
+  });
+
   const displayName = userProfile?.display_name || currentUser?.full_name || "Usuario";
-  const avatarUrl = userProfile?.avatar_url || "";
+  const avatarUrl = userProfile?.avatar_url || linkedArtist?.avatar_url || "";
   const initials = displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
+
+  // Catalog URL: artist dashboard or admin dashboard
+  const catalogUrl = linkedArtist
+    ? `/ArtistDashboard?artistId=${linkedArtist.id}`
+    : currentUser?.role === "admin"
+      ? "/AdminDashboard"
+      : null;
 
   // Library items list
   const libraryItems = [
@@ -345,6 +363,37 @@ export default function UserProfilePanel({ currentUser, onClose }) {
                   style={{ background: "rgba(255,88,51,0.12)", border: "1px solid rgba(255,88,51,0.2)" }}>
                   <ShieldCheck className="w-3 h-3" />
                   Admin
+                </button>
+              </Link>
+            </div>
+          )}
+
+          {/* Tu catálogo — visible si tiene artista vinculado o es admin */}
+          {catalogUrl && (
+            <div className="px-5 mt-3">
+              <Link to={catalogUrl} onClick={onClose}>
+                <button
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all group"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ background: "rgba(255,255,255,0.06)" }}>
+                      <Disc3 className="w-4 h-4 text-white/50 group-hover:text-white transition-colors" />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-bold text-white/80 group-hover:text-white transition-colors leading-tight">
+                        Tu catálogo
+                      </p>
+                      {linkedArtist && (
+                        <p className="text-[10px] text-white/25 mt-0.5 leading-tight">{linkedArtist.stageName}</p>
+                      )}
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors" />
                 </button>
               </Link>
             </div>
