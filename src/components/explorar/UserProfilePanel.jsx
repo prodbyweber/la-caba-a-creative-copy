@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, Heart, Bookmark, Plus, Play, Music2,
-  ChevronRight, Loader2, ShieldCheck, Disc3
+  ChevronRight, Loader2, ShieldCheck, Disc3, Upload, Trash2, Camera
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
@@ -157,6 +157,74 @@ function CreatePlaylistModal({ onClose, onCreate }) {
         </button>
       </motion.div>
     </motion.div>
+  );
+}
+
+// ── Profile Photos Inline ─────────────────────────────────────────────────────
+function ProfilePhotosInline({ userProfile, onUpdate }) {
+  const [uploading, setUploading] = useState(false);
+  const MAX_PHOTOS = 4;
+  const photos = (userProfile?.media_items || []).filter(m => m.type === "image");
+
+  const handleUpload = async (file) => {
+    if (!file || file.size > 20 * 1024 * 1024) return;
+    if (photos.length >= MAX_PHOTOS) return;
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const newItems = [
+        ...(userProfile?.media_items || []),
+        { id: Date.now().toString(), type: "image", url: file_url, title: file.name, thumbnail: file_url },
+      ];
+      onUpdate({ media_items: newItems });
+    } finally { setUploading(false); }
+  };
+
+  const handleDelete = (photoId) => {
+    const updated = (userProfile?.media_items || []).filter(m => m.id !== photoId);
+    onUpdate({ media_items: updated });
+  };
+
+  return (
+    <div className="mt-1.5 rounded-xl overflow-hidden"
+      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
+      <div className="flex items-center justify-between px-3 py-2.5">
+        <div className="flex items-center gap-2">
+          <Camera className="w-3.5 h-3.5 text-white/30" />
+          <p className="text-xs font-bold text-white/60">Fotos de perfil</p>
+        </div>
+        <span className="text-[10px] text-white/25">{photos.length}/{MAX_PHOTOS}</span>
+      </div>
+
+      {/* Grid */}
+      <div className="px-3 pb-3">
+        <div className="grid grid-cols-4 gap-1.5">
+          {photos.map(photo => (
+            <div key={photo.id} className="group relative rounded-lg overflow-hidden bg-white/5"
+              style={{ aspectRatio: "1/1" }}>
+              <img src={photo.url} alt="" className="w-full h-full object-cover" />
+              <button
+                onClick={() => handleDelete(photo.id)}
+                className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                <Trash2 className="w-3.5 h-3.5 text-red-400" />
+              </button>
+            </div>
+          ))}
+          {photos.length < MAX_PHOTOS && (
+            <label className="relative rounded-lg overflow-hidden cursor-pointer bg-white/[0.04] border border-dashed border-white/10 hover:border-white/25 transition-colors flex items-center justify-center"
+              style={{ aspectRatio: "1/1" }}>
+              <input type="file" accept="image/*" className="hidden"
+                onChange={e => e.target.files?.[0] && handleUpload(e.target.files[0])}
+                disabled={uploading} />
+              {uploading
+                ? <Loader2 className="w-4 h-4 text-white/25 animate-spin" />
+                : <Upload className="w-4 h-4 text-white/20" />
+              }
+            </label>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -396,6 +464,33 @@ export default function UserProfilePanel({ currentUser, onClose }) {
                   <ChevronRight className="w-3.5 h-3.5 text-white/20 group-hover:text-white/40 transition-colors" />
                 </button>
               </Link>
+
+              {/* Perfil público */}
+              {userProfile?.username && (
+                <Link to={`/${userProfile.username}`} onClick={onClose}>
+                  <button
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all group mt-1.5"
+                    style={{
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                    }}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+                        style={{ background: "rgba(255,255,255,0.06)" }}>
+                        <ChevronRight className="w-3.5 h-3.5 text-white/50 group-hover:text-white transition-colors rotate-[-45deg]" />
+                      </div>
+                      <p className="text-xs font-bold text-white/70 group-hover:text-white transition-colors leading-tight">
+                        Ver perfil público
+                      </p>
+                    </div>
+                    <ChevronRight className="w-3.5 h-3.5 text-white/20 group-hover:text-white/40 transition-colors" />
+                  </button>
+                </Link>
+              )}
+
+              {/* Fotos de perfil */}
+              <ProfilePhotosInline userProfile={userProfile} onUpdate={(data) => updateProfileMutation.mutate(data)} />
             </div>
           )}
 

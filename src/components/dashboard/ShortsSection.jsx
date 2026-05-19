@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, X, Trash2, Play, Loader2, Upload, Check, Pencil, Globe, Lock, Zap, ExternalLink, Search, Music2, Users } from "lucide-react";
+import { Plus, X, Trash2, Play, Loader2, Check, Pencil, Globe, Lock, Zap, ExternalLink, Search, Music2, Users } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -104,22 +104,21 @@ function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
   const ytId = getYoutubeId(form.youtube_url);
   const ytThumb = ytId ? getThumbnail(form.youtube_url) : null;
 
-  // Cargar soundtracks públicos del artista
-  const { data: publicTracks = [] } = useQuery({
-    queryKey: ["public-tracks", artistId],
-    queryFn: async () => {
-      if (!artistId) {
-        const me = await base44.auth.me();
-        const all = await base44.entities.Track.list("-created_date", 100);
-        return all.filter(t => t.is_public === true && t.created_by === me?.email);
-      }
-      const tracks = await base44.entities.Track.filter({ artist_id: artistId, is_public: true });
-      return tracks;
-    },
+  // Cargar TODOS los soundtracks públicos (de cualquier artista)
+  const { data: allPublicTracks = [] } = useQuery({
+    queryKey: ["all-public-tracks"],
+    queryFn: async () => base44.entities.Track.filter({ is_public: true }),
     enabled: true,
   });
 
-  const selectedTrack = publicTracks.find(t => t.id === form.track_id) || null;
+  const [trackSearch, setTrackSearch] = useState("");
+  const filteredTracks = trackSearch.trim()
+    ? allPublicTracks.filter(t =>
+        t.title?.toLowerCase().includes(trackSearch.toLowerCase()) ||
+        (t.composers || []).join(" ").toLowerCase().includes(trackSearch.toLowerCase()) ||
+        (t.producers || []).join(" ").toLowerCase().includes(trackSearch.toLowerCase())
+      )
+    : allPublicTracks;
 
   const handleUpload = async (file) => {
     if (!file) return;
@@ -237,68 +236,82 @@ function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
             />
           </div>
 
-          {/* Portada */}
-          <div>
-            <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">Portada personalizada <span className="text-white/15 normal-case font-normal">(opcional)</span></label>
-            <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed border-white/10 cursor-pointer hover:border-white/25 transition-colors">
-              <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleUpload(e.target.files[0])} />
-              {uploading ? <Loader2 className="w-4 h-4 text-white/30 animate-spin" /> : <Upload className="w-4 h-4 text-white/20" />}
-              <span className="text-xs text-white/30">{form.thumbnail_url ? "✓ Portada cargada — clic para cambiar" : "Subir portada (si no, se usa miniatura de YouTube)"}</span>
-            </label>
+          {/* Portada: informativo, no editable */}
+          <div className="px-3 py-2.5 rounded-xl border border-white/[0.06] flex items-center gap-3">
+            {ytId
+              ? <img src={ytThumb} alt="" className="w-8 h-12 object-cover rounded-lg flex-shrink-0" />
+              : <div className="w-8 h-12 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0"><Zap className="w-3.5 h-3.5 text-white/20" /></div>
+            }
+            <div>
+              <p className="text-[10px] text-white/40 font-semibold">Portada</p>
+              <p className="text-[10px] text-white/20 mt-0.5">Se usa automáticamente la miniatura de YouTube</p>
+            </div>
           </div>
 
           {/* Soundtrack vinculado */}
           <div>
             <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">
-              Soundtrack <span className="text-white/15 normal-case font-normal">(opcional — solo soundtracks públicos)</span>
+              Soundtrack <span className="text-white/15 normal-case font-normal">(opcional)</span>
             </label>
-            {publicTracks.length === 0 ? (
-              <div className="px-4 py-3 rounded-xl border border-white/[0.06] text-xs text-white/25">
-                No hay soundtracks públicos disponibles. Activa un soundtrack como público para poder vincularlo.
+            <div className="space-y-2">
+              {/* Buscador */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/25 pointer-events-none" />
+                <input
+                  value={trackSearch}
+                  onChange={e => setTrackSearch(e.target.value)}
+                  className={ic + " pl-9"}
+                  placeholder="Buscar soundtrack..."
+                />
               </div>
-            ) : (
-              <div className="space-y-1.5">
-                {/* Opción vacía */}
-                <button type="button"
-                  onClick={() => setForm(f => ({ ...f, track_id: "" }))}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
-                  style={{
-                    background: !form.track_id ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.03)",
-                    border: !form.track_id ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(255,255,255,0.06)",
-                  }}>
-                  <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
-                    <Music2 className="w-3.5 h-3.5 text-white/20" />
-                  </div>
-                  <span className="text-xs text-white/40">Sin soundtrack</span>
-                </button>
-                {/* Lista de tracks públicos */}
-                <div className="max-h-40 overflow-y-auto space-y-1 pr-1">
-                  {publicTracks.map(track => (
+              {/* Sin soundtrack */}
+              <button type="button"
+                onClick={() => setForm(f => ({ ...f, track_id: "" }))}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-colors"
+                style={{
+                  background: !form.track_id ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.03)",
+                  border: !form.track_id ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(255,255,255,0.06)",
+                }}>
+                <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+                  <Music2 className="w-3.5 h-3.5 text-white/20" />
+                </div>
+                <span className="text-xs text-white/40">Sin soundtrack</span>
+              </button>
+              {/* Lista */}
+              {allPublicTracks.length === 0 ? (
+                <p className="text-[11px] text-white/20 px-3 py-2">No hay soundtracks públicos en la plataforma aún.</p>
+              ) : filteredTracks.length === 0 ? (
+                <p className="text-[11px] text-white/20 px-3 py-2">Sin resultados para "{trackSearch}"</p>
+              ) : (
+                <div className="max-h-44 overflow-y-auto space-y-1 pr-1">
+                  {filteredTracks.map(track => (
                     <button key={track.id} type="button"
                       onClick={() => setForm(f => ({ ...f, track_id: track.id }))}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-colors text-left"
                       style={{
                         background: form.track_id === track.id ? "rgba(52,211,153,0.1)" : "rgba(255,255,255,0.03)",
                         border: form.track_id === track.id ? "1px solid rgba(52,211,153,0.3)" : "1px solid rgba(255,255,255,0.06)",
                       }}>
                       {track.cover_url
                         ? <img src={track.cover_url} className="w-7 h-7 rounded-lg object-cover flex-shrink-0" />
-                        : <div className="w-7 h-7 rounded-lg bg-white/8 flex items-center justify-center flex-shrink-0">
+                        : <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
                             <Music2 className="w-3.5 h-3.5 text-white/20" />
                           </div>
                       }
                       <div className="min-w-0 flex-1">
                         <p className="text-xs font-semibold text-white truncate">{track.title}</p>
-                        {track.artists?.length > 0 && <p className="text-[10px] text-white/30 truncate">{track.artists.join(", ")}</p>}
+                        {(track.composers?.length > 0 || track.producers?.length > 0) && (
+                          <p className="text-[10px] text-white/30 truncate">
+                            {[...(track.composers || []), ...(track.producers || [])].slice(0, 2).join(", ")}
+                          </p>
+                        )}
                       </div>
-                      {form.track_id === track.id && (
-                        <Check className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-                      )}
+                      {form.track_id === track.id && <Check className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />}
                     </button>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Colaboradores */}
@@ -349,47 +362,71 @@ function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
   );
 }
 
-// ── Short Card (portrait 9:16 poster) ────────────────────────────────────────
-function ShortCard({ short, onEdit, onDelete, onTogglePublic, onPlay }) {
+// ── Short Card (portrait 9:16 poster with inline YT player) ──────────────────
+function ShortCard({ short, onEdit, onDelete, onTogglePublic }) {
+  const [playing, setPlaying] = useState(false);
   const thumb = short.thumbnail_url || getThumbnail(short.youtube_url);
   const ytId = getYoutubeId(short.youtube_url);
   const isPublic = short.is_active !== false;
 
   return (
     <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-      className="group relative flex-shrink-0 w-[110px]">
-      {/* Poster */}
-      <div className="relative rounded-xl overflow-hidden bg-black/50 cursor-pointer"
-        style={{ aspectRatio: "9/16" }}
-        onClick={() => ytId && onPlay(ytId)}>
-        {thumb
-          ? <img src={thumb} alt={short.title} className="w-full h-full object-cover" />
-          : <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
-              <Zap className="w-7 h-7 text-white/15" />
-            </div>
-        }
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+      className="group relative flex-shrink-0 w-[130px]">
+      {/* Poster / Player */}
+      <div className="relative rounded-xl overflow-hidden bg-black"
+        style={{ aspectRatio: "9/16" }}>
 
-        {/* Play button */}
-        {ytId && (
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
-              <Play className="w-4 h-4 text-black ml-0.5" fill="black" />
+        {playing && ytId ? (
+          /* Inline YouTube embed (9:16) */
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
+            className="absolute inset-0 w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        ) : (
+          <>
+            {thumb
+              ? <img src={thumb} alt={short.title} className="w-full h-full object-cover" />
+              : <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
+                  <Zap className="w-7 h-7 text-white/15" />
+                </div>
+            }
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+
+            {/* YT badge */}
+            <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold"
+              style={{ background: "rgba(255,0,0,0.75)", color: "white" }}>
+              SHORT
             </div>
-          </div>
+
+            {/* Title bottom */}
+            <div className="absolute bottom-10 left-0 right-0 px-2 pb-1">
+              <p className="text-white font-bold text-[10px] leading-tight line-clamp-2">{short.title}</p>
+            </div>
+
+            {/* Play button — centered */}
+            {ytId && (
+              <button
+                onClick={() => setPlaying(true)}
+                className="absolute inset-0 flex items-center justify-center group/play"
+              >
+                <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover/play:opacity-100 transition-opacity shadow-lg">
+                  <Play className="w-4 h-4 text-black ml-0.5" fill="black" />
+                </div>
+              </button>
+            )}
+          </>
         )}
 
-        {/* YT badge top-left */}
-        <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold"
-          style={{ background: "rgba(255,0,0,0.75)", color: "white" }}>
-          SHORT
-        </div>
-
-        {/* Title bottom */}
-        <div className="absolute bottom-0 left-0 right-0 px-2 pb-2">
-          <p className="text-white font-bold text-[10px] leading-tight line-clamp-2">{short.title}</p>
-        </div>
+        {/* Stop button when playing */}
+        {playing && (
+          <button
+            onClick={() => setPlaying(false)}
+            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/70 flex items-center justify-center z-10 hover:bg-black/90 transition-colors">
+            <X className="w-3.5 h-3.5 text-white" />
+          </button>
+        )}
       </div>
 
       {/* Action row below poster */}
