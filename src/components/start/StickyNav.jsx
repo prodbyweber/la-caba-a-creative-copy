@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import useActiveSection, { SECTIONS } from "./useActiveSection";
 
 const NAV_ITEMS = [
-  { key: "hero",     label: "Inicio",        hideOnExplorar: true },
+  { key: "hero",     label: "Da el Paso",    hideOnExplorar: true },
   { key: "about",    label: "Quiénes Somos", hideOnExplorar: true },
   { key: "artists",  label: "Creadores",     hideOnExplorar: true },
   { key: "brands",   label: "Marcas",        hideOnExplorar: true },
