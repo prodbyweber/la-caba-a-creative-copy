@@ -40,7 +40,7 @@ export default function PhotosGallery({ userProfileId }) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["user-profile-photos", activeProfileId] }),
   });
 
-  const MAX_PHOTOS = 4;
+  const MAX_PHOTOS = 6;
 
   const handleUpload = async (file) => {
     if (!file || file.size > 20 * 1024 * 1024) {
