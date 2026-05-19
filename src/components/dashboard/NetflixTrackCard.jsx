@@ -689,6 +689,26 @@ function TrackCard({ track, onEdit, isFirst }) {
             <AnimatePresence>
               {hovered && (
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.22 }} style={{ background: "#1a1a1c", overflow: "hidden", borderRadius: "0 0 0.75rem 0.75rem" }}>
+
+                  {/* YouTube inline embed in panel — active when ytPlaying */}
+                  {hasYoutube && ytPlaying && (
+                    <div style={{ position: "relative", width: "100%", height: 135 }}>
+                      <iframe
+                        src={`https://www.youtube-nocookie.com/embed/${getYoutubeId(localTrack.youtube_music_url)}?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1`}
+                        className="w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setYtPlaying(false); }}
+                        className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center"
+                        style={{ background: "rgba(0,0,0,0.7)", border: "1px solid rgba(255,255,255,0.2)", zIndex: 20 }}
+                      >
+                        <X className="w-2.5 h-2.5 text-white/80" />
+                      </button>
+                    </div>
+                  )}
+
                   <div className="px-2.5 pt-2 pb-3 space-y-1.5">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5 flex-wrap">
@@ -714,6 +734,26 @@ function TrackCard({ track, onEdit, isFirst }) {
                         {localTrack.producers?.length > 0 && localTrack.mix_engineer && " · "}
                         {localTrack.mix_engineer && `Mix: ${localTrack.mix_engineer}`}
                       </p>
+                    )}
+
+                    {/* Play button centered in panel */}
+                    {(hasAudio || hasYoutube) && !ytPlaying && (
+                      <div className="flex justify-center pt-1">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (hasAudio) { togglePlay(e); }
+                            else { stopPreview(); setYtPlaying(true); }
+                          }}
+                          className="flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-bold transition-all"
+                          style={{ background: playing ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.9)", color: playing ? "white" : "black", border: playing ? "1px solid rgba(255,255,255,0.2)" : "none" }}
+                        >
+                          {playing
+                            ? <><Pause className="w-3 h-3" fill="currentColor" /> Pausar</>
+                            : <><Play className="w-3 h-3 ml-0.5" fill="currentColor" /> {hasYoutube ? "Reproducir" : "Play"}</>
+                          }
+                        </button>
+                      </div>
                     )}
                   </div>
                 </motion.div>
