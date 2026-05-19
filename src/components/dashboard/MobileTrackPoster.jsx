@@ -321,11 +321,12 @@ export default function MobileTrackPoster({ track, onEdit }) {
 
           {/* Info button — top right */}
           <button
-            onClick={(e) => { e.stopPropagation(); setShowDetail(true); }}
-            className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center"
-            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
+            onClick={(e) => { e.stopPropagation(); e.preventDefault(); setShowDetail(true); }}
+            onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); setShowDetail(true); }}
+            className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center"
+            style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)", zIndex: 10, touchAction: "manipulation" }}
           >
-            <ChevronDown className="w-3 h-3 text-white/70" />
+            <ChevronDown className="w-3.5 h-3.5 text-white/80" />
           </button>
 
           {/* YT badge when only youtube (no mp3) */}
