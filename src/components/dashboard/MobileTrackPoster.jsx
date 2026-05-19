@@ -281,7 +281,7 @@ export default function MobileTrackPoster({ track, onEdit }) {
 
   const handleTogglePublic = useCallback(async () => {
     await base44.entities.Track.update(track.id, { is_public: !track.is_public });
-    queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
+    queryClient.invalidateQueries({ queryKey: ['tracks'] });
   }, [track, queryClient]);
 
   return (

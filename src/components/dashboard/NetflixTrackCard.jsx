@@ -74,7 +74,7 @@ function TrackEditModal({ track, onClose, onSaved }) {
       return base44.entities.Track.update(track.id, clean);
     },
     onSuccess: (updated) => {
-      queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
+      queryClient.invalidateQueries({ queryKey: ['tracks'] });
       onSaved({ ...formData, ...updated });
     },
   });
@@ -575,14 +575,14 @@ function TrackCard({ track, onEdit, isFirst }) {
     const updated = { ...localTrack, is_public: !localTrack.is_public };
     await base44.entities.Track.update(localTrack.id, { is_public: updated.is_public });
     setLocalTrack(updated);
-    queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
+    queryClient.invalidateQueries({ queryKey: ['tracks'] });
   };
 
   const handleDelete = async () => {
     if (!confirm(`¿Eliminar "${localTrack.title}"?`)) return;
     await base44.entities.Track.delete(localTrack.id);
     setShowDetail(false);
-    queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
+    queryClient.invalidateQueries({ queryKey: ['tracks'] });
   };
 
   return (
@@ -599,11 +599,14 @@ function TrackCard({ track, onEdit, isFirst }) {
           onClick={() => setShowDetail(true)}
         >
           {/* ChevronDown */}
-          <div style={{ position: "absolute", top: 8, right: 8, zIndex: 10 }} onClick={(e) => { e.stopPropagation(); setShowDetail(true); }}>
+          <button
+            style={{ position: "absolute", top: 8, right: 8, zIndex: 50, pointerEvents: "all" }}
+            onClick={(e) => { e.stopPropagation(); e.preventDefault(); setShowDetail(true); }}
+          >
             <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: "rgba(10,10,10,0.8)", border: "1px solid rgba(255,255,255,0.3)", backdropFilter: "blur(8px)" }}>
               <ChevronDown className="w-3.5 h-3.5 text-white" />
             </div>
-          </div>
+          </button>
 
           <div className="rounded-xl shadow-2xl" style={{ background: "#1a1a1c", overflow: "visible" }}>
             {hasAudio && (
