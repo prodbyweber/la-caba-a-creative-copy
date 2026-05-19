@@ -182,6 +182,46 @@
           }
         }
       }
+    },
+    "custom_playlists": {
+      "type": "array",
+      "description": "Playlists personalizadas del usuario",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "saved_shorts": {
+      "type": "array",
+      "description": "Shorts guardados desde el feed Para Ti",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "thumbnail_url": {
+            "type": "string"
+          },
+          "saved_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
     }
   },
   "required": [

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, Heart, Bookmark, Plus, Play, Music2,
-  ChevronRight, Loader2, ShieldCheck, Disc3
+  ChevronRight, Loader2, ShieldCheck, Disc3, Sparkles
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
@@ -243,6 +243,9 @@ export default function UserProfilePanel({ currentUser, onClose }) {
     enabled: !!currentUser?.id,
   });
 
+  // Saved shorts (Para Ti)
+  const savedShorts = userProfile?.saved_shorts || [];
+
   // Linked artist (creator/artist account)
   const { data: linkedArtist } = useQuery({
     queryKey: ["linked-artist-profile", currentUser?.id],
@@ -282,6 +285,14 @@ export default function UserProfilePanel({ currentUser, onClose }) {
       count: savedItems.length,
       icon: <Bookmark className="w-5 h-5 text-white" fill="white" />,
       bgColor: "linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)",
+    },
+    {
+      id: "saved_shorts",
+      name: "Para Ti",
+      subtitle: `Shorts guardados`,
+      count: savedShorts.length,
+      icon: <Sparkles className="w-5 h-5 text-white" />,
+      bgColor: "linear-gradient(135deg, #ff5833 0%, #ff8c33 100%)",
     },
     ...customPlaylists.map(pl => ({
       id: pl.id,
@@ -437,7 +448,7 @@ export default function UserProfilePanel({ currentUser, onClose }) {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                onClick={() => setActiveDetail(item.id === "likes" ? "likes" : item.id === "saves" ? "saves" : { id: item.id, name: item.name })}
+                onClick={() => setActiveDetail(item.id === "likes" ? "likes" : item.id === "saves" ? "saves" : item.id === "saved_shorts" ? "saved_shorts" : { id: item.id, name: item.name })}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.05] transition-colors text-left"
               >
                 {/* Thumbnail / icon */}
@@ -490,6 +501,21 @@ export default function UserProfilePanel({ currentUser, onClose }) {
               title="Guardados"
               icon={<Bookmark className="w-5 h-5 text-white/70" fill="currentColor" />}
               items={savedItems}
+              onBack={() => setActiveDetail(null)}
+              onPlayYt={setPlayingYt}
+            />
+          )}
+          {activeDetail === "saved_shorts" && (
+            <PlaylistDetail
+              title="Para Ti"
+              icon={<Sparkles className="w-5 h-5 text-[#ff5833]" />}
+              items={(userProfile?.saved_shorts || []).map(s => ({
+                id: s.id,
+                title: s.title,
+                thumbnail_url: s.thumbnail_url,
+                youtube_url: s.url,
+                subtitle: "Short guardado",
+              }))}
               onBack={() => setActiveDetail(null)}
               onPlayYt={setPlayingYt}
             />

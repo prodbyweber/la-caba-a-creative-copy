@@ -2,9 +2,15 @@ import React, { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import LandingEditorInner from "@/components/admin/LandingEditorInner";
 import ExplorarAdminContent from "@/components/admin/ExplorarAdminContent";
+import ParaTiAdmin from "@/components/admin/ParaTiAdmin";
 
 export default function DesignEditor() {
   const [active, setActive] = useState("landing");
+  const tabs = [
+    { key: "landing", label: "Landing" },
+    { key: "explorar", label: "Explorar" },
+    { key: "parati", label: "Para Ti" },
+  ];
 
   return (
     <AdminLayout activePage="DesignEditor">
@@ -13,33 +19,25 @@ export default function DesignEditor() {
         <div>
           <h1 className="text-base font-bold text-white tracking-tight">Design Editor</h1>
           <p className="text-[11px] text-white/25 mt-0.5">
-            {active === "landing" ? "Editor de la página de inicio" : "Editor de la plataforma Explorar"}
+            {active === "landing" ? "Editor de la página de inicio" : active === "explorar" ? "Editor de la plataforma Explorar" : "Gestión del feed Para Ti"}
           </p>
         </div>
         {/* iOS pill toggle */}
-        <div className="inline-flex bg-white/[0.05] border border-white/[0.08] rounded-xl p-1 gap-0.5">
-          <button
-            onClick={() => setActive("landing")}
-            className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200"
-            style={active === "landing" ? {
-              background: "#ffffff",
-              color: "#000000",
-              boxShadow: "0 1px 8px rgba(0,0,0,0.4)"
-            } : { color: "rgba(255,255,255,0.35)" }}
-          >
-            Landing
-          </button>
-          <button
-            onClick={() => setActive("explorar")}
-            className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200"
-            style={active === "explorar" ? {
-              background: "#ffffff",
-              color: "#000000",
-              boxShadow: "0 1px 8px rgba(0,0,0,0.4)"
-            } : { color: "rgba(255,255,255,0.35)" }}
-          >
-            Explorar
-          </button>
+        <div className="inline-flex bg-white/[0.05] border border-white/[0.08] rounded-xl p-1 gap-0.5 flex-wrap">
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActive(tab.key)}
+              className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200"
+              style={active === tab.key ? {
+                background: "#ffffff",
+                color: "#000000",
+                boxShadow: "0 1px 8px rgba(0,0,0,0.4)"
+              } : { color: "rgba(255,255,255,0.35)" }}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -48,7 +46,9 @@ export default function DesignEditor() {
 
       {/* Content — full width */}
       <div className="w-full">
-        {active === "landing" ? <LandingEditorInner /> : <ExplorarAdminContent />}
+        {active === "landing" && <LandingEditorInner />}
+        {active === "explorar" && <ExplorarAdminContent />}
+        {active === "parati" && <ParaTiAdmin />}
       </div>
     </AdminLayout>
   );

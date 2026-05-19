@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
-import { X, Heart, Share2, Music2 } from "lucide-react";
+import { X, Heart, Bookmark, Music2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 
 function getYtShortId(url) {
@@ -26,20 +26,67 @@ function useUploaderProfile(uploaderId) {
   return profile || null;
 }
 
-function Overlay({ entry, liked, setLiked }) {
-  const profile = useUploaderProfile(entry.uploader_user_id);
-  const displayName = profile?.artist_name || profile?.display_name || profile?.full_name;
-  const username = profile?.username;
-  const avatar = profile?.avatar_url || profile?.profile_photo_url;
-  const photoPosition = profile?.photo_position || "center center";
+function CreatorBadge({ uploaderUserId }) {
+  const profile = useUploaderProfile(uploaderUserId);
+  if (!profile) return null;
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({ title: entry.title || "", url: window.location.href });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-    }
-  };
+  const displayName = profile.artist_name || profile.display_name || profile.full_name;
+  const username = profile.username;
+  const avatar = profile.profile_photo_url || profile.avatar_url;
+  const photoPosition = profile.photo_position || "center center";
+
+  if (!username && !displayName) return null;
+
+  return (
+    <Link
+      to={username ? `/${username}` : "#"}
+      onClick={e => e.stopPropagation()}
+      className="flex items-center gap-2.5 mb-2.5 group w-fit"
+    >
+      {/* Avatar circle — estilo Instagram */}
+      <div
+        className="relative flex-shrink-0 w-9 h-9 rounded-full overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)",
+          padding: "2px",
+        }}
+      >
+        <div className="w-full h-full rounded-full overflow-hidden bg-black border-2 border-black">
+          {avatar ? (
+            <img src={avatar} alt={displayName} className="w-full h-full object-cover" style={{ objectPosition: photoPosition }} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-[#222]">
+              <span className="text-xs font-black text-white/60">{displayName?.[0]?.toUpperCase()}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Name + verified */}
+      <div className="flex items-center gap-1.5 min-w-0">
+        <div>
+          <div className="flex items-center gap-1">
+            <span className="text-white font-bold text-sm drop-shadow-lg leading-tight">
+              {username ? `@${username}` : displayName}
+            </span>
+            {/* Verified badge */}
+            <svg className="flex-shrink-0 w-4 h-4" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="10" fill="#ff5833" />
+              <path d="M6 10l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          {username && displayName && displayName !== username && (
+            <p className="text-white/50 text-[10px] leading-none mt-0.5">{displayName}</p>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function Overlay({ entry, currentUser, savedShortIds, onSaveToggle, saving }) {
+  const [liked, setLiked] = useState(false);
+  const isSaved = savedShortIds.has(entry.id);
 
   return (
     <div className="absolute inset-0 pointer-events-none flex flex-col justify-between">
@@ -51,37 +98,13 @@ function Overlay({ entry, liked, setLiked }) {
         className="flex items-end justify-between px-4 pb-10 pointer-events-none"
         style={{ background: "linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.4) 55%, transparent 100%)" }}
       >
-        {/* Left: user + title */}
+        {/* Left: creator + title */}
         <div className="flex-1 min-w-0 pr-4 pointer-events-auto">
-          {username && (
-            <Link
-              to={`/${username}`}
-              onClick={e => e.stopPropagation()}
-              className="flex items-center gap-2.5 mb-3 group"
-            >
-              <div
-                className="relative flex-shrink-0 w-9 h-9 rounded-full overflow-hidden border-2 shadow-lg"
-                style={{ borderColor: "rgba(255,255,255,0.25)", background: "#222" }}
-              >
-                {avatar ? (
-                  <img src={avatar} alt={displayName} className="w-full h-full object-cover" style={{ objectPosition: photoPosition }} />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-xs font-black text-white/60">{displayName?.[0]?.toUpperCase()}</span>
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center gap-1.5 min-w-0">
-                <span className="text-white font-bold text-sm drop-shadow-lg leading-tight truncate">@{username}</span>
-                <svg className="flex-shrink-0 w-4 h-4" viewBox="0 0 20 20" fill="none">
-                  <circle cx="10" cy="10" r="10" fill="#ff5833" />
-                  <path d="M6 10l3 3 5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-            </Link>
-          )}
-          <p className="text-white font-semibold text-sm leading-snug drop-shadow-lg mb-0.5"
-            style={{ fontFamily: "'Helvetica Neue', sans-serif" }}>
+          <CreatorBadge uploaderUserId={entry.uploader_user_id} />
+          <p
+            className="text-white font-semibold text-sm leading-snug drop-shadow-lg mb-0.5"
+            style={{ fontFamily: "'Helvetica Neue', sans-serif" }}
+          >
             {entry.title || entry.caption || ""}
           </p>
           {entry.caption && entry.title && (
@@ -91,16 +114,34 @@ function Overlay({ entry, liked, setLiked }) {
 
         {/* Right: actions */}
         <div className="flex flex-col gap-5 items-center flex-shrink-0 pointer-events-auto">
+          {/* Like */}
           <button onClick={() => setLiked(l => !l)} className="flex flex-col items-center gap-1">
             <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/10">
               <Heart className={`w-5 h-5 ${liked ? "fill-red-500 text-red-500" : "text-white"}`} />
             </div>
             <span className="text-white/60 text-[10px]">{liked ? "1" : ""}</span>
           </button>
-          <button onClick={handleShare} className="flex flex-col items-center gap-1">
-            <div className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/10">
-              <Share2 className="w-5 h-5 text-white" />
+
+          {/* Save */}
+          <button
+            onClick={() => onSaveToggle(entry)}
+            disabled={saving || !currentUser}
+            className="flex flex-col items-center gap-1"
+            title={currentUser ? (isSaved ? "Quitar de guardados" : "Guardar") : "Inicia sesión para guardar"}
+          >
+            <div
+              className="w-11 h-11 rounded-full backdrop-blur-sm flex items-center justify-center border transition-all"
+              style={{
+                background: isSaved ? "rgba(255,88,51,0.25)" : "rgba(0,0,0,0.4)",
+                borderColor: isSaved ? "rgba(255,88,51,0.5)" : "rgba(255,255,255,0.1)",
+              }}
+            >
+              <Bookmark
+                className="w-5 h-5 transition-all"
+                style={{ fill: isSaved ? "#ff5833" : "transparent", color: isSaved ? "#ff5833" : "white" }}
+              />
             </div>
+            <span className="text-white/60 text-[10px]">{isSaved ? "Guardado" : ""}</span>
           </button>
         </div>
       </div>
@@ -108,8 +149,7 @@ function Overlay({ entry, liked, setLiked }) {
   );
 }
 
-function FeedSlide({ entry, isActive }) {
-  const [liked, setLiked] = useState(false);
+function FeedSlide({ entry, isActive, currentUser, savedShortIds, onSaveToggle, saving }) {
   const ytId = getYtShortId(entry.url || entry.youtube_url || entry.youtube_music_url || "");
 
   if (ytId) {
@@ -125,13 +165,18 @@ function FeedSlide({ entry, isActive }) {
           style={{ pointerEvents: "all" }}
         />
         <div className="absolute inset-0" style={{ pointerEvents: "none" }}>
-          <Overlay entry={entry} liked={liked} setLiked={setLiked} />
+          <Overlay
+            entry={entry}
+            currentUser={currentUser}
+            savedShortIds={savedShortIds}
+            onSaveToggle={onSaveToggle}
+            saving={saving}
+          />
         </div>
       </div>
     );
   }
 
-  // Image
   return (
     <div className="relative w-full h-full bg-black flex items-center justify-center overflow-hidden">
       {entry.url || entry.thumbnail_url ? (
@@ -141,36 +186,80 @@ function FeedSlide({ entry, isActive }) {
           <Music2 className="w-16 h-16 text-white/10" />
         </div>
       )}
-      <Overlay entry={entry} liked={liked} setLiked={setLiked} />
+      <Overlay
+        entry={entry}
+        currentUser={currentUser}
+        savedShortIds={savedShortIds}
+        onSaveToggle={onSaveToggle}
+        saving={saving}
+      />
     </div>
   );
 }
 
 // ── Main component ──────────────────────────────────────────────────────────
 export default function ParaTiFeed({ currentUser, onClose }) {
+  const qc = useQueryClient();
   const containerRef = useRef(null);
   const slideRefs = useRef([]);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Fetch all public ExplorarItems (galleries + regular)
+  // Load user profile to get/update saved_shorts
+  const { data: userProfile } = useQuery({
+    queryKey: ["user-profile-parati", currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      const profiles = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
+      return profiles[0] || null;
+    },
+    enabled: !!currentUser?.id,
+    staleTime: 30000,
+  });
+
+  const savedShortIds = useMemo(() => {
+    const ids = new Set((userProfile?.saved_shorts || []).map(s => s.id));
+    return ids;
+  }, [userProfile]);
+
+  const saveMutation = useMutation({
+    mutationFn: async (entry) => {
+      if (!userProfile) return;
+      const current = userProfile.saved_shorts || [];
+      const alreadySaved = current.some(s => s.id === entry.id);
+      const updated = alreadySaved
+        ? current.filter(s => s.id !== entry.id)
+        : [...current, {
+            id: entry.id,
+            url: entry.url || "",
+            title: entry.title || "",
+            thumbnail_url: entry.thumbnail_url || "",
+            saved_at: new Date().toISOString(),
+          }];
+      return base44.entities.UserProfile.update(userProfile.id, { saved_shorts: updated });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["user-profile-parati", currentUser?.id] });
+      qc.invalidateQueries({ queryKey: ["user-profile-me", currentUser?.id] });
+    },
+  });
+
+  // Fetch all public ExplorarItems
   const { data: explorarItems = [] } = useQuery({
     queryKey: ["para-ti-explorar-items"],
     queryFn: () => base44.entities.ExplorarItem.filter({ is_active: true }),
     staleTime: 30000,
   });
 
-  // Fetch all public Shorts from the dashboard catalog (content_type: "short")
+  // Fetch dashboard Shorts
   const { data: dashboardShorts = [] } = useQuery({
     queryKey: ["para-ti-dashboard-shorts"],
     queryFn: () => base44.entities.ExplorarItem.filter({ content_type: "short", is_active: true }),
     staleTime: 30000,
   });
 
-  // Build feed: dashboard Shorts + gallery youtube_shorts from ExplorarItems
   const feed = useMemo(() => {
     const result = [];
 
-    // 1. Dashboard shorts (from ShortsSection / project Shorts)
     dashboardShorts.forEach(short => {
       const ytUrl = short.youtube_url || short.youtube_music_url;
       if (!ytUrl) return;
@@ -187,9 +276,8 @@ export default function ParaTiFeed({ currentUser, onClose }) {
       });
     });
 
-    // 2. Gallery youtube_shorts from ExplorarItems
     explorarItems.forEach(item => {
-      if (item.content_type === "short") return; // ya incluido arriba
+      if (item.content_type === "short") return;
       const gallery = item.gallery || [];
       gallery.forEach(g => {
         if (g.type === "youtube_short" && g.url) {
@@ -207,7 +295,6 @@ export default function ParaTiFeed({ currentUser, onClose }) {
       });
     });
 
-    // Shuffle for variety
     return result.sort(() => Math.random() - 0.5);
   }, [explorarItems, dashboardShorts]);
 
@@ -269,7 +356,14 @@ export default function ParaTiFeed({ currentUser, onClose }) {
               ref={el => slideRefs.current[i] = el}
               style={{ scrollSnapAlign: "start", height: "100dvh", width: "100%", flexShrink: 0, position: "relative" }}
             >
-              <FeedSlide entry={entry} isActive={activeIndex === i} />
+              <FeedSlide
+                entry={entry}
+                isActive={activeIndex === i}
+                currentUser={currentUser}
+                savedShortIds={savedShortIds}
+                onSaveToggle={(entry) => saveMutation.mutate(entry)}
+                saving={saveMutation.isPending}
+              />
             </div>
           ))}
         </div>
