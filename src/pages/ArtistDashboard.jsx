@@ -8,7 +8,7 @@ import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
 import ProjectsSection from "@/components/dashboard/ProjectsSection.jsx";
 import TracksSection from "@/components/dashboard/TracksSection";
-import ClipsLibrary from "@/components/clips/ClipsLibrary";
+import ShortsSection from "@/components/dashboard/ShortsSection";
 import BrandCampaignsSection from "@/components/dashboard/BrandCampaignsSection";
 import PhotosGallery from "@/components/dashboard/PhotosGallery";
 import FilmsSection from "@/components/dashboard/FilmsSection";
@@ -172,9 +172,9 @@ export default function ArtistDashboard() {
         return (
           <div key="shorts">
             <SectionLabel label="Shorts" />
-            <ClipsLibrary
+            <ShortsSection
               artistId={effectiveArtist?.id || artistId}
-              filters={{ status: "all", platform: [], artist: effectiveArtist?.id || artistId || "all", dateRange: null, search: "" }}
+              userProfileId={userProfile?.id}
             />
           </div>
         );

@@ -1,0 +1,417 @@
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Plus, X, Trash2, Play, Loader2, Upload, Check, Pencil, Globe, Lock, Zap, ExternalLink } from "lucide-react";
+import { base44 } from "@/api/base44Client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function getYoutubeId(url) {
+  if (!url) return null;
+  // Shorts: youtube.com/shorts/ID
+  const shorts = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/);
+  if (shorts) return shorts[1];
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function getThumbnail(url) {
+  const id = getYoutubeId(url);
+  return id ? `https://img.youtube.com/vi/${id}/mqdefault.jpg` : null;
+}
+
+const ic = "w-full px-3 py-2.5 bg-white/5 border border-white/[0.08] rounded-xl text-white text-sm focus:outline-none focus:border-white/25 placeholder-white/20 transition-colors";
+
+// ── Short Form Modal ──────────────────────────────────────────────────────────
+function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
+  const isEdit = !!editingShort;
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const [form, setForm] = useState(() => ({
+    title: editingShort?.title || "",
+    youtube_url: editingShort?.youtube_url || "",
+    thumbnail_url: editingShort?.thumbnail_url || "",
+    description: editingShort?.description || "",
+    year: editingShort?.year || new Date().getFullYear(),
+    credits: editingShort?.credits || [],
+  }));
+
+  const ytId = getYoutubeId(form.youtube_url);
+  const ytThumb = ytId ? getThumbnail(form.youtube_url) : null;
+  const displayThumb = form.thumbnail_url || ytThumb;
+
+  const [newCredit, setNewCredit] = useState({ role: "", name: "" });
+
+  const handleUpload = async (file) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setForm(f => ({ ...f, thumbnail_url: file_url }));
+    } finally { setUploading(false); }
+  };
+
+  const addCredit = () => {
+    if (!newCredit.role || !newCredit.name) return;
+    setForm(f => ({ ...f, credits: [...f.credits, { ...newCredit, id: Date.now().toString() }] }));
+    setNewCredit({ role: "", name: "" });
+  };
+
+  const handleSubmit = async () => {
+    if (!form.title.trim()) { alert("El título es obligatorio"); return; }
+    if (!form.youtube_url.trim()) { alert("Añade la URL del Short de YouTube"); return; }
+    if (!ytId) { alert("URL de YouTube inválida"); return; }
+    setLoading(true);
+    const payload = {
+      title: form.title,
+      content_type: "short",
+      youtube_url: form.youtube_url,
+      thumbnail_url: form.thumbnail_url || ytThumb || undefined,
+      description: form.description || undefined,
+      year: Number(form.year),
+      artist_id: artistId || undefined,
+      credits: form.credits.map(({ id: _id, ...c }) => c),
+      is_active: true,
+    };
+    try {
+      if (isEdit) {
+        await base44.entities.ExplorarItem.update(editingShort.id, payload);
+      } else {
+        await base44.entities.ExplorarItem.create(payload);
+      }
+      onSave();
+      onClose();
+    } finally { setLoading(false); }
+  };
+
+  return ReactDOM.createPortal(
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[600] bg-black/90 backdrop-blur-xl flex items-end sm:items-center justify-center p-0 sm:p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
+        transition={{ type: "spring", damping: 28, stiffness: 300 }}
+        className="bg-[#111] border border-white/[0.08] rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg overflow-hidden max-h-[92vh] flex flex-col"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06] flex-shrink-0">
+          <div>
+            <p className="text-sm font-bold text-white">{isEdit ? "Editar short" : "Nuevo short"}</p>
+            <p className="text-[10px] text-white/25 mt-0.5">YouTube Shorts / Reels / TikTok</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="overflow-y-auto flex-1 p-5 space-y-5">
+
+          {/* URL primero — preview inmediato */}
+          <div>
+            <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">URL de YouTube Shorts *</label>
+            <input
+              value={form.youtube_url}
+              onChange={e => setForm(f => ({ ...f, youtube_url: e.target.value }))}
+              className={ic}
+              placeholder="https://youtube.com/shorts/... o youtu.be/..."
+            />
+            {/* Preview thumbnail inline */}
+            {ytId && (
+              <div className="mt-2.5 relative rounded-xl overflow-hidden bg-black/50"
+                style={{ aspectRatio: "9/16", maxHeight: 200, width: "fit-content" }}>
+                <img src={ytThumb} alt="" className="h-full w-auto object-cover" />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                  <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
+                    <Play className="w-4 h-4 text-black ml-0.5" fill="black" />
+                  </div>
+                </div>
+                <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold"
+                  style={{ background: "rgba(255,0,0,0.75)", color: "white" }}>
+                  YT
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Título */}
+          <div>
+            <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">Título *</label>
+            <input
+              value={form.title}
+              onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+              className={ic}
+              placeholder="Nombre del short"
+            />
+          </div>
+
+          {/* Año + descripción */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">Año</label>
+              <input value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))}
+                className={ic} type="number" min={2000} max={2099} />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">Portada (opc.)</label>
+              <label className="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-white/10 cursor-pointer hover:border-white/25 transition-colors">
+                <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleUpload(e.target.files[0])} />
+                {uploading ? <Loader2 className="w-4 h-4 text-white/30 animate-spin" /> : <Upload className="w-4 h-4 text-white/20" />}
+                <span className="text-[11px] text-white/25">{form.thumbnail_url ? "Cambiada ✓" : "Subir imagen"}</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">Descripción</label>
+            <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+              className={ic + " resize-none"} rows={2} placeholder="Descripción o notas del short" />
+          </div>
+
+          {/* Créditos */}
+          <div className="space-y-3">
+            <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Créditos</p>
+            <div className="grid grid-cols-2 gap-2">
+              <input value={newCredit.role} onChange={e => setNewCredit(c => ({ ...c, role: e.target.value }))}
+                className={ic} placeholder="Rol (ej: Dirección)" />
+              <input value={newCredit.name} onChange={e => setNewCredit(c => ({ ...c, name: e.target.value }))}
+                onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addCredit())}
+                className={ic} placeholder="Nombre" />
+            </div>
+            <button type="button" onClick={addCredit}
+              disabled={!newCredit.role || !newCredit.name}
+              className="w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-semibold disabled:opacity-30 flex items-center justify-center gap-1.5 transition-colors">
+              <Plus className="w-3.5 h-3.5" /> Añadir crédito
+            </button>
+            {form.credits.length > 0 && (
+              <div className="space-y-1.5">
+                {form.credits.map((c, i) => (
+                  <div key={c.id || i} className="flex items-center justify-between px-3 py-2 bg-white/5 rounded-lg">
+                    <span className="text-xs text-white/60">{c.role} — {c.name}</span>
+                    <button type="button" onClick={() => setForm(f => ({ ...f, credits: f.credits.filter((_, j) => j !== i) }))}
+                      className="p-1 hover:bg-red-500/20 rounded text-white/30 hover:text-red-400 transition-colors">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex gap-2 p-5 border-t border-white/[0.06] flex-shrink-0">
+          <button type="button" onClick={onClose}
+            className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white text-sm font-semibold transition-colors">
+            Cancelar
+          </button>
+          <button type="button" onClick={handleSubmit} disabled={loading}
+            className="flex-1 py-2.5 rounded-xl bg-white text-black text-sm font-bold hover:bg-white/90 disabled:opacity-30 flex items-center justify-center gap-2 transition-colors">
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Check className="w-4 h-4" /> {isEdit ? "Guardar" : "Añadir short"}</>}
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>,
+    document.body
+  );
+}
+
+// ── Short Card (portrait 9:16 poster) ────────────────────────────────────────
+function ShortCard({ short, onEdit, onDelete, onTogglePublic, onPlay }) {
+  const thumb = short.thumbnail_url || getThumbnail(short.youtube_url);
+  const ytId = getYoutubeId(short.youtube_url);
+  const isPublic = short.is_active !== false;
+
+  return (
+    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+      className="group relative flex-shrink-0 w-[110px]">
+      {/* Poster */}
+      <div className="relative rounded-xl overflow-hidden bg-black/50 cursor-pointer"
+        style={{ aspectRatio: "9/16" }}
+        onClick={() => ytId && onPlay(ytId)}>
+        {thumb
+          ? <img src={thumb} alt={short.title} className="w-full h-full object-cover" />
+          : <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
+              <Zap className="w-7 h-7 text-white/15" />
+            </div>
+        }
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+
+        {/* Play button */}
+        {ytId && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
+              <Play className="w-4 h-4 text-black ml-0.5" fill="black" />
+            </div>
+          </div>
+        )}
+
+        {/* YT badge top-left */}
+        <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold"
+          style={{ background: "rgba(255,0,0,0.75)", color: "white" }}>
+          SHORT
+        </div>
+
+        {/* Title bottom */}
+        <div className="absolute bottom-0 left-0 right-0 px-2 pb-2">
+          <p className="text-white font-bold text-[10px] leading-tight line-clamp-2">{short.title}</p>
+        </div>
+      </div>
+
+      {/* Action row below poster */}
+      <div className="flex items-center justify-between mt-1.5 gap-1">
+        <button onClick={() => onTogglePublic(short)}
+          className={`p-1.5 rounded-lg transition-colors ${isPublic ? "bg-emerald-500/15" : "bg-white/5"}`}>
+          {isPublic ? <Globe className="w-3 h-3 text-emerald-400" /> : <Lock className="w-3 h-3 text-white/25" />}
+        </button>
+        <button onClick={() => onEdit(short)} className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+          <Pencil className="w-3 h-3 text-white/40" />
+        </button>
+        {short.youtube_url && (
+          <a href={short.youtube_url} target="_blank" rel="noopener noreferrer"
+            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+            <ExternalLink className="w-3 h-3 text-white/40" />
+          </a>
+        )}
+        <button onClick={() => onDelete(short.id)} className="p-1.5 rounded-lg bg-white/5 hover:bg-red-900/60 transition-colors">
+          <Trash2 className="w-3 h-3 text-white/30 hover:text-red-400" />
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+export default function ShortsSection({ artistId, userProfileId }) {
+  const [showModal, setShowModal] = useState(false);
+  const [editingShort, setEditingShort] = useState(null);
+  const [playingYt, setPlayingYt] = useState(null);
+  const qc = useQueryClient();
+
+  const { data: shorts = [], isLoading, refetch } = useQuery({
+    queryKey: ["artist-shorts", artistId, userProfileId],
+    queryFn: async () => {
+      let items = [];
+      if (artistId) {
+        items = await base44.entities.ExplorarItem.filter({ artist_id: artistId, content_type: "short" });
+      } else {
+        const all = await base44.entities.ExplorarItem.list("-created_date", 100);
+        const me = await base44.auth.me();
+        items = all.filter(i => i.created_by === me?.email && i.content_type === "short");
+      }
+      return items;
+    },
+    enabled: !!(artistId || userProfileId),
+  });
+
+  const handleDelete = async (id) => {
+    if (!confirm("¿Eliminar este short?")) return;
+    await base44.entities.ExplorarItem.delete(id);
+    refetch();
+  };
+
+  const handleTogglePublic = async (short) => {
+    await base44.entities.ExplorarItem.update(short.id, { is_active: !short.is_active });
+    refetch();
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ overflow: "visible" }}>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Zap className="w-4 h-4 text-white/30" />
+          <h3 className="text-sm font-bold text-white">Shorts</h3>
+          {shorts.length > 0 && (
+            <span className="text-[10px] text-white/25 px-1.5 py-0.5 bg-white/5 rounded-full">{shorts.length}</span>
+          )}
+        </div>
+        <button
+          onClick={() => { setEditingShort(null); setShowModal(true); }}
+          className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/60 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-all"
+        >
+          <Plus className="w-3 h-3" />
+          <span className="hidden lg:inline">Nuevo short</span>
+        </button>
+      </div>
+
+      {/* Content */}
+      {isLoading ? (
+        <div className="flex gap-3 overflow-hidden">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex-shrink-0 w-[110px] rounded-xl bg-white/5 animate-pulse" style={{ aspectRatio: "9/16" }} />
+          ))}
+        </div>
+      ) : shorts.length === 0 ? (
+        <button
+          onClick={() => setShowModal(true)}
+          className="w-full py-16 rounded-2xl border border-dashed border-white/[0.06] flex flex-col items-center gap-3 hover:border-white/15 transition-colors"
+        >
+          <Zap className="w-8 h-8 text-white/10" />
+          <div className="text-center">
+            <p className="text-xs text-white/25">Sin shorts aún</p>
+            <p className="text-[10px] text-white/[0.12] mt-0.5">Añade tus YouTube Shorts con un link</p>
+          </div>
+        </button>
+      ) : (
+        <div style={{ overflowX: "auto", overflowY: "visible", scrollbarWidth: "none", msOverflowStyle: "none" }}>
+          <div className="flex gap-3 pb-2" style={{ width: "max-content" }}>
+            {shorts.map(short => (
+              <ShortCard
+                key={short.id}
+                short={short}
+                onEdit={s => { setEditingShort(s); setShowModal(true); }}
+                onDelete={handleDelete}
+                onTogglePublic={handleTogglePublic}
+                onPlay={setPlayingYt}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Form modal */}
+      <AnimatePresence>
+        {showModal && (
+          <ShortFormModal
+            onClose={() => { setShowModal(false); setEditingShort(null); }}
+            onSave={() => { refetch(); qc.invalidateQueries({ queryKey: ["explorar-items"] }); }}
+            artistId={artistId}
+            editingShort={editingShort}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* YouTube player overlay */}
+      <AnimatePresence>
+        {playingYt && ReactDOM.createPortal(
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[700] bg-black/95 flex items-center justify-center p-4"
+            onClick={() => setPlayingYt(null)}>
+            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}
+              className="relative w-full max-w-xs" onClick={e => e.stopPropagation()}>
+              <button onClick={() => setPlayingYt(null)}
+                className="absolute -top-10 right-0 p-2 text-white/50 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+              {/* 9:16 player for shorts */}
+              <div className="relative rounded-xl overflow-hidden" style={{ paddingBottom: "177.78%" }}>
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${playingYt}?autoplay=1&rel=0`}
+                  className="absolute inset-0 w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </motion.div>
+          </motion.div>,
+          document.body
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
