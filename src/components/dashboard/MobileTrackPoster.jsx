@@ -258,9 +258,6 @@ export default function MobileTrackPoster({ track, onEdit }) {
   const globalAudio = useGlobalAudio();
   const isPlaying = globalAudio?.playingTrack?.id === track.id;
   const queryClient = useQueryClient();
-  // Track touch start position to distinguish tap from scroll
-  const touchStartX = useRef(0);
-  const touchStartY = useRef(0);
 
   const status = statusConfig[track.status] || statusConfig.idea;
   const hasAudio = !!track.audio_file_url;
@@ -268,7 +265,7 @@ export default function MobileTrackPoster({ track, onEdit }) {
   const hasPlayable = hasAudio || hasYoutube;
 
   const handleTogglePlay = useCallback((e) => {
-    if (e) e.stopPropagation();
+    if (e) { e.stopPropagation(); e.preventDefault(); }
     if (hasAudio) {
       if (isPlaying) globalAudio.pauseTrack();
       else globalAudio.playTrack(track);
@@ -282,33 +279,18 @@ export default function MobileTrackPoster({ track, onEdit }) {
     queryClient.invalidateQueries({ queryKey: ['tracks'] });
   }, [track, queryClient]);
 
-  // Tap detection: only open detail if finger barely moved (not a scroll gesture)
-  const handleTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEnd = (e) => {
-    const dx = Math.abs(e.changedTouches[0].clientX - touchStartX.current);
-    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
-    if (dx < 8 && dy < 8) {
-      e.preventDefault();
-      setShowDetail(true);
-    }
-  };
+  const openDetail = useCallback((e) => {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    setShowDetail(true);
+  }, []);
 
   return (
     <>
       <div className="flex-shrink-0 w-[110px]" style={{ position: "relative" }}>
-        {/* Poster wrapper — tap opens detail, scroll is allowed */}
-        <div
-          className="relative mb-1.5 cursor-pointer"
-          style={{ aspectRatio: "2/3", position: "relative" }}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
-          onClick={() => setShowDetail(true)}
-        >
-          {/* Inner clipped visual layer */}
+        {/* Poster area */}
+        <div className="relative mb-1.5" style={{ aspectRatio: "2/3" }}>
+
+          {/* Visual layer (overflow hidden for image crop) */}
           <div className="absolute inset-0 rounded-lg overflow-hidden">
             <motion.div
               className="absolute inset-0"
@@ -323,7 +305,7 @@ export default function MobileTrackPoster({ track, onEdit }) {
                   : null;
                 const src = track.cover_url || ytThumb;
                 return src ? (
-                  <img src={src} alt={track.title} className="w-full h-full object-cover" />
+                  <img src={src} alt={track.title} className="w-full h-full object-cover" draggable={false} />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-[#1e1a3e] via-[#1a1a2e] to-[#0a0a0b] flex flex-col items-center justify-center gap-1.5">
                     <Music2 className="w-7 h-7 text-white/15" />
@@ -333,12 +315,12 @@ export default function MobileTrackPoster({ track, onEdit }) {
               })()}
             </motion.div>
 
-            {/* Bottom gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent" />
+            {/* Gradients */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent pointer-events-none" />
 
             {/* YT badge */}
             {!hasAudio && hasYoutube && (
-              <div className="absolute top-1.5 left-1.5 flex items-center gap-0.5 px-1 py-0.5 rounded"
+              <div className="absolute top-1.5 left-1.5 flex items-center gap-0.5 px-1 py-0.5 rounded pointer-events-none"
                 style={{ background: "rgba(255,0,0,0.2)", border: "1px solid rgba(255,80,80,0.3)" }}>
                 <svg className="w-2.5 h-2.5 text-red-400" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
@@ -346,31 +328,12 @@ export default function MobileTrackPoster({ track, onEdit }) {
               </div>
             )}
 
-            {/* Bottom: title + play button */}
-            <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 flex items-end justify-between gap-1">
-              <p className="text-white font-bold text-[11px] leading-tight line-clamp-2 flex-1">{track.title}</p>
-              {hasPlayable && (
-                <button
-                  onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); handleTogglePlay(e); }}
-                  onClick={(e) => { e.stopPropagation(); handleTogglePlay(e); }}
-                  className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-90"
-                  style={{
-                    background: isPlaying ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.88)",
-                    border: isPlaying ? "1px solid rgba(255,255,255,0.3)" : "none",
-                    backdropFilter: "blur(4px)",
-                    touchAction: "manipulation",
-                    WebkitTapHighlightColor: "transparent",
-                  }}
-                >
-                  {isPlaying
-                    ? <Pause className="w-3 h-3 text-white" fill="white" />
-                    : <Play className="w-3 h-3 text-black ml-0.5" fill="black" />
-                  }
-                </button>
-              )}
+            {/* Title (pointer-events none so taps fall through to button below) */}
+            <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 pointer-events-none">
+              <p className="text-white font-bold text-[11px] leading-tight line-clamp-2">{track.title}</p>
             </div>
 
-            {/* Waveform when playing */}
+            {/* Waveform */}
             <AnimatePresence>
               {isPlaying && (
                 <motion.div
@@ -383,21 +346,45 @@ export default function MobileTrackPoster({ track, onEdit }) {
             </AnimatePresence>
           </div>
 
-          {/* Info button — outside overflow:hidden so iOS doesn't clip tap area */}
+          {/* ── FULL-CARD TAP TARGET (outside overflow:hidden) ── */}
+          {/* Covers the entire poster; sends tap to openDetail except play-btn zone */}
           <button
-            onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); setShowDetail(true); }}
-            onClick={(e) => { e.stopPropagation(); e.preventDefault(); setShowDetail(true); }}
-            className="absolute top-1.5 right-1.5 w-8 h-8 rounded-full flex items-center justify-center"
+            onClick={openDetail}
+            aria-label="Ver créditos"
             style={{
-              background: "rgba(0,0,0,0.7)",
-              backdropFilter: "blur(4px)",
-              zIndex: 30,
+              position: "absolute", inset: 0,
+              background: "transparent",
+              border: "none", padding: 0, margin: 0,
+              cursor: "pointer",
+              zIndex: 10,
               touchAction: "manipulation",
               WebkitTapHighlightColor: "transparent",
+              WebkitAppearance: "none",
             }}
-          >
-            <ChevronDown className="w-4 h-4 text-white" />
-          </button>
+          />
+
+          {/* Play button — above the full-card tap layer */}
+          {hasPlayable && (
+            <button
+              onClick={handleTogglePlay}
+              aria-label={isPlaying ? "Pausar" : "Reproducir"}
+              className="absolute bottom-2 right-2 flex items-center justify-center rounded-full active:scale-90 transition-transform"
+              style={{
+                width: 28, height: 28,
+                background: isPlaying ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.88)",
+                border: isPlaying ? "1px solid rgba(255,255,255,0.3)" : "none",
+                backdropFilter: "blur(4px)",
+                zIndex: 20,
+                touchAction: "manipulation",
+                WebkitTapHighlightColor: "transparent",
+              }}
+            >
+              {isPlaying
+                ? <Pause className="w-3 h-3 text-white" fill="white" />
+                : <Play className="w-3 h-3 text-black ml-0.5" fill="black" />
+              }
+            </button>
+          )}
         </div>
 
         {/* Status label */}
