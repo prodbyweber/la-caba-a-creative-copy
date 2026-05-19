@@ -258,23 +258,21 @@ export default function MobileTrackPoster({ track, onEdit }) {
   const globalAudio = useGlobalAudio();
   const isPlaying = globalAudio?.playingTrack?.id === track.id;
   const queryClient = useQueryClient();
+  // Track touch start position to distinguish tap from scroll
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
 
   const status = statusConfig[track.status] || statusConfig.idea;
   const hasAudio = !!track.audio_file_url;
   const hasYoutube = !!track.youtube_music_url;
   const hasPlayable = hasAudio || hasYoutube;
 
-  // Toggle play/pause using global audio
   const handleTogglePlay = useCallback((e) => {
     if (e) e.stopPropagation();
     if (hasAudio) {
-      if (isPlaying) {
-        globalAudio.pauseTrack();
-      } else {
-        globalAudio.playTrack(track);
-      }
+      if (isPlaying) globalAudio.pauseTrack();
+      else globalAudio.playTrack(track);
     } else if (hasYoutube) {
-      // For YouTube-only tracks, open the detail sheet
       setShowDetail(true);
     }
   }, [isPlaying, hasAudio, hasYoutube, globalAudio, track]);
@@ -284,19 +282,34 @@ export default function MobileTrackPoster({ track, onEdit }) {
     queryClient.invalidateQueries({ queryKey: ['tracks'] });
   }, [track, queryClient]);
 
+  // Tap detection: only open detail if finger barely moved (not a scroll gesture)
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e) => {
+    const dx = Math.abs(e.changedTouches[0].clientX - touchStartX.current);
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
+    if (dx < 8 && dy < 8) {
+      e.preventDefault();
+      setShowDetail(true);
+    }
+  };
+
   return (
     <>
-
       <div className="flex-shrink-0 w-[110px]" style={{ position: "relative" }}>
-        {/* Poster — overflow hidden only on inner visual div */}
+        {/* Poster wrapper — tap opens detail, scroll is allowed */}
         <div
           className="relative mb-1.5 cursor-pointer"
           style={{ aspectRatio: "2/3", position: "relative" }}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           onClick={() => setShowDetail(true)}
         >
           {/* Inner clipped visual layer */}
           <div className="absolute inset-0 rounded-lg overflow-hidden">
-            {/* Cover with cinematic pan when playing */}
             <motion.div
               className="absolute inset-0"
               animate={isPlaying ? { scale: 1.08, x: [0, 3, -3, 1, 0] } : { scale: 1, x: 0 }}
@@ -305,7 +318,9 @@ export default function MobileTrackPoster({ track, onEdit }) {
                 : { duration: 0.5 }}
             >
               {(() => {
-                const ytThumb = !track.cover_url && track.youtube_music_url ? `https://img.youtube.com/vi/${getYoutubeId(track.youtube_music_url)}/hqdefault.jpg` : null;
+                const ytThumb = !track.cover_url && track.youtube_music_url
+                  ? `https://img.youtube.com/vi/${getYoutubeId(track.youtube_music_url)}/hqdefault.jpg`
+                  : null;
                 const src = track.cover_url || ytThumb;
                 return src ? (
                   <img src={src} alt={track.title} className="w-full h-full object-cover" />
@@ -321,7 +336,7 @@ export default function MobileTrackPoster({ track, onEdit }) {
             {/* Bottom gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent" />
 
-            {/* YT badge when only youtube (no mp3) */}
+            {/* YT badge */}
             {!hasAudio && hasYoutube && (
               <div className="absolute top-1.5 left-1.5 flex items-center gap-0.5 px-1 py-0.5 rounded"
                 style={{ background: "rgba(255,0,0,0.2)", border: "1px solid rgba(255,80,80,0.3)" }}>
@@ -331,46 +346,46 @@ export default function MobileTrackPoster({ track, onEdit }) {
               </div>
             )}
 
-            {/* Bottom area: title + play button */}
+            {/* Bottom: title + play button */}
             <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 flex items-end justify-between gap-1">
               <p className="text-white font-bold text-[11px] leading-tight line-clamp-2 flex-1">{track.title}</p>
-
               {hasPlayable && (
                 <button
+                  onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); handleTogglePlay(e); }}
                   onClick={(e) => { e.stopPropagation(); handleTogglePlay(e); }}
-                  className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all active:scale-90"
+                  className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-90"
                   style={{
                     background: isPlaying ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.88)",
                     border: isPlaying ? "1px solid rgba(255,255,255,0.3)" : "none",
                     backdropFilter: "blur(4px)",
+                    touchAction: "manipulation",
+                    WebkitTapHighlightColor: "transparent",
                   }}
                 >
                   {isPlaying
-                    ? <Pause className="w-2.5 h-2.5 text-white" fill="white" />
-                    : <Play className="w-2.5 h-2.5 text-black ml-0.5" fill="black" />
+                    ? <Pause className="w-3 h-3 text-white" fill="white" />
+                    : <Play className="w-3 h-3 text-black ml-0.5" fill="black" />
                   }
                 </button>
               )}
             </div>
 
-            {/* Waveform when playing — center of card */}
+            {/* Waveform when playing */}
             <AnimatePresence>
               {isPlaying && (
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
                 >
                   <AudioWave small />
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>{/* end inner clipped layer */}
+          </div>
 
-          {/* Info button — OUTSIDE overflow:hidden, rendered on top */}
+          {/* Info button — outside overflow:hidden so iOS doesn't clip tap area */}
           <button
-            onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); setShowDetail(true); }}
+            onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); setShowDetail(true); }}
             onClick={(e) => { e.stopPropagation(); e.preventDefault(); setShowDetail(true); }}
             className="absolute top-1.5 right-1.5 w-8 h-8 rounded-full flex items-center justify-center"
             style={{
@@ -385,7 +400,7 @@ export default function MobileTrackPoster({ track, onEdit }) {
           </button>
         </div>
 
-        {/* Status label below poster */}
+        {/* Status label */}
         <p className="text-[10px] truncate" style={{ color: status.color + "99" }}>{status.label}</p>
       </div>
 
