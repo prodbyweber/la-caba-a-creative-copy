@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, User, Home, BookOpen, Compass } from "lucide-react";
+import { Search, User, Home, BookOpen, Compass, Sparkles } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -20,6 +20,7 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
 
   const bottomNavItems = [
     { icon: Home,     label: "Inicio",      page: "Landing" },
+    { icon: Sparkles, label: "Para Ti",     page: null, action: onParaTiOpen },
     { icon: Compass,  label: "Explorar",    page: "Explorar" },
     { icon: BookOpen, label: "Tu catálogo", page: catalogPage, highlight: true },
   ];
@@ -76,10 +77,10 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
 
         {/* Right */}
         <div className="flex items-center gap-3">
-          {/* Para Ti button */}
+          {/* Para Ti button — solo desktop */}
           <button
             onClick={onParaTiOpen}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-white/60 hover:text-white text-xs font-semibold tracking-wide"
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-white/60 hover:text-white text-xs font-semibold tracking-wide"
             style={{ fontFamily: "'Helvetica Neue', sans-serif" }}
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
@@ -126,47 +127,53 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
         >
           <div className="flex items-center justify-around px-2 pt-2 pb-3">
             {bottomNavItems.map((item) => {
-              const active = isActiveNav(item.page);
+              const active = item.page ? isActiveNav(item.page) : false;
               const Icon = item.icon;
-              return (
-                <Link key={item.label} to={createPageUrl(item.page)} className="flex-1">
-                  <button className="flex flex-col items-center gap-1 w-full py-1">
-                    <div className="relative">
-                      {item.highlight && (
-                        <div
-                          className="absolute inset-0 rounded-full blur-md opacity-40"
-                          style={{ background: "rgba(255,88,51,0.5)", transform: "scale(1.8)" }}
-                        />
-                      )}
-                      <Icon
-                        className="w-6 h-6 relative z-10 transition-colors"
-                        style={{
-                          color: active
-                            ? item.highlight ? "#ff5833" : "white"
-                            : "rgba(255,255,255,0.35)",
-                        }}
+              const inner = (
+                <button
+                  className="flex flex-col items-center gap-1 w-full py-1"
+                  onClick={item.action || undefined}
+                >
+                  <div className="relative">
+                    {item.highlight && (
+                      <div
+                        className="absolute inset-0 rounded-full blur-md opacity-40"
+                        style={{ background: "rgba(255,88,51,0.5)", transform: "scale(1.8)" }}
                       />
-                      {active && (
-                        <motion.div
-                          layoutId="explorarBottomNavDot"
-                          className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
-                          style={{ background: item.highlight ? "#ff5833" : "white" }}
-                        />
-                      )}
-                    </div>
-                    <span
-                      className="text-[10px] font-medium transition-colors leading-tight"
+                    )}
+                    <Icon
+                      className="w-6 h-6 relative z-10 transition-colors"
                       style={{
                         color: active
                           ? item.highlight ? "#ff5833" : "white"
                           : "rgba(255,255,255,0.35)",
-                        fontFamily: "'Helvetica Neue', sans-serif",
                       }}
-                    >
-                      {item.label}
-                    </span>
-                  </button>
-                </Link>
+                    />
+                    {active && (
+                      <motion.div
+                        layoutId="explorarBottomNavDot"
+                        className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                        style={{ background: item.highlight ? "#ff5833" : "white" }}
+                      />
+                    )}
+                  </div>
+                  <span
+                    className="text-[10px] font-medium transition-colors leading-tight"
+                    style={{
+                      color: active
+                        ? item.highlight ? "#ff5833" : "white"
+                        : "rgba(255,255,255,0.35)",
+                      fontFamily: "'Helvetica Neue', sans-serif",
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                </button>
+              );
+              return item.page ? (
+                <Link key={item.label} to={createPageUrl(item.page)} className="flex-1">{inner}</Link>
+              ) : (
+                <div key={item.label} className="flex-1">{inner}</div>
               );
             })}
           </div>
