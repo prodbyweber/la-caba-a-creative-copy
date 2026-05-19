@@ -176,63 +176,34 @@ export default function TracksSection({ jlyArtistId }) {
 }
 
 function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
-  // Lock body scroll while modal is open
   useEffect(() => {
     if (!isOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = prev; };
   }, [isOpen]);
-  // jlyArtistId es el ID del artista al que se vinculará el track al crearlo
-  const [formData, setFormData] = useState(track || {
-    title: "",
-    project_id: "",
-    track_number: null,
-    cover_url: "",
-    audio_file_url: "",
-    composers: [],
-    producers: [],
-    mix_engineer: "",
-    master_engineer: "",
-    dolby_atmos: false,
-    genre: "",
-    bpm: null,
-    key: "",
-    status: "idea",
-    notes: "",
-    versions: {}
+
+  const [formData, setFormData] = useState({
+    title: "", project_id: "", cover_url: "", audio_file_url: "",
+    youtube_music_url: "", composers: [], producers: [],
+    genre: "", bpm: null, key: "", status: "demo", notes: "", versions: {}
   });
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
-  const [audioMode, setAudioMode] = useState(track?.youtube_music_url ? "link" : "file");
+  const [audioMode, setAudioMode] = useState("file");
   const [newComposer, setNewComposer] = useState("");
   const [newProducer, setNewProducer] = useState("");
-
   const queryClient = useQueryClient();
 
   useEffect(() => {
     if (track) {
-      setFormData(track);
+      setFormData({ ...track });
       setAudioMode(track.youtube_music_url ? "link" : "file");
     } else {
       setFormData({
-        title: "",
-        project_id: "",
-        track_number: null,
-        cover_url: "",
-        audio_file_url: "",
-        youtube_music_url: "",
-        composers: [],
-        producers: [],
-        mix_engineer: "",
-        master_engineer: "",
-        dolby_atmos: false,
-        genre: "",
-        bpm: null,
-        key: "",
-        status: "idea",
-        notes: "",
-        versions: {}
+        title: "", project_id: "", cover_url: "", audio_file_url: "",
+        youtube_music_url: "", composers: [], producers: [],
+        genre: "", bpm: null, key: "", status: "demo", notes: "", versions: {}
       });
       setAudioMode("file");
     }
@@ -240,496 +211,263 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
 
   const saveMutation = useMutation({
     mutationFn: (data) => {
-      // Limpiar campos vacíos para no enviar strings vacíos a la BD
       const clean = Object.fromEntries(
         Object.entries(data).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
       );
-      if (track) {
-        return base44.entities.Track.update(track.id, clean);
-      } else {
-        // Siempre incluir artist_id del artista activo
-        return base44.entities.Track.create({ ...clean, artist_id: jlyArtistId });
-      }
+      if (track) return base44.entities.Track.update(track.id, clean);
+      return base44.entities.Track.create({ ...clean, artist_id: jlyArtistId });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tracks'] });
-      onClose();
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tracks'] }); onClose(); },
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!formData.title.trim()) {
-      alert('El título del track es requerido');
-      return;
-    }
-    saveMutation.mutate(formData);
-  };
-
   const handleCoverUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+    const file = e.target.files?.[0]; if (!file) return;
     setUploadingCover(true);
-    try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setFormData({ ...formData, cover_url: file_url });
-    } catch (error) {
-      console.error('Error uploading cover:', error);
-    } finally {
-      setUploadingCover(false);
-    }
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    setFormData(f => ({ ...f, cover_url: file_url }));
+    setUploadingCover(false);
   };
 
   const handleAudioUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const maxSize = 70 * 1024 * 1024; // 70MB
-    if (file.size > maxSize) {
-      alert('El archivo supera los 70MB');
-      return;
-    }
-
-    const validTypes = ['audio/mpeg'];
-    if (!validTypes.includes(file.type) && !file.name.toLowerCase().endsWith('.mp3')) {
-      alert('Solo se permiten archivos MP3');
-      return;
-    }
-
+    const file = e.target.files?.[0]; if (!file) return;
+    if (file.size > 70 * 1024 * 1024) { alert('El archivo supera los 70MB'); return; }
     setUploadingAudio(true);
-    try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setFormData({ ...formData, audio_file_url: file_url });
-    } catch (error) {
-      console.error('Error uploading audio:', error);
-    } finally {
-      setUploadingAudio(false);
-    }
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    setFormData(f => ({ ...f, audio_file_url: file_url }));
+    setUploadingAudio(false);
   };
 
-  const addComposer = () => {
-    if (newComposer.trim()) {
-      setFormData({ 
-        ...formData, 
-        composers: [...(formData.composers || []), newComposer.trim()] 
-      });
-      setNewComposer("");
-    }
+  const addTag = (field, val, setter) => {
+    if (!val.trim()) return;
+    setFormData(f => ({ ...f, [field]: [...(f[field] || []), val.trim()] }));
+    setter("");
   };
+  const removeTag = (field, idx) => setFormData(f => ({ ...f, [field]: f[field].filter((_, i) => i !== idx) }));
 
-  const removeComposer = (index) => {
-    setFormData({
-      ...formData,
-      composers: formData.composers.filter((_, i) => i !== index)
-    });
-  };
+  const STATUS_OPTIONS = [
+    { value: "demo", label: "Demo" },
+    { value: "premix", label: "Premix" },
+    { value: "completed", label: "Clean Master" },
+  ];
 
-  const addProducer = () => {
-    if (newProducer.trim()) {
-      setFormData({ 
-        ...formData, 
-        producers: [...(formData.producers || []), newProducer.trim()] 
-      });
-      setNewProducer("");
-    }
-  };
-
-  const removeProducer = (index) => {
-    setFormData({
-      ...formData,
-      producers: formData.producers.filter((_, i) => i !== index)
-    });
-  };
+  const inp = "w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 transition-colors";
+  const lbl = "block text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-1.5";
 
   if (!isOpen) return null;
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 999999 }}>
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-        />
+      <div className="fixed inset-0 flex items-end sm:items-center justify-center sm:p-4" style={{ zIndex: 999999 }}>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          onClick={onClose} className="absolute inset-0 bg-black/80 backdrop-blur-md" />
 
-        {/* Modal */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-3xl bg-[#141414] rounded-2xl border border-white/10 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 40 }}
+          transition={{ type: "spring", damping: 28, stiffness: 300 }}
+          className="relative w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+          style={{ background: "#0f0f0f", border: "1px solid rgba(255,255,255,0.07)", maxHeight: "92vh" }}
         >
           {/* Header */}
-          <div className="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-[#141414] z-10">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center">
-                <Music2 className="w-5 h-5 text-purple-400" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white">
-                  {track ? 'Editar Soundtrack' : 'Nuevo Soundtrack'}
-                </h3>
-                <p className="text-sm text-gray-500">Completa la información del soundtrack</p>
-              </div>
+          <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06] flex-shrink-0">
+            <div>
+              <h3 className="text-sm font-bold text-white tracking-tight">
+                {track ? 'Editar soundtrack' : 'Nuevo soundtrack'}
+              </h3>
+              <p className="text-[11px] text-white/25 mt-0.5">{track?.title || "Completa la información"}</p>
             </div>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
-            >
-              <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+            <button onClick={onClose} className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/8 transition-colors">
+              <X className="w-3.5 h-3.5 text-white/40" />
             </button>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {/* Cover Upload */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-3">Portada</label>
-              <div className="flex items-center gap-4">
-                <div className="w-32 h-32 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center overflow-hidden">
-                  {formData.cover_url ? (
-                    <img src={formData.cover_url} alt="Cover" className="w-full h-full object-cover" />
-                  ) : (
-                    <ImageIcon className="w-12 h-12 text-white/40" />
-                  )}
+          {/* Scrollable body */}
+          <form onSubmit={(e) => { e.preventDefault(); if (!formData.title.trim()) { alert('El título es requerido'); return; } saveMutation.mutate(formData); }}
+            className="overflow-y-auto flex-1 px-5 py-5 space-y-5">
+
+            {/* Cover + Título — row */}
+            <div className="flex gap-4 items-start">
+              {/* Cover square */}
+              <label className="cursor-pointer flex-shrink-0 relative group">
+                <div className="w-20 h-20 rounded-xl overflow-hidden flex items-center justify-center"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  {formData.cover_url
+                    ? <img src={formData.cover_url} alt="Cover" className="w-full h-full object-cover" />
+                    : <ImageIcon className="w-7 h-7 text-white/15" />}
                 </div>
-                <div className="flex-1">
-                  <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium transition-colors">
-                    <Upload className="w-4 h-4" />
-                    {uploadingCover ? 'Subiendo...' : 'Subir Portada'}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleCoverUpload}
-                      className="hidden"
-                      disabled={uploadingCover}
-                    />
-                  </label>
-                  <p className="text-xs text-gray-500 mt-2">JPG, PNG o GIF. Máx 5MB.</p>
+                {uploadingCover && (
+                  <div className="absolute inset-0 rounded-xl bg-black/60 flex items-center justify-center">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  </div>
+                )}
+                <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" disabled={uploadingCover} />
+              </label>
+
+              {/* Título + Proyecto */}
+              <div className="flex-1 space-y-3">
+                <div>
+                  <label className={lbl}>Título *</label>
+                  <input type="text" value={formData.title}
+                    onChange={(e) => setFormData(f => ({ ...f, title: e.target.value }))}
+                    placeholder="Nombre de la pista" className={inp} required />
                 </div>
+                {projects?.length > 0 && (
+                  <div>
+                    <label className={lbl}>Proyecto</label>
+                    <select value={formData.project_id}
+                      onChange={(e) => setFormData(f => ({ ...f, project_id: e.target.value }))}
+                      className={inp}>
+                      <option value="">Sin proyecto</option>
+                      {projects.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
+                    </select>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Audio — MP3 o link YouTube Music */}
+            {/* Audio */}
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <label className="block text-sm font-medium text-gray-300">Audio</label>
-                <div className="flex items-center gap-1 bg-white/5 rounded-lg p-0.5">
-                  <button
-                    type="button"
-                    onClick={() => setAudioMode("file")}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${audioMode === "file" ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"}`}
-                  >
-                    <Upload className="w-3 h-3" /> MP3
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAudioMode("link")}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${audioMode === "link" ? "bg-white/10 text-white" : "text-white/40 hover:text-white/70"}`}
-                  >
-                    <Link className="w-3 h-3" /> YouTube Music
-                  </button>
+              <div className="flex items-center justify-between mb-2">
+                <label className={lbl} style={{ marginBottom: 0 }}>Audio</label>
+                <div className="flex items-center gap-0.5 rounded-lg p-0.5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  {[{ id: "file", icon: <Upload className="w-3 h-3" />, text: "MP3" }, { id: "link", icon: <Link className="w-3 h-3" />, text: "YouTube" }].map(opt => (
+                    <button key={opt.id} type="button" onClick={() => setAudioMode(opt.id)}
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${audioMode === opt.id ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"}`}>
+                      {opt.icon} {opt.text}
+                    </button>
+                  ))}
                 </div>
               </div>
 
               {audioMode === "file" ? (
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500/20 to-blue-500/20 flex items-center justify-center flex-shrink-0">
-                    {formData.audio_file_url ? <Check className="w-7 h-7 text-emerald-400" /> : <Music2 className="w-7 h-7 text-white/40" />}
+                <label className="cursor-pointer flex items-center gap-3 px-4 py-3 rounded-xl transition-colors"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ background: formData.audio_file_url ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.06)" }}>
+                    {formData.audio_file_url ? <Check className="w-4 h-4 text-emerald-400" /> : <Music2 className="w-4 h-4 text-white/30" />}
                   </div>
-                  <div className="flex-1">
-                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium transition-colors text-sm">
-                      <Upload className="w-4 h-4" />
-                      {uploadingAudio ? 'Subiendo...' : formData.audio_file_url ? 'Cambiar MP3' : 'Subir MP3'}
-                      <input type="file" accept=".mp3,audio/mpeg" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
-                    </label>
-                    <p className="text-xs text-gray-500 mt-1.5">Solo MP3. Máx 70MB.</p>
-                    {formData.audio_file_url && <p className="text-xs text-emerald-400 mt-1">✓ MP3 cargado</p>}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-white/70">
+                      {uploadingAudio ? "Subiendo..." : formData.audio_file_url ? "MP3 cargado ✓" : "Subir MP3"}
+                    </p>
+                    <p className="text-[10px] text-white/25">Máx 70MB</p>
                   </div>
-                </div>
+                  <input type="file" accept=".mp3,audio/mpeg" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
+                </label>
               ) : (
-                <div>
-                  <input
-                    type="url"
-                    value={formData.youtube_music_url || ""}
-                    onChange={(e) => setFormData({ ...formData, youtube_music_url: e.target.value })}
-                    placeholder="https://music.youtube.com/watch?v=..."
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-red-500/50 transition-colors text-sm"
-                  />
-                  <p className="text-xs text-gray-500 mt-1.5">Link de YouTube Music o YouTube</p>
-                </div>
+                <input type="url" value={formData.youtube_music_url || ""}
+                  onChange={(e) => setFormData(f => ({ ...f, youtube_music_url: e.target.value }))}
+                  placeholder="https://music.youtube.com/watch?v=..." className={inp} />
               )}
             </div>
 
-            {/* Basic Info */}
-            <div className="grid md:grid-cols-2 gap-4">
+            {/* Técnica: Género · BPM · Tonalidad · Estado */}
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Título *</label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Nombre de la pista"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors"
-                  required
-                />
+                <label className={lbl}>Género</label>
+                <input type="text" value={formData.genre || ""}
+                  onChange={(e) => setFormData(f => ({ ...f, genre: e.target.value }))}
+                  placeholder="Trap, Pop…" className={inp} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Proyecto</label>
-                <select
-                  value={formData.project_id}
-                  onChange={(e) => setFormData({ ...formData, project_id: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500/50 transition-colors"
-                >
-                  <option value="">Sin proyecto</option>
-                  {projects && projects.length > 0 ? (
-                    projects.map((project) => (
-                      <option key={project.id} value={project.id}>
-                        {project.title}
-                      </option>
-                    ))
-                  ) : (
-                    <option disabled>No hay proyectos disponibles</option>
+                <label className={lbl}>Estado</label>
+                <div className="flex gap-1.5">
+                  {STATUS_OPTIONS.map(s => (
+                    <button key={s.value} type="button"
+                      onClick={() => setFormData(f => ({ ...f, status: s.value }))}
+                      className="flex-1 py-2 rounded-lg text-[10px] font-semibold transition-all"
+                      style={{
+                        background: formData.status === s.value ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.04)",
+                        color: formData.status === s.value ? "white" : "rgba(255,255,255,0.3)",
+                        border: formData.status === s.value ? "1px solid rgba(255,255,255,0.2)" : "1px solid rgba(255,255,255,0.06)",
+                      }}>
+                      {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className={lbl}>BPM</label>
+                <input type="number" value={formData.bpm || ""}
+                  onChange={(e) => setFormData(f => ({ ...f, bpm: parseInt(e.target.value) || null }))}
+                  placeholder="120" className={inp} />
+              </div>
+              <div>
+                <label className={lbl}>Tonalidad</label>
+                <input type="text" value={formData.key || ""}
+                  onChange={(e) => setFormData(f => ({ ...f, key: e.target.value }))}
+                  placeholder="Am, C#m…" className={inp} />
+              </div>
+            </div>
+
+            {/* Créditos */}
+            <div className="space-y-3">
+              <p className={lbl}>Créditos</p>
+              {[
+                { field: "composers", label: "Compositores", state: newComposer, setter: setNewComposer },
+                { field: "producers", label: "Productores musicales", state: newProducer, setter: setNewProducer },
+              ].map(({ field, label, state, setter }) => (
+                <div key={field}>
+                  <label className="text-[10px] text-white/25 mb-1.5 block">{label}</label>
+                  {formData[field]?.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {formData[field].map((item, i) => (
+                        <span key={i} className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs text-white/60"
+                          style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                          {item}
+                          <button type="button" onClick={() => removeTag(field, i)} className="hover:text-white/90 transition-colors ml-0.5">
+                            <X className="w-2.5 h-2.5" />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
                   )}
-                </select>
-              </div>
-            </div>
-
-            {/* Credits */}
-            <div className="space-y-4">
-              <h4 className="font-semibold text-white flex items-center gap-2">
-                <span className="w-1 h-4 bg-purple-500 rounded-full" />
-                Créditos
-              </h4>
-
-              {/* Composers */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Compositores</label>
-                <div className="space-y-2">
-                  {formData.composers?.map((composer, index) => (
-                    <div key={index} className="flex items-center gap-2 bg-white/5 px-3 py-2 rounded-lg">
-                      <span className="flex-1 text-white text-sm">{composer}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeComposer(index)}
-                        className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-red-400 transition-colors"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
                   <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={newComposer}
-                      onChange={(e) => setNewComposer(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addComposer())}
-                      placeholder="Agregar compositor"
-                      className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors"
-                    />
-                    <button
-                      type="button"
-                      onClick={addComposer}
-                      className="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-lg text-purple-400 font-medium transition-colors"
-                    >
-                      Agregar
+                    <input type="text" value={state} onChange={(e) => setter(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag(field, state, setter))}
+                      placeholder={`Añadir ${label.toLowerCase()}`} className={inp + " flex-1"} />
+                    <button type="button" onClick={() => addTag(field, state, setter)}
+                      className="px-3 py-2 rounded-xl text-xs font-medium text-white/50 hover:text-white transition-colors"
+                      style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                      +
                     </button>
                   </div>
                 </div>
-              </div>
-
-              {/* Producers */}
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Productores Musicales</label>
-                <div className="space-y-2">
-                  {formData.producers?.map((producer, index) => (
-                    <div key={index} className="flex items-center gap-2 bg-white/5 px-3 py-2 rounded-lg">
-                      <span className="flex-1 text-white text-sm">{producer}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeProducer(index)}
-                        className="p-1 hover:bg-white/10 rounded text-gray-400 hover:text-red-400 transition-colors"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={newProducer}
-                      onChange={(e) => setNewProducer(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addProducer())}
-                      placeholder="Agregar productor"
-                      className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors"
-                    />
-                    <button
-                      type="button"
-                      onClick={addProducer}
-                      className="px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/30 rounded-lg text-purple-400 font-medium transition-colors"
-                    >
-                      Agregar
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Ingeniero de Mezcla</label>
-                  <input
-                    type="text"
-                    value={formData.mix_engineer}
-                    onChange={(e) => setFormData({ ...formData, mix_engineer: e.target.value })}
-                    placeholder="Mix engineer"
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Ingeniero de Master</label>
-                  <input
-                    type="text"
-                    value={formData.master_engineer}
-                    onChange={(e) => setFormData({ ...formData, master_engineer: e.target.value })}
-                    placeholder="Mastering engineer"
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors"
-                  />
-                </div>
-                </div>
-                </div>
-
-            {/* Technical Info */}
-            <div className="space-y-4">
-              <h4 className="font-semibold text-white flex items-center gap-2">
-                <span className="w-1 h-4 bg-purple-500 rounded-full" />
-                Información Técnica
-              </h4>
-              <div className="grid md:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Género</label>
-                  <input
-                    type="text"
-                    value={formData.genre}
-                    onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
-                    placeholder="Trap, Pop..."
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">BPM</label>
-                  <input
-                    type="number"
-                    value={formData.bpm || ""}
-                    onChange={(e) => setFormData({ ...formData, bpm: parseInt(e.target.value) || null })}
-                    placeholder="120"
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Tonalidad</label>
-                  <input
-                    type="text"
-                    value={formData.key}
-                    onChange={(e) => setFormData({ ...formData, key: e.target.value })}
-                    placeholder="Am, C#m..."
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Estado</label>
-                  <select
-                    value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-purple-500/50 transition-colors"
-                  >
-                    <option value="idea">Idea</option>
-                    <option value="production">Producción</option>
-                    <option value="mixing">Mezcla</option>
-                    <option value="mastering">Masterización</option>
-                    <option value="completed">Completado</option>
-                  </select>
-                </div>
-              </div>
+              ))}
             </div>
 
-            {/* Dolby Atmos */}
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-orange-500/5 border border-orange-500/20">
-              <label className="flex items-center gap-3 cursor-pointer flex-1">
-                <div className="relative">
-                  <input
-                    type="checkbox"
-                    checked={formData.dolby_atmos}
-                    onChange={(e) => setFormData({ ...formData, dolby_atmos: e.target.checked })}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-white/10 rounded-full peer-checked:bg-orange-500 transition-colors" />
-                  <div className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full transition-transform peer-checked:translate-x-5" />
-                </div>
-                <div>
-                  <p className="font-medium text-white">Dolby Atmos</p>
-                  <p className="text-xs text-gray-500">Masterización espacial inmersiva</p>
-                </div>
-              </label>
-            </div>
-
-            {/* Carpeta Drive */}
-            <div className="space-y-2">
-              <h4 className="font-semibold text-white flex items-center gap-2">
-                <span className="w-1 h-4 bg-emerald-500 rounded-full" />
-                Carpeta de Drive
-              </h4>
-              <p className="text-xs text-white/30">Link a la carpeta de Google Drive con todas las versiones del track (WAV, stems, etc.)</p>
-              <input
-                type="text"
-                value={formData.versions?.drive_folder || ""}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  versions: { ...(formData.versions || {}), drive_folder: e.target.value }
-                })}
-                placeholder="https://drive.google.com/drive/folders/..."
-                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-xs placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
-              />
+            {/* Drive */}
+            <div>
+              <label className={lbl}>Carpeta Drive</label>
+              <input type="text" value={formData.versions?.drive_folder || ""}
+                onChange={(e) => setFormData(f => ({ ...f, versions: { ...(f.versions || {}), drive_folder: e.target.value } }))}
+                placeholder="https://drive.google.com/drive/folders/…" className={inp} />
             </div>
 
             {/* Notes */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Notas</label>
-              <textarea
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder="Notas adicionales sobre la pista..."
-                rows={3}
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-gray-600 focus:outline-none focus:border-purple-500/50 transition-colors resize-none"
-              />
+              <label className={lbl}>Notas</label>
+              <textarea value={formData.notes || ""}
+                onChange={(e) => setFormData(f => ({ ...f, notes: e.target.value }))}
+                placeholder="Notas sobre la pista…" rows={2}
+                className={inp + " resize-none"} />
             </div>
 
             {/* Actions */}
-            <div className="flex gap-3 pt-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium transition-colors"
-              >
+            <div className="flex gap-2 pt-1 pb-2">
+              <button type="button" onClick={onClose}
+                className="flex-1 py-3 rounded-xl text-sm font-medium text-white/40 hover:text-white transition-colors"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
                 Cancelar
               </button>
-              <button
-                type="submit"
-                disabled={saveMutation.isPending}
-                className="flex-1 px-4 py-3 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              >
+              <button type="submit" disabled={saveMutation.isPending}
+                className="flex-1 py-3 rounded-xl text-sm font-bold text-black transition-all disabled:opacity-40 flex items-center justify-center gap-2"
+                style={{ background: "white" }}>
                 {saveMutation.isPending ? (
-                'Guardando...'
+                  <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
                 ) : (
-                <>
-                  <Check className="w-4 h-4" />
-                  {track ? 'Guardar Cambios' : 'Crear Soundtrack'}
-                </>
+                  <><Check className="w-4 h-4" />{track ? 'Guardar' : 'Crear soundtrack'}</>
                 )}
               </button>
             </div>
