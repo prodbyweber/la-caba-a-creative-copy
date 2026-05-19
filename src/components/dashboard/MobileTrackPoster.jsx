@@ -287,93 +287,101 @@ export default function MobileTrackPoster({ track, onEdit }) {
   return (
     <>
 
-      <div className="flex-shrink-0 w-[110px]">
-        {/* Poster */}
+      <div className="flex-shrink-0 w-[110px]" style={{ position: "relative" }}>
+        {/* Poster — overflow hidden only on inner visual div */}
         <div
-          className="relative rounded-lg overflow-hidden mb-1.5 cursor-pointer group"
-          style={{ aspectRatio: "2/3" }}
+          className="relative mb-1.5 cursor-pointer"
+          style={{ aspectRatio: "2/3", position: "relative" }}
           onClick={() => setShowDetail(true)}
         >
-          {/* Cover with cinematic pan when playing */}
-          <motion.div
-            className="absolute inset-0"
-            animate={isPlaying ? { scale: 1.08, x: [0, 3, -3, 1, 0] } : { scale: 1, x: 0 }}
-            transition={isPlaying
-              ? { scale: { duration: 0.7 }, x: { duration: 8, repeat: Infinity, ease: "easeInOut" } }
-              : { duration: 0.5 }}
-          >
-            {(() => {
-              const ytThumb = !track.cover_url && track.youtube_music_url ? `https://img.youtube.com/vi/${getYoutubeId(track.youtube_music_url)}/hqdefault.jpg` : null;
-              const src = track.cover_url || ytThumb;
-              return src ? (
-                <img src={src} alt={track.title} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-[#1e1a3e] via-[#1a1a2e] to-[#0a0a0b] flex flex-col items-center justify-center gap-1.5">
-                  <Music2 className="w-7 h-7 text-white/15" />
-                  <p className="text-[8px] text-white/15 font-medium text-center px-1.5 line-clamp-2 leading-tight">{track.title}</p>
-                </div>
-              );
-            })()}
-          </motion.div>
+          {/* Inner clipped visual layer */}
+          <div className="absolute inset-0 rounded-lg overflow-hidden">
+            {/* Cover with cinematic pan when playing */}
+            <motion.div
+              className="absolute inset-0"
+              animate={isPlaying ? { scale: 1.08, x: [0, 3, -3, 1, 0] } : { scale: 1, x: 0 }}
+              transition={isPlaying
+                ? { scale: { duration: 0.7 }, x: { duration: 8, repeat: Infinity, ease: "easeInOut" } }
+                : { duration: 0.5 }}
+            >
+              {(() => {
+                const ytThumb = !track.cover_url && track.youtube_music_url ? `https://img.youtube.com/vi/${getYoutubeId(track.youtube_music_url)}/hqdefault.jpg` : null;
+                const src = track.cover_url || ytThumb;
+                return src ? (
+                  <img src={src} alt={track.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-[#1e1a3e] via-[#1a1a2e] to-[#0a0a0b] flex flex-col items-center justify-center gap-1.5">
+                    <Music2 className="w-7 h-7 text-white/15" />
+                    <p className="text-[8px] text-white/15 font-medium text-center px-1.5 line-clamp-2 leading-tight">{track.title}</p>
+                  </div>
+                );
+              })()}
+            </motion.div>
 
-          {/* Bottom gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent" />
+            {/* Bottom gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent" />
 
-          {/* Info button — top right */}
+            {/* YT badge when only youtube (no mp3) */}
+            {!hasAudio && hasYoutube && (
+              <div className="absolute top-1.5 left-1.5 flex items-center gap-0.5 px-1 py-0.5 rounded"
+                style={{ background: "rgba(255,0,0,0.2)", border: "1px solid rgba(255,80,80,0.3)" }}>
+                <svg className="w-2.5 h-2.5 text-red-400" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                </svg>
+              </div>
+            )}
+
+            {/* Bottom area: title + play button */}
+            <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 flex items-end justify-between gap-1">
+              <p className="text-white font-bold text-[11px] leading-tight line-clamp-2 flex-1">{track.title}</p>
+
+              {hasPlayable && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleTogglePlay(e); }}
+                  className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all active:scale-90"
+                  style={{
+                    background: isPlaying ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.88)",
+                    border: isPlaying ? "1px solid rgba(255,255,255,0.3)" : "none",
+                    backdropFilter: "blur(4px)",
+                  }}
+                >
+                  {isPlaying
+                    ? <Pause className="w-2.5 h-2.5 text-white" fill="white" />
+                    : <Play className="w-2.5 h-2.5 text-black ml-0.5" fill="black" />
+                  }
+                </button>
+              )}
+            </div>
+
+            {/* Waveform when playing — center of card */}
+            <AnimatePresence>
+              {isPlaying && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                >
+                  <AudioWave small />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>{/* end inner clipped layer */}
+
+          {/* Info button — OUTSIDE overflow:hidden, rendered on top */}
           <button
             onClick={(e) => { e.stopPropagation(); e.preventDefault(); setShowDetail(true); }}
             onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); setShowDetail(true); }}
             className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center"
-            style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)", zIndex: 10, touchAction: "manipulation" }}
+            style={{
+              background: "rgba(0,0,0,0.65)",
+              backdropFilter: "blur(4px)",
+              zIndex: 20,
+              touchAction: "manipulation",
+            }}
           >
             <ChevronDown className="w-3.5 h-3.5 text-white/80" />
           </button>
-
-          {/* YT badge when only youtube (no mp3) */}
-          {!hasAudio && hasYoutube && (
-            <div className="absolute top-1.5 left-1.5 flex items-center gap-0.5 px-1 py-0.5 rounded"
-              style={{ background: "rgba(255,0,0,0.2)", border: "1px solid rgba(255,80,80,0.3)" }}>
-              <svg className="w-2.5 h-2.5 text-red-400" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
-              </svg>
-            </div>
-          )}
-
-          {/* Bottom area: title + play button */}
-          <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 flex items-end justify-between gap-1">
-            <p className="text-white font-bold text-[11px] leading-tight line-clamp-2 flex-1">{track.title}</p>
-
-            {hasPlayable && (
-              <button
-                onClick={handleTogglePlay}
-                className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all active:scale-90"
-                style={{
-                  background: isPlaying ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.88)",
-                  border: isPlaying ? "1px solid rgba(255,255,255,0.3)" : "none",
-                  backdropFilter: "blur(4px)",
-                }}
-              >
-                {isPlaying
-                  ? <Pause className="w-2.5 h-2.5 text-white" fill="white" />
-                  : <Play className="w-2.5 h-2.5 text-black ml-0.5" fill="black" />
-                }
-              </button>
-            )}
-          </div>
-
-          {/* Waveform when playing — center of card */}
-          <AnimatePresence>
-            {isPlaying && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-              >
-                <AudioWave small />
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
         {/* Status label below poster */}
