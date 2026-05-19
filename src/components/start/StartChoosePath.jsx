@@ -361,6 +361,125 @@ function ContactPanel() {
   );
 }
 
+function InlineContactForm() {
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.name || !form.email || !form.message) return;
+    setSending(true);
+    try {
+      await base44.functions.invoke("sendContactEmail", { name: form.name, email: form.email, message: form.message });
+      await base44.entities.ContactLead.create({ name: form.name, email: form.email, message: form.message, status: "Nuevo" });
+      setSent(true);
+    } catch {}
+    setSending(false);
+  };
+
+  return (
+    <div style={{ marginTop: "clamp(20px, 4vw, 36px)" }}>
+      {/* Toggle */}
+      <button
+        onClick={() => setOpen(v => !v)}
+        style={{
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          background: "none", border: "none", cursor: "pointer",
+          display: "flex", alignItems: "center", gap: "10px", padding: 0,
+        }}
+      >
+        <span style={{
+          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+          fontWeight: 700, fontSize: "10px", letterSpacing: "0.35em",
+          textTransform: "uppercase", color: open ? "#ff5833" : "rgba(240,237,232,0.3)",
+          transition: "color 0.25s ease",
+        }}>
+          Contacto
+        </span>
+        <motion.span
+          animate={{ rotate: open ? 90 : 0 }}
+          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          style={{ color: open ? "#ff5833" : "rgba(240,237,232,0.25)", fontSize: "12px", lineHeight: 1, display: "inline-block" }}
+        >
+          →
+        </motion.span>
+      </button>
+
+      {/* Collapsible form */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            style={{ overflow: "hidden" }}
+          >
+            {sent ? (
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                style={{
+                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                  fontWeight: 700, fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
+                  color: "#f0ede8", letterSpacing: "-0.02em",
+                  marginTop: "clamp(20px, 3vw, 28px)",
+                }}
+              >
+                Recibido. Te contactamos pronto.
+              </motion.p>
+            ) : (
+              <form
+                onSubmit={handleSubmit}
+                style={{ display: "flex", flexDirection: "column", gap: "clamp(16px, 3vw, 22px)", marginTop: "clamp(20px, 3vw, 28px)", paddingBottom: "8px" }}
+              >
+                <div style={{ display: "flex", gap: "clamp(16px, 4vw, 40px)", flexWrap: "wrap" }}>
+                  <div style={{ flex: "1 1 140px" }}>
+                    <label style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,237,232,0.25)", display: "block", marginBottom: "8px" }}>Nombre</label>
+                    <input style={inputStyle} placeholder="Tu nombre" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
+                  </div>
+                  <div style={{ flex: "1 1 140px" }}>
+                    <label style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,237,232,0.25)", display: "block", marginBottom: "8px" }}>Email</label>
+                    <input type="email" style={inputStyle} placeholder="tu@email.com" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required />
+                  </div>
+                  <div style={{ flex: "1 1 120px" }}>
+                    <label style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,237,232,0.25)", display: "block", marginBottom: "8px" }}>Teléfono</label>
+                    <input type="tel" style={inputStyle} placeholder="+34 600 000 000" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
+                  </div>
+                </div>
+                <div>
+                  <label style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(240,237,232,0.25)", display: "block", marginBottom: "8px" }}>Proyecto</label>
+                  <textarea rows={3} style={{ ...inputStyle, resize: "none" }} placeholder="¿Quién eres? ¿Qué quieres crear?" value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} required />
+                </div>
+                <div>
+                  <button
+                    type="submit" disabled={sending}
+                    style={{
+                      fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                      fontWeight: 900, fontSize: "clamp(0.75rem, 1.5vw, 0.85rem)",
+                      letterSpacing: "0.15em", textTransform: "uppercase",
+                      background: "#f0ede8", color: "#0c0c0c", border: "none",
+                      padding: "clamp(10px, 1.5vw, 13px) clamp(20px, 3vw, 32px)",
+                      cursor: sending ? "wait" : "pointer", opacity: sending ? 0.5 : 1,
+                      transition: "background 0.2s ease, color 0.2s ease",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.color = "#fff"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "#f0ede8"; e.currentTarget.style.color = "#0c0c0c"; }}
+                  >
+                    {sending ? "Enviando..." : "Enviar →"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export default function StartChoosePath() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
@@ -489,6 +608,16 @@ export default function StartChoosePath() {
           Una reunión para conocer tu visión creativa, analizar tu proyecto y explorar cómo podemos ayudarte a desarrollar tu sonido, identidad visual y dirección artística a través de Cabaña Creative.
         </motion.p>
 
+        {/* Contacto — colapsable minimalista */}
+        <motion.div
+          initial={{ opacity: 0, x: -16 }}
+          animate={inView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.65, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          style={{ marginBottom: "clamp(24px, 5vw, 40px)" }}
+        >
+          <InlineContactForm />
+        </motion.div>
+
         {/* Paths */}
         <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
           {PATHS.map((path, i) => (
@@ -563,6 +692,7 @@ export default function StartChoosePath() {
               </AnimatePresence>
             </div>
           ))}
+
         </div>
 
 
