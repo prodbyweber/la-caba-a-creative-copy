@@ -8,6 +8,7 @@ import StartCreadores from "@/components/start/StartCreadores";
 import StartExplorar from "@/components/start/StartExplorar";
 import StartChoosePath from "@/components/start/StartChoosePath";
 import StartFooter from "@/components/start/StartFooter";
+import LandingContact from "@/components/landing/LandingContact";
 import LandingStickyNav from "@/components/landing/LandingStickyNav";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import SplashScreen from "@/components/common/SplashScreen";
@@ -64,6 +65,7 @@ export default function Landing() {
         <StartCreadores />
         <StartWhatWeDo />
         <StartChoosePath />
+        <LandingContact />
         <StartFooter />
       </div>
 
