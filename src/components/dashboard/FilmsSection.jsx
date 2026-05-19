@@ -439,137 +439,60 @@ function FilmFormModal({ onClose, onSave, artistId, allArtists = [], editingFilm
 }
 
 // ── Series Card (Netflix style) ────────────────────────────────────────────
-function SeriesCard({ film, onEdit, onDelete, onTogglePublic }) {
-  const [activeSeason, setActiveSeason] = useState(0);
-  const [activeEp, setActiveEp] = useState(0);
-  const [showPlayer, setShowPlayer] = useState(false);
-
+function SeriesCard({ film, onEdit, onDelete, onTogglePublic, onPlay }) {
   let seasons = [];
   try {
     const parsed = JSON.parse(film.description || "{}");
     if (parsed.__seasons) seasons = parsed.__seasons;
   } catch {}
 
-  const currentSeason = seasons[activeSeason];
-  const currentEp = currentSeason?.episodes?.[activeEp];
-  const ytId = getYoutubeId(currentEp?.youtube_url);
+  const totalEps = seasons.reduce((acc, s) => acc + (s.episodes?.length || 0), 0);
   const thumb = film.thumbnail_url || getYoutubeThumbnail(film.youtube_url);
   const isPublic = film.is_active !== false;
+  const firstYtId = getYoutubeId(film.youtube_url) ||
+    (seasons[0]?.episodes?.[0] ? getYoutubeId(seasons[0].episodes[0].youtube_url) : null);
 
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      className="rounded-2xl overflow-hidden border border-white/[0.07]"
-      style={{ background: "#141414" }}>
-      {/* Cover */}
-      <div className="relative aspect-video overflow-hidden">
+      className="group flex gap-3 items-center p-3 rounded-xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] transition-colors">
+      <div className="relative w-28 h-16 rounded-lg overflow-hidden bg-black/50 flex-shrink-0">
         {thumb ? (
           <img src={thumb} alt={film.title} className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] via-[#12122a] to-[#0a0a0b] flex flex-col items-center justify-center gap-2">
-            <Tv className="w-12 h-12 text-white/15" />
-            <p className="text-[10px] text-white/20 font-medium">{film.title}</p>
+          <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
+            <Tv className="w-6 h-6 text-white/15" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-        <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
-          <div>
-            <h3 className="text-white font-black text-base leading-tight">{film.title}</h3>
-            {film.genres?.length > 0 && <p className="text-white/40 text-[10px] mt-0.5">{film.genres.join(" · ")}</p>}
-          </div>
-          {(ytId || getYoutubeId(film.youtube_url)) && (
-            <button onClick={() => setShowPlayer(true)}
-              className="w-10 h-10 rounded-full bg-white flex items-center justify-center flex-shrink-0 hover:bg-white/90 active:scale-95 transition-all shadow-lg">
-              <Play className="w-4 h-4 text-black ml-0.5" fill="black" />
-            </button>
-          )}
-        </div>
-        {/* Badges */}
-        <div className="absolute top-2 right-2 flex items-center gap-1">
-          <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-purple-500/20 text-purple-400">SERIE</span>
-          <button onClick={onTogglePublic}
-            className={`p-1.5 rounded-lg transition-colors ${isPublic ? "bg-emerald-500/15" : "bg-black/60"}`}>
-            {isPublic ? <Globe className="w-3 h-3 text-emerald-400" /> : <Lock className="w-3 h-3 text-white/30" />}
+        {firstYtId && (
+          <button onClick={() => onPlay(firstYtId)}
+            className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/60 transition-colors">
+            <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
+              <Play className="w-3.5 h-3.5 text-black ml-0.5" fill="black" />
+            </div>
           </button>
-          <button onClick={() => onEdit(film)} className="p-1.5 rounded-lg bg-black/60 hover:bg-black/80 transition-colors">
-            <Pencil className="w-3 h-3 text-white/60" />
-          </button>
-          <button onClick={() => onDelete(film.id)} className="p-1.5 rounded-lg bg-black/60 hover:bg-red-900/60 transition-colors">
-            <Trash2 className="w-3 h-3 text-white/40" />
-          </button>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-semibold text-white truncate">{film.title}</p>
+        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+          <span className="text-[9px] text-white/30 uppercase tracking-wider">Serie</span>
+          {seasons.length > 0 && <span className="text-[9px] text-white/20">· {seasons.length} temp.</span>}
+          {totalEps > 0 && <span className="text-[9px] text-white/20">· {totalEps} ep.</span>}
+          {film.genres?.length > 0 && <span className="text-[9px] text-white/20">· {film.genres.slice(0,2).join(", ")}</span>}
         </div>
       </div>
-
-      {seasons.length > 0 && (
-        <div className="p-3 space-y-3">
-          {/* Season selector */}
-          {seasons.length > 1 && (
-            <div className="flex gap-1.5 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-              {seasons.map((s, si) => (
-                <button key={si} onClick={() => { setActiveSeason(si); setActiveEp(0); }}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold flex-shrink-0 transition-all"
-                  style={{
-                    background: activeSeason === si ? "white" : "rgba(255,255,255,0.06)",
-                    color: activeSeason === si ? "black" : "rgba(255,255,255,0.4)",
-                  }}>
-                  {s.title || `T${s.number || si + 1}`}
-                </button>
-              ))}
-            </div>
-          )}
-          {/* Synopsis */}
-          {currentSeason?.synopsis && (
-            <p className="text-[11px] text-white/35 leading-relaxed">{currentSeason.synopsis}</p>
-          )}
-          {/* Episodes */}
-          {currentSeason?.episodes?.length > 0 && (
-            <div className="space-y-1">
-              {currentSeason.episodes.map((ep, ei) => (
-                <button key={ei} onClick={() => { setActiveEp(ei); setShowPlayer(true); }}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${activeEp === ei ? "bg-white/10" : "hover:bg-white/[0.05]"}`}>
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: activeEp === ei ? "white" : "rgba(255,255,255,0.08)" }}>
-                    <Play className="w-3 h-3 ml-0.5" style={{ color: activeEp === ei ? "black" : "rgba(255,255,255,0.4)" }} fill={activeEp === ei ? "black" : "rgba(255,255,255,0.4)"} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-white truncate">
-                      <span className="text-white/30 mr-1.5">E{ep.number}</span>{ep.title || `Episodio ${ep.number}`}
-                    </p>
-                    {ep.synopsis && <p className="text-[10px] text-white/30 truncate">{ep.synopsis}</p>}
-                  </div>
-                  {getYoutubeId(ep.youtube_url) && <ExternalLink className="w-3 h-3 text-white/20 flex-shrink-0" />}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Player modal */}
-      <AnimatePresence>
-        {showPlayer && ytId && ReactDOM.createPortal(
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[700] bg-black/95 flex items-center justify-center p-4"
-            onClick={() => setShowPlayer(false)}>
-            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}
-              className="relative w-full max-w-3xl" onClick={e => e.stopPropagation()}>
-              <button onClick={() => setShowPlayer(false)} className="absolute -top-10 right-0 p-2 text-white/50 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-              <p className="text-white/40 text-xs mb-2 text-center">
-                {currentEp?.title || film.title}
-                {currentEp && ` — E${currentEp.number}`}
-              </p>
-              <div className="relative rounded-xl overflow-hidden" style={{ paddingBottom: "56.25%" }}>
-                <iframe src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0`}
-                  className="absolute inset-0 w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen />
-              </div>
-            </motion.div>
-          </motion.div>,
-          document.body
-        )}
-      </AnimatePresence>
+      <div className="flex items-center gap-1 flex-shrink-0">
+        <button onClick={() => onTogglePublic(film)}
+          className={`p-1.5 rounded-lg transition-colors ${isPublic ? "bg-emerald-500/15 hover:bg-emerald-500/25" : "bg-white/5 hover:bg-white/10"}`}>
+          {isPublic ? <Globe className="w-3 h-3 text-emerald-400" /> : <Lock className="w-3 h-3 text-white/30" />}
+        </button>
+        <button onClick={() => onEdit(film)} className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+          <Pencil className="w-3 h-3 text-white/40" />
+        </button>
+        <button onClick={() => onDelete(film.id)} className="p-1.5 rounded-lg bg-black/40 hover:bg-red-900/60 transition-colors">
+          <Trash2 className="w-3 h-3 text-white/40" />
+        </button>
+      </div>
     </motion.div>
   );
 }
@@ -701,12 +624,13 @@ export default function FilmsSection({ artistId, userProfileId }) {
         </button>
       ) : (
         <div className="space-y-3">
-          {/* Series — Netflix card style */}
+          {/* Series — compact row style */}
           {seriesFilms.map(film => (
             <SeriesCard key={film.id} film={film}
               onEdit={f => { setEditingFilm(f); setShowModal(true); }}
               onDelete={handleDelete}
-              onTogglePublic={handleTogglePublic} />
+              onTogglePublic={handleTogglePublic}
+              onPlay={setPlayingYt} />
           ))}
           {/* Other films — row style */}
           {otherFilms.length > 0 && (
