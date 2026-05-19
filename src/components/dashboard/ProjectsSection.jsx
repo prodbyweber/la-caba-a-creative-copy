@@ -189,15 +189,19 @@ export default function ProjectsSection({ jlyArtistId }) {
   const [emblaRef] = useEmblaCarousel({ align: "start", containScroll: "trimSnaps" });
 
   const { data: allProjects = [], isLoading } = useQuery({
-    queryKey: ["projects"],
-    queryFn: () => base44.entities.Project.list("-created_date"),
+    queryKey: ["projects", jlyArtistId || "all"],
+    queryFn: () => jlyArtistId
+      ? base44.entities.Project.filter({ artist_id: jlyArtistId })
+      : base44.entities.Project.list("-created_date"),
     initialData: [],
     staleTime: 0,
   });
 
   const { data: allTracks = [] } = useQuery({
-    queryKey: ["all-tracks"],
-    queryFn: () => base44.entities.Track.list("-created_date"),
+    queryKey: ["all-tracks", jlyArtistId || "all"],
+    queryFn: () => jlyArtistId
+      ? base44.entities.Track.filter({ artist_id: jlyArtistId })
+      : base44.entities.Track.list("-created_date"),
     initialData: [],
     staleTime: 0,
   });
@@ -215,14 +219,9 @@ export default function ProjectsSection({ jlyArtistId }) {
 
   // Only film-type projects (exclude Singles/EP)
   const FILM_TYPES = ["Film","MiniFilm","Serie","Videoclip","Visualizer","Album","ContentPack"];
-  const projects = (jlyArtistId
-    ? allProjects.filter(p => p.artist_id === jlyArtistId)
-    : allProjects
-  ).filter(p => FILM_TYPES.includes(p.type));
+  const projects = allProjects.filter(p => FILM_TYPES.includes(p.type));
 
-  const artistTracks = jlyArtistId
-    ? allTracks.filter(t => t.artist_id === jlyArtistId)
-    : allTracks;
+  const artistTracks = allTracks;
 
   const getProjectTracks = (projectId) => allTracks.filter(t => t.project_id === projectId);
   const getProjectFilm = (project) => allFilms.find(f => f.title === project.title);

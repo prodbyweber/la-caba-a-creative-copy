@@ -13,39 +13,45 @@ export default function TracksSection({ jlyArtistId }) {
 
   const queryClient = useQueryClient();
 
-  const { data: allTracks = [], isLoading } = useQuery({
-    queryKey: ['all-tracks'],
-    queryFn: () => base44.entities.Track.list('-created_date'),
+  const { data: tracks = [], isLoading } = useQuery({
+    queryKey: ['tracks', jlyArtistId || 'all'],
+    queryFn: async () => {
+      if (jlyArtistId) {
+        // Tracks directos del artista
+        const byArtist = await base44.entities.Track.filter({ artist_id: jlyArtistId });
+        // También tracks vinculados por proyecto del artista
+        const projects = await base44.entities.Project.filter({ artist_id: jlyArtistId });
+        const projectIds = new Set(projects.map(p => p.id));
+        // Buscar tracks sin artist_id pero con project_id del artista
+        if (projectIds.size > 0) {
+          const allTracks = await base44.entities.Track.list('-created_date', 200);
+          const byProject = allTracks.filter(t => !t.artist_id && projectIds.has(t.project_id));
+          const seen = new Set(byArtist.map(t => t.id));
+          return [...byArtist, ...byProject.filter(t => !seen.has(t.id))];
+        }
+        return byArtist;
+      }
+      return base44.entities.Track.list('-created_date', 50);
+    },
     initialData: [],
     staleTime: 0,
   });
 
   const { data: allProjects = [] } = useQuery({
-    queryKey: ['projects'],
-    queryFn: () => base44.entities.Project.list('-created_date'),
+    queryKey: ['projects', jlyArtistId || 'all'],
+    queryFn: () => jlyArtistId
+      ? base44.entities.Project.filter({ artist_id: jlyArtistId })
+      : base44.entities.Project.list('-created_date'),
     initialData: [],
     staleTime: 0,
   });
 
-  // Filtrar proyectos del artista JLY
-  const projects = jlyArtistId 
-    ? allProjects.filter(project => project.artist_id === jlyArtistId)
-    : allProjects;
-
-  // Filtrar tracks del artista: por proyecto O por artist_id directo
-  // Si no hay jlyArtistId, mostrar todos (admin sin artista vinculado)
-  const tracks = jlyArtistId
-    ? allTracks.filter(track => {
-        if (track.artist_id === jlyArtistId) return true;
-        const project = allProjects.find(p => p.id === track.project_id);
-        return project && project.artist_id === jlyArtistId;
-      })
-    : allTracks.slice(0, 50);
+  const projects = allProjects;
 
   const deleteMutation = useMutation({
     mutationFn: (id) => base44.entities.Track.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
+      queryClient.invalidateQueries({ queryKey: ['tracks'] });
     },
   });
 
@@ -246,9 +252,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['all-tracks'] });
       queryClient.invalidateQueries({ queryKey: ['tracks'] });
-      queryClient.refetchQueries({ queryKey: ['all-tracks'] });
       onClose();
     },
   });
