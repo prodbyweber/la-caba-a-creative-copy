@@ -370,17 +370,18 @@ export default function MobileTrackPoster({ track, onEdit }) {
 
           {/* Info button — OUTSIDE overflow:hidden, rendered on top */}
           <button
+            onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); setShowDetail(true); }}
             onClick={(e) => { e.stopPropagation(); e.preventDefault(); setShowDetail(true); }}
-            onTouchEnd={(e) => { e.stopPropagation(); e.preventDefault(); setShowDetail(true); }}
-            className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full flex items-center justify-center"
+            className="absolute top-1.5 right-1.5 w-8 h-8 rounded-full flex items-center justify-center"
             style={{
-              background: "rgba(0,0,0,0.65)",
+              background: "rgba(0,0,0,0.7)",
               backdropFilter: "blur(4px)",
-              zIndex: 20,
+              zIndex: 30,
               touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
             }}
           >
-            <ChevronDown className="w-3.5 h-3.5 text-white/80" />
+            <ChevronDown className="w-4 h-4 text-white" />
           </button>
         </div>
 

@@ -111,7 +111,7 @@ export default function TracksSection({ jlyArtistId }) {
         </div>
 
         {/* MOBILE: poster-style Netflix carousel edge-to-edge */}
-        <div className="sm:hidden -mx-4 px-4">
+        <div className="sm:hidden -mx-4 px-4" style={{ overflow: "visible" }}>
           {tracks.length === 0 ? (
             <div className="text-center py-8 px-4">
               <Music2 className="w-12 h-12 text-gray-600 mx-auto mb-3" />
@@ -123,8 +123,8 @@ export default function TracksSection({ jlyArtistId }) {
             </div>
           ) : (
             <MobileAudioProvider>
-              <div className="overflow-x-auto" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-                <div className="flex gap-2.5" style={{ width: "max-content" }}>
+              <div style={{ overflowX: "auto", overflowY: "visible", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
+                <div className="flex gap-2.5 py-1" style={{ width: "max-content" }}>
                   {tracks.map((track) => (
                     <MobileTrackPoster key={track.id} track={track} onEdit={setEditingTrack} />
                   ))}
