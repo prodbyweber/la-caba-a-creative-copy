@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, X, Trash2, Play, Loader2, Upload, Check, Pencil, Globe, Lock, Zap, ExternalLink } from "lucide-react";
+import { Plus, X, Trash2, Play, Loader2, Upload, Check, Pencil, Globe, Lock, Zap, ExternalLink, Search, Music2, Users } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -22,6 +22,71 @@ function getThumbnail(url) {
 
 const ic = "w-full px-3 py-2.5 bg-white/5 border border-white/[0.08] rounded-xl text-white text-sm focus:outline-none focus:border-white/25 placeholder-white/20 transition-colors";
 
+// ── User search picker ────────────────────────────────────────────────────────
+function UserSearchPicker({ onAdd, addedIds = [] }) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (!query.trim()) { setResults([]); return; }
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const profiles = await base44.entities.UserProfile.list("-created_date", 50);
+        const q = query.toLowerCase();
+        setResults(
+          profiles.filter(p =>
+            !addedIds.includes(p.id) &&
+            ((p.display_name || "").toLowerCase().includes(q) ||
+             (p.username || "").toLowerCase().includes(q) ||
+             (p.artist_name || "").toLowerCase().includes(q))
+          ).slice(0, 6)
+        );
+      } finally { setSearching(false); }
+    }, 300);
+    return () => clearTimeout(timerRef.current);
+  }, [query, addedIds.join(",")]);
+
+  return (
+    <div className="relative">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/25 pointer-events-none" />
+        <input
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          className={ic + " pl-9"}
+          placeholder="Buscar usuario por nombre o @usuario..."
+        />
+        {searching && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/25 animate-spin" />}
+      </div>
+      {results.length > 0 && (
+        <div className="absolute z-10 mt-1 w-full rounded-xl border border-white/[0.08] overflow-hidden"
+          style={{ background: "#1a1a1a" }}>
+          {results.map(p => (
+            <button key={p.id} type="button"
+              onClick={() => { onAdd(p); setQuery(""); setResults([]); }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/[0.06] transition-colors text-left">
+              {p.avatar_url || p.profile_photo_url
+                ? <img src={p.avatar_url || p.profile_photo_url} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                : <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                    <Users className="w-3.5 h-3.5 text-white/30" />
+                  </div>
+              }
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-white truncate">{p.display_name || p.artist_name || p.username}</p>
+                {p.username && <p className="text-[10px] text-white/30">@{p.username}</p>}
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Short Form Modal ──────────────────────────────────────────────────────────
 function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
   const isEdit = !!editingShort;
@@ -32,16 +97,29 @@ function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
     title: editingShort?.title || "",
     youtube_url: editingShort?.youtube_url || "",
     thumbnail_url: editingShort?.thumbnail_url || "",
-    description: editingShort?.description || "",
-    year: editingShort?.year || new Date().getFullYear(),
-    credits: editingShort?.credits || [],
+    collaborators: editingShort?.collaborators || [], // [{id, display_name, username, avatar_url}]
+    track_id: editingShort?.track_id || "",           // soundtrack vinculado (opcional)
   }));
 
   const ytId = getYoutubeId(form.youtube_url);
   const ytThumb = ytId ? getThumbnail(form.youtube_url) : null;
-  const displayThumb = form.thumbnail_url || ytThumb;
 
-  const [newCredit, setNewCredit] = useState({ role: "", name: "" });
+  // Cargar soundtracks públicos del artista
+  const { data: publicTracks = [] } = useQuery({
+    queryKey: ["public-tracks", artistId],
+    queryFn: async () => {
+      if (!artistId) {
+        const me = await base44.auth.me();
+        const all = await base44.entities.Track.list("-created_date", 100);
+        return all.filter(t => t.is_public === true && t.created_by === me?.email);
+      }
+      const tracks = await base44.entities.Track.filter({ artist_id: artistId, is_public: true });
+      return tracks;
+    },
+    enabled: true,
+  });
+
+  const selectedTrack = publicTracks.find(t => t.id === form.track_id) || null;
 
   const handleUpload = async (file) => {
     if (!file) return;
@@ -52,10 +130,21 @@ function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
     } finally { setUploading(false); }
   };
 
-  const addCredit = () => {
-    if (!newCredit.role || !newCredit.name) return;
-    setForm(f => ({ ...f, credits: [...f.credits, { ...newCredit, id: Date.now().toString() }] }));
-    setNewCredit({ role: "", name: "" });
+  const addCollaborator = (profile) => {
+    if (form.collaborators.find(c => c.id === profile.id)) return;
+    setForm(f => ({
+      ...f,
+      collaborators: [...f.collaborators, {
+        id: profile.id,
+        display_name: profile.display_name || profile.artist_name || profile.username,
+        username: profile.username,
+        avatar_url: profile.avatar_url || profile.profile_photo_url || null,
+      }]
+    }));
+  };
+
+  const removeCollaborator = (id) => {
+    setForm(f => ({ ...f, collaborators: f.collaborators.filter(c => c.id !== id) }));
   };
 
   const handleSubmit = async () => {
@@ -68,10 +157,9 @@ function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
       content_type: "short",
       youtube_url: form.youtube_url,
       thumbnail_url: form.thumbnail_url || ytThumb || undefined,
-      description: form.description || undefined,
-      year: Number(form.year),
       artist_id: artistId || undefined,
-      credits: form.credits.map(({ id: _id, ...c }) => c),
+      collaborators: form.collaborators,
+      track_id: form.track_id || undefined,
       is_active: true,
     };
     try {
@@ -110,7 +198,7 @@ function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
 
         <div className="overflow-y-auto flex-1 p-5 space-y-5">
 
-          {/* URL primero — preview inmediato */}
+          {/* URL + preview */}
           <div>
             <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">URL de YouTube Shorts *</label>
             <input
@@ -119,19 +207,20 @@ function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
               className={ic}
               placeholder="https://youtube.com/shorts/... o youtu.be/..."
             />
-            {/* Preview thumbnail inline */}
             {ytId && (
-              <div className="mt-2.5 relative rounded-xl overflow-hidden bg-black/50"
-                style={{ aspectRatio: "9/16", maxHeight: 200, width: "fit-content" }}>
-                <img src={ytThumb} alt="" className="h-full w-auto object-cover" />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                  <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
-                    <Play className="w-4 h-4 text-black ml-0.5" fill="black" />
+              <div className="mt-2.5 flex items-center gap-3">
+                <div className="relative rounded-xl overflow-hidden bg-black/50 flex-shrink-0"
+                  style={{ aspectRatio: "9/16", height: 120 }}>
+                  <img src={ytThumb} alt="" className="h-full w-full object-cover" />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
+                      <Play className="w-3 h-3 text-black ml-0.5" fill="black" />
+                    </div>
                   </div>
                 </div>
-                <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold"
-                  style={{ background: "rgba(255,0,0,0.75)", color: "white" }}>
-                  YT
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] text-white/40 mb-1">Preview detectado</p>
+                  <p className="text-[11px] text-emerald-400 font-semibold">✓ Video válido</p>
                 </div>
               </div>
             )}
@@ -148,51 +237,91 @@ function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
             />
           </div>
 
-          {/* Año + descripción */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">Año</label>
-              <input value={form.year} onChange={e => setForm(f => ({ ...f, year: e.target.value }))}
-                className={ic} type="number" min={2000} max={2099} />
-            </div>
-            <div>
-              <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">Portada (opc.)</label>
-              <label className="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-white/10 cursor-pointer hover:border-white/25 transition-colors">
-                <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleUpload(e.target.files[0])} />
-                {uploading ? <Loader2 className="w-4 h-4 text-white/30 animate-spin" /> : <Upload className="w-4 h-4 text-white/20" />}
-                <span className="text-[11px] text-white/25">{form.thumbnail_url ? "Cambiada ✓" : "Subir imagen"}</span>
-              </label>
-            </div>
-          </div>
-
+          {/* Portada */}
           <div>
-            <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">Descripción</label>
-            <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-              className={ic + " resize-none"} rows={2} placeholder="Descripción o notas del short" />
+            <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">Portada personalizada <span className="text-white/15 normal-case font-normal">(opcional)</span></label>
+            <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed border-white/10 cursor-pointer hover:border-white/25 transition-colors">
+              <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleUpload(e.target.files[0])} />
+              {uploading ? <Loader2 className="w-4 h-4 text-white/30 animate-spin" /> : <Upload className="w-4 h-4 text-white/20" />}
+              <span className="text-xs text-white/30">{form.thumbnail_url ? "✓ Portada cargada — clic para cambiar" : "Subir portada (si no, se usa miniatura de YouTube)"}</span>
+            </label>
           </div>
 
-          {/* Créditos */}
-          <div className="space-y-3">
-            <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Créditos</p>
-            <div className="grid grid-cols-2 gap-2">
-              <input value={newCredit.role} onChange={e => setNewCredit(c => ({ ...c, role: e.target.value }))}
-                className={ic} placeholder="Rol (ej: Dirección)" />
-              <input value={newCredit.name} onChange={e => setNewCredit(c => ({ ...c, name: e.target.value }))}
-                onKeyDown={e => e.key === "Enter" && (e.preventDefault(), addCredit())}
-                className={ic} placeholder="Nombre" />
-            </div>
-            <button type="button" onClick={addCredit}
-              disabled={!newCredit.role || !newCredit.name}
-              className="w-full py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-semibold disabled:opacity-30 flex items-center justify-center gap-1.5 transition-colors">
-              <Plus className="w-3.5 h-3.5" /> Añadir crédito
-            </button>
-            {form.credits.length > 0 && (
+          {/* Soundtrack vinculado */}
+          <div>
+            <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">
+              Soundtrack <span className="text-white/15 normal-case font-normal">(opcional — solo soundtracks públicos)</span>
+            </label>
+            {publicTracks.length === 0 ? (
+              <div className="px-4 py-3 rounded-xl border border-white/[0.06] text-xs text-white/25">
+                No hay soundtracks públicos disponibles. Activa un soundtrack como público para poder vincularlo.
+              </div>
+            ) : (
               <div className="space-y-1.5">
-                {form.credits.map((c, i) => (
-                  <div key={c.id || i} className="flex items-center justify-between px-3 py-2 bg-white/5 rounded-lg">
-                    <span className="text-xs text-white/60">{c.role} — {c.name}</span>
-                    <button type="button" onClick={() => setForm(f => ({ ...f, credits: f.credits.filter((_, j) => j !== i) }))}
-                      className="p-1 hover:bg-red-500/20 rounded text-white/30 hover:text-red-400 transition-colors">
+                {/* Opción vacía */}
+                <button type="button"
+                  onClick={() => setForm(f => ({ ...f, track_id: "" }))}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors"
+                  style={{
+                    background: !form.track_id ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.03)",
+                    border: !form.track_id ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(255,255,255,0.06)",
+                  }}>
+                  <div className="w-7 h-7 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0">
+                    <Music2 className="w-3.5 h-3.5 text-white/20" />
+                  </div>
+                  <span className="text-xs text-white/40">Sin soundtrack</span>
+                </button>
+                {/* Lista de tracks públicos */}
+                <div className="max-h-40 overflow-y-auto space-y-1 pr-1">
+                  {publicTracks.map(track => (
+                    <button key={track.id} type="button"
+                      onClick={() => setForm(f => ({ ...f, track_id: track.id }))}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors text-left"
+                      style={{
+                        background: form.track_id === track.id ? "rgba(52,211,153,0.1)" : "rgba(255,255,255,0.03)",
+                        border: form.track_id === track.id ? "1px solid rgba(52,211,153,0.3)" : "1px solid rgba(255,255,255,0.06)",
+                      }}>
+                      {track.cover_url
+                        ? <img src={track.cover_url} className="w-7 h-7 rounded-lg object-cover flex-shrink-0" />
+                        : <div className="w-7 h-7 rounded-lg bg-white/8 flex items-center justify-center flex-shrink-0">
+                            <Music2 className="w-3.5 h-3.5 text-white/20" />
+                          </div>
+                      }
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold text-white truncate">{track.title}</p>
+                        {track.artists?.length > 0 && <p className="text-[10px] text-white/30 truncate">{track.artists.join(", ")}</p>}
+                      </div>
+                      {form.track_id === track.id && (
+                        <Check className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Colaboradores */}
+          <div>
+            <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-2">
+              Colaboradores <span className="text-white/15 normal-case font-normal">(opcional)</span>
+            </label>
+            <UserSearchPicker onAdd={addCollaborator} addedIds={form.collaborators.map(c => c.id)} />
+            {form.collaborators.length > 0 && (
+              <div className="mt-2.5 flex flex-wrap gap-2">
+                {form.collaborators.map(c => (
+                  <div key={c.id} className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl"
+                    style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)" }}>
+                    {c.avatar_url
+                      ? <img src={c.avatar_url} className="w-5 h-5 rounded-full object-cover" />
+                      : <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center">
+                          <Users className="w-3 h-3 text-white/30" />
+                        </div>
+                    }
+                    <span className="text-xs text-white/70 font-medium">{c.display_name}</span>
+                    {c.username && <span className="text-[10px] text-white/30">@{c.username}</span>}
+                    <button type="button" onClick={() => removeCollaborator(c.id)}
+                      className="ml-0.5 text-white/25 hover:text-white/60 transition-colors">
                       <X className="w-3 h-3" />
                     </button>
                   </div>
@@ -200,6 +329,7 @@ function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
               </div>
             )}
           </div>
+
         </div>
 
         {/* Footer */}
