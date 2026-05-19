@@ -14,14 +14,14 @@ export default function StartWhatWeDo() {
         position: "relative",
         width: "100%",
         height: "100dvh",
-        minHeight: "500px",
+        minHeight: "600px",
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "center",
         background: "#0c0c0c",
         overflow: "hidden",
         overflowY: "auto",
-        padding: "clamp(40px, 6vw, 80px) clamp(24px, 8vw, 100px) 0",
+        padding: "clamp(48px, 7vw, 96px) clamp(24px, 8vw, 100px) 48px",
       }}
     >
       {/* Subtle background texture */}
@@ -34,7 +34,7 @@ export default function StartWhatWeDo() {
         }}
       />
 
-      <div style={{ maxWidth: "720px", width: "100%", position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: "clamp(20px, 4vw, 32px)" }}>
+      <div style={{ maxWidth: "720px", width: "100%", position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: "clamp(24px, 5vw, 40px)" }}>
         <motion.p
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
@@ -46,7 +46,7 @@ export default function StartWhatWeDo() {
             letterSpacing: "0.3em",
             textTransform: "uppercase",
             color: "rgba(240,237,232,0.35)",
-            marginBottom: "8px",
+            marginBottom: "4px",
           }}
         >
           Quiénes Somos
@@ -59,7 +59,7 @@ export default function StartWhatWeDo() {
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "clamp(12px, 2.5vw, 20px)",
+            gap: "clamp(14px, 3vw, 22px)",
             maxWidth: "720px",
           }}
         >
