@@ -521,6 +521,7 @@ function TrackCard({ track, onEdit, isFirst }) {
   const [showDetail, setShowDetail] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showPreviewAnimation, setShowPreviewAnimation] = useState(false);
+  const [ytPlaying, setYtPlaying] = useState(false); // inline YT embed active
   const [localTrack, setLocalTrack] = useState(track);
 
   useEffect(() => { setLocalTrack(track); }, [track]);
@@ -550,7 +551,7 @@ function TrackCard({ track, onEdit, isFirst }) {
 
   const handleMouseEnter = () => {
     setHovered(true);
-    if (hasAudio && previewRef.current && !playing && !globalAudio?.isPlaying) {
+    if (hasAudio && previewRef.current && !playing && !globalAudio?.isPlaying && !ytPlaying) {
       hoverDelayRef.current = setTimeout(() => {
         setShowPreviewAnimation(true);
         previewRef.current.currentTime = 0;
@@ -560,10 +561,19 @@ function TrackCard({ track, onEdit, isFirst }) {
           previewTimerRef.current = setTimeout(() => stopPreview(), 40000);
         }).catch(() => {});
       }, 1500);
+    } else if (!hasAudio && hasYoutube && !ytPlaying) {
+      // YouTube preview: muted iframe after delay
+      hoverDelayRef.current = setTimeout(() => {
+        setShowPreviewAnimation(true);
+      }, 1500);
     }
   };
 
-  const handleMouseLeave = () => { setHovered(false); stopPreview(); };
+  const handleMouseLeave = () => {
+    setHovered(false);
+    stopPreview();
+    if (!ytPlaying) setShowPreviewAnimation(false);
+  };
 
   const togglePlay = (e) => {
     if (e) e.stopPropagation();
@@ -621,6 +631,20 @@ function TrackCard({ track, onEdit, isFirst }) {
 
             {/* Cover */}
             <div style={{ height: 150, overflow: "hidden", position: "relative", borderRadius: "0.75rem 0.75rem 0 0" }}>
+              {/* YouTube inline embed (full play or muted preview) */}
+              {hasYoutube && (ytPlaying || (showPreviewAnimation && !hasAudio)) && (
+                <div className="absolute inset-0 z-10">
+                  <iframe
+                    key={ytPlaying ? "play" : "preview"}
+                    src={`https://www.youtube-nocookie.com/embed/${getYoutubeId(localTrack.youtube_music_url)}?autoplay=1&mute=${ytPlaying ? 0 : 1}&controls=${ytPlaying ? 1 : 0}&rel=0&modestbranding=1${!ytPlaying ? `&loop=1&playlist=${getYoutubeId(localTrack.youtube_music_url)}` : ""}`}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    style={{ pointerEvents: ytPlaying ? "auto" : "none" }}
+                  />
+                </div>
+              )}
+
               <motion.div style={{ width: "100%", height: "100%" }}
                 animate={playing ? { scale: 1.1, x: [0, 3, -3, 1, 0] } : showPreviewAnimation ? { scale: 1.1, x: 2 } : hovered ? { scale: 1.08 } : { scale: 1, x: 0 }}
                 transition={playing ? { scale: { duration: 0.7 }, x: { duration: 8, repeat: Infinity, ease: "easeInOut" } } : showPreviewAnimation ? { duration: 1.5 } : { duration: 0.7 }}
@@ -633,22 +657,29 @@ function TrackCard({ track, onEdit, isFirst }) {
                     : <div className="w-full h-full flex flex-col items-center justify-center gap-1.5" style={{ background: "linear-gradient(135deg, #1e1a3e 0%, #1a1a2e 50%, #0a0a0b 100%)" }}><Music2 className="w-10 h-10 text-white/15" /><p className="text-[9px] text-white/15 font-medium text-center px-2 line-clamp-2 leading-tight">{localTrack.title}</p></div>;
                 })()}
               </motion.div>
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
-              <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[9px] font-bold" style={{ background: status.color + "30", color: status.color }}>{status.label}</div>
-              {!hasAudio && hasYoutube && (
-                <div className="absolute top-2 left-14 flex items-center gap-1 px-1.5 py-0.5 rounded" style={{ background: "rgba(255,0,0,0.18)", border: "1px solid rgba(255,80,80,0.25)" }}>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" style={{ zIndex: ytPlaying ? 0 : 1 }} />
+              {!ytPlaying && <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[9px] font-bold" style={{ background: status.color + "30", color: status.color, zIndex: 2 }}>{status.label}</div>}
+              {!hasAudio && hasYoutube && !ytPlaying && (
+                <div className="absolute top-2 left-14 flex items-center gap-1 px-1.5 py-0.5 rounded" style={{ background: "rgba(255,0,0,0.18)", border: "1px solid rgba(255,80,80,0.25)", zIndex: 2 }}>
                   <svg className="w-2.5 h-2.5 text-red-400" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
                   <span className="text-[8px] text-red-400 font-bold">YT</span>
                 </div>
               )}
-              <div className="absolute bottom-0 left-0 right-0 px-2.5 pb-2 flex items-end justify-between">
+              <div className="absolute bottom-0 left-0 right-0 px-2.5 pb-2 flex items-end justify-between" style={{ zIndex: 3 }}>
                 <div className="flex-1 min-w-0 pr-2">
                   <p className="text-white font-bold text-[11px] leading-tight line-clamp-1">{localTrack.title}</p>
                   {localTrack.genre && <p className="text-white/30 text-[9px] truncate mt-0.5">{localTrack.genre}</p>}
                 </div>
                 {(hasAudio || hasYoutube) && (
-                  <button onClick={(e) => { e.stopPropagation(); if (hasAudio) { togglePlay(e); } else { setShowDetail(true); } }} className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center" style={{ background: playing ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.88)", border: playing ? "1px solid rgba(255,255,255,0.18)" : "none" }}>
-                    {playing ? <Pause className="w-2.5 h-2.5 text-white" fill="white" /> : <Play className="w-2.5 h-2.5 text-black ml-0.5" fill="black" />}
+                  <button onClick={(e) => {
+                    e.stopPropagation();
+                    if (hasAudio) { togglePlay(e); }
+                    else if (hasYoutube) {
+                      stopPreview();
+                      setYtPlaying(v => !v);
+                    }
+                  }} className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center" style={{ background: (playing || ytPlaying) ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.88)", border: (playing || ytPlaying) ? "1px solid rgba(255,255,255,0.18)" : "none" }}>
+                    {(playing || ytPlaying) ? <Pause className="w-2.5 h-2.5 text-white" fill="white" /> : <Play className="w-2.5 h-2.5 text-black ml-0.5" fill="black" />}
                   </button>
                 )}
               </div>

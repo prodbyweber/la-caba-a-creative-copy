@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Music2, Play, Pause, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, Music2, Play, Pause, ChevronDown, X } from "lucide-react";
 import { useExplorar } from "@/context/ExplorarContext.jsx";
 
 function getYoutubeId(url) {
@@ -14,6 +14,7 @@ function ContentCard({ item, onClick, currentUser, allItems }) {
   const [hovered, setHovered] = useState(false);
   const [previewActive, setPreviewActive] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [ytPlaying, setYtPlaying] = useState(false);
   const audioRef = useRef(null);
   const hoverTimer = useRef(null);
   const explorar = useExplorar();
@@ -23,6 +24,7 @@ function ContentCard({ item, onClick, currentUser, allItems }) {
   const hasVideo = !!ytId;
 
   const handleMouseEnter = () => {
+    if (ytPlaying) return;
     setHovered(true);
     hoverTimer.current = setTimeout(() => {
       setPreviewActive(true);
@@ -33,6 +35,7 @@ function ContentCard({ item, onClick, currentUser, allItems }) {
   };
 
   const handleMouseLeave = () => {
+    if (ytPlaying) return;
     setHovered(false);
     setPreviewActive(false);
     clearTimeout(hoverTimer.current);
@@ -54,9 +57,13 @@ function ContentCard({ item, onClick, currentUser, allItems }) {
     }
   };
 
-  const openYT = (e) => {
+  const toggleYtPlay = (e) => {
     if (e) e.stopPropagation();
-    explorar?.openYtModal(ytId, item.title, item.youtube_url || item.youtube_music_url);
+    setYtPlaying(v => !v);
+    if (!ytPlaying) {
+      setPreviewActive(false);
+      clearTimeout(hoverTimer.current);
+    }
   };
 
   const openCredits = (e) => {
@@ -79,7 +86,22 @@ function ContentCard({ item, onClick, currentUser, allItems }) {
         )}
 
         <div className="relative rounded-xl overflow-hidden bg-[#1a1a1c]" style={{ aspectRatio: "16/9" }}>
-          {item.image ? (
+          {/* YouTube inline embed: full play (with sound) or muted hover preview */}
+          {hasVideo && (ytPlaying || (previewActive && !item.raw?.preview_media_url)) && (
+            <div className="absolute inset-0 z-10">
+              <iframe
+                key={ytPlaying ? "play" : "preview"}
+                src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&mute=${ytPlaying ? 0 : 1}&controls=${ytPlaying ? 1 : 0}&rel=0&modestbranding=1${!ytPlaying ? `&loop=1&playlist=${ytId}` : ""}`}
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{ pointerEvents: ytPlaying ? "auto" : "none" }}
+              />
+            </div>
+          )}
+
+          {/* Cover image */}
+          {!ytPlaying && (item.image ? (
             <img
               src={item.image}
               alt={item.title}
@@ -90,42 +112,35 @@ function ContentCard({ item, onClick, currentUser, allItems }) {
             <div className="w-full h-full flex items-center justify-center">
               <Music2 className="w-8 h-8 text-white/10" />
             </div>
-          )}
+          ))}
 
-          {/* Preview hover */}
+          {/* Custom video/image preview */}
           <AnimatePresence>
-            {previewActive && (item.raw?.preview_media_url || hasVideo) && (
+            {!ytPlaying && previewActive && item.raw?.preview_media_url && (
               <motion.div
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 transition={{ duration: 0.4 }}
                 className="absolute inset-0"
               >
-                {item.raw?.preview_media_url ? (
-                  item.raw.preview_media_type === "video" ? (
-                    <video src={item.raw.preview_media_url} className="w-full h-full object-cover"
-                      autoPlay muted loop playsInline preload="none" style={{ pointerEvents: "none" }} />
-                  ) : (
-                    <img src={item.raw.preview_media_url} alt="" className="w-full h-full object-cover" style={{ pointerEvents: "none" }} />
-                  )
-                ) : hasVideo ? (
-                  <iframe
-                    src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&controls=0&rel=0&modestbranding=1&loop=1&playlist=${ytId}`}
-                    className="w-full h-full border-0"
-                    allow="autoplay"
-                    style={{ pointerEvents: "none" }}
-                  />
-                ) : null}
+                {item.raw.preview_media_type === "video" ? (
+                  <video src={item.raw.preview_media_url} className="w-full h-full object-cover"
+                    autoPlay muted loop playsInline preload="none" style={{ pointerEvents: "none" }} />
+                ) : (
+                  <img src={item.raw.preview_media_url} alt="" className="w-full h-full object-cover" style={{ pointerEvents: "none" }} />
+                )}
               </motion.div>
             )}
           </AnimatePresence>
 
-          <div
-            className="absolute inset-0 transition-opacity duration-300 pointer-events-none"
-            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%)", opacity: hovered ? 1 : 0 }}
-          />
+          {!ytPlaying && (
+            <div
+              className="absolute inset-0 transition-opacity duration-300 pointer-events-none"
+              style={{ background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 50%)", opacity: hovered ? 1 : 0, zIndex: 2 }}
+            />
+          )}
 
-          {playing && !previewActive && (
-            <div className="absolute top-2 left-2 flex items-end gap-[2px] h-4">
+          {playing && !previewActive && !ytPlaying && (
+            <div className="absolute top-2 left-2 flex items-end gap-[2px] h-4" style={{ zIndex: 3 }}>
               {[3, 6, 9, 5, 8, 4, 7].map((h, i) => (
                 <div key={i} className="w-[2px] rounded-full bg-white/60"
                   style={{ height: `${h}px`, animation: `waveBar 0.${6 + (i % 5)}s ease-in-out infinite alternate`, animationDelay: `${i * 0.07}s` }} />
@@ -135,33 +150,49 @@ function ContentCard({ item, onClick, currentUser, allItems }) {
           )}
 
           <AnimatePresence>
-            {hovered && (
+            {(hovered || ytPlaying) && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="absolute inset-0 flex items-center justify-center gap-2.5">
-                {hasAudio && (
+                className="absolute inset-0 flex items-center justify-center gap-2.5" style={{ zIndex: 11, pointerEvents: ytPlaying ? "none" : "auto" }}>
+                {!ytPlaying && hasAudio && (
                   <button onClick={toggleAudio}
-                    className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-black/60 transition-colors"
+                    className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-black/60 transition-colors pointer-events-auto"
                     title={playing ? "Pausar" : "Reproducir audio"}>
                     {playing ? <Pause className="w-3.5 h-3.5 text-white" fill="white" /> : <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" />}
                   </button>
                 )}
-                {hasVideo && (
-                  <button onClick={openYT}
-                    className="w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center border border-white/20 hover:bg-black/60 transition-colors"
-                    title="Reproducir video">
-                    <Play className="w-3.5 h-3.5 text-white ml-0.5" fill="white" />
+                {hasVideo && !ytPlaying && (
+                  <button onClick={toggleYtPlay}
+                    className="w-9 h-9 rounded-full flex items-center justify-center border border-red-400/40 hover:bg-red-500/20 transition-colors pointer-events-auto"
+                    style={{ background: "rgba(255,0,0,0.25)" }}
+                    title="Reproducir con sonido">
+                    <svg className="w-4 h-4 text-red-300" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
                   </button>
                 )}
               </motion.div>
             )}
           </AnimatePresence>
 
+          {/* Stop YT / info buttons */}
           <AnimatePresence>
-            {hovered && (
+            {ytPlaying && (
+              <motion.button
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onClick={(e) => { e.stopPropagation(); setYtPlaying(false); }}
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/70 border border-white/20 flex items-center justify-center hover:bg-black/90 transition-all"
+                style={{ zIndex: 20, pointerEvents: "auto" }}
+              >
+                <X className="w-3 h-3 text-white/80" />
+              </motion.button>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {hovered && !ytPlaying && (
               <motion.button
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 onClick={openCredits}
                 className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-black/70 hover:border-white/40 transition-all"
+                style={{ zIndex: 3 }}
               >
                 <ChevronDown className="w-3.5 h-3.5 text-white/80" />
               </motion.button>
