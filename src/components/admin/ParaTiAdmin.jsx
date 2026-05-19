@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { Eye, EyeOff, Trash2, Search, Play, ExternalLink } from "lucide-react";
+import { Eye, EyeOff, Trash2, Search, Play, ExternalLink, User, Mail, Calendar, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 function getYtShortId(url) {
@@ -10,10 +10,15 @@ function getYtShortId(url) {
   return m ? m[1] : null;
 }
 
-function ShortCard({ item, onToggle, toggling }) {
+function ShortCard({ item, onToggle, toggling, creatorProfile }) {
   const ytId = getYtShortId(item.url || item.youtube_url || item.youtube_music_url || "");
   const thumb = item.thumbnail_url || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : null);
-  const [showPreview, setShowPreview] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  const creatorName = creatorProfile?.artist_name || creatorProfile?.display_name || creatorProfile?.full_name || "Desconocido";
+  const creatorUsername = creatorProfile?.username ? `@${creatorProfile.username}` : "";
+  const creatorAvatar = creatorProfile?.profile_photo_url || creatorProfile?.avatar_url;
+  const creatorEmail = item.created_by || "";
 
   return (
     <motion.div
@@ -73,12 +78,39 @@ function ShortCard({ item, onToggle, toggling }) {
         </div>
       </div>
 
-      {/* Info */}
-      <div className="px-3 py-2.5">
-        <p className="text-xs font-bold text-white truncate leading-tight">{item.title || "Sin título"}</p>
-        <p className="text-[10px] text-white/30 mt-0.5 truncate">{item.description || item.caption || ""}</p>
+      {/* Creator info - compact */}
+      <div className="px-3 py-2.5 border-t border-white/5">
+        <div className="flex items-center gap-2 mb-2">
+          {creatorAvatar ? (
+            <img src={creatorAvatar} alt={creatorName} className="w-6 h-6 rounded-full object-cover" />
+          ) : (
+            <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
+              <User className="w-3 h-3 text-white/40" />
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold text-white truncate">{creatorName}</p>
+            {creatorUsername && <p className="text-[10px] text-white/30 truncate">{creatorUsername}</p>}
+          </div>
+        </div>
 
-        {/* Toggle button */}
+        <p className="text-xs font-bold text-white truncate leading-tight mb-0.5">{item.title || "Sin título"}</p>
+        <p className="text-[10px] text-white/30 truncate">{item.description || item.caption || ""}</p>
+
+        {/* Expand button */}
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="mt-2 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
+          style={{
+            background: "rgba(255,255,255,0.06)",
+            color: "rgba(255,255,255,0.5)",
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          {expanded ? <><ChevronUp className="w-3 h-3" /> Ocultar detalles</> : <><ChevronDown className="w-3 h-3" /> Ver detalles</>}
+        </button>
+
+        {/* Toggle visibility button */}
         <button
           onClick={() => onToggle(item)}
           disabled={toggling}
@@ -92,6 +124,59 @@ function ShortCard({ item, onToggle, toggling }) {
           {item.is_active ? <><EyeOff className="w-3 h-3" /> Ocultar</> : <><Eye className="w-3 h-3" /> Mostrar</>}
         </button>
       </div>
+
+      {/* Expanded metadata */}
+      {expanded && (
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          className="px-3 pb-3 border-t border-white/5 pt-3"
+        >
+          <div className="space-y-2">
+            {/* Email */}
+            <div className="flex items-center gap-2">
+              <Mail className="w-3 h-3 text-white/30" />
+              <p className="text-[10px] text-white/50 truncate">{creatorEmail}</p>
+            </div>
+
+            {/* Created date */}
+            {item.created_date && (
+              <div className="flex items-center gap-2">
+                <Calendar className="w-3 h-3 text-white/30" />
+                <p className="text-[10px] text-white/50">
+                  {new Date(item.created_date).toLocaleDateString("es-ES", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })}
+                </p>
+              </div>
+            )}
+
+            {/* Source type */}
+            {item._is_gallery && (
+              <div className="px-2 py-1 rounded bg-white/5 border border-white/10">
+                <p className="text-[10px] text-white/40">
+                  Short de galería en: <span className="text-white/70 font-semibold">{item._parent_item?.title || "Item"}</span>
+                </p>
+              </div>
+            )}
+
+            {/* URL */}
+            {(item.url || item.youtube_url || item.youtube_music_url) && (
+              <a
+                href={item.url || item.youtube_url || item.youtube_music_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block px-2 py-1 rounded bg-[#ff5833]/10 border border-[#ff5833]/20 text-[10px] text-[#ff5833] font-semibold hover:bg-[#ff5833]/15 transition-colors text-center"
+              >
+                Ver en YouTube
+              </a>
+            )}
+          </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 }
@@ -114,6 +199,22 @@ export default function ParaTiAdmin() {
     queryFn: () => base44.entities.ExplorarItem.filter({ is_active: true }),
     staleTime: 10000,
   });
+
+  // Fetch all user profiles to get creator info
+  const { data: userProfiles = [] } = useQuery({
+    queryKey: ["admin-all-user-profiles"],
+    queryFn: () => base44.entities.UserProfile.list(),
+    staleTime: 60000,
+  });
+
+  // Create a map of user_id -> profile for quick lookup
+  const profileMap = React.useMemo(() => {
+    const map = {};
+    userProfiles.forEach(p => {
+      map[p.user_id] = p;
+    });
+    return map;
+  }, [userProfiles]);
 
   const toggleMutation = useMutation({
     mutationFn: (item) => base44.entities.ExplorarItem.update(item.id, { is_active: !item.is_active }),
@@ -244,6 +345,7 @@ export default function ParaTiAdmin() {
                 item={item}
                 onToggle={handleToggle}
                 toggling={toggleMutation.isPending}
+                creatorProfile={profileMap[item.created_by] || null}
               />
             ))}
           </AnimatePresence>
