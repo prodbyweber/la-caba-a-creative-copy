@@ -1,11 +1,12 @@
 import React, { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2, Share2, Users } from "lucide-react";
+import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2, Share2, Users, Image } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
 import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
 import CountryCitySelector from "@/components/common/CountrycitySelector";
+import PhotosGallery from "@/components/dashboard/PhotosGallery";
 
 const COUNTRY_CODES = [
   { code: "+1", flag: "🇺🇸" }, { code: "+34", flag: "🇪🇸" }, { code: "+52", flag: "🇲🇽" },
@@ -522,6 +523,19 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                             </div>
                             <svg className="w-3.5 h-3.5 text-orange-500/40 group-hover:text-orange-400 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                           </a>
+                        )}
+
+                        {/* Fotos de perfil */}
+                        {userProfile?.id && (
+                          <div className="mt-4">
+                            <div className="flex items-center gap-2 mb-3">
+                              <div className="w-7 h-7 rounded-lg bg-white/[0.06] flex items-center justify-center flex-shrink-0">
+                                <Image className="w-3.5 h-3.5 text-white/40" />
+                              </div>
+                              <p className="text-xs font-semibold text-white/70">Fotos de perfil</p>
+                            </div>
+                            <PhotosGallery userProfileId={userProfile.id} />
+                          </div>
                         )}
 
                         {/* Cerrar sesión */}

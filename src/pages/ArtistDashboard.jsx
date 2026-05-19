@@ -267,29 +267,7 @@ export default function ArtistDashboard() {
               </div>
             </div>
 
-          {/* ── PANEL DE CUENTA ── */}
-          {userProfile?.id && (
-            <div className="mt-16 border-t border-white/[0.06] pt-10">
-              <div className="mb-6">
-                <h2
-                  className="font-black text-white"
-                  style={{
-                    fontFamily: "'Helvetica Neue', sans-serif",
-                    letterSpacing: "-0.04em",
-                    fontSize: isMobileView ? "1.5rem" : "2rem",
-                  }}
-                >
-                  Panel de cuenta
-                </h2>
-                <p className="text-[11px] text-white/25 mt-0.5">Gestiona tus fotos y datos de perfil</p>
-              </div>
 
-              <div className="max-w-lg">
-                <SectionLabel label="Fotos de perfil" />
-                <PhotosGallery userProfileId={userProfile.id} />
-              </div>
-            </div>
-          )}
         </div>
       </main>
 
