@@ -35,7 +35,9 @@ export default function Explorar() {
   const [activeSection, setActiveSection] = useState("inicio"); // inicio | musica | films
   const [profileOpen, setProfileOpen] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
-  const [showParaTi, setShowParaTi] = useState(false);
+  const [showParaTi, setShowParaTi] = useState(() => {
+    return new URLSearchParams(window.location.search).get("parati") === "1";
+  });
   const [guestLocked, setGuestLocked] = useState(false);
   const isAdmin = currentUser?.role === "admin";
 
@@ -500,7 +502,13 @@ export default function Explorar() {
         {showParaTi && (
           <ParaTiFeed
             currentUser={currentUser}
-            onClose={() => setShowParaTi(false)}
+            onClose={() => {
+              setShowParaTi(false);
+              // Limpiar el param de la URL sin recargar
+              const url = new URL(window.location.href);
+              url.searchParams.delete("parati");
+              window.history.replaceState({}, "", url.toString());
+            }}
           />
         )}
       </AnimatePresence>

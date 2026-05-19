@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import { Home, BookOpen, Compass, LayoutDashboard } from "lucide-react";
+import { Home, BookOpen, Compass, LayoutDashboard, Sparkles } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 
@@ -25,6 +25,7 @@ export default function MobileBottomNav({ artistId, isAdmin }) {
 
   const items = [
     { icon: Home, label: "Inicio", page: "Landing" },
+    { icon: Sparkles, label: "Para Ti", page: "Explorar?parati=1" },
     { icon: Compass, label: "Explorar", page: "Explorar" },
     thirdItem,
   ];

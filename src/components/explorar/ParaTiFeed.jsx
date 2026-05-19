@@ -152,55 +152,64 @@ export default function ParaTiFeed({ currentUser, onClose }) {
   const slideRefs = useRef([]);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Fetch all public ExplorarItems with galleries or youtube_music_url/youtube_url
+  // Fetch all public ExplorarItems (galleries + regular)
   const { data: explorarItems = [] } = useQuery({
     queryKey: ["para-ti-explorar-items"],
     queryFn: () => base44.entities.ExplorarItem.filter({ is_active: true }),
     staleTime: 30000,
   });
 
-  // Fetch all UserProfile to find uploads
-  const { data: userProfiles = [] } = useQuery({
-    queryKey: ["para-ti-user-profiles"],
-    queryFn: () => base44.entities.UserProfile.list("-created_date", 50),
-    staleTime: 60000,
+  // Fetch all public Shorts from the dashboard catalog (content_type: "short")
+  const { data: dashboardShorts = [] } = useQuery({
+    queryKey: ["para-ti-dashboard-shorts"],
+    queryFn: () => base44.entities.ExplorarItem.filter({ content_type: "short", is_active: true }),
+    staleTime: 30000,
   });
 
-  // Build feed: gallery items from ExplorarItems + standalone youtube shorts from ExplorarItems
+  // Build feed: dashboard Shorts + gallery youtube_shorts from ExplorarItems
   const feed = useMemo(() => {
     const result = [];
+
+    // 1. Dashboard shorts (from ShortsSection / project Shorts)
+    dashboardShorts.forEach(short => {
+      const ytUrl = short.youtube_url || short.youtube_music_url;
+      if (!ytUrl) return;
+      const ytId = getYtShortId(ytUrl);
+      if (!ytId) return;
+      result.push({
+        id: short.id,
+        url: ytUrl,
+        title: short.title || "",
+        caption: short.description || "",
+        thumbnail_url: short.thumbnail_url || `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`,
+        uploader_user_id: short.created_by,
+        _source: "dashboard_short",
+      });
+    });
+
+    // 2. Gallery youtube_shorts from ExplorarItems
     explorarItems.forEach(item => {
-      // Gallery entries (images/videos uploaded)
+      if (item.content_type === "short") return; // ya incluido arriba
       const gallery = item.gallery || [];
       gallery.forEach(g => {
-        if (g.url) {
+        if (g.type === "youtube_short" && g.url) {
+          const ytId = getYtShortId(g.url);
           result.push({
-            ...g,
+            id: g.id || `${item.id}-${g.url}`,
+            url: g.url,
             title: item.title || "",
-            uploader_user_id: g.uploader_user_id || item.created_by_user_id,
+            caption: g.caption || "",
+            thumbnail_url: ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : item.thumbnail_url,
+            uploader_user_id: item.created_by,
             _source: "gallery",
           });
         }
       });
-
-      // YouTube shorts from the item itself (no gallery entry)
-      const ytUrl = item.youtube_url || item.youtube_music_url;
-      const ytId = ytUrl ? ytUrl.match(/(?:shorts\/|youtu\.be\/|watch\?v=)([a-zA-Z0-9_-]{11})/) : null;
-      if (ytId && gallery.length === 0) {
-        result.push({
-          id: item.id,
-          url: ytUrl,
-          title: item.title || "",
-          thumbnail_url: item.thumbnail_url,
-          uploader_user_id: item.created_by,
-          _source: "item",
-        });
-      }
     });
 
     // Shuffle for variety
     return result.sort(() => Math.random() - 0.5);
-  }, [explorarItems]);
+  }, [explorarItems, dashboardShorts]);
 
   useEffect(() => {
     const observers = [];
