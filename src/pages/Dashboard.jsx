@@ -10,6 +10,7 @@ import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
 import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
+import FilmsSection from "@/components/dashboard/FilmsSection";
 import PhotosGallery from "@/components/dashboard/PhotosGallery";
 import CatalogSectionOrder, { DEFAULT_SECTION_ORDER } from "@/components/dashboard/CatalogSectionOrder";
 import OnboardingForm from "@/components/onboarding/OnboardingForm";
@@ -145,6 +146,13 @@ export default function Dashboard() {
           <div key="tracks">
             <SectionLabel label="Soundtracks" />
             <TracksSection jlyArtistId={jlyArtistId} />
+          </div>
+        );
+      case "video":
+        return (
+          <div key="video">
+            <SectionLabel label="Films" />
+            <FilmsSection artistId={jlyArtistId} userProfileId={jlyUserProfile?.id} />
           </div>
         );
       case "projects":
