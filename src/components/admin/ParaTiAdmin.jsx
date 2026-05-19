@@ -10,10 +10,11 @@ function getYtShortId(url) {
   return m ? m[1] : null;
 }
 
-function ShortCard({ item, onToggle, toggling, creatorProfile }) {
+function ShortCard({ item, onToggle, togglingItemId, creatorProfile }) {
   const ytId = getYtShortId(item.url || item.youtube_url || item.youtube_music_url || "");
   const thumb = item.thumbnail_url || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : null);
   const [expanded, setExpanded] = useState(false);
+  const isToggling = togglingItemId === item.id;
 
   const creatorName = creatorProfile?.artist_name || creatorProfile?.display_name || creatorProfile?.full_name || "Desconocido";
   const creatorUsername = creatorProfile?.username ? `@${creatorProfile.username}` : "";
@@ -56,13 +57,24 @@ function ShortCard({ item, onToggle, toggling, creatorProfile }) {
           )}
           <button
             onClick={() => onToggle(item)}
-            disabled={toggling}
-            className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors"
+            disabled={isToggling}
+            className="w-10 h-10 rounded-full bg-white/15 flex items-center justify-center hover:bg-white/25 transition-colors disabled:opacity-50"
           >
-            {item.is_active
-              ? <EyeOff className="w-4 h-4 text-white" />
-              : <Eye className="w-4 h-4 text-white" />
-            }
+            {isToggling ? (
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+              >
+                <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" strokeOpacity="0.3" />
+                  <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
+                </svg>
+              </motion.div>
+            ) : item.is_active ? (
+              <EyeOff className="w-4 h-4 text-white" />
+            ) : (
+              <Eye className="w-4 h-4 text-white" />
+            )}
           </button>
         </div>
 
@@ -113,15 +125,31 @@ function ShortCard({ item, onToggle, toggling, creatorProfile }) {
         {/* Toggle visibility button */}
         <button
           onClick={() => onToggle(item)}
-          disabled={toggling}
-          className="mt-2 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
+          disabled={isToggling}
+          className="mt-2 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all disabled:opacity-50"
           style={{
             background: item.is_active ? "rgba(255,255,255,0.06)" : "rgba(16,185,129,0.15)",
             color: item.is_active ? "rgba(255,255,255,0.4)" : "rgb(16,185,129)",
             border: `1px solid ${item.is_active ? "rgba(255,255,255,0.08)" : "rgba(16,185,129,0.25)"}`,
           }}
         >
-          {item.is_active ? <><EyeOff className="w-3 h-3" /> Ocultar</> : <><Eye className="w-3 h-3" /> Mostrar</>}
+          {isToggling ? (
+            <motion.span
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              className="flex items-center gap-1.5"
+            >
+              <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" strokeOpacity="0.3" />
+                <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
+              </svg>
+              Procesando...
+            </motion.span>
+          ) : item.is_active ? (
+            <><EyeOff className="w-3 h-3" /> Ocultar</>
+          ) : (
+            <><Eye className="w-3 h-3" /> Mostrar</>
+          )}
         </button>
       </div>
 
@@ -248,8 +276,17 @@ export default function ParaTiAdmin() {
     return map;
   }, [userProfiles]);
 
+  const [togglingItemId, setTogglingItemId] = useState(null);
+
   const toggleMutation = useMutation({
-    mutationFn: (item) => base44.entities.ExplorarItem.update(item.id, { is_active: !item.is_active }),
+    mutationFn: async (item) => {
+      setTogglingItemId(item.id);
+      try {
+        return await base44.entities.ExplorarItem.update(item.id, { is_active: !item.is_active });
+      } finally {
+        setTogglingItemId(null);
+      }
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-para-ti-shorts"] });
       qc.invalidateQueries({ queryKey: ["admin-explorar-items-gallery"] });
@@ -378,7 +415,7 @@ export default function ParaTiAdmin() {
                 key={item.id}
                 item={item}
                 onToggle={handleToggle}
-                toggling={toggleMutation.isPending}
+                togglingItemId={togglingItemId}
                 creatorProfile={profileMap[item.created_by] || null}
               />
             ))}
