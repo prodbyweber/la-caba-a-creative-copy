@@ -8,10 +8,8 @@ import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
 import ProjectsSection from "@/components/dashboard/ProjectsSection.jsx";
 import TracksSection from "@/components/dashboard/TracksSection";
-import ClipsLibrary from "@/components/clips/ClipsLibrary";
 import BrandCampaignsSection from "@/components/dashboard/BrandCampaignsSection";
 import PhotosGallery from "@/components/dashboard/PhotosGallery";
-import FilmsSection from "@/components/dashboard/FilmsSection";
 import CatalogSectionOrder, { DEFAULT_SECTION_ORDER } from "@/components/dashboard/CatalogSectionOrder";
 
 export default function ArtistDashboard() {
@@ -157,25 +155,6 @@ export default function ArtistDashboard() {
           <div key="tracks">
             <SectionLabel label="Soundtracks" />
             <TracksSection jlyArtistId={effectiveArtist?.id || artistId} />
-          </div>
-        );
-      case "video":
-        if (!showVideoSection) return null;
-        return (
-          <div key="video">
-            <SectionLabel label="Films" />
-            <FilmsSection artistId={effectiveArtist?.id || artistId} userProfileId={userProfile?.id} />
-          </div>
-        );
-      case "shorts":
-        if (!showShortsSection) return null;
-        return (
-          <div key="shorts">
-            <SectionLabel label="Shorts" />
-            <ClipsLibrary
-              artistId={effectiveArtist?.id || artistId}
-              filters={{ status: "all", platform: [], artist: effectiveArtist?.id || artistId || "all", dateRange: null, search: "" }}
-            />
           </div>
         );
       case "projects":
