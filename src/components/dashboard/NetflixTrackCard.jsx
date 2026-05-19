@@ -401,10 +401,13 @@ function TrackDetailModal({ track, onClose, onEdit, onDelete, onTogglePublic }) 
             animate={playing ? { scale: 1.08, x: [0, 4, -4, 2, 0] } : { scale: 1.04, x: 0 }}
             transition={playing ? { scale: { duration: 0.8 }, x: { duration: 10, repeat: Infinity, ease: "easeInOut" } } : { duration: 0.8 }}
           >
-            {track.cover_url
-              ? <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
-              : <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #1e0a3c 0%, #0a1628 40%, #0a0a0b 100%)" }}><Music2 className="w-20 h-20 text-white/10" /></div>
-            }
+            {(() => {
+              const ytThumb = !track.cover_url && track.youtube_music_url ? `https://img.youtube.com/vi/${getYoutubeId(track.youtube_music_url)}/hqdefault.jpg` : null;
+              const src = track.cover_url || ytThumb;
+              return src
+                ? <img src={src} alt={track.title} className="w-full h-full object-cover" />
+                : <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #1e0a3c 0%, #0a1628 40%, #0a0a0b 100%)" }}><Music2 className="w-20 h-20 text-white/10" /></div>;
+            })()}
           </motion.div>
           <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #0f0f0f 0%, rgba(15,15,15,0.5) 50%, transparent 100%)" }} />
           {playing && <div className="absolute bottom-16 left-5"><AudioWave /></div>}
@@ -622,10 +625,13 @@ function TrackCard({ track, onEdit, isFirst }) {
                 animate={playing ? { scale: 1.1, x: [0, 3, -3, 1, 0] } : showPreviewAnimation ? { scale: 1.1, x: 2 } : hovered ? { scale: 1.08 } : { scale: 1, x: 0 }}
                 transition={playing ? { scale: { duration: 0.7 }, x: { duration: 8, repeat: Infinity, ease: "easeInOut" } } : showPreviewAnimation ? { duration: 1.5 } : { duration: 0.7 }}
               >
-                {localTrack.cover_url
-                  ? <img src={localTrack.cover_url} alt={localTrack.title} className="w-full h-full object-cover" />
-                  : <div className="w-full h-full flex flex-col items-center justify-center gap-1.5" style={{ background: "linear-gradient(135deg, #1e1a3e 0%, #1a1a2e 50%, #0a0a0b 100%)" }}><Music2 className="w-10 h-10 text-white/15" /><p className="text-[9px] text-white/15 font-medium text-center px-2 line-clamp-2 leading-tight">{localTrack.title}</p></div>
-                }
+                {(() => {
+                  const ytThumb = !localTrack.cover_url && localTrack.youtube_music_url ? `https://img.youtube.com/vi/${getYoutubeId(localTrack.youtube_music_url)}/hqdefault.jpg` : null;
+                  const src = localTrack.cover_url || ytThumb;
+                  return src
+                    ? <img src={src} alt={localTrack.title} className="w-full h-full object-cover" />
+                    : <div className="w-full h-full flex flex-col items-center justify-center gap-1.5" style={{ background: "linear-gradient(135deg, #1e1a3e 0%, #1a1a2e 50%, #0a0a0b 100%)" }}><Music2 className="w-10 h-10 text-white/15" /><p className="text-[9px] text-white/15 font-medium text-center px-2 line-clamp-2 leading-tight">{localTrack.title}</p></div>;
+                })()}
               </motion.div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
               <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded text-[9px] font-bold" style={{ background: status.color + "30", color: status.color }}>{status.label}</div>
@@ -640,8 +646,8 @@ function TrackCard({ track, onEdit, isFirst }) {
                   <p className="text-white font-bold text-[11px] leading-tight line-clamp-1">{localTrack.title}</p>
                   {localTrack.genre && <p className="text-white/30 text-[9px] truncate mt-0.5">{localTrack.genre}</p>}
                 </div>
-                {hasAudio && (
-                  <button onClick={(e) => { e.stopPropagation(); togglePlay(e); }} className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center" style={{ background: playing ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.88)", border: playing ? "1px solid rgba(255,255,255,0.18)" : "none" }}>
+                {(hasAudio || hasYoutube) && (
+                  <button onClick={(e) => { e.stopPropagation(); if (hasAudio) { togglePlay(e); } else { setShowDetail(true); } }} className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center" style={{ background: playing ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.88)", border: playing ? "1px solid rgba(255,255,255,0.18)" : "none" }}>
                     {playing ? <Pause className="w-2.5 h-2.5 text-white" fill="white" /> : <Play className="w-2.5 h-2.5 text-black ml-0.5" fill="black" />}
                   </button>
                 )}

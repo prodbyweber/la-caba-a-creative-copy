@@ -302,14 +302,18 @@ export default function MobileTrackPoster({ track, onEdit }) {
               ? { scale: { duration: 0.7 }, x: { duration: 8, repeat: Infinity, ease: "easeInOut" } }
               : { duration: 0.5 }}
           >
-            {track.cover_url ? (
-              <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-[#1e1a3e] via-[#1a1a2e] to-[#0a0a0b] flex flex-col items-center justify-center gap-1.5">
-                <Music2 className="w-7 h-7 text-white/15" />
-                <p className="text-[8px] text-white/15 font-medium text-center px-1.5 line-clamp-2 leading-tight">{track.title}</p>
-              </div>
-            )}
+            {(() => {
+              const ytThumb = !track.cover_url && track.youtube_music_url ? `https://img.youtube.com/vi/${getYoutubeId(track.youtube_music_url)}/hqdefault.jpg` : null;
+              const src = track.cover_url || ytThumb;
+              return src ? (
+                <img src={src} alt={track.title} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-[#1e1a3e] via-[#1a1a2e] to-[#0a0a0b] flex flex-col items-center justify-center gap-1.5">
+                  <Music2 className="w-7 h-7 text-white/15" />
+                  <p className="text-[8px] text-white/15 font-medium text-center px-1.5 line-clamp-2 leading-tight">{track.title}</p>
+                </div>
+              );
+            })()}
           </motion.div>
 
           {/* Bottom gradient */}
