@@ -363,7 +363,7 @@ function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
 }
 
 // ── Short Detail Modal (grande, metadata + reproductor 9:16) ─────────────────
-function ShortDetailModal({ short, onClose, onEdit, onDelete, onTogglePublic }) {
+function ShortDetailModal({ short, onClose, onEdit, onDelete, onTogglePublic, onMinimize }) {
   const ytId = getYoutubeId(short.youtube_url);
   const isPublic = short.is_active !== false;
 
@@ -385,11 +385,22 @@ function ShortDetailModal({ short, onClose, onEdit, onDelete, onTogglePublic }) 
         className="relative flex flex-col sm:flex-row gap-5 w-full max-w-2xl items-start"
         onClick={e => e.stopPropagation()}
       >
-        {/* Close */}
-        <button onClick={onClose}
-          className="absolute -top-10 right-0 p-2 text-white/40 hover:text-white transition-colors">
-          <X className="w-5 h-5" />
-        </button>
+        {/* Top bar with minimize and close */}
+        <div className="absolute -top-12 right-0 flex items-center gap-2">
+          {onMinimize && (
+            <button onClick={onMinimize}
+              className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-colors border border-white/10"
+              title="Minimizar">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M8 3v5a1 1 0 0 1-1 1H3m18 0h-4a1 1 0 0 1-1-1V3m0 18v-4a1 1 0 0 1 1-1h4M3 21h4a1 1 0 0 1 1-1v-4" />
+              </svg>
+            </button>
+          )}
+          <button onClick={onClose}
+            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/40 hover:text-white transition-colors border border-white/10">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
         {/* 9:16 player */}
         <div className="w-full sm:w-[260px] flex-shrink-0 rounded-2xl overflow-hidden bg-black self-center sm:self-start"
@@ -553,6 +564,7 @@ function ShortCard({ short, onEdit, onDelete, onTogglePublic }) {
             onEdit={onEdit}
             onDelete={onDelete}
             onTogglePublic={onTogglePublic}
+            onMinimize={() => setShowDetail(false)}
           />
         )}
       </AnimatePresence>
