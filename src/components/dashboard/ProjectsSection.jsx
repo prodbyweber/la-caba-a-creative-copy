@@ -290,9 +290,7 @@ export default function ProjectsSection({ jlyArtistId }) {
                           <div className="relative aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-white/10 to-white/5 mb-1.5">
                             {cover ? <img src={cover} alt={project.title} className="w-full h-full object-cover" />
                               : <div className="w-full h-full flex items-center justify-center"><Music2 className="w-7 h-7 text-white/20" /></div>}
-                            <div className="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-black/80 text-[8px] font-medium text-white">
-                              {projectTracks.length} tracks
-                            </div>
+
                             <div className="absolute bottom-1 left-1 flex items-center gap-1">
                               <button onClick={e => handleTogglePublic(e, project)}
                                 className={`w-5 h-5 rounded-md flex items-center justify-center ${project.is_public ? "bg-emerald-500/30" : "bg-black/60"}`}>
@@ -330,9 +328,7 @@ export default function ProjectsSection({ jlyArtistId }) {
                               {cover ? <img src={cover} alt={project.title} className="w-full h-full object-cover" />
                                 : <div className="w-full h-full flex items-center justify-center"><Music2 className="w-8 h-8 text-white/20" /></div>}
                             </Link>
-                            <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[9px] font-medium text-white">
-                              {projectTracks.length} tracks
-                            </div>
+
                             <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1 opacity-0 group-hover/proj:opacity-100 transition-opacity">
                               <button onClick={e => handleTogglePublic(e, project)}
                                 className={`w-6 h-6 rounded-md flex items-center justify-center ${project.is_public ? "bg-emerald-500/30 hover:bg-emerald-500/40" : "bg-black/70 hover:bg-black/90"}`}>

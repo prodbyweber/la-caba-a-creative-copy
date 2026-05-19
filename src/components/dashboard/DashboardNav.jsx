@@ -35,7 +35,7 @@ export default function DashboardNav({ artistName, artistId, children }) {
   const analyticsEnabled = landingConfig?.sections_enabled?.analytics !== false;
   
   const menuItems = [
-    { icon: BookOpen, label: "Catálogo", page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
+    { icon: BookOpen, label: "Tu catálogo", page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
     { icon: Compass, label: "Explorar", page: "Explorar" },
   ];
 
