@@ -125,7 +125,7 @@ function ShortCard({ item, onToggle, toggling, creatorProfile }) {
         </button>
       </div>
 
-      {/* Expanded metadata */}
+      {/* Expanded metadata panel */}
       {expanded && (
         <motion.div
           initial={{ height: 0, opacity: 0 }}
@@ -133,46 +133,78 @@ function ShortCard({ item, onToggle, toggling, creatorProfile }) {
           exit={{ height: 0, opacity: 0 }}
           className="px-3 pb-3 border-t border-white/5 pt-3"
         >
-          <div className="space-y-2">
+          <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-3 space-y-2.5">
+            {/* Creator section */}
+            <div>
+              <p className="text-[9px] font-bold text-white/30 uppercase tracking-wider mb-1.5">Creador</p>
+              <div className="flex items-center gap-2">
+                {creatorAvatar ? (
+                  <img src={creatorAvatar} alt={creatorName} className="w-5 h-5 rounded-full object-cover" />
+                ) : (
+                  <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center">
+                    <User className="w-2.5 h-2.5 text-white/40" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-white truncate">{creatorName}</p>
+                  {creatorUsername && <p className="text-[10px] text-white/40 truncate">{creatorUsername}</p>}
+                </div>
+              </div>
+            </div>
+
             {/* Email */}
-            <div className="flex items-center gap-2">
-              <Mail className="w-3 h-3 text-white/30" />
-              <p className="text-[10px] text-white/50 truncate">{creatorEmail}</p>
+            <div>
+              <p className="text-[9px] font-bold text-white/30 uppercase tracking-wider mb-1.5">Cuenta</p>
+              <div className="flex items-center gap-2">
+                <Mail className="w-3 h-3 text-white/30 flex-shrink-0" />
+                <p className="text-[10px] text-white/60 truncate">{creatorEmail}</p>
+              </div>
             </div>
 
             {/* Created date */}
             {item.created_date && (
-              <div className="flex items-center gap-2">
-                <Calendar className="w-3 h-3 text-white/30" />
-                <p className="text-[10px] text-white/50">
-                  {new Date(item.created_date).toLocaleDateString("es-ES", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                  })}
-                </p>
+              <div>
+                <p className="text-[9px] font-bold text-white/30 uppercase tracking-wider mb-1.5">Fecha</p>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-3 h-3 text-white/30 flex-shrink-0" />
+                  <p className="text-[10px] text-white/60">
+                    {new Date(item.created_date).toLocaleDateString("es-ES", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
               </div>
             )}
 
             {/* Source type */}
             {item._is_gallery && (
-              <div className="px-2 py-1 rounded bg-white/5 border border-white/10">
-                <p className="text-[10px] text-white/40">
-                  Short de galería en: <span className="text-white/70 font-semibold">{item._parent_item?.title || "Item"}</span>
-                </p>
+              <div>
+                <p className="text-[9px] font-bold text-white/30 uppercase tracking-wider mb-1.5">Origen</p>
+                <div className="px-2 py-1.5 rounded bg-[#ff5833]/10 border border-[#ff5833]/20">
+                  <p className="text-[10px] text-[#ff5833] font-semibold">
+                    Galería: <span className="text-white/80">{item._parent_item?.title || "Item"}</span>
+                  </p>
+                </div>
               </div>
             )}
 
             {/* URL */}
             {(item.url || item.youtube_url || item.youtube_music_url) && (
-              <a
-                href={item.url || item.youtube_url || item.youtube_music_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block px-2 py-1 rounded bg-[#ff5833]/10 border border-[#ff5833]/20 text-[10px] text-[#ff5833] font-semibold hover:bg-[#ff5833]/15 transition-colors text-center"
-              >
-                Ver en YouTube
-              </a>
+              <div>
+                <p className="text-[9px] font-bold text-white/30 uppercase tracking-wider mb-1.5">Enlace</p>
+                <a
+                  href={item.url || item.youtube_url || item.youtube_music_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block px-2 py-1.5 rounded bg-[#ff5833]/10 border border-[#ff5833]/20 text-[10px] text-[#ff5833] font-semibold hover:bg-[#ff5833]/15 transition-colors text-center"
+                >
+                  Abrir en YouTube
+                </a>
+              </div>
             )}
           </div>
         </motion.div>
@@ -245,6 +277,8 @@ export default function ParaTiAdmin() {
             _is_gallery: true,
             _parent_id: item.id,
             _parent_item: item,
+            created_by: item.created_by, // Heredar el creador del item padre
+            created_date: item.created_date,
           });
         }
       });
