@@ -32,55 +32,35 @@ export default function StartBrandsCarousel() {
   if (!logos || logos.length === 0) return null;
 
   return (
-    <section
+    <div
       style={{
-        position: "relative",
-        background: "#0c0c0c",
-        padding: "clamp(40px, 6vw, 80px) 0",
-        overflow: "hidden",
+        width: "100%",
+        maxWidth: "600px",
+        margin: "0 auto",
       }}
     >
-      {/* Label */}
-      <div style={{ textAlign: "center", marginBottom: "clamp(24px, 4vw, 40px)" }}>
-        <span
-          style={{
-            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            fontWeight: 700,
-            fontSize: "11px",
-            letterSpacing: "0.35em",
-            textTransform: "uppercase",
-            color: "rgba(240,237,232,0.25)",
-          }}
-        >
-          Marcas colaboradoras
-        </span>
-      </div>
-
       {/* Grid layout - 2 columns, 2 rows */}
       <div style={{ 
-        maxWidth: "900px", 
-        margin: "0 auto", 
         display: "grid", 
         gridTemplateColumns: "repeat(2, 1fr)",
-        gap: "clamp(24px, 4vw, 40px)",
-        padding: "0 clamp(24px, 6vw, 48px)"
+        gap: "20px",
       }}>
         {pages[currentPage]?.map((logo, idx) => (
           <motion.div
             key={idx}
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.5, delay: idx * 0.1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.4, delay: idx * 0.05 }}
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              minHeight: "clamp(120px, 18vw, 200px)",
+              height: "100px",
               background: "rgba(255,255,255,0.02)",
-              borderRadius: "16px",
-              padding: "clamp(20px, 4vw, 32px)",
-              border: "1px solid rgba(255,255,255,0.04)",
+              borderRadius: "12px",
+              padding: "16px",
+              border: "1px solid rgba(255,255,255,0.05)",
             }}
           >
             <img
@@ -91,20 +71,20 @@ export default function StartBrandsCarousel() {
                 maxWidth: "100%",
                 maxHeight: "100%",
                 objectFit: "contain",
-                opacity: 0.7,
+                opacity: 0.75,
                 filter: "brightness(1) saturate(1)",
-                transition: "all 0.4s ease",
+                transition: "all 0.3s ease",
               }}
               onMouseEnter={e => { 
                 e.currentTarget.style.opacity = "1"; 
-                e.currentTarget.style.filter = "brightness(1.2) drop-shadow(0 0 20px rgba(255,255,255,0.3))"; 
-                e.currentTarget.parentElement.style.borderColor = "rgba(255,255,255,0.12)";
-                e.currentTarget.parentElement.style.background = "rgba(255,255,255,0.04)";
+                e.currentTarget.style.filter = "brightness(1.15)"; 
+                e.currentTarget.parentElement.style.borderColor = "rgba(255,255,255,0.15)";
+                e.currentTarget.parentElement.style.background = "rgba(255,255,255,0.05)";
               }}
               onMouseLeave={e => { 
-                e.currentTarget.style.opacity = "0.7"; 
+                e.currentTarget.style.opacity = "0.75"; 
                 e.currentTarget.style.filter = "grayscale(0) brightness(1)"; 
-                e.currentTarget.parentElement.style.borderColor = "rgba(255,255,255,0.04)";
+                e.currentTarget.parentElement.style.borderColor = "rgba(255,255,255,0.05)";
                 e.currentTarget.parentElement.style.background = "rgba(255,255,255,0.02)";
               }}
             />
@@ -114,16 +94,16 @@ export default function StartBrandsCarousel() {
 
       {/* Pagination dots */}
       {pages.length > 1 && (
-        <div style={{ display: "flex", justifyContent: "center", gap: "12px", marginTop: "clamp(24px, 4vw, 40px)" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "20px" }}>
           {pages.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentPage(idx)}
               style={{
-                width: idx === currentPage ? "32px" : "10px",
-                height: "10px",
-                borderRadius: "5px",
-                background: idx === currentPage ? "rgba(240,237,232,0.8)" : "rgba(240,237,232,0.2)",
+                width: idx === currentPage ? "28px" : "8px",
+                height: "8px",
+                borderRadius: "4px",
+                background: idx === currentPage ? "rgba(240,237,232,0.7)" : "rgba(240,237,232,0.25)",
                 border: "none",
                 cursor: "pointer",
                 transition: "all 0.3s ease",
@@ -133,6 +113,6 @@ export default function StartBrandsCarousel() {
           ))}
         </div>
       )}
-    </section>
+    </div>
   );
 }
