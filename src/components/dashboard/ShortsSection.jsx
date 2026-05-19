@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, X, Trash2, Play, Loader2, Check, Pencil, Globe, Lock, Zap, ExternalLink, Search, Music2, Users } from "lucide-react";
+import { Plus, X, Trash2, Play, Loader2, Check, Pencil, Globe, Lock, Zap, ExternalLink, Search, Music2, Users, Maximize2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -362,93 +362,201 @@ function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
   );
 }
 
-// ── Short Card (portrait 9:16 poster with inline YT player) ──────────────────
+// ── Short Detail Modal (grande, metadata + reproductor 9:16) ─────────────────
+function ShortDetailModal({ short, onClose, onEdit, onDelete, onTogglePublic }) {
+  const ytId = getYoutubeId(short.youtube_url);
+  const isPublic = short.is_active !== false;
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  return ReactDOM.createPortal(
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[700] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.92, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 20 }}
+        transition={{ type: "spring", damping: 28, stiffness: 300 }}
+        className="relative flex flex-col sm:flex-row gap-5 w-full max-w-2xl items-start"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Close */}
+        <button onClick={onClose}
+          className="absolute -top-10 right-0 p-2 text-white/40 hover:text-white transition-colors">
+          <X className="w-5 h-5" />
+        </button>
+
+        {/* 9:16 player */}
+        <div className="w-full sm:w-[260px] flex-shrink-0 rounded-2xl overflow-hidden bg-black self-center sm:self-start"
+          style={{ aspectRatio: "9/16", maxHeight: "calc(100vh - 120px)" }}>
+          {ytId ? (
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
+              <Zap className="w-12 h-12 text-white/10" />
+            </div>
+          )}
+        </div>
+
+        {/* Metadata */}
+        <div className="flex-1 min-w-0 text-white space-y-4 py-1">
+          <div>
+            <p className="text-[10px] text-white/25 uppercase tracking-widest mb-1">Short</p>
+            <h2 className="text-xl font-black leading-tight">{short.title}</h2>
+          </div>
+
+          {/* Estado público */}
+          <button onClick={() => onTogglePublic(short)}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${isPublic ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/20" : "bg-white/5 text-white/30 border border-white/10"}`}>
+            {isPublic ? <Globe className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
+            {isPublic ? "Público" : "Privado"}
+          </button>
+
+          {/* Soundtrack */}
+          {short.track_id && (
+            <div>
+              <p className="text-[10px] text-white/25 uppercase tracking-widest mb-1.5">Soundtrack</p>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/[0.07]">
+                <Music2 className="w-3.5 h-3.5 text-white/40 flex-shrink-0" />
+                <span className="text-xs text-white/60 truncate">{short.track_id}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Colaboradores */}
+          {short.collaborators?.length > 0 && (
+            <div>
+              <p className="text-[10px] text-white/25 uppercase tracking-widest mb-1.5">Colaboradores</p>
+              <div className="flex flex-wrap gap-2">
+                {short.collaborators.map((c, i) => (
+                  <div key={c.id || i} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/[0.07]">
+                    {c.avatar_url
+                      ? <img src={c.avatar_url} className="w-5 h-5 rounded-full object-cover flex-shrink-0" />
+                      : <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                          <Users className="w-2.5 h-2.5 text-white/30" />
+                        </div>
+                    }
+                    <span className="text-xs text-white/60">{c.display_name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Acciones */}
+          <div className="flex flex-wrap gap-2 pt-2">
+            <button onClick={() => { onClose(); onEdit(short); }}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/8 hover:bg-white/12 text-white text-xs font-semibold transition-colors border border-white/10">
+              <Pencil className="w-3.5 h-3.5" /> Editar
+            </button>
+            {short.youtube_url && (
+              <a href={short.youtube_url} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/50 hover:text-white text-xs font-semibold transition-colors border border-white/10">
+                <ExternalLink className="w-3.5 h-3.5" /> Ver en YouTube
+              </a>
+            )}
+            <button onClick={() => { onDelete(short.id); onClose(); }}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold transition-colors border border-red-500/15">
+              <Trash2 className="w-3.5 h-3.5" /> Eliminar
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>,
+    document.body
+  );
+}
+
+// ── Short Card (portrait 9:16 poster) ────────────────────────────────────────
 function ShortCard({ short, onEdit, onDelete, onTogglePublic }) {
-  const [playing, setPlaying] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
   const thumb = short.thumbnail_url || getThumbnail(short.youtube_url);
   const ytId = getYoutubeId(short.youtube_url);
   const isPublic = short.is_active !== false;
 
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-      className="group relative flex-shrink-0 w-[130px]">
-      {/* Poster / Player */}
-      <div className="relative rounded-xl overflow-hidden bg-black"
-        style={{ aspectRatio: "9/16" }}>
+    <>
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+        className="group relative flex-shrink-0 w-[130px]">
+        {/* Poster */}
+        <div className="relative rounded-xl overflow-hidden bg-black cursor-pointer"
+          style={{ aspectRatio: "9/16" }}
+          onClick={() => setShowDetail(true)}>
 
-        {playing && ytId ? (
-          /* Inline YouTube embed (9:16) */
-          <iframe
-            src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1`}
-            className="absolute inset-0 w-full h-full"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        ) : (
-          <>
-            {thumb
-              ? <img src={thumb} alt={short.title} className="w-full h-full object-cover" />
-              : <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
-                  <Zap className="w-7 h-7 text-white/15" />
-                </div>
-            }
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+          {thumb
+            ? <img src={thumb} alt={short.title} className="w-full h-full object-cover" />
+            : <div className="w-full h-full bg-gradient-to-br from-[#1a1a2e] to-[#0a0a0b] flex items-center justify-center">
+                <Zap className="w-7 h-7 text-white/15" />
+              </div>
+          }
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
-            {/* YT badge */}
-            <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold"
-              style={{ background: "rgba(255,0,0,0.75)", color: "white" }}>
-              SHORT
-            </div>
+          {/* Title bottom */}
+          <div className="absolute bottom-0 left-0 right-0 px-2 pb-2">
+            <p className="text-white font-bold text-[10px] leading-tight line-clamp-2">{short.title}</p>
+          </div>
 
-            {/* Title bottom */}
-            <div className="absolute bottom-10 left-0 right-0 px-2 pb-1">
-              <p className="text-white font-bold text-[10px] leading-tight line-clamp-2">{short.title}</p>
-            </div>
-
-            {/* Play button — centered */}
-            {ytId && (
-              <button
-                onClick={() => setPlaying(true)}
-                className="absolute inset-0 flex items-center justify-center group/play"
-              >
-                <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover/play:opacity-100 transition-opacity shadow-lg">
-                  <Play className="w-4 h-4 text-black ml-0.5" fill="black" />
-                </div>
-              </button>
-            )}
-          </>
-        )}
-
-        {/* Stop button when playing */}
-        {playing && (
+          {/* Expand button — top right */}
           <button
-            onClick={() => setPlaying(false)}
-            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/70 flex items-center justify-center z-10 hover:bg-black/90 transition-colors">
-            <X className="w-3.5 h-3.5 text-white" />
+            onClick={e => { e.stopPropagation(); setShowDetail(true); }}
+            className="absolute top-1.5 right-1.5 w-6 h-6 rounded-md bg-black/60 hover:bg-black/80 flex items-center justify-center transition-colors opacity-0 group-hover:opacity-100"
+          >
+            <Maximize2 className="w-3 h-3 text-white/80" />
           </button>
-        )}
-      </div>
 
-      {/* Action row below poster */}
-      <div className="flex items-center justify-between mt-1.5 gap-1">
-        <button onClick={() => onTogglePublic(short)}
-          className={`p-1.5 rounded-lg transition-colors ${isPublic ? "bg-emerald-500/15" : "bg-white/5"}`}>
-          {isPublic ? <Globe className="w-3 h-3 text-emerald-400" /> : <Lock className="w-3 h-3 text-white/25" />}
-        </button>
-        <button onClick={() => onEdit(short)} className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-          <Pencil className="w-3 h-3 text-white/40" />
-        </button>
-        {short.youtube_url && (
-          <a href={short.youtube_url} target="_blank" rel="noopener noreferrer"
-            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
-            <ExternalLink className="w-3 h-3 text-white/40" />
-          </a>
+          {/* Play overlay on hover */}
+          {ytId && (
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
+                <Play className="w-4 h-4 text-black ml-0.5" fill="black" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Action row below poster */}
+        <div className="flex items-center justify-between mt-1.5 gap-1">
+          <button onClick={() => onTogglePublic(short)}
+            className={`p-1.5 rounded-lg transition-colors ${isPublic ? "bg-emerald-500/15" : "bg-white/5"}`}>
+            {isPublic ? <Globe className="w-3 h-3 text-emerald-400" /> : <Lock className="w-3 h-3 text-white/25" />}
+          </button>
+          <button onClick={() => onEdit(short)} className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+            <Pencil className="w-3 h-3 text-white/40" />
+          </button>
+          {short.youtube_url && (
+            <a href={short.youtube_url} target="_blank" rel="noopener noreferrer"
+              className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors">
+              <ExternalLink className="w-3 h-3 text-white/40" />
+            </a>
+          )}
+          <button onClick={() => onDelete(short.id)} className="p-1.5 rounded-lg bg-white/5 hover:bg-red-900/60 transition-colors">
+            <Trash2 className="w-3 h-3 text-white/30 hover:text-red-400" />
+          </button>
+        </div>
+      </motion.div>
+
+      <AnimatePresence>
+        {showDetail && (
+          <ShortDetailModal
+            short={short}
+            onClose={() => setShowDetail(false)}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onTogglePublic={onTogglePublic}
+          />
         )}
-        <button onClick={() => onDelete(short.id)} className="p-1.5 rounded-lg bg-white/5 hover:bg-red-900/60 transition-colors">
-          <Trash2 className="w-3 h-3 text-white/30 hover:text-red-400" />
-        </button>
-      </div>
-    </motion.div>
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -456,7 +564,6 @@ function ShortCard({ short, onEdit, onDelete, onTogglePublic }) {
 export default function ShortsSection({ artistId, userProfileId }) {
   const [showModal, setShowModal] = useState(false);
   const [editingShort, setEditingShort] = useState(null);
-  const [playingYt, setPlayingYt] = useState(null);
   const qc = useQueryClient();
 
   const { data: shorts = [], isLoading, refetch } = useQuery({
@@ -534,7 +641,6 @@ export default function ShortsSection({ artistId, userProfileId }) {
                 onEdit={s => { setEditingShort(s); setShowModal(true); }}
                 onDelete={handleDelete}
                 onTogglePublic={handleTogglePublic}
-                onPlay={setPlayingYt}
               />
             ))}
           </div>
@@ -553,32 +659,7 @@ export default function ShortsSection({ artistId, userProfileId }) {
         )}
       </AnimatePresence>
 
-      {/* YouTube player overlay */}
-      <AnimatePresence>
-        {playingYt && ReactDOM.createPortal(
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[700] bg-black/95 flex items-center justify-center p-4"
-            onClick={() => setPlayingYt(null)}>
-            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}
-              className="relative w-full max-w-xs" onClick={e => e.stopPropagation()}>
-              <button onClick={() => setPlayingYt(null)}
-                className="absolute -top-10 right-0 p-2 text-white/50 hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-              {/* 9:16 player for shorts */}
-              <div className="relative rounded-xl overflow-hidden" style={{ paddingBottom: "177.78%" }}>
-                <iframe
-                  src={`https://www.youtube-nocookie.com/embed/${playingYt}?autoplay=1&rel=0`}
-                  className="absolute inset-0 w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-            </motion.div>
-          </motion.div>,
-          document.body
-        )}
-      </AnimatePresence>
+
     </motion.div>
   );
 }
