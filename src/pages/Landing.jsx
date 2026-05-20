@@ -62,7 +62,7 @@ export default function Landing() {
       <div>
         <LandingHero bottomOffset="clamp(90px, 12vw, 140px)" />
         <StartExplorar showButton={true} allowMobileScroll={true} />
-        <StartCreadores />
+        <StartCreadores hideServices />
         <StartWhatWeDo />
         <StartChoosePath />
         <LandingContact />
