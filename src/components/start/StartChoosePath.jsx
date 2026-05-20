@@ -504,20 +504,6 @@ export default function StartChoosePath() {
     navigate("/meeting");
   };
 
-  // Scroll to section when "Comenzar" button is clicked from nav
-  useEffect(() => {
-    const handleHashChange = () => {
-      if (window.location.hash === "#choose") {
-        const section = document.getElementById("choose");
-        if (section) {
-          section.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }
-    };
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
-
   const btnColor = (key) => (key === "artist" || key === "brand") ? "#ff5833" : "rgba(240,237,232,0.6)";
 
   return (
@@ -532,7 +518,6 @@ export default function StartChoosePath() {
         background: "#080808",
         display: "flex",
         alignItems: "flex-end",
-        scrollSnapAlign: "start",
       }}
     >
       {/* Background */}
@@ -563,11 +548,11 @@ export default function StartChoosePath() {
         style={{
           position: "relative",
           zIndex: 10,
-          padding: "clamp(80px, 14vw, 160px) clamp(24px, 6vw, 56px) clamp(40px, 8vw, 72px)",
+          padding: "clamp(120px, 20vw, 200px) clamp(24px, 6vw, 56px) clamp(40px, 8vw, 72px)",
           width: "100%",
           overflowY: "auto",
           maxHeight: "100dvh",
-          paddingBottom: "clamp(60px, 10vw, 100px)",
+          paddingBottom: "clamp(80px, 12vw, 120px)",
         }}
       >
         {/* Label */}
@@ -622,6 +607,16 @@ export default function StartChoosePath() {
         >
           Una reunión para conocer tu visión creativa, analizar tu proyecto y explorar cómo podemos ayudarte a desarrollar tu sonido, identidad visual y dirección artística a través de Cabaña Creative.
         </motion.p>
+
+        {/* Contacto — colapsable minimalista */}
+        <motion.div
+          initial={{ opacity: 0, x: -16 }}
+          animate={inView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.65, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          style={{ marginBottom: "clamp(24px, 5vw, 40px)" }}
+        >
+          <InlineContactForm />
+        </motion.div>
 
         {/* Paths */}
         <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
@@ -697,23 +692,8 @@ export default function StartChoosePath() {
               </AnimatePresence>
             </div>
           ))}
-        </div>
 
-        {/* Contacto minimalista — solo aparece debajo de "Marca" cuando ningún panel está abierto o siempre visible */}
-        <AnimatePresence>
-          {openPanel !== "artist" && (
-            <motion.div
-              key="brand-inline-contact"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              style={{ marginTop: "clamp(16px, 3vw, 24px)" }}
-            >
-              <InlineContactForm />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        </div>
 
 
       </div>
