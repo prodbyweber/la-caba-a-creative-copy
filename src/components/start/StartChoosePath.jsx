@@ -532,6 +532,7 @@ export default function StartChoosePath() {
         background: "#080808",
         display: "flex",
         alignItems: "flex-end",
+        scrollSnapAlign: "start",
       }}
     >
       {/* Background */}
@@ -562,11 +563,11 @@ export default function StartChoosePath() {
         style={{
           position: "relative",
           zIndex: 10,
-          padding: "clamp(120px, 20vw, 200px) clamp(24px, 6vw, 56px) clamp(40px, 8vw, 72px)",
+          padding: "clamp(80px, 14vw, 160px) clamp(24px, 6vw, 56px) clamp(40px, 8vw, 72px)",
           width: "100%",
           overflowY: "auto",
           maxHeight: "100dvh",
-          paddingBottom: "clamp(80px, 12vw, 120px)",
+          paddingBottom: "clamp(60px, 10vw, 100px)",
         }}
       >
         {/* Label */}
@@ -621,20 +622,6 @@ export default function StartChoosePath() {
         >
           Una reunión para conocer tu visión creativa, analizar tu proyecto y explorar cómo podemos ayudarte a desarrollar tu sonido, identidad visual y dirección artística a través de Cabaña Creative.
         </motion.p>
-
-        {/* Contacto — colapsable minimalista (solo para Artista/Creador) */}
-        {openPanel === "artist" && (
-          <motion.div
-            key="artist-contact"
-            initial={{ opacity: 0, x: -16 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -16 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            style={{ marginBottom: "clamp(24px, 5vw, 40px)" }}
-          >
-            <InlineContactForm />
-          </motion.div>
-        )}
 
         {/* Paths */}
         <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
@@ -708,24 +695,25 @@ export default function StartChoosePath() {
                   </motion.div>
                 )}
               </AnimatePresence>
-
-              {/* Contacto minimalista SOLO para Marca - debajo del panel */}
-              {openPanel === "brand" && (
-                <motion.div
-                  key="brand-contact-inline"
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.35, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ marginTop: "clamp(16px, 3vw, 24px)", marginBottom: "clamp(24px, 5vw, 40px)" }}
-                >
-                  <InlineContactForm />
-                </motion.div>
-              )}
             </div>
           ))}
-
         </div>
+
+        {/* Contacto minimalista — solo aparece debajo de "Marca" cuando ningún panel está abierto o siempre visible */}
+        <AnimatePresence>
+          {openPanel !== "artist" && (
+            <motion.div
+              key="brand-inline-contact"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              style={{ marginTop: "clamp(16px, 3vw, 24px)" }}
+            >
+              <InlineContactForm />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
 
       </div>

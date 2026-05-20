@@ -29,6 +29,11 @@ export default function Start() {
     }
   }, []);
 
+  // Expose container ref so StickyNav can scroll the snap container on mobile
+  useEffect(() => {
+    window.__snapContainer = containerRef;
+  }, []);
+
   return (
     <div
       style={{

@@ -14,7 +14,22 @@ const NAV_ITEMS = [
 
 const scrollTo = (id) => {
   const el = document.getElementById(id);
-  if (el) el.scrollIntoView({ behavior: "smooth" });
+  if (!el) return;
+  // On mobile, scroll inside the snap container; on desktop use window scroll
+  const isMobile = window.innerWidth < 768;
+  const snapContainer = window.__snapContainer?.current;
+  if (isMobile && snapContainer) {
+    // Find which snap child contains the target element
+    const children = Array.from(snapContainer.children);
+    const targetChild = children.find(child => child.contains(el) || child.querySelector(`#${id}`));
+    if (targetChild) {
+      targetChild.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  } else {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 };
 
 export default function StickyNav({ showMoreInfo = false }) {
