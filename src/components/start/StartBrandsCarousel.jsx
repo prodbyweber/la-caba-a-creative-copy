@@ -79,13 +79,14 @@ export default function StartBrandsCarousel() {
               src={logo}
               alt="Brand"
               draggable={false}
-              whileHover={{ opacity: 1, scale: 1.04, filter: "brightness(1.2)" }}
-              transition={{ duration: 0.3 }}
+              whileHover={{ scale: 1.04, filter: "brightness(1.35) drop-shadow(0 0 10px rgba(255,255,255,0.18))" }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
               style={{
                 maxWidth: "100%",
                 maxHeight: "100%",
                 objectFit: "contain",
-                opacity: 0.8,
+                opacity: 1,
+                filter: "brightness(1)",
               }}
             />
           </motion.div>
