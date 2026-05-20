@@ -54,10 +54,10 @@ export default function StartBrandsCarousel() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              height: "72px",
-              background: "rgba(255,255,255,0.015)",
-              borderRadius: "12px",
-              padding: "12px",
+              height: "120px",
+                background: "rgba(255,255,255,0.015)",
+                borderRadius: "16px",
+                padding: "20px",
               border: "1px solid rgba(255,255,255,0.04)",
             }}
           >
