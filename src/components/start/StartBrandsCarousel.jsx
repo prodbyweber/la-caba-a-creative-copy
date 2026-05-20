@@ -55,10 +55,12 @@ export default function StartBrandsCarousel() {
               alignItems: "center",
               justifyContent: "center",
               height: "120px",
-                background: "rgba(255,255,255,0.015)",
-                borderRadius: "16px",
-                padding: "20px",
+              minHeight: "120px",
+              background: "rgba(255,255,255,0.015)",
+              borderRadius: "16px",
+              padding: "20px",
               border: "1px solid rgba(255,255,255,0.04)",
+              boxSizing: "border-box",
             }}
           >
             <motion.img
