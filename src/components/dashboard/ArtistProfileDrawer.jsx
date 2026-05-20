@@ -343,6 +343,7 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
   const TABS = [
     { id: "profile", label: "Perfil" },
     { id: "social",  label: "Redes" },
+    { id: "cuenta",  label: "Cuenta" },
     ...(artist?.id ? [{ id: "sessions", label: "Sesiones" }] : []),
   ];
 
@@ -525,19 +526,6 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                           </a>
                         )}
 
-                        {/* Fotos */}
-                        {userProfile?.id && (
-                          <div className="mt-4">
-                            <div className="flex items-center gap-2 mb-3">
-                              <div className="w-7 h-7 rounded-lg bg-white/[0.06] flex items-center justify-center flex-shrink-0">
-                                <Image className="w-3.5 h-3.5 text-white/40" />
-                              </div>
-                              <p className="text-xs font-semibold text-white/70">Fotos</p>
-                            </div>
-                            <PhotosGallery userProfileId={userProfile.id} />
-                          </div>
-                        )}
-
                         {/* Cerrar sesión */}
                         <button
                           onClick={() => base44.auth.logout("/")}
@@ -710,6 +698,25 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                         </motion.div>
                       )}
                     </AnimatePresence>
+                  </div>
+                )}
+
+                {/* ── TAB: CUENTA ── */}
+                {tab === "cuenta" && (
+                  <div className="px-5 py-5">
+                    {userProfile?.id ? (
+                      <div>
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-7 h-7 rounded-lg bg-white/[0.06] flex items-center justify-center flex-shrink-0">
+                            <Image className="w-3.5 h-3.5 text-white/40" />
+                          </div>
+                          <p className="text-xs font-semibold text-white/70">Fotos</p>
+                        </div>
+                        <PhotosGallery userProfileId={userProfile.id} />
+                      </div>
+                    ) : (
+                      <p className="text-white/25 text-sm text-center py-10">Sin perfil configurado</p>
+                    )}
                   </div>
                 )}
 
