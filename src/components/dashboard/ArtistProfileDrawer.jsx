@@ -232,9 +232,13 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: (data) => base44.entities.UserProfile.update(userProfile.id, data),
+    mutationFn: (data) => {
+      if (!userProfile?.id) return Promise.resolve(null);
+      return base44.entities.UserProfile.update(userProfile.id, data);
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userProfile', artist?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['userProfile', artist?.user_id || userProfile?.user_id] });
+      queryClient.invalidateQueries({ queryKey: ['user-profile-me'] });
     },
   });
 
@@ -284,18 +288,21 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
       ? `${formData.address}, ${formData.country_of_residence}`
       : formData.country_of_residence;
 
-    await updateArtistMutation.mutateAsync({
-      stageName: formData.artist_name || formData.first_name,
-      legalName: `${formData.first_name} ${formData.last_name}`.trim(),
-      phone: formData.phone ? `${formData.phone_country_code} ${formData.phone}`.trim() : '',
-      location: city,
-      nationality: formData.nationality,
-      country_of_residence: formData.country_of_residence,
-      avatar_url: formData.avatar_url,
-      photo_position: formData.photo_position,
-      photo_scale: formData.photo_scale,
-      social_links: socialLinks,
-    });
+    // Only update Artist entity if there's an actual artist record
+    if (artist?.id) {
+      await updateArtistMutation.mutateAsync({
+        stageName: formData.artist_name || formData.first_name,
+        legalName: `${formData.first_name} ${formData.last_name}`.trim(),
+        phone: formData.phone ? `${formData.phone_country_code} ${formData.phone}`.trim() : '',
+        location: city,
+        nationality: formData.nationality,
+        country_of_residence: formData.country_of_residence,
+        avatar_url: formData.avatar_url,
+        photo_position: formData.photo_position,
+        photo_scale: formData.photo_scale,
+        social_links: socialLinks,
+      });
+    }
 
     if (userProfile?.id) {
       await updateProfileMutation.mutateAsync({
@@ -303,6 +310,7 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
         last_name: formData.last_name,
         full_name: `${formData.first_name} ${formData.last_name}`.trim(),
         artist_name: formData.artist_name,
+        display_name: formData.artist_name || `${formData.first_name} ${formData.last_name}`.trim(),
         username: formData.username || generateUsername(),
         phone: formData.phone,
         phone_country_code: formData.phone_country_code,
@@ -310,6 +318,7 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
         country_of_residence: formData.country_of_residence,
         address: formData.address,
         profile_photo_url: formData.avatar_url,
+        avatar_url: formData.avatar_url,
         photo_position: formData.photo_position,
       });
     }
@@ -319,7 +328,8 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
   const handleSaveSocial = () => {
     const updated = { ...socialLinks, [editingPlatform]: platformUrl };
     setSocialLinks(updated);
-    updateArtistMutation.mutate({ social_links: updated });
+    if (artist?.id) updateArtistMutation.mutate({ social_links: updated });
+    if (userProfile?.id) updateProfileMutation.mutate({ social_links: updated });
     setEditingPlatform(null);
     setPlatformUrl("");
   };
@@ -328,10 +338,11 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
     const updated = { ...socialLinks };
     delete updated[id];
     setSocialLinks(updated);
-    updateArtistMutation.mutate({ social_links: updated });
+    if (artist?.id) updateArtistMutation.mutate({ social_links: updated });
+    if (userProfile?.id) updateProfileMutation.mutate({ social_links: updated });
   };
 
-  if (!artist && !userProfile) return null;
+  if (!userProfile && !artist) return null;
 
   const avatarUrl = artist?.avatar_url || userProfile?.avatar_url || userProfile?.profile_photo_url;
   const photoPosition = artist?.photo_position || userProfile?.photo_position || "center center";
@@ -645,9 +656,9 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
                             className="flex-1 py-3 rounded-2xl bg-white/[0.06] hover:bg-white/10 text-white/50 text-sm font-semibold transition-colors">
                             Cancelar
                           </button>
-                          <button onClick={handleSave} disabled={updateArtistMutation.isPending}
+                          <button onClick={handleSave} disabled={updateArtistMutation.isPending || updateProfileMutation.isPending}
                             className="flex-1 py-3 rounded-2xl bg-white text-black text-sm font-bold transition-colors hover:bg-white/90 disabled:opacity-50 flex items-center justify-center gap-2">
-                            {updateArtistMutation.isPending
+                            {(updateArtistMutation.isPending || updateProfileMutation.isPending)
                               ? <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
                               : <><Check className="w-4 h-4" /> Guardar</>
                             }

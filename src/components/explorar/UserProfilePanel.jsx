@@ -261,12 +261,14 @@ export default function UserProfilePanel({ currentUser, onClose }) {
   const avatarUrl = userProfile?.avatar_url || linkedArtist?.avatar_url || "";
   const initials = displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
 
-  // Catalog URL: admin → Dashboard (catálogo general), artist/user → ArtistDashboard
+  // Catalog URL: admin → Dashboard (catálogo general), todos los usuarios registrados → ArtistDashboard
   const catalogUrl = currentUser?.role === "admin"
     ? "/Dashboard"
     : linkedArtist
       ? `/ArtistDashboard?artistId=${linkedArtist.id}`
-      : null;
+      : currentUser
+        ? "/ArtistDashboard"
+        : null;
 
   // Library items list
   const libraryItems = [

@@ -56,20 +56,6 @@ export default function ArtistDashboard() {
       if (!uid) return null;
       const profiles = await base44.entities.UserProfile.filter({ user_id: uid });
       if (profiles.length > 0) return profiles[0];
-      if (artist && !artist?.user_id) {
-        const generatedUsername =
-          artist.stageName?.toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "").slice(0, 20) ||
-          "artist_" + Math.random().toString(36).substr(2, 9);
-        const created = await base44.entities.UserProfile.create({
-          user_id: uid,
-          username: generatedUsername,
-          display_name: artist.stageName || "Usuario",
-          artist_name: artist.stageName,
-          avatar_url: artist.avatar_url,
-          account_type: "artist",
-        });
-        return created;
-      }
       return null;
     },
     enabled: !!(artist?.user_id || currentUser?.id),
@@ -111,7 +97,8 @@ export default function ArtistDashboard() {
     try { localStorage.setItem(storageKey, JSON.stringify(newOrder)); } catch {}
   };
 
-  const resolving = !artistIdParam && !selfArtist && !currentUser;
+  // Solo mostrar loading si realmente estamos resolviendo (currentUser ya cargó pero selfArtist aún no)
+  const resolving = !!currentUser && !artistIdParam && selfArtist === undefined;
   if (isLoading || resolving) {
     return (
       <div className="min-h-screen bg-[#0a0a0b] text-white">
@@ -139,13 +126,15 @@ export default function ArtistDashboard() {
     );
   }
 
+
   const effectiveArtist = artist || null;
   const displayName =
     effectiveArtist?.stageName ||
     userProfile?.artist_name ||
     userProfile?.display_name ||
+    userProfile?.full_name ||
     currentUser?.full_name ||
-    "Dashboard";
+    "Mi catálogo";
 
   // Render a catalog section by key
   const renderSection = (key) => {
@@ -196,7 +185,7 @@ export default function ArtistDashboard() {
     <div className="min-h-screen bg-[#0a0a0b] text-white">
       <DashboardNav artistName={displayName} artistId={effectiveArtist?.id}>
         <ArtistAvatarButton
-          artist={effectiveArtist || { stageName: displayName, avatar_url: userProfile?.profile_photo_url || userProfile?.avatar_url }}
+          artist={effectiveArtist || { stageName: displayName, avatar_url: userProfile?.profile_photo_url || userProfile?.avatar_url || "" }}
           onClick={() => setShowProfileDrawer(true)}
         />
       </DashboardNav>
@@ -271,12 +260,14 @@ export default function ArtistDashboard() {
         </div>
       </main>
 
-      <ArtistProfileDrawer
-        artist={effectiveArtist}
-        userProfile={userProfile}
-        isOpen={showProfileDrawer}
-        onClose={() => setShowProfileDrawer(false)}
-      />
+      {(effectiveArtist || userProfile) && (
+        <ArtistProfileDrawer
+          artist={effectiveArtist}
+          userProfile={userProfile}
+          isOpen={showProfileDrawer}
+          onClose={() => setShowProfileDrawer(false)}
+        />
+      )}
     </div>
   );
 }
