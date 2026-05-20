@@ -162,10 +162,10 @@ function ContentCard({ item, onClick, currentUser, allItems }) {
                 )}
                 {hasVideo && !ytPlaying && (
                   <button onClick={toggleYtPlay}
-                    className="w-9 h-9 rounded-full flex items-center justify-center border border-red-400/40 hover:bg-red-500/20 transition-colors pointer-events-auto"
-                    style={{ background: "rgba(255,0,0,0.25)" }}
+                    className="w-9 h-9 rounded-full flex items-center justify-center transition-colors pointer-events-auto"
+                    style={{ background: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.25)" }}
                     title="Reproducir con sonido">
-                    <svg className="w-4 h-4 text-red-300" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                    <svg className="w-4 h-4 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                   </button>
                 )}
               </motion.div>

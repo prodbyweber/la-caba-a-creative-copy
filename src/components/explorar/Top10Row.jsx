@@ -43,7 +43,7 @@ function Top10Card({ item, rank, onClick, currentUser, allItems }) {
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => onClick && onClick(item)}
+      onClick={(e) => { explorar?.openCreditsModal(item, currentUser, allItems); }}
     >
       {/* ── NUMBER — absolutely positioned BEHIND the poster ── */}
       <div
@@ -122,14 +122,16 @@ function Top10Card({ item, rank, onClick, currentUser, allItems }) {
           >
             {(ytId || item.audio_file_url) && (
               <button
-                onClick={openYT}
+                onClick={openCredits}
                 className="w-8 h-8 rounded-full flex items-center justify-center"
                 style={{
-                  background: "rgba(255,255,255,0.95)",
+                  background: "rgba(255,255,255,0.13)",
+                  backdropFilter: "blur(8px)",
+                  border: "1px solid rgba(255,255,255,0.25)",
                   boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
                 }}
               >
-                <svg className="w-3.5 h-3.5 ml-0.5" fill="#000" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 ml-0.5" fill="white" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </button>
