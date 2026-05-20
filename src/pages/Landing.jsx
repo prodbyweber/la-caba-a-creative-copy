@@ -65,7 +65,6 @@ export default function Landing() {
         <StartCreadores />
         <StartWhatWeDo />
         <StartChoosePath />
-        <LandingContact />
         <StartFooter />
       </div>
 

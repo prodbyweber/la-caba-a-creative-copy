@@ -14,14 +14,14 @@ export default function StartWhatWeDo() {
         position: "relative",
         width: "100%",
         height: "100dvh",
-        minHeight: "600px",
+        minHeight: "550px",
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "center",
         background: "#0c0c0c",
         overflow: "hidden",
         overflowY: "auto",
-        padding: "clamp(48px, 7vw, 96px) clamp(24px, 8vw, 100px) 48px",
+        padding: "clamp(40px, 6vw, 80px) clamp(24px, 8vw, 100px) 40px",
       }}
     >
       {/* Subtle background texture */}
@@ -34,7 +34,7 @@ export default function StartWhatWeDo() {
         }}
       />
 
-      <div style={{ maxWidth: "720px", width: "100%", position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: "clamp(24px, 5vw, 40px)" }}>
+      <div style={{ maxWidth: "720px", width: "100%", position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: "clamp(20px, 4vw, 32px)" }}>
         <motion.p
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
@@ -55,11 +55,11 @@ export default function StartWhatWeDo() {
         <motion.div
           initial={{ opacity: 0, y: 32 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "clamp(14px, 3vw, 22px)",
+            gap: "clamp(12px, 2.5vw, 18px)",
             maxWidth: "720px",
           }}
         >
@@ -67,7 +67,6 @@ export default function StartWhatWeDo() {
             "Cabaña Creative es una compañía de producción creativa y sello discográfico con base en Madrid, España.",
             "Fundada en 2020 en Venezuela, nace con la visión de conectar a una nueva generación de creadores independientes a través de la música, el cine, la moda y la cultura.",
             "Hoy, se ha consolidado como una plataforma creativa donde convergen influencias latinas, afro y contemporáneas de la escena europea, desarrollando proyectos con identidad, dirección artística y una estética moderna y cinematográfica.",
-            "Creemos en las grandes ideas, en los jóvenes soñadores y en quienes siguen creando",
           ].map((p, i) => (
             <p
               key={i}
@@ -77,9 +76,9 @@ export default function StartWhatWeDo() {
                 fontSize: i === 0 || i === 1
                   ? "clamp(1rem, 2vw, 1.3rem)"
                   : "clamp(0.75rem, 1.3vw, 0.95rem)",
-                lineHeight: 1.4,
+                lineHeight: 1.35,
                 letterSpacing: i === 0 || i === 1 ? "-0.025em" : "-0.01em",
-                color: i === 0 || i === 1 ? "#f0ede8" : "rgba(240,237,232,0.65)",
+                color: i === 0 || i === 1 ? "#f0ede8" : "rgba(240,237,232,0.6)",
                 margin: 0,
               }}
             >
@@ -91,12 +90,12 @@ export default function StartWhatWeDo() {
         <motion.div
           initial={{ scaleX: 0 }}
           animate={inView ? { scaleX: 1 } : {}}
-          transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
           style={{
             height: "1px",
-            background: "rgba(240,237,232,0.15)",
+            background: "rgba(240,237,232,0.12)",
             transformOrigin: "left",
-            maxWidth: "180px",
+            maxWidth: "160px",
           }}
         />
 

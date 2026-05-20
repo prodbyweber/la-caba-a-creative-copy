@@ -35,24 +35,24 @@ export default function StartBrandsCarousel() {
     <div
       style={{
         width: "100%",
-        maxWidth: "700px",
+        maxWidth: "650px",
         margin: "0 auto",
-        padding: "32px 0 24px",
+        padding: "24px 0 16px",
       }}
     >
       {/* Title */}
-      <div style={{ textAlign: "center", marginBottom: "28px" }}>
+      <div style={{ textAlign: "center", marginBottom: "20px" }}>
         <motion.span
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
           style={{
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            fontWeight: 600,
-            fontSize: "10px",
-            letterSpacing: "0.25em",
+            fontWeight: 700,
+            fontSize: "9px",
+            letterSpacing: "0.3em",
             textTransform: "uppercase",
-            color: "rgba(240,237,232,0.4)",
+            color: "rgba(240,237,232,0.35)",
           }}
         >
           Marcas con las que hemos colaborado
@@ -77,25 +77,26 @@ export default function StartBrandsCarousel() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                height: "120px",
-                background: "rgba(255,255,255,0.015)",
-                borderRadius: "16px",
-                padding: "20px",
-                border: "1px solid rgba(255,255,255,0.04)",
+                height: "100px",
+                background: "transparent",
+                borderRadius: "12px",
+                padding: "16px",
+                border: "none",
               }}
             >
               <motion.img
                 src={logo}
                 alt="Brand"
                 draggable={false}
-                initial={{ opacity: 0.6, scale: 0.98 }}
-                animate={{ opacity: 0.85, scale: 1 }}
-                whileHover={{ opacity: 1, scale: 1.02, filter: "brightness(1.2)" }}
-                transition={{ duration: 0.4 }}
+                initial={{ opacity: 1, scale: 1 }}
+                animate={{ opacity: 1, scale: 1 }}
+                whileHover={{ opacity: 1, scale: 1.05, filter: "brightness(1.3)" }}
+                transition={{ duration: 0.3 }}
                 style={{
                   maxWidth: "100%",
                   maxHeight: "100%",
                   objectFit: "contain",
+                  filter: "brightness(0) invert(1)",
                 }}
               />
             </motion.div>
