@@ -1,7 +1,23 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function StartNav() {
+  const [textVisible, setTextVisible] = useState(true);
+
+  useEffect(() => {
+    const aboutEl = document.getElementById("about");
+    if (!aboutEl) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // Ocultar texto cuando la sección about o inferior es visible
+        setTextVisible(!entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(aboutEl);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <>
@@ -30,12 +46,22 @@ export default function StartNav() {
             alt=""
             style={{ height: "clamp(2rem, 5vw, 3rem)", width: "auto" }}
           />
-          <div style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: "flex", flexDirection: "column" }}>
-            <span style={{ letterSpacing: "-0.04em", display: "inline-flex", alignItems: "flex-start", lineHeight: 1, color: "#ff5833", fontWeight: 900, fontSize: "clamp(1rem, 2.5vw, 1.4rem)" }}>
-              Cabaña<sup style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.5em", fontWeight: 400, marginLeft: "3px", verticalAlign: "super" }}>®</sup>
-            </span>
-            <span style={{ letterSpacing: "-0.04em", display: "block", lineHeight: 1, color: "white", fontWeight: 900, fontSize: "clamp(1rem, 2.5vw, 1.4rem)" }}>Creative</span>
-          </div>
+          <AnimatePresence>
+            {textVisible && (
+              <motion.div
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -6 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif", fontWeight: 900, lineHeight: 1, display: "flex", flexDirection: "column" }}
+              >
+                <span style={{ letterSpacing: "-0.04em", display: "inline-flex", alignItems: "flex-start", lineHeight: 1, color: "#ff5833", fontWeight: 900, fontSize: "clamp(1rem, 2.5vw, 1.4rem)" }}>
+                  Cabaña<sup style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.5em", fontWeight: 400, marginLeft: "3px", verticalAlign: "super" }}>®</sup>
+                </span>
+                <span style={{ letterSpacing: "-0.04em", display: "block", lineHeight: 1, color: "white", fontWeight: 900, fontSize: "clamp(1rem, 2.5vw, 1.4rem)" }}>Creative</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </a>
 
       </motion.header>
