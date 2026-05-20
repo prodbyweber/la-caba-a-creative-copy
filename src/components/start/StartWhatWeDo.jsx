@@ -14,14 +14,13 @@ export default function StartWhatWeDo() {
         position: "relative",
         width: "100%",
         height: "100dvh",
-        minHeight: "600px",
+        minHeight: "560px",
         display: "flex",
-        alignItems: "flex-start",
+        alignItems: "center",
         justifyContent: "center",
         background: "#0c0c0c",
         overflow: "hidden",
-        overflowY: "auto",
-        padding: "clamp(48px, 7vw, 96px) clamp(24px, 8vw, 100px) 48px",
+        padding: "clamp(32px, 5vw, 64px) clamp(24px, 8vw, 100px)",
       }}
     >
       {/* Subtle background texture */}
@@ -34,7 +33,7 @@ export default function StartWhatWeDo() {
         }}
       />
 
-      <div style={{ maxWidth: "720px", width: "100%", position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: "clamp(24px, 5vw, 40px)" }}>
+      <div style={{ maxWidth: "720px", width: "100%", position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: "clamp(16px, 3vw, 24px)" }}>
         <motion.p
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : {}}
@@ -46,7 +45,7 @@ export default function StartWhatWeDo() {
             letterSpacing: "0.3em",
             textTransform: "uppercase",
             color: "rgba(240,237,232,0.35)",
-            marginBottom: "4px",
+            margin: 0,
           }}
         >
           Quiénes Somos
@@ -59,7 +58,7 @@ export default function StartWhatWeDo() {
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "clamp(14px, 3vw, 22px)",
+            gap: "clamp(10px, 2vw, 16px)",
             maxWidth: "720px",
           }}
         >
@@ -75,9 +74,9 @@ export default function StartWhatWeDo() {
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 900,
                 fontSize: i === 0 || i === 1
-                  ? "clamp(1rem, 2vw, 1.3rem)"
-                  : "clamp(0.75rem, 1.3vw, 0.95rem)",
-                lineHeight: 1.4,
+                  ? "clamp(0.9rem, 1.8vw, 1.2rem)"
+                  : "clamp(0.72rem, 1.2vw, 0.88rem)",
+                lineHeight: 1.38,
                 letterSpacing: i === 0 || i === 1 ? "-0.025em" : "-0.01em",
                 color: i === 0 || i === 1 ? "#f0ede8" : "rgba(240,237,232,0.65)",
                 margin: 0,
@@ -91,16 +90,16 @@ export default function StartWhatWeDo() {
         <motion.div
           initial={{ scaleX: 0 }}
           animate={inView ? { scaleX: 1 } : {}}
-          transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
           style={{
             height: "1px",
-            background: "rgba(240,237,232,0.15)",
+            background: "rgba(240,237,232,0.12)",
             transformOrigin: "left",
-            maxWidth: "180px",
+            maxWidth: "160px",
           }}
         />
 
-        {/* Brands Carousel */}
+        {/* Brands — todo visible sin paginación */}
         <StartBrandsCarousel />
       </div>
     </section>
