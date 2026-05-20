@@ -69,23 +69,24 @@ export default function StartHero() {
         background: "radial-gradient(ellipse 70% 50% at 50% 55%, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.0) 100%)"
       }} />
 
-      {/* Bottom-right: headline + paragraph — aligned with nav "Comenzar" */}
+      {/* Center: headline + paragraph */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
         style={{
           position: "absolute",
-          bottom: "clamp(30px, 3vw, 60px)",
-          right: "clamp(20px, 5vw, 48px)",
+          inset: 0,
           zIndex: 20,
           display: "flex",
           flexDirection: "column",
-          alignItems: "flex-end",
-          textAlign: "right",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          padding: "0 clamp(24px, 8vw, 120px)",
           pointerEvents: "none",
-          maxWidth: "480px",
         }}
+
       >
         <h1 style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
@@ -95,6 +96,7 @@ export default function StartHero() {
           letterSpacing: "-0.02em",
           lineHeight: 1.2,
           marginBottom: "clamp(14px, 2vw, 22px)",
+          maxWidth: "700px",
         }}>
           Un espacio para creadores y marcas con visión
         </h1>
@@ -105,6 +107,7 @@ export default function StartHero() {
           color: "rgba(240,237,232,0.45)",
           letterSpacing: "0.01em",
           lineHeight: 1.7,
+          maxWidth: "480px",
         }}>
           Descubre quiénes somos y cómo ayudamos a creadores y marcas antes de{" "}
           <motion.span
