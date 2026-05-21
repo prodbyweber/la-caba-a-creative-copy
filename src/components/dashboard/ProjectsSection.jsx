@@ -182,26 +182,32 @@ function ProjectModal({ onClose, jlyArtistId, project = null, existingTracks = [
 }
 
 // ── ProjectsSection ────────────────────────────────────────────────────────
-export default function ProjectsSection({ jlyArtistId }) {
+export default function ProjectsSection({ jlyArtistId, userEmail }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const qc = useQueryClient();
   const [emblaRef] = useEmblaCarousel({ align: "start", containScroll: "trimSnaps" });
 
   const { data: allProjects = [], isLoading } = useQuery({
-    queryKey: ["projects", jlyArtistId || "all"],
+    queryKey: ["projects", jlyArtistId || "user", userEmail || "anon"],
     queryFn: () => jlyArtistId
       ? base44.entities.Project.filter({ artist_id: jlyArtistId })
-      : base44.entities.Project.list("-created_date"),
+      : userEmail
+        ? base44.entities.Project.filter({ created_by: userEmail })
+        : Promise.resolve([]),
+    enabled: !!(jlyArtistId || userEmail),
     initialData: [],
     staleTime: 0,
   });
 
   const { data: allTracks = [] } = useQuery({
-    queryKey: ["all-tracks", jlyArtistId || "all"],
+    queryKey: ["all-tracks", jlyArtistId || "user", userEmail || "anon"],
     queryFn: () => jlyArtistId
       ? base44.entities.Track.filter({ artist_id: jlyArtistId })
-      : base44.entities.Track.list("-created_date"),
+      : userEmail
+        ? base44.entities.Track.filter({ created_by: userEmail })
+        : Promise.resolve([]),
+    enabled: !!(jlyArtistId || userEmail),
     initialData: [],
     staleTime: 0,
   });

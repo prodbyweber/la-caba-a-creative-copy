@@ -63,6 +63,11 @@ export default function ArtistDashboard() {
 
   const profileUserId = userIdParam || artist?.user_id || currentUser?.id;
 
+  // Email del dueño del catálogo (no necesariamente el usuario logueado)
+  const catalogOwnerEmail = userIdParam
+    ? (userProfile?.user_email || userProfile?.created_by)
+    : currentUser?.email;
+
   const { data: userProfile } = useQuery({
     queryKey: ["userProfile", profileUserId],
     queryFn: async () => {
@@ -158,7 +163,7 @@ export default function ArtistDashboard() {
         return (
           <div key="tracks">
             <SectionLabel label="Soundtracks" />
-            <TracksSection jlyArtistId={effectiveArtist?.id || artistId} userEmail={currentUser?.email} />
+            <TracksSection jlyArtistId={effectiveArtist?.id || artistId} userEmail={catalogOwnerEmail} />
           </div>
         );
       case "video":
@@ -185,7 +190,7 @@ export default function ArtistDashboard() {
         return (
           <div key="projects">
             <SectionLabel label="Proyectos" />
-            <ProjectsSection jlyArtistId={effectiveArtist?.id} />
+            <ProjectsSection jlyArtistId={effectiveArtist?.id} userEmail={catalogOwnerEmail} />
           </div>
         );
       case "photos":
