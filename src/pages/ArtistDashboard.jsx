@@ -63,11 +63,6 @@ export default function ArtistDashboard() {
 
   const profileUserId = userIdParam || artist?.user_id || currentUser?.id;
 
-  // Email del dueño del catálogo (no necesariamente el usuario logueado)
-  const catalogOwnerEmail = userIdParam
-    ? (userProfile?.user_email || userProfile?.created_by)
-    : currentUser?.email;
-
   const { data: userProfile } = useQuery({
     queryKey: ["userProfile", profileUserId],
     queryFn: async () => {
@@ -77,6 +72,11 @@ export default function ArtistDashboard() {
     },
     enabled: !!profileUserId,
   });
+
+  // Email del dueño del catálogo (después de resolver userProfile)
+  const catalogOwnerEmail = userIdParam
+    ? (userProfile?.user_email || userProfile?.created_by)
+    : currentUser?.email;
 
   const accountType = viewMode || userProfile?.account_type || "artist";
   React.useEffect(() => {
