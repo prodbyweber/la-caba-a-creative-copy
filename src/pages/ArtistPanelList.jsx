@@ -145,8 +145,14 @@ export default function ArtistPanelList() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ delay: idx * 0.01 }}
-                    onClick={() => c.artist?.id && navigate(createPageUrl("ArtistDashboard") + `?artistId=${c.artist.id}`)}
-                    className={`group flex items-center gap-3 px-4 py-3 bg-[#080809] hover:bg-white/[0.04] transition-colors ${c.artist?.id ? "cursor-pointer" : "cursor-default"}`}
+                    onClick={() => {
+      if (c.artist?.id) {
+        navigate(`/ArtistDashboard?artistId=${c.artist.id}`);
+      } else if (c.profile?.user_id) {
+        navigate(`/ArtistDashboard?userId=${c.profile.user_id}`);
+      }
+    }}
+    className="group flex items-center gap-3 px-4 py-3 bg-[#080809] hover:bg-white/[0.04] transition-colors cursor-pointer"
                   >
                     {/* Avatar circular pequeño */}
                     <div className="relative w-10 h-10 rounded-full overflow-hidden bg-[#1a1a1c] flex-shrink-0 ring-1 ring-white/10">

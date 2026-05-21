@@ -22,10 +22,22 @@ export default function ArtistDashboard() {
 
   const urlParams = new URLSearchParams(window.location.search);
   const artistIdParam = urlParams.get("artistId") || urlParams.get("id");
+  const userIdParam = urlParams.get("userId");
+  const hasExternalParam = !!artistIdParam || !!userIdParam;
 
   useEffect(() => {
     base44.auth.me().then(u => setCurrentUser(u)).catch(() => {});
   }, []);
+
+  // When viewing by userId (admin viewing a user catalog without artistId)
+  const { data: artistByUserId } = useQuery({
+    queryKey: ["artist-by-user", userIdParam],
+    queryFn: async () => {
+      const artists = await base44.entities.Artist.filter({ user_id: userIdParam });
+      return artists[0] || null;
+    },
+    enabled: !!userIdParam,
+  });
 
   const { data: selfArtist } = useQuery({
     queryKey: ["self-artist", currentUser?.id],
@@ -34,10 +46,10 @@ export default function ArtistDashboard() {
       const artists = await base44.entities.Artist.filter({ user_id: currentUser.id });
       return artists[0] || null;
     },
-    enabled: !!currentUser?.id && !artistIdParam,
+    enabled: !!currentUser?.id && !hasExternalParam,
   });
 
-  const artistId = artistIdParam || selfArtist?.id;
+  const artistId = artistIdParam || artistByUserId?.id || (!hasExternalParam ? selfArtist?.id : undefined);
 
   const { data: artist, isLoading } = useQuery({
     queryKey: ["artist", artistId],
@@ -49,16 +61,16 @@ export default function ArtistDashboard() {
     enabled: !!artistId,
   });
 
+  const profileUserId = userIdParam || artist?.user_id || currentUser?.id;
+
   const { data: userProfile } = useQuery({
-    queryKey: ["userProfile", artist?.user_id || currentUser?.id],
+    queryKey: ["userProfile", profileUserId],
     queryFn: async () => {
-      const uid = artist?.user_id || currentUser?.id;
-      if (!uid) return null;
-      const profiles = await base44.entities.UserProfile.filter({ user_id: uid });
-      if (profiles.length > 0) return profiles[0];
-      return null;
+      if (!profileUserId) return null;
+      const profiles = await base44.entities.UserProfile.filter({ user_id: profileUserId });
+      return profiles[0] || null;
     },
-    enabled: !!(artist?.user_id || currentUser?.id),
+    enabled: !!profileUserId,
   });
 
   const accountType = viewMode || userProfile?.account_type || "artist";
@@ -98,7 +110,9 @@ export default function ArtistDashboard() {
   };
 
   // Solo mostrar loading si realmente estamos resolviendo (currentUser ya cargó pero selfArtist aún no)
-  const resolving = !!currentUser && !artistIdParam && selfArtist === undefined;
+  const resolving =
+    (!!currentUser && !hasExternalParam && selfArtist === undefined) ||
+    (!!userIdParam && artistByUserId === undefined);
   if (isLoading || resolving) {
     return (
       <div className="min-h-screen bg-[#0a0a0b] text-white">
