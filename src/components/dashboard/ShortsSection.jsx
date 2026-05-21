@@ -573,7 +573,7 @@ function ShortCard({ short, onEdit, onDelete, onTogglePublic }) {
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
-export default function ShortsSection({ artistId, userProfileId }) {
+export default function ShortsSection({ artistId, userProfileId, userEmail }) {
   const [showModal, setShowModal] = useState(false);
   const [editingShort, setEditingShort] = useState(null);
   const qc = useQueryClient();
@@ -581,15 +581,13 @@ export default function ShortsSection({ artistId, userProfileId }) {
   const { data: shorts = [], isLoading, refetch } = useQuery({
     queryKey: ["artist-shorts", artistId, userProfileId],
     queryFn: async () => {
-      let items = [];
       if (artistId) {
-        items = await base44.entities.ExplorarItem.filter({ artist_id: artistId, content_type: "short" });
-      } else {
+        return base44.entities.ExplorarItem.filter({ artist_id: artistId, content_type: "short" });
+      } else if (userEmail) {
         const all = await base44.entities.ExplorarItem.list("-created_date", 100);
-        const me = await base44.auth.me();
-        items = all.filter(i => i.created_by === me?.email && i.content_type === "short");
+        return all.filter(i => i.created_by === userEmail && i.content_type === "short");
       }
-      return items;
+      return [];
     },
     enabled: !!(artistId || userProfileId),
   });

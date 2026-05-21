@@ -208,7 +208,7 @@ function SocialRow({ platform, url, onEdit, onRemove }) {
 }
 
 // ── Main Drawer ────────────────────────────────────────────────────────────
-export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClose }) {
+export default function ArtistProfileDrawer({ artist, userProfile, targetUserId, isOpen, onClose }) {
   const [tab, setTab] = useState("profile"); // "profile" | "social" | "sessions"
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(null);
@@ -232,12 +232,23 @@ export default function ArtistProfileDrawer({ artist, userProfile, isOpen, onClo
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: (data) => {
-      if (!userProfile?.id) return Promise.resolve(null);
-      return base44.entities.UserProfile.update(userProfile.id, data);
+    mutationFn: async (data) => {
+      if (userProfile?.id) {
+        return base44.entities.UserProfile.update(userProfile.id, data);
+      }
+      // No existe perfil — crear uno nuevo
+      const userId = targetUserId || artist?.user_id;
+      if (!userId) return null;
+      const me = await base44.auth.me();
+      return base44.entities.UserProfile.create({
+        ...data,
+        user_id: userId,
+        user_email: me?.email,
+      });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userProfile', artist?.user_id || userProfile?.user_id] });
+      const uid = targetUserId || artist?.user_id || userProfile?.user_id;
+      queryClient.invalidateQueries({ queryKey: ['userProfile', uid] });
       queryClient.invalidateQueries({ queryKey: ['user-profile-me'] });
     },
   });

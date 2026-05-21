@@ -555,7 +555,7 @@ function FilmRow({ film, onEdit, onDelete, onTogglePublic, onPlay }) {
 }
 
 // ── Main ───────────────────────────────────────────────────────────────────
-export default function FilmsSection({ artistId, userProfileId }) {
+export default function FilmsSection({ artistId, userProfileId, userEmail }) {
   const [showModal, setShowModal] = useState(false);
   const [editingFilm, setEditingFilm] = useState(null);
   const [playingYt, setPlayingYt] = useState(null);
@@ -567,10 +567,11 @@ export default function FilmsSection({ artistId, userProfileId }) {
       let items = [];
       if (artistId) {
         items = await base44.entities.ExplorarItem.filter({ artist_id: artistId });
+      } else if (userEmail) {
+        const all = await base44.entities.ExplorarItem.list("-created_date", 100);
+        items = all.filter(i => i.created_by === userEmail);
       } else {
-        items = await base44.entities.ExplorarItem.list("-created_date", 100);
-        const me = await base44.auth.me();
-        items = items.filter(i => i.created_by === me?.email);
+        return [];
       }
       return items.filter(i => ["film","minifilm","series","videoclip","visualizer"].includes(i.content_type));
     },

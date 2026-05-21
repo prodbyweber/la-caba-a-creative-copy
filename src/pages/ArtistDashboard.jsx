@@ -171,7 +171,7 @@ export default function ArtistDashboard() {
         return (
           <div key="video">
             <SectionLabel label="Films" />
-            <FilmsSection artistId={effectiveArtist?.id || artistId} userProfileId={userProfile?.id} />
+            <FilmsSection artistId={effectiveArtist?.id || artistId} userProfileId={userProfile?.id} userEmail={catalogOwnerEmail} />
           </div>
         );
       case "shorts":
@@ -182,6 +182,7 @@ export default function ArtistDashboard() {
             <ShortsSection
               artistId={effectiveArtist?.id || artistId}
               userProfileId={userProfile?.id}
+              userEmail={catalogOwnerEmail}
             />
           </div>
         );
@@ -279,10 +280,11 @@ export default function ArtistDashboard() {
         </div>
       </main>
 
-      {(effectiveArtist || userProfile) && (
+      {(effectiveArtist || userProfile || profileUserId) && (
         <ArtistProfileDrawer
           artist={effectiveArtist}
           userProfile={userProfile}
+          targetUserId={profileUserId}
           isOpen={showProfileDrawer}
           onClose={() => setShowProfileDrawer(false)}
         />
