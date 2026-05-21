@@ -7,14 +7,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import NetflixTrackCard from "./NetflixTrackCard";
 
-export default function TracksSection({ jlyArtistId }) {
+export default function TracksSection({ jlyArtistId, userEmail }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTrack, setEditingTrack] = useState(null);
 
   const queryClient = useQueryClient();
 
   const { data: tracks = [], isLoading } = useQuery({
-    queryKey: ['tracks', jlyArtistId || 'all'],
+    queryKey: ['tracks', jlyArtistId || 'user', userEmail || 'anon'],
     queryFn: async () => {
       if (jlyArtistId) {
         // Tracks directos del artista
@@ -31,17 +31,25 @@ export default function TracksSection({ jlyArtistId }) {
         }
         return byArtist;
       }
-      return base44.entities.Track.list('-created_date', 50);
+      // No hay artista — mostrar solo los tracks creados por este usuario
+      if (userEmail) {
+        return base44.entities.Track.filter({ created_by: userEmail });
+      }
+      return [];
     },
+    enabled: !!(jlyArtistId || userEmail),
     initialData: [],
     staleTime: 0,
   });
 
   const { data: allProjects = [] } = useQuery({
-    queryKey: ['projects', jlyArtistId || 'all'],
+    queryKey: ['projects', jlyArtistId || 'user', userEmail || 'anon'],
     queryFn: () => jlyArtistId
       ? base44.entities.Project.filter({ artist_id: jlyArtistId })
-      : base44.entities.Project.list('-created_date'),
+      : userEmail
+        ? base44.entities.Project.filter({ created_by: userEmail })
+        : Promise.resolve([]),
+    enabled: !!(jlyArtistId || userEmail),
     initialData: [],
     staleTime: 0,
   });
