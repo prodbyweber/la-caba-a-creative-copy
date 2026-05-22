@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import NetflixTrackCard from "./NetflixTrackCard";
+import { createSoundtrack, updateSoundtrack, uploadFile } from "@/lib/mediaCreation";
 
 // Same architecture as Explorar: modal state in parent, rendered OUTSIDE the scroll container.
 // This guarantees reliable mounting on ALL mobile browsers (iOS Safari, Android Chrome, etc.)
@@ -269,20 +270,21 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
   }, [track, isOpen]);
 
   const saveMutation = useMutation({
-    mutationFn: (data) => {
-      const clean = Object.fromEntries(
-        Object.entries(data).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
-      );
-      if (track) return base44.entities.Track.update(track.id, clean);
-      const createData = { ...clean };
-      if (jlyArtistId) createData.artist_id = jlyArtistId;
-      return base44.entities.Track.create(createData);
+    mutationFn: async (data) => {
+      if (track) {
+        return updateSoundtrack(track.id, data);
+      }
+      return createSoundtrack(data, jlyArtistId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tracks'] });
       queryClient.invalidateQueries({ queryKey: ['artist-films'] });
       queryClient.invalidateQueries({ queryKey: ['artist-shorts'] });
       onClose();
+    },
+    onError: (error) => {
+      console.error('[TracksSection] Save failed:', error);
+      alert('Error al guardar: ' + (error?.message || 'Error desconocido'));
     },
   });
 

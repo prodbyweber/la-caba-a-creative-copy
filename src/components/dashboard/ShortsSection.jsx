@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, X, Trash2, Play, Loader2, Check, Pencil, Globe, Lock, Zap, ExternalLink, Search, Music2, Users, Maximize2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { createShort, updateShort } from "@/lib/mediaCreation";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function getYoutubeId(url) {
@@ -151,25 +152,27 @@ function ShortFormModal({ onClose, onSave, artistId, editingShort = null }) {
     if (!form.youtube_url.trim()) { alert("Añade la URL del Short de YouTube"); return; }
     if (!ytId) { alert("URL de YouTube inválida"); return; }
     setLoading(true);
-    const payload = {
-      title: form.title,
-      content_type: "short",
-      youtube_url: form.youtube_url,
-      thumbnail_url: form.thumbnail_url || ytThumb || undefined,
-      artist_id: artistId || undefined,
-      collaborators: form.collaborators,
-      track_id: form.track_id || undefined,
-      is_active: true,
-    };
     try {
+      const shortData = {
+        title: form.title,
+        youtube_url: form.youtube_url,
+        thumbnail_url: form.thumbnail_url || ytThumb || undefined,
+        collaborators: form.collaborators,
+        track_id: form.track_id || undefined,
+      };
       if (isEdit) {
-        await base44.entities.ExplorarItem.update(editingShort.id, payload);
+        await updateShort(editingShort.id, shortData, artistId);
       } else {
-        await base44.entities.ExplorarItem.create(payload);
+        await createShort(shortData, artistId);
       }
       onSave();
       onClose();
-    } finally { setLoading(false); }
+    } catch (error) {
+      console.error('[ShortsSection] Save failed:', error);
+      alert('Error al guardar el short: ' + (error?.message || 'Error desconocido'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return ReactDOM.createPortal(

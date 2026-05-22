@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { createFilm, updateFilm, uploadFile } from "@/lib/mediaCreation";
 import {
   Plus, X, Trash2, Play, Loader2, Upload, Film, Check,
   ExternalLink, Pencil, Globe, Lock, ChevronDown, ChevronRight, Tv
@@ -227,21 +228,15 @@ function FilmFormModal({ onClose, onSave, artistId, allArtists = [], editingFilm
     if (!isSeries && !form.youtube_url) { alert("Añade una URL de YouTube"); return; }
     setLoading(true);
 
-    // Serialize seasons into description for series
-    const descriptionPayload = isSeries
-      ? JSON.stringify({ __seasons: form.seasons, text: form.description })
-      : form.description;
-
-    const payload = {
+    const filmData = {
       title: form.title,
       content_type: form.content_type,
-      subtitle: form.genres[0] || "",
       genres: form.genres,
-      year: Number(form.year),
-      description: descriptionPayload,
+      year: form.year,
+      description: form.description,
       youtube_url: form.youtube_url || undefined,
       thumbnail_url: displayThumb || undefined,
-      artist_id: artistId || undefined,
+      seasons: form.seasons,
       credits: form.credits.map(c => ({
         artist_id: c.artist_id || undefined,
         role: CREDIT_ROLES.find(r => r.key === c.role)?.label || c.role,
@@ -250,35 +245,19 @@ function FilmFormModal({ onClose, onSave, artistId, allArtists = [], editingFilm
     };
 
     try {
-      let item;
       if (isEdit) {
-        item = await base44.entities.ExplorarItem.update(editingFilm.id, { ...payload, is_active: editingFilm.is_active });
+        await updateFilm(editingFilm.id, filmData, editingFilm);
       } else {
-        item = await base44.entities.ExplorarItem.create({ ...payload, is_active: true });
-        // Project creation is secondary — don't let it block the catalog refresh
-        if (artistId) {
-          try {
-            await base44.entities.Project.create({
-              title: form.title,
-              type: form.content_type === "series" ? "Serie"
-                : form.content_type === "minifilm" ? "MiniFilm"
-                : form.content_type === "videoclip" ? "Videoclip"
-                : "Film",
-              artist_id: artistId,
-              cover_url: displayThumb || undefined,
-              description: form.description,
-              status: "Draft",
-              is_public: false,
-              explorar_item_id: item?.id,
-            });
-          } catch (projErr) {
-            console.warn("[FilmsSection] Project.create failed (non-critical):", projErr);
-          }
-        }
+        await createFilm(filmData, artistId);
       }
       onSave();
       onClose();
-    } finally { setLoading(false); }
+    } catch (error) {
+      console.error('[FilmsSection] Save failed:', error);
+      alert('Error al guardar el proyecto: ' + (error?.message || 'Error desconocido'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return ReactDOM.createPortal(
