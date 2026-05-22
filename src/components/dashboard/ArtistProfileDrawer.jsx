@@ -529,18 +529,16 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
                           </div>
                         )}
 
-                        {/* Photos Gallery — moved up with minimal styling */}
+                        {/* Photos Gallery — compact con upload minimalista */}
                          {userProfile?.id && (
                            <div className="-mx-5 px-5 py-4 bg-white/[0.02] rounded-2xl border border-white/[0.06]">
-                             <div className="flex items-center justify-between gap-2 mb-4">
-                               <div className="flex items-center gap-2">
-                                 <div className="w-7 h-7 rounded-lg bg-white/[0.06] flex items-center justify-center flex-shrink-0">
-                                   <Image className="w-3.5 h-3.5 text-white/40" />
-                                 </div>
-                                 <p className="text-xs font-semibold text-white/70">Fotos</p>
+                             <div className="flex items-center gap-2 mb-3">
+                               <div className="w-7 h-7 rounded-lg bg-white/[0.06] flex items-center justify-center flex-shrink-0">
+                                 <Image className="w-3.5 h-3.5 text-white/40" />
                                </div>
+                               <p className="text-xs font-semibold text-white/70">Fotos</p>
                              </div>
-                             <PhotosGallery userProfileId={userProfile.id} />
+                             <PhotosGallery userProfileId={userProfile.id} compact={true} />
                            </div>
                          )}
 

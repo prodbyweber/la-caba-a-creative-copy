@@ -118,8 +118,11 @@ export default function UserPublicProfile() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col sm:flex-row items-center sm:items-end gap-6"
           >
-            {/* Avatar */}
-            <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-2 border-white/10 shadow-2xl bg-white/5 flex items-center justify-center flex-shrink-0">
+            {/* Avatar — clickeable para ver en grande */}
+            <div
+              onClick={() => avatarUrl && setViewingImage(avatarUrl)}
+              className={`w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-2 border-white/10 shadow-2xl bg-white/5 flex items-center justify-center flex-shrink-0 ${avatarUrl ? "cursor-pointer hover:border-white/30 transition-all" : ""}`}
+            >
               {avatarUrl ? (
                 <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" style={{ objectPosition: userProfile.photo_position || "center" }} />
               ) : (

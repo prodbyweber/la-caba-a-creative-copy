@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Upload, Trash2, Loader2 } from "lucide-react";
 
-export default function PhotosGallery({ userProfileId }) {
+export default function PhotosGallery({ userProfileId, compact = false }) {
   const qc = useQueryClient();
   const [uploading, setUploading] = useState(false);
   const [resolvedProfileId, setResolvedProfileId] = useState(userProfileId);
@@ -80,35 +80,37 @@ export default function PhotosGallery({ userProfileId }) {
   const photos = (userProfile?.media_items || []).filter(m => m.type === "image");
 
   return (
-    <div className="space-y-6">
-      {/* Upload Area — only show if under limit */}
+    <div className={compact ? "space-y-3" : "space-y-6"}>
+      {/* Upload Area */}
       {photos.length < MAX_PHOTOS && (
-        <div>
-          <label className="block">
-            <div className="relative border-2 border-dashed border-white/20 rounded-2xl p-8 hover:border-white/40 hover:bg-white/[0.02] transition-all cursor-pointer group">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])}
-                disabled={uploading}
-                className="hidden"
-              />
-              <div className="flex flex-col items-center justify-center gap-3 text-center">
-                {uploading ? (
-                  <Loader2 className="w-10 h-10 text-white/30 animate-spin" />
-                ) : (
-                  <Upload className="w-10 h-10 text-white/20 group-hover:text-white/40 transition-colors" />
-                )}
-                <div>
-                  <p className="text-sm font-medium text-white/70">
-                    {uploading ? "Subiendo..." : "Sube una foto"}
-                  </p>
-                  <p className="text-xs text-white/30 mt-1">{photos.length}/{MAX_PHOTOS} fotos · Máx 20MB</p>
+        compact ? (
+          <label className="cursor-pointer inline-flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-white/8 transition-colors">
+            <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])} disabled={uploading} className="hidden" />
+            {uploading
+              ? <Loader2 className="w-3 h-3 text-white/30 animate-spin" />
+              : <Upload className="w-3 h-3 text-white/30" />}
+            <span className="text-[10px] text-white/30 font-medium">{uploading ? "Subiendo..." : "Añadir"}</span>
+          </label>
+        ) : (
+          <div>
+            <label className="block">
+              <div className="relative border-2 border-dashed border-white/20 rounded-2xl p-8 hover:border-white/40 hover:bg-white/[0.02] transition-all cursor-pointer group">
+                <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])} disabled={uploading} className="hidden" />
+                <div className="flex flex-col items-center justify-center gap-3 text-center">
+                  {uploading ? (
+                    <Loader2 className="w-10 h-10 text-white/30 animate-spin" />
+                  ) : (
+                    <Upload className="w-10 h-10 text-white/20 group-hover:text-white/40 transition-colors" />
+                  )}
+                  <div>
+                    <p className="text-sm font-medium text-white/70">{uploading ? "Subiendo..." : "Sube una foto"}</p>
+                    <p className="text-xs text-white/30 mt-1">{photos.length}/{MAX_PHOTOS} fotos · Máx 20MB</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </label>
-        </div>
+            </label>
+          </div>
+        )
       )}
       {photos.length >= MAX_PHOTOS && (
         <div className="flex items-center justify-center gap-2 py-3 rounded-xl text-xs text-white/25"
