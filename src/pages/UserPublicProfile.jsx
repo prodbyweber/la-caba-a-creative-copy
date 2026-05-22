@@ -19,7 +19,6 @@ export default function UserPublicProfile() {
   const [copied, setCopied] = useState(false);
   const [playingYt, setPlayingYt] = useState(null);
   const [viewingImage, setViewingImage] = useState(null);
-  const [activeTab, setActiveTab] = useState("content");
 
   const { data: userProfile, isLoading } = useQuery({
     queryKey: ["public-profile-username", username],
@@ -188,51 +187,9 @@ export default function UserPublicProfile() {
           </motion.p>
         )}
 
-        {/* Tabs */}
-        {(artist?.social_links && Object.keys(artist.social_links).length > 0) || userProfile.phone || userProfile.contact_email ? (
-          <div className="mb-8">
-            <div className="flex gap-4 border-b border-white/10 mb-6">
-              <button
-                onClick={() => setActiveTab("content")}
-                className={`pb-3 text-sm font-semibold transition-colors ${
-                  activeTab === "content"
-                    ? "text-white border-b-2 border-white/80 -mb-3 pb-4"
-                    : "text-white/40 hover:text-white/60"
-                }`}
-              >
-                Contenido
-              </button>
-              {artist?.social_links && Object.keys(artist.social_links).length > 0 && (
-                <button
-                  onClick={() => setActiveTab("redes")}
-                  className={`pb-3 text-sm font-semibold transition-colors ${
-                    activeTab === "redes"
-                      ? "text-white border-b-2 border-white/80 -mb-3 pb-4"
-                      : "text-white/40 hover:text-white/60"
-                  }`}
-                >
-                  Redes
-                </button>
-              )}
-              {(userProfile.phone || userProfile.user_email) && (
-                <button
-                  onClick={() => setActiveTab("contacto")}
-                  className={`pb-3 text-sm font-semibold transition-colors ${
-                    activeTab === "contacto"
-                      ? "text-white border-b-2 border-white/80 -mb-3 pb-4"
-                      : "text-white/40 hover:text-white/60"
-                  }`}
-                >
-                  Contacto
-                </button>
-              )}
-            </div>
-          </div>
-        ) : null}
 
-        {/* CONTENT TAB */}
-        {activeTab === "content" && (
-          <div>
+
+
         {/* Aparece en */}
         {explorarItems.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-12">
@@ -268,36 +225,6 @@ export default function UserPublicProfile() {
 
 
 
-        {/* YouTube content */}
-        {youtubeItems.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-12">
-            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/20 mb-4">Videos</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {youtubeItems.slice(0, 4).map((m, i) => {
-                const ytId = getYoutubeId(m.url);
-                const thumb = m.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : "");
-                return (
-                  <motion.div 
-                    key={m.id || i} 
-                    onClick={() => ytId && setPlayingYt(ytId)}
-                    className="group relative rounded-xl overflow-hidden bg-white/5 aspect-video cursor-pointer hover:scale-[1.01] transition-transform duration-300"
-                  >
-                    {thumb && <img src={thumb} alt={m.title} className="w-full h-full object-cover" />}
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/20 flex items-center justify-center">
-                        <svg className="w-5 h-5 text-white ml-0.5" fill="white" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                      </div>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
-                      <p className="text-xs font-semibold text-white truncate">{m.title}</p>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-
         {/* Photos */}
         {photos.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mb-12">
@@ -316,16 +243,14 @@ export default function UserPublicProfile() {
           </motion.div>
         )}
 
-        {explorarItems.length === 0 && photos.length === 0 && youtubeItems.length === 0 && (
+        {explorarItems.length === 0 && photos.length === 0 && (
           <div className="text-center py-20">
             <p className="text-white/20 text-sm">Perfil en construcción</p>
           </div>
         )}
-          </div>
-        )}
 
-        {/* REDES TAB */}
-        {activeTab === "redes" && artist?.social_links && (
+        {/* REDES */}
+        {artist?.social_links && Object.keys(artist.social_links).length > 0 && (
           <div className="space-y-3">
             {artist.social_links.instagram && (
               <a href={artist.social_links.instagram} target="_blank" rel="noopener noreferrer"
@@ -358,25 +283,7 @@ export default function UserPublicProfile() {
           </div>
         )}
 
-        {/* CONTACTO TAB */}
-        {activeTab === "contacto" && (
-          <div className="space-y-3">
-            {userProfile.phone && (
-              <div className="p-4 rounded-xl border border-white/10 bg-white/[0.03]">
-                <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Teléfono</p>
-                <p className="text-sm font-medium text-white">{userProfile.phone_country_code && `${userProfile.phone_country_code} `}{userProfile.phone}</p>
-              </div>
-            )}
-            {userProfile.contact_email && (
-              <div className="p-4 rounded-xl border border-white/10 bg-white/[0.03]">
-                <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Correo de contacto</p>
-                <a href={`mailto:${userProfile.contact_email}`} className="text-sm font-medium text-white hover:text-white/80 transition-colors break-all">
-                  {userProfile.contact_email}
-                </a>
-              </div>
-            )}
-          </div>
-        )}
+
       </div>
 
       {/* YouTube Player Modal */}
