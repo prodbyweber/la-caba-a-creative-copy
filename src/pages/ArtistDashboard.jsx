@@ -283,23 +283,6 @@ export default function ArtistDashboard() {
                 </div>
               </div>
 
-              {/* Admin: setup banner if no artist entity */}
-              {isAdmin && hasExternalParam && !artistId && !resolving && !isLoading && (
-                <div className="mb-6 p-4 rounded-2xl border border-orange-500/20 bg-orange-500/[0.06] flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-bold text-orange-400">Sin perfil de artista vinculado</p>
-                    <p className="text-[11px] text-white/30 mt-0.5">Crea el perfil para poder subir contenido al catálogo de este usuario</p>
-                  </div>
-                  <button
-                    onClick={handleSetupArtist}
-                    disabled={settingUpArtist}
-                    className="flex-shrink-0 px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-400 text-white text-xs font-bold transition-colors disabled:opacity-50"
-                  >
-                    {settingUpArtist ? 'Creando...' : 'Crear perfil'}
-                  </button>
-                </div>
-              )}
-
               {/* Sections stacked in user order */}
               <div className="space-y-10">
                 {sectionOrder.map(key => renderSection(key))}

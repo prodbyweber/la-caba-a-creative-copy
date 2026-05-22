@@ -213,9 +213,15 @@ export default function OnboardingForm({ user, onComplete }) {
       
       profileData.username = form.username;
       await base44.entities.UserProfile.create(profileData);
+      // Auto-crear perfil de artista vinculado al usuario
+      try {
+        await base44.functions.invoke('createArtistProfileForNewUser', {});
+      } catch (e) {
+        console.warn('Artist profile creation skipped:', e);
+      }
       onComplete();
-      // Redirigir a Explorar después del registro
-      window.location.href = '/Explorar';
+      // Redirigir al catálogo personal después del registro
+      window.location.href = '/ArtistDashboard';
     } finally {
       setLoading(false);
     }
