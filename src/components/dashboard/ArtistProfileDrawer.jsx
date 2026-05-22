@@ -445,35 +445,34 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
               {/* ── NAME ROW (offset to leave room for avatar) ── */}
               <div className="px-5 pt-14 pb-4 flex items-start justify-between flex-shrink-0">
                 <div className="flex-1">
-                   <p className="text-white font-bold text-lg leading-tight">{displayName}</p>
-                   {userProfile?.username && (
-                     <div className="flex flex-col mt-2">
-                    <p className="text-[11px] text-white/50 font-medium">@{userProfile.username}</p>
-                    {userProfile?.username && (
-                      <a
-                        href={`https://cabanacreative.es/${userProfile.username}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[9px] font-semibold text-orange-400 hover:text-orange-300 transition-colors mt-0.5"
-                      >
-                        Ver perfil
-                        <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                      </a>
-                    )}
-                  </div>
-                   )}
-                   <div className="flex items-center gap-1.5 mt-3">
-                     {nationality && COUNTRY_ISO[nationality] && (
-                       <img src={`https://flagcdn.com/w20/${COUNTRY_ISO[nationality]}.png`} alt={nationality}
-                         className="w-4 h-3 rounded-sm object-cover opacity-70" />
-                     )}
-                     {residence && COUNTRY_ISO[residence] && residence !== nationality && (
-                       <img src={`https://flagcdn.com/w20/${COUNTRY_ISO[residence]}.png`} alt={residence}
-                         className="w-4 h-3 rounded-sm object-cover opacity-70" />
-                     )}
-                     {nationality && <span className="text-white/30 text-xs">{nationality}</span>}
-                   </div>
-                 </div>
+                  <p className="text-white font-bold text-lg leading-tight">{displayName}</p>
+                  {userProfile?.username && (
+                    <div className="flex flex-col mt-1.5">
+                      <p className="text-[11px] text-white/50 font-medium">@{userProfile.username}</p>
+                      {/* Ubicación minimalista */}
+                      {(nationality || residence) && (
+                        <div className="flex items-center gap-1.5 mt-1.5">
+                          {residence && COUNTRY_ISO[residence] && (
+                            <img src={`https://flagcdn.com/w20/${COUNTRY_ISO[residence]}.png`} alt={residence}
+                              className="w-4 h-3 rounded-sm object-cover opacity-60" />
+                          )}
+                          {residence && <span className="text-[10px] text-white/40">{userProfile?.address ? `${userProfile.address}, ` : ""}{residence}</span>}
+                        </div>
+                      )}
+                      {userProfile?.username && (
+                        <a
+                          href={`https://cabanacreative.es/${userProfile.username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[9px] font-semibold text-orange-400 hover:text-orange-300 transition-colors mt-1.5"
+                        >
+                          Ver perfil
+                          <svg className="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
                  <div className="flex items-center gap-2 flex-shrink-0">
                   <button onClick={openEdit}
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 hover:border-white/20 hover:bg-white/5 text-white/40 hover:text-white text-xs font-medium transition-all">
@@ -505,29 +504,14 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
                   <div className="px-5 py-5">
                     {!isEditing ? (
                       <div className="space-y-4">
-                        {/* Info cards */}
-                        {(userProfile?.phone || artist?.phone) && (
-                          <div className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/[0.04] border border-white/[0.06]">
-                            <span className="text-white/30 text-xs">📞</span>
-                            <span className="text-white/60 text-sm">{userProfile?.phone || artist?.phone}</span>
-                          </div>
-                        )}
-                        {(residence || nationality) && (
-                          <div className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-white/[0.04] border border-white/[0.06]">
-                            <span className="text-white/30 text-xs">📍</span>
-                            <span className="text-white/60 text-sm">{userProfile?.address ? `${userProfile.address}, ` : ""}{residence || nationality}</span>
-                          </div>
-                        )}
                         {/* Empty state */}
-                        {!userProfile?.phone && !artist?.phone && !residence && !nationality && (
-                          <div className="text-center py-8">
-                            <p className="text-white/25 text-sm">Completa tu perfil</p>
-                            <button onClick={openEdit}
-                              className="mt-3 text-xs text-white/40 hover:text-white underline underline-offset-2 transition-colors">
-                              Añadir información →
-                            </button>
-                          </div>
-                        )}
+                        <div className="text-center py-8">
+                          <p className="text-white/25 text-sm">Completa tu perfil</p>
+                          <button onClick={openEdit}
+                            className="mt-3 text-xs text-white/40 hover:text-white underline underline-offset-2 transition-colors">
+                            Añadir información →
+                          </button>
+                        </div>
 
                         {/* Photos Gallery — compact con upload minimalista */}
                          {userProfile?.id && (
