@@ -24,7 +24,11 @@
         "EP",
         "Album",
         "ContentPack",
-        "MixMaster"
+        "MixMaster",
+        "Film",
+        "MiniFilm",
+        "Videoclip",
+        "Serie"
       ],
       "default": "Single",
       "description": "Tipo de proyecto"
@@ -73,7 +77,7 @@
       "items": {
         "type": "string"
       },
-      "description": "Enlaces a assets (Drive, stems, referencias)"
+      "description": "Enlaces a assets"
     },
     "bpm": {
       "type": "number",
@@ -96,7 +100,7 @@
       "items": {
         "type": "string"
       },
-      "description": "URLs de im\u00e1genes del moodboard visual del proyecto"
+      "description": "URLs del moodboard"
     },
     "cover_url": {
       "type": "string",
@@ -117,7 +121,11 @@
     "is_public": {
       "type": "boolean",
       "default": false,
-      "description": "Si el proyecto est\u00e1 disponible p\u00fablicamente en Explorar"
+      "description": "Si est\u00e1 disponible p\u00fablicamente en Explorar"
+    },
+    "explorar_item_id": {
+      "type": "string",
+      "description": "ID del ExplorarItem vinculado (para films/videos)"
     }
   },
   "required": [

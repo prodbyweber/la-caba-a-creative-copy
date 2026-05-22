@@ -255,20 +255,25 @@ function FilmFormModal({ onClose, onSave, artistId, allArtists = [], editingFilm
         item = await base44.entities.ExplorarItem.update(editingFilm.id, { ...payload, is_active: editingFilm.is_active });
       } else {
         item = await base44.entities.ExplorarItem.create({ ...payload, is_active: true });
+        // Project creation is secondary — don't let it block the catalog refresh
         if (artistId) {
-          await base44.entities.Project.create({
-            title: form.title,
-            type: form.content_type === "series" ? "Serie"
-              : form.content_type === "minifilm" ? "MiniFilm"
-              : form.content_type === "videoclip" ? "Single"
-              : "Film",
-            artist_id: artistId,
-            cover_url: displayThumb || undefined,
-            description: form.description,
-            status: "Draft",
-            is_public: false,
-            explorar_item_id: item?.id,
-          });
+          try {
+            await base44.entities.Project.create({
+              title: form.title,
+              type: form.content_type === "series" ? "Serie"
+                : form.content_type === "minifilm" ? "MiniFilm"
+                : form.content_type === "videoclip" ? "Videoclip"
+                : "Film",
+              artist_id: artistId,
+              cover_url: displayThumb || undefined,
+              description: form.description,
+              status: "Draft",
+              is_public: false,
+              explorar_item_id: item?.id,
+            });
+          } catch (projErr) {
+            console.warn("[FilmsSection] Project.create failed (non-critical):", projErr);
+          }
         }
       }
       onSave();
