@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2, Share2, Users, Image } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -220,11 +220,6 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
   const [pendingImageUrl, setPendingImageUrl] = useState(null);
 
   const queryClient = useQueryClient();
-  const [registeredEmail, setRegisteredEmail] = useState("");
-
-  useEffect(() => {
-    base44.auth.me().then(u => { if (u?.email) setRegisteredEmail(u.email); }).catch(() => {});
-  }, []);
 
   const updateArtistMutation = useMutation({
     mutationFn: (data) => artist?.id
@@ -272,6 +267,7 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
       username: userProfile?.username || generateUsername(),
       phone_country_code: userProfile?.phone_country_code || "+34",
       phone: userProfile?.phone || "",
+      contact_email: userProfile?.contact_email || "",
       nationality: userProfile?.nationality || artist?.nationality || "",
       country_of_residence: userProfile?.country_of_residence || artist?.country_of_residence || "",
       address: userProfile?.address || "",
@@ -331,6 +327,7 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
         username: formData.username || generateUsername(),
         phone: formData.phone,
         phone_country_code: formData.phone_country_code,
+        contact_email: formData.contact_email,
         nationality: formData.nationality,
         country_of_residence: formData.country_of_residence,
         address: formData.address,
@@ -619,6 +616,13 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
                           </div>
                         </div>
 
+                        {/* Correo de contacto */}
+                        <div>
+                          <label className={labelClass}>Correo de contacto</label>
+                          <input value={formData?.contact_email || ""} onChange={e => setFormData(f => ({ ...f, contact_email: e.target.value }))}
+                            className={iClass} placeholder="tu@correo.com" type="email" />
+                        </div>
+
                         {/* Nacionalidad */}
                         <div>
                           <label className={labelClass}>Nacionalidad</label>
@@ -719,11 +723,11 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
                 {/* ── TAB: CONTACTO ── */}
                 {tab === "contacto" && (
                   <div className="px-5 py-6 space-y-3">
-                    {(registeredEmail || userProfile?.user_email || artist?.email) && (
+                    {(userProfile?.contact_email) && (
                       <div className="p-4 rounded-2xl border border-white/10 bg-white/[0.03]">
-                        <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Correo registrado</p>
-                        <a href={`mailto:${registeredEmail || userProfile?.user_email || artist?.email}`} className="text-sm font-medium text-white hover:text-white/80 transition-colors break-all">
-                          {registeredEmail || userProfile?.user_email || artist?.email}
+                        <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Correo de contacto</p>
+                        <a href={`mailto:${userProfile.contact_email}`} className="text-sm font-medium text-white hover:text-white/80 transition-colors break-all">
+                          {userProfile.contact_email}
                         </a>
                       </div>
                     )}
@@ -733,7 +737,7 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
                         <p className="text-sm font-medium text-white">{userProfile?.phone_country_code ? `${userProfile.phone_country_code} ` : ""}{userProfile?.phone || artist?.phone}</p>
                       </div>
                     )}
-                    {!registeredEmail && !userProfile?.user_email && !artist?.email && !userProfile?.phone && !artist?.phone && (
+                    {!userProfile?.contact_email && !userProfile?.phone && !artist?.phone && (
                       <p className="text-xs text-white/25 text-center py-8">Sin datos de contacto</p>
                     )}
                   </div>
