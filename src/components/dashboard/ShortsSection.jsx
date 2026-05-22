@@ -608,8 +608,6 @@ export default function ShortsSection({ artistId, userProfileId, userEmail }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Zap className="w-4 h-4 text-white/30" />
-          <h3 className="text-sm font-bold text-white">Shorts</h3>
           {shorts.length > 0 && (
             <span className="text-[10px] text-white/25 px-1.5 py-0.5 bg-white/5 rounded-full">{shorts.length}</span>
           )}

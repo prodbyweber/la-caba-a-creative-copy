@@ -257,10 +257,6 @@ export default function ProjectsSection({ jlyArtistId, userEmail }) {
         {/* Header */}
         <div className="px-0 sm:px-4 sm:py-3 sm:border-b sm:border-white/5 flex items-center justify-between mb-3 sm:mb-0">
           <div className="flex items-center gap-2">
-            <div className="hidden sm:flex w-8 h-8 rounded-lg bg-white/5 items-center justify-center">
-              <FolderOpen className="w-4 h-4 text-white/40" />
-            </div>
-            <h3 className="text-base font-bold text-white">Proyectos</h3>
             {projects.length > 0 && <span className="text-[10px] text-white/25 px-1.5 py-0.5 bg-white/5 rounded-full">{projects.length}</span>}
           </div>
           <button onClick={() => { setEditingProject(null); setShowCreateModal(true); }}
