@@ -33,19 +33,7 @@ export default function ArtistDashboard() {
     base44.auth.me().then(u => setCurrentUser(u)).catch(() => {});
   }, []);  
 
-  // Auto-healing: cuando tenemos el usuario y NO tiene Artist record, provisionarlo automáticamente
-  useEffect(() => {
-    if (!currentUser || hasExternalParam || autoProvisionDone) return;
-    // Solo actuar cuando selfArtist === null (query completó, no encontró nada)
-    if (selfArtist !== null) return;
-    setAutoProvisionDone(true);
-    ensureUserSetupComplete(currentUser, {
-      onArtistCreated: () => {
-        queryClient.invalidateQueries({ queryKey: ['self-artist', currentUser.id] });
-        queryClient.invalidateQueries({ queryKey: ['userProfile', currentUser.id] });
-      }
-    });
-  }, [currentUser, selfArtist, hasExternalParam, autoProvisionDone]);
+
 
   // When viewing by userId (admin viewing a user catalog without artistId)
   const { data: artistByUserId } = useQuery({
@@ -69,6 +57,19 @@ export default function ArtistDashboard() {
 
   const artistId = artistIdParam || artistByUserId?.id || (!hasExternalParam ? selfArtist?.id : undefined);
   const isAdmin = currentUser?.role === 'admin';
+
+  // Auto-healing: cuando selfArtist === null (query completó, no encontró nada) provisionarlo
+  useEffect(() => {
+    if (!currentUser || hasExternalParam || autoProvisionDone) return;
+    if (selfArtist !== null) return; // undefined = loading, null = no encontrado
+    setAutoProvisionDone(true);
+    ensureUserSetupComplete(currentUser, {
+      onArtistCreated: () => {
+        queryClient.invalidateQueries({ queryKey: ['self-artist', currentUser.id] });
+        queryClient.invalidateQueries({ queryKey: ['userProfile', currentUser.id] });
+      }
+    });
+  }, [currentUser, selfArtist, hasExternalParam, autoProvisionDone]);
 
   const handleSetupArtist = async () => {
     if (!userProfile && !userIdParam) return;
