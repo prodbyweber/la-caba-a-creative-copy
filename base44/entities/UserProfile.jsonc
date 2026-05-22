@@ -51,6 +51,10 @@
       "type": "string",
       "description": "C\u00f3digo de pa\u00eds del tel\u00e9fono (ej: +34)"
     },
+    "contact_email": {
+      "type": "string",
+      "description": "Correo de contacto p\u00fablico"
+    },
     "nationality": {
       "type": "string",
       "description": "Pa\u00eds de nacionalidad"
