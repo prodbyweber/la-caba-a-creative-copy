@@ -314,7 +314,7 @@ export default function ArtistDashboard() {
 function SectionLabel({ label }) {
   return (
     <p
-      className="text-sm font-bold mb-2 text-white"
+      className="text-base font-bold mb-1 text-white"
       style={{
         fontFamily: "'Helvetica Neue', sans-serif",
         letterSpacing: "0.02em",
