@@ -23,6 +23,7 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
   const queryClient = useQueryClient();
   const { data: artists = [] } = useQuery({ queryKey: ['artists'], queryFn: () => base44.entities.Artist.list() });
   const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => base44.entities.Project.list() });
+  const { data: userProfiles = [] } = useQuery({ queryKey: ['all-user-profiles'], queryFn: () => base44.entities.UserProfile.list('-created_date', 100) });
 
   const defaultForm = {
     type: "Session", title: "", artist_id: "", project_id: "",
@@ -87,12 +88,26 @@ export default function CreateSessionModal({ isOpen, onClose, editData = null })
   const [showContacts, setShowContacts] = useState(false);
   const [contactSearch, setContactSearch] = useState("");
 
-  // Construir lista de contactos: artistas con email + emails de sesiones recientes
+  // Construir lista de contactos: artistas + userProfiles (usuarios registrados)
   const allContacts = useMemo(() => {
     const map = new Map();
-    artists.forEach(a => { if (a.email) map.set(a.email, { email: a.email, name: a.stageName, avatar: a.avatar_url }); });
-    return Array.from(map.values());
-  }, [artists]);
+    // Primero artistas
+    artists.forEach(a => {
+      if (a.email) map.set(a.email, { email: a.email, name: a.stageName, avatar: a.avatar_url });
+    });
+    // Luego UserProfiles (incluye usuarios sin Artist entity como Fiorella)
+    userProfiles.forEach(p => {
+      const email = p.user_email || p.contact_email;
+      if (email && !map.has(email)) {
+        map.set(email, {
+          email,
+          name: p.display_name || p.artist_name || p.full_name || email.split('@')[0],
+          avatar: p.profile_photo_url || p.avatar_url,
+        });
+      }
+    });
+    return Array.from(map.values()).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  }, [artists, userProfiles]);
 
   const filteredContacts = contactSearch
     ? allContacts.filter(c => c.name?.toLowerCase().includes(contactSearch.toLowerCase()) || c.email.toLowerCase().includes(contactSearch.toLowerCase()))

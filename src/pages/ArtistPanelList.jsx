@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -33,17 +33,26 @@ export default function ArtistPanelList() {
     enabled: authChecked && currentUser?.role === 'admin'
   });
 
-  const isLoading = loadingArtists || loadingProfiles;
+  const { data: platformUsers = [], isLoading: loadingUsers } = useQuery({
+    queryKey: ['platform-users'],
+    queryFn: () => base44.entities.User.list('-created_date', 200),
+    enabled: authChecked && currentUser?.role === 'admin'
+  });
+
+  const isLoading = loadingArtists || loadingProfiles || loadingUsers;
 
   const allCreators = React.useMemo(() => {
     const seen = new Set();
     const result = [];
 
+    // 1) Artistas con entity Artist
     for (const artist of artists) {
       const profile = userProfiles.find(p => p.user_id === artist.user_id);
       const key = artist.id;
       if (!seen.has(key)) {
         seen.add(key);
+        // Track user_id used to avoid duplicates below
+        if (artist.user_id) seen.add(`uid-${artist.user_id}`);
         result.push({
           artist,
           profile,
@@ -56,27 +65,47 @@ export default function ArtistPanelList() {
       }
     }
 
+    // 2) UserProfiles sin Artist vinculado
     for (const profile of userProfiles) {
       const linkedArtist = artists.find(a => a.user_id === profile.user_id);
       if (!linkedArtist) {
         const key = `profile-${profile.id}`;
         if (!seen.has(key)) {
           seen.add(key);
+          if (profile.user_id) seen.add(`uid-${profile.user_id}`);
           result.push({
             artist: null,
             profile,
-            displayName: profile.display_name || profile.artist_name || profile.full_name || "—",
+            displayName: profile.display_name || profile.artist_name || profile.full_name || profile.user_email || "—",
             avatarUrl: profile.avatar_url || profile.profile_photo_url,
             genre: null,
             username: profile.username,
-            email: profile.user_email,
+            email: profile.user_email || profile.contact_email,
           });
         }
       }
     }
 
+    // 3) Platform Users sin Artist ni UserProfile (ej: Fiorella Failde si no hizo onboarding)
+    for (const u of platformUsers) {
+      if (!seen.has(`uid-${u.id}`)) {
+        seen.add(`uid-${u.id}`);
+        result.push({
+          artist: null,
+          profile: null,
+          platformUser: u,
+          displayName: u.full_name || u.email?.split('@')[0] || "—",
+          avatarUrl: null,
+          genre: null,
+          username: null,
+          email: u.email,
+          userId: u.id,
+        });
+      }
+    }
+
     return result;
-  }, [artists, userProfiles]);
+  }, [artists, userProfiles, platformUsers]);
 
   const filtered = allCreators.filter(c => {
     if (!search) return true;
@@ -146,10 +175,11 @@ export default function ArtistPanelList() {
                     exit={{ opacity: 0 }}
                     transition={{ delay: idx * 0.01 }}
                     onClick={() => {
+      const uid = c.artist?.user_id || c.profile?.user_id || c.platformUser?.id || c.userId;
       if (c.artist?.id) {
         navigate(`/ArtistDashboard?artistId=${c.artist.id}`);
-      } else if (c.profile?.user_id) {
-        navigate(`/ArtistDashboard?userId=${c.profile.user_id}`);
+      } else if (uid) {
+        navigate(`/ArtistDashboard?userId=${uid}`);
       }
     }}
     className="group flex items-center gap-3 px-4 py-3 bg-[#080809] hover:bg-white/[0.04] transition-colors cursor-pointer"
