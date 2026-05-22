@@ -131,7 +131,13 @@ export default function TracksSection({ jlyArtistId, userEmail }) {
             </div>
           ) : (
             <MobileAudioProvider>
-              <div style={{ overflowX: "auto", overflowY: "visible", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
+              {/*
+                CRITICAL: Do NOT add WebkitOverflowScrolling:"touch" here.
+                That property enables native iOS momentum scrolling which intercepts
+                ALL touch events and cancels click events on descendants — even on <button> elements.
+                ContentRow (Explorar) works because it does NOT use this property.
+              */}
+              <div style={{ overflowX: "auto", overflowY: "visible", scrollbarWidth: "none", msOverflowStyle: "none" }}>
                 <div className="flex gap-2.5 py-1" style={{ width: "max-content" }}>
                   {tracks.map((track) => (
                     <MobileTrackPoster key={track.id} track={track} onEdit={setEditingTrack} onDelete={(id) => deleteMutation.mutate(id)} />
