@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Edit2, Youtube, Instagram, Music, Video, Plus, Check, User, Camera, ZoomIn, ZoomOut, Move, ChevronRight, ExternalLink, Trash2, Share2, Users, Image } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -220,6 +220,11 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
   const [pendingImageUrl, setPendingImageUrl] = useState(null);
 
   const queryClient = useQueryClient();
+  const [registeredEmail, setRegisteredEmail] = useState("");
+
+  useEffect(() => {
+    base44.auth.me().then(u => { if (u?.email) setRegisteredEmail(u.email); }).catch(() => {});
+  }, []);
 
   const updateArtistMutation = useMutation({
     mutationFn: (data) => artist?.id
@@ -259,6 +264,7 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
   };
 
   const openEdit = () => {
+    setTab("profile");
     setFormData({
       first_name: userProfile?.first_name || "",
       last_name: userProfile?.last_name || "",
@@ -365,7 +371,7 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
   const TABS = [
     { id: "profile", label: "Perfil" },
     { id: "social",  label: "Redes" },
-    ...(userProfile?.phone || artist?.phone || userProfile?.user_email || artist?.email ? [{ id: "contacto", label: "Contacto" }] : []),
+    { id: "contacto", label: "Contacto" },
     ...(artist?.id ? [{ id: "sessions", label: "Sesiones" }] : []),
   ];
 
@@ -387,15 +393,17 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
               style={{ width: "min(360px, 100vw)", background: "#0d0d0e", borderLeft: "1px solid rgba(255,255,255,0.06)" }}
             >
               {/* ── HERO SECTION ── */}
-              <div className="relative flex-shrink-0" style={{ height: 160 }}>
-                {/* Background blur of avatar */}
-                {avatarUrl && (
+              <div className="relative flex-shrink-0" style={{ height: 180 }}>
+                {/* Premium banner background */}
+                {avatarUrl ? (
                   <div className="absolute inset-0 overflow-hidden">
-                    <img src={avatarUrl} alt="" className="w-full h-full object-cover scale-110 blur-xl opacity-30" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-[#0d0d0e]" />
+                    <img src={avatarUrl} alt="" className="w-full h-full object-cover scale-125 blur-3xl opacity-50" style={{ objectPosition: photoPosition }} />
+                    <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(13,13,14,0.6) 60%, #0d0d0e 100%)" }} />
+                    <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(0,0,0,0.3) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)" }} />
                   </div>
+                ) : (
+                  <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)" }} />
                 )}
-                {!avatarUrl && <div className="absolute inset-0 bg-gradient-to-b from-white/[0.03] to-[#0d0d0e]" />}
 
                 {/* Close button */}
                 <button onClick={onClose}
@@ -711,19 +719,22 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
                 {/* ── TAB: CONTACTO ── */}
                 {tab === "contacto" && (
                   <div className="px-5 py-6 space-y-3">
+                    {(registeredEmail || userProfile?.user_email || artist?.email) && (
+                      <div className="p-4 rounded-2xl border border-white/10 bg-white/[0.03]">
+                        <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Correo registrado</p>
+                        <a href={`mailto:${registeredEmail || userProfile?.user_email || artist?.email}`} className="text-sm font-medium text-white hover:text-white/80 transition-colors break-all">
+                          {registeredEmail || userProfile?.user_email || artist?.email}
+                        </a>
+                      </div>
+                    )}
                     {(userProfile?.phone || artist?.phone) && (
                       <div className="p-4 rounded-2xl border border-white/10 bg-white/[0.03]">
                         <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Teléfono</p>
                         <p className="text-sm font-medium text-white">{userProfile?.phone_country_code ? `${userProfile.phone_country_code} ` : ""}{userProfile?.phone || artist?.phone}</p>
                       </div>
                     )}
-                    {(userProfile?.user_email || artist?.email) && (
-                      <div className="p-4 rounded-2xl border border-white/10 bg-white/[0.03]">
-                        <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Correo</p>
-                        <a href={`mailto:${userProfile?.user_email || artist?.email}`} className="text-sm font-medium text-white hover:text-white/80 transition-colors break-all">
-                          {userProfile?.user_email || artist?.email}
-                        </a>
-                      </div>
+                    {!registeredEmail && !userProfile?.user_email && !artist?.email && !userProfile?.phone && !artist?.phone && (
+                      <p className="text-xs text-white/25 text-center py-8">Sin datos de contacto</p>
                     )}
                   </div>
                 )}
