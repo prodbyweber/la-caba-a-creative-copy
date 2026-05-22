@@ -562,7 +562,7 @@ export default function FilmsSection({ artistId, userProfileId, userEmail }) {
   const qc = useQueryClient();
 
   const { data: films = [], isLoading, refetch } = useQuery({
-    queryKey: ["artist-films", artistId, userProfileId],
+    queryKey: ["artist-films", artistId, userProfileId, userEmail],
     queryFn: async () => {
       let items = [];
       if (artistId) {
@@ -575,7 +575,7 @@ export default function FilmsSection({ artistId, userProfileId, userEmail }) {
       }
       return items.filter(i => ["film","minifilm","series","videoclip","visualizer"].includes(i.content_type));
     },
-    enabled: !!(artistId || userProfileId),
+    enabled: !!(artistId || userProfileId || userEmail),
   });
 
   const { data: allArtists = [] } = useQuery({

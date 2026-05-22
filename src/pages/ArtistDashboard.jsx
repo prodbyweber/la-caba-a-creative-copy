@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
 import { GripVertical } from "lucide-react";
@@ -19,6 +19,8 @@ export default function ArtistDashboard() {
   const [currentUser, setCurrentUser] = useState(null);
   const [viewMode, setViewMode] = useState(null);
   const [showOrderMenu, setShowOrderMenu] = useState(false);
+  const [settingUpArtist, setSettingUpArtist] = useState(false);
+  const queryClient = useQueryClient();
 
   const urlParams = new URLSearchParams(window.location.search);
   const artistIdParam = urlParams.get("artistId") || urlParams.get("id");
@@ -50,6 +52,23 @@ export default function ArtistDashboard() {
   });
 
   const artistId = artistIdParam || artistByUserId?.id || (!hasExternalParam ? selfArtist?.id : undefined);
+  const isAdmin = currentUser?.role === 'admin';
+
+  const handleSetupArtist = async () => {
+    if (!userProfile && !userIdParam) return;
+    setSettingUpArtist(true);
+    const name = userProfile?.artist_name || userProfile?.display_name || userProfile?.full_name || 'Artista';
+    await base44.entities.Artist.create({
+      stageName: name,
+      user_id: userIdParam || userProfile?.user_id,
+      email: userProfile?.user_email || '',
+      status: 'Active',
+      avatar_url: userProfile?.avatar_url || userProfile?.profile_photo_url || '',
+    });
+    queryClient.invalidateQueries({ queryKey: ['artist-by-user', userIdParam] });
+    queryClient.invalidateQueries({ queryKey: ['self-artist', currentUser?.id] });
+    setSettingUpArtist(false);
+  };
 
   const { data: artist, isLoading } = useQuery({
     queryKey: ["artist", artistId],
@@ -263,6 +282,23 @@ export default function ArtistDashboard() {
                   </AnimatePresence>
                 </div>
               </div>
+
+              {/* Admin: setup banner if no artist entity */}
+              {isAdmin && hasExternalParam && !artistId && !resolving && !isLoading && (
+                <div className="mb-6 p-4 rounded-2xl border border-orange-500/20 bg-orange-500/[0.06] flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-bold text-orange-400">Sin perfil de artista vinculado</p>
+                    <p className="text-[11px] text-white/30 mt-0.5">Crea el perfil para poder subir contenido al catálogo de este usuario</p>
+                  </div>
+                  <button
+                    onClick={handleSetupArtist}
+                    disabled={settingUpArtist}
+                    className="flex-shrink-0 px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-400 text-white text-xs font-bold transition-colors disabled:opacity-50"
+                  >
+                    {settingUpArtist ? 'Creando...' : 'Crear perfil'}
+                  </button>
+                </div>
+              )}
 
               {/* Sections stacked in user order */}
               <div className="space-y-10">

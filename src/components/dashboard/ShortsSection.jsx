@@ -579,7 +579,7 @@ export default function ShortsSection({ artistId, userProfileId, userEmail }) {
   const qc = useQueryClient();
 
   const { data: shorts = [], isLoading, refetch } = useQuery({
-    queryKey: ["artist-shorts", artistId, userProfileId],
+    queryKey: ["artist-shorts", artistId, userProfileId, userEmail],
     queryFn: async () => {
       if (artistId) {
         return base44.entities.ExplorarItem.filter({ artist_id: artistId, content_type: "short" });
@@ -589,7 +589,7 @@ export default function ShortsSection({ artistId, userProfileId, userEmail }) {
       }
       return [];
     },
-    enabled: !!(artistId || userProfileId),
+    enabled: !!(artistId || userProfileId || userEmail),
   });
 
   const handleDelete = async (id) => {
