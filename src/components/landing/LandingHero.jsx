@@ -31,7 +31,9 @@ function VideoBackground({ src }) {
   );
 }
 
-export default function LandingHero({ bottomOffset = "clamp(90px, 12vw, 140px)" }) {
+export default function LandingHero({ bottomOffset } = {}) {
+  // Default bottom offset: desktop lower (closer to corner), mobile higher
+  const effectiveBottomOffset = bottomOffset || "clamp(12vw, 18vw, 140px)";
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
     queryFn: async () => { const c = await base44.entities.LandingConfig.list(); return c[0] || null; },
@@ -66,19 +68,19 @@ export default function LandingHero({ bottomOffset = "clamp(90px, 12vw, 140px)" 
       }} />
 
       {/* Bottom-right: slogan */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        style={{
-          position: "absolute",
-          bottom: bottomOffset,
-          right: "clamp(24px, 6vw, 56px)",
-          zIndex: 20,
-          textAlign: "right",
-          pointerEvents: "none",
-        }}
-      >
+       <motion.div
+         initial={{ opacity: 0, y: 16 }}
+         animate={{ opacity: 1, y: 0 }}
+         transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+         style={{
+           position: "absolute",
+           bottom: effectiveBottomOffset,
+           right: "clamp(24px, 6vw, 56px)",
+           zIndex: 20,
+           textAlign: "right",
+           pointerEvents: "none",
+         }}
+       >
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontSize: "9px",
