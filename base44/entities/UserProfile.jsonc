@@ -12,7 +12,7 @@
     },
     "username": {
       "type": "string",
-      "description": "Nombre de usuario \u00fanico para URL p\u00fablica (ej: jlybeatmaker)"
+      "description": "Nombre de usuario \u00fanico para URL p\u00fablica"
     },
     "first_name": {
       "type": "string",
@@ -20,7 +20,7 @@
     },
     "last_name": {
       "type": "string",
-      "description": "Apellido"
+      "description": "Apellidos"
     },
     "full_name": {
       "type": "string",
@@ -42,6 +42,21 @@
         "prefer_not_to_say"
       ],
       "description": "G\u00e9nero"
+    },
+    "creator_type": {
+      "type": "string",
+      "enum": [
+        "Artista",
+        "Modelo",
+        "Actor / Actriz",
+        "Creador de contenido",
+        "Productor",
+        "Fotograf@",
+        "Film Maker",
+        "Makeup Artist",
+        "Fashion & Styling"
+      ],
+      "description": "Tipo de creador"
     },
     "phone": {
       "type": "string",
@@ -109,8 +124,7 @@
             "type": "string"
           },
           "type": {
-            "type": "string",
-            "description": "youtube | image | video"
+            "type": "string"
           },
           "url": {
             "type": "string"
@@ -189,7 +203,6 @@
     },
     "custom_playlists": {
       "type": "array",
-      "description": "Playlists personalizadas del usuario",
       "items": {
         "type": "object",
         "properties": {
@@ -204,7 +217,6 @@
     },
     "saved_shorts": {
       "type": "array",
-      "description": "Shorts guardados desde el feed Para Ti",
       "items": {
         "type": "object",
         "properties": {

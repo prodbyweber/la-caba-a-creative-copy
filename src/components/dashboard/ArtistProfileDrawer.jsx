@@ -268,6 +268,8 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
       phone_country_code: userProfile?.phone_country_code || "+34",
       phone: userProfile?.phone || "",
       contact_email: userProfile?.contact_email || "",
+      gender: userProfile?.gender || "",
+      creator_type: userProfile?.creator_type || "",
       nationality: userProfile?.nationality || artist?.nationality || "",
       country_of_residence: userProfile?.country_of_residence || artist?.country_of_residence || "",
       address: userProfile?.address || "",
@@ -328,6 +330,8 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
         phone: formData.phone,
         phone_country_code: formData.phone_country_code,
         contact_email: formData.contact_email,
+        gender: formData.gender,
+        creator_type: formData.creator_type,
         nationality: formData.nationality,
         country_of_residence: formData.country_of_residence,
         address: formData.address,
@@ -577,14 +581,14 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
                         {/* Nombre + Apellido */}
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className={labelClass}>Nombre</label>
+                            <label className={labelClass}>Nombre completo</label>
                             <input value={formData?.first_name || ""} onChange={e => setFormData(f => ({ ...f, first_name: e.target.value }))}
                               className={iClass} placeholder="Nombre" />
                           </div>
                           <div>
-                            <label className={labelClass}>Apellido</label>
+                            <label className={labelClass}>Apellidos</label>
                             <input value={formData?.last_name || ""} onChange={e => setFormData(f => ({ ...f, last_name: e.target.value }))}
-                              className={iClass} placeholder="Apellido" />
+                              className={iClass} placeholder="Apellidos" />
                           </div>
                         </div>
 
@@ -646,6 +650,34 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
                           <label className={labelClass}>Ciudad</label>
                           <input value={formData?.address || ""} onChange={e => setFormData(f => ({ ...f, address: e.target.value }))}
                             className={iClass} placeholder="Ciudad" />
+                        </div>
+
+                        {/* Sexo */}
+                        <div>
+                          <label className={labelClass}>Género</label>
+                          <div className="flex gap-2">
+                            {[{val:"male",label:"Masculino"},{val:"female",label:"Femenino"},{val:"prefer_not_to_say",label:"Prefiero no decirlo"}].map(opt => (
+                              <button key={opt.val} type="button"
+                                onClick={() => setFormData(f => ({ ...f, gender: opt.val }))}
+                                className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all ${formData?.gender === opt.val ? "bg-white text-black border-white" : "bg-white/[0.04] border-white/[0.08] text-white/40 hover:border-white/20"}`}>
+                                {opt.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Tipo de creador */}
+                        <div>
+                          <label className={labelClass}>Tipo de creador</label>
+                          <div className="flex flex-wrap gap-2">
+                            {["Artista","Modelo","Actor / Actriz","Creador de contenido","Productor","Fotograf@","Film Maker","Makeup Artist","Fashion & Styling"].map(type => (
+                              <button key={type} type="button"
+                                onClick={() => setFormData(f => ({ ...f, creator_type: type }))}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${formData?.creator_type === type ? "bg-white text-black border-white" : "bg-white/[0.04] border-white/[0.08] text-white/40 hover:border-white/20"}`}>
+                                {type}
+                              </button>
+                            ))}
+                          </div>
                         </div>
 
                         {/* Save / Cancel */}

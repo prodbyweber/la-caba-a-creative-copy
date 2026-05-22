@@ -133,9 +133,11 @@ export default function UserPublicProfile() {
 
             {/* Info */}
             <div className="flex-1 text-center sm:text-left">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/25 mb-1.5">
-                {userProfile.account_type === "artist" ? "Artista" : userProfile.account_type === "creator" ? "Creador" : "Marca"} · Cabaña Creative
-              </p>
+              {(userProfile.creator_type) && (
+                <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/25 mb-1.5">
+                  {userProfile.creator_type}
+                </p>
+              )}
               <h1 className="text-3xl sm:text-5xl font-black text-white leading-none mb-2"
                 style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.03em" }}>
                 {displayName}
@@ -187,7 +189,7 @@ export default function UserPublicProfile() {
         )}
 
         {/* Tabs */}
-        {(artist?.social_links && Object.keys(artist.social_links).length > 0) || userProfile.phone || userProfile.user_email ? (
+        {(artist?.social_links && Object.keys(artist.social_links).length > 0) || userProfile.phone || userProfile.contact_email ? (
           <div className="mb-8">
             <div className="flex gap-4 border-b border-white/10 mb-6">
               <button
@@ -365,11 +367,11 @@ export default function UserPublicProfile() {
                 <p className="text-sm font-medium text-white">{userProfile.phone_country_code && `${userProfile.phone_country_code} `}{userProfile.phone}</p>
               </div>
             )}
-            {userProfile.user_email && (
+            {userProfile.contact_email && (
               <div className="p-4 rounded-xl border border-white/10 bg-white/[0.03]">
-                <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Correo</p>
-                <a href={`mailto:${userProfile.user_email}`} className="text-sm font-medium text-white hover:text-white/80 transition-colors break-all">
-                  {userProfile.user_email}
+                <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Correo de contacto</p>
+                <a href={`mailto:${userProfile.contact_email}`} className="text-sm font-medium text-white hover:text-white/80 transition-colors break-all">
+                  {userProfile.contact_email}
                 </a>
               </div>
             )}
