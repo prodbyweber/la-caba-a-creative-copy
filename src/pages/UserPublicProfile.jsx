@@ -234,9 +234,10 @@ export default function UserPublicProfile() {
                 <motion.div 
                   key={photo.id || idx} 
                   onClick={() => setViewingImage(photo.url)}
-                  className="group relative rounded-xl overflow-hidden aspect-square cursor-pointer hover:scale-[1.02] transition-transform duration-300"
+                  className="group relative rounded-xl overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform duration-300 bg-white/5 flex items-center justify-center"
+                  style={{ minHeight: 140 }}
                 >
-                  <img src={photo.url} alt={photo.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={photo.url} alt={photo.title} className="w-full h-full object-contain" style={{ maxHeight: 280 }} />
                 </motion.div>
               ))}
             </div>
@@ -327,22 +328,23 @@ export default function UserPublicProfile() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[700] bg-black/95 flex items-center justify-center p-4"
+            className="fixed inset-0 z-[700] bg-black/97 flex items-center justify-center p-4"
             onClick={() => setViewingImage(null)}
           >
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.9 }}
-              className="relative max-w-4xl max-h-[90vh] rounded-xl overflow-hidden"
+            <button onClick={() => setViewingImage(null)}
+              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors z-10">
+              <X className="w-5 h-5 text-white" />
+            </button>
+            <motion.img
+              src={viewingImage}
+              alt=""
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.92, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl"
               onClick={e => e.stopPropagation()}
-            >
-              <button onClick={() => setViewingImage(null)}
-                className="absolute -top-10 right-0 p-2 text-white/50 hover:text-white transition-colors z-10">
-                <X className="w-5 h-5" />
-              </button>
-              <img src={viewingImage} alt="" className="w-full h-full object-contain" />
-            </motion.div>
+            />
           </motion.div>
         )}
       </AnimatePresence>
