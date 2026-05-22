@@ -19,6 +19,7 @@ export default function UserPublicProfile() {
   const [copied, setCopied] = useState(false);
   const [playingYt, setPlayingYt] = useState(null);
   const [viewingImage, setViewingImage] = useState(null);
+  const [activeTab, setActiveTab] = useState("content");
 
   const { data: userProfile, isLoading } = useQuery({
     queryKey: ["public-profile-username", username],
@@ -185,6 +186,51 @@ export default function UserPublicProfile() {
           </motion.p>
         )}
 
+        {/* Tabs */}
+        {(artist?.social_links && Object.keys(artist.social_links).length > 0) || userProfile.phone || userProfile.user_email ? (
+          <div className="mb-8">
+            <div className="flex gap-4 border-b border-white/10 mb-6">
+              <button
+                onClick={() => setActiveTab("content")}
+                className={`pb-3 text-sm font-semibold transition-colors ${
+                  activeTab === "content"
+                    ? "text-white border-b-2 border-white/80 -mb-3 pb-4"
+                    : "text-white/40 hover:text-white/60"
+                }`}
+              >
+                Contenido
+              </button>
+              {artist?.social_links && Object.keys(artist.social_links).length > 0 && (
+                <button
+                  onClick={() => setActiveTab("redes")}
+                  className={`pb-3 text-sm font-semibold transition-colors ${
+                    activeTab === "redes"
+                      ? "text-white border-b-2 border-white/80 -mb-3 pb-4"
+                      : "text-white/40 hover:text-white/60"
+                  }`}
+                >
+                  Redes
+                </button>
+              )}
+              {(userProfile.phone || userProfile.user_email) && (
+                <button
+                  onClick={() => setActiveTab("contacto")}
+                  className={`pb-3 text-sm font-semibold transition-colors ${
+                    activeTab === "contacto"
+                      ? "text-white border-b-2 border-white/80 -mb-3 pb-4"
+                      : "text-white/40 hover:text-white/60"
+                  }`}
+                >
+                  Contacto
+                </button>
+              )}
+            </div>
+          </div>
+        ) : null}
+
+        {/* CONTENT TAB */}
+        {activeTab === "content" && (
+          <div>
         {/* Aparece en */}
         {explorarItems.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-12">
@@ -268,11 +314,65 @@ export default function UserPublicProfile() {
           </motion.div>
         )}
 
-
-
         {explorarItems.length === 0 && photos.length === 0 && youtubeItems.length === 0 && (
           <div className="text-center py-20">
             <p className="text-white/20 text-sm">Perfil en construcción</p>
+          </div>
+        )}
+          </div>
+        )}
+
+        {/* REDES TAB */}
+        {activeTab === "redes" && artist?.social_links && (
+          <div className="space-y-3">
+            {artist.social_links.instagram && (
+              <a href={artist.social_links.instagram} target="_blank" rel="noopener noreferrer"
+                className="block p-4 rounded-xl border border-white/10 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all text-sm font-medium text-white">
+                📸 Instagram
+                <p className="text-xs text-white/40 mt-1 font-normal">{artist.social_links.instagram.replace(/^https?:\/\/(www\.)?/, "")}</p>
+              </a>
+            )}
+            {artist.social_links.youtube && (
+              <a href={artist.social_links.youtube} target="_blank" rel="noopener noreferrer"
+                className="block p-4 rounded-xl border border-white/10 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all text-sm font-medium text-white">
+                ▶️ YouTube
+                <p className="text-xs text-white/40 mt-1 font-normal">{artist.social_links.youtube.replace(/^https?:\/\/(www\.)?/, "")}</p>
+              </a>
+            )}
+            {artist.social_links.spotify && (
+              <a href={artist.social_links.spotify} target="_blank" rel="noopener noreferrer"
+                className="block p-4 rounded-xl border border-white/10 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all text-sm font-medium text-white">
+                🎵 Spotify
+                <p className="text-xs text-white/40 mt-1 font-normal">{artist.social_links.spotify.replace(/^https?:\/\/(www\.)?/, "")}</p>
+              </a>
+            )}
+            {artist.social_links.tiktok && (
+              <a href={artist.social_links.tiktok} target="_blank" rel="noopener noreferrer"
+                className="block p-4 rounded-xl border border-white/10 hover:border-white/30 bg-white/[0.03] hover:bg-white/[0.06] transition-all text-sm font-medium text-white">
+                🎬 TikTok
+                <p className="text-xs text-white/40 mt-1 font-normal">{artist.social_links.tiktok.replace(/^https?:\/\/(www\.)?/, "")}</p>
+              </a>
+            )}
+          </div>
+        )}
+
+        {/* CONTACTO TAB */}
+        {activeTab === "contacto" && (
+          <div className="space-y-3">
+            {userProfile.phone && (
+              <div className="p-4 rounded-xl border border-white/10 bg-white/[0.03]">
+                <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Teléfono</p>
+                <p className="text-sm font-medium text-white">{userProfile.phone_country_code && `${userProfile.phone_country_code} `}{userProfile.phone}</p>
+              </div>
+            )}
+            {userProfile.user_email && (
+              <div className="p-4 rounded-xl border border-white/10 bg-white/[0.03]">
+                <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Correo</p>
+                <a href={`mailto:${userProfile.user_email}`} className="text-sm font-medium text-white hover:text-white/80 transition-colors break-all">
+                  {userProfile.user_email}
+                </a>
+              </div>
+            )}
           </div>
         )}
       </div>
