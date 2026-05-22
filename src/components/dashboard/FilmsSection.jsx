@@ -270,6 +270,7 @@ function FilmFormModal({ onClose, onSave, artistId, allArtists = [], editingFilm
             explorar_item_id: item?.id,
           });
         }
+      }
       onSave();
       onClose();
     } finally { setLoading(false); }
