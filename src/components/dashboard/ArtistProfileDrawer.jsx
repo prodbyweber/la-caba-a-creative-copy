@@ -365,6 +365,7 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
   const TABS = [
     { id: "profile", label: "Perfil" },
     { id: "social",  label: "Redes" },
+    ...(userProfile?.phone || artist?.phone || userProfile?.user_email || artist?.email ? [{ id: "contacto", label: "Contacto" }] : []),
     ...(artist?.id ? [{ id: "sessions", label: "Sesiones" }] : []),
   ];
 
@@ -518,28 +519,7 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
                           </div>
                         )}
 
-                        {/* Contacto */}
-                        {(userProfile?.phone || artist?.phone || userProfile?.user_email || artist?.email) && (
-                          <div className="py-3 border-t border-white/[0.06]">
-                            <div className="flex items-center gap-2 mb-3">
-                              <p className="text-xs font-semibold text-white/60">Contacto</p>
-                            </div>
-                            <div className="space-y-2">
-                              {(userProfile?.phone || artist?.phone) && (
-                                <div className="flex items-center gap-2.5">
-                                  <span className="text-white/20 text-xs">📞</span>
-                                  <span className="text-xs text-white/50">{userProfile?.phone_country_code ? `${userProfile.phone_country_code} ` : ""}{userProfile?.phone || artist?.phone}</span>
-                                </div>
-                              )}
-                              {(userProfile?.user_email || artist?.email) && (
-                                <div className="flex items-center gap-2.5">
-                                  <span className="text-white/20 text-xs">✉️</span>
-                                  <span className="text-xs text-white/50">{userProfile?.user_email || artist?.email}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
+
 
                         {/* Cerrar sesión */}
                         <div className="border-t border-white/[0.04] pt-3">
@@ -725,6 +705,26 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
                         </div>
                       );
                     })}
+                  </div>
+                )}
+
+                {/* ── TAB: CONTACTO ── */}
+                {tab === "contacto" && (
+                  <div className="px-5 py-6 space-y-3">
+                    {(userProfile?.phone || artist?.phone) && (
+                      <div className="p-4 rounded-2xl border border-white/10 bg-white/[0.03]">
+                        <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Teléfono</p>
+                        <p className="text-sm font-medium text-white">{userProfile?.phone_country_code ? `${userProfile.phone_country_code} ` : ""}{userProfile?.phone || artist?.phone}</p>
+                      </div>
+                    )}
+                    {(userProfile?.user_email || artist?.email) && (
+                      <div className="p-4 rounded-2xl border border-white/10 bg-white/[0.03]">
+                        <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Correo</p>
+                        <a href={`mailto:${userProfile?.user_email || artist?.email}`} className="text-sm font-medium text-white hover:text-white/80 transition-colors break-all">
+                          {userProfile?.user_email || artist?.email}
+                        </a>
+                      </div>
+                    )}
                   </div>
                 )}
 
