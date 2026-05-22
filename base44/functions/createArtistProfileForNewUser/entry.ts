@@ -10,12 +10,13 @@ Deno.serve(async (req) => {
     }
 
     // Buscar UserProfile para obtener datos del onboarding
-    const profiles = await base44.entities.UserProfile.list();
-    const userProfile = profiles.find(p => p.user_id === user.id);
+    // CRITICAL: usar .filter() no .list() para evitar paginación que omite usuarios nuevos
+    const profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
+    const userProfile = profiles[0] || null;
 
     // Buscar si ya existe un artista vinculado a este usuario
-    const artists = await base44.entities.Artist.list();
-    const existingArtist = artists.find(a => a.user_id === user.id);
+    const existingArtists = await base44.entities.Artist.filter({ user_id: user.id });
+    const existingArtist = existingArtists[0] || null;
 
     // Datos base del artista usando UserProfile si existe
     const residenceOrNationality = userProfile?.country_of_residence || userProfile?.nationality || '';
@@ -38,10 +39,11 @@ Deno.serve(async (req) => {
       // Si ya existe, sincronizar datos del UserProfile que falten
       const needsUpdate =
         (userProfile?.profile_photo_url && existingArtist.avatar_url !== userProfile.profile_photo_url) ||
-        (userProfile?.artist_name && existingArtist.stageName !== userProfile.artist_name);
+        (userProfile?.artist_name && existingArtist.stageName !== (userProfile.artist_name || '')) ||
+        (!existingArtist.user_id); // asegurar linkage
 
       if (needsUpdate) {
-        await base44.entities.Artist.update(existingArtist.id, artistData);
+        await base44.entities.Artist.update(existingArtist.id, { ...artistData, user_id: user.id });
       }
 
       return Response.json({ artistId: existingArtist.id, message: 'Artist profile already exists' });

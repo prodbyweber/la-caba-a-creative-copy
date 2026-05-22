@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { GripVertical } from "lucide-react";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
+import { ensureUserSetupComplete } from "@/lib/ensureUserProvisioned";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
 import ProjectsSection from "@/components/dashboard/ProjectsSection.jsx";
 import TracksSection from "@/components/dashboard/TracksSection";
@@ -20,6 +21,7 @@ export default function ArtistDashboard() {
   const [viewMode, setViewMode] = useState(null);
   const [showOrderMenu, setShowOrderMenu] = useState(false);
   const [settingUpArtist, setSettingUpArtist] = useState(false);
+  const [autoProvisionDone, setAutoProvisionDone] = useState(false);
   const queryClient = useQueryClient();
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -29,7 +31,21 @@ export default function ArtistDashboard() {
 
   useEffect(() => {
     base44.auth.me().then(u => setCurrentUser(u)).catch(() => {});
-  }, []);
+  }, []);  
+
+  // Auto-healing: cuando tenemos el usuario y NO tiene Artist record, provisionarlo automáticamente
+  useEffect(() => {
+    if (!currentUser || hasExternalParam || autoProvisionDone) return;
+    // Solo actuar cuando selfArtist === null (query completó, no encontró nada)
+    if (selfArtist !== null) return;
+    setAutoProvisionDone(true);
+    ensureUserSetupComplete(currentUser, {
+      onArtistCreated: () => {
+        queryClient.invalidateQueries({ queryKey: ['self-artist', currentUser.id] });
+        queryClient.invalidateQueries({ queryKey: ['userProfile', currentUser.id] });
+      }
+    });
+  }, [currentUser, selfArtist, hasExternalParam, autoProvisionDone]);
 
   // When viewing by userId (admin viewing a user catalog without artistId)
   const { data: artistByUserId } = useQuery({
