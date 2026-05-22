@@ -14,7 +14,10 @@
         "ep",
         "minifilm",
         "film",
-        "series"
+        "series",
+        "short",
+        "videoclip",
+        "visualizer"
       ],
       "default": "song",
       "description": "Tipo de contenido"
@@ -81,6 +84,17 @@
     "artist_id": {
       "type": "string",
       "description": "ID del artista principal"
+    },
+    "collaborators": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Colaboradores del item"
+    },
+    "track_id": {
+      "type": "string",
+      "description": "ID del soundtrack vinculado (para shorts)"
     },
     "credits": {
       "type": "array",

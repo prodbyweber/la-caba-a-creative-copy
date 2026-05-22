@@ -65,9 +65,10 @@ export default function TracksSection({ jlyArtistId, userEmail }) {
         }
         return byArtist;
       }
-      // No hay artista — mostrar solo los tracks creados por este usuario
+      // No hay artista — mostrar solo los tracks creados por este usuario (list-then-filter)
       if (userEmail) {
-        return base44.entities.Track.filter({ created_by: userEmail });
+        const all = await base44.entities.Track.list('-created_date', 200);
+        return all.filter(t => t.created_by === userEmail);
       }
       return [];
     },
@@ -80,9 +81,9 @@ export default function TracksSection({ jlyArtistId, userEmail }) {
     queryKey: ['projects', jlyArtistId || 'user', userEmail || 'anon'],
     queryFn: () => jlyArtistId
       ? base44.entities.Project.filter({ artist_id: jlyArtistId })
-      : userEmail
-        ? base44.entities.Project.filter({ created_by: userEmail })
-        : Promise.resolve([]),
+        : userEmail
+          ? base44.entities.Project.list('-created_date', 100).then(ps => ps.filter(p => p.created_by === userEmail))
+          : Promise.resolve([]),
     enabled: !!(jlyArtistId || userEmail),
     initialData: [],
     staleTime: 0,
@@ -273,7 +274,9 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
         Object.entries(data).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
       );
       if (track) return base44.entities.Track.update(track.id, clean);
-      return base44.entities.Track.create({ ...clean, artist_id: jlyArtistId });
+      const createData = { ...clean };
+      if (jlyArtistId) createData.artist_id = jlyArtistId;
+      return base44.entities.Track.create(createData);
     },
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tracks'] }); onClose(); },
   });
