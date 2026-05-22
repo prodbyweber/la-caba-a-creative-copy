@@ -249,7 +249,6 @@ export default function ArtistDashboard() {
                   >
                     Tu catálogo
                   </h1>
-                  <p className="text-[11px] text-white/25 mt-0.5">Todo tu contenido en un solo lugar</p>
                 </div>
 
                 {/* Reorder button */}
@@ -284,7 +283,7 @@ export default function ArtistDashboard() {
               </div>
 
               {/* Sections stacked in user order */}
-              <div className="space-y-10">
+              <div className="space-y-6">
                 {sectionOrder.map(key => renderSection(key))}
                 {showCampaignsSection && (
                   <div key="campaigns">
@@ -315,11 +314,10 @@ export default function ArtistDashboard() {
 function SectionLabel({ label }) {
   return (
     <p
-      className="text-[10px] font-bold uppercase mb-3"
+      className="text-sm font-bold mb-4 text-white"
       style={{
         fontFamily: "'Helvetica Neue', sans-serif",
-        letterSpacing: "0.28em",
-        color: "rgba(255,255,255,0.2)",
+        letterSpacing: "0.02em",
       }}
     >
       {label}
