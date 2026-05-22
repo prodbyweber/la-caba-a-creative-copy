@@ -278,7 +278,12 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
       if (jlyArtistId) createData.artist_id = jlyArtistId;
       return base44.entities.Track.create(createData);
     },
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tracks'] }); onClose(); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tracks'] });
+      queryClient.invalidateQueries({ queryKey: ['artist-films'] });
+      queryClient.invalidateQueries({ queryKey: ['artist-shorts'] });
+      onClose();
+    },
   });
 
   const handleCoverUpload = async (e) => {

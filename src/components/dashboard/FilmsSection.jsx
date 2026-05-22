@@ -569,6 +569,7 @@ export default function FilmsSection({ artistId, userProfileId, userEmail }) {
 
   const { data: films = [], isLoading, refetch } = useQuery({
     queryKey: ["artist-films", artistId, userProfileId, userEmail],
+    staleTime: 0,
     queryFn: async () => {
       let items = [];
       if (artistId) {
@@ -656,7 +657,11 @@ export default function FilmsSection({ artistId, userProfileId, userEmail }) {
         {showModal && (
           <FilmFormModal
             onClose={() => { setShowModal(false); setEditingFilm(null); }}
-            onSave={() => { refetch(); qc.invalidateQueries({ queryKey: ["projects"] }); }}
+            onSave={() => {
+              refetch();
+              qc.invalidateQueries({ queryKey: ["projects"] });
+              qc.invalidateQueries({ queryKey: ["artist-films"] });
+            }}
             artistId={artistId}
             allArtists={allArtists}
             editingFilm={editingFilm}

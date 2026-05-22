@@ -581,21 +581,27 @@ export default function ShortsSection({ artistId, userProfileId, userEmail }) {
   const { data: shorts = [], isLoading, refetch } = useQuery({
     queryKey: ["artist-shorts", artistId, userProfileId, userEmail],
     queryFn: async () => {
+      let items = [];
       if (artistId) {
-        return base44.entities.ExplorarItem.filter({ artist_id: artistId, content_type: "short" });
+        // Single-field filter + client-side content_type filter (more reliable)
+        items = await base44.entities.ExplorarItem.filter({ artist_id: artistId });
       } else if (userEmail) {
-        const all = await base44.entities.ExplorarItem.list("-created_date", 100);
-        return all.filter(i => i.created_by === userEmail && i.content_type === "short");
+        const all = await base44.entities.ExplorarItem.list("-created_date", 200);
+        items = all.filter(i => i.created_by === userEmail);
+      } else {
+        return [];
       }
-      return [];
+      return items.filter(i => i.content_type === "short");
     },
     enabled: !!(artistId || userProfileId || userEmail),
+    staleTime: 0,
   });
 
   const handleDelete = async (id) => {
     if (!confirm("¿Eliminar este short?")) return;
     await base44.entities.ExplorarItem.delete(id);
     refetch();
+    qc.invalidateQueries({ queryKey: ["artist-shorts"] });
   };
 
   const handleTogglePublic = async (short) => {
@@ -660,7 +666,11 @@ export default function ShortsSection({ artistId, userProfileId, userEmail }) {
         {showModal && (
           <ShortFormModal
             onClose={() => { setShowModal(false); setEditingShort(null); }}
-            onSave={() => { refetch(); qc.invalidateQueries({ queryKey: ["explorar-items"] }); }}
+            onSave={() => {
+              refetch();
+              qc.invalidateQueries({ queryKey: ["artist-shorts"] });
+              qc.invalidateQueries({ queryKey: ["artist-films"] });
+            }}
             artistId={artistId}
             editingShort={editingShort}
           />
