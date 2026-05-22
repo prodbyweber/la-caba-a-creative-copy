@@ -255,21 +255,21 @@ function FilmFormModal({ onClose, onSave, artistId, allArtists = [], editingFilm
         item = await base44.entities.ExplorarItem.update(editingFilm.id, { ...payload, is_active: editingFilm.is_active });
       } else {
         item = await base44.entities.ExplorarItem.create({ ...payload, is_active: true });
-        // Auto-create Project linked to this film
-        await base44.entities.Project.create({
-          title: form.title,
-          type: form.content_type === "series" ? "Serie"
-            : form.content_type === "minifilm" ? "MiniFilm"
-            : form.content_type === "videoclip" ? "Single"
-            : "Film",
-          artist_id: artistId || undefined,
-          cover_url: displayThumb || undefined,
-          description: form.description,
-          status: "Draft",
-          is_public: false,
-          explorar_item_id: item?.id,
-        });
-      }
+        if (artistId) {
+          await base44.entities.Project.create({
+            title: form.title,
+            type: form.content_type === "series" ? "Serie"
+              : form.content_type === "minifilm" ? "MiniFilm"
+              : form.content_type === "videoclip" ? "Single"
+              : "Film",
+            artist_id: artistId,
+            cover_url: displayThumb || undefined,
+            description: form.description,
+            status: "Draft",
+            is_public: false,
+            explorar_item_id: item?.id,
+          });
+        }
       onSave();
       onClose();
     } finally { setLoading(false); }
