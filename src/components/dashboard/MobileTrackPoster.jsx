@@ -81,11 +81,20 @@ function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, onToggle
   const hasYoutube = !!track.youtube_music_url;
   const [showYtPlayer, setShowYtPlayer] = useState(false);
 
-  // Lock body scroll while open
+  // Lock body scroll — iOS Safari requires position:fixed trick
   useEffect(() => {
-    const prev = document.body.style.overflow;
+    const scrollY = window.scrollY;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = "100%";
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      window.scrollTo(0, scrollY);
+    };
   }, []);
 
   return (
@@ -295,14 +304,32 @@ export default function MobileTrackPoster({ track, onEdit, onDelete }) {
 
   return (
     <>
-      {/* Card — single tap target, no invisible overlay */}
-      <div
-        className="flex-shrink-0 w-[110px] rounded-lg overflow-hidden cursor-pointer active:opacity-80 transition-opacity"
-        style={{ aspectRatio: "2/3", position: "relative", flexShrink: 0 }}
+      {/*
+        KEY FIX: <button> instead of <div> ensures onClick fires reliably on
+        iOS Safari inside -webkit-overflow-scrolling:touch scroll containers.
+        Non-interactive elements (div, span) silently drop tap events on iOS.
+      */}
+      <button
+        type="button"
+        aria-label={`Ver detalles de ${track.title}`}
         onClick={openDetail}
+        className="flex-shrink-0 active:opacity-75 transition-opacity"
+        style={{
+          width: 110,
+          aspectRatio: "2/3",
+          position: "relative",
+          flexShrink: 0,
+          background: "transparent",
+          border: "none",
+          padding: 0,
+          cursor: "pointer",
+          WebkitTapHighlightColor: "transparent",
+          touchAction: "manipulation",
+          display: "block",
+        }}
       >
-        {/* Visual layer */}
-        <div className="absolute inset-0">
+        {/* Visual layer — overflow hidden on inner div, NOT on the button */}
+        <div className="absolute inset-0 rounded-lg overflow-hidden">
           <motion.div
             className="absolute inset-0"
             animate={isPlaying ? { scale: 1.08, x: [0, 3, -3, 1, 0] } : { scale: 1, x: 0 }}
@@ -339,12 +366,12 @@ export default function MobileTrackPoster({ track, onEdit, onDelete }) {
             </div>
           )}
 
-          {/* ChevronDown — top-right corner */}
+          {/* ChevronDown — top-right corner indicator */}
           <div
             className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center pointer-events-none"
-            style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+            style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)", WebkitBackdropFilter: "blur(4px)" }}
           >
-            <ChevronDown className="w-3 h-3 text-white/60" />
+            <ChevronDown className="w-3 h-3 text-white/70" />
           </div>
 
           {/* Title */}
@@ -365,10 +392,11 @@ export default function MobileTrackPoster({ track, onEdit, onDelete }) {
           </AnimatePresence>
         </div>
 
-        {/* Play button — stops propagation so it doesn't also open detail */}
+        {/* Play button — nested button stops propagation to card */}
         {hasPlayable && (
           <button
-            onClick={(e) => { e.stopPropagation(); handleTogglePlay(e); }}
+            type="button"
+            onClick={(e) => { e.stopPropagation(); handleTogglePlay(null); }}
             aria-label={isPlaying ? "Pausar" : "Reproducir"}
             className="absolute bottom-2 right-2 flex items-center justify-center rounded-full"
             style={{
@@ -376,6 +404,7 @@ export default function MobileTrackPoster({ track, onEdit, onDelete }) {
               background: isPlaying ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.88)",
               border: isPlaying ? "1px solid rgba(255,255,255,0.3)" : "none",
               backdropFilter: "blur(4px)",
+              WebkitBackdropFilter: "blur(4px)",
               zIndex: 2,
               touchAction: "manipulation",
               WebkitTapHighlightColor: "transparent",
@@ -387,7 +416,7 @@ export default function MobileTrackPoster({ track, onEdit, onDelete }) {
             }
           </button>
         )}
-      </div>
+      </button>
 
       <AnimatePresence>
         {showDetail && ReactDOM.createPortal(
