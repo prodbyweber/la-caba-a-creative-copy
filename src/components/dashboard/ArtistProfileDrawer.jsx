@@ -364,6 +364,7 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
 
   const TABS = [
     { id: "profile", label: "Perfil" },
+    { id: "social",  label: "Redes" },
     ...(artist?.id ? [{ id: "sessions", label: "Sesiones" }] : []),
   ];
 
@@ -692,6 +693,57 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
                 )}
 
 
+
+                {/* ── TAB: REDES ── */}
+                {tab === "social" && (
+                  <div className="px-5 py-6 space-y-2">
+                    {socialPlatforms.map(platform => {
+                      const { id, name, icon: Icon, color } = platform;
+                      const url = socialLinks[id];
+                      const hasUrl = !!url;
+                      if (editingPlatform === id) return (
+                        <div key={id} className="p-4 rounded-2xl border border-white/10 space-y-3" style={{ background: "#161616" }}>
+                          <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color }}>{name}</p>
+                          <input type="url" autoFocus value={platformUrl} onChange={e => setPlatformUrl(e.target.value)}
+                            placeholder="https://..."
+                            className="w-full px-3 py-2.5 rounded-xl text-sm text-white bg-white/[0.06] border border-white/[0.08] focus:outline-none focus:border-white/20 placeholder-white/20" />
+                          <div className="flex gap-2">
+                            <button onClick={() => { setEditingPlatform(null); setPlatformUrl(""); }}
+                              className="flex-1 py-2 rounded-xl bg-white/5 text-xs text-white/40 font-medium">Cancelar</button>
+                            <button onClick={handleSaveSocial} disabled={!platformUrl}
+                              className="flex-1 py-2 rounded-xl text-xs font-bold disabled:opacity-30"
+                              style={{ background: color + "22", color }}>Guardar</button>
+                          </div>
+                        </div>
+                      );
+                      return (
+                        <div key={id} className="flex items-center gap-3 px-4 py-3.5 rounded-2xl border transition-all"
+                          style={hasUrl ? { background: color + "0a", borderColor: color + "25" } : { background: "rgba(255,255,255,0.02)", borderColor: "rgba(255,255,255,0.05)" }}>
+                          <Icon className="w-4 h-4 flex-shrink-0" style={{ color: hasUrl ? color : "rgba(255,255,255,0.18)" }} />
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-xs font-semibold ${hasUrl ? "text-white/75" : "text-white/20"}`}>{name}</p>
+                            {hasUrl && <p className="text-[10px] text-white/25 truncate mt-0.5">{url.replace(/^https?:\/\/(www\.)?/, "")}</p>}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {hasUrl && (
+                              <a href={url} target="_blank" rel="noopener noreferrer"
+                                className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/8 transition-colors"
+                                onClick={e => e.stopPropagation()}>
+                                <ExternalLink className="w-3 h-3 text-white/20" />
+                              </a>
+                            )}
+                            <button onClick={hasUrl ? () => handleRemoveSocial(id) : () => { setEditingPlatform(id); setPlatformUrl(""); }}
+                              className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-white/8 transition-colors">
+                              {hasUrl
+                                ? <Trash2 className="w-3 h-3 text-white/20 hover:text-red-400/70" />
+                                : <Plus className="w-3.5 h-3.5 text-white/20" />}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
 
                 {/* ── TAB: SESIONES ── */}
                 {tab === "sessions" && artist?.id && (
