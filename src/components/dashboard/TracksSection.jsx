@@ -243,7 +243,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
   const [formData, setFormData] = useState({
     title: "", project_id: "", cover_url: "", audio_file_url: "",
     youtube_music_url: "", composers: [], producers: [],
-    genre: "", genre_secondary: "", status: "demo", notes: "", versions: {}
+    genre: "", genre_secondary: "", status: "idea", notes: "", versions: {}
   });
   const [showGenrePanel, setShowGenrePanel] = useState(false);
   const [genreTarget, setGenreTarget] = useState("primary");
@@ -306,7 +306,8 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
   const removeTag = (field, idx) => setFormData(f => ({ ...f, [field]: f[field].filter((_, i) => i !== idx) }));
 
   const STATUS_OPTIONS = [
-    { value: "demo", label: "Demo" },
+    { value: "idea", label: "Demo" },
+    { value: "production", label: "En producción" },
     { value: "completed", label: "Master" },
   ];
 
