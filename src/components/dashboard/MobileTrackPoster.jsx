@@ -74,7 +74,7 @@ function getYoutubeId(url) {
 }
 
 // ─── Bottom-sheet detail (with shared play state) ─────────────────────────────
-function MobileTrackDetail({ track, onClose, onEdit, playing, onTogglePlay, onTogglePublic }) {
+function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, onTogglePlay, onTogglePublic }) {
   const status = statusConfig[track.status] || statusConfig.idea;
   const folders = FOLDER_DEFS.filter(f => track.versions?.[f.key]);
   const isPublic = track.is_public === true;
@@ -184,10 +184,19 @@ function MobileTrackDetail({ track, onClose, onEdit, playing, onTogglePlay, onTo
                 {showYtPlayer ? "Cerrar" : "YT Music"}
               </button>
             )}
-            <button onClick={() => { onClose(); onEdit(track); }}
+            <button onClick={() => { onEdit(track); onClose(); }}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold flex-1 justify-center hover:bg-white/15 transition-colors">
               <Edit className="w-4 h-4" /> Editar
             </button>
+            {onDelete && (
+              <button
+                onClick={() => { if (window.confirm('¿Eliminar este soundtrack?')) { onDelete(track.id); onClose(); } }}
+                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors"
+                style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)" }}
+                title="Eliminar">
+                <X className="w-4 h-4 text-red-400" />
+              </button>
+            )}
             {/* Toggle público/privado */}
             <button
               onClick={onTogglePublic}
@@ -253,7 +262,7 @@ function MobileTrackDetail({ track, onClose, onEdit, playing, onTogglePlay, onTo
 }
 
 // ─── Poster card ──────────────────────────────────────────────────────────────
-export default function MobileTrackPoster({ track, onEdit }) {
+export default function MobileTrackPoster({ track, onEdit, onDelete }) {
   const [showDetail, setShowDetail] = useState(false);
   const globalAudio = useGlobalAudio();
   const isPlaying = globalAudio?.playingTrack?.id === track.id;
@@ -387,8 +396,16 @@ export default function MobileTrackPoster({ track, onEdit }) {
           )}
         </div>
 
-        {/* Status label */}
-        <p className="text-[10px] truncate" style={{ color: status.color + "99" }}>{status.label}</p>
+        {/* Rover expand button */}
+        <button
+          onClick={openDetail}
+          className="w-full flex items-center justify-center gap-1 py-1 rounded-lg transition-colors active:bg-white/10"
+          style={{ background: "transparent", border: "none" }}
+          aria-label="Ver detalles"
+        >
+          <p className="text-[9px] truncate" style={{ color: status.color + "99" }}>{status.label}</p>
+          <ChevronDown className="w-3 h-3 flex-shrink-0" style={{ color: "rgba(255,255,255,0.2)" }} />
+        </button>
       </div>
 
       <AnimatePresence>
@@ -397,6 +414,7 @@ export default function MobileTrackPoster({ track, onEdit }) {
             track={track}
             onClose={() => setShowDetail(false)}
             onEdit={onEdit}
+            onDelete={onDelete}
             playing={isPlaying}
             onTogglePlay={handleTogglePlay}
             onTogglePublic={handleTogglePublic}

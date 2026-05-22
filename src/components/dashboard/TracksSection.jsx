@@ -134,7 +134,7 @@ export default function TracksSection({ jlyArtistId, userEmail }) {
               <div style={{ overflowX: "auto", overflowY: "visible", scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}>
                 <div className="flex gap-2.5 py-1" style={{ width: "max-content" }}>
                   {tracks.map((track) => (
-                    <MobileTrackPoster key={track.id} track={track} onEdit={setEditingTrack} />
+                    <MobileTrackPoster key={track.id} track={track} onEdit={setEditingTrack} onDelete={(id) => deleteMutation.mutate(id)} />
                   ))}
                   <div className="flex-shrink-0 w-1" />
                 </div>
