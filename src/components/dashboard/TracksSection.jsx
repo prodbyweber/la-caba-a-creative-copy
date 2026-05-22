@@ -246,8 +246,10 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
   const [formData, setFormData] = useState({
     title: "", project_id: "", cover_url: "", audio_file_url: "",
     youtube_music_url: "", composers: [], producers: [],
-    genre: "", bpm: null, key: "", status: "demo", notes: "", versions: {}
+    genre: "", genre_secondary: "", status: "demo", notes: "", versions: {}
   });
+  const [showGenrePanel, setShowGenrePanel] = useState(false);
+  const [genreTarget, setGenreTarget] = useState("primary");
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
   const [audioMode, setAudioMode] = useState("file");
@@ -263,7 +265,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
       setFormData({
         title: "", project_id: "", cover_url: "", audio_file_url: "",
         youtube_music_url: "", composers: [], producers: [],
-        genre: "", bpm: null, key: "", status: "demo", notes: "", versions: {}
+        genre: "", genre_secondary: "", status: "demo", notes: "", versions: {}
       });
       setAudioMode("file");
     }
@@ -290,7 +292,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
 
   const handleAudioUpload = async (e) => {
     const file = e.target.files?.[0]; if (!file) return;
-    if (file.size > 70 * 1024 * 1024) { alert('El archivo supera los 70MB'); return; }
+    if (file.size > 14 * 1024 * 1024) { alert('El archivo supera los 14MB'); return; }
     setUploadingAudio(true);
     const { file_url } = await base44.integrations.Core.UploadFile({ file });
     setFormData(f => ({ ...f, audio_file_url: file_url }));
@@ -306,8 +308,13 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
 
   const STATUS_OPTIONS = [
     { value: "demo", label: "Demo" },
-    { value: "premix", label: "Premix" },
-    { value: "completed", label: "Clean Master" },
+    { value: "completed", label: "Master" },
+  ];
+
+  const GENRES = [
+    "Reggaetón","Trap","Drill","Hip Hop / Rap","R&B","Afrobeat","Amapiano",
+    "Dancehall","Funk Brasileiro","Afro House","House","Tech House","Techno",
+    "EDM","Pop","Indie","Rock","Salsa","Bachata","Corridos","Experimental / Alternativo",
   ];
 
   const inp = "w-full px-3 py-2.5 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-white/20 transition-colors";
@@ -411,7 +418,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
                     <p className="text-xs font-medium text-white/70">
                       {uploadingAudio ? "Subiendo..." : formData.audio_file_url ? "MP3 cargado ✓" : "Subir MP3"}
                     </p>
-                    <p className="text-[10px] text-white/25">Máx 70MB</p>
+                    <p className="text-[10px] text-white/25">Solo MP3 · Máx 14MB</p>
                   </div>
                   <input type="file" accept=".mp3,audio/mpeg" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
                 </label>
@@ -422,44 +429,67 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
               )}
             </div>
 
-            {/* Técnica: Género · BPM · Tonalidad · Estado */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={lbl}>Género</label>
-                <input type="text" value={formData.genre || ""}
-                  onChange={(e) => setFormData(f => ({ ...f, genre: e.target.value }))}
-                  placeholder="Trap, Pop…" className={inp} />
+            {/* Estado */}
+            <div>
+              <label className={lbl}>Estado</label>
+              <div className="flex gap-2">
+                {STATUS_OPTIONS.map(s => (
+                  <button key={s.value} type="button"
+                    onClick={() => setFormData(f => ({ ...f, status: s.value }))}
+                    className="flex-1 py-2.5 rounded-xl text-xs font-semibold transition-all"
+                    style={{
+                      background: formData.status === s.value ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.04)",
+                      color: formData.status === s.value ? "white" : "rgba(255,255,255,0.3)",
+                      border: formData.status === s.value ? "1px solid rgba(255,255,255,0.2)" : "1px solid rgba(255,255,255,0.07)",
+                    }}>
+                    {s.label}
+                  </button>
+                ))}
               </div>
-              <div>
-                <label className={lbl}>Estado</label>
-                <div className="flex gap-1.5">
-                  {STATUS_OPTIONS.map(s => (
-                    <button key={s.value} type="button"
-                      onClick={() => setFormData(f => ({ ...f, status: s.value }))}
-                      className="flex-1 py-2 rounded-lg text-[10px] font-semibold transition-all"
-                      style={{
-                        background: formData.status === s.value ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.04)",
-                        color: formData.status === s.value ? "white" : "rgba(255,255,255,0.3)",
-                        border: formData.status === s.value ? "1px solid rgba(255,255,255,0.2)" : "1px solid rgba(255,255,255,0.06)",
-                      }}>
-                      {s.label}
+            </div>
+
+            {/* Géneros */}
+            <div className="grid grid-cols-2 gap-3">
+              {[{key:"genre",label:"Género principal"},{key:"genre_secondary",label:"Género secundario"}].map(({key,label}) => (
+                <div key={key}>
+                  <label className={lbl}>{label}</label>
+                  <button type="button"
+                    onClick={() => { setGenreTarget(key); setShowGenrePanel(true); }}
+                    className="w-full px-3 py-2.5 rounded-xl text-sm text-left transition-colors"
+                    style={{
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      color: formData[key] ? "white" : "rgba(255,255,255,0.2)",
+                    }}>
+                    {formData[key] || "Seleccionar…"}
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Genre panel */}
+            {showGenrePanel && (
+              <div className="rounded-xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.1)", background: "#0a0a0a" }}>
+                <div className="flex items-center justify-between px-3 py-2 border-b border-white/[0.06]">
+                  <span className="text-[10px] font-semibold text-white/40 uppercase tracking-widest">
+                    {genreTarget === "genre" ? "Género principal" : "Género secundario"}
+                  </span>
+                  <button type="button" onClick={() => setShowGenrePanel(false)} className="text-white/30 hover:text-white transition-colors">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <div className="max-h-44 overflow-y-auto py-1">
+                  {GENRES.map(g => (
+                    <button key={g} type="button"
+                      onClick={() => { setFormData(f => ({ ...f, [genreTarget]: g })); setShowGenrePanel(false); }}
+                      className="w-full text-left px-4 py-2 text-sm transition-colors hover:bg-white/[0.06]"
+                      style={{ color: formData[genreTarget] === g ? "white" : "rgba(255,255,255,0.5)" }}>
+                      {g}
                     </button>
                   ))}
                 </div>
               </div>
-              <div>
-                <label className={lbl}>BPM</label>
-                <input type="number" value={formData.bpm || ""}
-                  onChange={(e) => setFormData(f => ({ ...f, bpm: parseInt(e.target.value) || null }))}
-                  placeholder="120" className={inp} />
-              </div>
-              <div>
-                <label className={lbl}>Tonalidad</label>
-                <input type="text" value={formData.key || ""}
-                  onChange={(e) => setFormData(f => ({ ...f, key: e.target.value }))}
-                  placeholder="Am, C#m…" className={inp} />
-              </div>
-            </div>
+            )}
 
             {/* Créditos */}
             <div className="space-y-3">
