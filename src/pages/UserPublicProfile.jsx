@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Heart, Share2, Music2, ExternalLink, X, Check } from "lucide-react";
+import { ArrowLeft, Heart, Share2, Music2, ExternalLink, X } from "lucide-react";
 import { Link } from "react-router-dom";
 
 
@@ -19,16 +19,6 @@ export default function UserPublicProfile() {
   const [copied, setCopied] = useState(false);
   const [playingYt, setPlayingYt] = useState(null);
   const [viewingImage, setViewingImage] = useState(null);
-  const [bannerUrl, setBannerUrl] = useState(null);
-  const [showBannerPicker, setShowBannerPicker] = useState(false);
-  const [isOwner, setIsOwner] = useState(false);
-
-  const queryClient = useQueryClient();
-
-  const saveBannerMutation = useMutation({
-    mutationFn: (url) => base44.entities.UserProfile.update(userProfile.id, { banner_photo_url: url }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["public-profile-username", username] }),
-  });
 
   const { data: userProfile, isLoading } = useQuery({
     queryKey: ["public-profile-username", username],
@@ -69,29 +59,6 @@ export default function UserPublicProfile() {
     enabled: !!userProfile,
   });
 
-  // Check ownership + initialize banner
-  useEffect(() => {
-    if (!userProfile) return;
-    base44.auth.isAuthenticated().then(async (auth) => {
-      if (auth) {
-        const me = await base44.auth.me();
-        setIsOwner(me?.id === userProfile.user_id || me?.email === userProfile.user_email);
-      }
-    });
-  }, [userProfile]);
-
-  useEffect(() => {
-    if (!userProfile) return;
-    const photos = (userProfile.media_items || []).filter(m => m.type === "image");
-    if (userProfile.banner_photo_url) {
-      setBannerUrl(userProfile.banner_photo_url);
-    } else if (photos.length > 0) {
-      // Assign random photo automatically
-      const random = photos[Math.floor(Math.random() * photos.length)];
-      setBannerUrl(random.url);
-    }
-  }, [userProfile]);
-
   const handleShare = () => {
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(() => {
@@ -129,31 +96,9 @@ export default function UserPublicProfile() {
 
   return (
     <div className="min-h-screen bg-[#080808] text-white overflow-hidden">
-      {/* Cinematic Banner */}
-      {bannerUrl && (
-        <div className="relative w-full" style={{ height: "340px" }}>
-          <img
-            src={bannerUrl}
-            alt="banner"
-            className="w-full h-full object-cover"
-            style={{ filter: "blur(2px) brightness(0.55) saturate(1.2)", transform: "scale(1.04)", transformOrigin: "center" }}
-          />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(8,8,8,0.15) 0%, rgba(8,8,8,0.3) 60%, rgba(8,8,8,1) 100%)" }} />
-          {/* Banner picker button — only for owner */}
-          {isOwner && photos.length > 0 && (
-            <button
-              onClick={() => setShowBannerPicker(true)}
-              className="absolute top-4 right-4 text-[10px] font-semibold text-white/30 hover:text-white/70 uppercase tracking-[0.2em] transition-colors"
-            >
-              Banner
-            </button>
-          )}
-        </div>
-      )}
-
       {/* Hero */}
-      <div className={`relative ${bannerUrl ? "-mt-20" : ""}`}>
-        {!bannerUrl && avatarUrl && (
+      <div className="relative">
+        {avatarUrl && (
           <div className="absolute inset-0 h-[420px]">
             <img src={avatarUrl} alt="" className="w-full h-full object-cover blur-2xl opacity-15" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#080808]/60 to-[#080808]" />
@@ -171,17 +116,8 @@ export default function UserPublicProfile() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col sm:flex-row items-center sm:items-end gap-6 relative"
+            className="flex flex-col sm:flex-row items-center sm:items-end gap-6"
           >
-            {/* Banner btn for mobile when no banner yet */}
-            {isOwner && photos.length > 0 && !bannerUrl && (
-              <button
-                onClick={() => setShowBannerPicker(true)}
-                className="absolute top-0 right-0 text-[10px] font-semibold text-white/25 hover:text-white/60 uppercase tracking-[0.2em] transition-colors"
-              >
-                Banner
-              </button>
-            )}
             {/* Avatar — clickeable para ver en grande */}
             <div
               onClick={() => avatarUrl && setViewingImage(avatarUrl)}
@@ -406,58 +342,6 @@ export default function UserPublicProfile() {
                 <X className="w-5 h-5" />
               </button>
               <img src={viewingImage} alt="" className="w-full h-full object-contain" />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Banner Picker Modal */}
-      <AnimatePresence>
-        {showBannerPicker && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[800] bg-black/90 backdrop-blur-xl flex items-end sm:items-center justify-center p-4"
-            onClick={() => setShowBannerPicker(false)}
-          >
-            <motion.div
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 30, opacity: 0 }}
-              transition={{ type: "spring", damping: 26, stiffness: 280 }}
-              className="w-full max-w-lg rounded-3xl overflow-hidden"
-              style={{ background: "#111" }}
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between px-6 pt-6 pb-4">
-                <p className="text-sm font-bold text-white">Elegir banner</p>
-                <button onClick={() => setShowBannerPicker(false)} className="w-7 h-7 rounded-full bg-white/8 flex items-center justify-center hover:bg-white/15 transition-colors">
-                  <X className="w-3.5 h-3.5 text-white/50" />
-                </button>
-              </div>
-              <div className="grid grid-cols-3 gap-2 px-6 pb-6">
-                {photos.map((photo, idx) => (
-                  <button
-                    key={photo.id || idx}
-                    onClick={() => {
-                      setBannerUrl(photo.url);
-                      saveBannerMutation.mutate(photo.url);
-                      setShowBannerPicker(false);
-                    }}
-                    className={`relative rounded-xl overflow-hidden aspect-video group border-2 transition-all ${
-                      bannerUrl === photo.url ? "border-white/80" : "border-transparent hover:border-white/30"
-                    }`}
-                  >
-                    <img src={photo.url} alt="" className="w-full h-full object-cover" style={{ filter: "brightness(0.7)" }} />
-                    {bannerUrl === photo.url && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                        <Check className="w-5 h-5 text-white" />
-                      </div>
-                    )}
-                  </button>
-                ))}
-              </div>
             </motion.div>
           </motion.div>
         )}

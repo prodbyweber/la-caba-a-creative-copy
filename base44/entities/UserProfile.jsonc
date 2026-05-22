@@ -90,10 +90,6 @@
       "type": "string",
       "description": "URL del avatar del cat\u00e1logo"
     },
-    "banner_photo_url": {
-      "type": "string",
-      "description": "URL de la foto del banner cinematico del perfil"
-    },
     "bio": {
       "type": "string",
       "description": "Bio p\u00fablica del creador"
