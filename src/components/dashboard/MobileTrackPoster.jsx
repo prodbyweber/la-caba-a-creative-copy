@@ -295,117 +295,98 @@ export default function MobileTrackPoster({ track, onEdit, onDelete }) {
 
   return (
     <>
-      <div className="flex-shrink-0 w-[110px]" style={{ position: "relative" }}>
-        {/* Poster area */}
-        <div className="relative mb-1.5" style={{ aspectRatio: "2/3" }}>
+      {/* Card — single tap target, no invisible overlay */}
+      <div
+        className="flex-shrink-0 w-[110px] rounded-lg overflow-hidden cursor-pointer active:opacity-80 transition-opacity"
+        style={{ aspectRatio: "2/3", position: "relative", flexShrink: 0 }}
+        onClick={openDetail}
+      >
+        {/* Visual layer */}
+        <div className="absolute inset-0">
+          <motion.div
+            className="absolute inset-0"
+            animate={isPlaying ? { scale: 1.08, x: [0, 3, -3, 1, 0] } : { scale: 1, x: 0 }}
+            transition={isPlaying
+              ? { scale: { duration: 0.7 }, x: { duration: 8, repeat: Infinity, ease: "easeInOut" } }
+              : { duration: 0.5 }}
+          >
+            {(() => {
+              const ytThumb = !track.cover_url && track.youtube_music_url
+                ? `https://img.youtube.com/vi/${getYoutubeId(track.youtube_music_url)}/hqdefault.jpg`
+                : null;
+              const src = track.cover_url || ytThumb;
+              return src ? (
+                <img src={src} alt={track.title} className="w-full h-full object-cover" draggable={false} />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-[#1e1a3e] via-[#1a1a2e] to-[#0a0a0b] flex flex-col items-center justify-center gap-1.5">
+                  <Music2 className="w-7 h-7 text-white/15" />
+                  <p className="text-[8px] text-white/15 font-medium text-center px-1.5 line-clamp-2 leading-tight">{track.title}</p>
+                </div>
+              );
+            })()}
+          </motion.div>
 
-          {/* Visual layer (overflow hidden for image crop) */}
-          <div className="absolute inset-0 rounded-lg overflow-hidden">
-            <motion.div
-              className="absolute inset-0"
-              animate={isPlaying ? { scale: 1.08, x: [0, 3, -3, 1, 0] } : { scale: 1, x: 0 }}
-              transition={isPlaying
-                ? { scale: { duration: 0.7 }, x: { duration: 8, repeat: Infinity, ease: "easeInOut" } }
-                : { duration: 0.5 }}
-            >
-              {(() => {
-                const ytThumb = !track.cover_url && track.youtube_music_url
-                  ? `https://img.youtube.com/vi/${getYoutubeId(track.youtube_music_url)}/hqdefault.jpg`
-                  : null;
-                const src = track.cover_url || ytThumb;
-                return src ? (
-                  <img src={src} alt={track.title} className="w-full h-full object-cover" draggable={false} />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[#1e1a3e] via-[#1a1a2e] to-[#0a0a0b] flex flex-col items-center justify-center gap-1.5">
-                    <Music2 className="w-7 h-7 text-white/15" />
-                    <p className="text-[8px] text-white/15 font-medium text-center px-1.5 line-clamp-2 leading-tight">{track.title}</p>
-                  </div>
-                );
-              })()}
-            </motion.div>
+          {/* Gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
 
-            {/* Gradients */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/15 to-transparent pointer-events-none" />
-
-            {/* YT badge */}
-            {!hasAudio && hasYoutube && (
-              <div className="absolute top-1.5 left-1.5 flex items-center gap-0.5 px-1 py-0.5 rounded pointer-events-none"
-                style={{ background: "rgba(255,0,0,0.2)", border: "1px solid rgba(255,80,80,0.3)" }}>
-                <svg className="w-2.5 h-2.5 text-red-400" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
-                </svg>
-              </div>
-            )}
-
-            {/* Title (pointer-events none so taps fall through to button below) */}
-            <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 pointer-events-none">
-              <p className="text-white font-bold text-[11px] leading-tight line-clamp-2">{track.title}</p>
+          {/* YT badge */}
+          {!hasAudio && hasYoutube && (
+            <div className="absolute top-1.5 left-1.5 flex items-center gap-0.5 px-1 py-0.5 rounded pointer-events-none"
+              style={{ background: "rgba(255,0,0,0.2)", border: "1px solid rgba(255,80,80,0.3)" }}>
+              <svg className="w-2.5 h-2.5 text-red-400" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+              </svg>
             </div>
+          )}
 
-            {/* Waveform */}
-            <AnimatePresence>
-              {isPlaying && (
-                <motion.div
-                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-                >
-                  <AudioWave small />
-                </motion.div>
-              )}
-            </AnimatePresence>
+          {/* ChevronDown — top-right corner */}
+          <div
+            className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center pointer-events-none"
+            style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(4px)" }}
+          >
+            <ChevronDown className="w-3 h-3 text-white/60" />
           </div>
 
-          {/* ── FULL-CARD TAP TARGET (outside overflow:hidden) ── */}
-          {/* Covers the entire poster; sends tap to openDetail except play-btn zone */}
-          <button
-            onClick={openDetail}
-            aria-label="Ver créditos"
-            style={{
-              position: "absolute", inset: 0,
-              background: "transparent",
-              border: "none", padding: 0, margin: 0,
-              cursor: "pointer",
-              zIndex: 10,
-              touchAction: "manipulation",
-              WebkitTapHighlightColor: "transparent",
-              WebkitAppearance: "none",
-            }}
-          />
+          {/* Title */}
+          <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 pointer-events-none">
+            <p className="text-white font-bold text-[11px] leading-tight line-clamp-2">{track.title}</p>
+          </div>
 
-          {/* Play button — above the full-card tap layer */}
-          {hasPlayable && (
-            <button
-              onClick={handleTogglePlay}
-              aria-label={isPlaying ? "Pausar" : "Reproducir"}
-              className="absolute bottom-2 right-2 flex items-center justify-center rounded-full active:scale-90 transition-transform"
-              style={{
-                width: 28, height: 28,
-                background: isPlaying ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.88)",
-                border: isPlaying ? "1px solid rgba(255,255,255,0.3)" : "none",
-                backdropFilter: "blur(4px)",
-                zIndex: 20,
-                touchAction: "manipulation",
-                WebkitTapHighlightColor: "transparent",
-              }}
-            >
-              {isPlaying
-                ? <Pause className="w-3 h-3 text-white" fill="white" />
-                : <Play className="w-3 h-3 text-black ml-0.5" fill="black" />
-              }
-            </button>
-          )}
+          {/* Waveform */}
+          <AnimatePresence>
+            {isPlaying && (
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+              >
+                <AudioWave small />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* Rover expand button */}
-        <button
-          onClick={openDetail}
-          className="w-full flex items-center justify-center gap-1 py-1 rounded-lg transition-colors active:bg-white/10"
-          style={{ background: "transparent", border: "none" }}
-          aria-label="Ver detalles"
-        >
-          <p className="text-[9px] truncate" style={{ color: status.color + "99" }}>{status.label}</p>
-          <ChevronDown className="w-3 h-3 flex-shrink-0" style={{ color: "rgba(255,255,255,0.2)" }} />
-        </button>
+        {/* Play button — stops propagation so it doesn't also open detail */}
+        {hasPlayable && (
+          <button
+            onClick={(e) => { e.stopPropagation(); handleTogglePlay(e); }}
+            aria-label={isPlaying ? "Pausar" : "Reproducir"}
+            className="absolute bottom-2 right-2 flex items-center justify-center rounded-full"
+            style={{
+              width: 28, height: 28,
+              background: isPlaying ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.88)",
+              border: isPlaying ? "1px solid rgba(255,255,255,0.3)" : "none",
+              backdropFilter: "blur(4px)",
+              zIndex: 2,
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            {isPlaying
+              ? <Pause className="w-3 h-3 text-white" fill="white" />
+              : <Play className="w-3 h-3 text-black ml-0.5" fill="black" />
+            }
+          </button>
+        )}
       </div>
 
       <AnimatePresence>
