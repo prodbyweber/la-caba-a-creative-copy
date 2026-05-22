@@ -32,8 +32,8 @@ function VideoBackground({ src }) {
 }
 
 export default function LandingHero({ bottomOffset } = {}) {
-  // Default bottom offset: desktop lower (closer to corner), mobile higher
-  const effectiveBottomOffset = bottomOffset || "clamp(12vw, 18vw, 140px)";
+  // Default bottom offset: desktop lower (closer to corner), mobile higher, 2cm lower
+  const effectiveBottomOffset = bottomOffset || "calc(clamp(12vw, 18vw, 140px) - 20px)";
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
     queryFn: async () => { const c = await base44.entities.LandingConfig.list(); return c[0] || null; },
@@ -79,6 +79,7 @@ export default function LandingHero({ bottomOffset } = {}) {
            zIndex: 20,
            textAlign: "right",
            pointerEvents: "none",
+           willChange: "transform",
          }}
        >
         <p style={{
