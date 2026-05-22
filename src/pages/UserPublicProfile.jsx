@@ -182,7 +182,7 @@ export default function UserPublicProfile() {
         {/* Bio */}
         {userProfile.bio && (
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
-            className="text-white/50 text-sm leading-relaxed mb-12 max-w-xl">
+            className="text-white/50 text-sm leading-relaxed mb-16 max-w-xl">
             {userProfile.bio}
           </motion.p>
         )}
@@ -192,8 +192,8 @@ export default function UserPublicProfile() {
 
         {/* Aparece en */}
         {explorarItems.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-12">
-            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/20 mb-4">Aparece en</p>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-16">
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/20 mb-3">Aparece en</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {explorarItems.slice(0, 12).map((item, idx) => {
                 const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
@@ -227,8 +227,8 @@ export default function UserPublicProfile() {
 
         {/* Photos */}
         {photos.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mb-12">
-            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/20 mb-4">Galería</p>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mb-16">
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/20 mb-3">Galería</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {photos.map((photo, idx) => (
                 <motion.div 
