@@ -74,7 +74,7 @@ function getYoutubeId(url) {
 }
 
 // ─── Bottom-sheet detail (with shared play state) ─────────────────────────────
-function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, onTogglePlay, onTogglePublic }) {
+export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, onTogglePlay, onTogglePublic }) {
   const status = statusConfig[track.status] || statusConfig.idea;
   const folders = FOLDER_DEFS.filter(f => track.versions?.[f.key]);
   const isPublic = track.is_public === true;
@@ -271,36 +271,27 @@ function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, onToggle
 }
 
 // ─── Poster card ──────────────────────────────────────────────────────────────
-export default function MobileTrackPoster({ track, onEdit, onDelete }) {
-  const [showDetail, setShowDetail] = useState(false);
+// onOpenDetail(track) — lifts selection state to parent (mirrors Explorar pattern)
+export default function MobileTrackPoster({ track, onEdit, onDelete, onOpenDetail }) {
   const globalAudio = useGlobalAudio();
   const isPlaying = globalAudio?.playingTrack?.id === track.id;
-  const queryClient = useQueryClient();
 
-  const status = statusConfig[track.status] || statusConfig.idea;
   const hasAudio = !!track.audio_file_url;
   const hasYoutube = !!track.youtube_music_url;
   const hasPlayable = hasAudio || hasYoutube;
 
-  const handleTogglePlay = useCallback((e) => {
-    if (e) { e.stopPropagation(); e.preventDefault(); }
+  const handleTogglePlay = useCallback(() => {
     if (hasAudio) {
       if (isPlaying) globalAudio.pauseTrack();
       else globalAudio.playTrack(track);
     } else if (hasYoutube) {
-      setShowDetail(true);
+      onOpenDetail && onOpenDetail(track);
     }
-  }, [isPlaying, hasAudio, hasYoutube, globalAudio, track]);
+  }, [isPlaying, hasAudio, hasYoutube, globalAudio, track, onOpenDetail]);
 
-  const handleTogglePublic = useCallback(async () => {
-    await base44.entities.Track.update(track.id, { is_public: !track.is_public });
-    queryClient.invalidateQueries({ queryKey: ['tracks'] });
-  }, [track, queryClient]);
-
-  const openDetail = useCallback((e) => {
-    if (e) { e.stopPropagation(); e.preventDefault(); }
-    setShowDetail(true);
-  }, []);
+  const openDetail = useCallback(() => {
+    onOpenDetail && onOpenDetail(track);
+  }, [onOpenDetail, track]);
 
   return (
     <>
@@ -396,7 +387,7 @@ export default function MobileTrackPoster({ track, onEdit, onDelete }) {
         {hasPlayable && (
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); handleTogglePlay(null); }}
+            onClick={(e) => { e.stopPropagation(); handleTogglePlay(); }}
             aria-label={isPlaying ? "Pausar" : "Reproducir"}
             className="absolute bottom-2 right-2 flex items-center justify-center rounded-full"
             style={{
@@ -418,20 +409,6 @@ export default function MobileTrackPoster({ track, onEdit, onDelete }) {
         )}
       </button>
 
-      <AnimatePresence>
-        {showDetail && ReactDOM.createPortal(
-          <MobileTrackDetail
-            track={track}
-            onClose={() => setShowDetail(false)}
-            onEdit={onEdit}
-            onDelete={onDelete}
-            playing={isPlaying}
-            onTogglePlay={handleTogglePlay}
-            onTogglePublic={handleTogglePublic}
-          />,
-          document.body
-        )}
-      </AnimatePresence>
     </>
   );
 }

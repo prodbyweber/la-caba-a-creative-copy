@@ -1,15 +1,49 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import ReactDOM from "react-dom";
-import MobileTrackPoster, { MobileAudioProvider } from "./MobileTrackPoster";
+import MobileTrackPoster, { MobileAudioProvider, MobileTrackDetail } from "./MobileTrackPoster";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Music2, Upload, Edit, Image as ImageIcon, Check, X, Link } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import NetflixTrackCard from "./NetflixTrackCard";
+
+// Same architecture as Explorar: modal state in parent, rendered OUTSIDE the scroll container.
+// This guarantees reliable mounting on ALL mobile browsers (iOS Safari, Android Chrome, etc.)
+function MobileDetailWrapper({ track, onClose, onEdit, onDelete }) {
+  const globalAudio = useGlobalAudio();
+  const queryClient = useQueryClient();
+  const isPlaying = globalAudio?.playingTrack?.id === track.id;
+
+  const handleTogglePlay = useCallback(() => {
+    if (track.audio_file_url) {
+      if (isPlaying) globalAudio.pauseTrack();
+      else globalAudio.playTrack(track);
+    }
+  }, [track, isPlaying, globalAudio]);
+
+  const handleTogglePublic = useCallback(async () => {
+    await base44.entities.Track.update(track.id, { is_public: !track.is_public });
+    queryClient.invalidateQueries({ queryKey: ['tracks'] });
+  }, [track, queryClient]);
+
+  return (
+    <MobileTrackDetail
+      track={track}
+      onClose={onClose}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      playing={isPlaying}
+      onTogglePlay={handleTogglePlay}
+      onTogglePublic={handleTogglePublic}
+    />
+  );
+}
 
 export default function TracksSection({ jlyArtistId, userEmail }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTrack, setEditingTrack] = useState(null);
+  const [selectedTrack, setSelectedTrack] = useState(null); // lifted modal state, mirrors Explorar
 
   const queryClient = useQueryClient();
 
@@ -140,7 +174,7 @@ export default function TracksSection({ jlyArtistId, userEmail }) {
               <div style={{ overflowX: "auto", overflowY: "visible", scrollbarWidth: "none", msOverflowStyle: "none" }}>
                 <div className="flex gap-2.5 py-1" style={{ width: "max-content" }}>
                   {tracks.map((track) => (
-                    <MobileTrackPoster key={track.id} track={track} onEdit={setEditingTrack} onDelete={(id) => deleteMutation.mutate(id)} />
+                    <MobileTrackPoster key={track.id} track={track} onEdit={setEditingTrack} onDelete={(id) => deleteMutation.mutate(id)} onOpenDetail={setSelectedTrack} />
                   ))}
                   <div className="flex-shrink-0 w-1" />
                 </div>
@@ -148,6 +182,18 @@ export default function TracksSection({ jlyArtistId, userEmail }) {
             </MobileAudioProvider>
           )}
         </div>
+
+        {/* Mobile track detail — rendered at section level OUTSIDE scroll container.
+            Exact same pattern as Explorar's GlobalModals. Works on all mobile browsers. */}
+        {selectedTrack && ReactDOM.createPortal(
+          <MobileDetailWrapper
+            track={selectedTrack}
+            onClose={() => setSelectedTrack(null)}
+            onEdit={(t) => { setEditingTrack(t); setSelectedTrack(null); }}
+            onDelete={(id) => { deleteMutation.mutate(id); setSelectedTrack(null); }}
+          />,
+          document.body
+        )}
 
         {/* DESKTOP: existing Netflix hover cards */}
         <div className="hidden sm:block" style={{ overflowX: "auto", overflowY: "visible", padding: "80px 16px 240px", margin: "-80px 0 -240px", scrollbarWidth: "none", msOverflowStyle: "none" }}>
