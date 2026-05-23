@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Heart, Share2, Music2, ExternalLink, X } from "lucide-react";
 import { Link } from "react-router-dom";
-
 
 function getYoutubeId(url) {
   if (!url) return null;
@@ -45,13 +44,11 @@ export default function UserPublicProfile() {
     queryFn: async () => {
       const allItems = await base44.entities.ExplorarItem.filter({ is_active: true });
       if (!artist?.id) return allItems.filter(item =>
-        // fallback: items whose gallery items were uploaded by this user
         (item.gallery || []).some(g => g.uploader_user_id === userProfile?.user_id)
       );
       return allItems.filter(item => {
         if (item.artist_id === artist.id) return true;
         if (item.credits?.some(c => c.artist_id === artist.id)) return true;
-        // Also items where user uploaded gallery content
         if ((item.gallery || []).some(g => g.uploader_user_id === userProfile?.user_id)) return true;
         return false;
       });
@@ -92,93 +89,83 @@ export default function UserPublicProfile() {
   const avatarUrl = userProfile.avatar_url || userProfile.profile_photo_url || artist?.avatar_url || "";
   const initials = displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
   const photos = (userProfile.media_items || []).filter(m => m.type === "image");
-  const youtubeItems = (userProfile.media_items || []).filter(m => m.type === "youtube");
 
   return (
     <div className="min-h-screen bg-[#080808] text-white overflow-hidden">
       {/* Hero */}
-      <div className="relative">
-        {avatarUrl && (
-          <div className="absolute inset-0 h-[420px]">
-            <img src={avatarUrl} alt="" className="w-full h-full object-cover blur-2xl opacity-15" />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#080808]/60 to-[#080808]" />
-          </div>
-        )}
+      <div className="px-5 sm:px-10 pt-6 pb-20">
+        <Link to="/Explorar">
+          <button className="flex items-center gap-2 text-white/30 hover:text-white transition-colors mb-10 text-sm">
+            <ArrowLeft className="w-4 h-4" />
+            Explorar
+          </button>
+        </Link>
 
-        <div className="relative z-10 px-5 sm:px-10 pt-6 pb-20">
-          <Link to="/Explorar">
-            <button className="flex items-center gap-2 text-white/30 hover:text-white transition-colors mb-10 text-sm">
-              <ArrowLeft className="w-4 h-4" />
-              Explorar
-            </button>
-          </Link>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col sm:flex-row items-center sm:items-end gap-6"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col sm:flex-row items-center sm:items-end gap-6"
+        >
+          {/* Avatar */}
+          <div
+            onClick={() => avatarUrl && setViewingImage(avatarUrl)}
+            className={`w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-2 border-white/10 shadow-2xl bg-white/5 flex items-center justify-center flex-shrink-0 ${avatarUrl ? "cursor-pointer hover:border-white/30 transition-all" : ""}`}
           >
-            {/* Avatar — clickeable para ver en grande */}
-            <div
-              onClick={() => avatarUrl && setViewingImage(avatarUrl)}
-              className={`w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden border-2 border-white/10 shadow-2xl bg-white/5 flex items-center justify-center flex-shrink-0 ${avatarUrl ? "cursor-pointer hover:border-white/30 transition-all" : ""}`}
-            >
-              {avatarUrl ? (
-                <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" style={{ objectPosition: userProfile.photo_position || "center" }} />
-              ) : (
-                <span className="text-4xl font-black text-white/20">{initials}</span>
-              )}
-            </div>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" style={{ objectPosition: userProfile.photo_position || "center" }} />
+            ) : (
+              <span className="text-4xl font-black text-white/20">{initials}</span>
+            )}
+          </div>
 
-            {/* Info */}
-            <div className="flex-1 text-center sm:text-left">
-              {(userProfile.creator_type) && (
-                <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/25 mb-1.5">
-                  {userProfile.creator_type}
-                </p>
-              )}
-              <h1 className="text-3xl sm:text-5xl font-black text-white leading-none mb-2"
-                style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.03em" }}>
-                {displayName}
-              </h1>
-              <p className="text-white/30 text-sm mb-1">@{userProfile.username}</p>
-              {artist?.genre && <p className="text-white/40 text-sm mb-3">{artist.genre}</p>}
-              {(userProfile.role_tags || []).length > 0 && (
-                <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 mb-4">
-                  {userProfile.role_tags.slice(0, 4).map((tag, i) => (
-                    <span key={i} className="text-[9px] px-2.5 py-1 rounded-full bg-white/6 border border-white/8 text-white/40 uppercase tracking-widest">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              <div className="flex gap-2 justify-center sm:justify-start">
-                <button onClick={() => setLiked(!liked)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/8 hover:bg-white/15 border border-white/10 transition-all text-xs font-semibold">
-                  <Heart className={`w-3.5 h-3.5 ${liked ? "fill-red-500 text-red-500" : "text-white/60"}`} />
-                  {liked ? "Guardado" : "Guardar"}
-                </button>
-                <button onClick={handleShare}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:border-white/25 transition-all text-xs font-semibold text-white/50 hover:text-white">
-                  <Share2 className="w-3.5 h-3.5" />
-                  {copied ? "¡Copiado!" : "Compartir"}
-                </button>
-                {artist?.social_links?.instagram && (
-                  <a href={artist.social_links.instagram} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:border-white/25 transition-all text-xs font-semibold text-white/50 hover:text-white">
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    Instagram
-                  </a>
-                )}
+          {/* Info */}
+          <div className="flex-1 text-center sm:text-left">
+            {userProfile.creator_type && (
+              <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/25 mb-1.5">
+                {userProfile.creator_type}
+              </p>
+            )}
+            <h1 className="text-3xl sm:text-5xl font-black text-white leading-none mb-2"
+              style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.03em" }}>
+              {displayName}
+            </h1>
+            <p className="text-white/30 text-sm mb-1">@{userProfile.username}</p>
+            {artist?.genre && <p className="text-white/40 text-sm mb-3">{artist.genre}</p>}
+            {(userProfile.role_tags || []).length > 0 && (
+              <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 mb-4">
+                {userProfile.role_tags.slice(0, 4).map((tag, i) => (
+                  <span key={i} className="text-[9px] px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/40 uppercase tracking-widest">
+                    {tag}
+                  </span>
+                ))}
               </div>
+            )}
+
+            <div className="flex gap-2 justify-center sm:justify-start">
+              <button onClick={() => setLiked(!liked)}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/8 hover:bg-white/15 border border-white/10 transition-all text-xs font-semibold">
+                <Heart className={`w-3.5 h-3.5 ${liked ? "fill-red-500 text-red-500" : "text-white/60"}`} />
+                {liked ? "Guardado" : "Guardar"}
+              </button>
+              <button onClick={handleShare}
+                className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:border-white/25 transition-all text-xs font-semibold text-white/50 hover:text-white">
+                <Share2 className="w-3.5 h-3.5" />
+                {copied ? "¡Copiado!" : "Compartir"}
+              </button>
+              {artist?.social_links?.instagram && (
+                <a href={artist.social_links.instagram} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:border-white/25 transition-all text-xs font-semibold text-white/50 hover:text-white">
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  Instagram
+                </a>
+              )}
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </div>
 
       {/* Content */}
-      <div className="relative z-10 px-5 sm:px-10 pb-16 max-w-5xl mx-auto">
+      <div className="px-5 sm:px-10 pb-16 max-w-5xl mx-auto">
         {/* Bio */}
         {userProfile.bio && (
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
@@ -186,9 +173,6 @@ export default function UserPublicProfile() {
             {userProfile.bio}
           </motion.p>
         )}
-
-
-
 
         {/* Aparece en */}
         {explorarItems.length > 0 && (
@@ -199,10 +183,10 @@ export default function UserPublicProfile() {
                 const ytId = getYoutubeId(item.youtube_url || item.youtube_music_url);
                 const thumb = item.thumbnail_url || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : "");
                 return (
-                  <motion.div 
-                    key={item.id} 
-                    initial={{ opacity: 0, scale: 0.95 }} 
-                    animate={{ opacity: 1, scale: 1 }} 
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: idx * 0.03 }}
                     onClick={() => ytId && setPlayingYt(ytId)}
                     className="group relative rounded-xl overflow-hidden bg-white/5 aspect-square cursor-pointer hover:scale-[1.02] transition-transform duration-300">
@@ -223,16 +207,14 @@ export default function UserPublicProfile() {
           </motion.div>
         )}
 
-
-
         {/* Photos */}
         {photos.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mb-16">
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/20 mb-3">Galería</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {photos.map((photo, idx) => (
-                <motion.div 
-                  key={photo.id || idx} 
+                <motion.div
+                  key={photo.id || idx}
                   onClick={() => setViewingImage(photo.url)}
                   className="group relative rounded-xl overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform duration-300 bg-white/5 flex items-center justify-center"
                   style={{ minHeight: 140 }}
@@ -250,7 +232,7 @@ export default function UserPublicProfile() {
           </div>
         )}
 
-        {/* REDES */}
+        {/* Redes sociales */}
         {artist?.social_links && Object.keys(artist.social_links).length > 0 && (
           <div className="space-y-3">
             {artist.social_links.instagram && (
@@ -283,8 +265,6 @@ export default function UserPublicProfile() {
             )}
           </div>
         )}
-
-
       </div>
 
       {/* YouTube Player Modal */}
@@ -328,7 +308,7 @@ export default function UserPublicProfile() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[700] bg-black/97 flex items-center justify-center p-4"
+            className="fixed inset-0 z-[700] bg-black/95 flex items-center justify-center p-4"
             onClick={() => setViewingImage(null)}
           >
             <button onClick={() => setViewingImage(null)}
