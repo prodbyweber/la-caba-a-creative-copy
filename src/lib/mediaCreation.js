@@ -39,6 +39,14 @@ export async function uploadFile(file, label = "file") {
  * @returns {Promise<object>} created Track entity
  */
 export async function createSoundtrack(data, artistId) {
+  // Safety net: if artistId missing, auto-resolve from authenticated user
+  if (!artistId) {
+    try {
+      const res = await base44.functions.invoke('createArtistProfileForNewUser', {});
+      artistId = res?.data?.artistId || null;
+      if (artistId) log("soundtrack", "Auto-resolved artistId", artistId);
+    } catch (e) { log("soundtrack", "Could not auto-resolve artistId", e); }
+  }
   log("soundtrack", "Starting creation", { title: data.title, artistId });
 
   if (!data.title?.trim()) throw new Error("El título es obligatorio");
@@ -93,6 +101,14 @@ export async function updateSoundtrack(trackId, data) {
  * @returns {Promise<object>} created ExplorarItem entity
  */
 export async function createShort(data, artistId) {
+  // Safety net: if artistId missing, auto-resolve from authenticated user
+  if (!artistId) {
+    try {
+      const res = await base44.functions.invoke('createArtistProfileForNewUser', {});
+      artistId = res?.data?.artistId || null;
+      if (artistId) log("short", "Auto-resolved artistId", artistId);
+    } catch (e) { log("short", "Could not auto-resolve artistId", e); }
+  }
   log("short", "Starting creation", { title: data.title, artistId });
 
   if (!data.title?.trim()) throw new Error("El título es obligatorio");
@@ -149,6 +165,14 @@ export async function updateShort(itemId, data, artistId) {
  * @returns {Promise<object>} created ExplorarItem entity
  */
 export async function createFilm(data, artistId) {
+  // Safety net: if artistId missing, auto-resolve from authenticated user
+  if (!artistId) {
+    try {
+      const res = await base44.functions.invoke('createArtistProfileForNewUser', {});
+      artistId = res?.data?.artistId || null;
+      if (artistId) log("film", "Auto-resolved artistId", artistId);
+    } catch (e) { log("film", "Could not auto-resolve artistId", e); }
+  }
   log("film", "Starting creation", { title: data.title, content_type: data.content_type, artistId });
 
   if (!data.title?.trim()) throw new Error("El título es obligatorio");

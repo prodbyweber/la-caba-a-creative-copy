@@ -22,6 +22,7 @@ export default function ArtistDashboard() {
   const [showOrderMenu, setShowOrderMenu] = useState(false);
   const [settingUpArtist, setSettingUpArtist] = useState(false);
   const [autoProvisionDone, setAutoProvisionDone] = useState(false);
+  const [provisioning, setProvisioning] = useState(false);
   const queryClient = useQueryClient();
 
   const urlParams = new URLSearchParams(window.location.search);
@@ -63,12 +64,13 @@ export default function ArtistDashboard() {
     if (!currentUser || hasExternalParam || autoProvisionDone) return;
     if (selfArtist !== null) return; // undefined = loading, null = no encontrado
     setAutoProvisionDone(true);
+    setProvisioning(true);
     ensureUserSetupComplete(currentUser, {
       onArtistCreated: () => {
         queryClient.invalidateQueries({ queryKey: ['self-artist', currentUser.id] });
         queryClient.invalidateQueries({ queryKey: ['userProfile', currentUser.id] });
       }
-    });
+    }).finally(() => setProvisioning(false));
   }, [currentUser, selfArtist, hasExternalParam, autoProvisionDone]);
 
   const handleSetupArtist = async () => {
@@ -151,10 +153,11 @@ export default function ArtistDashboard() {
   };
 
   // Solo mostrar loading si realmente estamos resolviendo (currentUser ya cargó pero selfArtist aún no)
+  // O si estamos en medio del proceso de provisioning de cuenta
   const resolving =
     (!!currentUser && !hasExternalParam && selfArtist === undefined) ||
     (!!userIdParam && artistByUserId === undefined);
-  if (isLoading || resolving) {
+  if (isLoading || resolving || provisioning) {
     return (
       <div className="min-h-screen bg-[#0a0a0b] text-white">
         <DashboardNav />

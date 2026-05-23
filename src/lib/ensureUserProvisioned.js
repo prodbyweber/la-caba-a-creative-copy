@@ -60,19 +60,23 @@ export async function ensureUserProfile(user) {
  * @param {Function} options.onArtistCreated - Callback para refrescar queries tras crear Artist
  */
 export async function ensureUserSetupComplete(user, { onArtistCreated } = {}) {
-  if (!user?.id) return;
+  if (!user?.id) return null;
 
   // 1. Asegurar UserProfile
   await ensureUserProfile(user);
 
   // 2. Verificar si ya tiene Artist
   const existingArtists = await base44.entities.Artist.filter({ user_id: user.id });
-  if (existingArtists.length > 0) return; // Ya tiene todo, no hacer nada
+  if (existingArtists.length > 0) {
+    return existingArtists[0].id; // Ya existe, retornar ID
+  }
 
   // 3. No tiene Artist → crear via backend function
-  const artistId = await ensureArtistRecord();
+  const newArtistId = await ensureArtistRecord();
   
-  if (artistId && onArtistCreated) {
-    onArtistCreated(artistId);
+  if (newArtistId && onArtistCreated) {
+    onArtistCreated(newArtistId);
   }
+
+  return newArtistId;
 }
