@@ -665,10 +665,10 @@ function TrackCard({ track, onEdit, isFirst }) {
                   <span className="text-[8px] text-red-400 font-bold">YT</span>
                 </div>
               )}
-              <div className="absolute bottom-0 left-0 right-0 px-2.5 pb-2 flex items-end justify-between" style={{ zIndex: 3 }}>
+              <div className="absolute bottom-0 left-0 right-0 px-3.5 pb-3 flex items-end justify-between" style={{ zIndex: 3 }}>
                 <div className="flex-1 min-w-0 pr-2">
-                  <p className="text-white font-bold text-[11px] leading-tight line-clamp-1">{localTrack.title}</p>
-                  {localTrack.genre && <p className="text-white/30 text-[9px] truncate mt-0.5">{localTrack.genre}</p>}
+                  <p className="text-white font-bold text-[12px] leading-tight line-clamp-2">{localTrack.title}</p>
+                  {localTrack.genre && <p className="text-white/40 text-[9px] truncate mt-1">{localTrack.genre}</p>}
                 </div>
                 {(hasAudio || hasYoutube) && (
                   <button onClick={(e) => {
