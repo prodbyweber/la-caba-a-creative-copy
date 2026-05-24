@@ -109,8 +109,10 @@ export default function ExplorarAdminContent() {
 
   const heroItems = items.filter(i => i.is_hero).sort((a, b) => (a.hero_order ?? 0) - (b.hero_order ?? 0));
 
+  const nonHeroItems = items.filter(i => !i.is_hero);
+
   const TABS = [
-    { key: "projects", label: "Proyectos", icon: LayoutGrid, count: items.length },
+    { key: "projects", label: "Proyectos", icon: LayoutGrid, count: nonHeroItems.length },
     { key: "sections", label: "Secciones", icon: Layers, count: sections.length },
     { key: "hero", label: "Hero", icon: Star, count: heroItems.length },
   ];
@@ -136,7 +138,7 @@ export default function ExplorarAdminContent() {
       </div>
 
       {activeTab === "projects" && (
-        <ProjectsLibrary items={items} artists={artists}
+        <ProjectsLibrary items={nonHeroItems} artists={artists}
           onEdit={(item) => { setEditingItem(item); setShowProjectModal(true); }}
           onDelete={deleteItemMutation.mutate} onToggle={toggleItemMutation.mutate}
           onNew={() => { setEditingItem(null); setShowProjectModal(true); }} />
