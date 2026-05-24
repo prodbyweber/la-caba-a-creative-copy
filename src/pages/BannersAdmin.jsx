@@ -39,15 +39,18 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedD
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState(null);
   const [showMobilePanel, setShowMobilePanel] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
   const fileInputImg = useRef();
   const fileInputVid = useRef();
   const previewRef = useRef();
+  const isDraggingRef = useRef(false);
+  const latestPosRef = useRef(desktopPosition);
 
   useEffect(() => {
     setUrl(savedUrl || "");
     setMobilePosition(savedMobilePosition || "center center");
-    setDesktopPosition(savedDesktopPosition || "50% 50%");
+    const dp = savedDesktopPosition || "50% 50%";
+    setDesktopPosition(dp);
+    latestPosRef.current = dp;
     setAudioEnabled(savedAudioEnabled === true);
   }, [savedUrl, savedMobilePosition, savedDesktopPosition, savedAudioEnabled]);
 
@@ -66,7 +69,7 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedD
     return { x: 50, y: 50 };
   })();
 
-  const getPosFromEvent = useCallback((e) => {
+  const getPosFromEvent = (e) => {
     const rect = previewRef.current?.getBoundingClientRect();
     if (!rect) return null;
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -74,47 +77,42 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedD
     const x = Math.round(Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100)));
     const y = Math.round(Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100)));
     return `${x}% ${y}%`;
-  }, []);
+  };
 
   const handlePreviewPointerDown = (e) => {
     if (!url || isVideo) return;
     e.preventDefault();
-    setIsDragging(true);
+    isDraggingRef.current = true;
     const pos = getPosFromEvent(e);
-    if (pos) setDesktopPosition(pos);
+    if (pos) { setDesktopPosition(pos); latestPosRef.current = pos; }
   };
 
-  const handlePreviewPointerMove = useCallback((e) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const pos = getPosFromEvent(e);
-    if (pos) setDesktopPosition(pos);
-  }, [isDragging, getPosFromEvent]);
-
-  const handlePreviewPointerUp = useCallback((e) => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    const pos = getPosFromEvent(e);
-    if (pos) {
-      setDesktopPosition(pos);
-      persist({ [bannerDef.desktopKey]: pos });
-    }
-  }, [isDragging, getPosFromEvent]);
-
   useEffect(() => {
-    if (isDragging) {
-      window.addEventListener("mousemove", handlePreviewPointerMove);
-      window.addEventListener("mouseup", handlePreviewPointerUp);
-      window.addEventListener("touchmove", handlePreviewPointerMove, { passive: false });
-      window.addEventListener("touchend", handlePreviewPointerUp);
-    }
-    return () => {
-      window.removeEventListener("mousemove", handlePreviewPointerMove);
-      window.removeEventListener("mouseup", handlePreviewPointerUp);
-      window.removeEventListener("touchmove", handlePreviewPointerMove);
-      window.removeEventListener("touchend", handlePreviewPointerUp);
+    const onMove = (e) => {
+      if (!isDraggingRef.current) return;
+      if (e.cancelable) e.preventDefault();
+      const pos = getPosFromEvent(e);
+      if (pos) { setDesktopPosition(pos); latestPosRef.current = pos; }
     };
-  }, [isDragging, handlePreviewPointerMove, handlePreviewPointerUp]);
+    const onUp = async () => {
+      if (!isDraggingRef.current) return;
+      isDraggingRef.current = false;
+      const pos = latestPosRef.current;
+      if (pos && configId) {
+        await persist({ [bannerDef.desktopKey]: pos });
+      }
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    window.addEventListener("touchmove", onMove, { passive: false });
+    window.addEventListener("touchend", onUp);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+      window.removeEventListener("touchmove", onMove);
+      window.removeEventListener("touchend", onUp);
+    };
+  }, [configId, bannerDef.desktopKey]);
 
   const isVideo = isVideoUrl(url);
 

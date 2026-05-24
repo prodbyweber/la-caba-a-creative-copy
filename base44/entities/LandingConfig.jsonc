@@ -42,6 +42,11 @@
       "type": "string",
       "description": "object-position CSS para mobile del banner 1"
     },
+    "hero_banner_1_desktop_position": {
+      "type": "string",
+      "description": "object-position CSS para desktop del banner 1",
+      "default": "50% 50%"
+    },
     "hero_banner_1_cta_text": {
       "type": "string",
       "description": "Texto del bot\u00f3n CTA del banner 1",
@@ -60,6 +65,11 @@
       "type": "string",
       "description": "object-position CSS para mobile del banner 2"
     },
+    "hero_banner_2_desktop_position": {
+      "type": "string",
+      "description": "object-position CSS para desktop del banner 2",
+      "default": "50% 50%"
+    },
     "hero_banner_2_cta_text": {
       "type": "string",
       "description": "Texto del bot\u00f3n CTA del banner 2",
@@ -77,6 +87,11 @@
     "hero_banner_3_mobile_position": {
       "type": "string",
       "description": "object-position CSS para mobile del banner 3"
+    },
+    "hero_banner_3_desktop_position": {
+      "type": "string",
+      "description": "object-position CSS para desktop del banner 3",
+      "default": "50% 50%"
     },
     "hero_banner_3_cta_text": {
       "type": "string",
