@@ -103,6 +103,10 @@
       "description": "Link del bot\u00f3n CTA del banner 3",
       "default": "/Explorar"
     },
+    "comenzar_bg_image": {
+      "type": "string",
+      "description": "URL de imagen/video de fondo para la secci\u00f3n Comenzar"
+    },
     "brand_logos": {
       "type": "array",
       "items": {

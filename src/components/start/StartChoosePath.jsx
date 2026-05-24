@@ -492,7 +492,7 @@ export default function StartChoosePath() {
     staleTime: 30000,
   });
 
-  const bgSrc = cfg?.hero_banner_1_image || "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1800&q=85";
+  const bgSrc = cfg?.comenzar_bg_image || "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/a32a65d3c_Still2026-05-22190754_1431.jpg";
   const vidRef = useAutoPlay(isVideo(bgSrc) ? bgSrc : null);
 
   const PATHS = [

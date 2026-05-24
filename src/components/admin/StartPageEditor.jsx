@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { Save, ExternalLink, Plus, Trash2, Loader2 } from "lucide-react";
@@ -109,6 +109,8 @@ export default function StartPageEditor() {
   const qc = useQueryClient();
   const [local, setLocal] = useState(null);
   const [saved, setSaved] = useState(false);
+  const [uploadingBg, setUploadingBg] = useState(false);
+  const bgFileRef = useRef(null);
 
   // Store config in LandingConfig as a JSON blob under key "start_page_config"
   const { data: landingConfig, isLoading } = useQuery({
@@ -137,6 +139,20 @@ export default function StartPageEditor() {
   });
 
   const set = (key, val) => setLocal(f => ({ ...f, [key]: val }));
+
+  const saveBgImage = useMutation({
+    mutationFn: (url) => base44.entities.LandingConfig.update(landingConfig.id, { comenzar_bg_image: url }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["landingConfig"] }),
+  });
+
+  const handleBgUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !landingConfig?.id) return;
+    setUploadingBg(true);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    await saveBgImage.mutateAsync(file_url);
+    setUploadingBg(false);
+  };
 
   if (isLoading || !local) {
     return <div className="flex items-center justify-center py-8"><Loader2 className="w-5 h-5 text-white/30 animate-spin" /></div>;
@@ -170,6 +186,29 @@ export default function StartPageEditor() {
           </button>
         </div>
       </div>
+
+      {/* COMENZAR BG */}
+      <SubSection title="Sección Comenzar — Imagen de fondo">
+        <div className="flex items-center gap-4">
+          {landingConfig?.comenzar_bg_image && (
+            <div className="w-24 h-16 rounded-lg overflow-hidden flex-shrink-0 border border-white/10">
+              <img src={landingConfig.comenzar_bg_image} alt="" className="w-full h-full object-cover" />
+            </div>
+          )}
+          <div className="flex-1">
+            <p className="text-xs text-white/40 mb-2">Imagen de fondo de la sección "Comenzar" en la landing</p>
+            <input ref={bgFileRef} type="file" accept="image/*,video/*" className="hidden" onChange={handleBgUpload} />
+            <button
+              onClick={() => bgFileRef.current?.click()}
+              disabled={uploadingBg}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/[0.07] hover:bg-white/10 border border-white/10 text-white text-xs font-medium transition-colors disabled:opacity-50"
+            >
+              {uploadingBg ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+              {uploadingBg ? "Subiendo..." : "Cambiar imagen"}
+            </button>
+          </div>
+        </div>
+      </SubSection>
 
       {/* NAV */}
       <SubSection title="Navegación">
