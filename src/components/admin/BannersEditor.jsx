@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Upload, Trash2, CheckCircle, AlertCircle } from "lucide-react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { Upload, Trash2, CheckCircle, AlertCircle, Move } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const BANNERS = [
@@ -20,6 +20,8 @@ function BannerCard({ bannerDef, configId, savedUrl, savedCtaText, savedCtaLink,
   const [ctaLink, setCtaLink] = useState(savedCtaLink || "");
   const [mobilePosition, setMobilePosition] = useState(savedMobilePosition || "center center");
   const [desktopPosition, setDesktopPosition] = useState(savedDesktopPosition || "center center");
+  const [isDragging, setIsDragging] = useState(false);
+  const previewRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState(null); // null | "saving" | "ok" | "error"
   const fileInputImg = useRef();
@@ -101,6 +103,71 @@ function BannerCard({ bannerDef, configId, savedUrl, savedCtaText, savedCtaLink,
   const handleMobilePositionChange = (e) => { setMobilePosition(e.target.value); persistPosition(bannerDef.mobilePositionKey, e.target.value); };
   const handleDesktopPositionChange = (e) => { setDesktopPosition(e.target.value); persistPosition(bannerDef.desktopPositionKey, e.target.value); };
 
+  const getPosFromEvent = useCallback((e) => {
+    const rect = previewRef.current?.getBoundingClientRect();
+    if (!rect) return null;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const x = Math.round(Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100)));
+    const y = Math.round(Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100)));
+    return `${x}% ${y}%`;
+  }, []);
+
+  const handlePreviewPointerDown = (e) => {
+    if (!url || isVideo) return;
+    e.preventDefault();
+    setIsDragging(true);
+    const pos = getPosFromEvent(e);
+    if (pos) setDesktopPosition(pos);
+  };
+
+  const handlePreviewPointerMove = useCallback((e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const pos = getPosFromEvent(e);
+    if (pos) setDesktopPosition(pos);
+  }, [isDragging, getPosFromEvent]);
+
+  const handlePreviewPointerUp = useCallback((e) => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    const pos = getPosFromEvent(e);
+    if (pos) {
+      setDesktopPosition(pos);
+      persistPosition(bannerDef.desktopPositionKey, pos);
+    }
+  }, [isDragging, getPosFromEvent, bannerDef.desktopPositionKey]);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener("mousemove", handlePreviewPointerMove);
+      window.addEventListener("mouseup", handlePreviewPointerUp);
+      window.addEventListener("touchmove", handlePreviewPointerMove, { passive: false });
+      window.addEventListener("touchend", handlePreviewPointerUp);
+    }
+    return () => {
+      window.removeEventListener("mousemove", handlePreviewPointerMove);
+      window.removeEventListener("mouseup", handlePreviewPointerUp);
+      window.removeEventListener("touchmove", handlePreviewPointerMove);
+      window.removeEventListener("touchend", handlePreviewPointerUp);
+    };
+  }, [isDragging, handlePreviewPointerMove, handlePreviewPointerUp]);
+
+  // Parse position to x/y % for the crosshair dot
+  const parsedPos = (() => {
+    const parts = desktopPosition.split(" ");
+    if (parts.length === 2) {
+      const parseVal = (v) => {
+        if (v.endsWith("%")) return parseFloat(v);
+        if (v === "left") return 0; if (v === "right") return 100;
+        if (v === "top") return 0; if (v === "bottom") return 100;
+        return 50;
+      };
+      return { x: parseVal(parts[0]), y: parseVal(parts[1]) };
+    }
+    return { x: 50, y: 50 };
+  })();
+
   return (
     <div className="mb-5 bg-white/[0.03] rounded-xl border border-white/10 overflow-hidden">
       {/* Header */}
@@ -138,18 +205,47 @@ function BannerCard({ bannerDef, configId, savedUrl, savedCtaText, savedCtaLink,
         </div>
       </div>
 
-      {/* Preview */}
-      <div className="relative bg-black/40" style={{ height: 120 }}>
+      {/* Preview interactivo — arrastra para ajustar posición desktop */}
+      <div
+        ref={previewRef}
+        className={`relative bg-black/40 overflow-hidden ${url && !isVideo ? "cursor-crosshair" : ""}`}
+        style={{ height: 200 }}
+        onMouseDown={handlePreviewPointerDown}
+        onTouchStart={handlePreviewPointerDown}
+      >
         {url ? (
           isVideo ? (
             <video key={url} src={url} autoPlay muted loop playsInline className="w-full h-full object-cover" />
           ) : (
-            <img src={url} alt={bannerDef.subtitle} className="w-full h-full object-cover" />
+            <img
+              src={url}
+              alt={bannerDef.subtitle}
+              className="w-full h-full object-cover select-none"
+              draggable={false}
+              style={{ objectPosition: desktopPosition }}
+            />
           )
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <p className="text-white/20 text-xs">Sin media</p>
           </div>
+        )}
+        {url && !isVideo && (
+          <>
+            {/* Crosshair dot */}
+            <div
+              className="absolute w-5 h-5 rounded-full border-2 border-white shadow-lg pointer-events-none"
+              style={{
+                left: `calc(${parsedPos.x}% - 10px)`,
+                top: `calc(${parsedPos.y}% - 10px)`,
+                background: "rgba(255,255,255,0.25)",
+                boxShadow: "0 0 0 1px rgba(0,0,0,0.4)",
+              }}
+            />
+            <div className="absolute bottom-1.5 right-1.5 flex items-center gap-1 px-2 py-0.5 rounded bg-black/70 text-[9px] font-bold text-white/70">
+              <Move className="w-3 h-3" /> Arrastra para ajustar
+            </div>
+          </>
         )}
         {url && (
           <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/70 text-[9px] font-bold text-white/70 uppercase tracking-wider">
@@ -195,44 +291,28 @@ function BannerCard({ bannerDef, configId, savedUrl, savedCtaText, savedCtaLink,
 
         {/* Posición de imagen */}
         <div className="pt-2 pb-1 border-t border-white/[0.06]">
-          <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest mb-2">Posición de imagen</p>
-          <div className="space-y-2">
-            <div>
-              <label className="text-[9px] text-white/40 block mb-1">Desktop</label>
-              <select
-                value={desktopPosition}
-                onChange={handleDesktopPositionChange}
-                className="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
-              >
-                <option value="top left">Arriba Izquierda</option>
-                <option value="top center">Arriba Centro</option>
-                <option value="top right">Arriba Derecha</option>
-                <option value="center left">Centro Izquierda</option>
-                <option value="center center">Centro Centro</option>
-                <option value="center right">Centro Derecha</option>
-                <option value="bottom left">Abajo Izquierda</option>
-                <option value="bottom center">Abajo Centro</option>
-                <option value="bottom right">Abajo Derecha</option>
-              </select>
-            </div>
-            <div>
-              <label className="text-[9px] text-white/40 block mb-1">Mobile</label>
-              <select
-                value={mobilePosition}
-                onChange={handleMobilePositionChange}
-                className="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
-              >
-                <option value="top left">Arriba Izquierda</option>
-                <option value="top center">Arriba Centro</option>
-                <option value="top right">Arriba Derecha</option>
-                <option value="center left">Centro Izquierda</option>
-                <option value="center center">Centro Centro</option>
-                <option value="center right">Centro Derecha</option>
-                <option value="bottom left">Abajo Izquierda</option>
-                <option value="bottom center">Abajo Centro</option>
-                <option value="bottom right">Abajo Derecha</option>
-              </select>
-            </div>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest">Posición Desktop</p>
+            <span className="text-[9px] text-white/30 font-mono">{desktopPosition}</span>
+          </div>
+          <p className="text-[9px] text-white/30 mb-3">Arrastra la imagen de arriba para ajustar el encuadre desktop.</p>
+          <div>
+            <label className="text-[9px] text-white/40 block mb-1">Posición Mobile</label>
+            <select
+              value={mobilePosition}
+              onChange={handleMobilePositionChange}
+              className="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+            >
+              <option value="top left">Arriba Izquierda</option>
+              <option value="top center">Arriba Centro</option>
+              <option value="top right">Arriba Derecha</option>
+              <option value="center left">Centro Izquierda</option>
+              <option value="center center">Centro Centro</option>
+              <option value="center right">Centro Derecha</option>
+              <option value="bottom left">Abajo Izquierda</option>
+              <option value="bottom center">Abajo Centro</option>
+              <option value="bottom right">Abajo Derecha</option>
+            </select>
           </div>
         </div>
 
