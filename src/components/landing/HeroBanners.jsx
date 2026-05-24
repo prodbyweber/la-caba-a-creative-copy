@@ -22,6 +22,7 @@ const defaultBanners = [
     defaultImage: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=1800&h=900&fit=crop&q=85",
     configKey: "hero_banner_1_image",
     mobilePositionKey: "hero_banner_1_mobile_position",
+    desktopPositionKey: "hero_banner_1_desktop_position",
     ctaTextKey: "hero_banner_1_cta_text",
     ctaLinkKey: "hero_banner_1_cta_link",
     audioKey: "hero_banner_1_audio_enabled",
@@ -36,6 +37,7 @@ const defaultBanners = [
     defaultImage: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=1800&h=900&fit=crop&q=85",
     configKey: "hero_banner_2_image",
     mobilePositionKey: "hero_banner_2_mobile_position",
+    desktopPositionKey: "hero_banner_2_desktop_position",
     ctaTextKey: "hero_banner_2_cta_text",
     ctaLinkKey: "hero_banner_2_cta_link",
   },
@@ -49,6 +51,7 @@ const defaultBanners = [
     defaultImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1800&h=900&fit=crop&q=85",
     configKey: "hero_banner_3_image",
     mobilePositionKey: "hero_banner_3_mobile_position",
+    desktopPositionKey: "hero_banner_3_desktop_position",
     ctaTextKey: "hero_banner_3_cta_text",
     ctaLinkKey: "hero_banner_3_cta_link",
   },
@@ -109,10 +112,10 @@ function BannerVideo({ src, enableAudio = false }) {
   );
 }
 
-function BannerBlock({ banner, image, mobilePosition, ctaText, ctaLink, audioEnabled = false, index }) {
+function BannerBlock({ banner, image, mobilePosition, desktopPosition, ctaText, ctaLink, audioEnabled = false, index }) {
   const isMobile = useMobile();
   const navigate = useNavigate();
-  const objectPos = isMobile && mobilePosition ? mobilePosition : "center center";
+  const objectPos = isMobile && mobilePosition ? mobilePosition : (desktopPosition || "center center");
   // Audio always starts muted by default, regardless of config
   const [isAudioActive, setIsAudioActive] = useState(false);
 
@@ -299,6 +302,7 @@ export default function HeroBanners() {
           banner={banner}
           image={config?.[banner.configKey] || banner.defaultImage}
           mobilePosition={config?.[banner.mobilePositionKey] || "center center"}
+          desktopPosition={config?.[banner.desktopPositionKey] || "center center"}
           ctaText={config?.[banner.ctaTextKey] || ""}
           ctaLink={config?.[banner.ctaLinkKey] || ""}
           audioEnabled={banner.audioKey ? config?.[banner.audioKey] === true : false}

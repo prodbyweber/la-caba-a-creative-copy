@@ -3,9 +3,9 @@ import { Upload, Trash2, CheckCircle, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const BANNERS = [
-  { key: "hero_banner_1_image", label: "Banner 1", subtitle: "Muse Club", ctaTextKey: "hero_banner_1_cta_text", ctaLinkKey: "hero_banner_1_cta_link", defaultCta: "Explore" },
-  { key: "hero_banner_2_image", label: "Banner 2", subtitle: "La Nueva Corriente", ctaTextKey: "hero_banner_2_cta_text", ctaLinkKey: "hero_banner_2_cta_link", defaultCta: "Descubrir" },
-  { key: "hero_banner_3_image", label: "Banner 3", subtitle: "Friends & Family", ctaTextKey: "hero_banner_3_cta_text", ctaLinkKey: "hero_banner_3_cta_link", defaultCta: "Ver todo" },
+  { key: "hero_banner_1_image", label: "Banner 1", subtitle: "Muse Club", ctaTextKey: "hero_banner_1_cta_text", ctaLinkKey: "hero_banner_1_cta_link", mobilePositionKey: "hero_banner_1_mobile_position", desktopPositionKey: "hero_banner_1_desktop_position", defaultCta: "Explore" },
+  { key: "hero_banner_2_image", label: "Banner 2", subtitle: "La Nueva Corriente", ctaTextKey: "hero_banner_2_cta_text", ctaLinkKey: "hero_banner_2_cta_link", mobilePositionKey: "hero_banner_2_mobile_position", desktopPositionKey: "hero_banner_2_desktop_position", defaultCta: "Descubrir" },
+  { key: "hero_banner_3_image", label: "Banner 3", subtitle: "Friends & Family", ctaTextKey: "hero_banner_3_cta_text", ctaLinkKey: "hero_banner_3_cta_link", mobilePositionKey: "hero_banner_3_mobile_position", desktopPositionKey: "hero_banner_3_desktop_position", defaultCta: "Ver todo" },
 ];
 
 function isVideoUrl(url) {
@@ -14,10 +14,12 @@ function isVideoUrl(url) {
   return cleanUrl.endsWith(".mp4") || cleanUrl.endsWith(".webm") || cleanUrl.endsWith(".mov");
 }
 
-function BannerCard({ bannerDef, configId, savedUrl, savedCtaText, savedCtaLink }) {
+function BannerCard({ bannerDef, configId, savedUrl, savedCtaText, savedCtaLink, savedMobilePosition, savedDesktopPosition }) {
   const [url, setUrl] = useState(savedUrl || "");
   const [ctaText, setCtaText] = useState(savedCtaText || "");
   const [ctaLink, setCtaLink] = useState(savedCtaLink || "");
+  const [mobilePosition, setMobilePosition] = useState(savedMobilePosition || "center center");
+  const [desktopPosition, setDesktopPosition] = useState(savedDesktopPosition || "center center");
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState(null); // null | "saving" | "ok" | "error"
   const fileInputImg = useRef();
@@ -30,6 +32,8 @@ function BannerCard({ bannerDef, configId, savedUrl, savedCtaText, savedCtaLink 
       setUrl(savedUrl || "");
       setCtaText(savedCtaText || "");
       setCtaLink(savedCtaLink || "");
+      setMobilePosition(savedMobilePosition || "center center");
+      setDesktopPosition(savedDesktopPosition || "center center");
     }
   }, [savedUrl]);
 
@@ -81,10 +85,21 @@ function BannerCard({ bannerDef, configId, savedUrl, savedCtaText, savedCtaLink 
     }
   };
 
+  const persistPosition = async (key, value) => {
+    if (!configId) return;
+    try {
+      await base44.entities.LandingConfig.update(configId, { [key]: value });
+    } catch (e) {
+      console.error("Error al guardar posición:", e);
+    }
+  };
+
   const handleRemove = () => persist("");
   const handleUrlBlur = () => { if (url !== savedUrl) persist(url); };
   const handleCtaTextBlur = () => { if (ctaText !== savedCtaText) persistCta(bannerDef.ctaTextKey, ctaText); };
   const handleCtaLinkBlur = () => { if (ctaLink !== savedCtaLink) persistCta(bannerDef.ctaLinkKey, ctaLink); };
+  const handleMobilePositionChange = (e) => { setMobilePosition(e.target.value); persistPosition(bannerDef.mobilePositionKey, e.target.value); };
+  const handleDesktopPositionChange = (e) => { setDesktopPosition(e.target.value); persistPosition(bannerDef.desktopPositionKey, e.target.value); };
 
   return (
     <div className="mb-5 bg-white/[0.03] rounded-xl border border-white/10 overflow-hidden">
@@ -178,6 +193,49 @@ function BannerCard({ bannerDef, configId, savedUrl, savedCtaText, savedCtaLink 
           <p className="text-[10px] text-white/20 mt-1.5">Por defecto redirigen a /Explorar</p>
         </div>
 
+        {/* Posición de imagen */}
+        <div className="pt-2 pb-1 border-t border-white/[0.06]">
+          <p className="text-[10px] font-semibold text-white/25 uppercase tracking-widest mb-2">Posición de imagen</p>
+          <div className="space-y-2">
+            <div>
+              <label className="text-[9px] text-white/40 block mb-1">Desktop</label>
+              <select
+                value={desktopPosition}
+                onChange={handleDesktopPositionChange}
+                className="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+              >
+                <option value="top left">Arriba Izquierda</option>
+                <option value="top center">Arriba Centro</option>
+                <option value="top right">Arriba Derecha</option>
+                <option value="center left">Centro Izquierda</option>
+                <option value="center center">Centro Centro</option>
+                <option value="center right">Centro Derecha</option>
+                <option value="bottom left">Abajo Izquierda</option>
+                <option value="bottom center">Abajo Centro</option>
+                <option value="bottom right">Abajo Derecha</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-[9px] text-white/40 block mb-1">Mobile</label>
+              <select
+                value={mobilePosition}
+                onChange={handleMobilePositionChange}
+                className="w-full px-3 py-2 bg-white/5 rounded-lg border border-white/10 text-white text-sm focus:outline-none focus:border-emerald-500"
+              >
+                <option value="top left">Arriba Izquierda</option>
+                <option value="top center">Arriba Centro</option>
+                <option value="top right">Arriba Derecha</option>
+                <option value="center left">Centro Izquierda</option>
+                <option value="center center">Centro Centro</option>
+                <option value="center right">Centro Derecha</option>
+                <option value="bottom left">Abajo Izquierda</option>
+                <option value="bottom center">Abajo Centro</option>
+                <option value="bottom right">Abajo Derecha</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 gap-2">
           <label className={`flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border border-dashed border-white/20 text-sm cursor-pointer transition-all ${uploading || status === "saving" ? "opacity-40 pointer-events-none" : "bg-white/5 hover:bg-white/10 text-white"}`}>
             <input ref={fileInputImg} type="file" accept="image/*" className="hidden"
@@ -211,6 +269,8 @@ export default function BannersEditor({ configId, config }) {
           savedUrl={config?.[banner.key] || ""}
           savedCtaText={config?.[banner.ctaTextKey] || ""}
           savedCtaLink={config?.[banner.ctaLinkKey] || ""}
+          savedMobilePosition={config?.[banner.mobilePositionKey] || "center center"}
+          savedDesktopPosition={config?.[banner.desktopPositionKey] || "center center"}
         />
       ))}
     </div>
