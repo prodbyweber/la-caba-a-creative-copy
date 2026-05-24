@@ -14,9 +14,10 @@ function MiniHero({ items }) {
   const [transitioning, setTransitioning] = useState(false);
   const intervalRef = useRef(null);
 
+  const nonShorts = items.filter(i => i.content_type !== "short");
   const heroItems = [
-    ...items.filter(i => i.is_hero),
-    ...items.filter(i => !i.is_hero && (i.thumbnail_url || i.youtube_url || i.youtube_music_url)),
+    ...nonShorts.filter(i => i.is_hero),
+    ...nonShorts.filter(i => !i.is_hero && (i.thumbnail_url || i.youtube_url || i.youtube_music_url)),
   ].slice(0, 8);
   const current = heroItems[activeIdx] || heroItems[0];
 
@@ -183,7 +184,9 @@ export default function StartExplorar({ showButton = true, allowMobileScroll = f
     staleTime: 60000,
   });
 
-  const withThumb = items.filter(i => i.thumbnail_url || i.youtube_url || i.youtube_music_url);
+  const withThumb = items
+    .filter(i => i.content_type !== "short")
+    .filter(i => i.thumbnail_url || i.youtube_url || i.youtube_music_url);
   const row1 = withThumb.slice(0, 7);
   const row2 = withThumb.slice(7, 14);
   const row3 = withThumb.slice(14, 21);
