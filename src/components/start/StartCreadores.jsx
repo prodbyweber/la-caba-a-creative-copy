@@ -41,11 +41,11 @@ function SlideMedia({ url }) {
         src={url}
         autoPlay muted loop playsInline preload="auto"
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ pointerEvents: "none", objectPosition: "center top" }}
+        style={{ pointerEvents: "none", objectPosition: "center 35%" }}
       />
     );
   }
-  return <img key={url} src={url} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: "center top" }} />;
+  return <img key={url} src={url} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: "center 35%" }} />;
 }
 
 // ── Stories helpers ────────────────────────────────────────────────────────────
