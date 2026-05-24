@@ -285,6 +285,8 @@ export default function HeroBanners() {
       return configs.length > 0 ? configs[0] : null;
     },
     staleTime: 0,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   return (

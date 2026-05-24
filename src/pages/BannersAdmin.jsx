@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Upload, Trash2, CheckCircle, AlertCircle, ArrowLeft, RefreshCw, Smartphone, Volume2, VolumeX, Move } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "@/components/admin/AdminLayout";
 
 const BANNERS = [
@@ -30,6 +31,7 @@ function isVideoUrl(url) {
 }
 
 function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedDesktopPosition, savedAudioEnabled, onUpdated }) {
+  const queryClient = useQueryClient();
   const [url, setUrl] = useState(savedUrl || "");
   const [mobilePosition, setMobilePosition] = useState(savedMobilePosition || "center center");
   const [desktopPosition, setDesktopPosition] = useState(savedDesktopPosition || "50% 50%");
@@ -128,11 +130,16 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedD
           setAudioEnabled(value);
         } else if (key === bannerDef.mobileKey) {
           setMobilePosition(value);
+        } else if (key === bannerDef.desktopKey) {
+          setDesktopPosition(value);
+          latestPosRef.current = value;
         } else if (key === bannerDef.key) {
           setUrl(value);
         }
       });
       onUpdated(fields);
+      // Invalidar caché para que HeroBanners recargue con los nuevos datos
+      queryClient.invalidateQueries({ queryKey: ['landingConfig'] });
       setTimeout(() => setStatus(null), 2500);
     } catch (e) {
       setStatus("error");
