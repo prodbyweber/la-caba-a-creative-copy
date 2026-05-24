@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Upload, Trash2, CheckCircle, AlertCircle, ArrowLeft, RefreshCw, Smartphone, Volume2, VolumeX } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Upload, Trash2, CheckCircle, AlertCircle, ArrowLeft, RefreshCw, Smartphone, Volume2, VolumeX, Move } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 
 const BANNERS = [
-  { key: "hero_banner_1_image", mobileKey: "hero_banner_1_mobile_position", audioKey: "hero_banner_1_audio_enabled", label: "Banner 1", subtitle: "The Girls" },
-  { key: "hero_banner_2_image", mobileKey: "hero_banner_2_mobile_position", audioKey: "hero_banner_2_audio_enabled", label: "Banner 2", subtitle: "La Nueva Corriente" },
-  { key: "hero_banner_3_image", mobileKey: "hero_banner_3_mobile_position", audioKey: "hero_banner_3_audio_enabled", label: "Banner 3", subtitle: "Friends & Family" },
+  { key: "hero_banner_1_image", mobileKey: "hero_banner_1_mobile_position", desktopKey: "hero_banner_1_desktop_position", audioKey: "hero_banner_1_audio_enabled", label: "Banner 1", subtitle: "The Girls" },
+  { key: "hero_banner_2_image", mobileKey: "hero_banner_2_mobile_position", desktopKey: "hero_banner_2_desktop_position", audioKey: "hero_banner_2_audio_enabled", label: "Banner 2", subtitle: "La Nueva Corriente" },
+  { key: "hero_banner_3_image", mobileKey: "hero_banner_3_mobile_position", desktopKey: "hero_banner_3_desktop_position", audioKey: "hero_banner_3_audio_enabled", label: "Banner 3", subtitle: "Friends & Family" },
 ];
 
 // Presets de posición para mobile
@@ -29,23 +29,92 @@ function isVideoUrl(url) {
   return cleanUrl.endsWith(".mp4") || cleanUrl.endsWith(".webm") || cleanUrl.endsWith(".mov");
 }
 
-function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedAudioEnabled, onUpdated }) {
+function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedDesktopPosition, savedAudioEnabled, onUpdated }) {
   const [url, setUrl] = useState(savedUrl || "");
   const [mobilePosition, setMobilePosition] = useState(savedMobilePosition || "center center");
+  const [desktopPosition, setDesktopPosition] = useState(savedDesktopPosition || "50% 50%");
   const [audioEnabled, setAudioEnabled] = useState(savedAudioEnabled || false);
   const [customX, setCustomX] = useState("50");
   const [customY, setCustomY] = useState("50");
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState(null);
   const [showMobilePanel, setShowMobilePanel] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputImg = useRef();
   const fileInputVid = useRef();
+  const previewRef = useRef();
 
   useEffect(() => {
     setUrl(savedUrl || "");
     setMobilePosition(savedMobilePosition || "center center");
+    setDesktopPosition(savedDesktopPosition || "50% 50%");
     setAudioEnabled(savedAudioEnabled === true);
-  }, [savedUrl, savedMobilePosition, savedAudioEnabled]);
+  }, [savedUrl, savedMobilePosition, savedDesktopPosition, savedAudioEnabled]);
+
+  // Parse desktop position to x/y % for crosshair dot
+  const parsedPos = (() => {
+    const parts = desktopPosition.split(" ");
+    if (parts.length === 2) {
+      const parseVal = (v) => {
+        if (v.endsWith("%")) return parseFloat(v);
+        if (v === "left") return 0; if (v === "right") return 100;
+        if (v === "top") return 0; if (v === "bottom") return 100;
+        return 50;
+      };
+      return { x: parseVal(parts[0]), y: parseVal(parts[1]) };
+    }
+    return { x: 50, y: 50 };
+  })();
+
+  const getPosFromEvent = useCallback((e) => {
+    const rect = previewRef.current?.getBoundingClientRect();
+    if (!rect) return null;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const x = Math.round(Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100)));
+    const y = Math.round(Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100)));
+    return `${x}% ${y}%`;
+  }, []);
+
+  const handlePreviewPointerDown = (e) => {
+    if (!url || isVideo) return;
+    e.preventDefault();
+    setIsDragging(true);
+    const pos = getPosFromEvent(e);
+    if (pos) setDesktopPosition(pos);
+  };
+
+  const handlePreviewPointerMove = useCallback((e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const pos = getPosFromEvent(e);
+    if (pos) setDesktopPosition(pos);
+  }, [isDragging, getPosFromEvent]);
+
+  const handlePreviewPointerUp = useCallback((e) => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    const pos = getPosFromEvent(e);
+    if (pos) {
+      setDesktopPosition(pos);
+      persist({ [bannerDef.desktopKey]: pos });
+    }
+  }, [isDragging, getPosFromEvent]);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener("mousemove", handlePreviewPointerMove);
+      window.addEventListener("mouseup", handlePreviewPointerUp);
+      window.addEventListener("touchmove", handlePreviewPointerMove, { passive: false });
+      window.addEventListener("touchend", handlePreviewPointerUp);
+    }
+    return () => {
+      window.removeEventListener("mousemove", handlePreviewPointerMove);
+      window.removeEventListener("mouseup", handlePreviewPointerUp);
+      window.removeEventListener("touchmove", handlePreviewPointerMove);
+      window.removeEventListener("touchend", handlePreviewPointerUp);
+    };
+  }, [isDragging, handlePreviewPointerMove, handlePreviewPointerUp]);
 
   const isVideo = isVideoUrl(url);
 
@@ -152,23 +221,53 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedA
         </div>
       </div>
 
-      {/* Preview desktop */}
-      <div className="relative bg-black/40" style={{ height: 180 }}>
+      {/* Preview desktop — arrastra para ajustar encuadre */}
+      <div
+        ref={previewRef}
+        className={`relative bg-black/40 overflow-hidden select-none ${url && !isVideo ? "cursor-crosshair" : ""}`}
+        style={{ height: 200 }}
+        onMouseDown={handlePreviewPointerDown}
+        onTouchStart={handlePreviewPointerDown}
+      >
         {url ? (
           isVideo ? (
             <video key={url} src={url} autoPlay muted={!audioEnabled} loop playsInline className="w-full h-full object-cover" />
           ) : (
-            <img src={url} alt={bannerDef.subtitle} className="w-full h-full object-cover" style={{ objectPosition: "center center" }} />
+            <img
+              src={url}
+              alt={bannerDef.subtitle}
+              draggable={false}
+              className="w-full h-full object-cover pointer-events-none"
+              style={{ objectPosition: desktopPosition }}
+            />
           )
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <p className="text-white/20 text-sm">Sin media — sube una imagen o video</p>
           </div>
         )}
+        {/* Crosshair dot */}
+        {url && !isVideo && (
+          <div
+            className="absolute w-5 h-5 rounded-full border-2 border-white pointer-events-none"
+            style={{
+              left: `calc(${parsedPos.x}% - 10px)`,
+              top: `calc(${parsedPos.y}% - 10px)`,
+              background: "rgba(255,255,255,0.25)",
+              boxShadow: "0 0 0 1px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.5)",
+            }}
+          />
+        )}
         {url && (
           <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[10px] font-bold text-white/70 uppercase tracking-wider flex items-center gap-1">
             {isVideo ? "Video" : "Imagen"}
             {isVideo && audioEnabled && <Volume2 className="w-3 h-3 text-emerald-400" />}
+          </div>
+        )}
+        {url && !isVideo && (
+          <div className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-0.5 rounded bg-black/70 text-[9px] text-white/60 pointer-events-none">
+            <Move className="w-3 h-3" />
+            <span className="font-mono">{desktopPosition}</span>
           </div>
         )}
       </div>
@@ -240,6 +339,14 @@ function BannerCard({ bannerDef, configId, savedUrl, savedMobilePosition, savedA
             >
               Guardar Configuración de Audio
             </button>
+          </div>
+        )}
+
+        {/* Desktop position label */}
+        {url && !isVideo && (
+          <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+            <span className="text-xs text-white/40 flex items-center gap-1.5"><Move className="w-3.5 h-3.5" /> Posición desktop</span>
+            <span className="text-[10px] font-mono text-white/50">{desktopPosition}</span>
           </div>
         )}
 
@@ -368,12 +475,15 @@ export default function BannersAdmin() {
       setBannerData({
         hero_banner_1_image: cfg.hero_banner_1_image || "",
         hero_banner_1_mobile_position: cfg.hero_banner_1_mobile_position || "center center",
+        hero_banner_1_desktop_position: cfg.hero_banner_1_desktop_position || "50% 50%",
         hero_banner_1_audio_enabled: cfg.hero_banner_1_audio_enabled || false,
         hero_banner_2_image: cfg.hero_banner_2_image || "",
         hero_banner_2_mobile_position: cfg.hero_banner_2_mobile_position || "center center",
+        hero_banner_2_desktop_position: cfg.hero_banner_2_desktop_position || "50% 50%",
         hero_banner_2_audio_enabled: cfg.hero_banner_2_audio_enabled === true,
         hero_banner_3_image: cfg.hero_banner_3_image || "",
         hero_banner_3_mobile_position: cfg.hero_banner_3_mobile_position || "center center",
+        hero_banner_3_desktop_position: cfg.hero_banner_3_desktop_position || "50% 50%",
         hero_banner_3_audio_enabled: cfg.hero_banner_3_audio_enabled || false,
       });
     } catch (e) {
@@ -446,6 +556,7 @@ export default function BannersAdmin() {
                     configId={configId}
                     savedUrl={bannerData[banner.key]}
                     savedMobilePosition={bannerData[banner.mobileKey]}
+                    savedDesktopPosition={bannerData[banner.desktopKey]}
                     savedAudioEnabled={bannerData[banner.audioKey]}
                     onUpdated={handleUpdated}
                   />
