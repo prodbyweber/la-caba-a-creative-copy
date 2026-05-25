@@ -41,6 +41,7 @@ export default function LandingHero({ bottomOffset } = {}) {
   });
 
   const videoSrc = cfg?.hero_video_url || null;
+  const mobileVideoSrc = cfg?.hero_video_mobile_url || null;
   const fallbackImage = cfg?.hero_banner_1_image || null;
 
   return (
@@ -56,11 +57,20 @@ export default function LandingHero({ bottomOffset } = {}) {
       }}
     >
       {/* Background media */}
+      {/* Desktop video (hidden on mobile if mobile video exists) */}
       {videoSrc ? (
-        <VideoBackground src={videoSrc} />
+        <div className={mobileVideoSrc ? "hidden md:block absolute inset-0 w-full h-full" : "absolute inset-0 w-full h-full"}>
+          <VideoBackground src={videoSrc} />
+        </div>
       ) : fallbackImage ? (
         <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover" loading="eager" />
       ) : null}
+      {/* Mobile-only video */}
+      {mobileVideoSrc && (
+        <div className="md:hidden absolute inset-0 w-full h-full">
+          <VideoBackground src={mobileVideoSrc} />
+        </div>
+      )}
 
       {/* Overlay */}
       <div className="absolute inset-0" style={{

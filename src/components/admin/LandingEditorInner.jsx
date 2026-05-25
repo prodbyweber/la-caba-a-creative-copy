@@ -132,6 +132,29 @@ export default function LandingEditorInner() {
               maxSize={50}
             />
           </Field>
+          <Field label="Video para móvil (opcional)">
+            <p className="text-[10px] text-white/25 mb-2">Solo visible en dispositivos móviles. Si no hay video móvil, se usa el video de fondo general.</p>
+            {config.hero_video_mobile_url && (
+              <div className="mb-2 relative rounded-xl overflow-hidden border border-white/10">
+                <video src={config.hero_video_mobile_url} className="w-full h-28 object-cover" muted loop autoPlay playsInline />
+                <button
+                  onClick={() => updateField("hero_video_mobile_url", "")}
+                  className="absolute top-2 right-2 p-1.5 bg-black/70 rounded-lg text-red-400 hover:bg-red-500/20 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+            <ImageUploadField
+              value={null}
+              onChange={(v) => updateField("hero_video_mobile_url", v)}
+              isUploading={isUploading}
+              setIsUploading={setIsUploading}
+              accept="video/mp4,video/webm,video/mov,video/quicktime"
+              label={isUploading ? "Subiendo..." : "Subir video móvil (máx. 50 MB)"}
+              maxSize={50}
+            />
+          </Field>
         </SectionCard>
 
         {/* ── Banners de Portada ── */}
