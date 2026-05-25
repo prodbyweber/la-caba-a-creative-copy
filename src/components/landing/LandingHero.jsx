@@ -18,14 +18,14 @@ function useAutoPlay(src) {
   return ref;
 }
 
-function VideoBackground({ src }) {
+function VideoBackground({ src, className = "" }) {
   const ref = useAutoPlay(src);
   return (
     <video
       ref={ref}
       src={src}
       autoPlay muted loop playsInline preload="auto"
-      className="absolute inset-0 w-full h-full object-cover"
+      className={`absolute inset-0 w-full h-full object-cover ${className}`}
       style={{ pointerEvents: "none" }}
     />
   );
@@ -57,19 +57,17 @@ export default function LandingHero({ bottomOffset } = {}) {
       }}
     >
       {/* Background media */}
-      {/* Desktop video (hidden on mobile if mobile video exists) */}
-      {videoSrc ? (
-        <div className={mobileVideoSrc ? "hidden md:block absolute inset-0 w-full h-full" : "absolute inset-0 w-full h-full"}>
-          <VideoBackground src={videoSrc} />
-        </div>
-      ) : fallbackImage ? (
-        <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover" loading="eager" />
-      ) : null}
-      {/* Mobile-only video */}
+      {/* Desktop video: hidden on mobile when a mobile video exists */}
+      {videoSrc && (
+        <VideoBackground src={videoSrc} className={mobileVideoSrc ? "hidden md:block" : ""} />
+      )}
+      {/* Mobile-only video: only renders on mobile */}
       {mobileVideoSrc && (
-        <div className="md:hidden absolute inset-0 w-full h-full">
-          <VideoBackground src={mobileVideoSrc} />
-        </div>
+        <VideoBackground src={mobileVideoSrc} className="md:hidden" />
+      )}
+      {/* Fallback image if no video */}
+      {!videoSrc && !mobileVideoSrc && fallbackImage && (
+        <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover" loading="eager" />
       )}
 
       {/* Overlay */}
