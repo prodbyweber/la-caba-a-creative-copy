@@ -9,7 +9,7 @@ function getYoutubeId(url) {
   return match ? match[1] : null;
 }
 
-function HeroSlide({ item, artist, onExplore, active, shouldPlayAudio, onVideoReady }) {
+function HeroSlide({ item, artist, onExplore, active, shouldPlayAudio, onVideoReady, onOpenItem }) {
   const ytUrl = item?.youtube_url || item?.youtube_music_url;
   const ytId = getYoutubeId(ytUrl);
   const bg = item?.image || artist?.avatar_url || "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1600&q=80";
@@ -50,7 +50,15 @@ function HeroSlide({ item, artist, onExplore, active, shouldPlayAudio, onVideoRe
 
   const handleActionBtn = () => {
     const link = item?.hero_link;
-    if (!link) return;
+    if (!link) {
+      onExplore?.();
+      return;
+    }
+    if (link.startsWith("#open:")) {
+      const itemId = link.replace("#open:", "");
+      onOpenItem?.(itemId);
+      return;
+    }
     if (link.startsWith("http://") || link.startsWith("https://")) {
       window.open(link, "_blank", "noopener");
     } else {
@@ -173,7 +181,7 @@ function HeroSlide({ item, artist, onExplore, active, shouldPlayAudio, onVideoRe
   );
 }
 
-export default function ExplorarHero({ items = [], artists = [], onExplore }) {
+export default function ExplorarHero({ items = [], artists = [], onExplore, onOpenItem }) {
   const [activeIdx, setActiveIdx] = useState(0);
   const [transitioning, setTransitioning] = useState(false);
   const [heroReady, setHeroReady] = useState(false);
@@ -355,6 +363,7 @@ export default function ExplorarHero({ items = [], artists = [], onExplore }) {
               active={idx === activeIdx && !transitioning}
               shouldPlayAudio={shouldPlayAudio}
               onVideoReady={idx === 0 ? () => setHeroReady(true) : undefined}
+              onOpenItem={onOpenItem}
             />
           </div>
         ))}

@@ -334,6 +334,10 @@ export default function Explorar() {
               if (a) setSelectedArtist(a);
             }
           }}
+          onOpenItem={(id) => {
+            const card = allCards.find(c => c.id === id);
+            if (card) handleCardClick(card);
+          }}
         />
       )}
 

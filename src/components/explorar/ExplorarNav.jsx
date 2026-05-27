@@ -1,12 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Search, User, Home, BookOpen, Compass, Sparkles } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 export default function ExplorarNav({ currentUser, activeSection, setActiveSection, searchOpen, setSearchOpen, searchQuery, setSearchQuery, onProfileOpen, artistId, onParaTiOpen }) {
   const [scrolled, setScrolled] = useState(false);
+  const [guestMenuOpen, setGuestMenuOpen] = useState(false);
+  const guestMenuRef = useRef(null);
   const location = useLocation();
+
+  // Close guest menu when clicking outside
+  useEffect(() => {
+    if (!guestMenuOpen) return;
+    const handler = (e) => { if (guestMenuRef.current && !guestMenuRef.current.contains(e.target)) setGuestMenuOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [guestMenuOpen]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -97,18 +108,51 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
             <Search className="w-4 h-4" />
           </button>
 
-          {/* Avatar — abre panel de perfil */}
-          <button
-            onClick={onProfileOpen}
-            className="w-8 h-8 rounded-full overflow-hidden border border-white/10 hover:border-white/30 transition-all flex items-center justify-center bg-white/5 hover:bg-white/10 flex-shrink-0"
-            title={currentUser?.full_name || "Perfil"}
-          >
-            {currentUser?.avatar_url ? (
-              <img src={currentUser.avatar_url} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <User className="w-4 h-4 text-white/50" strokeWidth={1.5} />
-            )}
-          </button>
+          {/* Avatar — abre panel de perfil o menú guest */}
+          <div className="relative" ref={guestMenuRef}>
+            <button
+              onClick={() => currentUser ? onProfileOpen() : setGuestMenuOpen(v => !v)}
+              className="w-8 h-8 rounded-full overflow-hidden border border-white/10 hover:border-white/30 transition-all flex items-center justify-center bg-white/5 hover:bg-white/10 flex-shrink-0"
+              title={currentUser?.full_name || "Iniciar sesión"}
+            >
+              {currentUser?.avatar_url ? (
+                <img src={currentUser.avatar_url} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-4 h-4 text-white/50" strokeWidth={1.5} />
+              )}
+            </button>
+
+            {/* Guest login/register dropdown */}
+            <AnimatePresence>
+              {!currentUser && guestMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                  transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute right-0 top-11 z-50 w-56 rounded-2xl p-4"
+                  style={{ background: "rgba(10,10,11,0.97)", border: "1px solid rgba(255,255,255,0.1)", boxShadow: "0 16px 48px rgba(0,0,0,0.7)" }}
+                >
+                  <p className="text-white text-xs font-bold mb-0.5" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.02em" }}>Cabaña Creative</p>
+                  <p className="text-white/40 text-[10px] mb-3">Accede a contenido exclusivo</p>
+                  <button
+                    onClick={() => { setGuestMenuOpen(false); base44.auth.redirectToLogin(window.location.href); }}
+                    className="w-full px-4 py-2.5 rounded-xl text-xs font-bold text-black mb-2 transition-all hover:scale-[1.02]"
+                    style={{ background: "white" }}
+                  >
+                    Iniciar sesión
+                  </button>
+                  <button
+                    onClick={() => { setGuestMenuOpen(false); base44.auth.redirectToLogin(window.location.href); }}
+                    className="w-full px-4 py-2.5 rounded-xl text-xs font-semibold text-white transition-colors hover:text-white"
+                    style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}
+                  >
+                    Registrarse
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </nav>

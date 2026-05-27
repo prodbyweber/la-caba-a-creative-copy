@@ -88,7 +88,7 @@ function MiniHero({ items }) {
             </div>
           )}
           <a href="/Explorar"
-            onClick={(e) => { e.preventDefault(); base44.auth.redirectToLogin("/Explorar"); }}
+            onClick={(e) => { e.preventDefault(); window.location.href = "/Explorar"; }}
             className="group relative inline-flex items-center gap-0.5 sm:gap-1.5 overflow-hidden flex-shrink-0"
             style={{ padding: "4px 10px", borderRadius: 99, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.22)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
             <span className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -412,7 +412,7 @@ export default function StartExplorar({ showButton = true, allowMobileScroll = f
           style={{ position: "relative", zIndex: 1, display: "flex", justifyContent: "center", marginTop: "clamp(12px, 2vw, 24px)" }}
         >
           <button
-            onClick={() => base44.auth.redirectToLogin(window.location.href)}
+            onClick={() => window.location.href = "/Explorar"}
             style={{
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               fontWeight: 900,

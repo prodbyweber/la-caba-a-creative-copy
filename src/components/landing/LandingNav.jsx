@@ -98,13 +98,7 @@ export default function LandingNav() {
           {/* Explorar button — desktop only */}
           <button
             className="hidden sm:block"
-            onClick={() => {
-              if (user) {
-                navigate("/Explorar");
-              } else {
-                base44.auth.redirectToLogin("/Explorar");
-              }
-            }}
+            onClick={() => navigate("/Explorar")}
             style={{
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               fontWeight: 700,
@@ -257,11 +251,7 @@ export default function LandingNav() {
               {/* Explorar button */}
               <button
                 onClick={() => {
-                  if (user) {
-                    navigate("/Explorar");
-                  } else {
-                    base44.auth.redirectToLogin("/Explorar");
-                  }
+                  navigate("/Explorar");
                   setMobileOpen(false);
                 }}
                 className="flex items-center justify-center gap-3 w-full py-3 px-4 rounded-lg bg-[#ff5833] text-white font-medium hover:bg-[#e04a20] transition-colors mb-3"
