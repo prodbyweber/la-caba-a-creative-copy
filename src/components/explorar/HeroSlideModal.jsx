@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Save, Film, Upload, Star, Image as ImageIcon, Youtube, Music2, Link, Volume2 } from "lucide-react";
+import { X, Save, Film, Upload, Star, Image as ImageIcon, Youtube, Music2, Link, Volume2, Layers, ExternalLink } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 function getYoutubeThumbnail(url) {
@@ -29,8 +29,38 @@ const EMPTY_HERO = {
   is_active: true,
 };
 
-export default function HeroSlideModal({ item, artists, onClose, onSave }) {
+export default function HeroSlideModal({ item, artists, explorarItems = [], onClose, onSave }) {
   const [form, setForm] = useState(item ? { ...EMPTY_HERO, ...item, is_hero: true } : EMPTY_HERO);
+
+  // Determine link mode from current hero_link value
+  const initialLinkMode = form.hero_link?.startsWith("#open:") ? "item" : "url";
+  const [linkMode, setLinkMode] = useState(initialLinkMode);
+  const [selectedItemId, setSelectedItemId] = useState(
+    form.hero_link?.startsWith("#open:") ? form.hero_link.replace("#open:", "") : ""
+  );
+  const [customUrl, setCustomUrl] = useState(
+    form.hero_link?.startsWith("#open:") ? "" : (form.hero_link || "")
+  );
+
+  const handleLinkModeChange = (mode) => {
+    setLinkMode(mode);
+    if (mode === "item") {
+      const heroLink = selectedItemId ? `#open:${selectedItemId}` : "";
+      setForm(f => ({ ...f, hero_link: heroLink }));
+    } else {
+      setForm(f => ({ ...f, hero_link: customUrl }));
+    }
+  };
+
+  const handleItemSelect = (id) => {
+    setSelectedItemId(id);
+    setForm(f => ({ ...f, hero_link: id ? `#open:${id}` : "" }));
+  };
+
+  const handleCustomUrlChange = (url) => {
+    setCustomUrl(url);
+    setForm(f => ({ ...f, hero_link: url }));
+  };
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [uploadingThumb, setUploadingThumb] = useState(false);
 
@@ -192,17 +222,64 @@ export default function HeroSlideModal({ item, artists, onClose, onSave }) {
             <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-3 flex items-center gap-1.5">
               <Link className="w-3.5 h-3.5" /> Botón de Acción / Redirect
             </p>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className={labelClass}>Texto del botón</label>
-                <input value={form.hero_link_label} onChange={e => set("hero_link_label", e.target.value)} className={inputClass} placeholder="Más info" />
-              </div>
-              <div>
-                <label className={labelClass}>URL / Ruta de destino</label>
-                <input value={form.hero_link} onChange={e => set("hero_link", e.target.value)} className={inputClass} placeholder="/Explorar o https://..." />
-              </div>
+
+            {/* Texto del botón */}
+            <div className="mb-3">
+              <label className={labelClass}>Texto del botón</label>
+              <input value={form.hero_link_label} onChange={e => set("hero_link_label", e.target.value)} className={inputClass} placeholder="Más info" />
             </div>
-            <p className="text-[10px] text-white/20 mt-1">Puede ser una ruta interna (/ArtistDashboard?id=...) o URL externa</p>
+
+            {/* Tipo de destino */}
+            <div className="flex gap-2 mb-3">
+              <button
+                onClick={() => handleLinkModeChange("item")}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                  linkMode === "item" ? "bg-yellow-500/20 border border-yellow-500/40 text-yellow-400" : "bg-white/5 border border-white/10 text-white/30 hover:text-white/60"
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" /> Proyecto de la plataforma
+              </button>
+              <button
+                onClick={() => handleLinkModeChange("url")}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                  linkMode === "url" ? "bg-yellow-500/20 border border-yellow-500/40 text-yellow-400" : "bg-white/5 border border-white/10 text-white/30 hover:text-white/60"
+                }`}
+              >
+                <ExternalLink className="w-3.5 h-3.5" /> URL / Link externo
+              </button>
+            </div>
+
+            {linkMode === "item" ? (
+              <div>
+                <label className={labelClass}>Selecciona el proyecto destino</label>
+                <select
+                  value={selectedItemId}
+                  onChange={e => handleItemSelect(e.target.value)}
+                  className={inputClass}
+                >
+                  <option value="" className="bg-[#111]">— Sin destino —</option>
+                  {explorarItems.filter(i => !i.is_hero).map(it => (
+                    <option key={it.id} value={it.id} className="bg-[#111]">
+                      {it.title}{it.subtitle ? ` · ${it.subtitle}` : ""}
+                    </option>
+                  ))}
+                </select>
+                {selectedItemId && (
+                  <p className="text-[10px] text-yellow-400/50 mt-1">Abrirá la tarjeta del proyecto dentro de Explorar</p>
+                )}
+              </div>
+            ) : (
+              <div>
+                <label className={labelClass}>URL o ruta de destino</label>
+                <input
+                  value={customUrl}
+                  onChange={e => handleCustomUrlChange(e.target.value)}
+                  className={inputClass}
+                  placeholder="/Explorar, /Pricing, https://..."
+                />
+                <p className="text-[10px] text-white/20 mt-1">Ruta interna (/Pricing) o URL externa (https://...)</p>
+              </div>
+            )}
           </div>
 
           {/* === SECCIÓN: MINIATURA (para lista admin) === */}

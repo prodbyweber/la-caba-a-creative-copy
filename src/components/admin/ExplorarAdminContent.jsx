@@ -282,7 +282,7 @@ export default function ExplorarAdminContent() {
         {showProjectModal && <ProjectModal item={editingItem} artists={artists} onClose={() => { setShowProjectModal(false); setEditingItem(null); }} onSave={saveItemMutation.mutate} />}
       </AnimatePresence>
       <AnimatePresence>
-        {showHeroModal && <HeroSlideModal item={editingHero} artists={artists} onClose={() => { setShowHeroModal(false); setEditingHero(null); }} onSave={saveItemMutation.mutate} />}
+        {showHeroModal && <HeroSlideModal item={editingHero} artists={artists} explorarItems={items} onClose={() => { setShowHeroModal(false); setEditingHero(null); }} onSave={saveItemMutation.mutate} />}
       </AnimatePresence>
       <AnimatePresence>
         {showSectionModal && editingSection && (
