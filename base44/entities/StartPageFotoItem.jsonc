@@ -1,0 +1,33 @@
+{
+  "name": "StartPageFotoItem",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo de la sesi\u00f3n fotogr\u00e1fica"
+    },
+    "category_label": {
+      "type": "string",
+      "description": "Etiqueta de categor\u00eda (ej: Editorial, Retrato...)"
+    },
+    "thumbnail_url": {
+      "type": "string",
+      "description": "URL de la miniatura principal"
+    },
+    "photos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs de las fotos de la galer\u00eda"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden dentro de la fila"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

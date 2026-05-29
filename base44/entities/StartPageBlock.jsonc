@@ -1,0 +1,32 @@
+{
+  "name": "StartPageBlock",
+  "type": "object",
+  "properties": {
+    "row_key": {
+      "type": "string",
+      "enum": [
+        "films",
+        "musica",
+        "shorts"
+      ],
+      "description": "Fila a la que pertenece este bloque"
+    },
+    "item_id": {
+      "type": "string",
+      "description": "ID del ExplorarItem vinculado"
+    },
+    "youtube_url_override": {
+      "type": "string",
+      "description": "URL de YouTube personalizada (override del item)"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden dentro de la fila"
+    }
+  },
+  "required": [
+    "row_key",
+    "item_id"
+  ]
+}
