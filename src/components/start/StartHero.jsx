@@ -154,7 +154,7 @@ export default function StartHero() {
               margin: 0,
               maxWidth: "480px",
             }}>
-              Identidad visual, producción musical, audiovisual y marketing bajo una sola dirección creativa. Tu proyecto, con estructura y con alma — para artistas que quieren crecer con criterio, no con suerte.
+              Identidad, producción musical, audiovisual y marketing, somos tu equipo creativo. Para artistas que quieren crecer con criterio, no con suerte.
             </p>
 
             {/* CTA row */}
