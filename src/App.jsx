@@ -4,11 +4,16 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { base44 } from '@/api/base44Client';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import GuestCatalogPreview from './pages/GuestCatalogPreview';
 import PoliticaPrivacidad from './pages/PoliticaPrivacidad';
 import AvisoLegal from './pages/AvisoLegal';
@@ -76,7 +81,7 @@ const ProtectedAdminRoute = ({ element }) => {
 };
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings } = useAuth();
   const isLoading = isLoadingPublicSettings || isLoadingAuth;
 
   React.useEffect(() => {
@@ -87,20 +92,6 @@ const AuthenticatedApp = () => {
 
   if (isLoading) {
     return null;
-  }
-
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      // Allow public routes without login
-      const publicPaths = ['/Explorar', '/Pricing', '/PublicProfile'];
-      const isPublicPath = publicPaths.some(p => window.location.pathname.startsWith(p));
-      if (!isPublicPath) {
-        navigateToLogin();
-        return null;
-      }
-    }
   }
 
   // Redirect authenticated users: admin → /AdminDashboard, others → /Explorar
@@ -130,7 +121,44 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
+      {/* Auth routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
+      {/* Home redirect */}
       <Route path="/" element={<AuthRedirect />} />
+
+      {/* Public pages (no auth required) */}
+      <Route path="/start" element={<Start />} />
+      <Route path="/Marcas" element={<Marcas />} />
+      <Route path="/Pricing" element={<Pricing />} />
+      <Route path="/GuestCatalogPreview" element={<GuestCatalogPreview />} />
+      <Route path="/ContactLeads" element={<ContactLeads />} />
+      <Route path="/PublicProfile" element={<PublicProfile />} />
+      <Route path="/creator/:username" element={<CreatorProfile />} />
+      <Route path="/:username" element={<UserPublicProfile />} />
+      <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
+      <Route path="/aviso-legal" element={<AvisoLegal />} />
+      <Route path="/politica-de-cookies" element={<PoliticaCookies />} />
+
+      {/* Protected pages (require login) */}
+      <Route path="/Explorar" element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}><Route index element={<Explorar />} /></Route>
+      <Route path="/StudioSession" element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}><Route index element={<StudioSession />} /></Route>
+      <Route path="/meeting" element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}><Route index element={<Meeting />} /></Route>
+
+      {/* Admin-only pages */}
+      <Route path="/AdminDashboard" element={<ProtectedAdminRoute element={<AdminDashboard />} />} />
+      <Route path="/BannersAdmin" element={<ProtectedAdminRoute element={<BannersAdmin />} />} />
+      <Route path="/ExplorarAdmin" element={<ProtectedAdminRoute element={<ExplorarAdmin />} />} />
+      <Route path="/UserProfiles" element={<ProtectedAdminRoute element={<UserProfiles />} />} />
+      <Route path="/DesignEditor" element={<ProtectedAdminRoute element={<DesignEditor />} />} />
+      <Route path="/CatalogoAdmin" element={<ProtectedAdminRoute element={<CatalogoAdmin />} />} />
+      <Route path="/ArtistPanelList" element={<ProtectedAdminRoute element={<ArtistPanelList />} />} />
+      <Route path="/ADNdeMarca" element={<ProtectedAdminRoute element={<ADNdeMarca />} />} />
+
+      {/* Legacy pages config loop */}
       {Object.entries(Pages).map(([path, Page]) => (
         <Route
           key={path}
@@ -142,28 +170,7 @@ const AuthenticatedApp = () => {
           }
         />
       ))}
-      <Route path="/start" element={<Start />} />
-      <Route path="/GuestCatalogPreview" element={<GuestCatalogPreview />} />
-      <Route path="/ContactLeads" element={<ContactLeads />} />
-      <Route path="/Pricing" element={<Pricing />} />
-      <Route path="/AdminDashboard" element={<ProtectedAdminRoute element={<AdminDashboard />} />} />
-      <Route path="/BannersAdmin" element={<ProtectedAdminRoute element={<BannersAdmin />} />} />
-      <Route path="/Explorar" element={<Explorar />} />
-      <Route path="/ExplorarAdmin" element={<ProtectedAdminRoute element={<ExplorarAdmin />} />} />
-      <Route path="/UserProfiles" element={<ProtectedAdminRoute element={<UserProfiles />} />} />
-      <Route path="/DesignEditor" element={<ProtectedAdminRoute element={<DesignEditor />} />} />
-      <Route path="/CatalogoAdmin" element={<ProtectedAdminRoute element={<CatalogoAdmin />} />} />
-      <Route path="/ArtistPanelList" element={<ProtectedAdminRoute element={<ArtistPanelList />} />} />
-      <Route path="/ADNdeMarca" element={<ProtectedAdminRoute element={<ADNdeMarca />} />} />
-      <Route path="/StudioSession" element={<StudioSession />} />
-      <Route path="/meeting" element={<Meeting />} />
-      <Route path="/PublicProfile" element={<PublicProfile />} />
-      <Route path="/creator/:username" element={<CreatorProfile />} />
-      <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
-      <Route path="/aviso-legal" element={<AvisoLegal />} />
-      <Route path="/politica-de-cookies" element={<PoliticaCookies />} />
-      <Route path="/Marcas" element={<Marcas />} />
-      <Route path="/:username" element={<UserPublicProfile />} />
+
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
