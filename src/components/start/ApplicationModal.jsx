@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
+import { Link } from "react-router-dom";
 
 const COUNTRIES = [
   "España","México","Argentina","Colombia","Chile","Perú","Venezuela","Ecuador","Bolivia","Paraguay","Uruguay","Cuba","República Dominicana","Guatemala","Honduras","El Salvador","Nicaragua","Costa Rica","Panamá","Puerto Rico","Estados Unidos","Reino Unido","Francia","Alemania","Italia","Portugal","Países Bajos","Bélgica","Suiza","Austria","Polonia","Rumania","Suecia","Noruega","Dinamarca","Finlandia","Japón","China","India","Brasil","Australia","Canadá","Otro"
@@ -32,9 +33,9 @@ const inputStyle = {
   width: "100%",
   background: "#141414",
   border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: "10px",
-  padding: "13px 16px",
-  fontSize: "15px",
+  borderRadius: "8px",
+  padding: "10px 13px",
+  fontSize: "14px",
   color: "#f0ede8",
   fontFamily: "'Helvetica Neue', sans-serif",
   outline: "none",
@@ -44,14 +45,14 @@ const inputStyle = {
 
 const labelStyle = {
   fontFamily: "'Helvetica Neue', sans-serif",
-  fontSize: "13px",
+  fontSize: "12px",
   fontWeight: 600,
-  color: "rgba(240,237,232,0.7)",
-  marginBottom: "6px",
+  color: "rgba(240,237,232,0.6)",
+  marginBottom: "5px",
   display: "block",
 };
 
-const fieldWrap = { display: "flex", flexDirection: "column", gap: "6px" };
+const fieldWrap = { display: "flex", flexDirection: "column", gap: "4px" };
 
 function Label({ children, required }) {
   return (
@@ -63,19 +64,19 @@ function Label({ children, required }) {
 
 function StepIndicator({ current }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "0", marginBottom: "32px" }}>
+    <div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
       {STEPS.map((s, i) => {
         const done = s.id < current;
         const active = s.id === current;
         return (
           <React.Fragment key={s.id}>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
               <div style={{
-                width: 36, height: 36, borderRadius: "50%",
+                width: 28, height: 28, borderRadius: "50%",
                 background: done || active ? "#ff5833" : "#1a1a1a",
                 border: done || active ? "none" : "1px solid rgba(255,255,255,0.12)",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: "13px", fontWeight: 700,
+                fontSize: "11px", fontWeight: 700,
                 color: done || active ? "#fff" : "rgba(240,237,232,0.3)",
                 fontFamily: "'Helvetica Neue', sans-serif",
                 transition: "all 0.3s",
@@ -84,16 +85,16 @@ function StepIndicator({ current }) {
               </div>
               <span style={{
                 fontFamily: "'Helvetica Neue', sans-serif",
-                fontSize: "11px",
+                fontSize: "10px",
                 fontWeight: active ? 700 : 400,
                 color: active ? "#f0ede8" : "rgba(240,237,232,0.3)",
               }}>{s.label}</span>
             </div>
             {i < STEPS.length - 1 && (
               <div style={{
-                flex: 1, height: "1px", margin: "0 8px",
+                flex: 1, height: "1px", margin: "0 6px",
                 background: done ? "#ff5833" : "rgba(255,255,255,0.1)",
-                marginBottom: "22px",
+                marginBottom: "18px",
                 transition: "background 0.3s",
               }} />
             )}
@@ -111,11 +112,9 @@ export default function ApplicationModal({ isOpen, onClose }) {
   const [errors, setErrors] = useState({});
 
   const [form, setForm] = useState({
-    // Step 1
     nombre: "", apellidos: "", email: "", phoneCode: "+34", phone: "", birthdate: "",
-    // Step 2
+    privacidad: false,
     pais_residencia: "", nacionalidad: "", viaje_madrid: "",
-    // Step 3
     situacion_laboral: "", experiencia_musica: "", presupuesto: false,
   });
 
@@ -138,6 +137,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
     if (!form.phone.trim()) e.phone = true;
     if (!form.birthdate) e.birthdate = true;
     else if (!isAdult(form.birthdate)) e.birthdate = "minor";
+    if (!form.privacidad) e.privacidad = true;
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -190,7 +190,12 @@ export default function ApplicationModal({ isOpen, onClose }) {
 
   const handleClose = () => {
     onClose();
-    setTimeout(() => { setStep(1); setForm({ nombre:"",apellidos:"",email:"",phoneCode:"+34",phone:"",birthdate:"",pais_residencia:"",nacionalidad:"",viaje_madrid:"",situacion_laboral:"",experiencia_musica:"",presupuesto:false }); setSent(false); setErrors({}); }, 300);
+    setTimeout(() => {
+      setStep(1);
+      setForm({ nombre:"",apellidos:"",email:"",phoneCode:"+34",phone:"",birthdate:"",privacidad:false,pais_residencia:"",nacionalidad:"",viaje_madrid:"",situacion_laboral:"",experiencia_musica:"",presupuesto:false });
+      setSent(false);
+      setErrors({});
+    }, 300);
   };
 
   if (!isOpen) return null;
@@ -210,32 +215,53 @@ export default function ApplicationModal({ isOpen, onClose }) {
         onClick={e => { if (e.target === e.currentTarget) handleClose(); }}
       >
         <motion.div
-          initial={{ y: 60, opacity: 0 }}
+          initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 60, opacity: 0 }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          exit={{ y: 50, opacity: 0 }}
+          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
           style={{
             background: "#0e0e0e",
-            borderRadius: "20px 20px 0 0",
+            borderRadius: "18px 18px 0 0",
             width: "100%",
-            maxWidth: "520px",
-            maxHeight: "92dvh",
+            maxWidth: "480px",
+            maxHeight: "88dvh",
             overflowY: "auto",
-            padding: "28px 24px calc(28px + env(safe-area-inset-bottom, 0px))",
+            padding: "20px 20px calc(20px + env(safe-area-inset-bottom, 0px))",
             boxSizing: "border-box",
             border: "1px solid rgba(255,255,255,0.08)",
             borderBottom: "none",
+            position: "relative",
           }}
         >
-          {/* Handle */}
-          <div style={{ width: 40, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 2, margin: "0 auto 24px" }} />
+          {/* Handle bar + close button */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "18px", position: "relative" }}>
+            <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.13)", borderRadius: 2 }} />
+            <button
+              onClick={handleClose}
+              style={{
+                position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)",
+                width: 30, height: 30, borderRadius: "50%",
+                background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", transition: "background 0.2s",
+                color: "rgba(240,237,232,0.6)",
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.14)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
+              aria-label="Cerrar"
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              </svg>
+            </button>
+          </div>
 
           {sent ? (
-            <div style={{ textAlign: "center", padding: "40px 0" }}>
-              <div style={{ fontSize: "48px", marginBottom: "16px" }}>✅</div>
-              <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.4rem", color: "#f0ede8", marginBottom: "10px" }}>¡Solicitud enviada!</h3>
-              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.9rem", color: "rgba(240,237,232,0.5)", lineHeight: 1.6 }}>Nuestro equipo revisará tu solicitud y te contactará en menos de 24h.</p>
-              <button onClick={handleClose} style={{ marginTop: "28px", background: "#ff5833", color: "#fff", border: "none", borderRadius: "10px", padding: "14px 32px", fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 700, fontSize: "0.95rem", cursor: "pointer" }}>Cerrar</button>
+            <div style={{ textAlign: "center", padding: "32px 0" }}>
+              <div style={{ fontSize: "40px", marginBottom: "12px" }}>✅</div>
+              <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.2rem", color: "#f0ede8", marginBottom: "8px" }}>¡Solicitud enviada!</h3>
+              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.85rem", color: "rgba(240,237,232,0.5)", lineHeight: 1.6 }}>Nuestro equipo revisará tu solicitud y te contactará en menos de 24h.</p>
+              <button onClick={handleClose} style={{ marginTop: "24px", background: "#ff5833", color: "#fff", border: "none", borderRadius: "9px", padding: "12px 28px", fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}>Cerrar</button>
             </div>
           ) : (
             <>
@@ -243,12 +269,12 @@ export default function ApplicationModal({ isOpen, onClose }) {
 
               {/* Step 1 — Datos */}
               {step === 1 && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                   <div>
-                    <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.25rem", color: "#f0ede8", margin: "0 0 4px" }}>Datos personales</h3>
-                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.82rem", color: "rgba(240,237,232,0.35)", margin: 0 }}>Información de contacto</p>
+                    <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.1rem", color: "#f0ede8", margin: "0 0 3px" }}>Datos personales</h3>
+                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.3)", margin: 0 }}>Información de contacto</p>
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                     <div style={fieldWrap}>
                       <Label required>Nombre</Label>
                       <input style={{ ...inputStyle, borderColor: errors.nombre ? "#ff5833" : "rgba(255,255,255,0.1)" }} value={form.nombre} onChange={e => set("nombre", e.target.value)} placeholder="Tu nombre" />
@@ -263,13 +289,9 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     <input type="email" style={{ ...inputStyle, borderColor: errors.email ? "#ff5833" : "rgba(255,255,255,0.1)" }} value={form.email} onChange={e => set("email", e.target.value)} placeholder="tu@email.com" />
                   </div>
                   <div style={fieldWrap}>
-                    <Label required>Número de teléfono</Label>
+                    <Label required>Teléfono</Label>
                     <div style={{ display: "flex", gap: "8px" }}>
-                      <select
-                        value={form.phoneCode}
-                        onChange={e => set("phoneCode", e.target.value)}
-                        style={{ ...inputStyle, width: "110px", flexShrink: 0 }}
-                      >
+                      <select value={form.phoneCode} onChange={e => set("phoneCode", e.target.value)} style={{ ...inputStyle, width: "105px", flexShrink: 0 }}>
                         {PHONE_CODES.map(p => <option key={p.code} value={p.code} style={{ background: "#141414" }}>{p.country} {p.code}</option>)}
                       </select>
                       <input type="tel" style={{ ...inputStyle, borderColor: errors.phone ? "#ff5833" : "rgba(255,255,255,0.1)" }} value={form.phone} onChange={e => set("phone", e.target.value)} placeholder="612 345 678" />
@@ -278,17 +300,42 @@ export default function ApplicationModal({ isOpen, onClose }) {
                   <div style={fieldWrap}>
                     <Label required>Fecha de nacimiento</Label>
                     <input type="date" style={{ ...inputStyle, borderColor: errors.birthdate ? "#ff5833" : "rgba(255,255,255,0.1)", colorScheme: "dark" }} value={form.birthdate} onChange={e => set("birthdate", e.target.value)} max={new Date(new Date().setFullYear(new Date().getFullYear()-18)).toISOString().split("T")[0]} />
-                    {errors.birthdate === "minor" && <span style={{ fontSize: "12px", color: "#ff5833", fontFamily: "'Helvetica Neue', sans-serif" }}>Debes ser mayor de 18 años para solicitar plaza.</span>}
+                    {errors.birthdate === "minor" && <span style={{ fontSize: "11px", color: "#ff5833", fontFamily: "'Helvetica Neue', sans-serif" }}>Debes ser mayor de 18 años para solicitar plaza.</span>}
+                  </div>
+
+                  {/* Política de privacidad */}
+                  <div style={{ background: errors.privacidad ? "rgba(255,88,51,0.06)" : "#141414", border: errors.privacidad ? "1px solid rgba(255,88,51,0.35)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "9px", padding: "12px 13px" }}>
+                    <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}>
+                      <div
+                        onClick={() => set("privacidad", !form.privacidad)}
+                        style={{
+                          width: "18px", height: "18px", borderRadius: "5px", flexShrink: 0, marginTop: "1px",
+                          background: form.privacidad ? "#ff5833" : "transparent",
+                          border: form.privacidad ? "none" : "1.5px solid rgba(255,255,255,0.2)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          transition: "all 0.2s", cursor: "pointer",
+                        }}
+                      >
+                        {form.privacidad && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                      </div>
+                      <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "12px", color: "rgba(240,237,232,0.6)", lineHeight: 1.5 }}>
+                        He leído y acepto la{" "}
+                        <Link to="/politica-de-privacidad" target="_blank" rel="noopener noreferrer" style={{ color: "#ff5833", textDecoration: "underline", textDecorationColor: "rgba(255,88,51,0.4)" }}>
+                          política de privacidad y protección de datos
+                        </Link>
+                      </span>
+                    </label>
+                    {errors.privacidad && <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "#ff5833", margin: "7px 0 0" }}>Debes aceptar la política de privacidad para continuar.</p>}
                   </div>
                 </div>
               )}
 
               {/* Step 2 — Ubicación */}
               {step === 2 && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                   <div>
-                    <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.25rem", color: "#f0ede8", margin: "0 0 4px" }}>Ubicación</h3>
-                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.82rem", color: "rgba(240,237,232,0.35)", margin: 0 }}>Ubicación y disponibilidad</p>
+                    <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.1rem", color: "#f0ede8", margin: "0 0 3px" }}>Ubicación</h3>
+                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.3)", margin: 0 }}>Residencia y disponibilidad</p>
                   </div>
                   <div style={fieldWrap}>
                     <Label required>País de residencia</Label>
@@ -305,16 +352,16 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     </select>
                   </div>
                   <div style={fieldWrap}>
-                    <Label required>¿Tienes disposición de viajar a Madrid para trabajar juntos?</Label>
+                    <Label required>¿Tienes disposición de viajar a Madrid?</Label>
                     <select value={form.viaje_madrid} onChange={e => set("viaje_madrid", e.target.value)} style={{ ...inputStyle, borderColor: errors.viaje_madrid ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
                       <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
                       <option value="si" style={{ background: "#141414" }}>Sí</option>
                       <option value="no" style={{ background: "#141414" }}>No</option>
                     </select>
                     {errors.viaje_madrid === "no" && (
-                      <div style={{ background: "rgba(255,88,51,0.08)", border: "1px solid rgba(255,88,51,0.25)", borderRadius: "8px", padding: "12px 14px", marginTop: "4px" }}>
-                        <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "13px", color: "rgba(255,88,51,0.9)", margin: 0, lineHeight: 1.5 }}>
-                          Nuestro programa de desarrollo artístico requiere sesiones presenciales en Madrid. Es necesaria disponibilidad para desplazarse.
+                      <div style={{ background: "rgba(255,88,51,0.08)", border: "1px solid rgba(255,88,51,0.25)", borderRadius: "8px", padding: "10px 12px", marginTop: "4px" }}>
+                        <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "12px", color: "rgba(255,88,51,0.9)", margin: 0, lineHeight: 1.5 }}>
+                          Nuestro programa requiere sesiones presenciales en Madrid.
                         </p>
                       </div>
                     )}
@@ -324,13 +371,13 @@ export default function ApplicationModal({ isOpen, onClose }) {
 
               {/* Step 3 — Experiencia */}
               {step === 3 && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                   <div>
-                    <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.25rem", color: "#f0ede8", margin: "0 0 4px" }}>Experiencia</h3>
-                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.82rem", color: "rgba(240,237,232,0.35)", margin: 0 }}>Tu situación profesional actual</p>
+                    <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.1rem", color: "#f0ede8", margin: "0 0 3px" }}>Experiencia</h3>
+                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.3)", margin: 0 }}>Tu situación profesional actual</p>
                   </div>
                   <div style={fieldWrap}>
-                    <Label required>Situación laboral actual</Label>
+                    <Label required>Situación laboral</Label>
                     <select value={form.situacion_laboral} onChange={e => set("situacion_laboral", e.target.value)} style={{ ...inputStyle, borderColor: errors.situacion_laboral ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
                       <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
                       <option value="empleado" style={{ background: "#141414" }}>Empleado/a</option>
@@ -352,38 +399,38 @@ export default function ApplicationModal({ isOpen, onClose }) {
                       <option value="mas_5" style={{ background: "#141414" }}>Más de 5 años</option>
                     </select>
                   </div>
-                  <div style={{ background: "#141414", border: errors.presupuesto ? "1px solid #ff5833" : "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "16px" }}>
-                    <label style={{ display: "flex", alignItems: "flex-start", gap: "12px", cursor: "pointer" }}>
+                  <div style={{ background: "#141414", border: errors.presupuesto ? "1px solid #ff5833" : "1px solid rgba(255,255,255,0.08)", borderRadius: "9px", padding: "13px" }}>
+                    <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}>
                       <div
                         onClick={() => set("presupuesto", !form.presupuesto)}
                         style={{
-                          width: "22px", height: "22px", borderRadius: "6px", flexShrink: 0, marginTop: "1px",
+                          width: "18px", height: "18px", borderRadius: "5px", flexShrink: 0, marginTop: "1px",
                           background: form.presupuesto ? "#ff5833" : "transparent",
-                          border: form.presupuesto ? "none" : "2px solid rgba(255,255,255,0.2)",
+                          border: form.presupuesto ? "none" : "1.5px solid rgba(255,255,255,0.2)",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           transition: "all 0.2s", cursor: "pointer",
                         }}
                       >
-                        {form.presupuesto && <svg width="12" height="9" viewBox="0 0 12 9" fill="none"><path d="M1 4L4.5 7.5L11 1" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                        {form.presupuesto && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                       </div>
-                      <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "14px", color: "rgba(240,237,232,0.75)", lineHeight: 1.5 }}>
+                      <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "13px", color: "rgba(240,237,232,0.7)", lineHeight: 1.5 }}>
                         Confirmo que cuento con un presupuesto mínimo de <strong style={{ color: "#ff5833" }}>2.000€</strong> para invertir en mi desarrollo artístico.
                       </span>
                     </label>
-                    {errors.presupuesto && <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "12px", color: "#ff5833", margin: "10px 0 0" }}>Es necesario confirmar el presupuesto mínimo para continuar.</p>}
+                    {errors.presupuesto && <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "#ff5833", margin: "8px 0 0" }}>Es necesario confirmar el presupuesto mínimo para continuar.</p>}
                   </div>
                 </div>
               )}
 
               {/* Navigation */}
-              <div style={{ display: "flex", gap: "10px", marginTop: "28px" }}>
+              <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>
                 {step > 1 && (
                   <button
                     onClick={() => { setStep(s => s - 1); setErrors({}); }}
                     style={{
                       flex: "0 0 auto", background: "transparent", border: "1px solid rgba(255,255,255,0.12)",
-                      borderRadius: "10px", padding: "14px 20px", color: "rgba(240,237,232,0.5)",
-                      fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 600, fontSize: "0.9rem",
+                      borderRadius: "9px", padding: "12px 16px", color: "rgba(240,237,232,0.5)",
+                      fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 600, fontSize: "0.85rem",
                       cursor: "pointer",
                     }}
                   >
@@ -394,9 +441,9 @@ export default function ApplicationModal({ isOpen, onClose }) {
                   <button
                     onClick={nextStep}
                     style={{
-                      flex: 1, background: "#ff5833", border: "none", borderRadius: "10px",
-                      padding: "14px 20px", color: "#fff",
-                      fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "0.95rem",
+                      flex: 1, background: "#ff5833", border: "none", borderRadius: "9px",
+                      padding: "12px 20px", color: "#fff",
+                      fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "0.9rem",
                       cursor: "pointer", transition: "background 0.2s",
                     }}
                     onMouseEnter={e => e.currentTarget.style.background = "#e04a28"}
@@ -409,8 +456,8 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     onClick={handleSubmit}
                     disabled={sending || !form.presupuesto}
                     style={{
-                      flex: 1, borderRadius: "10px", padding: "14px 20px", fontWeight: 900,
-                      fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.95rem",
+                      flex: 1, borderRadius: "9px", padding: "12px 20px", fontWeight: 900,
+                      fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.9rem",
                       border: "none", cursor: form.presupuesto ? "pointer" : "not-allowed",
                       background: form.presupuesto ? "#ff5833" : "#2a2a2a",
                       color: form.presupuesto ? "#fff" : "rgba(240,237,232,0.25)",
