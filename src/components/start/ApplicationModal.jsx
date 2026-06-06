@@ -232,28 +232,25 @@ export default function ApplicationModal({ isOpen, onClose }) {
             position: "relative",
           }}
         >
-          {/* Close button only — no handle on centered modal */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", marginBottom: "14px", position: "relative" }}>
-            <div />
-            <button
-              onClick={handleClose}
-              style={{
-                position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)",
-                width: 30, height: 30, borderRadius: "50%",
-                background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer", transition: "background 0.2s",
-                color: "rgba(240,237,232,0.6)",
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.14)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
-              aria-label="Cerrar"
-            >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            </button>
-          </div>
+          {/* Close button — absolute, always top-right of panel */}
+          <button
+            onClick={handleClose}
+            style={{
+              position: "absolute", top: "16px", right: "16px", zIndex: 10,
+              width: 28, height: 28, borderRadius: "50%",
+              background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: "pointer", transition: "background 0.2s",
+              color: "rgba(240,237,232,0.6)", flexShrink: 0,
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.14)"}
+            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
+            aria-label="Cerrar"
+          >
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+              <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+          </button>
 
           {sent ? (
             <div style={{ textAlign: "center", padding: "32px 0" }}>
