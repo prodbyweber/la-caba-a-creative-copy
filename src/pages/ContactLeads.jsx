@@ -398,6 +398,36 @@ export default function ContactLeads() {
                           <span className="text-[10px] px-2 py-1 rounded-lg bg-[#ff5833]/10 border border-[#ff5833]/20 text-[#ff5833] font-medium">Presupuesto: {presupuestoTexto}</span>
                         </div>
                         {app.created_date && <p className="text-[10px] text-white/25 flex items-center gap-1"><Calendar className="w-3 h-3" />{format(parseISO(app.created_date), "d MMM yyyy", { locale: es })}</p>}
+                        {/* Botones de acción rápida */}
+                        <div className="flex items-center gap-1.5 mt-2">
+                          <a
+                            href={`mailto:${app.email}`}
+                            className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white hover:border-white/15 transition-all text-[10px] font-medium"
+                            title="Enviar email"
+                          >
+                            <Mail className="w-3 h-3" />
+                          </a>
+                          {app.telefono && app.telefono !== '-' && (
+                            <>
+                              <a
+                                href={`tel:${app.telefono}`}
+                                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white hover:border-white/15 transition-all text-[10px] font-medium"
+                                title="Llamar"
+                              >
+                                <Phone className="w-3 h-3" />
+                              </a>
+                              <a
+                                href={`https://wa.me/${app.telefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${app.nombre}, soy el equipo de Cabaña Creative. Hemos recibido tu solicitud y nos gustaría conocer más sobre tu proyecto. ¿Tienes disponibilidad para una videollamada esta semana?`)}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-emerald-400 hover:border-emerald-500/30 transition-all text-[10px] font-medium"
+                                title="WhatsApp"
+                              >
+                                <MessageSquare className="w-3 h-3" />
+                              </a>
+                            </>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
                         <button onClick={() => setSelectedApp(app)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
@@ -471,6 +501,36 @@ export default function ContactLeads() {
                         </div>
                         <p className="text-xs text-white/50 leading-relaxed mb-2 line-clamp-2">{lead.message}</p>
                         {lead.created_date && <p className="text-[10px] text-white/25 flex items-center gap-1"><Calendar className="w-3 h-3" />{format(parseISO(lead.created_date), "d MMM yyyy", { locale: es })}</p>}
+                        {/* Botones de acción rápida */}
+                        <div className="flex items-center gap-1.5 mt-2">
+                          <a
+                            href={`mailto:${lead.email}`}
+                            className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white hover:border-white/15 transition-all text-[10px] font-medium"
+                            title="Enviar email"
+                          >
+                            <Mail className="w-3 h-3" />
+                          </a>
+                          {lead.phone && lead.phone !== '-' && (
+                            <>
+                              <a
+                                href={`tel:${lead.phone}`}
+                                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white hover:border-white/15 transition-all text-[10px] font-medium"
+                                title="Llamar"
+                              >
+                                <Phone className="w-3 h-3" />
+                              </a>
+                              <a
+                                href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${lead.name}, soy el equipo de Cabaña Creative. Hemos recibido tu mensaje y estamos aquí para ayudarte. ¿Cuándo te vendría bien una videollamada?`)}`}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-emerald-400 hover:border-emerald-500/30 transition-all text-[10px] font-medium"
+                                title="WhatsApp"
+                              >
+                                <MessageSquare className="w-3 h-3" />
+                              </a>
+                            </>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
                         <button onClick={() => handleViewLead(lead)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
