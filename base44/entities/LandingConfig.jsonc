@@ -270,6 +270,18 @@
     "guest_popup_color_secondary": {
       "type": "string",
       "default": "#ffffff"
+    },
+    "application_youtube_video_id": {
+      "type": "string",
+      "description": "ID del video de YouTube para mostrar despu\u00e9s de enviar la solicitud (ej: dQw4w9WgXcQ)"
+    },
+    "application_video_title": {
+      "type": "string",
+      "description": "T\u00edtulo opcional para el video de aplicaci\u00f3n"
+    },
+    "application_video_subtitle": {
+      "type": "string",
+      "description": "Subt\u00edtulo opcional para el video de aplicaci\u00f3n"
     }
   },
   "required": []

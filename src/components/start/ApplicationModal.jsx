@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
@@ -110,6 +110,15 @@ export default function ApplicationModal({ isOpen, onClose }) {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [errors, setErrors] = useState({});
+  const [config, setConfig] = useState(null);
+
+  useEffect(() => {
+    base44.entities.LandingConfig.filter({}).then(configs => {
+      if (configs && configs.length > 0) {
+        setConfig(configs[0]);
+      }
+    });
+  }, []);
 
   const [form, setForm] = useState({
     nombre: "", apellidos: "", email: "", phoneCode: "+34", phone: "", birthdate: "",
@@ -284,6 +293,71 @@ export default function ApplicationModal({ isOpen, onClose }) {
                       Plazas limitadas — cuanto antes, mejor.
                     </p>
                   </div>
+
+                  {/* Video de YouTube - solo si está configurado */}
+                  {config?.application_youtube_video_id && (
+                    <div style={{ marginBottom: "20px" }}>
+                      {/* Tarjeta cinemática del video */}
+                      <div style={{
+                        background: "linear-gradient(180deg, rgba(255,88,51,0.08) 0%, rgba(255,88,51,0.02) 100%)",
+                        borderRadius: "14px",
+                        border: "1px solid rgba(255,88,51,0.2)",
+                        padding: "16px",
+                        marginBottom: "14px"
+                      }}>
+                        {config.application_video_title && (
+                          <h4 style={{
+                            fontFamily: "'Helvetica Neue', sans-serif",
+                            fontWeight: 700,
+                            fontSize: "0.85rem",
+                            color: "#f0ede8",
+                            margin: "0 0 4px",
+                            letterSpacing: "-0.02em"
+                          }}>
+                            {config.application_video_title}
+                          </h4>
+                        )}
+                        {config.application_video_subtitle && (
+                          <p style={{
+                            fontFamily: "'Helvetica Neue', sans-serif",
+                            fontWeight: 300,
+                            fontSize: "0.72rem",
+                            color: "rgba(240,237,232,0.5)",
+                            margin: 0,
+                            lineHeight: 1.5
+                          }}>
+                            {config.application_video_subtitle}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Embed de YouTube */}
+                      <div style={{
+                        position: "relative",
+                        width: "100%",
+                        paddingBottom: "56.25%",
+                        borderRadius: "14px",
+                        overflow: "hidden",
+                        border: "1px solid rgba(255,255,255,0.07)",
+                        background: "#000"
+                      }}>
+                        <iframe
+                          src={`https://www.youtube.com/embed/${config.application_youtube_video_id}?rel=0&modestbranding=1`}
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: "100%",
+                            border: "none"
+                          }}
+                          title="Video informativo"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   {/* Calendly iframe - solo calendario */}
                   <div style={{ borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", height: "500px", flexShrink: 0, background: "#080808" }}>

@@ -9,6 +9,7 @@ import StartCreadoresEditor from "@/components/admin/StartCreadoresEditor";
 import PlansEditor from "@/components/admin/PlansEditor";
 import FormsEditor from "@/components/admin/FormsEditor";
 import StoriesEditor from "@/components/admin/StoriesEditor.jsx";
+import ApplicationVideoEditor from "@/components/admin/ApplicationVideoEditor";
 import { Link } from "react-router-dom";
 import { Upload, Save, Trash2, ZoomIn, X, ExternalLink } from "lucide-react";
 
@@ -293,6 +294,11 @@ export default function LandingEditorInner() {
               onSave={(t) => updateField("testimonials", t)}
             />
           </SectionCard>
+        </div>
+
+        {/* ── Video de Aplicación ── */}
+        <div className="xl:col-span-2">
+          <ApplicationVideoEditor config={config} updateField={updateField} />
         </div>
 
       </div>
