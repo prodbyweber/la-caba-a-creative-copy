@@ -13,6 +13,7 @@ import StartChoosePath from "@/components/start/StartChoosePath";
 import StickyCtaBar from "@/components/start/StickyCtaBar";
 import StartFooter from "@/components/start/StartFooter";
 import WhyStructure from "@/components/start/WhyStructure";
+import InvestmentSector from "@/components/start/InvestmentSector";
 
 export default function Start() {
   useEffect(() => { window.scrollTo(0, 0); }, []);
@@ -32,6 +33,9 @@ export default function Start() {
 
       {/* 1b. Why Structure */}
       <WhyStructure />
+
+      {/* 1c. Investment Sector */}
+      <InvestmentSector />
 
       {/* 2. Social proof bar */}
       <section style={{
