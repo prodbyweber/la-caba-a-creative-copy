@@ -87,6 +87,11 @@
   }
 }
 
+/* Hide admin bottom nav when modal is open */
+body.admin-modal-open .admin-bottom-nav {
+  display: none !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
