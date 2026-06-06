@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function StartNav() {
   const [textVisible, setTextVisible] = useState(true);
+  const [showCta, setShowCta] = useState(false);
 
   useEffect(() => {
     const aboutEl = document.getElementById("about");
@@ -12,12 +13,18 @@ export default function StartNav() {
       ([entry]) => {
         // Ocultar texto cuando la sección about o inferior es visible
         setTextVisible(!entry.isIntersecting);
+        // Mostrar CTA cuando se hace scroll past hero (about es visible)
+        setShowCta(entry.isIntersecting);
       },
       { threshold: 0.1 }
     );
     observer.observe(aboutEl);
     return () => observer.disconnect();
   }, []);
+
+  const handleSolicitarPlaza = () => {
+    window.dispatchEvent(new CustomEvent("open-application-modal"));
+  };
 
   return (
     <>
@@ -63,6 +70,38 @@ export default function StartNav() {
             )}
           </AnimatePresence>
         </a>
+
+        {/* CTA Button — Desktop only, appears on scroll */}
+        <AnimatePresence>
+          {showCta && (
+            <motion.button
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              onClick={handleSolicitarPlaza}
+              className="hidden md:flex"
+              style={{
+                fontFamily: "'Helvetica Neue', sans-serif",
+                fontWeight: 700,
+                fontSize: "0.85rem",
+                letterSpacing: "0.01em",
+                background: "#ff5833",
+                color: "#fff",
+                border: "none",
+                borderRadius: "8px",
+                padding: "11px 20px",
+                cursor: "pointer",
+                transition: "background 0.2s ease, transform 0.2s ease",
+                whiteSpace: "nowrap",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.transform = "translateY(0)"; }}
+            >
+              Solicitar plaza →
+            </motion.button>
+          )}
+        </AnimatePresence>
 
       </motion.header>
     </>
