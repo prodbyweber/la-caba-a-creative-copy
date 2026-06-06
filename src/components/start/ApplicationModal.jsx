@@ -253,11 +253,40 @@ export default function ApplicationModal({ isOpen, onClose }) {
           </button>
 
           {sent ? (
-            <div style={{ textAlign: "center", padding: "32px 0" }}>
-              <div style={{ fontSize: "40px", marginBottom: "12px" }}>✅</div>
-              <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.2rem", color: "#f0ede8", marginBottom: "8px" }}>¡Solicitud enviada!</h3>
-              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.85rem", color: "rgba(240,237,232,0.5)", lineHeight: 1.6 }}>Nuestro equipo revisará tu solicitud y te contactará en menos de 24h.</p>
-              <button onClick={handleClose} style={{ marginTop: "24px", background: "#ff5833", color: "#fff", border: "none", borderRadius: "9px", padding: "12px 28px", fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer" }}>Cerrar</button>
+            <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
+              {/* Header */}
+              <div style={{ textAlign: "center", paddingBottom: "16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.15rem", color: "#f0ede8", margin: "0 0 6px" }}>¡Solicitud recibida!</h3>
+                <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.8rem", color: "rgba(240,237,232,0.45)", margin: 0, lineHeight: 1.5 }}>
+                  Nuestro equipo revisará tu solicitud y te contactará en <strong style={{ color: "rgba(240,237,232,0.7)", fontWeight: 600 }}>menos de 24h</strong>.
+                </p>
+              </div>
+
+              {/* Calendly CTA */}
+              <div style={{ padding: "16px 0 8px", textAlign: "center" }}>
+                <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.82rem", color: "rgba(240,237,232,0.55)", margin: "0 0 4px", lineHeight: 1.5 }}>
+                  ¿Prefieres hablar antes? Agenda ahora una videollamada gratuita con nuestro equipo y aterriza tu proyecto.
+                </p>
+                <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.75rem", color: "rgba(255,88,51,0.7)", margin: "0 0 12px", fontWeight: 600 }}>
+                  Las plazas son limitadas — cuanto antes, mejor.
+                </p>
+              </div>
+
+              {/* Calendly iframe */}
+              <div style={{ borderRadius: "12px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", height: "380px", flexShrink: 0 }}>
+                <iframe
+                  src="https://calendly.com/prodweber/30min?embed_domain=cabana.creative&embed_type=Inline&hide_landing_page_details=1&hide_gdpr_banner=1&background_color=0e0e0e&text_color=f0ede8&primary_color=ff5833"
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  title="Agendar videollamada"
+                  style={{ display: "block" }}
+                />
+              </div>
+
+              <button onClick={handleClose} style={{ marginTop: "14px", background: "transparent", color: "rgba(240,237,232,0.35)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "9px", padding: "10px 20px", fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 600, fontSize: "0.82rem", cursor: "pointer", width: "100%" }}>
+                Cerrar sin agendar
+              </button>
             </div>
           ) : (
             <>
