@@ -11,7 +11,7 @@ const PLANS = [
   {
     name: "Plan Cabaña Creative",
     tagline: "Desarrollo artístico completo",
-    badge: "Oferta principal",
+    badge: "Experiencia completa",
     items: [
       "Producción musical profesional (letra, beat, dirección artística)",
       "Mezcla y mastering incluidos",
