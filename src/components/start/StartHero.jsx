@@ -46,7 +46,7 @@ export default function StartHero() {
       <style>{`
         .hero-wrap {
           display: flex;
-          flex-direction: column;
+          flex-direction: column-reverse;
           min-height: 100dvh;
         }
         .hero-text-col {
