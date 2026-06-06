@@ -242,15 +242,15 @@ export default function StartHero() {
         <div className="hero-stats-grid">
           {STATS.map(stat => (
             <div key={stat.label} style={{
-              background: "#111",
+              background: "rgba(255,255,255,0.04)",
               borderRadius: "16px",
-              padding: "24px 24px 22px",
-              border: "1px solid rgba(255,255,255,0.06)",
+              padding: "28px 24px",
+              border: "1px solid rgba(255,255,255,0.08)",
               width: "100%",
               boxSizing: "border-box",
             }}>
-              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", fontWeight: 700, color: "rgba(240,237,232,0.32)", textTransform: "uppercase", letterSpacing: "0.18em", margin: "0 0 10px" }}>{stat.label}</p>
-              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "1.1rem", fontWeight: 400, color: "rgba(240,237,232,0.75)", margin: 0, letterSpacing: "-0.01em", lineHeight: 1.3 }}>{stat.value}</p>
+              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "1.15rem", fontWeight: 700, color: "#f0ede8", margin: "0 0 8px", letterSpacing: "-0.01em" }}>{stat.label}</p>
+              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.95rem", fontWeight: 400, color: "rgba(240,237,232,0.5)", margin: 0, lineHeight: 1.4 }}>{stat.value}</p>
             </div>
           ))}
         </div>
