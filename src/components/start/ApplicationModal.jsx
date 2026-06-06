@@ -209,33 +209,32 @@ export default function ApplicationModal({ isOpen, onClose }) {
         style={{
           position: "fixed", inset: 0, zIndex: 9999,
           background: "rgba(0,0,0,0.82)", backdropFilter: "blur(8px)",
-          display: "flex", alignItems: "flex-end", justifyContent: "center",
-          padding: "0",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          padding: "16px",
         }}
         onClick={e => { if (e.target === e.currentTarget) handleClose(); }}
       >
         <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 50, opacity: 0 }}
-          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ scale: 0.96, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.96, opacity: 0 }}
+          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           style={{
             background: "#0e0e0e",
-            borderRadius: "18px 18px 0 0",
+            borderRadius: "18px",
             width: "100%",
-            maxWidth: "480px",
-            maxHeight: "88dvh",
+            maxWidth: "460px",
+            maxHeight: "90dvh",
             overflowY: "auto",
-            padding: "20px 20px calc(20px + env(safe-area-inset-bottom, 0px))",
+            padding: "20px",
             boxSizing: "border-box",
             border: "1px solid rgba(255,255,255,0.08)",
-            borderBottom: "none",
             position: "relative",
           }}
         >
-          {/* Handle bar + close button */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "18px", position: "relative" }}>
-            <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.13)", borderRadius: 2 }} />
+          {/* Close button only — no handle on centered modal */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", marginBottom: "14px", position: "relative" }}>
+            <div />
             <button
               onClick={handleClose}
               style={{
