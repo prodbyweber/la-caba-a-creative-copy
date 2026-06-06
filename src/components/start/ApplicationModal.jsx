@@ -262,81 +262,119 @@ export default function ApplicationModal({ isOpen, onClose }) {
           </button>
 
           {sent ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-              {/* Mensaje de confirmación */}
-              <div style={{ textAlign: "center", padding: "8px 0 20px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.3rem", color: "#f0ede8", margin: "0 0 8px", letterSpacing: "-0.02em" }}>Estás a punto de entrar a La Cabaña.</h3>
-                <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.85rem", color: "rgba(240,237,232,0.5)", margin: 0, lineHeight: 1.6 }}>
-                  Un lugar donde el arte tiene estructura, el talento tiene dirección y los proyectos tienen alma.
+            <div style={{
+              maxWidth: "680px",
+              margin: "0 auto",
+              padding: "20px 20px 0",
+              display: "flex",
+              flexDirection: "column",
+              gap: "32px"
+            }}>
+              {/* Título */}
+              <div style={{ textAlign: "center" }}>
+                <h2 style={{
+                  fontFamily: "'Helvetica Neue', sans-serif",
+                  fontWeight: 900,
+                  fontSize: "1.5rem",
+                  color: "#f0ede8",
+                  margin: "0 0 8px",
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.3
+                }}>
+                  Estás a punto de entrar a La Cabaña.
+                </h2>
+                <p style={{
+                  fontFamily: "'Helvetica Neue', sans-serif",
+                  fontWeight: 400,
+                  fontSize: "0.95rem",
+                  color: "rgba(240,237,232,0.5)",
+                  margin: 0,
+                  lineHeight: 1.5
+                }}>
+                  Antes de agendar, mira este video. El mapa que todo artista necesita.
                 </p>
               </div>
 
-              {form.presupuesto === "Por ahora no cuento con presupuesto." ? (
-                /* Opción 4: Sin Calendly */
-                <div style={{ padding: "20px 0", textAlign: "center" }}>
-                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.85rem", color: "rgba(240,237,232,0.5)", margin: 0, lineHeight: 1.6 }}>
-                    Hemos recibido tu solicitud. Cuando estés listo para dar el paso, estaremos aquí.
-                  </p>
+              {/* Video */}
+              <div>
+                <div style={{
+                  position: "relative",
+                  width: "100%",
+                  paddingBottom: "56.25%",
+                  background: "#000"
+                }}>
+                  <iframe
+                    src="https://www.youtube.com/embed/im6BfAvTsLA?rel=0&modestbranding=1"
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      border: "none"
+                    }}
+                    title="Video informativo"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
                 </div>
-              ) : (
-                /* Opciones 1-3: Flujo normal con Calendly */
-                <>
-                  {/* Video de YouTube - solo si está configurado */}
-                  {config?.application_youtube_video_id && (
-                    <div style={{ marginBottom: "20px" }}>
-                      {/* Título del video */}
-                      <div style={{ marginBottom: "12px" }}>
-                        <h4 style={{
-                          fontFamily: "'Helvetica Neue', sans-serif",
-                          fontWeight: 700,
-                          fontSize: "0.95rem",
-                          color: "#f0ede8",
-                          margin: "0 0 4px",
-                          letterSpacing: "-0.02em"
-                        }}>
-                          El mapa que todo artista necesita antes de lanzarse.
-                        </h4>
-                        <p style={{
-                          fontFamily: "'Helvetica Neue', sans-serif",
-                          fontWeight: 300,
-                          fontSize: "0.75rem",
-                          color: "rgba(240,237,232,0.5)",
-                          margin: 0,
-                          lineHeight: 1.5
-                        }}>
-                          Antes de agendar, mira este video de 5 minutos. Es importante que entiendas cómo trabajamos.
-                        </p>
-                      </div>
-                    </div>
-                  )}
+                <p style={{
+                  fontFamily: "'Helvetica Neue', sans-serif",
+                  fontWeight: 400,
+                  fontSize: "0.75rem",
+                  color: "rgba(240,237,232,0.3)",
+                  margin: "12px 0 0",
+                  textAlign: "center"
+                }}>
+                  Cuando termines, agenda tu videollamada con nuestro equipo.
+                </p>
+              </div>
 
-                  {/* Calendly */}
-                  <div style={{ marginBottom: "20px" }}>
-                    <h4 style={{
-                      fontFamily: "'Helvetica Neue', sans-serif",
-                      fontWeight: 700,
-                      fontSize: "0.95rem",
-                      color: "#f0ede8",
-                      margin: "0 0 12px",
-                      letterSpacing: "-0.02em"
-                    }}>
-                      Agenda tu videollamada con nuestro equipo.
-                    </h4>
-                    <div style={{ borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", height: "500px", flexShrink: 0, background: "#080808" }}>
-                      <iframe
-                        src="https://calendly.com/hola-cabanacreative/creadores?embed_type=Inline&hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1&background_color=080808&text_color=f0ede8&primary_color=ff4300"
-                        width="100%"
-                        height="100%"
-                        frameBorder="0"
-                        title="Agendar videollamada"
-                        style={{ display: "block" }}
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
+              {/* Calendly */}
+              <div>
+                <h3 style={{
+                  fontFamily: "'Helvetica Neue', sans-serif",
+                  fontWeight: 700,
+                  fontSize: "1rem",
+                  color: "#f0ede8",
+                  margin: "0 0 16px",
+                  letterSpacing: "-0.02em"
+                }}>
+                  Agenda tu videollamada.
+                </h3>
+                <div style={{
+                  borderRadius: "14px",
+                  overflow: "hidden",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                  height: "500px",
+                  background: "#080808"
+                }}>
+                  <iframe
+                    src="https://calendly.com/hola-cabanacreative/creadores?embed_type=Inline&hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1&background_color=080808&text_color=f0ede8&primary_color=ff4300"
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    title="Agendar videollamada"
+                    style={{ display: "block" }}
+                  />
+                </div>
+              </div>
 
-              <button onClick={handleClose} style={{ marginTop: "12px", background: "transparent", color: "rgba(240,237,232,0.3)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "9px", padding: "10px 20px", fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 600, fontSize: "0.8rem", cursor: "pointer", width: "100%", transition: "color 0.2s" }}
+              <button
+                onClick={handleClose}
+                style={{
+                  background: "transparent",
+                  color: "rgba(240,237,232,0.3)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                  borderRadius: "9px",
+                  padding: "10px 20px",
+                  fontFamily: "'Helvetica Neue', sans-serif",
+                  fontWeight: 600,
+                  fontSize: "0.8rem",
+                  cursor: "pointer",
+                  width: "100%",
+                  transition: "color 0.2s"
+                }}
                 onMouseEnter={e => e.currentTarget.style.color = "rgba(240,237,232,0.6)"}
                 onMouseLeave={e => e.currentTarget.style.color = "rgba(240,237,232,0.3)"}
               >
