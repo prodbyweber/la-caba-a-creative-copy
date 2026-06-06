@@ -7,7 +7,7 @@ const STATS = [
   { label: "Modalidad", value: "Presencial · Online" },
   { label: "Duración", value: "90 días" },
   { label: "Plazas disponibles", value: "27" },
-  { label: "Horas de creación", value: "42h" },
+  { label: "Horario", value: "Lunes a Viernes 15:00 – 22:00" },
 ];
 
 function useAutoPlay(src) {
@@ -70,11 +70,15 @@ export default function StartHero() {
           margin-top: 24px;
         }
         .hero-stats-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 8px;
-          margin-top: clamp(24px, 4vw, 40px);
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          margin-top: 20px;
           order: 3;
+          padding: 0 clamp(24px, 6vw, 64px) 32px;
+        }
+        .hero-stats-grid > div {
+          padding: 18px 20px !important;
         }
         .hero-stats-inline {
           display: none;
@@ -235,17 +239,17 @@ export default function StartHero() {
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "25%", background: "linear-gradient(to top, rgba(8,8,8,0.7) 0%, transparent 100%)" }} />
         </motion.div>
 
-        {/* Stats — below video on mobile, inside text col on desktop */}
-        <div className="hero-stats-grid" style={{ padding: "clamp(16px, 3vw, 0px) clamp(24px, 6vw, 64px) clamp(24px, 3vw, 40px)" }}>
+        {/* Stats — below video on mobile only */}
+        <div className="hero-stats-grid">
           {STATS.map(stat => (
             <div key={stat.label} style={{
               background: "#111",
-              borderRadius: "10px",
-              padding: "12px 14px",
+              borderRadius: "12px",
+              padding: "18px 20px",
               border: "1px solid rgba(255,255,255,0.05)",
             }}>
-              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "8px", fontWeight: 700, color: "rgba(240,237,232,0.28)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 3px" }}>{stat.label}</p>
-              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em" }}>{stat.value}</p>
+              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "9px", fontWeight: 700, color: "rgba(240,237,232,0.28)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 6px" }}>{stat.label}</p>
+              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em", lineHeight: 1.2 }}>{stat.value}</p>
             </div>
           ))}
         </div>
