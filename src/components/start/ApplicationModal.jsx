@@ -265,10 +265,10 @@ export default function ApplicationModal({ isOpen, onClose }) {
             <div style={{
               maxWidth: "680px",
               margin: "0 auto",
-              padding: "20px 20px 0",
+              padding: "16px 20px 0",
               display: "flex",
               flexDirection: "column",
-              gap: "32px"
+              gap: "20px"
             }}>
               {/* Título */}
               <div style={{ textAlign: "center" }}>
@@ -277,7 +277,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                   fontWeight: 900,
                   fontSize: "1.5rem",
                   color: "#f0ede8",
-                  margin: "0 0 8px",
+                  margin: "0 0 6px",
                   letterSpacing: "-0.02em",
                   lineHeight: 1.3
                 }}>
@@ -301,8 +301,8 @@ export default function ApplicationModal({ isOpen, onClose }) {
                 fontWeight: 700,
                 fontSize: "22px",
                 color: "#ffffff",
-                marginTop: "32px",
-                marginBottom: "16px",
+                marginTop: "20px",
+                marginBottom: "12px",
                 letterSpacing: "-0.02em"
               }}>
                 El mapa que todo artista necesita.
@@ -337,11 +337,18 @@ export default function ApplicationModal({ isOpen, onClose }) {
                   fontWeight: 400,
                   fontSize: "0.75rem",
                   color: "rgba(240,237,232,0.3)",
-                  margin: "12px 0 0",
+                  margin: "10px 0 0",
                   textAlign: "center"
                 }}>
                   Cuando termines, agenda tu videollamada con nuestro equipo.
                 </p>
+              </div>
+
+              {/* Flecha indicadora */}
+              <div style={{ textAlign: "center", marginTop: "8px" }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ animation: "bounce 1.5s infinite" }}>
+                  <path d="M12 5V19M12 19L5 12M12 19L19 12" stroke="#ff5833" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </div>
 
               {/* Calendly */}
