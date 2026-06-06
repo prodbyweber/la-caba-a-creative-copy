@@ -223,30 +223,12 @@ export default function ApplicationModal({ isOpen, onClose }) {
         }}
         onClick={e => { if (e.target === e.currentTarget) handleClose(); }}
       >
-        <motion.div
-          initial={{ scale: 0.96, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.96, opacity: 0 }}
-          transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-          style={{
-            background: "#0e0e0e",
-            borderRadius: "18px",
-            width: "100%",
-            maxWidth: "460px",
-            maxHeight: "90dvh",
-            overflowY: "auto",
-            padding: "20px 20px 20px 20px",
-            boxSizing: "border-box",
-            border: "1px solid rgba(255,255,255,0.08)",
-            position: "relative",
-            marginTop: "40px",
-          }}
-        >
-          {/* Close button — outside the card, above it */}
+        <div style={{ position: "relative", maxWidth: "460px", width: "100%", margin: "0 auto" }}>
+          {/* Close button — outside the card, aligned with step 3 */}
           <button
             onClick={handleClose}
             style={{
-              position: "absolute", top: "-48px", right: "0", zIndex: 10,
+              position: "absolute", top: "-44px", right: "0", zIndex: 10,
               width: 32, height: 32, borderRadius: "50%",
               background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)",
               display: "flex", alignItems: "center", justifyContent: "center",
@@ -261,6 +243,26 @@ export default function ApplicationModal({ isOpen, onClose }) {
               <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
             </svg>
           </button>
+
+          <motion.div
+            initial={{ scale: 0.96, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.96, opacity: 0 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              background: "#0e0e0e",
+              borderRadius: "18px",
+              width: "100%",
+              maxWidth: "460px",
+              maxHeight: "90dvh",
+              overflowY: "auto",
+              overflowX: "hidden",
+              padding: "20px",
+              boxSizing: "border-box",
+              border: "1px solid rgba(255,255,255,0.08)",
+              position: "relative",
+            }}
+          >
 
           {sent ? (
             <div style={{
@@ -597,7 +599,8 @@ export default function ApplicationModal({ isOpen, onClose }) {
               </div>
             </>
           )}
-        </motion.div>
+          </motion.div>
+        </div>
       </motion.div>
     </AnimatePresence>
   );
