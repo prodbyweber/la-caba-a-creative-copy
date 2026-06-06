@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import StartNav from "@/components/start/StartNav";
 import StartHero from "@/components/start/StartHero";
 import StartBrandsCarousel from "@/components/start/StartBrandsCarousel";
-import StartWhatWeDo from "@/components/start/StartWhatWeDo";
 import ProblemSolution from "@/components/start/ProblemSolution";
 import DeliverablesAndProcess from "@/components/start/DeliverablesAndProcess";
 import StartCreadores from "@/components/start/StartCreadores";
@@ -54,32 +53,28 @@ export default function Start() {
         borderTop: "1px solid rgba(255,255,255,0.04)",
         borderBottom: "1px solid rgba(255,255,255,0.04)",
       }}>
-
         <StartBrandsCarousel />
       </section>
 
-      {/* 3. Quiénes somos */}
-      <StartWhatWeDo />
-
-      {/* 4. Problema → Solución */}
+      {/* 3. Problema → Solución */}
       <ProblemSolution />
 
-      {/* 5. Deliverables + Proceso */}
+      {/* 4. Deliverables + Proceso */}
       <DeliverablesAndProcess />
 
-      {/* 6. Creadores / Testimonios */}
+      {/* 5. Creadores / Testimonios */}
       <StartCreadores hideServices />
 
-      {/* 7. Resultados / Casos */}
+      {/* 6. Resultados / Casos */}
       <StartExplorar showButton={false} />
 
-      {/* 8. Pricing */}
+      {/* 7. Pricing */}
       <PricingPlans />
 
-      {/* 9. FAQ */}
+      {/* 8. FAQ */}
       <FAQSection />
 
-      {/* 10. CTA Final + formulario */}
+      {/* 9. CTA Final + formulario */}
       <div id="contacto">
         <StartChoosePath />
       </div>
