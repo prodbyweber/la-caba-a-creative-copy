@@ -9,7 +9,6 @@ import StatusButton from "@/components/admin/StatusButton";
 import {
   Calendar, Clock, Package, CheckCircle2, Plus, Pencil, Trash2, Archive, MoreHorizontal, Music2
 } from "lucide-react";
-import ApplicationsPanel from "@/components/admin/ApplicationsPanel";
 import { format, parseISO, isToday } from "date-fns";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -144,9 +143,6 @@ export default function AdminDashboard() {
   return (
     <AdminLayout activePage="AdminDashboard">
       <div className="px-3 sm:px-8 lg:px-14 xl:px-20 pt-2 pb-6 max-w-[1600px] mx-auto">
-
-        {/* Solicitudes */}
-        <ApplicationsPanel />
 
         {/* Task Management Panel */}
         <motion.div
