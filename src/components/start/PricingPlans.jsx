@@ -13,18 +13,15 @@ const PLANS = [
     tagline: "Desarrollo artístico completo",
     badge: "Experiencia completa",
     items: [
-      "Producción musical profesional (letra, beat, dirección artística)",
-      "Mezcla y mastering incluidos",
-      "Videoclip oficial o mini-film",
-      "Identidad visual completa (branding + manual)",
-      "Artwork y fotografía de portada",
-      "Fotografía editorial completa",
-      "1 reel o short oficial para redes",
-      "Estrategia de contenido 3 meses",
-      "Plan de lanzamiento y distribución",
-      "Distribución en plataformas digitales",
-      "8 sesiones de mentoría / dirección artística",
-      "Acceso a la plataforma Cabaña Creative",
+      "Producción musical profesional",
+      "Videoclip o mini-film",
+      "Identidad visual y branding",
+      "Fotografía editorial y portadas",
+      "Contenido para redes sociales",
+      "Estrategia y plan de lanzamiento",
+      "Distribución digital",
+      "Mentoría y dirección artística",
+      "Acceso a plataforma Cabaña Creative",
     ],
     cta: "Solicitar plaza",
     featured: true,
@@ -70,19 +67,18 @@ export default function PricingPlans() {
           lineHeight: 0.95,
           color: "#f0ede8",
           marginBottom: "clamp(12px, 2vw, 16px)",
-          maxWidth: "480px",
         }}
       >
-        Una propuesta completa para tu carrera musical
+        Programa integral de desarrollo artístico
       </motion.h2>
 
       <motion.p
         initial={{ opacity: 0 }}
         animate={inView ? { opacity: 1 } : {}}
         transition={{ duration: 0.7, delay: 0.2 }}
-        style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "clamp(0.82rem, 1.4vw, 0.95rem)", color: "rgba(240,237,232,0.4)", lineHeight: 1.6, marginBottom: "clamp(36px, 5vw, 60px)", maxWidth: "480px" }}
+        style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "clamp(0.82rem, 1.4vw, 0.95rem)", color: "rgba(240,237,232,0.4)", lineHeight: 1.6, marginBottom: "clamp(36px, 5vw, 60px)", maxWidth: "520px" }}
       >
-        Escríbenos y en menos de 24h tienes una propuesta adaptada a ti.
+        Todo lo que necesitas para lanzar tu carrera con estructura profesional.
       </motion.p>
 
       <style>{`
@@ -170,14 +166,6 @@ export default function PricingPlans() {
         ))}
       </div>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={inView ? { opacity: 1 } : {}}
-        transition={{ duration: 0.6, delay: 0.55 }}
-        style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "rgba(240,237,232,0.2)", marginTop: "20px", textAlign: "center" }}
-      >
-        Sin permanencia · Sin letra pequeña · Respuesta en menos de 24h
-      </motion.p>
     </section>
   );
 }
