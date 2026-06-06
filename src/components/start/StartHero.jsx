@@ -76,17 +76,22 @@ export default function StartHero() {
           margin-top: clamp(24px, 4vw, 40px);
           order: 3;
         }
+        .hero-stats-inline {
+          display: none;
+        }
         @media (min-width: 768px) {
           .hero-wrap {
             flex-direction: row;
-            flex-wrap: wrap;
             height: 100dvh;
           }
           .hero-text-col {
             width: 54%;
             flex: none;
-            padding: 80px 56px 24px;
+            padding: 80px 56px 60px;
             order: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
           }
           .hero-media-col {
             width: 46%;
@@ -97,16 +102,18 @@ export default function StartHero() {
             margin-top: 0;
           }
           .hero-stats-grid {
+            display: none;
+          }
+          .hero-stats-inline {
+            display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            width: 54%;
-            order: 3;
-            padding: 0 56px 60px !important;
-            margin-top: 0 !important;
+            gap: 8px;
+            margin-top: clamp(20px, 3vw, 32px);
+            width: 100%;
           }
         }
         @media (min-width: 1200px) {
-          .hero-text-col { padding: 120px 80px 100px; }
+          .hero-text-col { padding: 120px 80px 80px; }
         }
       `}</style>
 
@@ -181,6 +188,21 @@ export default function StartHero() {
                 Solicitar plaza →
               </button>
 
+            </div>
+
+            {/* Stats inline — desktop only */}
+            <div className="hero-stats-inline">
+              {STATS.map(stat => (
+                <div key={stat.label} style={{
+                  background: "#111",
+                  borderRadius: "10px",
+                  padding: "12px 14px",
+                  border: "1px solid rgba(255,255,255,0.05)",
+                }}>
+                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "8px", fontWeight: 700, color: "rgba(240,237,232,0.28)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 3px" }}>{stat.label}</p>
+                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em" }}>{stat.value}</p>
+                </div>
+              ))}
             </div>
 
           </motion.div>
