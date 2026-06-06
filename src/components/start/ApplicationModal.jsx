@@ -226,9 +226,9 @@ export default function ApplicationModal({ isOpen, onClose }) {
         <div style={{ position: "relative", maxWidth: "460px", width: "100%", margin: "0 auto" }}>
           {/* Close button — outside the card, aligned with step 3 */}
           <button
-            onClick={handleClose}
+            onClick={(e) => { e.stopPropagation(); handleClose(); }}
             style={{
-              position: "absolute", top: "-44px", right: "0", zIndex: 10,
+              position: "absolute", top: "-44px", right: "0", zIndex: 100,
               width: 32, height: 32, borderRadius: "50%",
               background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)",
               display: "flex", alignItems: "center", justifyContent: "center",
