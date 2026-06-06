@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
@@ -17,7 +17,8 @@ const inputStyle = {
 export default function CatalogoAdminPanel() {
   const queryClient = useQueryClient();
   const [editingId, setEditingId] = useState(null);
-  const [newItem, setNewItem] = useState({ youtube_url: "", artista: "", compania: "" });
+  const [uploadingImageId, setUploadingImageId] = useState(null);
+  const fileInputRef = useRef(null);
 
   const { data: items = [] } = useQuery({
     queryKey: ['catalogo-produccion'],
@@ -26,18 +27,33 @@ export default function CatalogoAdminPanel() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.CatalogoProduccion.create(data),
+    mutationFn: async (data) => {
+      const { imagen_file, ...restData } = data;
+      if (imagen_file) {
+        const uploadResult = await base44.integrations.Core.UploadFile({ file: imagen_file });
+        return base44.entities.CatalogoProduccion.create({ ...restData, imagen_personalizada_url: uploadResult.file_url });
+      }
+      return base44.entities.CatalogoProduccion.create(restData);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['catalogo-produccion'] });
-      setNewItem({ youtube_url: "", artista: "", compania: "" });
+      if (fileInputRef.current) fileInputRef.current.value = "";
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.CatalogoProduccion.update(id, data),
+    mutationFn: async ({ id, data }) => {
+      const { imagen_file, ...restData } = data;
+      if (imagen_file) {
+        const uploadResult = await base44.integrations.Core.UploadFile({ file: imagen_file });
+        return base44.entities.CatalogoProduccion.update(id, { ...restData, imagen_personalizada_url: uploadResult.file_url });
+      }
+      return base44.entities.CatalogoProduccion.update(id, restData);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['catalogo-produccion'] });
       setEditingId(null);
+      setUploadingImageId(null);
     },
   });
 
@@ -72,10 +88,11 @@ export default function CatalogoAdminPanel() {
   };
 
   const extractYoutubeId = (url) => {
-    if (!url) return "";
     const match = url.match(/\/embed\/([a-zA-Z0-9_-]+)/);
-    return match ? match[1] : url;
+    return match ? match[1] : null;
   };
+
+  const [newItem, setNewItem] = useState({ youtube_url: "", artista: "", compania: "", imagen_file: null });
 
   return (
     <div style={{
@@ -120,7 +137,7 @@ export default function CatalogoAdminPanel() {
           }}>
             Añadir nuevo video
           </h3>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr auto", gap: "12px", alignItems: "end" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr auto", gap: "12px", alignItems: "end" }}>
             <div>
               <label style={{
                 display: "block",
@@ -178,6 +195,29 @@ export default function CatalogoAdminPanel() {
                 style={inputStyle}
               />
             </div>
+            <div>
+              <label style={{
+                display: "block",
+                fontFamily: "'Helvetica Neue', sans-serif",
+                fontSize: "11px",
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.5)",
+                marginBottom: "6px",
+              }}>
+                Portada (opcional)
+              </label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={(e) => setNewItem({ ...newItem, imagen_file: e.target.files[0] })}
+                style={{
+                  ...inputStyle,
+                  padding: "8px",
+                  cursor: "pointer",
+                }}
+              />
+            </div>
             <button
               onClick={handleCreate}
               disabled={createMutation.isPending}
@@ -227,45 +267,60 @@ export default function CatalogoAdminPanel() {
                 background: "#000",
               }}>
                 <img
-                  src={`https://img.youtube.com/vi/${extractYoutubeId(item.youtube_url)}/mqdefault.jpg`}
+                  src={item.imagen_personalizada_url || `https://img.youtube.com/vi/${extractYoutubeId(item.youtube_url)}/mqdefault.jpg`}
                   alt={item.artista}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  onError={(e) => {
+                    e.target.src = `https://img.youtube.com/vi/${extractYoutubeId(item.youtube_url)}/mqdefault.jpg`;
+                  }}
                 />
               </div>
 
               {/* Campos editables */}
               {editingId === item.id ? (
-                <div style={{ flex: 1, display: "flex", gap: "12px", alignItems: "center" }}>
+                <div style={{ flex: 1, display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
                   <input
                     type="text"
                     defaultValue={item.youtube_url}
                     id={`youtube-${item.id}`}
-                    style={{ ...inputStyle, flex: 1 }}
+                    style={{ ...inputStyle, flex: 1, minWidth: "200px" }}
                   />
                   <input
                     type="text"
                     defaultValue={item.artista}
                     id={`artista-${item.id}`}
-                    style={{ ...inputStyle, width: "180px" }}
+                    style={{ ...inputStyle, width: "150px" }}
                   />
                   <input
                     type="text"
                     defaultValue={item.compania || ""}
                     id={`compania-${item.id}`}
-                    style={{ ...inputStyle, width: "150px" }}
+                    style={{ ...inputStyle, width: "120px" }}
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id={`imagen-${item.id}`}
+                    style={{ ...inputStyle, width: "150px", padding: "6px" }}
                   />
                   <button
                     onClick={() => {
                       const youtube = document.getElementById(`youtube-${item.id}`).value;
                       const artista = document.getElementById(`artista-${item.id}`).value;
                       const compania = document.getElementById(`compania-${item.id}`).value;
+                      const imagenInput = document.getElementById(`imagen-${item.id}`);
+                      const updateData = { youtube_url: youtube, artista, compania };
+                      if (imagenInput.files[0]) {
+                        updateData.imagen_file = imagenInput.files[0];
+                      }
                       updateMutation.mutate({
                         id: item.id,
-                        data: { youtube_url: youtube, artista, compania },
+                        data: updateData,
                       });
                     }}
+                    disabled={updateMutation.isPending}
                     style={{
-                      background: "#4ade80",
+                      background: updateMutation.isPending ? "#9ca3af" : "#4ade80",
                       color: "#000",
                       border: "none",
                       borderRadius: "6px",
@@ -273,10 +328,10 @@ export default function CatalogoAdminPanel() {
                       fontFamily: "'Helvetica Neue', sans-serif",
                       fontWeight: 600,
                       fontSize: "12px",
-                      cursor: "pointer",
+                      cursor: updateMutation.isPending ? "not-allowed" : "pointer",
                     }}
                   >
-                    Guardar
+                    {updateMutation.isPending ? "Guardando..." : "Guardar"}
                   </button>
                   <button
                     onClick={() => setEditingId(null)}
