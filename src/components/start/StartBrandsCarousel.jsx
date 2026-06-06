@@ -60,9 +60,10 @@ export default function StartBrandsCarousel() {
           textTransform: "uppercase",
           color: "rgba(240,237,232,0.35)",
           margin: "0 0 16px 0",
+          textAlign: "center",
         }}
       >
-        Marcas con las que hemos colaborado
+        Con quienes hemos colaborado
       </motion.p>
 
       {/* Grid */}

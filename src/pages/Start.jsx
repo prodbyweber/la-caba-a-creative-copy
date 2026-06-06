@@ -36,18 +36,7 @@ export default function Start() {
         borderTop: "1px solid rgba(255,255,255,0.04)",
         borderBottom: "1px solid rgba(255,255,255,0.04)",
       }}>
-        <p style={{
-          textAlign: "center",
-          fontSize: "9px",
-          fontWeight: 700,
-          letterSpacing: "0.3em",
-          textTransform: "uppercase",
-          color: "rgba(240,237,232,0.18)",
-          marginBottom: "20px",
-          fontFamily: "'Helvetica Neue', sans-serif",
-        }}>
-          Artistas, marcas y sellos que han confiado en nosotros
-        </p>
+
         <StartBrandsCarousel />
       </section>
 
