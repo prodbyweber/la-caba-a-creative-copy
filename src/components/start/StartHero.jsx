@@ -5,7 +5,7 @@ import { base44 } from "@/api/base44Client";
 import ApplicationModal from "@/components/start/ApplicationModal";
 
 const STATS = [
-  { label: "Modalidad", value: "Presencial · Online" },
+  { label: "Método de trabajo", value: "Presencial · Online" },
   { label: "Duración", value: "90 días" },
   { label: "Plazas disponibles", value: "27" },
   { label: "Horario", value: "Lunes a Viernes 15:00 – 22:00" },
