@@ -309,7 +309,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
               </h3>
 
               {/* Video */}
-              <div>
+              <div style={{ margin: "0 -20px" }}>
                 <div style={{
                   position: "relative",
                   width: "100%",
@@ -317,7 +317,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                   background: "#000"
                 }}>
                   <iframe
-                    src="https://www.youtube.com/embed/im6BfAvTsLA?rel=0&modestbranding=1"
+                    src="https://www.youtube.com/embed/im6BfAvTsLA?rel=0&modestbranding=1&playsinline=1"
                     style={{
                       position: "absolute",
                       top: 0,
@@ -329,6 +329,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     title="Video informativo"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
+                    referrerPolicy="strict-origin-when-cross-origin"
                   />
                 </div>
                 <p style={{
