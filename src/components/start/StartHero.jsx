@@ -67,6 +67,7 @@ export default function StartHero() {
           position: relative;
           flex-shrink: 0;
           order: 2;
+          margin-top: 24px;
         }
         .hero-stats-grid {
           display: grid;
@@ -93,6 +94,7 @@ export default function StartHero() {
             height: 100%;
             flex: 1;
             order: 2;
+            margin-top: 0;
           }
           .hero-stats-grid {
             grid-template-columns: repeat(4, 1fr);
@@ -178,22 +180,7 @@ export default function StartHero() {
               >
                 Solicitar plaza →
               </button>
-              <a
-                href="/Explorar"
-                style={{
-                  fontFamily: "'Helvetica Neue', sans-serif",
-                  fontWeight: 600,
-                  fontSize: "clamp(0.8rem, 1.3vw, 0.88rem)",
-                  color: "rgba(240,237,232,0.45)",
-                  textDecoration: "none",
-                  transition: "color 0.2s ease",
-                  letterSpacing: "-0.01em",
-                }}
-                onMouseEnter={e => e.currentTarget.style.color = "#f0ede8"}
-                onMouseLeave={e => e.currentTarget.style.color = "rgba(240,237,232,0.45)"}
-              >
-                Ver proyectos →
-              </a>
+
             </div>
 
           </motion.div>
