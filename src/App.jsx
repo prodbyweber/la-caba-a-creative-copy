@@ -10,6 +10,10 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { base44 } from '@/api/base44Client';
 import GuestCatalogPreview from './pages/GuestCatalogPreview';
+import PoliticaPrivacidad from './pages/PoliticaPrivacidad';
+import AvisoLegal from './pages/AvisoLegal';
+import PoliticaCookies from './pages/PoliticaCookies';
+import CookieBanner from './components/common/CookieBanner';
 import StudioSession from './pages/StudioSession';
 import Meeting from './pages/Meeting';
 import Start from './pages/Start';
@@ -152,6 +156,9 @@ const AuthenticatedApp = () => {
       <Route path="/meeting" element={<Meeting />} />
       <Route path="/PublicProfile" element={<PublicProfile />} />
       <Route path="/creator/:username" element={<CreatorProfile />} />
+      <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
+      <Route path="/aviso-legal" element={<AvisoLegal />} />
+      <Route path="/politica-de-cookies" element={<PoliticaCookies />} />
       <Route path="/:username" element={<UserPublicProfile />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
@@ -171,6 +178,7 @@ function App() {
             <GlobalAudioPlayer />
             <DesktopAudioPlayer />
           </Router>
+          <CookieBanner />
           <Toaster />
         </GlobalAudioProvider>
       </QueryClientProvider>
