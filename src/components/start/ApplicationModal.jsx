@@ -265,7 +265,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                 </p>
               </div>
 
-              {form.presupuesto === "sin_presupuesto" ? (
+              {form.presupuesto === "Por ahora no cuento con presupuesto." ? (
                 /* Opción 4: Sin Calendly */
                 <div style={{ padding: "20px 0", textAlign: "center" }}>
                   <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.85rem", color: "rgba(240,237,232,0.5)", margin: 0, lineHeight: 1.6 }}>
@@ -443,10 +443,10 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     <Label required>Presupuesto disponible</Label>
                     <select value={form.presupuesto} onChange={e => set("presupuesto", e.target.value)} style={{ ...inputStyle, borderColor: errors.presupuesto ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
                       <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
-                      <option value="5000+" style={{ background: "#141414" }}>Cuento con un presupuesto de 5.000€ o más para mi proyecto.</option>
-                      <option value="2000" style={{ background: "#141414" }}>Cuento con un presupuesto mínimo de 2.000€ para comenzar.</option>
-                      <option value="financiando" style={{ background: "#141414" }}>No tengo el presupuesto completo, pero estoy comprometido a financiarlo.</option>
-                      <option value="sin_presupuesto" style={{ background: "#141414" }}>Por ahora no cuento con presupuesto disponible.</option>
+                      <option value="Cuento con un presupuesto de 5.000€ o más para mi proyecto." style={{ background: "#141414" }}>Cuento con un presupuesto de 5.000€ o más para mi proyecto.</option>
+                      <option value="Cuento con un presupuesto mínimo de 2.000€ para comenzar." style={{ background: "#141414" }}>Cuento con un presupuesto mínimo de 2.000€ para comenzar.</option>
+                      <option value="Estoy comprometido y abierto a explorar un plan de financiamiento." style={{ background: "#141414" }}>Estoy comprometido y abierto a explorar un plan de financiamiento.</option>
+                      <option value="Por ahora no cuento con presupuesto." style={{ background: "#141414" }}>Por ahora no cuento con presupuesto.</option>
                     </select>
                   </div>
                 </div>
