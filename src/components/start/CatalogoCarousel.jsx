@@ -428,48 +428,7 @@ export default function CatalogoCarousel() {
               </p>
             )}
 
-            {/* Divider */}
-            <div style={{
-              width: "60px",
-              height: "3px",
-              background: "#FF5833",
-              marginBottom: "24px",
-            }} />
 
-            {/* CTA Button */}
-            <div style={{
-              marginTop: "24px",
-            }}>
-              <button
-                onClick={() => {
-                  window.dispatchEvent(new CustomEvent('open-application-modal'));
-                  handleCloseModal();
-                }}
-                style={{
-                  background: "#FF5833",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: "8px",
-                  padding: "14px 32px",
-                  fontFamily: "'Helvetica Neue', sans-serif",
-                  fontWeight: 700,
-                  fontSize: "15px",
-                  cursor: "pointer",
-                  transition: "background 0.2s, transform 0.2s",
-                  letterSpacing: "-0.02em",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#e04a28";
-                  e.currentTarget.style.transform = "translateY(-2px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#FF5833";
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}
-              >
-                Solicitar producción similar
-              </button>
-            </div>
           </div>
         </div>
       </div>
