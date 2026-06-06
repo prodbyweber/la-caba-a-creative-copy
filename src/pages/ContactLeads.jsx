@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -220,18 +220,7 @@ export default function ContactLeads() {
   const [selectedApp, setSelectedApp] = useState(null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [modalOpen, setModalOpen] = useState(false);
   const queryClient = useQueryClient();
-
-  // Hide mobile bottom nav when modal is open
-  useEffect(() => {
-    if (modalOpen) {
-      document.body.classList.add('admin-modal-open');
-    } else {
-      document.body.classList.remove('admin-modal-open');
-    }
-    return () => document.body.classList.remove('admin-modal-open');
-  }, [modalOpen]);
 
   const { data: leads = [], isLoading: leadsLoading } = useQuery({
     queryKey: ['contactLeads'],
@@ -280,18 +269,7 @@ export default function ContactLeads() {
 
   const handleViewLead = (lead) => {
     setSelectedLead(lead);
-    setModalOpen(true);
     if (lead.status === 'Nuevo') updateLeadStatus.mutate({ id: lead.id, status: 'Revisado' });
-  };
-
-  const handleCloseModal = () => {
-    setSelectedLead(null);
-    setModalOpen(false);
-  };
-
-  const handleViewApp = (app) => {
-    setSelectedApp(app);
-    setModalOpen(true);
   };
 
   const newAppsCount = applications.filter(a => a.status === 'nueva').length;
@@ -299,7 +277,7 @@ export default function ContactLeads() {
 
   return (
     <AdminLayout activePage="ContactLeads">
-      <div className="px-4 sm:px-6 lg:px-10 xl:px-16 py-8 sm:py-10 max-w-[1400px] mx-auto pb-24 sm:pb-16" style={{ paddingBottom: modalOpen ? '2rem' : undefined }}>
+      <div className="px-4 sm:px-6 lg:px-10 xl:px-16 py-8 sm:py-10 max-w-[1400px] mx-auto pb-24 sm:pb-16">
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6 sm:mb-8">
@@ -422,7 +400,7 @@ export default function ContactLeads() {
                         {app.created_date && <p className="text-[10px] text-white/25 flex items-center gap-1"><Calendar className="w-3 h-3" />{format(parseISO(app.created_date), "d MMM yyyy", { locale: es })}</p>}
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <button onClick={() => handleViewApp(app)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
+                        <button onClick={() => setSelectedApp(app)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
                           <Eye className="w-3.5 h-3.5 text-white/50" />
                         </button>
                         <select
@@ -515,8 +493,8 @@ export default function ContactLeads() {
         )}
       </div>
 
-      <LeadDetailModal lead={selectedLead} onClose={handleCloseModal} />
-      <ApplicationDetailModal app={selectedApp} onClose={handleCloseModal} />
+      <LeadDetailModal lead={selectedLead} onClose={() => setSelectedLead(null)} />
+      <ApplicationDetailModal app={selectedApp} onClose={() => setSelectedApp(null)} />
     </AdminLayout>
   );
 }
