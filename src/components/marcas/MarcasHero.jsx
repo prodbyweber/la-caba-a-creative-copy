@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -15,16 +15,51 @@ const SECTORES = [
 
 function useAutoPlay(src) {
   const ref = useRef(null);
+  const [retryCount, setRetryCount] = useState(0);
+  
   useEffect(() => {
     const v = ref.current;
     if (!v || !src) return;
-    const play = () => { v.muted = true; v.play().catch(() => {}); };
-    play();
-    v.addEventListener("canplay", play);
-    v.addEventListener("pause", play);
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) play(); });
-    return () => { v.removeEventListener("canplay", play); v.removeEventListener("pause", play); };
-  }, [src]);
+    
+    const attemptPlay = async () => {
+      v.muted = true;
+      v.playsInline = true;
+      try {
+        await v.play();
+      } catch (e) {
+        if (retryCount < 3) {
+          setTimeout(() => setRetryCount(c => c + 1), 500 * (retryCount + 1));
+        }
+      }
+    };
+    
+    const onCanPlay = () => { attemptPlay(); };
+    const onLoadedData = () => { attemptPlay(); };
+    const onPause = () => { 
+      if (!document.hidden) attemptPlay(); 
+    };
+    
+    v.addEventListener("canplay", onCanPlay);
+    v.addEventListener("loadeddata", onLoadedData);
+    v.addEventListener("pause", onPause);
+    
+    attemptPlay();
+    
+    const handleVisibility = () => {
+      if (!document.hidden && v.paused) {
+        attemptPlay();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    
+    return () => {
+      v.removeEventListener("canplay", onCanPlay);
+      v.removeEventListener("loadeddata", onLoadedData);
+      v.removeEventListener("pause", onPause);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [src, retryCount]);
+  
   return ref;
 }
 
@@ -311,27 +346,37 @@ export default function MarcasHero() {
           </motion.div>
         </div>
 
-        {/* Right: Preview Video */}
+        {/* Right: Video - same as /start hero */}
         <motion.div
           className="hero-media-col"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.2, delay: 0.15 }}
-          style={{ position: "relative", overflow: "hidden" }}
         >
           {videoSrc ? (
             <video
               ref={videoRef}
-              src={videoSrc}
               autoPlay muted loop playsInline preload="auto"
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", border: "none", padding: 0, borderRadius: 0 }}
+              poster={imageSrc || undefined}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            >
+              <source src={videoSrc} type="video/mp4" />
+              {videoSrc.includes('.webm') && <source src={videoSrc.replace('.webm', '.mp4')} type="video/mp4" />}
+              {videoSrc.includes('.mp4') && <source src={videoSrc.replace('.mp4', '.webm')} type="video/webm" />}
+              <track kind="captions" />
+            </video>
+          ) : imageSrc ? (
+            <img
+              src={imageSrc}
+              alt=""
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
             />
           ) : (
             <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #1a1a1a 0%, #0c0c0c 100%)" }} />
           )}
         </motion.div>
 
-        {/* Con quién trabajamos section */}
+        {/* Sectores section - below hero */}
         <motion.div
           className="hero-sectores-section"
           initial={{ opacity: 0, y: 20 }}
