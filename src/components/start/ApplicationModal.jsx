@@ -268,7 +268,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
 
               {/* Step 1 — Datos */}
               {step === 1 && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                   <div>
                     <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.1rem", color: "#f0ede8", margin: "0 0 3px" }}>Datos personales</h3>
                     <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.3)", margin: 0 }}>Información de contacto</p>
@@ -303,28 +303,25 @@ export default function ApplicationModal({ isOpen, onClose }) {
                   </div>
 
                   {/* Política de privacidad */}
-                  <div style={{ background: errors.privacidad ? "rgba(255,88,51,0.06)" : "#141414", border: errors.privacidad ? "1px solid rgba(255,88,51,0.35)" : "1px solid rgba(255,255,255,0.07)", borderRadius: "9px", padding: "12px 13px" }}>
-                    <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}>
-                      <div
-                        onClick={() => set("privacidad", !form.privacidad)}
-                        style={{
-                          width: "18px", height: "18px", borderRadius: "5px", flexShrink: 0, marginTop: "1px",
-                          background: form.privacidad ? "#ff5833" : "transparent",
-                          border: form.privacidad ? "none" : "1.5px solid rgba(255,255,255,0.2)",
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          transition: "all 0.2s", cursor: "pointer",
-                        }}
-                      >
-                        {form.privacidad && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                      </div>
-                      <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "12px", color: "rgba(240,237,232,0.6)", lineHeight: 1.5 }}>
-                        He leído y acepto la{" "}
-                        <Link to="/politica-de-privacidad" target="_blank" rel="noopener noreferrer" style={{ color: "#ff5833", textDecoration: "underline", textDecorationColor: "rgba(255,88,51,0.4)" }}>
-                          política de privacidad y protección de datos
-                        </Link>
-                      </span>
-                    </label>
-                    {errors.privacidad && <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "#ff5833", margin: "7px 0 0" }}>Debes aceptar la política de privacidad para continuar.</p>}
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <div
+                      onClick={() => set("privacidad", !form.privacidad)}
+                      style={{
+                        width: "16px", height: "16px", borderRadius: "4px", flexShrink: 0,
+                        background: form.privacidad ? "#ff5833" : "transparent",
+                        border: form.privacidad ? "none" : "1.5px solid rgba(255,255,255,0.2)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        transition: "all 0.2s", cursor: "pointer",
+                      }}
+                    >
+                      {form.privacidad && <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 6L8 1" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                    </div>
+                    <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: errors.privacidad ? "#ff5833" : "rgba(240,237,232,0.5)", lineHeight: 1.4, cursor: "pointer" }} onClick={() => set("privacidad", !form.privacidad)}>
+                      Acepto la{" "}
+                      <Link to="/politica-de-privacidad" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: "#ff5833", textDecoration: "underline", textDecorationColor: "rgba(255,88,51,0.4)" }}>
+                        política de privacidad y protección de datos
+                      </Link>
+                    </span>
                   </div>
                 </div>
               )}
