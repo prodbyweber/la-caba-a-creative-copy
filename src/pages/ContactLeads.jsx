@@ -5,7 +5,7 @@ import { base44 } from "@/api/base44Client";
 import AdminLayout from "@/components/admin/AdminLayout";
 import {
   Mail, Phone, MessageSquare, Trash2, Archive, Eye,
-  User, Calendar, X, Search, FileText, Download
+  User, Calendar, X, Search, FileText, Download, Copy, Check
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
@@ -220,6 +220,7 @@ export default function ContactLeads() {
   const [selectedApp, setSelectedApp] = useState(null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [copiedId, setCopiedId] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: leads = [], isLoading: leadsLoading } = useQuery({
@@ -270,6 +271,37 @@ export default function ContactLeads() {
   const handleViewLead = (lead) => {
     setSelectedLead(lead);
     if (lead.status === 'Nuevo') updateLeadStatus.mutate({ id: lead.id, status: 'Revisado' });
+  };
+
+  const copyLeadData = async (lead) => {
+    const text = `📋 Contacto: ${lead.name}
+📧 Email: ${lead.email}
+📱 Teléfono: ${lead.phone || 'No especificado'}
+💬 Mensaje: ${lead.message}
+📅 Fecha: ${lead.created_date ? format(parseISO(lead.created_date), "d MMM yyyy") : 'N/A'}
+🏷️ Estado: ${lead.status}`;
+    await navigator.clipboard.writeText(text);
+    setCopiedId(lead.id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const copyAppData = async (app) => {
+    const text = `📋 Solicitud de Plaza
+👤 Nombre: ${app.nombre} ${app.apellidos}
+📧 Email: ${app.email}
+📱 Teléfono: ${app.telefono}
+🎂 Fecha nacimiento: ${app.fecha_nacimiento || 'N/A'}
+📍 País: ${app.pais_residencia || 'N/A'}
+🌍 Nacionalidad: ${app.nacionalidad || 'N/A'}
+✈️ Viaje Madrid: ${app.disponibilidad_viaje_madrid === 'si' ? 'Sí' : app.disponibilidad_viaje_madrid === 'no' ? 'No' : 'N/A'}
+💼 Situación laboral: ${app.situacion_laboral || 'N/A'}
+🎵 Experiencia música: ${app.experiencia_musica || 'N/A'}
+💰 Presupuesto: ${app.presupuesto || 'No especificado'}
+🏷️ Estado: ${app.status}
+📅 Fecha: ${app.created_date ? format(parseISO(app.created_date), "d MMM yyyy") : 'N/A'}`;
+    await navigator.clipboard.writeText(text);
+    setCopiedId(app.id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   const newAppsCount = applications.filter(a => a.status === 'nueva').length;
@@ -438,22 +470,33 @@ export default function ContactLeads() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <button onClick={() => setSelectedApp(app)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
-                          <Eye className="w-3.5 h-3.5 text-white/50" />
-                        </button>
-                        <select
-                          value={app.status}
-                          onChange={e => updateAppStatus.mutate({ id: app.id, status: e.target.value })}
-                          className="h-7 sm:h-8 px-1.5 sm:px-2 rounded-lg bg-white/[0.05] border border-white/[0.08] text-white/50 text-[10px] sm:text-xs focus:outline-none hover:bg-white/10 transition-colors cursor-pointer"
-                          style={{ appearance: "none", paddingRight: "6px" }}
-                        >
-                          {Object.entries(APP_STATUS_CONFIG).map(([k, v]) => (
-                            <option key={k} value={k} style={{ background: "#111" }}>{v.label}</option>
-                          ))}
-                        </select>
-                        <button onClick={() => deleteApp.mutate(app.id)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-red-500/10 flex items-center justify-center transition-colors group/del" title="Eliminar">
-                          <Trash2 className="w-3.5 h-3.5 text-white/30 group-hover/del:text-red-400 transition-colors" />
-                        </button>
+                      <button
+                        onClick={() => copyAppData(app)}
+                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-[#ff5833]/20 flex items-center justify-center transition-colors"
+                        title="Copiar datos"
+                      >
+                        {copiedId === app.id ? (
+                          <Check className="w-3.5 h-3.5 text-[#ff5833]" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5 text-white/50" />
+                        )}
+                      </button>
+                      <button onClick={() => setSelectedApp(app)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
+                        <Eye className="w-3.5 h-3.5 text-white/50" />
+                      </button>
+                      <select
+                        value={app.status}
+                        onChange={e => updateAppStatus.mutate({ id: app.id, status: e.target.value })}
+                        className="h-7 sm:h-8 px-1.5 sm:px-2 rounded-lg bg-white/[0.05] border border-white/[0.08] text-white/50 text-[10px] sm:text-xs focus:outline-none hover:bg-white/10 transition-colors cursor-pointer"
+                        style={{ appearance: "none", paddingRight: "6px" }}
+                      >
+                        {Object.entries(APP_STATUS_CONFIG).map(([k, v]) => (
+                          <option key={k} value={k} style={{ background: "#111" }}>{v.label}</option>
+                        ))}
+                      </select>
+                      <button onClick={() => deleteApp.mutate(app.id)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-red-500/10 flex items-center justify-center transition-colors group/del" title="Eliminar">
+                        <Trash2 className="w-3.5 h-3.5 text-white/30 group-hover/del:text-red-400 transition-colors" />
+                      </button>
                       </div>
                       </div>
                       </motion.div>
@@ -541,6 +584,17 @@ export default function ContactLeads() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <button
+                          onClick={() => copyLeadData(lead)}
+                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-[#ff5833]/20 flex items-center justify-center transition-colors"
+                          title="Copiar datos"
+                        >
+                          {copiedId === lead.id ? (
+                            <Check className="w-3.5 h-3.5 text-[#ff5833]" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5 text-white/50" />
+                          )}
+                        </button>
                         <button onClick={() => handleViewLead(lead)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
                           <Eye className="w-3.5 h-3.5 text-white/50" />
                         </button>
