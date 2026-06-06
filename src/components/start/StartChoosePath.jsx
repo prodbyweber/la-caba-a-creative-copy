@@ -497,14 +497,13 @@ export default function StartChoosePath() {
 
   const PATHS = [
     { key: "artist", label: "Artista / Creador" },
-    { key: "brand", label: "Marca" },
   ];
 
   const toggle = (key) => {
     window.dispatchEvent(new CustomEvent("open-application-modal"));
   };
 
-  const btnColor = (key) => (key === "artist" || key === "brand") ? "#ff5833" : "rgba(240,237,232,0.6)";
+  const btnColor = (key) => key === "artist" ? "#ff5833" : "rgba(240,237,232,0.6)";
 
   return (
     <section
@@ -686,7 +685,7 @@ export default function StartChoosePath() {
                     transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                     style={{ overflow: "visible", marginBottom: "clamp(10px, 2vw, 16px)" }}
                   >
-                    {path.key === "artist" ? <CalendlyPanel /> : <ContactPanel />}
+                    <CalendlyPanel />
                   </motion.div>
                 )}
               </AnimatePresence>
