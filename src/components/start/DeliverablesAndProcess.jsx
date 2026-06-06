@@ -3,28 +3,52 @@ import { motion, useInView } from "framer-motion";
 
 const PILLARS = [
   {
-    icon: "🎚️",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M4 4h16M4 12h16M4 20h16" stroke="#ff5833" strokeWidth="2" strokeLinecap="round"/>
+        <circle cx="8" cy="4" r="2" fill="#ff5833"/>
+        <circle cx="12" cy="12" r="2" fill="#ff5833"/>
+        <circle cx="16" cy="20" r="2" fill="#ff5833"/>
+      </svg>
+    ),
+    title: "Identidad Visual",
+    desc: "Branding completo: logotipo, paleta de color, tipografía y manual de estilo adaptado a tu proyecto.",
+    accent: "#ff5833",
+  },
+  {
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="8" stroke="#ff5833" strokeWidth="2"/>
+        <circle cx="12" cy="12" r="3" fill="#ff5833"/>
+        <path d="M12 4v2M12 18v2M4 12h2M18 12h2" stroke="#ff5833" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+    ),
     title: "Producción Musical",
     desc: "Dirección artística, grabación, producción, mezcla y mastering de al menos un single, EP o álbum.",
     accent: "#ff5833",
   },
   {
-    icon: "🎬",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="3" width="18" height="18" rx="3" stroke="#ff5833" strokeWidth="2"/>
+        <circle cx="12" cy="12" r="4" stroke="#ff5833" strokeWidth="2"/>
+        <path d="M12 8v8M8 12h8" stroke="#ff5833" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+    ),
     title: "Contenido Audiovisual",
-    desc: "Videoclip oficial, reels y shorts para redes, fotografía editorial y contenido de backstudio.",
-    accent: "#6c8fff",
+    desc: "Visuales oficiales, reels y shorts para redes, fotografía editorial y contenido de backstudio.",
+    accent: "#ff5833",
   },
   {
-    icon: "✦",
-    title: "Identidad Visual",
-    desc: "Branding completo: logotipo, paleta de color, tipografía y manual de estilo adaptado a tu proyecto.",
-    accent: "#43d9a2",
-  },
-  {
-    icon: "📡",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2v6M12 16v6M4 12h6M14 12h6" stroke="#ff5833" strokeWidth="2" strokeLinecap="round"/>
+        <circle cx="12" cy="12" r="3" fill="#ff5833"/>
+      </svg>
+    ),
     title: "Campaña & Distribución",
     desc: "Distribución en plataformas digitales, estrategia de contenido y plan de lanzamiento coordinado.",
-    accent: "#c97dff",
+    accent: "#ff5833",
   },
 ];
 
@@ -112,7 +136,7 @@ export default function DeliverablesAndProcess() {
               position: "relative",
             }}
           >
-            <div style={{ fontSize: "26px", marginBottom: "14px" }}>{p.icon}</div>
+            <div style={{ marginBottom: "14px", color: "#ff5833" }}>{p.icon}</div>
             <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "clamp(0.95rem, 1.6vw, 1.1rem)", letterSpacing: "-0.03em", color: "#f0ede8", marginBottom: "8px", lineHeight: 1.2 }}>{p.title}</h3>
             <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)", color: "rgba(240,237,232,0.45)", lineHeight: 1.6, margin: 0 }}>{p.desc}</p>
           </motion.div>
