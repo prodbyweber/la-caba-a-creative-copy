@@ -1,163 +1,261 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
+
+const STATS = [
+  { label: "Método de trabajo", value: "Presencial · Online" },
+  { label: "Audiencia", value: "Gen Z · 1997–2012" },
+  { label: "Mercado", value: "Europa" },
+  { label: "Sectores", value: "Moda · Belleza · Bebidas · Eventos · Audio" },
+];
+
+function useAutoPlay(src) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const v = ref.current;
+    if (!v || !src) return;
+    const play = () => { v.muted = true; v.play().catch(() => {}); };
+    play();
+    v.addEventListener("canplay", play);
+    v.addEventListener("pause", play);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) play(); });
+    return () => { v.removeEventListener("canplay", play); v.removeEventListener("pause", play); };
+  }, [src]);
+  return ref;
+}
 
 export default function MarcasHero() {
+  const { data: cfg } = useQuery({
+    queryKey: ["landingConfig"],
+    queryFn: async () => { const c = await base44.entities.LandingConfig.list(); return c[0] || null; },
+    staleTime: 30000,
+  });
+
+  const videoSrc = cfg?.hero_video_url || null;
+  const imageSrc = cfg?.hero_banner_1_image || null;
+  const videoRef = useAutoPlay(videoSrc);
+
   const handleClick = () => {
     window.dispatchEvent(new CustomEvent("open-application-modal"));
   };
 
   return (
-    <section style={{
-      position: "relative",
-      padding: "60px 24px 40px",
-      paddingTop: "80px",
-      maxWidth: "1200px",
-      margin: "0 auto",
-      minHeight: "100dvh",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-    }}>
-      {/* Supratítulo */}
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        style={{
-          fontSize: "clamp(10px, 2vw, 12px)",
-          fontWeight: 700,
-          color: "#ff5833",
-          textTransform: "uppercase",
-          letterSpacing: "0.22em",
-          marginBottom: "16px",
-          fontFamily: "'Helvetica Neue', sans-serif",
-        }}
-      >
-        LA AGENCIA
-      </motion.p>
+    <section id="hero" style={{ background: "#080808", position: "relative", overflow: "hidden" }}>
+      <style>{`
+        .hero-wrap {
+          display: flex;
+          flex-direction: column;
+          min-height: 100dvh;
+        }
+        .hero-text-col {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: clamp(80px, 10vw, 120px) clamp(24px, 6vw, 64px) 0;
+          position: relative;
+          z-index: 10;
+          order: 1;
+        }
+        .hero-media-col {
+          width: 100%;
+          height: 52vw;
+          max-height: 52vh;
+          min-height: 220px;
+          overflow: hidden;
+          position: relative;
+          flex-shrink: 0;
+          order: 2;
+          margin-top: 24px;
+        }
+        .hero-stats-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          margin-top: 16px;
+          order: 3;
+          padding: 0 20px 40px;
+          width: 100%;
+          box-sizing: border-box;
+        }
+        .hero-stats-inline {
+          display: none;
+        }
+        @media (min-width: 768px) {
+          .hero-wrap {
+            flex-direction: row;
+            height: 100dvh;
+          }
+          .hero-text-col {
+            width: 54%;
+            flex: none;
+            padding: 80px 56px 60px;
+            order: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+          }
+          .hero-media-col {
+            width: 46%;
+            max-height: none;
+            height: 100%;
+            flex: 1;
+            order: 2;
+            margin-top: 0;
+          }
+          .hero-stats-grid {
+            display: none;
+          }
+          .hero-stats-inline {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: clamp(20px, 3vw, 32px);
+            width: 100%;
+          }
+        }
+        @media (min-width: 1200px) {
+          .hero-text-col { padding: 120px 80px 80px; }
+        }
+      `}</style>
 
-      {/* Headline */}
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        style={{
-          fontSize: "clamp(36px, 7.5vw, 96px)",
-          fontWeight: 900,
-          lineHeight: 1.15,
-          marginBottom: "20px",
-          letterSpacing: "-0.02em",
-          fontFamily: "'Helvetica Neue', sans-serif",
-        }}
-      >
-        Tu marca necesita hablarle a la Gen Z.
-        <br />
-        Nosotros sabemos cómo.
-      </motion.h1>
-
-      {/* Subtítulo */}
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
-        style={{
-          fontSize: "clamp(14px, 2vw, 18px)",
-          color: "rgba(240,237,232,0.5)",
-          maxWidth: "700px",
-          lineHeight: 1.7,
-          marginBottom: "32px",
-          fontFamily: "'Helvetica Neue', sans-serif",
-        }}
-      >
-        Contenido que no parece publicidad. Música que mueve emociones. Estrategia que convierte. Somos la única agencia creativa que también produce música para tu marca.
-      </motion.p>
-
-      {/* CTA Button */}
-      <motion.button
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.3 }}
-        onClick={handleClick}
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "12px",
-          padding: "14px 24px",
-          background: "#ff5833",
-          color: "white",
-          border: "none",
-          borderRadius: "9px",
-          fontWeight: 700,
-          fontSize: "14px",
-          cursor: "pointer",
-          transition: "all 0.2s",
-          fontFamily: "'Helvetica Neue', sans-serif",
-          width: "fit-content",
-          marginBottom: "40px",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = "#e04a28";
-          e.currentTarget.style.transform = "scale(1.05)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = "#ff5833";
-          e.currentTarget.style.transform = "scale(1)";
-        }}
-      >
-        Quiero trabajar con Cabaña
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M5 12h14M12 5l7 7-7 7" />
-        </svg>
-      </motion.button>
-
-      {/* Data Cards */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-          gap: "16px",
-          marginTop: "40px",
-        }}
-      >
-        {[
-          { label: "Método de trabajo", value: "Presencial · Online" },
-          { label: "Audiencia", value: "Gen Z · 1997–2012" },
-          { label: "Mercado", value: "Europa" },
-          { label: "Sectores", value: "Moda · Belleza · Bebidas · Eventos · Audio" },
-        ].map((card, i) => (
-          <div
-            key={i}
-            style={{
-              background: "#141414",
-              borderRadius: "12px",
-              padding: "20px",
-              borderLeft: "2px solid #ff5833",
-            }}
+      <div className="hero-wrap">
+        {/* Left: content */}
+        <div className="hero-text-col">
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+            style={{ display: "flex", flexDirection: "column", gap: "clamp(14px, 2.2vw, 20px)", maxWidth: "600px" }}
           >
+            {/* Pre-label */}
             <p style={{
-              fontSize: "10px",
-              fontWeight: 700,
-              color: "rgba(240,237,232,0.35)",
+              fontFamily: "'Helvetica Neue', sans-serif",
+              fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)",
+              fontWeight: 500,
+              color: "#ff5833",
+              letterSpacing: "0.04em",
               textTransform: "uppercase",
-              letterSpacing: "0.15em",
-              marginBottom: "8px",
-              fontFamily: "'Helvetica Neue', sans-serif",
+              margin: 0,
             }}>
-              {card.label}
+              LA AGENCIA
             </p>
+
+            {/* Headline */}
+            <h1 style={{
+              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+              fontWeight: 900,
+              fontSize: "clamp(2.1rem, 5.2vw, 4rem)",
+              letterSpacing: "-0.04em",
+              lineHeight: 0.93,
+              color: "#f0ede8",
+              margin: 0,
+            }}>
+              Tu marca necesita hablarle a la Gen Z.
+              <br />
+              Nosotros sabemos cómo.
+            </h1>
+
+            {/* Description */}
             <p style={{
-              fontSize: "14px",
-              fontWeight: 700,
               fontFamily: "'Helvetica Neue', sans-serif",
+              fontWeight: 300,
+              fontSize: "clamp(0.85rem, 1.5vw, 1rem)",
+              color: "rgba(240,237,232,0.52)",
+              lineHeight: 1.65,
+              margin: 0,
+              maxWidth: "480px",
             }}>
-              {card.value}
+              Contenido que no parece publicidad. Música que mueve emociones. Estrategia que convierte. Somos la única agencia creativa que también produce música para tu marca.
             </p>
-          </div>
-        ))}
-      </motion.div>
+
+            {/* CTA row */}
+            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
+              <button
+                onClick={handleClick}
+                style={{
+                  fontFamily: "'Helvetica Neue', sans-serif",
+                  fontWeight: 900,
+                  fontSize: "clamp(0.85rem, 1.4vw, 0.95rem)",
+                  letterSpacing: "0.01em",
+                  background: "#ff5833",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "clamp(13px, 1.8vw, 17px) clamp(22px, 3vw, 36px)",
+                  cursor: "pointer",
+                  transition: "background 0.2s ease, transform 0.2s ease",
+                  flexShrink: 0,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.transform = "translateY(0)"; }}
+              >
+                Quiero trabajar con Cabaña →
+              </button>
+            </div>
+
+            {/* Stats inline — desktop only */}
+            <div className="hero-stats-inline">
+              {STATS.map(stat => (
+                <div key={stat.label} style={{
+                  background: "#111",
+                  borderRadius: "10px",
+                  padding: "12px 14px",
+                  border: "1px solid rgba(255,255,255,0.05)",
+                }}>
+                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "8px", fontWeight: 700, color: "rgba(240,237,232,0.28)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 3px" }}>{stat.label}</p>
+                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em" }}>{stat.value}</p>
+                </div>
+              ))}
+            </div>
+
+          </motion.div>
+        </div>
+
+        {/* Right: Media */}
+        <motion.div
+          className="hero-media-col"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.2, delay: 0.15 }}
+        >
+          {videoSrc ? (
+            <video
+              ref={videoRef}
+              src={videoSrc}
+              autoPlay muted loop playsInline preload="auto"
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
+          ) : imageSrc ? (
+            <img
+              src={imageSrc}
+              alt=""
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
+          ) : (
+            <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #1a1a1a 0%, #0c0c0c 100%)" }} />
+          )}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(8,8,8,0.45) 0%, transparent 35%)" }} />
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "25%", background: "linear-gradient(to top, rgba(8,8,8,0.7) 0%, transparent 100%)" }} />
+        </motion.div>
+
+        {/* Stats — below video on mobile only */}
+        <div className="hero-stats-grid">
+          {STATS.map(stat => (
+            <div key={stat.label} style={{
+              background: "rgba(255,255,255,0.04)",
+              borderRadius: "16px",
+              padding: "28px 24px",
+              border: "1px solid rgba(255,255,255,0.08)",
+              width: "100%",
+              boxSizing: "border-box",
+            }}>
+              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "1.15rem", fontWeight: 700, color: "#f0ede8", margin: "0 0 8px", letterSpacing: "-0.01em" }}>{stat.label}</p>
+              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.95rem", fontWeight: 400, color: "rgba(240,237,232,0.5)", margin: 0, lineHeight: 1.4 }}>{stat.value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
