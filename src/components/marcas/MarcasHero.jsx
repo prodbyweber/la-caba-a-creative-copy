@@ -3,11 +3,14 @@ import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
-const STATS = [
-  { label: "Método de trabajo", value: "Presencial · Online" },
-  { label: "Audiencia", value: "Gen Z · 1997–2012" },
-  { label: "Mercado", value: "Europa" },
-  { label: "Sectores", value: "Moda · Belleza · Bebidas · Eventos · Audio" },
+const SECTORES = [
+  "Moda y Streetwear",
+  "Calzado",
+  "Bebidas",
+  "Belleza y Cosmética",
+  "Audio y Tecnología",
+  "Eventos y Conciertos",
+  "Hostelería",
 ];
 
 function useAutoPlay(src) {
@@ -68,17 +71,17 @@ export default function MarcasHero() {
           order: 2;
           margin-top: 24px;
         }
-        .hero-stats-grid {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
+        .hero-sectores-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
           margin-top: 16px;
           order: 3;
           padding: 0 20px 40px;
           width: 100%;
           box-sizing: border-box;
         }
-        .hero-stats-inline {
+        .hero-sectores-inline {
           display: none;
         }
         @media (min-width: 768px) {
@@ -103,10 +106,10 @@ export default function MarcasHero() {
             order: 2;
             margin-top: 0;
           }
-          .hero-stats-grid {
+          .hero-sectores-grid {
             display: none;
           }
-          .hero-stats-inline {
+          .hero-sectores-inline {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 8px;
@@ -194,17 +197,16 @@ export default function MarcasHero() {
               </button>
             </div>
 
-            {/* Stats inline — desktop only */}
-            <div className="hero-stats-inline">
-              {STATS.map(stat => (
-                <div key={stat.label} style={{
+            {/* Sectores inline — desktop only */}
+            <div className="hero-sectores-inline">
+              {SECTORES.map((sector, i) => (
+                <div key={sector} style={{
                   background: "#111",
                   borderRadius: "10px",
                   padding: "12px 14px",
                   border: "1px solid rgba(255,255,255,0.05)",
                 }}>
-                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "8px", fontWeight: 700, color: "rgba(240,237,232,0.28)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 3px" }}>{stat.label}</p>
-                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em" }}>{stat.value}</p>
+                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em" }}>{sector}</p>
                 </div>
               ))}
             </div>
@@ -239,19 +241,18 @@ export default function MarcasHero() {
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "25%", background: "linear-gradient(to top, rgba(8,8,8,0.7) 0%, transparent 100%)" }} />
         </motion.div>
 
-        {/* Stats — below video on mobile only */}
-        <div className="hero-stats-grid">
-          {STATS.map(stat => (
-            <div key={stat.label} style={{
+        {/* Sectores — below video on mobile only */}
+        <div className="hero-sectores-grid">
+          {SECTORES.map((sector) => (
+            <div key={sector} style={{
               background: "rgba(255,255,255,0.04)",
               borderRadius: "16px",
-              padding: "28px 24px",
+              padding: "20px 24px",
               border: "1px solid rgba(255,255,255,0.08)",
               width: "100%",
               boxSizing: "border-box",
             }}>
-              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "1.15rem", fontWeight: 700, color: "#f0ede8", margin: "0 0 8px", letterSpacing: "-0.01em" }}>{stat.label}</p>
-              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.95rem", fontWeight: 400, color: "rgba(240,237,232,0.5)", margin: 0, lineHeight: 1.4 }}>{stat.value}</p>
+              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.95rem", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.01em" }}>{sector}</p>
             </div>
           ))}
         </div>
