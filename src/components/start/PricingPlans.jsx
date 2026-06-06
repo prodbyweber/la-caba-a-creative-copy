@@ -93,7 +93,7 @@ export default function PricingPlans() {
         transition={{ duration: 0.7, delay: 0.2 }}
         style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "clamp(0.82rem, 1.4vw, 0.95rem)", color: "rgba(240,237,232,0.4)", lineHeight: 1.6, marginBottom: "clamp(36px, 5vw, 60px)", maxWidth: "480px" }}
       >
-        Precios personalizados según el proyecto. Respuesta en menos de 24 horas.
+        Escríbenos y en menos de 24h tienes una propuesta adaptada.
       </motion.p>
 
       <style>{`
@@ -153,9 +153,6 @@ export default function PricingPlans() {
                 </li>
               ))}
             </ul>
-
-            {/* Price note */}
-            <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "10px", fontWeight: 700, color: "rgba(240,237,232,0.22)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "16px" }}>Precio personalizado</p>
 
             {/* CTA */}
             <button
