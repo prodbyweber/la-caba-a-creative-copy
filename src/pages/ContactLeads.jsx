@@ -371,9 +371,26 @@ export default function ContactLeads() {
                           <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${cfg.color}`}>{cfg.label}</span>
                         </div>
                         {app.status === 'nueva' && <span className="w-2 h-2 rounded-full bg-[#ff5833] animate-pulse mb-2" />}
-                        <div className="flex flex-col gap-1.5 text-xs text-white/40 mb-2">
-                          <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{app.email}</span>
-                          {app.telefono && <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{app.telefono}</span>}
+                        <div className="flex flex-col gap-2 text-xs text-white/40 mb-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{app.email}</span>
+                            <a href={`mailto:${app.email}`} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#ff5833]/10 text-[#ff5833] border border-[#ff5833]/20 hover:bg-[#ff5833]/20 transition-all text-[10px] font-medium">
+                              <Mail className="w-3 h-3" /> Email
+                            </a>
+                          </div>
+                          {app.telefono && (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{app.telefono}</span>
+                              <div className="flex items-center gap-1">
+                                <a href={`tel:${app.telefono}`} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/[0.06] text-white/60 border border-white/[0.08] hover:bg-white/[0.1] transition-all text-[10px] font-medium">
+                                  <Phone className="w-3 h-3" /> Llamar
+                                </a>
+                                <a href={`https://wa.me/${app.telefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${app.nombre}, soy el equipo de Cabaña Creative. Hemos recibido tu solicitud y nos gustaría conocer más sobre tu proyecto. ¿Tienes disponibilidad para una videollamada esta semana?`)}`} target="_blank" rel="noreferrer" className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-[10px] font-medium">
+                                  <MessageSquare className="w-3 h-3" /> WhatsApp
+                                </a>
+                              </div>
+                            </div>
+                          )}
                           {app.pais_residencia && <span className="flex items-center gap-1.5"><span className="w-3 h-3 flex items-center justify-center">📍</span>{app.pais_residencia}</span>}
                         </div>
                         <div className="flex flex-wrap gap-2 mb-2">
@@ -440,9 +457,26 @@ export default function ContactLeads() {
                           <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${cfg.color}`}>{cfg.label}</span>
                         </div>
                         {lead.status === 'Nuevo' && <span className="w-2 h-2 rounded-full bg-[#ff5833] animate-pulse mb-2" />}
-                        <div className="flex flex-col gap-1.5 text-xs text-white/40 mb-2">
-                          <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{lead.email}</span>
-                          {lead.phone && lead.phone !== '-' && <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{lead.phone}</span>}
+                        <div className="flex flex-col gap-2 text-xs text-white/40 mb-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{lead.email}</span>
+                            <a href={`mailto:${lead.email}`} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#ff5833]/10 text-[#ff5833] border border-[#ff5833]/20 hover:bg-[#ff5833]/20 transition-all text-[10px] font-medium">
+                              <Mail className="w-3 h-3" /> Email
+                            </a>
+                          </div>
+                          {lead.phone && lead.phone !== '-' && (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{lead.phone}</span>
+                              <div className="flex items-center gap-1">
+                                <a href={`tel:${lead.phone}`} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/[0.06] text-white/60 border border-white/[0.08] hover:bg-white/[0.1] transition-all text-[10px] font-medium">
+                                  <Phone className="w-3 h-3" /> Llamar
+                                </a>
+                                <a href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${lead.name}, soy el equipo de Cabaña Creative. Hemos recibido tu mensaje y estamos aquí para ayudarte. ¿Cuándo te vendría bien una videollamada?`)}`} target="_blank" rel="noreferrer" className="flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-[10px] font-medium">
+                                  <MessageSquare className="w-3 h-3" /> WhatsApp
+                                </a>
+                              </div>
+                            </div>
+                          )}
                         </div>
                         <p className="text-xs text-white/50 leading-relaxed mb-2 line-clamp-2">{lead.message}</p>
                         {lead.created_date && <p className="text-[10px] text-white/25 flex items-center gap-1"><Calendar className="w-3 h-3" />{format(parseISO(lead.created_date), "d MMM yyyy", { locale: es })}</p>}
