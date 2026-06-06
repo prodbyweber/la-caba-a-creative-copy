@@ -164,21 +164,23 @@ export default function MarcasHero() {
         @media (min-width: 768px) {
           .hero-wrap {
             flex-direction: row;
-            height: 100dvh;
+            height: auto;
           }
           .hero-text-col {
-            width: 54%;
+            width: 100%;
             flex: none;
             padding: 80px clamp(40px, 6vw, 56px) 60px;
             order: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            min-height: 100dvh;
           }
           .hero-media-col {
-            width: 46%;
+            width: 100%;
             max-height: none;
-            height: 100%;
+            height: auto;
+            aspect-ratio: 16/9;
             flex: 1;
             order: 2;
             margin-top: 0;
@@ -197,6 +199,29 @@ export default function MarcasHero() {
           .hero-sectores-section { padding: 80px clamp(56px, 8vw, 80px); }
         }
         @media (min-width: 1280px) {
+          .hero-wrap {
+            flex-direction: row;
+            height: 100dvh;
+          }
+          .hero-text-col {
+            width: 50%;
+            flex: none;
+            padding: 120px clamp(56px, 8vw, 80px) 80px;
+            order: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100dvh;
+          }
+          .hero-media-col {
+            width: 50%;
+            max-height: none;
+            height: 100%;
+            aspect-ratio: auto;
+            flex: 1;
+            order: 2;
+            margin-top: 0;
+          }
           .hero-text-col h1 {
             font-size: clamp(2.1rem, 3.5vw, 4rem) !important;
           }
