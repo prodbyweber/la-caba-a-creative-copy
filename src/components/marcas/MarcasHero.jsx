@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -71,13 +71,9 @@ export default function MarcasHero() {
           order: 2;
           margin-top: 24px;
         }
-        .hero-sectores-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 12px;
-          margin-top: 16px;
+        .hero-sectores-wrap {
           order: 3;
-          padding: 0 20px 40px;
+          padding: clamp(40px, 6vw, 60px) clamp(24px, 6vw, 64px);
           width: 100%;
           box-sizing: border-box;
         }
@@ -106,15 +102,15 @@ export default function MarcasHero() {
             order: 2;
             margin-top: 0;
           }
-          .hero-sectores-grid {
+          .hero-sectores-wrap {
             display: none;
           }
           .hero-sectores-inline {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: clamp(20px, 3vw, 32px);
-            width: 100%;
+            display: block;
+            order: 3;
+            padding: 0 56px 60px;
+            width: 54%;
+            box-sizing: border-box;
           }
         }
         @media (min-width: 1200px) {
@@ -196,21 +192,6 @@ export default function MarcasHero() {
                 Quiero trabajar con Cabaña →
               </button>
             </div>
-
-            {/* Sectores inline — desktop only */}
-            <div className="hero-sectores-inline">
-              {SECTORES.map((sector, i) => (
-                <div key={sector} style={{
-                  background: "#111",
-                  borderRadius: "10px",
-                  padding: "12px 14px",
-                  border: "1px solid rgba(255,255,255,0.05)",
-                }}>
-                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em" }}>{sector}</p>
-                </div>
-              ))}
-            </div>
-
           </motion.div>
         </div>
 
@@ -242,19 +223,105 @@ export default function MarcasHero() {
         </motion.div>
 
         {/* Sectores — below video on mobile only */}
-        <div className="hero-sectores-grid">
-          {SECTORES.map((sector) => (
-            <div key={sector} style={{
-              background: "rgba(255,255,255,0.04)",
-              borderRadius: "16px",
-              padding: "20px 24px",
-              border: "1px solid rgba(255,255,255,0.08)",
-              width: "100%",
-              boxSizing: "border-box",
-            }}>
-              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.95rem", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.01em" }}>{sector}</p>
-            </div>
-          ))}
+        <div className="hero-sectores-wrap">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            style={{
+              fontFamily: "'Helvetica Neue', sans-serif",
+              fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)",
+              fontWeight: 500,
+              color: "#ff5833",
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+              marginBottom: "16px",
+            }}
+          >
+            CON QUIÉN TRABAJAMOS
+          </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+            style={{
+              fontFamily: "'Helvetica Neue', sans-serif",
+              fontSize: "clamp(0.9rem, 1.5vw, 1.1rem)",
+              fontWeight: 400,
+              color: "rgba(240,237,232,0.6)",
+              lineHeight: 1.5,
+              marginBottom: "20px",
+            }}
+          >
+            Marcas que quieren conectar con la generación más influyente del mercado.
+          </motion.p>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: "12px",
+          }}>
+            {SECTORES.map((sector) => (
+              <div key={sector} style={{
+                background: "rgba(255,255,255,0.04)",
+                borderRadius: "16px",
+                padding: "20px 24px",
+                border: "1px solid rgba(255,255,255,0.08)",
+              }}>
+                <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.95rem", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.01em" }}>{sector}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Sectores inline — desktop only (below text column) */}
+        <div className="hero-sectores-inline">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            style={{
+              fontFamily: "'Helvetica Neue', sans-serif",
+              fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)",
+              fontWeight: 500,
+              color: "#ff5833",
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+              marginBottom: "16px",
+            }}
+          >
+            CON QUIÉN TRABAJAMOS
+          </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
+            style={{
+              fontFamily: "'Helvetica Neue', sans-serif",
+              fontSize: "clamp(0.9rem, 1.5vw, 1.1rem)",
+              fontWeight: 400,
+              color: "rgba(240,237,232,0.6)",
+              lineHeight: 1.5,
+              marginBottom: "20px",
+            }}
+          >
+            Marcas que quieren conectar con la generación más influyente del mercado.
+          </motion.p>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: "8px",
+          }}>
+            {SECTORES.map((sector) => (
+              <div key={sector} style={{
+                background: "#111",
+                borderRadius: "10px",
+                padding: "12px 14px",
+                border: "1px solid rgba(255,255,255,0.05)",
+              }}>
+                <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em" }}>{sector}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
