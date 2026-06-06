@@ -270,7 +270,7 @@ export default function MarcasHero() {
           </motion.div>
         </div>
 
-        {/* Right: Media */}
+        {/* Right: Preview Video */}
         <motion.div
           className="hero-media-col"
           initial={{ opacity: 0 }}
@@ -282,12 +282,6 @@ export default function MarcasHero() {
               ref={videoRef}
               src={videoSrc}
               autoPlay muted loop playsInline preload="auto"
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-            />
-          ) : imageSrc ? (
-            <img
-              src={imageSrc}
-              alt=""
               style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
             />
           ) : (
