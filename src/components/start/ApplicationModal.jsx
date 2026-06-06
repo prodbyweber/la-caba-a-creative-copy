@@ -263,14 +263,11 @@ export default function ApplicationModal({ isOpen, onClose }) {
 
           {sent ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-              {/* Header */}
-              <div style={{ textAlign: "center", padding: "8px 0 16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 40, height: 40, borderRadius: "50%", background: "rgba(255,88,51,0.12)", border: "1px solid rgba(255,88,51,0.25)", marginBottom: "10px" }}>
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9.5L7 13.5L15 5" stroke="#ff5833" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </div>
-                <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.2rem", color: "#f0ede8", margin: "0 0 5px", letterSpacing: "-0.02em" }}>¡Solicitud recibida!</h3>
-                <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.4)", margin: 0, lineHeight: 1.5 }}>
-                  Nuestro equipo te contactará en <strong style={{ color: "#ff5833", fontWeight: 700 }}>menos de 24h</strong>.
+              {/* Mensaje de confirmación */}
+              <div style={{ textAlign: "center", padding: "8px 0 20px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.3rem", color: "#f0ede8", margin: "0 0 8px", letterSpacing: "-0.02em" }}>Estás a punto de entrar a La Cabaña.</h3>
+                <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.85rem", color: "rgba(240,237,232,0.5)", margin: 0, lineHeight: 1.6 }}>
+                  Un lugar donde el arte tiene estructura, el talento tiene dirección y los proyectos tienen alma.
                 </p>
               </div>
 
@@ -284,91 +281,57 @@ export default function ApplicationModal({ isOpen, onClose }) {
               ) : (
                 /* Opciones 1-3: Flujo normal con Calendly */
                 <>
-                  {/* Calendly CTA */}
-                  <div style={{ padding: "14px 0 10px", textAlign: "center" }}>
-                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.8rem", color: "rgba(240,237,232,0.5)", margin: "0 0 3px", lineHeight: 1.5 }}>
-                      Agenda ahora una videollamada gratuita con nuestro equipo.
-                    </p>
-                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.72rem", color: "#ff5833", margin: 0, fontWeight: 700, letterSpacing: "0.02em" }}>
-                      Plazas limitadas — cuanto antes, mejor.
-                    </p>
-                  </div>
-
                   {/* Video de YouTube - solo si está configurado */}
                   {config?.application_youtube_video_id && (
                     <div style={{ marginBottom: "20px" }}>
-                      {/* Tarjeta cinemática del video */}
-                      <div style={{
-                        background: "linear-gradient(180deg, rgba(255,88,51,0.08) 0%, rgba(255,88,51,0.02) 100%)",
-                        borderRadius: "14px",
-                        border: "1px solid rgba(255,88,51,0.2)",
-                        padding: "16px",
-                        marginBottom: "14px"
-                      }}>
-                        {config.application_video_title && (
-                          <h4 style={{
-                            fontFamily: "'Helvetica Neue', sans-serif",
-                            fontWeight: 700,
-                            fontSize: "0.85rem",
-                            color: "#f0ede8",
-                            margin: "0 0 4px",
-                            letterSpacing: "-0.02em"
-                          }}>
-                            {config.application_video_title}
-                          </h4>
-                        )}
-                        {config.application_video_subtitle && (
-                          <p style={{
-                            fontFamily: "'Helvetica Neue', sans-serif",
-                            fontWeight: 300,
-                            fontSize: "0.72rem",
-                            color: "rgba(240,237,232,0.5)",
-                            margin: 0,
-                            lineHeight: 1.5
-                          }}>
-                            {config.application_video_subtitle}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Embed de YouTube */}
-                      <div style={{
-                        position: "relative",
-                        width: "100%",
-                        paddingBottom: "56.25%",
-                        borderRadius: "14px",
-                        overflow: "hidden",
-                        border: "1px solid rgba(255,255,255,0.07)",
-                        background: "#000"
-                      }}>
-                        <iframe
-                          src={`https://www.youtube.com/embed/${config.application_youtube_video_id}?rel=0&modestbranding=1`}
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            border: "none"
-                          }}
-                          title="Video informativo"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
+                      {/* Título del video */}
+                      <div style={{ marginBottom: "12px" }}>
+                        <h4 style={{
+                          fontFamily: "'Helvetica Neue', sans-serif",
+                          fontWeight: 700,
+                          fontSize: "0.95rem",
+                          color: "#f0ede8",
+                          margin: "0 0 4px",
+                          letterSpacing: "-0.02em"
+                        }}>
+                          El mapa que todo artista necesita antes de lanzarse.
+                        </h4>
+                        <p style={{
+                          fontFamily: "'Helvetica Neue', sans-serif",
+                          fontWeight: 300,
+                          fontSize: "0.75rem",
+                          color: "rgba(240,237,232,0.5)",
+                          margin: 0,
+                          lineHeight: 1.5
+                        }}>
+                          Antes de agendar, mira este video de 5 minutos. Es importante que entiendas cómo trabajamos.
+                        </p>
                       </div>
                     </div>
                   )}
 
-                  {/* Calendly iframe - solo calendario */}
-                  <div style={{ borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", height: "500px", flexShrink: 0, background: "#080808" }}>
-                    <iframe
-                      src="https://calendly.com/hola-cabanacreative/creadores?embed_type=Inline&hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1&background_color=080808&text_color=f0ede8&primary_color=ff4300"
-                      width="100%"
-                      height="100%"
-                      frameBorder="0"
-                      title="Agendar videollamada"
-                      style={{ display: "block" }}
-                    />
+                  {/* Calendly */}
+                  <div style={{ marginBottom: "20px" }}>
+                    <h4 style={{
+                      fontFamily: "'Helvetica Neue', sans-serif",
+                      fontWeight: 700,
+                      fontSize: "0.95rem",
+                      color: "#f0ede8",
+                      margin: "0 0 12px",
+                      letterSpacing: "-0.02em"
+                    }}>
+                      Agenda tu videollamada con nuestro equipo.
+                    </h4>
+                    <div style={{ borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", height: "500px", flexShrink: 0, background: "#080808" }}>
+                      <iframe
+                        src="https://calendly.com/hola-cabanacreative/creadores?embed_type=Inline&hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1&background_color=080808&text_color=f0ede8&primary_color=ff4300"
+                        width="100%"
+                        height="100%"
+                        frameBorder="0"
+                        title="Agendar videollamada"
+                        style={{ display: "block" }}
+                      />
+                    </div>
                   </div>
                 </>
               )}
