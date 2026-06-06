@@ -9,30 +9,20 @@ const CHECK = (
 
 const PLANS = [
   {
-    name: "Plan Inicio",
-    tagline: "Tu primer lanzamiento con estructura profesional",
+    name: "Plan Cabaña Creative",
+    tagline: "Desarrollo artístico completo",
+    badge: "Oferta principal",
     items: [
-      "Producción de 1 single (letra, beat, dirección artística)",
+      "Producción musical profesional (letra, beat, dirección artística)",
       "Mezcla y mastering incluidos",
-      "Artwork y fotografía de portada",
-      "1 reel o short oficial para redes",
-      "Distribución en plataformas digitales",
-      "Sesión de estrategia inicial",
-    ],
-    cta: "Solicitar información",
-    featured: false,
-  },
-  {
-    name: "Plan Pro Trimestre",
-    tagline: "Desarrollo artístico completo en 3 meses",
-    badge: "Más elegido",
-    items: [
-      "Todo lo del Plan Inicio",
       "Videoclip oficial o mini-film",
       "Identidad visual completa (branding + manual)",
+      "Artwork y fotografía de portada",
       "Fotografía editorial completa",
+      "1 reel o short oficial para redes",
       "Estrategia de contenido 3 meses",
       "Plan de lanzamiento y distribución",
+      "Distribución en plataformas digitales",
       "8 sesiones de mentoría / dirección artística",
       "Acceso a la plataforma Cabaña Creative",
     ],
@@ -83,7 +73,7 @@ export default function PricingPlans() {
           maxWidth: "480px",
         }}
       >
-        Elige el nivel de desarrollo que necesitas
+        Una propuesta completa para tu carrera musical
       </motion.h2>
 
       <motion.p
@@ -92,7 +82,7 @@ export default function PricingPlans() {
         transition={{ duration: 0.7, delay: 0.2 }}
         style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "clamp(0.82rem, 1.4vw, 0.95rem)", color: "rgba(240,237,232,0.4)", lineHeight: 1.6, marginBottom: "clamp(36px, 5vw, 60px)", maxWidth: "480px" }}
       >
-        Escríbenos y en menos de 24h tienes una propuesta adaptada.
+        Escríbenos y en menos de 24h tienes una propuesta adaptada a ti.
       </motion.p>
 
       <style>{`
@@ -100,12 +90,8 @@ export default function PricingPlans() {
           display: grid;
           grid-template-columns: 1fr;
           gap: clamp(14px, 2vw, 20px);
-        }
-        @media (min-width: 640px) {
-          .plans-grid {
-            grid-template-columns: 1fr 1fr;
-            align-items: start;
-          }
+          max-width: 640px;
+          margin: 0 auto;
         }
       `}</style>
 
