@@ -55,27 +55,28 @@ export default function WhyStructure() {
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
-          <p style={{
-            fontFamily: "'Helvetica Neue', sans-serif",
-            fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)",
-            fontWeight: 500,
-            color: "rgba(240,237,232,0.38)",
-            letterSpacing: "0.04em",
-            margin: "0 0 12px",
-          }}>
-            ¿Por qué construir tu proyecto con estructura?
-          </p>
           <h2 style={{
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             fontWeight: 900,
             fontSize: "clamp(1.6rem, 3.5vw, 2.4rem)",
             letterSpacing: "-0.03em",
-            lineHeight: 1.1,
+            lineHeight: 1.05,
             color: "#f0ede8",
-            margin: 0,
+            margin: "0 0 16px",
           }}>
-            Los artistas que crecen no tienen más talento. Tienen un plan.
+            Invierte en un sector que nunca deja de crecer.
           </h2>
+          <p style={{
+            fontFamily: "'Helvetica Neue', sans-serif",
+            fontWeight: 300,
+            fontSize: "clamp(0.85rem, 1.4vw, 0.95rem)",
+            color: "rgba(240,237,232,0.5)",
+            lineHeight: 1.65,
+            margin: 0,
+            maxWidth: "580px",
+          }}>
+            La música no depende de bolsas ni ciclos económicos, y la gente nunca deja de escucharla. Once años consecutivos de crecimiento. $31.700M en ingresos globales en 2025. El momento es ahora.
+          </p>
         </motion.div>
 
         {/* Cards */}
