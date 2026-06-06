@@ -19,7 +19,7 @@ const PLANS = [
       "Fotografía editorial y portadas",
       "Contenido para redes sociales",
       "Estrategia y plan de lanzamiento",
-      "Distribución digital",
+      "Campañas de marketing",
       "Mentoría y dirección artística",
       "Acceso a plataforma Cabaña Creative",
     ],
