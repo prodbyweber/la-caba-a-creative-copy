@@ -150,8 +150,8 @@ export default function CatalogoCarousel() {
                   onClick={() => handleCardClick(item.id)}
                   style={{
                     flex: "0 0 auto",
-                    width: isMobile ? "calc(100vw - 56px)" : "calc(28.5vw - 12px)",
-                    minWidth: isMobile ? "calc(100vw - 56px)" : "380px",
+                    width: isMobile ? "calc(100vw - 56px)" : "calc(20vw - 12px)",
+                    minWidth: isMobile ? "calc(100vw - 56px)" : "280px",
                     aspectRatio: "16/9",
                     borderRadius: "12px",
                     overflow: "hidden",
@@ -159,6 +159,15 @@ export default function CatalogoCarousel() {
                     background: "#141414",
                     boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
                     cursor: "pointer",
+                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.05)";
+                    e.currentTarget.style.boxShadow = "0 8px 30px rgba(255,88,51,0.3)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.4)";
                   }}
                 >
                   {isPlaying ? (
@@ -427,55 +436,39 @@ export default function CatalogoCarousel() {
               marginBottom: "24px",
             }} />
 
-            {/* Metadata */}
+            {/* CTA Button */}
             <div style={{
-              display: "flex",
-              gap: "24px",
-              flexWrap: "wrap",
+              marginTop: "24px",
             }}>
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF5833" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polygon points="10 8 16 12 10 16 10 8" fill="#FF5833"/>
-                </svg>
-                <span style={{
-                  fontFamily: "'Helvetica Neue', sans-serif",
-                  fontWeight: 600,
-                  fontSize: "14px",
+              <button
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('open-application-modal'));
+                  handleCloseModal();
+                }}
+                style={{
+                  background: "#FF5833",
                   color: "#ffffff",
-                }}>
-                  Producción Original
-                </span>
-              </div>
-              
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#AAAAAA" strokeWidth="2">
-                  <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/>
-                  <line x1="7" y1="2" x2="7" y2="22"/>
-                  <line x1="17" y1="2" x2="17" y2="22"/>
-                  <line x1="2" y1="12" x2="22" y2="12"/>
-                  <line x1="2" y1="7" x2="7" y2="7"/>
-                  <line x1="2" y1="17" x2="7" y2="17"/>
-                  <line x1="17" y1="12" x2="22" y2="12"/>
-                  <line x1="17" y1="17" x2="22" y2="17"/>
-                </svg>
-                <span style={{
+                  border: "none",
+                  borderRadius: "8px",
+                  padding: "14px 32px",
                   fontFamily: "'Helvetica Neue', sans-serif",
-                  fontWeight: 500,
-                  fontSize: "14px",
-                  color: "#AAAAAA",
-                }}>
-                  Weber x Cabaña Creative
-                </span>
-              </div>
+                  fontWeight: 700,
+                  fontSize: "15px",
+                  cursor: "pointer",
+                  transition: "background 0.2s, transform 0.2s",
+                  letterSpacing: "-0.02em",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#e04a28";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#FF5833";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
+                Solicitar producción similar
+              </button>
             </div>
           </div>
         </div>
