@@ -291,9 +291,22 @@ export default function ApplicationModal({ isOpen, onClose }) {
                   margin: 0,
                   lineHeight: 1.5
                 }}>
-                  Antes de agendar, mira este video. El mapa que todo artista necesita.
+                  Antes de agendar, mira este video.
                 </p>
               </div>
+
+              {/* Título del video */}
+              <h3 style={{
+                fontFamily: "'Helvetica Neue', sans-serif",
+                fontWeight: 700,
+                fontSize: "22px",
+                color: "#ffffff",
+                marginTop: "32px",
+                marginBottom: "16px",
+                letterSpacing: "-0.02em"
+              }}>
+                El mapa que todo artista necesita.
+              </h3>
 
               {/* Video */}
               <div>
