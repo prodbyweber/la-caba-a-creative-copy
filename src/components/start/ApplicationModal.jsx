@@ -235,28 +235,29 @@ export default function ApplicationModal({ isOpen, onClose }) {
             maxWidth: "460px",
             maxHeight: "90dvh",
             overflowY: "auto",
-            padding: "20px",
+            padding: "20px 20px 20px 20px",
             boxSizing: "border-box",
             border: "1px solid rgba(255,255,255,0.08)",
             position: "relative",
+            marginTop: "40px",
           }}
         >
-          {/* Close button — absolute, always top-right of panel */}
+          {/* Close button — outside the card, above it */}
           <button
             onClick={handleClose}
             style={{
-              position: "absolute", top: "16px", right: "16px", zIndex: 10,
-              width: 28, height: 28, borderRadius: "50%",
-              background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)",
+              position: "absolute", top: "-48px", right: "0", zIndex: 10,
+              width: 32, height: 32, borderRadius: "50%",
+              background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", transition: "background 0.2s",
-              color: "rgba(240,237,232,0.6)", flexShrink: 0,
+              cursor: "pointer", transition: "all 0.2s",
+              color: "#f0ede8", flexShrink: 0,
             }}
-            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.14)"}
-            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.2)"; e.currentTarget.style.transform = "scale(1.1)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.transform = "scale(1)"; }}
             aria-label="Cerrar"
           >
-            <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+            <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
               <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
             </svg>
           </button>
