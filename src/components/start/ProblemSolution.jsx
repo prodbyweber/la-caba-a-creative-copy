@@ -1,24 +1,48 @@
 import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 
+const AudioIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff5833" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 18V5l12-2v13" />
+    <circle cx="6" cy="18" r="3" />
+    <circle cx="18" cy="16" r="3" />
+  </svg>
+);
+
+const IdentityIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff5833" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+    <path d="M16 3.5c1.5.5 2.5 2 2.5 3.5S17.5 9.5 16 10" />
+  </svg>
+);
+
+const StructureIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff5833" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2" />
+    <path d="M16 2v4M8 2v4M3 10h18" />
+    <path d="M8 14h2M14 14h2M8 18h2M14 18h2" />
+  </svg>
+);
+
 const PROBLEMS = [
   {
-    icon: "🎵",
-    label: "Sin audiencia",
-    title: "Creas, pero no llegas",
-    desc: "Produces música o contenido pero no sabes cómo posicionarte, construir una audiencia real ni diferenciarte en un mercado saturado.",
+    Icon: AudioIcon,
+    label: "Sin calidad, sin mercado",
+    title: "Crees que suenas bien. El mercado tiene otro nivel.",
+    desc: "La producción musical comercial actual tiene un estándar técnico muy alto. Un mal mix, una voz mal grabada o un beat genérico te deja fuera antes de que alguien te escuche dos veces. La calidad de audio no es un detalle — es tu producto.",
   },
   {
-    icon: "🎨",
-    label: "Sin identidad",
-    title: "Tienes talento, pero no marca",
-    desc: "Tu imagen visual no comunica quién eres. Cambias de estética con cada proyecto y no conectas emocionalmente con tu público.",
+    Icon: IdentityIcon,
+    label: "Sin identidad, sin conexión",
+    title: "Tienes talento, pero no marca.",
+    desc: "Tu imagen visual no comunica quién eres. Cambias de estética con cada proyecto y no conectas emocionalmente con tu público. En un mercado saturado, quien no tiene una identidad clara simplemente no existe.",
   },
   {
-    icon: "📅",
-    label: "Sin estructura",
-    title: "Produces, pero sin plan",
-    desc: "Las ideas se acumulan pero el plan no existe. Sin calendario, sin lanzamiento, sin distribución: el trabajo no trasciende.",
+    Icon: StructureIcon,
+    label: "Sin estructura, sin trascendencia",
+    title: "Produces, pero sin plan.",
+    desc: "Las ideas se acumulan pero el plan no existe. Sin calendario editorial, sin estrategia de lanzamiento, sin distribución: el trabajo no llega a quien tiene que llegar. El talento sin estructura no escala.",
   },
 ];
 
@@ -72,7 +96,7 @@ export default function ProblemSolution() {
           maxWidth: "640px",
         }}
       >
-        La mayoría de artistas independientes no necesitan más talento. Necesitan un plan.
+        La mayoría de artistas independientes necesitan un plan.
       </motion.h2>
 
       {/* Problem cards */}
@@ -97,7 +121,7 @@ export default function ProblemSolution() {
               overflow: "hidden",
             }}
           >
-            <div style={{ fontSize: "28px", marginBottom: "12px" }}>{p.icon}</div>
+            <div style={{ marginBottom: "14px" }}><p.Icon /></div>
             <span style={{ display: "inline-block", fontSize: "9px", fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,88,51,0.6)", marginBottom: "8px", fontFamily: "'Helvetica Neue', sans-serif" }}>{p.label}</span>
             <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "clamp(1rem, 1.8vw, 1.2rem)", letterSpacing: "-0.03em", color: "#f0ede8", marginBottom: "10px", lineHeight: 1.15 }}>{p.title}</h3>
             <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "clamp(0.8rem, 1.3vw, 0.9rem)", color: "rgba(240,237,232,0.45)", lineHeight: 1.6, margin: 0 }}>{p.desc}</p>
