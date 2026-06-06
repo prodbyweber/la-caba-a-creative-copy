@@ -129,7 +129,7 @@ export default function StartHero() {
               color: "#f0ede8",
               margin: 0,
             }}>
-              El plan de desarrollo artístico para creadores independientes
+              Plan de desarrollo artístico para creadores independientes
             </h1>
 
             {/* Description */}
