@@ -123,7 +123,7 @@ function AccordionItem({ item, isOpen, onToggle }) {
 }
 
 export default function HowItWorksAccordion() {
-  const [openIndex, setOpenIndex] = useState(0);
+  const [openIndex, setOpenIndex] = useState(null);
 
   return (
     <section style={{
