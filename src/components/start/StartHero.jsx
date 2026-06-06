@@ -46,16 +46,17 @@ export default function StartHero() {
       <style>{`
         .hero-wrap {
           display: flex;
-          flex-direction: column-reverse;
+          flex-direction: column;
           min-height: 100dvh;
         }
         .hero-text-col {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          padding: clamp(80px, 10vw, 120px) clamp(24px, 6vw, 64px) clamp(30px, 4vw, 56px);
+          padding: clamp(80px, 10vw, 120px) clamp(24px, 6vw, 64px) 0;
           position: relative;
           z-index: 10;
+          order: 1;
         }
         .hero-media-col {
           width: 100%;
@@ -65,32 +66,41 @@ export default function StartHero() {
           overflow: hidden;
           position: relative;
           flex-shrink: 0;
+          order: 2;
         }
         .hero-stats-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
           gap: 8px;
           margin-top: clamp(24px, 4vw, 40px);
+          order: 3;
         }
         @media (min-width: 768px) {
           .hero-wrap {
             flex-direction: row;
+            flex-wrap: wrap;
             height: 100dvh;
           }
           .hero-text-col {
             width: 54%;
             flex: none;
-            padding: 80px 56px 60px;
+            padding: 80px 56px 24px;
+            order: 1;
           }
           .hero-media-col {
             width: 46%;
             max-height: none;
             height: 100%;
             flex: 1;
+            order: 2;
           }
           .hero-stats-grid {
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
+            width: 54%;
+            order: 3;
+            padding: 0 56px 60px !important;
+            margin-top: 0 !important;
           }
         }
         @media (min-width: 1200px) {
@@ -186,20 +196,6 @@ export default function StartHero() {
               </a>
             </div>
 
-            {/* Stats */}
-            <div className="hero-stats-grid">
-              {STATS.map(stat => (
-                <div key={stat.label} style={{
-                  background: "#111",
-                  borderRadius: "10px",
-                  padding: "12px 14px",
-                  border: "1px solid rgba(255,255,255,0.05)",
-                }}>
-                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "8px", fontWeight: 700, color: "rgba(240,237,232,0.28)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 3px" }}>{stat.label}</p>
-                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em" }}>{stat.value}</p>
-                </div>
-              ))}
-            </div>
           </motion.div>
         </div>
 
@@ -229,6 +225,21 @@ export default function StartHero() {
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(8,8,8,0.45) 0%, transparent 35%)" }} />
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "25%", background: "linear-gradient(to top, rgba(8,8,8,0.7) 0%, transparent 100%)" }} />
         </motion.div>
+
+        {/* Stats — below video on mobile, inside text col on desktop */}
+        <div className="hero-stats-grid" style={{ padding: "clamp(16px, 3vw, 0px) clamp(24px, 6vw, 64px) clamp(24px, 3vw, 40px)" }}>
+          {STATS.map(stat => (
+            <div key={stat.label} style={{
+              background: "#111",
+              borderRadius: "10px",
+              padding: "12px 14px",
+              border: "1px solid rgba(255,255,255,0.05)",
+            }}>
+              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "8px", fontWeight: 700, color: "rgba(240,237,232,0.28)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 3px" }}>{stat.label}</p>
+              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em" }}>{stat.value}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
