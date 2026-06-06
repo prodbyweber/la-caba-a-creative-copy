@@ -115,7 +115,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
     nombre: "", apellidos: "", email: "", phoneCode: "+34", phone: "", birthdate: "",
     privacidad: false,
     pais_residencia: "", nacionalidad: "", viaje_madrid: "",
-    situacion_laboral: "", experiencia_musica: "", presupuesto: false,
+    situacion_laboral: "", experiencia_musica: "", presupuesto: "",
   });
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -192,7 +192,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
     onClose();
     setTimeout(() => {
       setStep(1);
-      setForm({ nombre:"",apellidos:"",email:"",phoneCode:"+34",phone:"",birthdate:"",privacidad:false,pais_residencia:"",nacionalidad:"",viaje_madrid:"",situacion_laboral:"",experiencia_musica:"",presupuesto:false });
+      setForm({ nombre:"",apellidos:"",email:"",phoneCode:"+34",phone:"",birthdate:"",privacidad:false,pais_residencia:"",nacionalidad:"",viaje_madrid:"",situacion_laboral:"",experiencia_musica:"",presupuesto:"" });
       setSent(false);
       setErrors({});
     }, 300);
@@ -427,25 +427,15 @@ export default function ApplicationModal({ isOpen, onClose }) {
                       <option value="mas_5" style={{ background: "#141414" }}>Más de 5 años</option>
                     </select>
                   </div>
-                  <div style={{ background: "#141414", border: errors.presupuesto ? "1px solid #ff5833" : "1px solid rgba(255,255,255,0.08)", borderRadius: "9px", padding: "13px" }}>
-                    <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}>
-                      <div
-                        onClick={() => set("presupuesto", !form.presupuesto)}
-                        style={{
-                          width: "18px", height: "18px", borderRadius: "5px", flexShrink: 0, marginTop: "1px",
-                          background: form.presupuesto ? "#ff5833" : "transparent",
-                          border: form.presupuesto ? "none" : "1.5px solid rgba(255,255,255,0.2)",
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          transition: "all 0.2s", cursor: "pointer",
-                        }}
-                      >
-                        {form.presupuesto && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                      </div>
-                      <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "13px", color: "rgba(240,237,232,0.7)", lineHeight: 1.5 }}>
-                        Confirmo que cuento con un presupuesto mínimo de <strong style={{ color: "#ff5833" }}>2.000€</strong> para invertir en mi desarrollo artístico.
-                      </span>
-                    </label>
-                    {errors.presupuesto && <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "#ff5833", margin: "8px 0 0" }}>Es necesario confirmar el presupuesto mínimo para continuar.</p>}
+                  <div style={fieldWrap}>
+                    <Label required>Presupuesto disponible</Label>
+                    <select value={form.presupuesto} onChange={e => set("presupuesto", e.target.value)} style={{ ...inputStyle, borderColor: errors.presupuesto ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
+                      <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
+                      <option value="5000+" style={{ background: "#141414" }}>Cuento con un presupuesto de 5.000€ o más para mi proyecto.</option>
+                      <option value="2000" style={{ background: "#141414" }}>Cuento con un presupuesto mínimo de 2.000€ para comenzar.</option>
+                      <option value="financiando" style={{ background: "#141414" }}>No tengo el presupuesto completo, pero estoy comprometido a financiarlo.</option>
+                      <option value="sin_presupuesto" style={{ background: "#141414" }}>Por ahora no cuento con presupuesto disponible.</option>
+                    </select>
                   </div>
                 </div>
               )}
@@ -482,13 +472,13 @@ export default function ApplicationModal({ isOpen, onClose }) {
                 ) : (
                   <button
                     onClick={handleSubmit}
-                    disabled={sending || !form.presupuesto}
+                    disabled={sending}
                     style={{
                       flex: 1, borderRadius: "9px", padding: "12px 20px", fontWeight: 900,
                       fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.9rem",
-                      border: "none", cursor: form.presupuesto ? "pointer" : "not-allowed",
-                      background: form.presupuesto ? "#ff5833" : "#2a2a2a",
-                      color: form.presupuesto ? "#fff" : "rgba(240,237,232,0.25)",
+                      border: "none", cursor: "pointer",
+                      background: "#ff5833",
+                      color: "#fff",
                       transition: "all 0.2s",
                     }}
                   >
