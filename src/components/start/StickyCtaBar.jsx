@@ -17,9 +17,8 @@ export default function StickyCtaBar() {
     return () => window.removeEventListener("scroll", check);
   }, []);
 
-  const scrollToContact = () => {
-    const el = document.getElementById("contacto");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+  const openModal = () => {
+    window.dispatchEvent(new CustomEvent("open-application-modal"));
   };
 
   return (
@@ -55,7 +54,7 @@ export default function StickyCtaBar() {
         }}
       >
         <button
-          onClick={scrollToContact}
+          onClick={openModal}
           style={{
             width: "100%",
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",

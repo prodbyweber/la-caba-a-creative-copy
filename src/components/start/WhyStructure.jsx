@@ -26,8 +26,7 @@ export default function WhyStructure() {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   const scrollToContact = () => {
-    const el = document.getElementById("contacto");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
+    window.dispatchEvent(new CustomEvent("open-application-modal"));
   };
 
   return (

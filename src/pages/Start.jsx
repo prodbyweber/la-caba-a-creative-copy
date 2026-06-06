@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import StartNav from "@/components/start/StartNav";
 import StartHero from "@/components/start/StartHero";
 import StartBrandsCarousel from "@/components/start/StartBrandsCarousel";
@@ -14,9 +14,19 @@ import StickyCtaBar from "@/components/start/StickyCtaBar";
 import StartFooter from "@/components/start/StartFooter";
 import WhyStructure from "@/components/start/WhyStructure";
 import HowItWorksAccordion from "@/components/start/HowItWorksAccordion";
+import ApplicationModal from "@/components/start/ApplicationModal";
 
 export default function Start() {
+  const [modalOpen, setModalOpen] = useState(false);
+
   useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  // Global event so any child component can open the modal
+  useEffect(() => {
+    const handler = () => setModalOpen(true);
+    window.addEventListener("open-application-modal", handler);
+    return () => window.removeEventListener("open-application-modal", handler);
+  }, []);
 
   return (
     <div style={{
@@ -78,6 +88,9 @@ export default function Start() {
 
       {/* Mobile sticky CTA */}
       <StickyCtaBar />
+
+      {/* Application Modal — controlled from here */}
+      <ApplicationModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 }

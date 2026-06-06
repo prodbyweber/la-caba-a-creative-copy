@@ -501,7 +501,7 @@ export default function StartChoosePath() {
   ];
 
   const toggle = (key) => {
-    navigate("/meeting");
+    window.dispatchEvent(new CustomEvent("open-application-modal"));
   };
 
   const btnColor = (key) => (key === "artist" || key === "brand") ? "#ff5833" : "rgba(240,237,232,0.6)";
