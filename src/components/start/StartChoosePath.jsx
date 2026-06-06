@@ -7,20 +7,64 @@ import PhoneInput from "./PhoneInput";
 
 function useAutoPlay(src) {
   const ref = useRef(null);
+  const [retryCount, setRetryCount] = useState(0);
+  
   useEffect(() => {
     const v = ref.current;
     if (!v || !src) return;
-    const play = () => { v.muted = true; v.play().catch(() => {}); };
-    play();
-    v.addEventListener("canplay", play);
-    v.addEventListener("pause", play);
-    return () => { v.removeEventListener("canplay", play); v.removeEventListener("pause", play); };
-  }, [src]);
+    
+    const attemptPlay = async () => {
+      v.muted = true;
+      v.playsInline = true;
+      try {
+        await v.play();
+      } catch (e) {
+        // Reintentar con delay en caso de error
+        if (retryCount < 3) {
+          setTimeout(() => setRetryCount(c => c + 1), 500 * (retryCount + 1));
+        }
+      }
+    };
+    
+    // Intentar play cuando el video esté listo
+    const onCanPlay = () => { attemptPlay(); };
+    const onLoadedData = () => { attemptPlay(); };
+    const onPause = () => { 
+      if (!document.hidden) attemptPlay(); 
+    };
+    
+    v.addEventListener("canplay", onCanPlay);
+    v.addEventListener("loadeddata", onLoadedData);
+    v.addEventListener("pause", onPause);
+    
+    // Intento inicial
+    attemptPlay();
+    
+    // Reintentar si cambia visibilidad
+    const handleVisibility = () => {
+      if (!document.hidden && v.paused) {
+        attemptPlay();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    
+    return () => {
+      v.removeEventListener("canplay", onCanPlay);
+      v.removeEventListener("loadeddata", onLoadedData);
+      v.removeEventListener("pause", onPause);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [src, retryCount]);
+  
   return ref;
 }
 
 function isVideo(url) {
-  return url && /\.(mp4|webm|mov)(\?|$)/i.test(url);
+  if (!url) return false;
+  // Detectar videos por extensión o por parámetros de URL
+  const videoExtensions = /\.(mp4|webm|mov|ogg)(\?|$)/i;
+  const videoParams = /[?&](type=format&)?format=(mp4|webm|mov)(&|$)/i;
+  return videoExtensions.test(url) || videoParams.test(url);
 }
 
 const inputStyle = {
@@ -523,11 +567,14 @@ export default function StartChoosePath() {
       {isVideo(bgSrc) ? (
         <video
           ref={vidRef}
-          src={bgSrc}
           autoPlay muted loop playsInline preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ pointerEvents: "none", filter: "brightness(0.4) saturate(0.6)" }}
-        />
+        >
+          <source src={bgSrc} type="video/mp4" />
+          {bgSrc.includes('.webm') && <source src={bgSrc.replace('.webm', '.mp4')} type="video/mp4" />}
+          {bgSrc.includes('.mp4') && <source src={bgSrc.replace('.mp4', '.webm')} type="video/webm" />}
+        </video>
       ) : (
         <img
           src={bgSrc}
