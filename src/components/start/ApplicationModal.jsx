@@ -285,10 +285,10 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     </p>
                   </div>
 
-                  {/* Calendly iframe */}
+                  {/* Calendly iframe - solo calendario */}
                   <div style={{ borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", height: "500px", flexShrink: 0, background: "#080808" }}>
                     <iframe
-                      src="https://calendly.com/hola-cabanacreative/creadores?embed_type=Inline&hide_gdpr_banner=1&background_color=080808&text_color=f0ede8&primary_color=ff4300"
+                      src="https://calendly.com/hola-cabanacreative/creadores?embed_type=Inline&hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1&background_color=080808&text_color=f0ede8&primary_color=ff4300"
                       width="100%"
                       height="100%"
                       frameBorder="0"
