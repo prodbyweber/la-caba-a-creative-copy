@@ -87,12 +87,14 @@ export default function StartHero() {
           display: flex;
           flex-direction: column;
           min-height: 100dvh;
+          max-width: 1920px;
+          margin: 0 auto;
         }
         .hero-text-col {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          padding: clamp(80px, 10vw, 120px) clamp(24px, 6vw, 64px) 0;
+          padding: clamp(80px, 10vw, 120px) clamp(24px, 6vw, 56px) 0;
           position: relative;
           z-index: 10;
           order: 1;
@@ -129,7 +131,7 @@ export default function StartHero() {
           .hero-text-col {
             width: 54%;
             flex: none;
-            padding: 80px 56px 60px;
+            padding: 80px clamp(40px, 6vw, 56px) 60px;
             order: 1;
             display: flex;
             flex-direction: column;
@@ -155,7 +157,12 @@ export default function StartHero() {
           }
         }
         @media (min-width: 1200px) {
-          .hero-text-col { padding: 120px 80px 80px; }
+          .hero-text-col { padding: 120px clamp(56px, 8vw, 80px) 80px; }
+        }
+        @media (min-width: 1280px) {
+          .hero-text-col h1 {
+            font-size: clamp(2.1rem, 3.5vw, 4rem) !important;
+          }
         }
       `}</style>
 
@@ -188,11 +195,14 @@ export default function StartHero() {
               style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 900,
-                fontSize: "clamp(2.1rem, 5.2vw, 4rem)",
+                fontSize: "clamp(2.1rem, 4vw, 4rem)",
                 letterSpacing: "-0.04em",
                 lineHeight: 0.93,
                 color: "#f0ede8",
                 margin: 0,
+                maxWidth: "100%",
+                wordBreak: "break-word",
+                overflowWrap: "break-word",
               }}
             >
               Plan de desarrollo artístico para creadores independientes

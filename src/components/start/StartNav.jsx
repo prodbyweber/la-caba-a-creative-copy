@@ -31,7 +31,14 @@ export default function StartNav() {
       {/* Fixed nav bar */}
       <motion.header
         className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between"
-        style={{ padding: "clamp(20px, 4vw, 32px) clamp(24px, 6vw, 56px)", pointerEvents: "all" }}
+        style={{ 
+          padding: "clamp(20px, 4vw, 32px) clamp(24px, 6vw, 56px)",
+          pointerEvents: "all",
+          maxWidth: "1920px",
+          margin: "0 auto",
+          left: 0,
+          right: 0,
+        }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.2 }}
@@ -80,8 +87,8 @@ export default function StartNav() {
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
               onClick={handleSolicitarPlaza}
-              className="hidden md:flex"
               style={{
+                display: "none",
                 fontFamily: "'Helvetica Neue', sans-serif",
                 fontWeight: 700,
                 fontSize: "0.85rem",
@@ -102,6 +109,20 @@ export default function StartNav() {
             </motion.button>
           )}
         </AnimatePresence>
+
+        <style>{`
+          @media (min-width: 768px) {
+            button[style*="display: none"] {
+              display: flex !important;
+            }
+          }
+          @media (min-width: 1280px) {
+            header[style*="max-width"] {
+              padding-left: 56px !important;
+              padding-right: 56px !important;
+            }
+          }
+        `}</style>
 
       </motion.header>
     </>

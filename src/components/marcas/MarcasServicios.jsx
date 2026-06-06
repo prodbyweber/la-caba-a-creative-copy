@@ -28,9 +28,11 @@ export default function MarcasServicios() {
 
   return (
     <section style={{
-      padding: "80px 24px",
-      maxWidth: "1200px",
+      padding: "clamp(60px, 8vw, 80px) clamp(24px, 6vw, 56px)",
+      maxWidth: "1440px",
       margin: "0 auto",
+      width: "100%",
+      boxSizing: "border-box",
     }}>
       {/* Supratítulo */}
       <motion.p
@@ -58,12 +60,15 @@ export default function MarcasServicios() {
         viewport={{ once: true }}
         transition={{ duration: 0.6, delay: 0.1 }}
         style={{
-          fontSize: "clamp(28px, 5vw, 60px)",
+          fontSize: "clamp(28px, 4vw, 60px)",
           fontWeight: 900,
           lineHeight: 1.2,
           marginBottom: "48px",
           letterSpacing: "-0.02em",
           fontFamily: "'Helvetica Neue', sans-serif",
+          maxWidth: "100%",
+          wordBreak: "break-word",
+          overflowWrap: "break-word",
         }}
       >
         Todo lo que tu marca necesita para dominar el mercado joven.
@@ -72,9 +77,23 @@ export default function MarcasServicios() {
       {/* Grid de servicios */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
         gap: "24px",
+        width: "100%",
+        maxWidth: "100%",
       }}>
+        <style>{`
+          @media (min-width: 1280px) {
+            [style*="grid-template-columns: repeat(auto-fit"] {
+              grid-template-columns: repeat(2, 1fr) !important;
+            }
+          }
+          @media (min-width: 1600px) {
+            [style*="grid-template-columns: repeat(auto-fit"] {
+              grid-template-columns: repeat(4, 1fr) !important;
+            }
+          }
+        `}</style>
         {servicios.map((servicio, i) => (
           <motion.div
             key={i}

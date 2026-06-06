@@ -14,9 +14,11 @@ export default function MarcasSectores() {
 
   return (
     <section style={{
-      padding: "80px 24px",
-      maxWidth: "1200px",
+      padding: "clamp(60px, 8vw, 80px) clamp(24px, 6vw, 56px)",
+      maxWidth: "1440px",
       margin: "0 auto",
+      width: "100%",
+      boxSizing: "border-box",
     }}>
       {/* Supratítulo */}
       <motion.p
@@ -44,12 +46,15 @@ export default function MarcasSectores() {
         viewport={{ once: true }}
         transition={{ duration: 0.6, delay: 0.1 }}
         style={{
-          fontSize: "clamp(28px, 5vw, 60px)",
+          fontSize: "clamp(28px, 4vw, 60px)",
           fontWeight: 900,
           lineHeight: 1.2,
           marginBottom: "48px",
           letterSpacing: "-0.02em",
           fontFamily: "'Helvetica Neue', sans-serif",
+          maxWidth: "100%",
+          wordBreak: "break-word",
+          overflowWrap: "break-word",
         }}
       >
         Marcas que quieren conectar con la generación más influyente del mercado.
@@ -60,6 +65,7 @@ export default function MarcasSectores() {
         display: "flex",
         flexWrap: "wrap",
         gap: "12px",
+        maxWidth: "100%",
       }}>
         {sectores.map((sector, i) => (
           <motion.span

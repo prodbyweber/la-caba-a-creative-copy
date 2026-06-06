@@ -25,14 +25,15 @@ export default function StickyCtaBar() {
     <>
       <style>{`
         .sticky-cta-bar {
-          display: none;
+          display: none !important;
+          visibility: hidden !important;
+          opacity: 0 !important;
         }
         @media (max-width: 767px) {
           .sticky-cta-bar {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
           }
         }
       `}</style>

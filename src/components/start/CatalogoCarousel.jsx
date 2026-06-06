@@ -51,31 +51,38 @@ export default function CatalogoCarousel() {
     <>
     <section style={{
       background: "#080808",
-      padding: "60px 0",
+      padding: "clamp(40px, 6vw, 60px) 0",
       position: "relative",
+      width: "100%",
+      boxSizing: "border-box",
     }}>
       <div style={{
-        maxWidth: "1400px",
+        maxWidth: "1440px",
         margin: "0 auto",
-        padding: "0 20px",
+        padding: "0 clamp(20px, 4vw, 56px)",
+        width: "100%",
+        boxSizing: "border-box",
       }}>
         {/* Header */}
-        <div style={{ marginBottom: "40px" }}>
+        <div style={{ marginBottom: "40px", maxWidth: "100%", wordBreak: "break-word", overflowWrap: "break-word" }}>
           <h2 style={{
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             fontWeight: 900,
-            fontSize: "clamp(1.5rem, 3vw, 2.2rem)",
+            fontSize: "clamp(1.5rem, 2.5vw, 2.2rem)",
             letterSpacing: "-0.03em",
             lineHeight: 1.1,
             color: "#ffffff",
             marginBottom: "8px",
+            maxWidth: "100%",
+            wordBreak: "break-word",
+            overflowWrap: "break-word",
           }}>
             Prod. by Weber x Cabaña Creative
           </h2>
           <p style={{
             fontFamily: "'Helvetica Neue', sans-serif",
             fontWeight: 400,
-            fontSize: "clamp(0.9rem, 1.5vw, 1.1rem)",
+            fontSize: "clamp(0.9rem, 1.3vw, 1.1rem)",
             color: "#AAAAAA",
             lineHeight: 1.5,
           }}>
@@ -86,9 +93,17 @@ export default function CatalogoCarousel() {
         {/* Carousel Container */}
         <div style={{
           position: "relative",
-          maxWidth: "100vw",
-          margin: "0 calc(-50vw + 50%)",
+          width: "100%",
+          margin: "0",
+          overflow: "hidden",
         }}>
+          <style>{`
+            @media (min-width: 1280px) {
+              [style*="position: relative"][style*="width: 100%"] {
+                padding: 0;
+              }
+            }
+          `}</style>
           {/* Left Arrow (Desktop only) */}
           {!isMobile && (
             <button
@@ -122,20 +137,36 @@ export default function CatalogoCarousel() {
           {/* Carousel Track */}
           <div
             ref={carouselRef}
+            className="carousel-track"
             style={{
               display: "flex",
               gap: "16px",
               overflowX: "auto",
+              overflowY: "hidden",
               scrollBehavior: "smooth",
               scrollbarWidth: "none",
               msOverflowStyle: "none",
               WebkitOverflowScrolling: "touch",
               padding: "10px 20px",
+              width: "100%",
             }}
           >
             <style>{`
+              .carousel-track {
+                max-width: 100%;
+              }
               .carousel-track::-webkit-scrollbar {
                 display: none;
+              }
+              @media (min-width: 1280px) {
+                .carousel-track {
+                  padding: 10px 20px !important;
+                }
+              }
+              @media (min-width: 1440px) {
+                .carousel-track {
+                  padding: 10px 40px !important;
+                }
               }
             `}</style>
 
@@ -150,8 +181,9 @@ export default function CatalogoCarousel() {
                   onClick={() => handleCardClick(item.id)}
                   style={{
                     flex: "0 0 auto",
-                    width: isMobile ? "calc(100vw - 56px)" : "calc(20vw - 12px)",
-                    minWidth: isMobile ? "calc(100vw - 56px)" : "280px",
+                    width: isMobile ? "calc(100vw - 56px)" : "calc(20% - 16px)",
+                    minWidth: "280px",
+                    maxWidth: "400px",
                     aspectRatio: "16/9",
                     borderRadius: "12px",
                     overflow: "hidden",

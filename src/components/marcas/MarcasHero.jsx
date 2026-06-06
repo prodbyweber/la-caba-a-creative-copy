@@ -50,6 +50,9 @@ export default function MarcasHero() {
           display: flex;
           flex-direction: column;
           min-height: 100dvh;
+          max-width: 1920px;
+          margin: 0 auto;
+          width: 100%;
         }
         .hero-text-col {
           display: flex;
@@ -100,12 +103,14 @@ export default function MarcasHero() {
         }
         .sectores-subtitle {
           font-family: 'Helvetica Neue', sans-serif;
-          font-size: clamp(1.3rem, 3vw, 2rem);
+          font-size: clamp(1.3rem, 2.5vw, 2rem);
           font-weight: 900;
           color: #f0ede8;
           line-height: 1.15;
           margin: 0;
-          max-width: 500px;
+          max-width: 100%;
+          word-break: break-word;
+          overflow-wrap: break-word;
         }
         .sectores-grid {
           display: flex;
@@ -164,7 +169,7 @@ export default function MarcasHero() {
           .hero-text-col {
             width: 54%;
             flex: none;
-            padding: 80px 56px 60px;
+            padding: 80px clamp(40px, 6vw, 56px) 60px;
             order: 1;
             display: flex;
             flex-direction: column;
@@ -181,15 +186,23 @@ export default function MarcasHero() {
           .hero-sectores-section {
             order: 3;
             width: 100%;
-            padding: 60px 56px;
+            padding: 60px clamp(40px, 6vw, 56px);
           }
           .sectores-button {
             max-width: 100%;
           }
         }
         @media (min-width: 1200px) {
-          .hero-text-col { padding: 120px 80px 80px; }
-          .hero-sectores-section { padding: 80px; }
+          .hero-text-col { padding: 120px clamp(56px, 8vw, 80px) 80px; }
+          .hero-sectores-section { padding: 80px clamp(56px, 8vw, 80px); }
+        }
+        @media (min-width: 1280px) {
+          .hero-text-col h1 {
+            font-size: clamp(2.1rem, 3.5vw, 4rem) !important;
+          }
+          .sectores-subtitle {
+            font-size: clamp(1.3rem, 2vw, 2rem) !important;
+          }
         }
       `}</style>
 
@@ -219,11 +232,14 @@ export default function MarcasHero() {
             <h1 style={{
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               fontWeight: 900,
-              fontSize: "clamp(2.1rem, 5.2vw, 4rem)",
+              fontSize: "clamp(2.1rem, 4vw, 4rem)",
               letterSpacing: "-0.04em",
               lineHeight: 0.93,
               color: "#f0ede8",
               margin: 0,
+              maxWidth: "100%",
+              wordBreak: "break-word",
+              overflowWrap: "break-word",
             }}>
               Tu marca necesita hablarle a la Gen Z.
               <br />

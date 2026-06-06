@@ -42,8 +42,10 @@ export default function PricingPlans() {
       ref={ref}
       style={{
         background: "#080808",
-        padding: "clamp(80px, 10vw, 120px) clamp(24px, 6vw, 56px)",
+        padding: "clamp(60px, 8vw, 120px) clamp(24px, 6vw, 56px)",
         position: "relative",
+        width: "100%",
+        boxSizing: "border-box",
       }}
     >
       <motion.p
@@ -62,11 +64,14 @@ export default function PricingPlans() {
         style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontWeight: 900,
-          fontSize: "clamp(1.8rem, 4.5vw, 3.2rem)",
+          fontSize: "clamp(1.8rem, 3.5vw, 3.2rem)",
           letterSpacing: "-0.04em",
           lineHeight: 0.95,
           color: "#f0ede8",
           marginBottom: "clamp(12px, 2vw, 16px)",
+          maxWidth: "100%",
+          wordBreak: "break-word",
+          overflowWrap: "break-word",
         }}
       >
         Programa integral de desarrollo artístico

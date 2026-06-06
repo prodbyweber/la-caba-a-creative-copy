@@ -35,6 +35,8 @@ export default function Start() {
       fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
       overflowX: "hidden",
       minHeight: "100dvh",
+      maxWidth: "1920px",
+      margin: "0 auto",
     }}>
       <StartNav />
 

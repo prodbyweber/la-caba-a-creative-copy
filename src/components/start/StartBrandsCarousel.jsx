@@ -21,6 +21,9 @@ export default function StartBrandsCarousel() {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
           gap: 12px;
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 20px;
         }
         .brand-cell {
           display: flex;
@@ -34,10 +37,17 @@ export default function StartBrandsCarousel() {
           border: 1px solid rgba(255,255,255,0.04);
           box-sizing: border-box;
         }
+        @media (min-width: 1280px) {
+          .brands-grid {
+            gap: 16px;
+            padding: 0 40px;
+          }
+        }
         @media (max-width: 640px) {
           .brands-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
+            padding: 0 12px;
           }
           .brand-cell {
             height: 140px;
