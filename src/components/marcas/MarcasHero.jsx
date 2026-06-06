@@ -44,12 +44,12 @@ export default function MarcasHero() {
   };
 
   return (
-    <section id="hero" style={{ background: "#080808", position: "relative", overflow: "hidden", marginTop: "0" }}>
+    <section id="hero" style={{ background: "#080808", position: "relative", overflow: "hidden" }}>
       <style>{`
         .hero-wrap {
           display: flex;
           flex-direction: column;
-          padding-top: 0;
+          min-height: 100dvh;
         }
         .hero-text-col {
           display: flex;
@@ -159,27 +159,22 @@ export default function MarcasHero() {
         @media (min-width: 768px) {
           .hero-wrap {
             flex-direction: row;
-            min-height: 100dvh;
-            padding-top: 80px;
-            gap: 0;
+            height: 100dvh;
           }
           .hero-text-col {
-            width: 50%;
-            flex: 0 0 50%;
+            width: 54%;
+            flex: none;
             padding: 80px 56px 60px;
             order: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            height: 100%;
-            margin-top: 0;
           }
           .hero-media-col {
-            width: 50%;
-            flex: 0 0 50%;
+            width: 46%;
             max-height: none;
             height: 100%;
-            flex-shrink: 0;
+            flex: 1;
             order: 2;
             margin-top: 0;
           }
@@ -187,7 +182,6 @@ export default function MarcasHero() {
             order: 3;
             width: 100%;
             padding: 60px 56px;
-            margin-top: 0;
           }
           .sectores-button {
             max-width: 100%;
@@ -195,7 +189,6 @@ export default function MarcasHero() {
         }
         @media (min-width: 1200px) {
           .hero-text-col { padding: 120px 80px 80px; }
-          .hero-wrap { padding-top: 80px; }
           .hero-sectores-section { padding: 80px; }
         }
       `}</style>
