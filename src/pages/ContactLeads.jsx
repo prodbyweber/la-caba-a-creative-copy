@@ -64,6 +64,41 @@ function LeadDetailModal({ lead, onClose }) {
                 )}
               </div>
             </div>
+            {/* Botones de acción arriba */}
+            <div className="flex flex-col sm:flex-row gap-2 mb-4 pb-4 border-b border-white/[0.06]">
+              <a
+                href={`mailto:${lead.email}?subject=Re: Tu mensaje en Cabaña Creative`}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#ff5833] hover:bg-[#e84d2a] text-white font-semibold text-sm transition-all"
+              >
+                <Mail className="w-4 h-4" />
+                Responder email
+              </a>
+              {lead.phone && lead.phone !== '-' && (
+                <a
+                  href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${lead.name}, soy el equipo de Cabaña Creative. Hemos recibido tu mensaje y estamos aquí para ayudarte. ¿Cuándo te vendría bien una videollamada?`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-sm font-medium"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  WhatsApp
+                </a>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Email</p>
+                <a href={`mailto:${lead.email}`} className="text-sm text-[#ff5833] hover:underline break-all">{lead.email}</a>
+              </div>
+              <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Teléfono</p>
+                {lead.phone && lead.phone !== '-' ? (
+                  <a href={`tel:${lead.phone}`} className="text-sm text-white/70 hover:text-white">{lead.phone}</a>
+                ) : (
+                  <p className="text-sm text-white/25 italic">No indicado</p>
+                )}
+              </div>
+            </div>
             <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
               <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Fecha</p>
               <p className="text-sm text-white/60">
@@ -76,26 +111,6 @@ function LeadDetailModal({ lead, onClose }) {
                 <p className="text-[10px] text-white/30 uppercase tracking-widest">Mensaje</p>
               </div>
               <p className="text-sm text-white/70 leading-relaxed whitespace-pre-line">{lead.message}</p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2 mt-4 pt-4 border-t border-white/[0.06]">
-              <a
-                href={`mailto:${lead.email}?subject=Re: Tu mensaje en Cabaña Creative`}
-                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#ff5833] hover:bg-[#e84d2a] text-white font-semibold text-sm transition-all"
-              >
-                <Mail className="w-4 h-4" />
-                Responder email
-              </a>
-              {lead.phone && lead.phone !== '-' && (
-                <a
-                  href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${lead.name}, soy el equipo de Cabaña Creative. Hemos recibido tu mensaje y estamos aquí para ayudarte. ¿Cuándo te vendría bien una videollamada?`)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-sm font-medium"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  WhatsApp
-                </a>
-              )}
             </div>
           </div>
         </motion.div>
@@ -143,6 +158,27 @@ function ApplicationDetailModal({ app, onClose }) {
             </button>
           </div>
           <div className="p-6 space-y-3">
+            {/* Botones de acción arriba */}
+            <div className="flex flex-col sm:flex-row gap-2 mb-4 pb-4 border-b border-white/[0.06]">
+              <a
+                href={`mailto:${app.email}?subject=Tu solicitud en Cabaña Creative`}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#ff5833] hover:bg-[#e84d2a] text-white font-semibold text-sm transition-all"
+              >
+                <Mail className="w-4 h-4" />
+                Enviar email
+              </a>
+              {app.telefono && app.telefono !== '-' && (
+                <a
+                  href={`https://wa.me/${app.telefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${app.nombre}, soy el equipo de Cabaña Creative. Hemos recibido tu solicitud y nos gustaría conocer más sobre tu proyecto. ¿Tienes disponibilidad para una videollamada esta semana?`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-sm font-medium"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  WhatsApp
+                </a>
+              )}
+            </div>
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {fields.map(f => f.value ? (
                 <div key={f.label} className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
@@ -154,26 +190,6 @@ function ApplicationDetailModal({ app, onClose }) {
                   )}
                 </div>
               ) : null)}
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2 mt-4 pt-4 border-t border-white/[0.06]">
-              <a
-                href={`mailto:${app.email}?subject=Tu solicitud en Cabaña Creative`}
-                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#ff5833] hover:bg-[#e84d2a] text-white font-semibold text-sm transition-all"
-              >
-                <Mail className="w-4 h-4" />
-                Enviar email
-              </a>
-              {app.telefono && app.telefono !== '-' && (
-                <a
-                  href={`https://wa.me/${app.telefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${app.nombre}, soy el equipo de Cabaña Creative. Hemos recibido tu solicitud y nos gustaría conocer más sobre tu proyecto. ¿Tienes disponibilidad para una videollamada esta semana?`)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-sm font-medium"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  WhatsApp
-                </a>
-              )}
             </div>
           </div>
         </motion.div>
@@ -366,22 +382,6 @@ export default function ContactLeads() {
                         {app.nombre?.charAt(0)?.toUpperCase() || '?'}
                       </div>
                       <div className="flex-1 min-w-0">
-                        {/* Botones de acción arriba */}
-                        <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/[0.06]">
-                          <a href={`mailto:${app.email}`} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#ff5833]/10 text-[#ff5833] border border-[#ff5833]/20 hover:bg-[#ff5833]/20 transition-all text-xs font-medium">
-                            <Mail className="w-3.5 h-3.5" /> Email
-                          </a>
-                          {app.telefono && (
-                            <>
-                              <a href={`tel:${app.telefono}`} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.06] text-white/70 border border-white/[0.08] hover:bg-white/[0.1] transition-all text-xs font-medium">
-                                <Phone className="w-3.5 h-3.5" /> Llamar
-                              </a>
-                              <a href={`https://wa.me/${app.telefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${app.nombre}, soy el equipo de Cabaña Creative. Hemos recibido tu solicitud y nos gustaría conocer más sobre tu proyecto. ¿Tienes disponibilidad para una videollamada esta semana?`)}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-xs font-medium">
-                                <MessageSquare className="w-3.5 h-3.5" /> WhatsApp
-                              </a>
-                            </>
-                          )}
-                        </div>
                         <div className="flex items-center gap-2 flex-wrap mb-2">
                           <span className="text-sm sm:text-base font-semibold text-white">{app.nombre} {app.apellidos}</span>
                           <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${cfg.color}`}>{cfg.label}</span>
@@ -451,22 +451,6 @@ export default function ContactLeads() {
                         {lead.name?.charAt(0)?.toUpperCase() || '?'}
                       </div>
                       <div className="flex-1 min-w-0">
-                        {/* Botones de acción arriba */}
-                        <div className="flex items-center gap-2 mb-2 pb-2 border-b border-white/[0.06]">
-                          <a href={`mailto:${lead.email}`} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#ff5833]/10 text-[#ff5833] border border-[#ff5833]/20 hover:bg-[#ff5833]/20 transition-all text-xs font-medium">
-                            <Mail className="w-3.5 h-3.5" /> Email
-                          </a>
-                          {lead.phone && lead.phone !== '-' && (
-                            <>
-                              <a href={`tel:${lead.phone}`} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.06] text-white/70 border border-white/[0.08] hover:bg-white/[0.1] transition-all text-xs font-medium">
-                                <Phone className="w-3.5 h-3.5" /> Llamar
-                              </a>
-                              <a href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${lead.name}, soy el equipo de Cabaña Creative. Hemos recibido tu mensaje y estamos aquí para ayudarte. ¿Cuándo te vendría bien una videollamada?`)}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-xs font-medium">
-                                <MessageSquare className="w-3.5 h-3.5" /> WhatsApp
-                              </a>
-                            </>
-                          )}
-                        </div>
                         <div className="flex items-center gap-2 flex-wrap mb-2">
                           <span className="text-sm sm:text-base font-semibold text-white">{lead.name}</span>
                           <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${cfg.color}`}>{cfg.label}</span>
