@@ -77,20 +77,20 @@ function LeadDetailModal({ lead, onClose }) {
               </div>
               <p className="text-sm text-white/70 leading-relaxed whitespace-pre-line">{lead.message}</p>
             </div>
-            <div className="flex gap-2 items-center">
+            <div className="flex flex-col sm:flex-row gap-2 mt-4 pt-4 border-t border-white/[0.06]">
               <a
                 href={`mailto:${lead.email}?subject=Re: Tu mensaje en Cabaña Creative`}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#ff5833] hover:bg-[#e84d2a] text-white font-semibold text-sm transition-all"
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#ff5833] hover:bg-[#e84d2a] text-white font-semibold text-sm transition-all"
               >
                 <Mail className="w-4 h-4" />
-                Responder por email
+                Responder email
               </a>
               {lead.phone && lead.phone !== '-' && (
                 <a
                   href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${lead.name}, soy el equipo de Cabaña Creative. Hemos recibido tu mensaje y estamos aquí para ayudarte. ¿Cuándo te vendría bien una videollamada?`)}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-4 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-sm font-medium flex items-center gap-2"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-sm font-medium"
                 >
                   <MessageSquare className="w-4 h-4" />
                   WhatsApp
@@ -117,7 +117,7 @@ function ApplicationDetailModal({ app, onClose }) {
     { label: "Viaje a Madrid", value: app.disponibilidad_viaje_madrid === 'si' ? 'Sí' : app.disponibilidad_viaje_madrid === 'no' ? 'No' : app.disponibilidad_viaje_madrid },
     { label: "Situación laboral", value: app.situacion_laboral },
     { label: "Experiencia música", value: app.experiencia_musica },
-    { label: "Presupuesto 2000€", value: app.presupuesto_minimo ? 'Confirmado ✓' : 'No confirmado' },
+    { label: "Presupuesto", value: app.presupuesto || 'No especificado' },
   ];
   return (
     <AnimatePresence>
@@ -143,32 +143,32 @@ function ApplicationDetailModal({ app, onClose }) {
             </button>
           </div>
           <div className="p-6 space-y-3">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               {fields.map(f => f.value ? (
-                <div key={f.label} className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <div key={f.label} className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
                   <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">{f.label}</p>
                   {f.href ? (
-                    <a href={f.href} className="text-sm text-[#ff5833] hover:underline break-all">{f.value}</a>
+                    <a href={f.href} className="text-xs sm:text-sm text-[#ff5833] hover:underline break-all">{f.value}</a>
                   ) : (
-                    <p className="text-sm text-white/70">{f.value}</p>
+                    <p className="text-xs sm:text-sm text-white/70">{f.value}</p>
                   )}
                 </div>
               ) : null)}
             </div>
-            <div className="flex gap-2 mt-2">
+            <div className="flex flex-col sm:flex-row gap-2 mt-4 pt-4 border-t border-white/[0.06]">
               <a
                 href={`mailto:${app.email}?subject=Tu solicitud en Cabaña Creative`}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#ff5833] hover:bg-[#e84d2a] text-white font-semibold text-sm transition-all"
+                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#ff5833] hover:bg-[#e84d2a] text-white font-semibold text-sm transition-all"
               >
                 <Mail className="w-4 h-4" />
-                Email
+                Enviar email
               </a>
               {app.telefono && app.telefono !== '-' && (
                 <a
                   href={`https://wa.me/${app.telefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${app.nombre}, soy el equipo de Cabaña Creative. Hemos recibido tu solicitud y nos gustaría conocer más sobre tu proyecto. ¿Tienes disponibilidad para una videollamada esta semana?`)}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-sm font-medium"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-sm font-medium"
                 >
                   <MessageSquare className="w-4 h-4" />
                   WhatsApp
@@ -199,7 +199,7 @@ function exportCSV(apps) {
 }
 
 export default function ContactLeads() {
-  const [tab, setTab] = useState("applications"); // "applications" | "contact"
+  const [tab, setTab] = useState("applications");
   const [selectedLead, setSelectedLead] = useState(null);
   const [selectedApp, setSelectedApp] = useState(null);
   const [search, setSearch] = useState("");
@@ -261,19 +261,19 @@ export default function ContactLeads() {
 
   return (
     <AdminLayout activePage="ContactLeads">
-      <div className="px-4 sm:px-8 lg:px-14 xl:px-20 py-6 max-w-[1400px] mx-auto">
+      <div className="px-4 sm:px-6 lg:px-10 xl:px-16 py-8 sm:py-10 max-w-[1400px] mx-auto pb-24 sm:pb-16">
 
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Solicitudes</h1>
-          <p className="text-sm text-white/30">Gestión de todas las solicitudes recibidas</p>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1">Solicitudes</h1>
+          <p className="text-xs sm:text-sm text-white/30">Gestión de todas las solicitudes recibidas</p>
         </motion.div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-white/[0.07] pb-0">
+        <div className="flex gap-1 sm:gap-2 mb-5 sm:mb-6 border-b border-white/[0.07] pb-0">
           <button
             onClick={() => { setTab("applications"); setSearch(""); setFilterStatus("all"); }}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-px ${
+            className={`flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold transition-all border-b-2 -mb-px ${
               tab === "applications"
                 ? "border-[#ff5833] text-white"
                 : "border-transparent text-white/35 hover:text-white/60"
@@ -300,7 +300,7 @@ export default function ContactLeads() {
         </div>
 
         {/* Search + Filters */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-5">
+        <div className="flex flex-col sm:flex-row gap-3 mb-5 sm:mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/25" />
             <input
@@ -308,7 +308,7 @@ export default function ContactLeads() {
               placeholder="Buscar por nombre o email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 bg-[#111113] border border-white/[0.08] rounded-xl text-white placeholder-white/25 focus:outline-none focus:border-white/20 text-sm"
+              className="w-full pl-9 pr-4 py-2 sm:py-2.5 bg-[#111113] border border-white/[0.08] rounded-xl text-white placeholder-white/25 focus:outline-none focus:border-white/20 text-xs sm:text-sm"
             />
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -316,13 +316,13 @@ export default function ContactLeads() {
               <>
                 {["all","nueva","revisada","contactada","aceptada","rechazada"].map(s => (
                   <button key={s} onClick={() => setFilterStatus(s)}
-                    className={`px-3 py-2 rounded-xl text-xs font-medium transition-all border ${
+                    className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-medium transition-all border ${
                       filterStatus === s ? 'bg-white/10 text-white border-white/20' : 'bg-transparent text-white/35 border-white/[0.07] hover:border-white/15 hover:text-white/60'
                     }`}>
                     {s === "all" ? "Todos" : (APP_STATUS_CONFIG[s]?.label || s)}
                   </button>
                 ))}
-                <button onClick={() => exportCSV(applications)} className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium border border-white/[0.07] text-white/35 hover:text-white/60 hover:border-white/15 transition-all">
+                <button onClick={() => exportCSV(applications)} className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-medium border border-white/[0.07] text-white/35 hover:text-white/60 hover:border-white/15 transition-all">
                   <Download className="w-3.5 h-3.5" /> CSV
                 </button>
               </>
@@ -351,59 +351,59 @@ export default function ContactLeads() {
               <p className="text-white/25 text-sm">No hay solicitudes de plaza</p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 sm:space-y-3">
               {filteredApps.map((app, i) => {
                 const cfg = APP_STATUS_CONFIG[app.status] || APP_STATUS_CONFIG.nueva;
+                const presupuestoTexto = app.presupuesto || 'No especificado';
                 return (
                   <motion.div key={app.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.025 }}
-                    className="group bg-[#111113] border border-white/[0.06] hover:border-white/[0.12] rounded-xl p-4 transition-all"
+                    className="group bg-[#111113] border border-white/[0.06] hover:border-white/[0.12] rounded-xl p-3 sm:p-4 transition-all"
                   >
-                    <div className="flex items-start gap-4">
-                      <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center font-bold text-sm ${
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex-shrink-0 flex items-center justify-center font-bold text-xs sm:text-sm ${
                         app.status === 'nueva' ? 'bg-[#ff5833]/15 text-[#ff5833]' : 'bg-white/[0.06] text-white/40'
                       }`}>
                         {app.nombre?.charAt(0)?.toUpperCase() || '?'}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="text-sm font-semibold text-white">{app.nombre} {app.apellidos}</span>
+                        <div className="flex items-center gap-2 flex-wrap mb-2">
+                          <span className="text-sm sm:text-base font-semibold text-white">{app.nombre} {app.apellidos}</span>
                           <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${cfg.color}`}>{cfg.label}</span>
-                          {app.status === 'nueva' && <span className="w-2 h-2 rounded-full bg-[#ff5833] animate-pulse" />}
-                          {app.presupuesto_minimo && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#ff5833]/10 text-[#ff5833] border border-[#ff5833]/20 font-medium">2.000€ ✓</span>
-                          )}
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-white/35 mb-1 flex-wrap">
-                          <span className="flex items-center gap-1"><Mail className="w-3 h-3" />{app.email}</span>
-                          {app.telefono && <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{app.telefono}</span>}
-                          {app.pais_residencia && <span className="text-white/25">{app.pais_residencia}</span>}
-                          {app.created_date && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{format(parseISO(app.created_date), "d MMM yyyy", { locale: es })}</span>}
+                        {app.status === 'nueva' && <span className="w-2 h-2 rounded-full bg-[#ff5833] animate-pulse mb-2" />}
+                        <div className="flex flex-col gap-1.5 text-xs text-white/40 mb-2">
+                          <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{app.email}</span>
+                          {app.telefono && <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{app.telefono}</span>}
+                          {app.pais_residencia && <span className="flex items-center gap-1.5"><span className="w-3 h-3 flex items-center justify-center">📍</span>{app.pais_residencia}</span>}
                         </div>
-                        {app.situacion_laboral && (
-                          <p className="text-xs text-white/30">{app.situacion_laboral} · {app.experiencia_musica}</p>
-                        )}
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.situacion_laboral || 'N/A'}</span>
+                          <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.experiencia_musica || 'N/A'}</span>
+                          <span className="text-[10px] px-2 py-1 rounded-lg bg-[#ff5833]/10 border border-[#ff5833]/20 text-[#ff5833] font-medium">Presupuesto: {presupuestoTexto}</span>
+                        </div>
+                        {app.created_date && <p className="text-[10px] text-white/25 flex items-center gap-1"><Calendar className="w-3 h-3" />{format(parseISO(app.created_date), "d MMM yyyy", { locale: es })}</p>}
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <button onClick={() => setSelectedApp(app)} className="w-8 h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
+                        <button onClick={() => setSelectedApp(app)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
                           <Eye className="w-3.5 h-3.5 text-white/50" />
                         </button>
                         <select
                           value={app.status}
                           onChange={e => updateAppStatus.mutate({ id: app.id, status: e.target.value })}
-                          className="h-8 px-2 rounded-lg bg-white/[0.05] border border-white/[0.08] text-white/50 text-xs focus:outline-none hover:bg-white/10 transition-colors cursor-pointer"
-                          style={{ appearance: "none", paddingRight: "8px" }}
+                          className="h-7 sm:h-8 px-1.5 sm:px-2 rounded-lg bg-white/[0.05] border border-white/[0.08] text-white/50 text-[10px] sm:text-xs focus:outline-none hover:bg-white/10 transition-colors cursor-pointer"
+                          style={{ appearance: "none", paddingRight: "6px" }}
                         >
                           {Object.entries(APP_STATUS_CONFIG).map(([k, v]) => (
                             <option key={k} value={k} style={{ background: "#111" }}>{v.label}</option>
                           ))}
                         </select>
-                        <button onClick={() => deleteApp.mutate(app.id)} className="w-8 h-8 rounded-lg bg-white/[0.05] hover:bg-red-500/10 flex items-center justify-center transition-colors group/del" title="Eliminar">
+                        <button onClick={() => deleteApp.mutate(app.id)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-red-500/10 flex items-center justify-center transition-colors group/del" title="Eliminar">
                           <Trash2 className="w-3.5 h-3.5 text-white/30 group-hover/del:text-red-400 transition-colors" />
                         </button>
                       </div>
-                    </div>
-                  </motion.div>
-                );
+                      </div>
+                      </motion.div>
+                      );
               })}
             </div>
           )
@@ -421,47 +421,47 @@ export default function ContactLeads() {
               <p className="text-white/25 text-sm">No hay mensajes de contacto</p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 sm:space-y-3">
               {filteredLeads.map((lead, i) => {
                 const cfg = LEAD_STATUS_CONFIG[lead.status] || LEAD_STATUS_CONFIG.Nuevo;
                 return (
                   <motion.div key={lead.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                    className="group bg-[#111113] border border-white/[0.06] hover:border-white/[0.12] rounded-xl p-4 transition-all"
+                    className="group bg-[#111113] border border-white/[0.06] hover:border-white/[0.12] rounded-xl p-3 sm:p-4 transition-all"
                   >
-                    <div className="flex items-start gap-4">
-                      <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center font-bold text-sm ${
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex-shrink-0 flex items-center justify-center font-bold text-xs sm:text-sm ${
                         lead.status === 'Nuevo' ? 'bg-[#ff5833]/15 text-[#ff5833]' : 'bg-white/[0.06] text-white/40'
                       }`}>
                         {lead.name?.charAt(0)?.toUpperCase() || '?'}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="text-sm font-semibold text-white">{lead.name}</span>
+                        <div className="flex items-center gap-2 flex-wrap mb-2">
+                          <span className="text-sm sm:text-base font-semibold text-white">{lead.name}</span>
                           <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${cfg.color}`}>{cfg.label}</span>
-                          {lead.status === 'Nuevo' && <span className="w-2 h-2 rounded-full bg-[#ff5833] animate-pulse" />}
                         </div>
-                        <div className="flex items-center gap-3 text-xs text-white/35 mb-2 flex-wrap">
-                          <span className="flex items-center gap-1"><Mail className="w-3 h-3" />{lead.email}</span>
-                          {lead.phone && lead.phone !== '-' && <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{lead.phone}</span>}
-                          {lead.created_date && <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{format(parseISO(lead.created_date), "d MMM yyyy", { locale: es })}</span>}
+                        {lead.status === 'Nuevo' && <span className="w-2 h-2 rounded-full bg-[#ff5833] animate-pulse mb-2" />}
+                        <div className="flex flex-col gap-1.5 text-xs text-white/40 mb-2">
+                          <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{lead.email}</span>
+                          {lead.phone && lead.phone !== '-' && <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{lead.phone}</span>}
                         </div>
-                        <p className="text-xs text-white/40 line-clamp-2 leading-relaxed">{lead.message}</p>
+                        <p className="text-xs text-white/50 leading-relaxed mb-2 line-clamp-2">{lead.message}</p>
+                        {lead.created_date && <p className="text-[10px] text-white/25 flex items-center gap-1"><Calendar className="w-3 h-3" />{format(parseISO(lead.created_date), "d MMM yyyy", { locale: es })}</p>}
                       </div>
                       <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <button onClick={() => handleViewLead(lead)} className="w-8 h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
+                        <button onClick={() => handleViewLead(lead)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
                           <Eye className="w-3.5 h-3.5 text-white/50" />
                         </button>
                         <button onClick={() => updateLeadStatus.mutate({ id: lead.id, status: lead.status === 'Archivado' ? 'Revisado' : 'Archivado' })}
-                          className="w-8 h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title={lead.status === 'Archivado' ? 'Desarchivar' : 'Archivar'}>
+                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title={lead.status === 'Archivado' ? 'Desarchivar' : 'Archivar'}>
                           <Archive className={`w-3.5 h-3.5 ${lead.status === 'Archivado' ? 'text-[#ff5833]' : 'text-white/50'}`} />
                         </button>
-                        <button onClick={() => deleteLead.mutate(lead.id)} className="w-8 h-8 rounded-lg bg-white/[0.05] hover:bg-red-500/10 flex items-center justify-center transition-colors group/del" title="Eliminar">
+                        <button onClick={() => deleteLead.mutate(lead.id)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-red-500/10 flex items-center justify-center transition-colors group/del" title="Eliminar">
                           <Trash2 className="w-3.5 h-3.5 text-white/30 group-hover/del:text-red-400 transition-colors" />
                         </button>
                       </div>
-                    </div>
-                  </motion.div>
-                );
+                      </div>
+                      </motion.div>
+                      );
               })}
             </div>
           )
