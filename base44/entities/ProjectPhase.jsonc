@@ -1,0 +1,50 @@
+{
+  "name": "ProjectPhase",
+  "type": "object",
+  "properties": {
+    "phase_name": {
+      "type": "string",
+      "description": "Nombre de la fase"
+    },
+    "objectives": {
+      "type": "string",
+      "description": "Objetivos"
+    },
+    "budget": {
+      "type": "number",
+      "description": "Presupuesto asociado"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de inicio"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de finalizaci\u00f3n"
+    },
+    "completion_percentage": {
+      "type": "number",
+      "default": 0,
+      "description": "% completado"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Planificada",
+        "En Progreso",
+        "Completada",
+        "Retrasada"
+      ],
+      "default": "Planificada",
+      "description": "Estado"
+    }
+  },
+  "required": [
+    "phase_name",
+    "budget",
+    "start_date",
+    "end_date"
+  ]
+}

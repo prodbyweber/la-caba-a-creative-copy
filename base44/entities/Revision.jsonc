@@ -1,0 +1,78 @@
+{
+  "name": "Revision",
+  "type": "object",
+  "properties": {
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "ID del proyecto"
+    },
+    "track_id": {
+      "type": "string",
+      "description": "ID del track espec\u00edfico"
+    },
+    "timecode": {
+      "type": "string",
+      "description": "C\u00f3digo de tiempo MM:SS (ej: 01:32)"
+    },
+    "revision_type": {
+      "type": "string",
+      "enum": [
+        "Vocal",
+        "Beat",
+        "Mix",
+        "Master",
+        "Arrangement",
+        "FX",
+        "Lyrics"
+      ],
+      "default": "Mix",
+      "description": "Tipo de revisi\u00f3n"
+    },
+    "request_text": {
+      "type": "string",
+      "description": "Descripci\u00f3n de la revisi\u00f3n solicitada"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "Small",
+        "Medium",
+        "Critical"
+      ],
+      "default": "Medium",
+      "description": "Severidad de la revisi\u00f3n"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Open",
+        "InProgress",
+        "Fixed",
+        "NeedsReview",
+        "Closed"
+      ],
+      "default": "Open",
+      "description": "Estado de la revisi\u00f3n"
+    },
+    "assigned_to": {
+      "type": "string",
+      "enum": [
+        "Me",
+        "Engineer",
+        "Editor"
+      ],
+      "default": "Me",
+      "description": "Asignado a"
+    }
+  },
+  "required": [
+    "artist_id",
+    "project_id",
+    "timecode",
+    "request_text"
+  ]
+}

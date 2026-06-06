@@ -1,0 +1,129 @@
+{
+  "name": "ArtistBrandDNA",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario que cre\u00f3 el ADN"
+    },
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista asociado"
+    },
+    "firstName": {
+      "type": "string",
+      "description": "Nombre"
+    },
+    "lastName": {
+      "type": "string",
+      "description": "Apellido"
+    },
+    "artistName": {
+      "type": "string",
+      "description": "Nombre art\u00edstico"
+    },
+    "birthCountry": {
+      "type": "string",
+      "description": "Pa\u00eds de nacimiento"
+    },
+    "residenceCountry": {
+      "type": "string",
+      "description": "Pa\u00eds de residencia"
+    },
+    "phoneCode": {
+      "type": "string",
+      "description": "C\u00f3digo de pa\u00eds del tel\u00e9fono"
+    },
+    "phoneNumber": {
+      "type": "string",
+      "description": "N\u00famero de tel\u00e9fono"
+    },
+    "emotions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Emociones n\u00facleo"
+    },
+    "vibe": {
+      "type": "string",
+      "description": "Energ\u00eda/vibe"
+    },
+    "genres": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "G\u00e9neros musicales"
+    },
+    "textures": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Texturas sonoras"
+    },
+    "musicReferences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Referencias musicales"
+    },
+    "narratives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Narrativas"
+    },
+    "narrativeText": {
+      "type": "string",
+      "description": "Texto narrativo personalizado"
+    },
+    "visualLinks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Referencias visuales"
+    },
+    "colors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Paleta de colores"
+    },
+    "palette": {
+      "type": "string",
+      "description": "Nombre de la paleta predefinida"
+    },
+    "typography": {
+      "type": "object",
+      "properties": {
+        "primary": {
+          "type": "string"
+        },
+        "secondary": {
+          "type": "string"
+        }
+      },
+      "description": "Tipograf\u00edas"
+    },
+    "has_paid": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si ha pagado por el servicio completo"
+    }
+  },
+  "required": []
+}

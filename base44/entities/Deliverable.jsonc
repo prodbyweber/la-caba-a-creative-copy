@@ -1,0 +1,65 @@
+{
+  "name": "Deliverable",
+  "type": "object",
+  "properties": {
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "ID del proyecto"
+    },
+    "deliverable_type": {
+      "type": "string",
+      "enum": [
+        "Demo",
+        "Beat",
+        "Recording",
+        "Mix",
+        "Master",
+        "Stems",
+        "Visual",
+        "ContentPack"
+      ],
+      "default": "Demo",
+      "description": "Tipo de entregable"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo del entregable"
+    },
+    "due_date_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha y hora l\u00edmite"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Pending",
+        "Sent",
+        "Approved",
+        "Rejected",
+        "Overdue"
+      ],
+      "default": "Pending",
+      "description": "Estado del entregable"
+    },
+    "delivery_link": {
+      "type": "string",
+      "description": "Enlace al entregable"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas sobre el entregable"
+    }
+  },
+  "required": [
+    "artist_id",
+    "project_id",
+    "deliverable_type",
+    "title",
+    "due_date_time"
+  ]
+}

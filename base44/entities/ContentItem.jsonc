@@ -1,0 +1,78 @@
+{
+  "name": "ContentItem",
+  "type": "object",
+  "properties": {
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista (opcional si es contenido de marca)"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "ID del proyecto relacionado (opcional)"
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "IGReels",
+        "TikTok",
+        "YouTubeShorts",
+        "YouTubeLong",
+        "Blog"
+      ],
+      "default": "IGReels",
+      "description": "Plataforma de publicaci\u00f3n"
+    },
+    "content_pillar": {
+      "type": "string",
+      "enum": [
+        "BTS",
+        "Education",
+        "Results",
+        "Lifestyle",
+        "Offer",
+        "UrbanLeague"
+      ],
+      "default": "BTS",
+      "description": "Pilar de contenido"
+    },
+    "idea": {
+      "type": "string",
+      "description": "Idea del contenido"
+    },
+    "script": {
+      "type": "string",
+      "description": "Gui\u00f3n del contenido"
+    },
+    "recording_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de grabaci\u00f3n"
+    },
+    "scheduled_post_date_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha y hora programada de publicaci\u00f3n"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Idea",
+        "Script",
+        "ToRecord",
+        "Recorded",
+        "Edited",
+        "Scheduled",
+        "Posted"
+      ],
+      "default": "Idea",
+      "description": "Estado del contenido"
+    },
+    "assets_link": {
+      "type": "string",
+      "description": "Enlace a archivos/assets"
+    }
+  },
+  "required": [
+    "idea"
+  ]
+}

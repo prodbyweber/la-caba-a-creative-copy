@@ -1,0 +1,46 @@
+{
+  "name": "DigitalBudget",
+  "type": "object",
+  "properties": {
+    "concept": {
+      "type": "string",
+      "description": "Concepto (desarrollo web, plataforma, etc.)"
+    },
+    "assigned_budget": {
+      "type": "number",
+      "description": "Presupuesto asignado"
+    },
+    "executed_cost": {
+      "type": "number",
+      "default": 0,
+      "description": "Gasto ejecutado"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "MVP",
+        "Mejora",
+        "Mantenimiento",
+        "Completado"
+      ],
+      "default": "MVP",
+      "description": "Estado del desarrollo"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Desarrollo Web",
+        "Plataforma Digital",
+        "Automatizaciones",
+        "Hosting",
+        "Herramientas"
+      ],
+      "description": "Categor\u00eda"
+    }
+  },
+  "required": [
+    "concept",
+    "assigned_budget",
+    "category"
+  ]
+}

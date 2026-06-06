@@ -1,0 +1,52 @@
+{
+  "name": "GastoPersonalUnico",
+  "type": "object",
+  "properties": {
+    "fecha": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha del gasto"
+    },
+    "nombre": {
+      "type": "string",
+      "description": "Nombre del gasto"
+    },
+    "categoria": {
+      "type": "string",
+      "enum": [
+        "Ocio",
+        "Comida",
+        "Compras",
+        "Viajes",
+        "Salud",
+        "Formaci\u00f3n",
+        "Regalos",
+        "Otros"
+      ],
+      "description": "Categor\u00eda del gasto"
+    },
+    "importe": {
+      "type": "number",
+      "description": "Importe del gasto"
+    },
+    "estado": {
+      "type": "string",
+      "enum": [
+        "Pendiente",
+        "Pagado"
+      ],
+      "default": "Pagado",
+      "description": "Estado del pago"
+    },
+    "notas": {
+      "type": "string",
+      "description": "Notas adicionales"
+    }
+  },
+  "required": [
+    "fecha",
+    "nombre",
+    "categoria",
+    "importe"
+  ]
+}

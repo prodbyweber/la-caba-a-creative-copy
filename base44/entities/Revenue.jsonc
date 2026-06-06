@@ -1,0 +1,33 @@
+{
+  "name": "Revenue",
+  "type": "object",
+  "properties": {
+    "month": {
+      "type": "string",
+      "description": "Mes (YYYY-MM)"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "Estudio",
+        "Plataforma",
+        "Productos Digitales",
+        "Otros"
+      ],
+      "description": "Fuente de ingreso"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Monto"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n"
+    }
+  },
+  "required": [
+    "month",
+    "source",
+    "amount"
+  ]
+}

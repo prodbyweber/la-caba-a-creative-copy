@@ -1,0 +1,44 @@
+{
+  "name": "Note",
+  "type": "object",
+  "properties": {
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "ID del proyecto"
+    },
+    "track_id": {
+      "type": "string",
+      "description": "ID del track espec\u00edfico"
+    },
+    "timecode": {
+      "type": "string",
+      "description": "C\u00f3digo de tiempo opcional MM:SS"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "CreativeDirection",
+        "Lyrics",
+        "Arrangement",
+        "MixNotes",
+        "Branding",
+        "VisualIdeas"
+      ],
+      "default": "CreativeDirection",
+      "description": "Categor\u00eda de la nota"
+    },
+    "text": {
+      "type": "string",
+      "description": "Contenido de la nota"
+    }
+  },
+  "required": [
+    "artist_id",
+    "project_id",
+    "text"
+  ]
+}

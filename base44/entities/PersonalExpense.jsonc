@@ -1,0 +1,64 @@
+{
+  "name": "PersonalExpense",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha del gasto personal"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Comida",
+        "Transporte",
+        "Ocio",
+        "Salud",
+        "Ropa",
+        "Vivienda",
+        "Educaci\u00f3n",
+        "Suscripciones",
+        "Otro"
+      ],
+      "default": "Otro",
+      "description": "Categor\u00eda del gasto personal"
+    },
+    "concept": {
+      "type": "string",
+      "description": "Concepto del gasto"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Monto del gasto"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "Tarjeta",
+        "Bizum",
+        "Efectivo",
+        "Transferencia",
+        "Otro"
+      ],
+      "description": "M\u00e9todo de pago"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionales"
+    },
+    "month": {
+      "type": "number",
+      "description": "Mes del gasto (1-12)"
+    },
+    "year": {
+      "type": "number",
+      "description": "A\u00f1o del gasto"
+    }
+  },
+  "required": [
+    "date",
+    "category",
+    "concept",
+    "amount"
+  ]
+}

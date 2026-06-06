@@ -1,0 +1,58 @@
+{
+  "name": "Expense",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha del gasto"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Empresa",
+        "Personal"
+      ],
+      "default": "Empresa",
+      "description": "Categor\u00eda del gasto"
+    },
+    "concept": {
+      "type": "string",
+      "description": "Concepto del gasto"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Monto del gasto"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "Visum",
+        "Transferencia Bancaria",
+        "PayPal",
+        "Tarjeta",
+        "Efectivo",
+        "Otro"
+      ],
+      "description": "M\u00e9todo de pago"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionales"
+    },
+    "month": {
+      "type": "number",
+      "description": "Mes del gasto (1-12)"
+    },
+    "year": {
+      "type": "number",
+      "description": "A\u00f1o del gasto"
+    }
+  },
+  "required": [
+    "date",
+    "category",
+    "concept",
+    "amount"
+  ]
+}

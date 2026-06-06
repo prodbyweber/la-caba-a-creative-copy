@@ -1,82 +1,86 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import StartNav from "@/components/start/StartNav";
 import StartHero from "@/components/start/StartHero";
-import StartWhatWeDo from "@/components/start/StartWhatWeDo";
 import StartBrandsCarousel from "@/components/start/StartBrandsCarousel";
+import StartWhatWeDo from "@/components/start/StartWhatWeDo";
+import ProblemSolution from "@/components/start/ProblemSolution";
+import DeliverablesAndProcess from "@/components/start/DeliverablesAndProcess";
 import StartCreadores from "@/components/start/StartCreadores";
-import StartBrands from "@/components/start/StartBrands";
 import StartExplorar from "@/components/start/StartExplorar";
+import PricingPlans from "@/components/start/PricingPlans";
+import FAQSection from "@/components/start/FAQSection";
 import StartChoosePath from "@/components/start/StartChoosePath";
-
+import StickyCtaBar from "@/components/start/StickyCtaBar";
 import StartFooter from "@/components/start/StartFooter";
-import StickyNav from "@/components/start/StickyNav";
-
-
-const SnapSection = ({ children }) => (
-  <div style={{ scrollSnapAlign: "start", scrollSnapStop: "always" }}>
-    {children}
-  </div>
-);
 
 export default function Start() {
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    // Scroll to top instantly on mount — both window and snap container
-    window.scrollTo(0, 0);
-    if (containerRef.current) {
-      containerRef.current.scrollTop = 0;
-    }
-  }, []);
+  useEffect(() => { window.scrollTo(0, 0); }, []);
 
   return (
-    <div
-      style={{
-        background: "#080808",
-        color: "#f0ede8",
-        fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-        overflowX: "hidden",
-        minHeight: "100dvh",
-      }}
-    >
-      
+    <div style={{
+      background: "#080808",
+      color: "#f0ede8",
+      fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+      overflowX: "hidden",
+      minHeight: "100dvh",
+    }}>
       <StartNav />
-      <StickyNav />
 
-      {/* Mobile: TikTok-style scroll snap. Desktop: normal scroll */}
-      <style>{`
-        @media (max-width: 767px) {
-          .snap-scroll-container {
-            height: 100dvh;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior-y: contain;
-          }
-          .snap-section-full {
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            height: 100dvh;
-            overflow: hidden;
-          }
-          .snap-section-auto {
-            scroll-snap-align: start;
-            scroll-snap-stop: always;
-            height: auto;
-            overflow: hidden;
-          }
-        }
-      `}</style>
+      {/* 1. Hero */}
+      <StartHero />
 
-      <div className="snap-scroll-container" ref={containerRef}>
-        <div className="snap-section-full"><StartHero /></div>
-        <div className="snap-section-full"><StartWhatWeDo /></div>
-        <div className="snap-section-full"><StartCreadores /></div>
-        <div className="snap-section-full"><StartBrands /></div>
-        <div className="snap-section-full"><StartExplorar showButton={false} /></div>
-        <div className="snap-section-full"><StartChoosePath /></div>
-        <div className="snap-section-auto"><StartFooter /></div>
+      {/* 2. Social proof bar */}
+      <section style={{
+        background: "#0a0a0a",
+        padding: "36px 0",
+        borderTop: "1px solid rgba(255,255,255,0.04)",
+        borderBottom: "1px solid rgba(255,255,255,0.04)",
+      }}>
+        <p style={{
+          textAlign: "center",
+          fontSize: "9px",
+          fontWeight: 700,
+          letterSpacing: "0.3em",
+          textTransform: "uppercase",
+          color: "rgba(240,237,232,0.18)",
+          marginBottom: "20px",
+          fontFamily: "'Helvetica Neue', sans-serif",
+        }}>
+          Artistas, marcas y sellos que han confiado en nosotros
+        </p>
+        <StartBrandsCarousel />
+      </section>
+
+      {/* 3. Quiénes somos */}
+      <StartWhatWeDo />
+
+      {/* 4. Problema → Solución */}
+      <ProblemSolution />
+
+      {/* 5. Deliverables + Proceso */}
+      <DeliverablesAndProcess />
+
+      {/* 6. Creadores / Testimonios */}
+      <StartCreadores hideServices />
+
+      {/* 7. Resultados / Casos */}
+      <StartExplorar showButton={false} />
+
+      {/* 8. Pricing */}
+      <PricingPlans />
+
+      {/* 9. FAQ */}
+      <FAQSection />
+
+      {/* 10. CTA Final + formulario */}
+      <div id="contacto">
+        <StartChoosePath />
       </div>
+
+      <StartFooter />
+
+      {/* Mobile sticky CTA */}
+      <StickyCtaBar />
     </div>
   );
 }

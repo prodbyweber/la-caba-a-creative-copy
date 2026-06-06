@@ -1,0 +1,73 @@
+{
+  "name": "Client",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre del cliente"
+    },
+    "service": {
+      "type": "string",
+      "description": "Servicio contratado"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Activo",
+        "Pendiente",
+        "Completado",
+        "Pausado"
+      ],
+      "default": "Activo",
+      "description": "Estado del cliente"
+    },
+    "total_agreed": {
+      "type": "number",
+      "default": 0,
+      "description": "Total acordado"
+    },
+    "amount_paid": {
+      "type": "number",
+      "default": 0,
+      "description": "Monto cobrado"
+    },
+    "amount_pending": {
+      "type": "number",
+      "default": 0,
+      "description": "Monto pendiente"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "Tarjeta",
+        "Bizum",
+        "Efectivo",
+        "Transferencia",
+        "Otro"
+      ],
+      "description": "M\u00e9todo de pago preferido"
+    },
+    "contract_signed": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u00bfTiene contrato firmado?"
+    },
+    "contract_id": {
+      "type": "string",
+      "description": "ID del contrato asociado"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email del cliente"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Tel\u00e9fono del cliente"
+    }
+  },
+  "required": [
+    "name",
+    "service",
+    "total_agreed"
+  ]
+}

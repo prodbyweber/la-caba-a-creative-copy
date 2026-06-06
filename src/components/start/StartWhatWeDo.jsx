@@ -1,6 +1,5 @@
 import React, { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import StartBrandsCarousel from "./StartBrandsCarousel";
 
 export default function StartWhatWeDo() {
   const ref = useRef(null);
@@ -13,7 +12,6 @@ export default function StartWhatWeDo() {
       style={{
         position: "relative",
         width: "100%",
-        height: "100dvh",
         minHeight: "560px",
         display: "flex",
         alignItems: "center",
@@ -99,8 +97,6 @@ export default function StartWhatWeDo() {
           }}
         />
 
-        {/* Brands — todo visible sin paginación */}
-        <StartBrandsCarousel />
       </div>
     </section>
   );

@@ -1,0 +1,59 @@
+{
+  "name": "Equipment",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre del equipo"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Audio",
+        "Video",
+        "Iluminaci\u00f3n",
+        "Hardware",
+        "Otro"
+      ],
+      "description": "Categor\u00eda del equipo"
+    },
+    "price": {
+      "type": "number",
+      "description": "Precio"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Comprado",
+        "Pendiente",
+        "Planificado"
+      ],
+      "default": "Planificado",
+      "description": "Estado"
+    },
+    "impact": {
+      "type": "string",
+      "enum": [
+        "Alto",
+        "Medio",
+        "Bajo"
+      ],
+      "default": "Medio",
+      "description": "Impacto"
+    },
+    "purchase_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de compra"
+    },
+    "reference_link": {
+      "type": "string",
+      "description": "Link de referencia"
+    }
+  },
+  "required": [
+    "name",
+    "category",
+    "price"
+  ]
+}

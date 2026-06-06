@@ -1,0 +1,44 @@
+{
+  "name": "ClipPublishLog",
+  "type": "object",
+  "properties": {
+    "clip_id": {
+      "type": "string",
+      "description": "ID del clip publicado"
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "youtube",
+        "instagram",
+        "tiktok"
+      ],
+      "description": "Plataforma de publicaci\u00f3n"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "error"
+      ],
+      "description": "Estado de la publicaci\u00f3n"
+    },
+    "message": {
+      "type": "string",
+      "description": "Mensaje de \u00e9xito o error"
+    },
+    "external_post_id": {
+      "type": "string",
+      "description": "ID del post en la plataforma externa"
+    },
+    "external_url": {
+      "type": "string",
+      "description": "URL del post publicado"
+    }
+  },
+  "required": [
+    "clip_id",
+    "platform",
+    "status"
+  ]
+}

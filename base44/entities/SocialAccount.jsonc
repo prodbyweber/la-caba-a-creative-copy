@@ -1,0 +1,55 @@
+{
+  "name": "SocialAccount",
+  "type": "object",
+  "properties": {
+    "platform": {
+      "type": "string",
+      "enum": [
+        "youtube",
+        "instagram",
+        "tiktok"
+      ],
+      "description": "Plataforma social"
+    },
+    "account_name": {
+      "type": "string",
+      "description": "Nombre de la cuenta"
+    },
+    "account_id": {
+      "type": "string",
+      "description": "ID externo de la cuenta"
+    },
+    "access_token": {
+      "type": "string",
+      "description": "Token de acceso OAuth (encriptado)"
+    },
+    "refresh_token": {
+      "type": "string",
+      "description": "Token de refresco OAuth (encriptado)"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha de expiraci\u00f3n del token"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "connected",
+        "expired",
+        "error"
+      ],
+      "default": "connected",
+      "description": "Estado de la conexi\u00f3n"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario propietario"
+    }
+  },
+  "required": [
+    "platform",
+    "account_name",
+    "access_token"
+  ]
+}

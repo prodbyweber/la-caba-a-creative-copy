@@ -1,0 +1,112 @@
+{
+  "name": "Clip",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo del clip"
+    },
+    "clip_id": {
+      "type": "string",
+      "description": "ID breve \u00fanico del clip (5 caracteres)"
+    },
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista asociado"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "ID del proyecto asociado"
+    },
+    "track_id": {
+      "type": "string",
+      "description": "ID del track/canci\u00f3n asociado"
+    },
+    "folder_id": {
+      "type": "string",
+      "description": "ID de la carpeta (opcional)"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL del archivo de video"
+    },
+    "thumbnail_url": {
+      "type": "string",
+      "description": "URL de la miniatura"
+    },
+    "duration": {
+      "type": "number",
+      "description": "Duraci\u00f3n del clip en segundos"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "scheduled",
+        "publishing",
+        "published",
+        "error"
+      ],
+      "default": "draft",
+      "description": "Estado del clip"
+    },
+    "scheduled_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha y hora programada para publicaci\u00f3n"
+    },
+    "platforms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "youtube",
+          "instagram",
+          "tiktok"
+        ]
+      },
+      "description": "Plataformas donde se publicar\u00e1"
+    },
+    "caption_master": {
+      "type": "string",
+      "description": "Caption principal base"
+    },
+    "caption_youtube": {
+      "type": "string",
+      "description": "Caption espec\u00edfico para YouTube Shorts"
+    },
+    "caption_instagram": {
+      "type": "string",
+      "description": "Caption espec\u00edfico para Instagram Reels"
+    },
+    "caption_tiktok": {
+      "type": "string",
+      "description": "Caption espec\u00edfico para TikTok"
+    },
+    "hashtags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de hashtags"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags del clip"
+    },
+    "featuring_artists": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs de artistas invitados"
+    }
+  },
+  "required": [
+    "title",
+    "artist_id"
+  ]
+}

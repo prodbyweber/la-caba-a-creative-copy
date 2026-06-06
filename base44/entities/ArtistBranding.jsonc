@@ -1,0 +1,66 @@
+{
+  "name": "ArtistBranding",
+  "type": "object",
+  "properties": {
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista"
+    },
+    "primary_font": {
+      "type": "string",
+      "description": "Tipograf\u00eda principal"
+    },
+    "secondary_font": {
+      "type": "string",
+      "description": "Tipograf\u00eda secundaria"
+    },
+    "primary_color": {
+      "type": "string",
+      "description": "Color primario (hex)"
+    },
+    "secondary_color": {
+      "type": "string",
+      "description": "Color secundario (hex)"
+    },
+    "accent_color": {
+      "type": "string",
+      "description": "Color de acento (hex)"
+    },
+    "logo_url": {
+      "type": "string",
+      "description": "URL del logo principal"
+    },
+    "logo_variations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "URLs de variaciones del logo"
+    },
+    "brand_keywords": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Palabras clave de marca"
+    },
+    "visual_style": {
+      "type": "string",
+      "description": "Descripci\u00f3n del estilo visual"
+    },
+    "tone_of_voice": {
+      "type": "string",
+      "description": "Tono de comunicaci\u00f3n"
+    },
+    "moodboard_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Referencias visuales"
+    }
+  },
+  "required": [
+    "artist_id"
+  ]
+}

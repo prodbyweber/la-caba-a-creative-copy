@@ -1,0 +1,47 @@
+{
+  "name": "PersonalLedger",
+  "type": "object",
+  "properties": {
+    "fecha": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha del movimiento"
+    },
+    "referencia_ingreso_id": {
+      "type": "string",
+      "description": "ID del ingreso relacionado"
+    },
+    "monto": {
+      "type": "number",
+      "description": "Monto del sueldo pagado"
+    },
+    "metodo": {
+      "type": "string",
+      "enum": [
+        "Revolut",
+        "Transferencia",
+        "Efectivo",
+        "Interno"
+      ],
+      "description": "M\u00e9todo de pago"
+    },
+    "nota": {
+      "type": "string",
+      "description": "Nota del movimiento"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "Abono",
+        "Reverso"
+      ],
+      "default": "Abono",
+      "description": "Tipo de movimiento"
+    }
+  },
+  "required": [
+    "fecha",
+    "monto",
+    "metodo"
+  ]
+}

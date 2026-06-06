@@ -1,0 +1,50 @@
+{
+  "name": "GastoUnico",
+  "type": "object",
+  "properties": {
+    "fecha": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha del gasto \u00fanico"
+    },
+    "nombre": {
+      "type": "string",
+      "description": "Nombre del gasto"
+    },
+    "categoria": {
+      "type": "string",
+      "enum": [
+        "Equipamiento",
+        "Marketing",
+        "Reparaciones",
+        "Legal",
+        "Formaci\u00f3n",
+        "Otros"
+      ],
+      "description": "Categor\u00eda del gasto \u00fanico"
+    },
+    "importe": {
+      "type": "number",
+      "description": "Importe del gasto"
+    },
+    "estado": {
+      "type": "string",
+      "enum": [
+        "Pendiente",
+        "Pagado"
+      ],
+      "default": "Pendiente",
+      "description": "Estado del pago"
+    },
+    "notas": {
+      "type": "string",
+      "description": "Notas adicionales"
+    }
+  },
+  "required": [
+    "fecha",
+    "nombre",
+    "categoria",
+    "importe"
+  ]
+}

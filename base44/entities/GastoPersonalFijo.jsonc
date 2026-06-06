@@ -1,0 +1,55 @@
+{
+  "name": "GastoPersonalFijo",
+  "type": "object",
+  "properties": {
+    "nombre": {
+      "type": "string",
+      "description": "Nombre del gasto personal fijo"
+    },
+    "categoria": {
+      "type": "string",
+      "enum": [
+        "Vivienda",
+        "Transporte",
+        "Salud",
+        "Seguros",
+        "Suscripciones",
+        "Gimnasio",
+        "Otros"
+      ],
+      "description": "Categor\u00eda del gasto"
+    },
+    "importe": {
+      "type": "number",
+      "description": "Importe del gasto"
+    },
+    "frecuencia": {
+      "type": "string",
+      "enum": [
+        "Mensual",
+        "Trimestral",
+        "Anual"
+      ],
+      "default": "Mensual",
+      "description": "Frecuencia del gasto"
+    },
+    "dia_vencimiento": {
+      "type": "number",
+      "description": "D\u00eda de vencimiento (1-31)"
+    },
+    "estado": {
+      "type": "string",
+      "enum": [
+        "Pendiente",
+        "Pagado"
+      ],
+      "default": "Pendiente",
+      "description": "Estado del pago"
+    }
+  },
+  "required": [
+    "nombre",
+    "categoria",
+    "importe"
+  ]
+}

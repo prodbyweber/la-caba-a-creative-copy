@@ -1,0 +1,30 @@
+{
+  "name": "ApplicationForm",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre del formulario"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n del formulario"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Pasos del formulario con sus campos"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si el formulario est\u00e1 activo"
+    }
+  },
+  "required": [
+    "name",
+    "steps"
+  ]
+}

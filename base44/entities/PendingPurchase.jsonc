@@ -1,0 +1,56 @@
+{
+  "name": "PendingPurchase",
+  "type": "object",
+  "properties": {
+    "product": {
+      "type": "string",
+      "description": "Nombre del producto"
+    },
+    "price": {
+      "type": "number",
+      "description": "Precio"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "Alta",
+        "Media",
+        "Baja"
+      ],
+      "default": "Media",
+      "description": "Prioridad"
+    },
+    "impact": {
+      "type": "string",
+      "enum": [
+        "Alto",
+        "Medio",
+        "Bajo"
+      ],
+      "default": "Medio",
+      "description": "Impacto"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Aprobado",
+        "Pendiente",
+        "Descartado"
+      ],
+      "default": "Pendiente",
+      "description": "Estado"
+    },
+    "alternatives": {
+      "type": "string",
+      "description": "Alternativas m\u00e1s econ\u00f3micas"
+    },
+    "reference_link": {
+      "type": "string",
+      "description": "Link de referencia"
+    }
+  },
+  "required": [
+    "product",
+    "price"
+  ]
+}

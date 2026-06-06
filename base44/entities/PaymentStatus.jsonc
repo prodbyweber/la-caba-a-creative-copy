@@ -1,0 +1,68 @@
+{
+  "name": "PaymentStatus",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "ID del cliente"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Nombre del cliente"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Cobrado",
+        "Pendiente",
+        "Por cobrar"
+      ],
+      "default": "Por cobrar",
+      "description": "Estado del cobro"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Monto"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "Tarjeta",
+        "Bizum",
+        "Efectivo",
+        "Transferencia",
+        "Otro"
+      ],
+      "description": "M\u00e9todo de pago"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de vencimiento/estimada"
+    },
+    "paid_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de pago real"
+    },
+    "days_overdue": {
+      "type": "number",
+      "default": 0,
+      "description": "D\u00edas de retraso"
+    },
+    "has_contract": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u00bfTiene contrato asociado?"
+    },
+    "contract_id": {
+      "type": "string",
+      "description": "ID del contrato"
+    }
+  },
+  "required": [
+    "client_name",
+    "status",
+    "amount"
+  ]
+}

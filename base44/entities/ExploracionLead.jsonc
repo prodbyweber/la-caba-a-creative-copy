@@ -1,0 +1,117 @@
+{
+  "name": "ExploracionLead",
+  "type": "object",
+  "properties": {
+    "nombre": {
+      "type": "string",
+      "description": "Nombre"
+    },
+    "apellido": {
+      "type": "string",
+      "description": "Apellido"
+    },
+    "nombre_artistico": {
+      "type": "string",
+      "description": "Nombre art\u00edstico"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email"
+    },
+    "telefono": {
+      "type": "string",
+      "description": "N\u00famero de tel\u00e9fono (WhatsApp)"
+    },
+    "pais_nacimiento": {
+      "type": "string",
+      "description": "Pa\u00eds de nacimiento"
+    },
+    "pais_residencia": {
+      "type": "string",
+      "description": "Pa\u00eds donde reside"
+    },
+    "direccion": {
+      "type": "string",
+      "description": "Direcci\u00f3n de domicilio"
+    },
+    "instagram": {
+      "type": "string",
+      "description": "URL de Instagram"
+    },
+    "tiktok": {
+      "type": "string",
+      "description": "URL de TikTok"
+    },
+    "spotify": {
+      "type": "string",
+      "description": "URL de Spotify"
+    },
+    "youtube": {
+      "type": "string",
+      "description": "URL de YouTube"
+    },
+    "nivel_actual": {
+      "type": "string",
+      "enum": [
+        "Estoy empezando",
+        "Tengo m\u00fasica publicada",
+        "Soy constante pero no crezco",
+        "Estoy creciendo y quiero escalar",
+        "Vivo parcialmente de la m\u00fasica"
+      ],
+      "description": "Nivel actual del artista"
+    },
+    "que_frena_crecimiento": {
+      "type": "string",
+      "description": "Qu\u00e9 frena tu crecimiento"
+    },
+    "que_espera_resolver": {
+      "type": "string",
+      "description": "Qu\u00e9 espera resolver con la Exploraci\u00f3n"
+    },
+    "enlaces_musica": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Enlaces a m\u00fasica (Drive, Spotify, YouTube)"
+    },
+    "compromiso_inversion": {
+      "type": "string",
+      "enum": [
+        "S\u00ed, estoy listo/a para avanzar",
+        "Me interesa, pero quiero m\u00e1s informaci\u00f3n antes de confirmar",
+        "Ahora mismo no estoy en ese punto"
+      ],
+      "description": "Compromiso con la inversi\u00f3n"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Alta intenci\u00f3n",
+        "Interesado",
+        "No listo"
+      ],
+      "default": "Interesado",
+      "description": "Clasificaci\u00f3n autom\u00e1tica del lead"
+    }
+  },
+  "required": [
+    "nombre",
+    "apellido",
+    "nombre_artistico",
+    "email",
+    "telefono",
+    "pais_nacimiento",
+    "pais_residencia",
+    "direccion",
+    "instagram",
+    "tiktok",
+    "spotify",
+    "youtube",
+    "nivel_actual",
+    "que_frena_crecimiento",
+    "que_espera_resolver",
+    "compromiso_inversion"
+  ]
+}

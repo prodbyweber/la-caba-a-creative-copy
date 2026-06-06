@@ -1,0 +1,64 @@
+{
+  "name": "Contract",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "description": "ID del cliente"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Nombre del cliente"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Producci\u00f3n Musical",
+        "Grabaci\u00f3n",
+        "Membres\u00edas",
+        "Servicios Digitales",
+        "Otro"
+      ],
+      "default": "Producci\u00f3n Musical",
+      "description": "Tipo de contrato"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Firmado",
+        "Pendiente",
+        "Enviado",
+        "Cancelado"
+      ],
+      "default": "Pendiente",
+      "description": "Estado del contrato"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Monto del contrato"
+    },
+    "docusign_url": {
+      "type": "string",
+      "description": "URL del contrato en DocuSign"
+    },
+    "docusign_id": {
+      "type": "string",
+      "description": "ID del documento en DocuSign"
+    },
+    "signed_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de firma"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de vencimiento"
+    }
+  },
+  "required": [
+    "client_name",
+    "type",
+    "amount"
+  ]
+}

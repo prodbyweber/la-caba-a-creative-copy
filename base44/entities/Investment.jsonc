@@ -1,0 +1,59 @@
+{
+  "name": "Investment",
+  "type": "object",
+  "properties": {
+    "total_capital": {
+      "type": "number",
+      "description": "Capital total invertido"
+    },
+    "return_generated": {
+      "type": "number",
+      "default": 0,
+      "description": "Retorno generado"
+    },
+    "projected_return": {
+      "type": "number",
+      "default": 0,
+      "description": "Retorno proyectado"
+    },
+    "roi_percentage": {
+      "type": "number",
+      "default": 0,
+      "description": "ROI %"
+    },
+    "available_cash": {
+      "type": "number",
+      "default": 0,
+      "description": "Cash disponible"
+    },
+    "project_status": {
+      "type": "string",
+      "enum": [
+        "Activo",
+        "Escalando",
+        "Alerta",
+        "Pausado"
+      ],
+      "default": "Activo",
+      "description": "Estado del proyecto"
+    },
+    "health_indicator": {
+      "type": "string",
+      "enum": [
+        "green",
+        "yellow",
+        "red"
+      ],
+      "default": "green",
+      "description": "Indicador de salud financiera"
+    },
+    "progress_percentage": {
+      "type": "number",
+      "default": 0,
+      "description": "Porcentaje de progreso del proyecto"
+    }
+  },
+  "required": [
+    "total_capital"
+  ]
+}

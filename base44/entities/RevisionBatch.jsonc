@@ -1,0 +1,88 @@
+{
+  "name": "RevisionBatch",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "ID del proyecto"
+    },
+    "batch_number": {
+      "type": "number",
+      "description": "N\u00famero de revisi\u00f3n (1, 2, 3...)"
+    },
+    "is_included": {
+      "type": "boolean",
+      "default": true,
+      "description": "\u00bfEs revisi\u00f3n incluida? (false = revisi\u00f3n extra de pago)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Sin comenzar",
+        "En proceso",
+        "Finalizado"
+      ],
+      "default": "Sin comenzar",
+      "description": "Estado de la revisi\u00f3n"
+    },
+    "corrections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timecode": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Pendiente",
+              "Hecho"
+            ],
+            "default": "Pendiente"
+          }
+        }
+      },
+      "description": "Lista de correcciones (m\u00e1ximo 10)",
+      "maxItems": 10
+    },
+    "feedback_sent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha en que el artista envi\u00f3 el feedback"
+    },
+    "delivery_sent_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha en que el productor entreg\u00f3 la versi\u00f3n corregida"
+    },
+    "delivery_link": {
+      "type": "string",
+      "description": "Link de la versi\u00f3n entregada por el productor (Drive/Dropbox/etc.)"
+    },
+    "reference_link": {
+      "type": "string",
+      "description": "Link de referencia del artista (opcional)"
+    },
+    "is_locked": {
+      "type": "boolean",
+      "default": false,
+      "description": "\u00bfEst\u00e1 bloqueada? (true = no se pueden a\u00f1adir m\u00e1s correcciones)"
+    },
+    "extra_cost": {
+      "type": "number",
+      "default": 0,
+      "description": "Coste de la revisi\u00f3n extra (si aplica)"
+    }
+  },
+  "required": [
+    "project_id",
+    "batch_number"
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "name": "MonthlyExpense",
+  "type": "object",
+  "properties": {
+    "month": {
+      "type": "string",
+      "description": "Mes (YYYY-MM)"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Alquiler",
+        "Software",
+        "Marketing",
+        "Personal",
+        "Operativos",
+        "Otro"
+      ],
+      "description": "Categor\u00eda"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Monto"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n"
+    },
+    "is_recurring": {
+      "type": "boolean",
+      "default": false,
+      "description": "Es recurrente"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "unpaid",
+        "paid"
+      ],
+      "default": "unpaid",
+      "description": "Estado de pago"
+    }
+  },
+  "required": [
+    "month",
+    "category",
+    "amount"
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "name": "Session",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "Session",
+        "Meeting",
+        "StudioWork"
+      ],
+      "default": "Session",
+      "description": "Tipo de evento"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo de la sesi\u00f3n"
+    },
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista asociado"
+    },
+    "project_id": {
+      "type": "string",
+      "description": "ID del proyecto asociado"
+    },
+    "start_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha y hora de inicio"
+    },
+    "end_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha y hora de fin"
+    },
+    "location": {
+      "type": "string",
+      "enum": [
+        "Studio",
+        "Online",
+        "External"
+      ],
+      "default": "Studio",
+      "description": "Ubicaci\u00f3n de la sesi\u00f3n"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n detallada"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Scheduled",
+        "Done",
+        "Cancelled",
+        "Pending",
+        "Confirmed"
+      ],
+      "default": "Pending",
+      "description": "Estado de la sesi\u00f3n"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionales"
+    },
+    "color": {
+      "type": "string",
+      "description": "Color para visualizaci\u00f3n en calendario"
+    },
+    "google_meet_link": {
+      "type": "string",
+      "description": "Link de Google Meet"
+    },
+    "drive_link": {
+      "type": "string",
+      "description": "Link de Google Drive o WeTransfer"
+    },
+    "google_event_id": {
+      "type": "string",
+      "description": "ID del evento en Google Calendar"
+    },
+    "google_event_link": {
+      "type": "string",
+      "description": "URL del evento en Google Calendar"
+    },
+    "source": {
+      "type": "string",
+      "description": "Origen del evento (google_calendar o cabana)"
+    },
+    "attendees": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Lista de emails de invitados al evento"
+    }
+  },
+  "required": [
+    "title",
+    "start_time",
+    "end_time"
+  ]
+}

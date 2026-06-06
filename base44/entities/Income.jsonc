@@ -1,0 +1,93 @@
+{
+  "name": "Income",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha del ingreso"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Nombre del cliente"
+    },
+    "concept": {
+      "type": "string",
+      "description": "Concepto del ingreso"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Monto total del ingreso"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "Efectivo",
+        "Wise",
+        "Transferencia",
+        "Plataforma online",
+        "Bizum",
+        "Otro"
+      ],
+      "description": "M\u00e9todo de cobro"
+    },
+    "sueldo_porcentaje": {
+      "type": "number",
+      "default": 35,
+      "description": "Porcentaje del sueldo (default 35%)"
+    },
+    "sueldo_monto_calculado": {
+      "type": "number",
+      "description": "Monto del sueldo calculado autom\u00e1ticamente"
+    },
+    "sueldo_estado": {
+      "type": "string",
+      "enum": [
+        "Sin pagar",
+        "Pagado"
+      ],
+      "default": "Sin pagar",
+      "description": "Estado del pago del sueldo"
+    },
+    "sueldo_fecha_pago": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha en que se pag\u00f3 el sueldo"
+    },
+    "sueldo_metodo_pago": {
+      "type": "string",
+      "enum": [
+        "Transferencia",
+        "Revolut",
+        "Efectivo",
+        "Interno"
+      ],
+      "description": "M\u00e9todo de pago del sueldo"
+    },
+    "negocio_porcentaje": {
+      "type": "number",
+      "default": 40,
+      "description": "Porcentaje del negocio (default 40%)"
+    },
+    "reinversion_porcentaje": {
+      "type": "number",
+      "default": 15,
+      "description": "Porcentaje de reinversi\u00f3n (default 15%)"
+    },
+    "ads_porcentaje": {
+      "type": "number",
+      "default": 10,
+      "description": "Porcentaje de ads (default 10%)"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionales"
+    }
+  },
+  "required": [
+    "date",
+    "client_name",
+    "amount",
+    "payment_method"
+  ]
+}
