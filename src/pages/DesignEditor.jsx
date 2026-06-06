@@ -16,6 +16,42 @@ export default function DesignEditor() {
 
   return (
     <AdminLayout activePage="DesignEditor">
+      {/* Top navigation buttons */}
+      <div className="px-4 sm:px-8 lg:px-12 pt-5 pb-0 flex items-center gap-3">
+        <a
+          href="/start"
+          className="px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200"
+          style={{
+            background: "#ff5833",
+            color: "#fff",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px"
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; }}
+        >
+          <span>🎵</span> Ver Start
+        </a>
+        <a
+          href="/Marcas"
+          className="px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200"
+          style={{
+            background: "#ff5833",
+            color: "#fff",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px"
+          }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; }}
+        >
+          <span>🏢</span> Ver Marcas
+        </a>
+      </div>
+
       {/* iOS-style toggle header */}
       <div className="px-4 sm:px-8 lg:px-12 pt-5 pb-0 flex items-center justify-between">
         <div>
