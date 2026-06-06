@@ -23,7 +23,7 @@ const PLANS = [
       "Mentoría y dirección artística",
       "Acceso a plataforma Cabaña Creative",
     ],
-    cta: "Quiero mi plan",
+    cta: "Solicitar plaza",
     featured: true,
   },
 ];
