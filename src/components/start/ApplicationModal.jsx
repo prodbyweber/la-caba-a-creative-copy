@@ -254,17 +254,6 @@ export default function ApplicationModal({ isOpen, onClose }) {
 
           {sent ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-              {/* Header */}
-              <div style={{ textAlign: "center", padding: "8px 0 16px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 40, height: 40, borderRadius: "50%", background: "rgba(255,88,51,0.12)", border: "1px solid rgba(255,88,51,0.25)", marginBottom: "10px" }}>
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9.5L7 13.5L15 5" stroke="#ff5833" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                </div>
-                <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.2rem", color: "#f0ede8", margin: "0 0 5px", letterSpacing: "-0.02em" }}>¡Solicitud recibida!</h3>
-                <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.4)", margin: 0, lineHeight: 1.5 }}>
-                  Nuestro equipo te contactará en <strong style={{ color: "#ff5833", fontWeight: 700 }}>menos de 24h</strong>.
-                </p>
-              </div>
-
               {form.presupuesto === "Por ahora no cuento con presupuesto." ? (
                 /* Opción 4: Sin Calendly */
                 <div style={{ padding: "20px 0", textAlign: "center" }}>
@@ -273,30 +262,17 @@ export default function ApplicationModal({ isOpen, onClose }) {
                   </p>
                 </div>
               ) : (
-                /* Opciones 1-3: Flujo normal con Calendly */
-                <>
-                  {/* Calendly CTA */}
-                  <div style={{ padding: "14px 0 10px", textAlign: "center" }}>
-                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.8rem", color: "rgba(240,237,232,0.5)", margin: "0 0 3px", lineHeight: 1.5 }}>
-                      Agenda ahora una videollamada gratuita con nuestro equipo.
-                    </p>
-                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.72rem", color: "#ff5833", margin: 0, fontWeight: 700, letterSpacing: "0.02em" }}>
-                      Plazas limitadas — cuanto antes, mejor.
-                    </p>
-                  </div>
-
-                  {/* Calendly iframe */}
-                  <div style={{ borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", height: "500px", flexShrink: 0, background: "#080808" }}>
-                    <iframe
-                      src="https://calendly.com/hola-cabanacreative/creadores?embed_type=Inline&hide_gdpr_banner=1&background_color=080808&text_color=f0ede8&primary_color=ff4300"
-                      width="100%"
-                      height="100%"
-                      frameBorder="0"
-                      title="Agendar videollamada"
-                      style={{ display: "block" }}
-                    />
-                  </div>
-                </>
+                /* Opciones 1-3: Solo Calendly embedido */
+                <div style={{ borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", height: "500px", flexShrink: 0, background: "#080808", marginTop: "-20px" }}>
+                  <iframe
+                    src="https://calendly.com/hola-cabanacreative/creadores?embed_type=Inline&hide_gdpr_banner=1&background_color=080808&text_color=f0ede8&primary_color=ff4300"
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    title="Agendar videollamada"
+                    style={{ display: "block" }}
+                  />
+                </div>
               )}
 
               <button onClick={handleClose} style={{ marginTop: "12px", background: "transparent", color: "rgba(240,237,232,0.3)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "9px", padding: "10px 20px", fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 600, fontSize: "0.8rem", cursor: "pointer", width: "100%", transition: "color 0.2s" }}
