@@ -4,10 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
 const STATS = [
-  { label: "Modalidad", value: "Online · Presencial" },
-  { label: "Duración", value: "3 meses" },
-  { label: "Plazas", value: "50 por conv." },
-  { label: "Entregables", value: "100% propios" },
+  { label: "Modalidad", value: "Presencial · Online" },
+  { label: "Duración", value: "90 días" },
+  { label: "Plazas", value: "27 disponibles" },
+  { label: "Horas de estudio", value: "32h de creación" },
 ];
 
 function useAutoPlay(src) {
@@ -107,36 +107,16 @@ export default function StartHero() {
             transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             style={{ display: "flex", flexDirection: "column", gap: "clamp(14px, 2.2vw, 20px)", maxWidth: "600px" }}
           >
-            {/* Scarcity badge */}
-            <div>
-              <span style={{
-                display: "inline-block",
-                background: "rgba(255,88,51,0.1)",
-                border: "1px solid rgba(255,88,51,0.28)",
-                borderRadius: 99,
-                padding: "5px 14px",
-                fontSize: "10px",
-                fontWeight: 800,
-                color: "#ff5833",
-                letterSpacing: "0.1em",
-                fontFamily: "'Helvetica Neue', sans-serif",
-                textTransform: "uppercase",
-              }}>
-                Solo 50 plazas por convocatoria
-              </span>
-            </div>
-
             {/* Pre-label */}
             <p style={{
               fontFamily: "'Helvetica Neue', sans-serif",
-              fontSize: "clamp(0.68rem, 1.1vw, 0.78rem)",
+              fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)",
               fontWeight: 500,
-              color: "rgba(240,237,232,0.38)",
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
+              color: "rgba(240,237,232,0.45)",
+              letterSpacing: "0.04em",
               margin: 0,
             }}>
-              Plan Artístico Integral · Cabaña Creative
+              ¿Tienes el talento pero no el plan?
             </p>
 
             {/* Headline */}
@@ -162,7 +142,7 @@ export default function StartHero() {
               margin: 0,
               maxWidth: "480px",
             }}>
-              Producción musical, audiovisual, identidad visual y distribución bajo una sola dirección creativa. Tu proyecto, con estructura y con alma.
+              Identidad visual, producción musical, audiovisual y marketing bajo una sola dirección creativa. Tu proyecto, con estructura y con alma — para artistas que quieren crecer con criterio, no con suerte.
             </p>
 
             {/* CTA row */}
