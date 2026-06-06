@@ -8,26 +8,79 @@ function useAutoPlay(src) {
   useEffect(() => {
     const v = ref.current;
     if (!v || !src) return;
-    const play = () => { v.muted = true; v.play().catch(() => {}); };
+    
+    v.muted = true;
+    v.playsInline = true;
+    v.preload = "auto";
+    
+    const play = async () => {
+      try {
+        if (v.paused) {
+          await v.play();
+        }
+      } catch (err) {
+        console.warn("Video autoplay failed, will retry:", err);
+      }
+    };
+    
+    // Initial play attempt
     play();
+    
+    // Retry on events
     v.addEventListener("canplay", play);
+    v.addEventListener("loadeddata", play);
     v.addEventListener("pause", play);
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) play(); });
-    return () => { v.removeEventListener("canplay", play); v.removeEventListener("pause", play); };
+    
+    // Retry when page becomes visible
+    const handleVisibility = () => {
+      if (!document.hidden && v.paused) {
+        play();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    
+    // Force play after short delay (Windows PC fix)
+    const timeoutId = setTimeout(play, 500);
+    
+    return () => {
+      v.removeEventListener("canplay", play);
+      v.removeEventListener("loadeddata", play);
+      v.removeEventListener("pause", play);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      clearTimeout(timeoutId);
+    };
   }, [src]);
   return ref;
 }
 
 function VideoBackground({ src, className = "" }) {
   const ref = useAutoPlay(src);
+  
+  // Extract base URL to check for MP4/WebM extensions
+  const getVideoType = (url) => {
+    if (!url) return null;
+    const lower = url.toLowerCase();
+    if (lower.includes('.mp4')) return 'video/mp4';
+    if (lower.includes('.webm')) return 'video/webm';
+    if (lower.includes('.mov')) return 'video/quicktime';
+    return 'video/mp4'; // Default fallback
+  };
+  
+  const videoType = getVideoType(src);
+  
   return (
     <video
       ref={ref}
-      src={src}
       autoPlay muted loop playsInline preload="auto"
       className={`absolute inset-0 w-full h-full object-cover ${className}`}
-      style={{ pointerEvents: "none" }}
-    />
+      style={{ pointerEvents: "none", background: "#080808" }}
+      poster=""
+      key={src}
+    >
+      <source src={src} type={videoType} />
+      {/* Fallback source without type for maximum compatibility */}
+      <source src={src} />
+    </video>
   );
 }
 
@@ -59,11 +112,23 @@ export default function LandingHero({ bottomOffset } = {}) {
       {/* Background media */}
       {/* Desktop video: hidden on mobile when a mobile video exists */}
       {videoSrc && (
-        <VideoBackground src={videoSrc} className={mobileVideoSrc ? "hidden md:block" : ""} />
+        <>
+          <VideoBackground src={videoSrc} className={mobileVideoSrc ? "hidden md:block" : ""} />
+          {/* Fallback image behind video in case of load failure */}
+          {fallbackImage && (
+            <img src={fallbackImage} alt="" className={`absolute inset-0 w-full h-full object-cover ${mobileVideoSrc ? "hidden md:block" : ""}`} style={{ zIndex: -1 }} loading="eager" />
+          )}
+        </>
       )}
       {/* Mobile-only video: only renders on mobile */}
       {mobileVideoSrc && (
-        <VideoBackground src={mobileVideoSrc} className="md:hidden" />
+        <>
+          <VideoBackground src={mobileVideoSrc} className="md:hidden" />
+          {/* Fallback image for mobile */}
+          {fallbackImage && (
+            <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover md:hidden" style={{ zIndex: -1 }} loading="eager" />
+          )}
+        </>
       )}
       {/* Fallback image if no video */}
       {!videoSrc && !mobileVideoSrc && fallbackImage && (
