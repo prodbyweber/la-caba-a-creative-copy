@@ -1,22 +1,23 @@
 import React, { useRef } from "react";
 import { useInView } from "framer-motion";
 import { motion } from "framer-motion";
+import { Users, TrendingUp, Landmark } from "lucide-react";
 
 const CARDS = [
   {
-    icon: "📡",
+    Icon: Users,
     title: "Una identidad clara construye audiencia real",
-    desc: "Cuando tu imagen, tu música y tu contenido hablan el mismo idioma, la gente no solo escucha — se queda. Una dirección creativa coherente convierte oyentes en comunidad y seguidores en fans que te siguen a donde vayas.",
+    desc: "Cuando tu imagen y tu música hablan el mismo idioma, los oyentes se convierten en comunidad.",
   },
   {
-    icon: "📈",
+    Icon: TrendingUp,
     title: "Tu música trabajando por ti en todas las plataformas",
-    desc: "Spotify, Apple Music, YouTube, TikTok — cada plataforma es una fuente de ingresos si el proyecto está bien construido. Con un plan integral activas regalías, sincronizaciones, contenido monetizable y campañas que convierten streams en dinero real.",
+    desc: "Spotify, Apple Music, YouTube, TikTok — un proyecto bien construido activa múltiples fuentes de ingresos.",
   },
   {
-    icon: "🤝",
-    title: "Un proyecto sólido atrae inversores y abre puertas a las Majors",
-    desc: "Los inversores y los sellos no fichan talento suelto — fichan proyectos con estructura. Con una identidad definida, un catálogo producido y una campaña funcionando, tienes lo que cualquier Major o fondo de inversión musical necesita ver antes de firmar.",
+    Icon: Landmark,
+    title: "Un proyecto sólido atrae inversores y abre puertas",
+    desc: "Los sellos y los fondos no fichan talento suelto. Fichan proyectos con estructura.",
   },
 ];
 
@@ -35,14 +36,14 @@ export default function WhyStructure() {
         .why-grid {
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 20px;
           margin-top: 40px;
         }
         @media (min-width: 768px) {
           .why-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
+            gap: 28px;
           }
         }
       `}</style>
@@ -88,13 +89,13 @@ export default function WhyStructure() {
               style={{
                 background: "#141414",
                 borderRadius: "12px",
-                padding: "28px 24px",
+                padding: "28px",
                 display: "flex",
                 flexDirection: "column",
                 gap: "10px",
               }}
             >
-              <span style={{ fontSize: "28px", lineHeight: 1 }}>{card.icon}</span>
+              <card.Icon size={28} stroke="#FF5833" strokeWidth={1.5} />
               <p style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 700,
