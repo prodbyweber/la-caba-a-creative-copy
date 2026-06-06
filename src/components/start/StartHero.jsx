@@ -53,7 +53,7 @@ export default function StartHero() {
           display: flex;
           flex-direction: column;
           justify-content: center;
-          padding: clamp(110px, 14vw, 160px) clamp(24px, 6vw, 64px) clamp(40px, 5vw, 72px);
+          padding: clamp(80px, 10vw, 120px) clamp(24px, 6vw, 64px) clamp(30px, 4vw, 56px);
           position: relative;
           z-index: 10;
         }
@@ -80,7 +80,7 @@ export default function StartHero() {
           .hero-text-col {
             width: 54%;
             flex: none;
-            padding: 120px 56px 80px;
+            padding: 80px 56px 60px;
           }
           .hero-media-col {
             width: 46%;
@@ -185,18 +185,6 @@ export default function StartHero() {
                 Ver proyectos →
               </a>
             </div>
-
-            {/* Trust */}
-            <p style={{
-              fontFamily: "'Helvetica Neue', sans-serif",
-              fontSize: "11px",
-              fontWeight: 400,
-              color: "rgba(240,237,232,0.22)",
-              margin: 0,
-              letterSpacing: "0.02em",
-            }}>
-              Sin permanencia · Respuesta en menos de 24h · Plazas limitadas
-            </p>
 
             {/* Stats */}
             <div className="hero-stats-grid">
