@@ -2,29 +2,66 @@
   "name": "ApplicationForm",
   "type": "object",
   "properties": {
-    "name": {
+    "nombre": {
       "type": "string",
-      "description": "Nombre del formulario"
+      "description": "Nombre del solicitante"
     },
-    "description": {
+    "apellidos": {
       "type": "string",
-      "description": "Descripci\u00f3n del formulario"
+      "description": "Apellidos del solicitante"
     },
-    "steps": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      },
-      "description": "Pasos del formulario con sus campos"
+    "email": {
+      "type": "string",
+      "description": "Email de contacto"
     },
-    "is_active": {
+    "telefono": {
+      "type": "string",
+      "description": "Tel\u00e9fono con c\u00f3digo de pa\u00eds"
+    },
+    "fecha_nacimiento": {
+      "type": "string",
+      "description": "Fecha de nacimiento"
+    },
+    "pais_residencia": {
+      "type": "string",
+      "description": "Pa\u00eds de residencia"
+    },
+    "nacionalidad": {
+      "type": "string",
+      "description": "Nacionalidad"
+    },
+    "disponibilidad_viaje_madrid": {
+      "type": "string",
+      "description": "Disponibilidad para viajar a Madrid (si/no)"
+    },
+    "situacion_laboral": {
+      "type": "string",
+      "description": "Situaci\u00f3n laboral actual"
+    },
+    "experiencia_musica": {
+      "type": "string",
+      "description": "Experiencia creando m\u00fasica"
+    },
+    "presupuesto_minimo": {
       "type": "boolean",
-      "default": true,
-      "description": "Si el formulario est\u00e1 activo"
+      "default": false,
+      "description": "Confirma presupuesto m\u00ednimo de 2000\u20ac"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "nueva",
+        "revisada",
+        "contactada",
+        "aceptada",
+        "rechazada"
+      ],
+      "default": "nueva",
+      "description": "Estado de la solicitud"
     }
   },
   "required": [
-    "name",
-    "steps"
+    "nombre",
+    "email"
   ]
 }

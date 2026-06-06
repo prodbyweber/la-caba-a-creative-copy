@@ -82,7 +82,7 @@ export default function StickyCtaBar() {
           margin: 0,
           textAlign: "center",
         }}>
-          Sin compromiso · Respuesta en 24h · Plazas limitadas
+          Reúnete con nuestro equipo · Plazas limitadas
         </p>
       </div>
     </>

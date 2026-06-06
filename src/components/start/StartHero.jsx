@@ -1,7 +1,8 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import ApplicationModal from "@/components/start/ApplicationModal";
 
 const STATS = [
   { label: "Modalidad", value: "Presencial · Online" },
@@ -26,6 +27,8 @@ function useAutoPlay(src) {
 }
 
 export default function StartHero() {
+  const [modalOpen, setModalOpen] = useState(false);
+
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
     queryFn: async () => { const c = await base44.entities.LandingConfig.list(); return c[0] || null; },
@@ -170,7 +173,7 @@ export default function StartHero() {
             {/* CTA row */}
             <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
               <button
-                onClick={scrollToContact}
+                onClick={() => setModalOpen(true)}
                 style={{
                   fontFamily: "'Helvetica Neue', sans-serif",
                   fontWeight: 900,
@@ -188,10 +191,12 @@ export default function StartHero() {
                 onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; e.currentTarget.style.transform = "translateY(-1px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                Solicitar plaza →
-              </button>
+                Solicitar información →
+                </button>
 
-            </div>
+                </div>
+
+                <ApplicationModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
 
             {/* Stats inline — desktop only */}
             <div className="hero-stats-inline">
