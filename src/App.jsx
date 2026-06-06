@@ -18,6 +18,7 @@ import StudioSession from './pages/StudioSession';
 import Meeting from './pages/Meeting';
 import Start from './pages/Start';
 import ContactLeads from './pages/ContactLeads';
+import CatalogoAdmin from './pages/CatalogoAdmin.jsx';
 import ArtistPanelList from './pages/ArtistPanelList';
 import UserProfiles from './pages/UserProfiles';
 import Pricing from './pages/Pricing';
@@ -150,6 +151,7 @@ const AuthenticatedApp = () => {
       <Route path="/ExplorarAdmin" element={<ProtectedAdminRoute element={<ExplorarAdmin />} />} />
       <Route path="/UserProfiles" element={<ProtectedAdminRoute element={<UserProfiles />} />} />
       <Route path="/DesignEditor" element={<ProtectedAdminRoute element={<DesignEditor />} />} />
+      <Route path="/CatalogoAdmin" element={<ProtectedAdminRoute element={<CatalogoAdmin />} />} />
       <Route path="/ArtistPanelList" element={<ProtectedAdminRoute element={<ArtistPanelList />} />} />
       <Route path="/ADNdeMarca" element={<ProtectedAdminRoute element={<ADNdeMarca />} />} />
       <Route path="/StudioSession" element={<StudioSession />} />

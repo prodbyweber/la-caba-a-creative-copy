@@ -1,0 +1,31 @@
+{
+  "name": "CatalogoProduccion",
+  "type": "object",
+  "properties": {
+    "youtube_url": {
+      "type": "string",
+      "description": "URL del video de YouTube (ej: https://www.youtube.com/embed/VIDEO_ID)"
+    },
+    "artista": {
+      "type": "string",
+      "description": "Nombre del artista"
+    },
+    "compania": {
+      "type": "string",
+      "description": "Compa\u00f1\u00eda discogr\u00e1fica (opcional)"
+    },
+    "imagen_personalizada_url": {
+      "type": "string",
+      "description": "URL de imagen de portada personalizada (opcional)"
+    },
+    "orden": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n en el carrusel"
+    }
+  },
+  "required": [
+    "youtube_url",
+    "artista"
+  ]
+}
