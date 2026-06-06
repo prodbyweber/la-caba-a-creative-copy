@@ -72,13 +72,12 @@ export default function StartHero() {
         .hero-stats-grid {
           display: flex;
           flex-direction: column;
-          gap: 10px;
-          margin-top: 20px;
+          gap: 12px;
+          margin-top: 16px;
           order: 3;
-          padding: 0 clamp(24px, 6vw, 64px) 32px;
-        }
-        .hero-stats-grid > div {
-          padding: 18px 20px !important;
+          padding: 0 20px 40px;
+          width: 100%;
+          box-sizing: border-box;
         }
         .hero-stats-inline {
           display: none;
@@ -244,12 +243,14 @@ export default function StartHero() {
           {STATS.map(stat => (
             <div key={stat.label} style={{
               background: "#111",
-              borderRadius: "12px",
-              padding: "18px 20px",
-              border: "1px solid rgba(255,255,255,0.05)",
+              borderRadius: "16px",
+              padding: "24px 24px 22px",
+              border: "1px solid rgba(255,255,255,0.06)",
+              width: "100%",
+              boxSizing: "border-box",
             }}>
-              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "9px", fontWeight: 700, color: "rgba(240,237,232,0.28)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 6px" }}>{stat.label}</p>
-              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "1rem", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em", lineHeight: 1.2 }}>{stat.value}</p>
+              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", fontWeight: 700, color: "rgba(240,237,232,0.32)", textTransform: "uppercase", letterSpacing: "0.18em", margin: "0 0 10px" }}>{stat.label}</p>
+              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "1.1rem", fontWeight: 400, color: "rgba(240,237,232,0.75)", margin: 0, letterSpacing: "-0.01em", lineHeight: 1.3 }}>{stat.value}</p>
             </div>
           ))}
         </div>
