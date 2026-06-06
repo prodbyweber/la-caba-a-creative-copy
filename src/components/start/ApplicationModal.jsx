@@ -265,33 +265,45 @@ export default function ApplicationModal({ isOpen, onClose }) {
                 </p>
               </div>
 
-              {/* Calendly CTA */}
-              <div style={{ padding: "14px 0 10px", textAlign: "center" }}>
-                <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.8rem", color: "rgba(240,237,232,0.5)", margin: "0 0 3px", lineHeight: 1.5 }}>
-                  Agenda ahora una videollamada gratuita con nuestro equipo.
-                </p>
-                <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.72rem", color: "#ff5833", margin: 0, fontWeight: 700, letterSpacing: "0.02em" }}>
-                  Plazas limitadas — cuanto antes, mejor.
-                </p>
-              </div>
+              {form.presupuesto === "sin_presupuesto" ? (
+                /* Opción 4: Sin Calendly */
+                <div style={{ padding: "20px 0", textAlign: "center" }}>
+                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.85rem", color: "rgba(240,237,232,0.5)", margin: 0, lineHeight: 1.6 }}>
+                    Hemos recibido tu solicitud. Cuando estés listo para dar el paso, estaremos aquí.
+                  </p>
+                </div>
+              ) : (
+                /* Opciones 1-3: Flujo normal con Calendly */
+                <>
+                  {/* Calendly CTA */}
+                  <div style={{ padding: "14px 0 10px", textAlign: "center" }}>
+                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.8rem", color: "rgba(240,237,232,0.5)", margin: "0 0 3px", lineHeight: 1.5 }}>
+                      Agenda ahora una videollamada gratuita con nuestro equipo.
+                    </p>
+                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.72rem", color: "#ff5833", margin: 0, fontWeight: 700, letterSpacing: "0.02em" }}>
+                      Plazas limitadas — cuanto antes, mejor.
+                    </p>
+                  </div>
 
-              {/* Calendly iframe */}
-              <div style={{ borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", height: "500px", flexShrink: 0, background: "#080808" }}>
-                <iframe
-                  src="https://calendly.com/hola-cabanacreative/creadores?embed_type=Inline&hide_gdpr_banner=1&background_color=080808&text_color=f0ede8&primary_color=ff4300"
-                  width="100%"
-                  height="100%"
-                  frameBorder="0"
-                  title="Agendar videollamada"
-                  style={{ display: "block" }}
-                />
-              </div>
+                  {/* Calendly iframe */}
+                  <div style={{ borderRadius: "14px", overflow: "hidden", border: "1px solid rgba(255,255,255,0.07)", height: "500px", flexShrink: 0, background: "#080808" }}>
+                    <iframe
+                      src="https://calendly.com/hola-cabanacreative/creadores?embed_type=Inline&hide_gdpr_banner=1&background_color=080808&text_color=f0ede8&primary_color=ff4300"
+                      width="100%"
+                      height="100%"
+                      frameBorder="0"
+                      title="Agendar videollamada"
+                      style={{ display: "block" }}
+                    />
+                  </div>
+                </>
+              )}
 
               <button onClick={handleClose} style={{ marginTop: "12px", background: "transparent", color: "rgba(240,237,232,0.3)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "9px", padding: "10px 20px", fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 600, fontSize: "0.8rem", cursor: "pointer", width: "100%", transition: "color 0.2s" }}
                 onMouseEnter={e => e.currentTarget.style.color = "rgba(240,237,232,0.6)"}
                 onMouseLeave={e => e.currentTarget.style.color = "rgba(240,237,232,0.3)"}
               >
-                Cerrar sin agendar
+                Cerrar
               </button>
             </div>
           ) : (
