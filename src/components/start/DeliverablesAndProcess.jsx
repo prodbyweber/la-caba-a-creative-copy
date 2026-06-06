@@ -227,14 +227,14 @@ export default function DeliverablesAndProcess() {
         style={{ marginTop: "clamp(36px, 5vw, 52px)", display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center" }}
       >
         <button
-          onClick={() => { const el = document.getElementById("contacto"); if (el) el.scrollIntoView({ behavior: "smooth" }); }}
+          onClick={() => { window.dispatchEvent(new CustomEvent("open-application-modal")); }}
           style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "clamp(0.82rem, 1.3vw, 0.92rem)", background: "#ff5833", color: "#fff", border: "none", borderRadius: "8px", padding: "13px 28px", cursor: "pointer", transition: "background 0.2s ease" }}
           onMouseEnter={e => e.currentTarget.style.background = "#e04a28"}
           onMouseLeave={e => e.currentTarget.style.background = "#ff5833"}
         >
           Quiero mi plan →
         </button>
-        <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "rgba(240,237,232,0.22)" }}>Sin compromiso · Respuesta en 24h</span>
+        <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "rgba(240,237,232,0.22)" }}>Acceso limitado</span>
       </motion.div>
     </section>
   );

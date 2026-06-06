@@ -5,7 +5,7 @@ const ITEMS = [
   {
     title: "Sesión de Exploración",
     text: "Antes de cualquier compromiso, nos sentamos contigo. En este meeting gratuito descubrimos tu proyecto, tu visión y tu momento actual. Aterrizamos ideas, detectamos qué necesitas y definimos si Cabaña es el equipo adecuado para llevarlo a cabo. Sin presión. Sin coste.",
-    badge: "Meeting gratuito · Sin compromiso",
+    badge: "Acceso limitado",
   },
   {
     title: "Identidad",
