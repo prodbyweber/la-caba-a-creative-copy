@@ -44,11 +44,12 @@ export default function MarcasHero() {
   };
 
   return (
-    <section id="hero" style={{ background: "#080808", position: "relative", overflow: "hidden" }}>
+    <section id="hero" style={{ background: "#080808", position: "relative", overflow: "hidden", marginTop: "0" }}>
       <style>{`
         .hero-wrap {
           display: flex;
           flex-direction: column;
+          padding-top: 0;
         }
         .hero-text-col {
           display: flex;
@@ -159,28 +160,34 @@ export default function MarcasHero() {
           .hero-wrap {
             flex-direction: row;
             min-height: 100dvh;
+            padding-top: 80px;
+            gap: 0;
           }
           .hero-text-col {
-            width: 54%;
-            flex: none;
+            width: 50%;
+            flex: 0 0 50%;
             padding: 80px 56px 60px;
             order: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            height: 100%;
+            margin-top: 0;
           }
           .hero-media-col {
-            width: 46%;
+            width: 50%;
+            flex: 0 0 50%;
             max-height: none;
-            height: auto;
-            flex: 1;
+            height: 100%;
+            flex-shrink: 0;
             order: 2;
             margin-top: 0;
           }
           .hero-sectores-section {
             order: 3;
-            width: 54%;
+            width: 100%;
             padding: 60px 56px;
+            margin-top: 0;
           }
           .sectores-button {
             max-width: 100%;
@@ -188,6 +195,7 @@ export default function MarcasHero() {
         }
         @media (min-width: 1200px) {
           .hero-text-col { padding: 120px 80px 80px; }
+          .hero-wrap { padding-top: 80px; }
           .hero-sectores-section { padding: 80px; }
         }
       `}</style>
