@@ -382,24 +382,32 @@ export default function ContactLeads() {
                         {app.nombre?.charAt(0)?.toUpperCase() || '?'}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-2">
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm sm:text-base font-semibold text-white">{app.nombre} {app.apellidos}</span>
                           <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${cfg.color}`}>{cfg.label}</span>
                         </div>
-                        {app.status === 'nueva' && <span className="w-2 h-2 rounded-full bg-[#ff5833] animate-pulse mb-2" />}
-                        <div className="flex flex-col gap-1.5 text-xs text-white/40 mb-2">
+                        {app.status === 'nueva' && <span className="w-2 h-2 rounded-full bg-[#ff5833] animate-pulse" />}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                        <div className="flex flex-col gap-1 text-xs text-white/40">
                           <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{app.email}</span>
                           {app.telefono && <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{app.telefono}</span>}
                           {app.pais_residencia && <span className="flex items-center gap-1.5"><span className="w-3 h-3 flex items-center justify-center">📍</span>{app.pais_residencia}</span>}
                         </div>
-                        <div className="flex flex-wrap gap-2 mb-2">
-                          <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.situacion_laboral || 'N/A'}</span>
-                          <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.experiencia_musica || 'N/A'}</span>
-                          <span className="text-[10px] px-2 py-1 rounded-lg bg-[#ff5833]/10 border border-[#ff5833]/20 text-[#ff5833] font-medium">Presupuesto: {presupuestoTexto}</span>
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.situacion_laboral || 'N/A'}</span>
+                            <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.experiencia_musica || 'N/A'}</span>
+                          </div>
+                          <span className="text-[10px] px-2 py-1.5 rounded-lg bg-[#ff5833]/10 border border-[#ff5833]/20 text-[#ff5833] font-medium inline-block w-fit">
+                            Presupuesto: {presupuestoTexto}
+                          </span>
                         </div>
-                        {app.created_date && <p className="text-[10px] text-white/25 flex items-center gap-1"><Calendar className="w-3 h-3" />{format(parseISO(app.created_date), "d MMM yyyy", { locale: es })}</p>}
-                        {/* Botones de acción rápida */}
-                        <div className="flex items-center gap-1.5 mt-2">
+                      </div>
+                      {app.created_date && <p className="text-[10px] text-white/25 flex items-center gap-1 mb-2"><Calendar className="w-3 h-3" />{format(parseISO(app.created_date), "d MMM yyyy", { locale: es })}</p>}
+                      {/* Botones de acción rápida */}
+                      <div className="flex items-center gap-1.5">
                           <a
                             href={`mailto:${app.email}`}
                             className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white hover:border-white/15 transition-all text-[10px] font-medium"
