@@ -71,6 +71,12 @@ export default function CatalogoAdminPanel() {
     updateMutation.mutate({ id: swapItem.id, data: { orden: currentItem.orden } });
   };
 
+  const extractYoutubeId = (url) => {
+    if (!url) return "";
+    const match = url.match(/\/embed\/([a-zA-Z0-9_-]+)/);
+    return match ? match[1] : url;
+  };
+
   return (
     <div style={{
       maxWidth: "1200px",
@@ -221,7 +227,7 @@ export default function CatalogoAdminPanel() {
                 background: "#000",
               }}>
                 <img
-                  src={`https://img.youtube.com/vi/${item.youtube_url.split('/embed/')[1]}/mqdefault.jpg`}
+                  src={`https://img.youtube.com/vi/${extractYoutubeId(item.youtube_url)}/mqdefault.jpg`}
                   alt={item.artista}
                   style={{ width: "100%", height: "100%", objectFit: "cover" }}
                 />

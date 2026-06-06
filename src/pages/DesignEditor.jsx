@@ -3,11 +3,13 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import LandingEditorInner from "@/components/admin/LandingEditorInner";
 import ExplorarAdminContent from "@/components/admin/ExplorarAdminContent";
 import ParaTiAdmin from "@/components/admin/ParaTiAdmin";
+import CatalogoAdminPanel from "@/components/admin/CatalogoAdminPanel";
 
 export default function DesignEditor() {
   const [active, setActive] = useState("landing");
   const tabs = [
     { key: "landing", label: "Landing" },
+    { key: "catalogo", label: "Catálogo" },
     { key: "explorar", label: "Explorar" },
     { key: "parati", label: "Para Ti" },
   ];
@@ -47,6 +49,7 @@ export default function DesignEditor() {
       {/* Content — full width */}
       <div className="w-full">
         {active === "landing" && <LandingEditorInner />}
+        {active === "catalogo" && <CatalogoAdminPanel />}
         {active === "explorar" && <ExplorarAdminContent />}
         {active === "parati" && <ParaTiAdmin />}
       </div>
