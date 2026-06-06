@@ -87,11 +87,12 @@ function LeadDetailModal({ lead, onClose }) {
               </a>
               {lead.phone && lead.phone !== '-' && (
                 <a
-                  href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}`}
+                  href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${lead.name}, soy el equipo de Cabaña Creative. Hemos recibido tu mensaje y estamos aquí para ayudarte. ¿Cuándo te vendría bien una videollamada?`)}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="px-4 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-sm font-medium"
+                  className="px-4 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-sm font-medium flex items-center gap-2"
                 >
+                  <MessageSquare className="w-4 h-4" />
                   WhatsApp
                 </a>
               )}
@@ -154,13 +155,26 @@ function ApplicationDetailModal({ app, onClose }) {
                 </div>
               ) : null)}
             </div>
-            <a
-              href={`mailto:${app.email}?subject=Tu solicitud en Cabaña Creative`}
-              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#ff5833] hover:bg-[#e84d2a] text-white font-semibold text-sm transition-all mt-2"
-            >
-              <Mail className="w-4 h-4" />
-              Contactar por email
-            </a>
+            <div className="flex gap-2 mt-2">
+              <a
+                href={`mailto:${app.email}?subject=Tu solicitud en Cabaña Creative`}
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#ff5833] hover:bg-[#e84d2a] text-white font-semibold text-sm transition-all"
+              >
+                <Mail className="w-4 h-4" />
+                Email
+              </a>
+              {app.telefono && app.telefono !== '-' && (
+                <a
+                  href={`https://wa.me/${app.telefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${app.nombre}, soy el equipo de Cabaña Creative. Hemos recibido tu solicitud y nos gustaría conocer más sobre tu proyecto. ¿Tienes disponibilidad para una videollamada esta semana?`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-sm font-medium"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  WhatsApp
+                </a>
+              )}
+            </div>
           </div>
         </motion.div>
       </div>
