@@ -72,7 +72,7 @@ export default function StartHero() {
         .hero-stats-grid {
           display: flex;
           flex-direction: column;
-          gap: 12px;
+          gap: 20px;
           margin-top: 16px;
           order: 3;
           padding: 0 20px 40px;
