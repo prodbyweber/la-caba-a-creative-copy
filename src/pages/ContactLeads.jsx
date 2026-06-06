@@ -367,7 +367,7 @@ export default function ContactLeads() {
               <p className="text-white/25 text-sm">No hay solicitudes de plaza</p>
             </div>
           ) : (
-            <div className="space-y-2 sm:space-y-3">
+            <div className="space-y-3 sm:space-y-4 pb-4">
               {filteredApps.map((app, i) => {
                 const cfg = APP_STATUS_CONFIG[app.status] || APP_STATUS_CONFIG.nueva;
                 const presupuestoTexto = app.presupuesto || 'No especificado';
@@ -437,7 +437,7 @@ export default function ContactLeads() {
               <p className="text-white/25 text-sm">No hay mensajes de contacto</p>
             </div>
           ) : (
-            <div className="space-y-2 sm:space-y-3">
+            <div className="space-y-3 sm:space-y-4 pb-4">
               {filteredLeads.map((lead, i) => {
                 const cfg = LEAD_STATUS_CONFIG[lead.status] || LEAD_STATUS_CONFIG.Nuevo;
                 return (
@@ -456,9 +456,18 @@ export default function ContactLeads() {
                           <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${cfg.color}`}>{cfg.label}</span>
                         </div>
                         {lead.status === 'Nuevo' && <span className="w-2 h-2 rounded-full bg-[#ff5833] animate-pulse mb-2" />}
-                        <div className="flex flex-col gap-1.5 text-xs text-white/40 mb-2">
-                          <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{lead.email}</span>
-                          {lead.phone && lead.phone !== '-' && <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{lead.phone}</span>}
+                        <div className="flex flex-col gap-2 text-xs text-white/40 mb-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{lead.email}</span>
+                          </div>
+                          {lead.phone && lead.phone !== '-' && (
+                            <div className="flex items-center gap-2">
+                              <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{lead.phone}</span>
+                              <a href={`tel:${lead.phone}`} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/[0.06] text-white/60 border border-white/[0.08] hover:bg-white/[0.1] hover:text-white transition-all text-[10px] font-medium">
+                                <Phone className="w-3 h-3" /> Llamar
+                              </a>
+                            </div>
+                          )}
                         </div>
                         <p className="text-xs text-white/50 leading-relaxed mb-2 line-clamp-2">{lead.message}</p>
                         {lead.created_date && <p className="text-[10px] text-white/25 flex items-center gap-1"><Calendar className="w-3 h-3" />{format(parseISO(lead.created_date), "d MMM yyyy", { locale: es })}</p>}
