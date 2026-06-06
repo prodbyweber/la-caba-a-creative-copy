@@ -123,52 +123,67 @@ export default function StartHero() {
       <div className="hero-wrap">
         {/* Left: content */}
         <div className="hero-text-col">
-          <motion.div
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-            style={{ display: "flex", flexDirection: "column", gap: "clamp(14px, 2.2vw, 20px)", maxWidth: "600px" }}
-          >
+          <div style={{ display: "flex", flexDirection: "column", gap: "clamp(14px, 2.2vw, 20px)", maxWidth: "600px" }}>
             {/* Pre-label */}
-            <p style={{
-              fontFamily: "'Helvetica Neue', sans-serif",
-              fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)",
-              fontWeight: 500,
-              color: "rgba(240,237,232,0.45)",
-              letterSpacing: "0.04em",
-              margin: 0,
-            }}>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                fontFamily: "'Helvetica Neue', sans-serif",
+                fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)",
+                fontWeight: 500,
+                color: "rgba(240,237,232,0.45)",
+                letterSpacing: "0.04em",
+                margin: 0,
+              }}
+            >
               ¿Tienes el talento pero no el plan?
-            </p>
+            </motion.p>
 
             {/* Headline */}
-            <h1 style={{
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-              fontWeight: 900,
-              fontSize: "clamp(2.1rem, 5.2vw, 4rem)",
-              letterSpacing: "-0.04em",
-              lineHeight: 0.93,
-              color: "#f0ede8",
-              margin: 0,
-            }}>
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontWeight: 900,
+                fontSize: "clamp(2.1rem, 5.2vw, 4rem)",
+                letterSpacing: "-0.04em",
+                lineHeight: 0.93,
+                color: "#f0ede8",
+                margin: 0,
+              }}
+            >
               Plan de desarrollo artístico para creadores independientes
-            </h1>
+            </motion.h1>
 
             {/* Description */}
-            <p style={{
-              fontFamily: "'Helvetica Neue', sans-serif",
-              fontWeight: 300,
-              fontSize: "clamp(0.85rem, 1.5vw, 1rem)",
-              color: "rgba(240,237,232,0.52)",
-              lineHeight: 1.65,
-              margin: 0,
-              maxWidth: "480px",
-            }}>
+            <motion.p
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.75, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                fontFamily: "'Helvetica Neue', sans-serif",
+                fontWeight: 300,
+                fontSize: "clamp(0.85rem, 1.5vw, 1rem)",
+                color: "rgba(240,237,232,0.52)",
+                lineHeight: 1.65,
+                margin: 0,
+                maxWidth: "480px",
+              }}
+            >
               Identidad, producción musical, audiovisual y marketing, somos tu equipo creativo. Para artistas que quieren crecer con criterio, no con suerte.
-            </p>
+            </motion.p>
 
             {/* CTA row */}
-            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}
+            >
               <button
                 onClick={() => { window.dispatchEvent(new CustomEvent("open-application-modal")); }}
                 style={{
@@ -190,24 +205,35 @@ export default function StartHero() {
               >
                 Solicitar información →
               </button>
-            </div>
+            </motion.div>
 
             {/* Stats inline — desktop only */}
-            <div className="hero-stats-inline">
-              {STATS.map(stat => (
-                <div key={stat.label} style={{
-                  background: "#111",
-                  borderRadius: "10px",
-                  padding: "12px 14px",
-                  border: "1px solid rgba(255,255,255,0.05)",
-                }}>
+            <motion.div
+              className="hero-stats-inline"
+              initial={{ opacity: 0, y: 25 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.75, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {STATS.map((stat, idx) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.9 + (idx * 0.1), ease: [0.22, 1, 0.36, 1] }}
+                  style={{
+                    background: "#111",
+                    borderRadius: "10px",
+                    padding: "12px 14px",
+                    border: "1px solid rgba(255,255,255,0.05)",
+                  }}
+                >
                   <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "8px", fontWeight: 700, color: "rgba(240,237,232,0.28)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 3px" }}>{stat.label}</p>
                   <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em" }}>{stat.value}</p>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
-          </motion.div>
+          </div>
         </div>
 
         {/* Right: Media */}
@@ -238,21 +264,32 @@ export default function StartHero() {
         </motion.div>
 
         {/* Stats — below video on mobile only */}
-        <div className="hero-stats-grid">
-          {STATS.map(stat => (
-            <div key={stat.label} style={{
-              background: "rgba(255,255,255,0.04)",
-              borderRadius: "16px",
-              padding: "28px 24px",
-              border: "1px solid rgba(255,255,255,0.08)",
-              width: "100%",
-              boxSizing: "border-box",
-            }}>
+        <motion.div
+          className="hero-stats-grid"
+          initial={{ opacity: 0, y: 25 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.75, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {STATS.map((stat, idx) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.9 + (idx * 0.1), ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                borderRadius: "16px",
+                padding: "28px 24px",
+                border: "1px solid rgba(255,255,255,0.08)",
+                width: "100%",
+                boxSizing: "border-box",
+              }}
+            >
               <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "1.15rem", fontWeight: 700, color: "#f0ede8", margin: "0 0 8px", letterSpacing: "-0.01em" }}>{stat.label}</p>
               <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.95rem", fontWeight: 400, color: "rgba(240,237,232,0.5)", margin: 0, lineHeight: 1.4 }}>{stat.value}</p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
