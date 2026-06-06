@@ -182,7 +182,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
       disponibilidad_viaje_madrid: form.viaje_madrid,
       situacion_laboral: form.situacion_laboral,
       experiencia_musica: form.experiencia_musica,
-      presupuesto_minimo: form.presupuesto,
+      presupuesto: form.presupuesto,
     });
     setSending(false);
     setSent(true);

@@ -42,10 +42,15 @@
       "type": "string",
       "description": "Experiencia creando m\u00fasica"
     },
-    "presupuesto_minimo": {
-      "type": "boolean",
-      "default": false,
-      "description": "Confirma presupuesto m\u00ednimo de 2000\u20ac"
+    "presupuesto": {
+      "type": "string",
+      "enum": [
+        "5000+",
+        "2000",
+        "financiando",
+        "sin_presupuesto"
+      ],
+      "description": "Presupuesto disponible para el proyecto"
     },
     "status": {
       "type": "string",
