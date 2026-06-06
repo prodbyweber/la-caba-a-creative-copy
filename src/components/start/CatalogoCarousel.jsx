@@ -1,12 +1,15 @@
-import React, { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import React, { useState, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 
-export default function CatalogoCarousel({ items }) {
+export default function CatalogoCarousel() {
+  const { data: items = [] } = useQuery({
+    queryKey: ['catalogo-produccion'],
+    queryFn: () => base44.entities.CatalogoProduccion.list("orden"),
+    initialData: [],
+  });
   const [playingId, setPlayingId] = useState(null);
   const carouselRef = useRef(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
 
   const getVideoId = (url) => {
     if (!url) return null;
@@ -24,29 +27,6 @@ export default function CatalogoCarousel({ items }) {
     setPlayingId(playingId === id ? null : id);
   };
 
-  const handleMouseDown = (e) => {
-    if (playingId) return;
-    setIsDragging(true);
-    setStartX(e.pageX - carouselRef.current.offsetLeft);
-    setScrollLeft(carouselRef.current.scrollLeft);
-  };
-
-  const handleMouseLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging || playingId) return;
-    e.preventDefault();
-    const x = e.pageX - carouselRef.current.offsetLeft;
-    const walk = (x - startX) * 2;
-    carouselRef.current.scrollLeft = scrollLeft - walk;
-  };
-
   const scroll = (direction) => {
     if (!carouselRef.current) return;
     const scrollAmount = carouselRef.current.offsetWidth * 0.8;
@@ -57,6 +37,8 @@ export default function CatalogoCarousel({ items }) {
   };
 
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
+  if (!items || items.length === 0) return null;
 
   return (
     <section style={{
@@ -94,14 +76,18 @@ export default function CatalogoCarousel({ items }) {
         </div>
 
         {/* Carousel Container */}
-        <div style={{ position: "relative" }}>
+        <div style={{
+          position: "relative",
+          maxWidth: "100vw",
+          margin: "0 calc(-50vw + 50%)",
+        }}>
           {/* Left Arrow (Desktop only) */}
           {!isMobile && (
             <button
               onClick={() => scroll("left")}
               style={{
                 position: "absolute",
-                left: "-20px",
+                left: "10px",
                 top: "50%",
                 transform: "translateY(-50%)",
                 zIndex: 10,
@@ -128,10 +114,6 @@ export default function CatalogoCarousel({ items }) {
           {/* Carousel Track */}
           <div
             ref={carouselRef}
-            onMouseDown={handleMouseDown}
-            onMouseLeave={handleMouseLeave}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
             style={{
               display: "flex",
               gap: "16px",
@@ -140,8 +122,7 @@ export default function CatalogoCarousel({ items }) {
               scrollbarWidth: "none",
               msOverflowStyle: "none",
               WebkitOverflowScrolling: "touch",
-              cursor: isDragging ? "grabbing" : "grab",
-              padding: "10px 0",
+              padding: "10px 20px",
             }}
           >
             <style>{`
@@ -161,9 +142,8 @@ export default function CatalogoCarousel({ items }) {
                   onClick={() => handleCardClick(item.id)}
                   style={{
                     flex: "0 0 auto",
-                    width: isMobile ? "calc(100vw - 40px)" : "calc(33.333% - 10.667px)",
-                    minWidth: isMobile ? "calc(100vw - 40px)" : "400px",
-                    maxWidth: isMobile ? "calc(100vw - 40px)" : "500px",
+                    width: isMobile ? "calc(100vw - 56px)" : "calc(28.5vw - 12px)",
+                    minWidth: isMobile ? "calc(100vw - 56px)" : "380px",
                     aspectRatio: "16/9",
                     borderRadius: "12px",
                     overflow: "hidden",
@@ -171,17 +151,6 @@ export default function CatalogoCarousel({ items }) {
                     background: "#141414",
                     boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
                     cursor: "pointer",
-                    transition: "transform 0.3s",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isDragging && !playingId) {
-                      e.currentTarget.style.transform = "scale(1.02)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isDragging && !playingId) {
-                      e.currentTarget.style.transform = "scale(1)";
-                    }
                   }}
                 >
                   {isPlaying ? (
@@ -283,7 +252,7 @@ export default function CatalogoCarousel({ items }) {
               onClick={() => scroll("right")}
               style={{
                 position: "absolute",
-                right: "-20px",
+                right: "10px",
                 top: "50%",
                 transform: "translateY(-50%)",
                 zIndex: 10,

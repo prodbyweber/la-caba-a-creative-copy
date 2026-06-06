@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import StartNav from "@/components/start/StartNav";
 import StartHero from "@/components/start/StartHero";
 import StartBrandsCarousel from "@/components/start/StartBrandsCarousel";
+import CatalogoCarousel from "@/components/start/CatalogoCarousel";
 import ProblemSolution from "@/components/start/ProblemSolution";
 import DeliverablesAndProcess from "@/components/start/DeliverablesAndProcess";
 import StartCreadores from "@/components/start/StartCreadores";
@@ -55,6 +56,9 @@ export default function Start() {
       }}>
         <StartBrandsCarousel />
       </section>
+
+      {/* 2b. Catálogo de producciones */}
+      <CatalogoCarousel />
 
       {/* 3. Problema → Solución */}
       <ProblemSolution />
