@@ -4,13 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
 const SECTORES = [
-  "Moda y Streetwear",
-  "Calzado",
-  "Bebidas",
-  "Belleza y Cosmética",
-  "Audio y Tecnología",
-  "Eventos y Conciertos",
-  "Hostelería",
+  { label: "Moda y Streetwear", width: "large" },
+  { label: "Calzado", width: "small" },
+  { label: "Bebidas", width: "small" },
+  { label: "Belleza y Cosmética", width: "large" },
+  { label: "Audio y Tecnología", width: "large" },
+  { label: "Eventos y Conciertos", width: "large" },
+  { label: "Hostelería", width: "small" },
 ];
 
 function useAutoPlay(src) {
@@ -49,7 +49,6 @@ export default function MarcasHero() {
         .hero-wrap {
           display: flex;
           flex-direction: column;
-          min-height: 100dvh;
         }
         .hero-text-col {
           display: flex;
@@ -71,19 +70,95 @@ export default function MarcasHero() {
           order: 2;
           margin-top: 24px;
         }
-        .hero-sectores-wrap {
+        .hero-sectores-section {
           order: 3;
+          background: #0a0a0b;
           padding: clamp(40px, 6vw, 60px) clamp(24px, 6vw, 64px);
           width: 100%;
           box-sizing: border-box;
         }
-        .hero-sectores-inline {
-          display: none;
+        .sectores-container {
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+          max-width: 100%;
+        }
+        .sectores-header {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .sectores-title {
+          font-family: 'Helvetica Neue', sans-serif;
+          font-size: clamp(0.78rem, 1.3vw, 0.92rem);
+          font-weight: 700;
+          color: #ff5833;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          margin: 0;
+        }
+        .sectores-subtitle {
+          font-family: 'Helvetica Neue', sans-serif;
+          font-size: clamp(1.3rem, 3vw, 2rem);
+          font-weight: 900;
+          color: #f0ede8;
+          line-height: 1.15;
+          margin: 0;
+          max-width: 500px;
+        }
+        .sectores-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          justify-content: flex-start;
+        }
+        .sector-card {
+          border: 2px solid #ff5833;
+          border-radius: 30px;
+          padding: 12px 24px;
+          font-family: 'Helvetica Neue', sans-serif;
+          font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+          font-weight: 600;
+          color: #ff5833;
+          background: transparent;
+          cursor: default;
+          white-space: nowrap;
+        }
+        .sector-card.large {
+          min-width: 200px;
+        }
+        .sectores-button {
+          align-self: flex-start;
+          width: 100%;
+          max-width: 500px;
+          padding: clamp(16px, 2vw, 20px) clamp(24px, 4vw, 32px);
+          background: #ff5833;
+          border: none;
+          border-radius: 12px;
+          font-family: 'Helvetica Neue', sans-serif;
+          font-size: clamp(0.95rem, 1.3vw, 1.1rem);
+          font-weight: 900;
+          color: #fff;
+          cursor: pointer;
+          transition: background 0.2s ease, transform 0.2s ease;
+          margin-top: 8px;
+        }
+        .sectores-button:hover {
+          background: #e04a28;
+          transform: translateY(-1px);
+        }
+        .sectores-subtitle-small {
+          font-family: 'Helvetica Neue', sans-serif;
+          font-size: clamp(0.75rem, 1vw, 0.85rem);
+          font-weight: 400;
+          color: rgba(240,237,232,0.35);
+          margin: 0;
+          padding-top: 4px;
         }
         @media (min-width: 768px) {
           .hero-wrap {
             flex-direction: row;
-            height: 100dvh;
+            min-height: 100dvh;
           }
           .hero-text-col {
             width: 54%;
@@ -97,24 +172,23 @@ export default function MarcasHero() {
           .hero-media-col {
             width: 46%;
             max-height: none;
-            height: 100%;
+            height: auto;
             flex: 1;
             order: 2;
             margin-top: 0;
           }
-          .hero-sectores-wrap {
-            display: none;
-          }
-          .hero-sectores-inline {
-            display: block;
+          .hero-sectores-section {
             order: 3;
-            padding: 0 56px 60px;
             width: 54%;
-            box-sizing: border-box;
+            padding: 60px 56px;
+          }
+          .sectores-button {
+            max-width: 100%;
           }
         }
         @media (min-width: 1200px) {
           .hero-text-col { padding: 120px 80px 80px; }
+          .hero-sectores-section { padding: 80px; }
         }
       `}</style>
 
@@ -222,107 +296,45 @@ export default function MarcasHero() {
           <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "25%", background: "linear-gradient(to top, rgba(8,8,8,0.7) 0%, transparent 100%)" }} />
         </motion.div>
 
-        {/* Sectores — below video on mobile only */}
-        <div className="hero-sectores-wrap">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            style={{
-              fontFamily: "'Helvetica Neue', sans-serif",
-              fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)",
-              fontWeight: 500,
-              color: "#ff5833",
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-              marginBottom: "16px",
-            }}
-          >
-            CON QUIÉN TRABAJAMOS
-          </motion.p>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.35 }}
-            style={{
-              fontFamily: "'Helvetica Neue', sans-serif",
-              fontSize: "clamp(0.9rem, 1.5vw, 1.1rem)",
-              fontWeight: 400,
-              color: "rgba(240,237,232,0.6)",
-              lineHeight: 1.5,
-              marginBottom: "20px",
-            }}
-          >
-            Marcas que quieren conectar con la generación más influyente del mercado.
-          </motion.p>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: "12px",
-          }}>
-            {SECTORES.map((sector) => (
-              <div key={sector} style={{
-                background: "rgba(255,255,255,0.04)",
-                borderRadius: "16px",
-                padding: "20px 24px",
-                border: "1px solid rgba(255,255,255,0.08)",
-              }}>
-                <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.95rem", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.01em" }}>{sector}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Con quién trabajamos section */}
+        <motion.div
+          className="hero-sectores-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <div className="sectores-container">
+            <div className="sectores-header">
+              <p className="sectores-title">CON QUIÉN TRABAJAMOS</p>
+              <h2 className="sectores-subtitle">
+                Marcas que quieren conectar con la generación más influyente del mercado.
+              </h2>
+            </div>
 
-        {/* Sectores inline — desktop only (below text column) */}
-        <div className="hero-sectores-inline">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            style={{
-              fontFamily: "'Helvetica Neue', sans-serif",
-              fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)",
-              fontWeight: 500,
-              color: "#ff5833",
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-              marginBottom: "16px",
-            }}
-          >
-            CON QUIÉN TRABAJAMOS
-          </motion.p>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.35 }}
-            style={{
-              fontFamily: "'Helvetica Neue', sans-serif",
-              fontSize: "clamp(0.9rem, 1.5vw, 1.1rem)",
-              fontWeight: 400,
-              color: "rgba(240,237,232,0.6)",
-              lineHeight: 1.5,
-              marginBottom: "20px",
-            }}
-          >
-            Marcas que quieren conectar con la generación más influyente del mercado.
-          </motion.p>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "8px",
-          }}>
-            {SECTORES.map((sector) => (
-              <div key={sector} style={{
-                background: "#111",
-                borderRadius: "10px",
-                padding: "12px 14px",
-                border: "1px solid rgba(255,255,255,0.05)",
-              }}>
-                <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em" }}>{sector}</p>
-              </div>
-            ))}
+            <div className="sectores-grid">
+              {SECTORES.map((sector) => (
+                <div
+                  key={sector.label}
+                  className={`sector-card ${sector.width === "large" ? "large" : ""}`}
+                >
+                  {sector.label}
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <button
+                className="sectores-button"
+                onClick={handleClick}
+              >
+                Solicitar plaza →
+              </button>
+              <p className="sectores-subtitle-small">
+                Reúnete con nuestro equipo · Plazas limitadas
+              </p>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
