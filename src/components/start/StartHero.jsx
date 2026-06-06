@@ -6,8 +6,8 @@ import { base44 } from "@/api/base44Client";
 const STATS = [
   { label: "Modalidad", value: "Presencial · Online" },
   { label: "Duración", value: "90 días" },
-  { label: "Plazas", value: "27 disponibles" },
-  { label: "Horas de estudio", value: "32h de creación" },
+  { label: "Plazas disponibles", value: "27" },
+  { label: "Horas de creación", value: "42h" },
 ];
 
 function useAutoPlay(src) {
