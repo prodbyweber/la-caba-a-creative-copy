@@ -31,6 +31,7 @@ import ADNdeMarca from './pages/ADNdeMarca';
 import PublicProfile from './pages/PublicProfile';
 import UserPublicProfile from './pages/UserPublicProfile';
 import CreatorProfile from './pages/CreatorProfile';
+import Marcas from './pages/Marcas';
 import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
@@ -161,6 +162,7 @@ const AuthenticatedApp = () => {
       <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
       <Route path="/aviso-legal" element={<AvisoLegal />} />
       <Route path="/politica-de-cookies" element={<PoliticaCookies />} />
+      <Route path="/Marcas" element={<Marcas />} />
       <Route path="/:username" element={<UserPublicProfile />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
