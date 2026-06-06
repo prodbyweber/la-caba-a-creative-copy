@@ -317,19 +317,18 @@ export default function MarcasHero() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.2, delay: 0.15 }}
+          style={{ position: "relative", overflow: "hidden" }}
         >
           {videoSrc ? (
             <video
               ref={videoRef}
               src={videoSrc}
               autoPlay muted loop playsInline preload="auto"
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", border: "none", padding: 0, borderRadius: 0 }}
             />
           ) : (
             <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #1a1a1a 0%, #0c0c0c 100%)" }} />
           )}
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(8,8,8,0.45) 0%, transparent 35%)" }} />
-          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "25%", background: "linear-gradient(to top, rgba(8,8,8,0.7) 0%, transparent 100%)" }} />
         </motion.div>
 
         {/* Con quién trabajamos section */}
