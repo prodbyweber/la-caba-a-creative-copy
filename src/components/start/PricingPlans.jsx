@@ -42,7 +42,7 @@ export default function PricingPlans() {
       ref={ref}
       style={{
         background: "#080808",
-        padding: "clamp(60px, 8vw, 120px) clamp(24px, 6vw, 56px)",
+        padding: "clamp(30px, 4vw, 60px) clamp(24px, 6vw, 56px) clamp(60px, 8vw, 120px)",
         position: "relative",
         width: "100%",
         boxSizing: "border-box",
