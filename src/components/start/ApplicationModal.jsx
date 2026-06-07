@@ -491,7 +491,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     </select>
                   </div>
                   <div style={fieldWrap}>
-                    <Label required>¿Tienes disposición de viajar a Madrid?</Label>
+                    <Label required>Producimos en Madrid. ¿Estás cerca o tienes disposición de viajar?</Label>
                     <select value={form.viaje_madrid} onChange={e => set("viaje_madrid", e.target.value)} style={{ ...inputStyle, borderColor: errors.viaje_madrid ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
                       <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
                       <option value="si" style={{ background: "#141414" }}>Sí</option>
