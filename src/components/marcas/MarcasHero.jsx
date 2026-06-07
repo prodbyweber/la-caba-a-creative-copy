@@ -9,6 +9,7 @@ const SECTORES = [
   { label: "Bebidas", width: "small" },
   { label: "Belleza y Cosmética", width: "large" },
   { label: "Audio y Tecnología", width: "large" },
+  { label: "Marca Personal", width: "small" },
   { label: "Eventos y Conciertos", width: "large" },
   { label: "Hostelería", width: "small" },
 ];
