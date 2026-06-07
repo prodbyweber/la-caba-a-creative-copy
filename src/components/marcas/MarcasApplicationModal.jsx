@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const COUNTRIES_CITIES = {
   "España": ["Madrid", "Barcelona", "Valencia", "Sevilla", "Bilbao", "Málaga", "Zaragoza", "Murcia", "Palma", "Las Palmas", "Alicante", "Córdoba", "Valladolid", "Vigo", "Gijón", "Granada", "Otra"],
@@ -178,7 +178,6 @@ const INITIAL_FORM = {
 };
 
 export default function MarcasApplicationModal({ isOpen, onClose }) {
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [sending, setSending] = useState(false);
   const [errors, setErrors] = useState({});
@@ -255,7 +254,7 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
     });
     setSending(false);
     onClose();
-    navigate("/solicitud");
+    window.location.href = "/solicitud";
   };
 
   const handleClose = () => {

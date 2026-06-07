@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const COUNTRIES = [
   "España","México","Argentina","Colombia","Chile","Perú","Venezuela","Ecuador","Bolivia","Paraguay","Uruguay","Cuba","República Dominicana","Guatemala","Honduras","El Salvador","Nicaragua","Costa Rica","Panamá","Puerto Rico","Estados Unidos","Reino Unido","Francia","Alemania","Italia","Portugal","Países Bajos","Bélgica","Suiza","Austria","Polonia","Rumania","Suecia","Noruega","Dinamarca","Finlandia","Japón","China","India","Brasil","Australia","Canadá","Otro"
@@ -106,7 +106,6 @@ function StepIndicator({ current }) {
 }
 
 export default function ApplicationModal({ isOpen, onClose }) {
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [sending, setSending] = useState(false);
   const [errors, setErrors] = useState({});
@@ -195,7 +194,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
     });
     setSending(false);
     onClose();
-    navigate("/gracias");
+    window.location.href = "/gracias";
   };
 
   const handleClose = () => {
