@@ -104,35 +104,34 @@ export default function CatalogoCarousel() {
               }
             }
           `}</style>
-          {/* Left Arrow (Desktop only) */}
-          {!isMobile && (
-            <button
-              onClick={() => scroll("left")}
-              style={{
-                position: "absolute",
-                left: "10px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                zIndex: 10,
-                width: "44px",
-                height: "44px",
-                borderRadius: "50%",
-                background: "#FF5833",
-                border: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                transition: "background 0.2s",
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = "#e04a28"}
-              onMouseLeave={(e) => e.currentTarget.style.background = "#FF5833"}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-          )}
+          {/* Left Arrow */}
+          <button
+            onClick={() => scroll("left")}
+            style={{
+              position: "absolute",
+              left: "6px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 10,
+              width: isMobile ? "34px" : "44px",
+              height: isMobile ? "34px" : "44px",
+              borderRadius: "50%",
+              background: "rgba(255,88,51,0.85)",
+              border: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              transition: "background 0.2s",
+              backdropFilter: "blur(4px)",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#e04a28"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,88,51,0.85)"}
+          >
+            <svg width={isMobile ? "16" : "20"} height={isMobile ? "16" : "20"} viewBox="0 0 24 24" fill="none">
+              <path d="M15 18L9 12L15 6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
 
           {/* Carousel Track */}
           <div
@@ -295,35 +294,34 @@ export default function CatalogoCarousel() {
             })}
           </div>
 
-          {/* Right Arrow (Desktop only) */}
-          {!isMobile && (
-            <button
-              onClick={() => scroll("right")}
-              style={{
-                position: "absolute",
-                right: "10px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                zIndex: 10,
-                width: "44px",
-                height: "44px",
-                borderRadius: "50%",
-                background: "#FF5833",
-                border: "none",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                transition: "background 0.2s",
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.background = "#e04a28"}
-              onMouseLeave={(e) => e.currentTarget.style.background = "#FF5833"}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-          )}
+          {/* Right Arrow */}
+          <button
+            onClick={() => scroll("right")}
+            style={{
+              position: "absolute",
+              right: "6px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              zIndex: 10,
+              width: isMobile ? "34px" : "44px",
+              height: isMobile ? "34px" : "44px",
+              borderRadius: "50%",
+              background: "rgba(255,88,51,0.85)",
+              border: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              transition: "background 0.2s",
+              backdropFilter: "blur(4px)",
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#e04a28"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,88,51,0.85)"}
+          >
+            <svg width={isMobile ? "16" : "20"} height={isMobile ? "16" : "20"} viewBox="0 0 24 24" fill="none">
+              <path d="M9 18L15 12L9 6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
         </div>
       </div>
     </section>
