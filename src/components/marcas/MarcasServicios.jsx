@@ -1,28 +1,28 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Music, Play, Target, Zap } from "lucide-react";
+import { Music, Play, Target, Zap, Clapperboard, Users } from "lucide-react";
 
 export default function MarcasServicios() {
   const servicios = [
     {
-      icon: Music,
-      title: "Música para Marcas",
-      desc: "Jingles, identidad sonora y música original para campañas. El diferencial que ninguna otra agencia te ofrece.",
+      icon: Zap,
+      title: "Branding y Estrategia",
+      desc: "Identidad de marca, landing pages, estrategia de contenido y posicionamiento en el mercado europeo.",
     },
     {
-      icon: Play,
-      title: "Contenido UGC y Orgánico",
+      icon: Clapperboard,
+      title: "Producción de Contenido",
+      desc: "Creamos la narrativa de tu marca — contenido cinematográfico orgánico y de venta directa para campañas de paid media audiovisual. Cada pieza, pensada para impactar.",
+    },
+    {
+      icon: Users,
+      title: "Contenido UGC",
       desc: "Creadores reales, situaciones reales. Contenido que conecta con la Gen Z porque no parece publicidad.",
     },
     {
       icon: Target,
       title: "Paid Media",
       desc: "Campañas en Meta y YouTube Ads con estrategia, segmentación y creatividades que convierten. Sin quemar presupuesto.",
-    },
-    {
-      icon: Zap,
-      title: "Branding y Estrategia",
-      desc: "Identidad de marca, landing pages, estrategia de contenido y posicionamiento en el mercado europeo.",
     },
   ];
 
