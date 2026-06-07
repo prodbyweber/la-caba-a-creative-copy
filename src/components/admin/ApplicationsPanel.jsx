@@ -208,7 +208,11 @@ export default function ApplicationsPanel() {
                       </span>
                     )}
                     {app.created_date && (
-                      <span className="text-[10px] text-white/20 ml-auto">{new Date(app.created_date).toLocaleDateString("es-ES")}</span>
+                      <span className="text-[10px] text-white/20 ml-auto">
+                        {new Date(app.created_date).toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}
+                        {" · "}
+                        {new Date(app.created_date).toLocaleTimeString("es-ES", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit", hour12: true })}
+                      </span>
                     )}
                   </div>
                   {app.presupuesto && (
