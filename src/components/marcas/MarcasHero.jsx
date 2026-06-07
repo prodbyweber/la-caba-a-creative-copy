@@ -115,6 +115,7 @@ export default function MarcasHero() {
           padding: clamp(40px, 6vw, 60px) clamp(24px, 6vw, 64px);
           width: 100%;
           box-sizing: border-box;
+          display: none;
         }
         .sectores-container {
           display: flex;
@@ -262,6 +263,9 @@ export default function MarcasHero() {
           }
           .sectores-subtitle {
             font-size: clamp(1.3rem, 2vw, 2rem) !important;
+          }
+          .hero-sectores-section {
+            display: block;
           }
         }
       `}</style>
