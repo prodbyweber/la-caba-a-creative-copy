@@ -52,7 +52,7 @@ export default function Start() {
       {/* 2. Social proof bar */}
       <section style={{
         background: "#0a0a0a",
-        padding: "36px 0",
+        padding: "28px 0",
         borderTop: "1px solid rgba(255,255,255,0.04)",
         borderBottom: "1px solid rgba(255,255,255,0.04)",
       }}>

@@ -13,13 +13,12 @@ export default function StartExplorar({ showButton = true }) {
       style={{
         position: "relative",
         width: "100%",
-        minHeight: "100dvh",
         background: "#0a0a0b",
         overflowX: "hidden",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        padding: "clamp(80px, 10vw, 120px) clamp(24px, 6vw, 56px) clamp(80px, 10vw, 120px)",
+        padding: "clamp(60px, 8vw, 100px) clamp(24px, 6vw, 56px) clamp(60px, 8vw, 100px)",
       }}
     >
       {/* Ambient glow */}
