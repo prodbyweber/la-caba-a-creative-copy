@@ -205,7 +205,7 @@ export default function StartHero() {
                 overflowWrap: "break-word",
               }}
             >
-              Plan de desarrollo artístico para creadores independientes
+              Lleva tu música del estudio al mercado real.
             </motion.h1>
 
             {/* Description */}
@@ -223,7 +223,7 @@ export default function StartHero() {
                 maxWidth: "480px",
               }}
             >
-              Identidad, producción musical, audiovisual y marketing, somos tu equipo creativo. Para artistas que quieren crecer con criterio, no con suerte.
+              Dejemos atrás las maquetas. Diseñamos, producimos y posicionamos tu proyecto musical con la estética visual y el sonido premium que exige la industria hoy.
             </motion.p>
 
             {/* CTA row */}
