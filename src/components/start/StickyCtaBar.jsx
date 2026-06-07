@@ -75,15 +75,6 @@ export default function StickyCtaBar() {
         >
           Solicitar plaza →
         </button>
-        <p style={{
-          fontFamily: "'Helvetica Neue', sans-serif",
-          fontSize: "10px",
-          color: "rgba(240,237,232,0.22)",
-          margin: 0,
-          textAlign: "center",
-        }}>
-          Reúnete con nuestro equipo · Plazas limitadas
-        </p>
       </div>
     </>
   );
