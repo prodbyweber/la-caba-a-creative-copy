@@ -306,9 +306,9 @@ export default function MarcasHero() {
               wordBreak: "break-word",
               overflowWrap: "break-word",
             }}>
-              Las marcas que dominan el mercado joven no interrumpen.
+              Las marcas que dominan el mercado joven
               <br />
-              Inspiran.
+              <span style={{ color: "#ff5833" }}>no interrumpen. Inspiran.</span>
             </h1>
 
             {/* Description */}
@@ -321,7 +321,7 @@ export default function MarcasHero() {
               margin: 0,
               maxWidth: "480px",
             }}>
-              Gestionamos tu proyecto creativo de principio a fin — estrategia, contenido, campañas y posicionamiento. Publicidad que no parece publicidad. Resultados que hablan solos.
+              Gestionamos tu proyecto creativo de principio a fin. Estrategia, contenido, campañas y posicionamiento. Publicidad que no parece publicidad. Resultados que hablan solos.
             </p>
 
             {/* CTA row */}
