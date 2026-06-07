@@ -8,7 +8,7 @@ import MarcasContacto from "@/components/marcas/MarcasContacto";
 import StartFooter from "@/components/start/StartFooter";
 import StartNav from "@/components/start/StartNav";
 import StickyCtaBar from "@/components/start/StickyCtaBar";
-import ApplicationModal from "@/components/start/ApplicationModal";
+import MarcasApplicationModal from "@/components/marcas/MarcasApplicationModal";
 
 export default function Marcas() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -59,7 +59,7 @@ export default function Marcas() {
       <StickyCtaBar />
 
       {/* Application Modal */}
-      <ApplicationModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <MarcasApplicationModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 }

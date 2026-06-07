@@ -24,27 +24,36 @@
     },
     "pais_residencia": {
       "type": "string",
-      "description": "Pa\u00eds de residencia"
+      "description": "Pa\u00eds de residencia (artistas) o pa\u00eds/ciudad de la empresa (marcas)"
     },
     "nacionalidad": {
       "type": "string",
-      "description": "Nacionalidad"
+      "description": "Nacionalidad (artistas) o gesti\u00f3n producci\u00f3n (marcas)"
     },
     "disponibilidad_viaje_madrid": {
       "type": "string",
-      "description": "Disponibilidad para viajar a Madrid (si/no)"
+      "description": "Disponibilidad viaje Madrid (artistas) o trayectoria empresa (marcas)"
     },
     "situacion_laboral": {
       "type": "string",
-      "description": "Situaci\u00f3n laboral actual"
+      "description": "Situaci\u00f3n laboral (artistas) o sector empresa (marcas)"
     },
     "experiencia_musica": {
       "type": "string",
-      "description": "Experiencia creando m\u00fasica"
+      "description": "Experiencia creando m\u00fasica (artistas)"
     },
     "presupuesto": {
       "type": "string",
-      "description": "Presupuesto disponible para el proyecto"
+      "description": "Presupuesto disponible"
+    },
+    "tipo": {
+      "type": "string",
+      "enum": [
+        "Artista",
+        "Marca"
+      ],
+      "default": "Artista",
+      "description": "Tipo de solicitud: Artista o Marca"
     },
     "status": {
       "type": "string",

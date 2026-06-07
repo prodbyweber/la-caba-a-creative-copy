@@ -99,6 +99,8 @@ function StatusSelect({ current, onChange }) {
 
 export default function ApplicationsPanel() {
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState("artistas");
+
   const { data: apps = [] } = useQuery({
     queryKey: ["applicationForms"],
     queryFn: () => base44.entities.ApplicationForm.list("-created_date"),
@@ -114,21 +116,21 @@ export default function ApplicationsPanel() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["applicationForms"] }),
   });
 
-  const nuevas = apps.filter(a => !a.status || a.status === "nueva").length;
+  const artistasApps = apps.filter(a => !a.tipo || a.tipo === "Artista");
+  const marcasApps = apps.filter(a => a.tipo === "Marca");
+  const visibleApps = activeTab === "artistas" ? artistasApps : marcasApps;
+
+  const nuevasArtistas = artistasApps.filter(a => !a.status || a.status === "nueva").length;
+  const nuevasMarcas = marcasApps.filter(a => !a.status || a.status === "nueva").length;
 
   return (
     <div className="bg-[#111113] border border-white/[0.07] rounded-2xl p-4 sm:p-5 mb-6">
-      <div className="flex items-center gap-3 mb-5">
+      <div className="flex items-center gap-3 mb-4">
         <Users className="w-4 h-4 text-orange-400" />
         <h3 className="text-sm font-semibold text-white flex-1">Solicitudes</h3>
-        {nuevas > 0 && (
-          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-400 border border-orange-500/20">
-            {nuevas} nueva{nuevas > 1 ? "s" : ""}
-          </span>
-        )}
-        {apps.length > 0 && (
+        {visibleApps.length > 0 && (
           <button
-            onClick={() => exportToExcel(apps)}
+            onClick={() => exportToExcel(visibleApps)}
             className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors"
           >
             <Download className="w-3 h-3" />
@@ -137,14 +139,43 @@ export default function ApplicationsPanel() {
         )}
       </div>
 
-      {apps.length === 0 ? (
+      {/* Tabs */}
+      <div className="flex gap-1 mb-4 p-1 bg-white/[0.03] rounded-xl border border-white/[0.05]">
+        {[
+          { key: "artistas", label: "Artistas", count: nuevasArtistas },
+          { key: "marcas", label: "Marcas", count: nuevasMarcas },
+        ].map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all"
+            style={{
+              background: activeTab === tab.key ? "rgba(255,88,51,0.12)" : "transparent",
+              color: activeTab === tab.key ? "#ff5833" : "rgba(255,255,255,0.3)",
+              border: activeTab === tab.key ? "1px solid rgba(255,88,51,0.2)" : "1px solid transparent",
+            }}
+          >
+            {tab.label}
+            {tab.count > 0 && (
+              <span style={{
+                fontSize: "9px", fontWeight: 700, padding: "1px 5px",
+                borderRadius: "20px", background: "rgba(255,88,51,0.2)", color: "#ff5833",
+              }}>
+                {tab.count}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {visibleApps.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 rounded-xl border border-white/[0.05] bg-white/[0.02]">
           <Users className="w-8 h-8 text-white/10 mb-2" />
           <p className="text-xs text-white/25">No hay solicitudes todavía</p>
         </div>
       ) : (
         <div className="space-y-2">
-          {apps.map(app => (
+          {visibleApps.map(app => (
             <div
               key={app.id}
               className="p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.1] transition-all"
@@ -161,18 +192,28 @@ export default function ApplicationsPanel() {
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     {app.telefono && <span className="text-[11px] text-white/25">{app.telefono}</span>}
                     {app.pais_residencia && <span className="text-[11px] text-white/25">· {app.pais_residencia}</span>}
-                    {app.disponibilidad_viaje_madrid && (
+                    {activeTab === "artistas" && app.disponibilidad_viaje_madrid && (
                       <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${app.disponibilidad_viaje_madrid === "si" ? "bg-emerald-500/10 text-emerald-400" : "bg-white/[0.05] text-white/20"}`}>
                         Madrid: {app.disponibilidad_viaje_madrid === "si" ? "Sí" : "No"}
                       </span>
                     )}
-                    {app.presupuesto_minimo && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-500/10 text-orange-400 font-medium">+2000€</span>
+                    {activeTab === "marcas" && app.situacion_laboral && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 font-medium">
+                        {app.situacion_laboral}
+                      </span>
+                    )}
+                    {activeTab === "marcas" && app.disponibilidad_viaje_madrid && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/[0.05] text-white/30 font-medium">
+                        {app.disponibilidad_viaje_madrid}
+                      </span>
                     )}
                     {app.created_date && (
                       <span className="text-[10px] text-white/20 ml-auto">{new Date(app.created_date).toLocaleDateString("es-ES")}</span>
                     )}
                   </div>
+                  {app.presupuesto && (
+                    <p className="text-[10px] text-white/20 mt-1 truncate">{app.presupuesto}</p>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <StatusSelect
