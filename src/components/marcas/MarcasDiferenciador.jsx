@@ -78,11 +78,6 @@ export default function MarcasDiferenciador() {
             featured: true,
           },
           {
-            icon: Music,
-            title: "Música que vende",
-            desc: "Producimos el sonido de tu marca — jingles, identidad sonora y música original para campañas. Comunicamos a través del audio como lo hacen las grandes.",
-          },
-          {
             icon: Play,
             title: "Publicidad que no parece publicidad",
             desc: "Los jóvenes odian los anuncios. Nosotros creamos contenido orgánico, UGC y paid media que se consume como entretenimiento y convierte como publicidad.",
@@ -91,6 +86,11 @@ export default function MarcasDiferenciador() {
             icon: Zap,
             title: "Talento joven para marcas con trayectoria",
             desc: "Contamos con creadores, modelos y artistas dispuestos a posicionar tu producto. Energía nueva para marcas que quieren llegar más lejos.",
+          },
+          {
+            icon: Music,
+            title: "Música que vende",
+            desc: "Producimos el sonido de tu marca — jingles, identidad sonora y música original para campañas. Comunicamos a través del audio como lo hacen las grandes.",
           },
         ].map((card, i) => (
           <motion.div
