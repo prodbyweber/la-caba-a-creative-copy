@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Music, Play, Zap } from "lucide-react";
+import { Music, Play, Zap, Film } from "lucide-react";
 
 export default function MarcasDiferenciador() {
   return (
@@ -72,6 +72,12 @@ export default function MarcasDiferenciador() {
       }}>
         {[
           {
+            icon: Film,
+            title: "Contenido Audiovisual Premium",
+            desc: "Producimos contenido audiovisual de alto nivel para Instagram, TikTok y YouTube. Reels y vídeo vertical que genera comunidad, contenido horizontal con enfoque premium y producciones largas para YouTube — porque el vídeo largo es el que realmente conecta y construye marca a largo plazo.",
+            featured: true,
+          },
+          {
             icon: Music,
             title: "Música que vende",
             desc: "Producimos el sonido de tu marca — jingles, identidad sonora y música original para campañas. Comunicamos a través del audio como lo hacen las grandes.",
@@ -94,20 +100,39 @@ export default function MarcasDiferenciador() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 * (i + 3) }}
             style={{
-              background: "#141414",
+              background: card.featured ? "rgba(255,88,51,0.08)" : "#141414",
               borderRadius: "12px",
               padding: "28px",
-              borderLeft: "2px solid #ff5833",
+              borderLeft: card.featured ? "3px solid #ff5833" : "2px solid #ff5833",
+              border: card.featured ? "1.5px solid rgba(255,88,51,0.5)" : undefined,
+              borderLeft: card.featured ? "3px solid #ff5833" : "2px solid rgba(255,88,51,0.3)",
             }}
           >
+            {card.featured && (
+              <span style={{
+                display: "inline-block",
+                background: "#ff5833",
+                color: "#fff",
+                fontSize: "10px",
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                borderRadius: "20px",
+                padding: "3px 10px",
+                marginBottom: "14px",
+                fontFamily: "'Helvetica Neue', sans-serif",
+              }}>
+                Nuestro core
+              </span>
+            )}
             <card.icon
-              size={32}
+              size={card.featured ? 36 : 32}
               color="#ff5833"
               strokeWidth={1.5}
-              style={{ marginBottom: "16px" }}
+              style={{ marginBottom: "16px", display: "block" }}
             />
             <h3 style={{
-              fontSize: "18px",
+              fontSize: card.featured ? "22px" : "18px",
               fontWeight: 700,
               marginBottom: "12px",
               fontFamily: "'Helvetica Neue', sans-serif",
