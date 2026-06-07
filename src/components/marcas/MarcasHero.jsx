@@ -306,9 +306,9 @@ export default function MarcasHero() {
               wordBreak: "break-word",
               overflowWrap: "break-word",
             }}>
-              Tu marca necesita hablarle a la Gen Z.
+              Las marcas que dominan el mercado joven no interrumpen.
               <br />
-              Nosotros sabemos cómo.
+              Inspiran.
             </h1>
 
             {/* Description */}
@@ -321,7 +321,7 @@ export default function MarcasHero() {
               margin: 0,
               maxWidth: "480px",
             }}>
-              Contenido que no parece publicidad. Música que mueve emociones. Estrategia que convierte. Somos la única agencia creativa que también produce música para tu marca.
+              Gestionamos tu proyecto creativo de principio a fin — estrategia, contenido, campañas y posicionamiento. Publicidad que no parece publicidad. Resultados que hablan solos.
             </p>
 
             {/* CTA row */}
