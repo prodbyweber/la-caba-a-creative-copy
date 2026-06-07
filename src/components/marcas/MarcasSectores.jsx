@@ -8,6 +8,7 @@ export default function MarcasSectores() {
     "Bebidas",
     "Belleza y Cosmética",
     "Audio y Tecnología",
+    "Marca Personal",
     "Eventos y Conciertos",
     "Hostelería",
   ];
