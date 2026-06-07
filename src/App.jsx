@@ -37,6 +37,8 @@ import PublicProfile from './pages/PublicProfile';
 import UserPublicProfile from './pages/UserPublicProfile';
 import CreatorProfile from './pages/CreatorProfile';
 import Marcas from './pages/Marcas';
+import Gracias from './pages/Gracias';
+import Solicitud from './pages/Solicitud';
 import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
@@ -133,6 +135,8 @@ const AuthenticatedApp = () => {
       {/* Public pages (no auth required) */}
       <Route path="/start" element={<Start />} />
       <Route path="/Marcas" element={<Marcas />} />
+      <Route path="/gracias" element={<Gracias />} />
+      <Route path="/solicitud" element={<Solicitud />} />
       <Route path="/Pricing" element={<Pricing />} />
       <Route path="/GuestCatalogPreview" element={<GuestCatalogPreview />} />
       <Route path="/ContactLeads" element={<ContactLeads />} />

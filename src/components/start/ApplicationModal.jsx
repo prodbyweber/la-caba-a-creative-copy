@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const COUNTRIES = [
   "España","México","Argentina","Colombia","Chile","Perú","Venezuela","Ecuador","Bolivia","Paraguay","Uruguay","Cuba","República Dominicana","Guatemala","Honduras","El Salvador","Nicaragua","Costa Rica","Panamá","Puerto Rico","Estados Unidos","Reino Unido","Francia","Alemania","Italia","Portugal","Países Bajos","Bélgica","Suiza","Austria","Polonia","Rumania","Suecia","Noruega","Dinamarca","Finlandia","Japón","China","India","Brasil","Australia","Canadá","Otro"
@@ -106,9 +106,9 @@ function StepIndicator({ current }) {
 }
 
 export default function ApplicationModal({ isOpen, onClose }) {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
   const [errors, setErrors] = useState({});
   const [config, setConfig] = useState(null);
 
@@ -194,7 +194,8 @@ export default function ApplicationModal({ isOpen, onClose }) {
       presupuesto: form.presupuesto,
     });
     setSending(false);
-    setSent(true);
+    onClose();
+    navigate("/gracias");
   };
 
   const handleClose = () => {
@@ -202,7 +203,6 @@ export default function ApplicationModal({ isOpen, onClose }) {
     setTimeout(() => {
       setStep(1);
       setForm({ nombre:"",apellidos:"",email:"",phoneCode:"+34",phone:"",birthdate:"",privacidad:false,pais_residencia:"",nacionalidad:"",viaje_madrid:"",situacion_laboral:"",experiencia_musica:"",presupuesto:"" });
-      setSent(false);
       setErrors({});
     }, 300);
   };
@@ -264,149 +264,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
             }}
           >
 
-          {sent ? (
-            <div style={{
-              maxWidth: "680px",
-              margin: "0 auto",
-              padding: "16px 20px 0",
-              display: "flex",
-              flexDirection: "column",
-              gap: "20px"
-            }}>
-              {/* Título */}
-              <div style={{ textAlign: "center" }}>
-                <h2 style={{
-                  fontFamily: "'Helvetica Neue', sans-serif",
-                  fontWeight: 900,
-                  fontSize: "1.5rem",
-                  color: "#f0ede8",
-                  margin: "0 0 6px",
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.3
-                }}>
-                  Estás a punto de entrar a La Cabaña.
-                </h2>
-                <p style={{
-                  fontFamily: "'Helvetica Neue', sans-serif",
-                  fontWeight: 400,
-                  fontSize: "0.95rem",
-                  color: "rgba(240,237,232,0.5)",
-                  margin: 0,
-                  lineHeight: 1.5
-                }}>
-                  Antes de agendar, mira este video.
-                </p>
-              </div>
-
-              {/* Título del video */}
-              <h3 style={{
-                fontFamily: "'Helvetica Neue', sans-serif",
-                fontWeight: 700,
-                fontSize: "22px",
-                color: "#ffffff",
-                marginTop: "20px",
-                marginBottom: "12px",
-                letterSpacing: "-0.02em"
-              }}>
-                El mapa que todo artista necesita.
-              </h3>
-
-              {/* Video */}
-              <div style={{ margin: "0 -20px" }}>
-                <div style={{
-                  position: "relative",
-                  width: "100%",
-                  paddingBottom: "56.25%",
-                  background: "#000"
-                }}>
-                  <iframe
-                    src="https://www.youtube.com/embed/im6BfAvTsLA?rel=0&modestbranding=1&playsinline=1"
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      border: "none"
-                    }}
-                    title="Video informativo"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    referrerPolicy="strict-origin-when-cross-origin"
-                  />
-                </div>
-                <p style={{
-                  fontFamily: "'Helvetica Neue', sans-serif",
-                  fontWeight: 400,
-                  fontSize: "0.75rem",
-                  color: "rgba(240,237,232,0.3)",
-                  margin: "10px 0 0",
-                  textAlign: "center"
-                }}>
-                  Cuando termines, agenda tu videollamada con nuestro equipo.
-                </p>
-              </div>
-
-              {/* Flecha indicadora */}
-              <div style={{ textAlign: "center", marginTop: "8px" }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ animation: "bounce 1.5s infinite" }}>
-                  <path d="M12 5V19M12 19L5 12M12 19L19 12" stroke="#ff5833" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-
-              {/* Calendly */}
-              <div>
-                <h3 style={{
-                  fontFamily: "'Helvetica Neue', sans-serif",
-                  fontWeight: 700,
-                  fontSize: "1rem",
-                  color: "#f0ede8",
-                  margin: "0 0 16px",
-                  letterSpacing: "-0.02em"
-                }}>
-                  Agenda tu videollamada.
-                </h3>
-                <div style={{
-                  borderRadius: "14px",
-                  overflow: "hidden",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                  height: "500px",
-                  background: "#080808"
-                }}>
-                  <iframe
-                    src="https://calendly.com/hola-cabanacreative/creadores?embed_type=Inline&hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1&background_color=080808&text_color=f0ede8&primary_color=ff4300"
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
-                    title="Agendar videollamada"
-                    style={{ display: "block" }}
-                  />
-                </div>
-              </div>
-
-              <button
-                onClick={handleClose}
-                style={{
-                  background: "transparent",
-                  color: "rgba(240,237,232,0.3)",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                  borderRadius: "9px",
-                  padding: "10px 20px",
-                  fontFamily: "'Helvetica Neue', sans-serif",
-                  fontWeight: 600,
-                  fontSize: "0.8rem",
-                  cursor: "pointer",
-                  width: "100%",
-                  transition: "color 0.2s"
-                }}
-                onMouseEnter={e => e.currentTarget.style.color = "rgba(240,237,232,0.6)"}
-                onMouseLeave={e => e.currentTarget.style.color = "rgba(240,237,232,0.3)"}
-              >
-                Cerrar
-              </button>
-            </div>
-          ) : (
-            <>
+          <>
               <StepIndicator current={step} />
 
               {/* Step 1 — Datos */}
@@ -598,7 +456,6 @@ export default function ApplicationModal({ isOpen, onClose }) {
                 )}
               </div>
             </>
-          )}
           </motion.div>
         </div>
       </motion.div>

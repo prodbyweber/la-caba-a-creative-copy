@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const COUNTRIES_CITIES = {
   "España": ["Madrid", "Barcelona", "Valencia", "Sevilla", "Bilbao", "Málaga", "Zaragoza", "Murcia", "Palma", "Las Palmas", "Alicante", "Córdoba", "Valladolid", "Vigo", "Gijón", "Granada", "Otra"],
@@ -178,9 +178,9 @@ const INITIAL_FORM = {
 };
 
 export default function MarcasApplicationModal({ isOpen, onClose }) {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(INITIAL_FORM);
 
@@ -254,7 +254,8 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
       tipo: "Marca",
     });
     setSending(false);
-    setSent(true);
+    onClose();
+    navigate("/solicitud");
   };
 
   const handleClose = () => {
@@ -262,7 +263,6 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
     setTimeout(() => {
       setStep(1);
       setForm(INITIAL_FORM);
-      setSent(false);
       setErrors({});
     }, 300);
   };
@@ -331,53 +331,7 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
               position: "relative",
             }}
           >
-            {sent ? (
-              /* ── SUCCESS STATE ── */
-              <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                <div style={{ textAlign: "center" }}>
-                  <h2 style={{
-                    fontFamily: "'Helvetica Neue', sans-serif",
-                    fontWeight: 900, fontSize: "1.5rem", color: "#f0ede8",
-                    margin: "0 0 8px", letterSpacing: "-0.02em", lineHeight: 1.3
-                  }}>
-                    Tu solicitud ha llegado a Cabaña.
-                  </h2>
-                  <p style={{
-                    fontFamily: "'Helvetica Neue', sans-serif",
-                    fontWeight: 400, fontSize: "0.95rem",
-                    color: "rgba(240,237,232,0.5)", margin: 0, lineHeight: 1.5
-                  }}>
-                    Agenda una reunión con nuestro equipo para aterrizar tu proyecto y recibir un presupuesto personalizado.
-                  </p>
-                </div>
-
-                {/* Calendly */}
-                <div style={{
-                  borderRadius: "14px", overflow: "hidden",
-                  border: "1px solid rgba(255,255,255,0.07)",
-                  height: "500px", background: "#080808"
-                }}>
-                  <iframe
-                    src="https://calendly.com/hola-cabanacreative/creadores?embed_type=Inline&hide_gdpr_banner=1&hide_event_type_details=1&hide_landing_page_details=1&background_color=080808&text_color=f0ede8&primary_color=ff4300"
-                    width="100%" height="100%" frameBorder="0"
-                    title="Agendar videollamada" style={{ display: "block" }}
-                  />
-                </div>
-
-                <button
-                  onClick={handleClose}
-                  style={{
-                    background: "transparent", color: "rgba(240,237,232,0.3)",
-                    border: "1px solid rgba(255,255,255,0.07)", borderRadius: "9px",
-                    padding: "10px 20px", fontFamily: "'Helvetica Neue', sans-serif",
-                    fontWeight: 600, fontSize: "0.8rem", cursor: "pointer", width: "100%",
-                  }}
-                >
-                  Cerrar
-                </button>
-              </div>
-            ) : (
-              <>
+            <>
                 <StepIndicator current={step} />
 
                 {/* Step 1 — Datos */}
@@ -558,7 +512,6 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
                   )}
                 </div>
               </>
-            )}
           </motion.div>
         </div>
       </motion.div>
