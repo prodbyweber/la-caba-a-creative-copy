@@ -74,7 +74,7 @@ export default function MarcasDiferenciador() {
           {
             icon: Film,
             title: "Contenido Audiovisual Premium",
-            desc: "Producimos contenido audiovisual de alto nivel para Instagram, TikTok y YouTube. Reels y vídeo vertical que genera comunidad, contenido horizontal con enfoque premium y producciones largas para YouTube — porque el vídeo largo es el que realmente conecta y construye marca a largo plazo.",
+            desc: "Producimos contenido audiovisual premium para Instagram, TikTok y YouTube.\n\nContenido que genera comunidad. Enfoque premium en cada producción. Vídeos largos para YouTube porque es el que realmente conecta y construye marca a largo plazo.",
             featured: true,
           },
           {
