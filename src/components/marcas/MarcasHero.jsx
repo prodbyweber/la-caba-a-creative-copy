@@ -430,16 +430,14 @@ export default function MarcasHero() {
               ))}
             </div>
 
-            <div>
+            <div style={{ display: "flex", justifyContent: "center" }}>
               <button
                 className="sectores-button"
                 onClick={handleClick}
+                style={{ maxWidth: "100%", alignSelf: "center" }}
               >
                 Solicitar plaza →
               </button>
-              <p className="sectores-subtitle-small">
-                Reúnete con nuestro equipo · Plazas limitadas
-              </p>
             </div>
           </div>
         </motion.div>
