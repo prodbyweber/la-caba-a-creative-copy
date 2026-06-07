@@ -28,7 +28,7 @@ export default function MarcasContacto() {
           fontFamily: "'Helvetica Neue', sans-serif",
         }}
       >
-        ¿Lista para conectar con la Gen Z?
+        ¿List@ para conectar con la Gen Z?
       </motion.h2>
 
       {/* Subtítulo */}
@@ -46,7 +46,7 @@ export default function MarcasContacto() {
           fontFamily: "'Helvetica Neue', sans-serif",
         }}
       >
-        Una videollamada con nuestro equipo para aterrizar tu proyecto. Sin compromiso.
+        Una videollamada con nuestro equipo para aterrizar tu proyecto.
       </motion.p>
 
       {/* CTA Button */}
