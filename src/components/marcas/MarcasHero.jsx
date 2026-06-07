@@ -75,6 +75,8 @@ export default function MarcasHero() {
   const imageSrc = cfg?.hero_banner_1_image || null;
   const videoRef = useAutoPlay(videoSrc);
 
+  const EASE = [0.22, 1, 0.36, 1];
+
   const handleClick = () => {
     window.dispatchEvent(new CustomEvent("open-application-modal"));
   };
@@ -275,57 +277,77 @@ export default function MarcasHero() {
         {/* Left: content */}
         <div className="hero-text-col">
           <motion.div
-            initial={{ opacity: 0, y: 28 }}
+            initial={{ opacity: 0, y: 0 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.01 }}
             style={{ display: "flex", flexDirection: "column", gap: "clamp(14px, 2.2vw, 20px)", maxWidth: "600px" }}
           >
             {/* Pre-label */}
-            <p style={{
-              fontFamily: "'Helvetica Neue', sans-serif",
-              fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)",
-              fontWeight: 500,
-              color: "#ff5833",
-              letterSpacing: "0.04em",
-              textTransform: "uppercase",
-              margin: 0,
-            }}>
+            <motion.p
+              initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.5, ease: EASE, delay: 0.1 }}
+              style={{
+                fontFamily: "'Helvetica Neue', sans-serif",
+                fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)",
+                fontWeight: 500,
+                color: "#ff5833",
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+                margin: 0,
+              }}
+            >
               LA AGENCIA
-            </p>
+            </motion.p>
 
             {/* Headline */}
-            <h1 style={{
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-              fontWeight: 900,
-              fontSize: "clamp(2.1rem, 4vw, 4rem)",
-              letterSpacing: "-0.04em",
-              lineHeight: 0.93,
-              color: "#f0ede8",
-              margin: 0,
-              maxWidth: "100%",
-              wordBreak: "break-word",
-              overflowWrap: "break-word",
-            }}>
+            <motion.h1
+              initial={{ opacity: 0, y: 40, filter: "blur(12px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.65, ease: EASE, delay: 0.18 }}
+              style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontWeight: 900,
+                fontSize: "clamp(2.1rem, 4vw, 4rem)",
+                letterSpacing: "-0.04em",
+                lineHeight: 0.93,
+                color: "#f0ede8",
+                margin: 0,
+                maxWidth: "100%",
+                wordBreak: "break-word",
+                overflowWrap: "break-word",
+              }}
+            >
               Las marcas que dominan el mercado joven
               <br />
               <span style={{ color: "#ff5833" }}>no interrumpen. Inspiran.</span>
-            </h1>
+            </motion.h1>
 
             {/* Description */}
-            <p style={{
-              fontFamily: "'Helvetica Neue', sans-serif",
-              fontWeight: 300,
-              fontSize: "clamp(0.85rem, 1.5vw, 1rem)",
-              color: "rgba(240,237,232,0.52)",
-              lineHeight: 1.65,
-              margin: 0,
-              maxWidth: "480px",
-            }}>
+            <motion.p
+              initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.6, ease: EASE, delay: 0.28 }}
+              style={{
+                fontFamily: "'Helvetica Neue', sans-serif",
+                fontWeight: 300,
+                fontSize: "clamp(0.85rem, 1.5vw, 1rem)",
+                color: "rgba(240,237,232,0.52)",
+                lineHeight: 1.65,
+                margin: 0,
+                maxWidth: "480px",
+              }}
+            >
               Gestionamos tu proyecto creativo de principio a fin. Estrategia, contenido, campañas y posicionamiento. Publicidad que no parece publicidad. Resultados que hablan solos.
-            </p>
+            </motion.p>
 
-            {/* CTA row */}
-            <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}>
+            {/* CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 24, scale: 0.92, filter: "blur(6px)" }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+              transition={{ duration: 0.52, ease: EASE, delay: 0.38 }}
+              style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}
+            >
               <button
                 onClick={handleClick}
                 style={{
@@ -347,8 +369,9 @@ export default function MarcasHero() {
               >
                 Quiero trabajar con Cabaña →
               </button>
-            </div>
+            </motion.div>
           </motion.div>
+
         </div>
 
         {/* Right: Video - same as /start hero */}

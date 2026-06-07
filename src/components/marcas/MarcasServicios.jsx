@@ -1,6 +1,15 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Music, Play, Target, Zap, Clapperboard, Users } from "lucide-react";
+import { Zap, Clapperboard, Users, Target } from "lucide-react";
+
+const EASE = [0.22, 1, 0.36, 1];
+
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 52, filter: "blur(10px)" },
+  whileInView: { opacity: 1, y: 0, filter: "blur(0px)" },
+  viewport: { once: true, amount: 0.15 },
+  transition: { duration: 0.58, ease: EASE, delay },
+});
 
 export default function MarcasServicios() {
   const servicios = [
@@ -34,47 +43,32 @@ export default function MarcasServicios() {
       width: "100%",
       boxSizing: "border-box",
     }}>
-      {/* Supratítulo */}
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        style={{
-          fontSize: "clamp(10px, 2vw, 12px)",
-          fontWeight: 700,
-          color: "#ff5833",
-          textTransform: "uppercase",
-          letterSpacing: "0.22em",
-          marginBottom: "16px",
-          fontFamily: "'Helvetica Neue', sans-serif",
-        }}
-      >
+      <motion.p {...fadeUp(0)} style={{
+        fontSize: "clamp(10px, 2vw, 12px)",
+        fontWeight: 700,
+        color: "#ff5833",
+        textTransform: "uppercase",
+        letterSpacing: "0.22em",
+        marginBottom: "16px",
+        fontFamily: "'Helvetica Neue', sans-serif",
+      }}>
         NUESTROS SERVICIOS
       </motion.p>
 
-      {/* Headline */}
-      <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        style={{
-          fontSize: "clamp(28px, 4vw, 60px)",
-          fontWeight: 900,
-          lineHeight: 1.2,
-          marginBottom: "48px",
-          letterSpacing: "-0.02em",
-          fontFamily: "'Helvetica Neue', sans-serif",
-          maxWidth: "100%",
-          wordBreak: "break-word",
-          overflowWrap: "break-word",
-        }}
-      >
+      <motion.h2 {...fadeUp(0.08)} style={{
+        fontSize: "clamp(28px, 4vw, 60px)",
+        fontWeight: 900,
+        lineHeight: 1.2,
+        marginBottom: "48px",
+        letterSpacing: "-0.02em",
+        fontFamily: "'Helvetica Neue', sans-serif",
+        maxWidth: "100%",
+        wordBreak: "break-word",
+        overflowWrap: "break-word",
+      }}>
         Todo lo que tu marca necesita para dominar el mercado joven.
       </motion.h2>
 
-      {/* Grid de servicios */}
       <div style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
@@ -84,23 +78,19 @@ export default function MarcasServicios() {
       }}>
         <style>{`
           @media (min-width: 1280px) {
-            [style*="grid-template-columns: repeat(auto-fit"] {
-              grid-template-columns: repeat(2, 1fr) !important;
-            }
+            [data-servicios-grid] { grid-template-columns: repeat(2, 1fr) !important; }
           }
           @media (min-width: 1600px) {
-            [style*="grid-template-columns: repeat(auto-fit"] {
-              grid-template-columns: repeat(4, 1fr) !important;
-            }
+            [data-servicios-grid] { grid-template-columns: repeat(4, 1fr) !important; }
           }
         `}</style>
         {servicios.map((servicio, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 * (i + 3) }}
+            initial={{ opacity: 0, y: 50, filter: "blur(8px)" }}
+            whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.52, ease: EASE, delay: 0.05 + i * 0.1 }}
             style={{
               background: "#141414",
               borderRadius: "12px",

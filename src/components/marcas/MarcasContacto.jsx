@@ -1,6 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 
+const EASE = [0.22, 1, 0.36, 1];
+
 export default function MarcasContacto() {
   const handleClick = () => {
     window.dispatchEvent(new CustomEvent("open-application-modal"));
@@ -13,12 +15,11 @@ export default function MarcasContacto() {
       margin: "0 auto",
       textAlign: "center",
     }}>
-      {/* Headline */}
       <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
+        initial={{ opacity: 0, y: 60, filter: "blur(12px)" }}
+        whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.65, ease: EASE }}
         style={{
           fontSize: "clamp(28px, 5vw, 60px)",
           fontWeight: 900,
@@ -31,12 +32,11 @@ export default function MarcasContacto() {
         ¿List@ para conectar con la Gen Z?
       </motion.h2>
 
-      {/* Subtítulo */}
       <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.1 }}
+        initial={{ opacity: 0, y: 36, filter: "blur(8px)" }}
+        whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.55, ease: EASE, delay: 0.1 }}
         style={{
           fontSize: "clamp(14px, 2vw, 18px)",
           color: "rgba(240,237,232,0.5)",
@@ -49,12 +49,11 @@ export default function MarcasContacto() {
         Una videollamada con nuestro equipo para aterrizar tu proyecto.
       </motion.p>
 
-      {/* CTA Button */}
       <motion.button
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        initial={{ opacity: 0, y: 28, scale: 0.9, filter: "blur(6px)" }}
+        whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.5, ease: EASE, delay: 0.18 }}
         onClick={handleClick}
         style={{
           display: "inline-flex",
@@ -87,12 +86,11 @@ export default function MarcasContacto() {
         </svg>
       </motion.button>
 
-      {/* Microcopy */}
       <motion.p
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, delay: 0.3 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.5, ease: EASE, delay: 0.28 }}
         style={{
           fontSize: "12px",
           color: "rgba(240,237,232,0.3)",
