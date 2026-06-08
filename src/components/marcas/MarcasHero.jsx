@@ -14,55 +14,7 @@ const SECTORES = [
   { label: "Hostelería", width: "small" },
 ];
 
-function useAutoPlay(src) {
-  const ref = useRef(null);
-  const [retryCount, setRetryCount] = useState(0);
-  
-  useEffect(() => {
-    const v = ref.current;
-    if (!v || !src) return;
-    
-    const attemptPlay = async () => {
-      v.muted = true;
-      v.playsInline = true;
-      try {
-        await v.play();
-      } catch (e) {
-        if (retryCount < 3) {
-          setTimeout(() => setRetryCount(c => c + 1), 500 * (retryCount + 1));
-        }
-      }
-    };
-    
-    const onCanPlay = () => { attemptPlay(); };
-    const onLoadedData = () => { attemptPlay(); };
-    const onPause = () => { 
-      if (!document.hidden) attemptPlay(); 
-    };
-    
-    v.addEventListener("canplay", onCanPlay);
-    v.addEventListener("loadeddata", onLoadedData);
-    v.addEventListener("pause", onPause);
-    
-    attemptPlay();
-    
-    const handleVisibility = () => {
-      if (!document.hidden && v.paused) {
-        attemptPlay();
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibility);
-    
-    return () => {
-      v.removeEventListener("canplay", onCanPlay);
-      v.removeEventListener("loadeddata", onLoadedData);
-      v.removeEventListener("pause", onPause);
-      document.removeEventListener("visibilitychange", handleVisibility);
-    };
-  }, [src, retryCount]);
-  
-  return ref;
-}
+// Removed legacy useAutoPlay — using inline state-driven approach below
 
 export default function MarcasHero() {
   const { data: cfg } = useQuery({
@@ -73,7 +25,49 @@ export default function MarcasHero() {
 
   const videoSrc = cfg?.hero_video_url || null;
   const imageSrc = cfg?.hero_banner_1_image || null;
-  const videoRef = useAutoPlay(videoSrc);
+
+  const videoRef = useRef(null);
+  const [videoReady, setVideoReady] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || !videoSrc) return;
+
+    setVideoReady(false);
+    setVideoError(false);
+
+    const tryPlay = () => {
+      v.muted = true;
+      v.play().catch(() => {
+        setTimeout(() => v.play().catch(() => {}), 400);
+      });
+    };
+
+    const onLoadedData = () => { setVideoReady(true); tryPlay(); };
+    const onCanPlayThrough = () => { setVideoReady(true); tryPlay(); };
+    const onError = () => setVideoError(true);
+    const onVisibility = () => {
+      if (!document.hidden && v.paused && !v.ended) v.play().catch(() => {});
+    };
+
+    v.addEventListener("loadeddata", onLoadedData);
+    v.addEventListener("canplaythrough", onCanPlayThrough);
+    v.addEventListener("error", onError);
+    document.addEventListener("visibilitychange", onVisibility);
+
+    v.load();
+    tryPlay();
+
+    return () => {
+      v.removeEventListener("loadeddata", onLoadedData);
+      v.removeEventListener("canplaythrough", onCanPlayThrough);
+      v.removeEventListener("error", onError);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [videoSrc]);
+
+  const showVideo = videoSrc && !videoError;
 
   const EASE = [0.22, 1, 0.36, 1];
 
@@ -374,34 +368,47 @@ export default function MarcasHero() {
 
         </div>
 
-        {/* Right: Video - same as /start hero */}
+        {/* Right: Media */}
         <motion.div
           className="hero-media-col"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1.2, delay: 0.15 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          style={{ background: "#0d0d0d" }}
         >
-          {videoSrc ? (
-            <video
-              ref={videoRef}
-              autoPlay muted loop playsInline preload="auto"
-              poster={imageSrc || undefined}
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-            >
-              <source src={videoSrc} type="video/mp4" />
-              {videoSrc.includes('.webm') && <source src={videoSrc.replace('.webm', '.mp4')} type="video/mp4" />}
-              {videoSrc.includes('.mp4') && <source src={videoSrc.replace('.mp4', '.webm')} type="video/webm" />}
-              <track kind="captions" />
-            </video>
-          ) : imageSrc ? (
+          {/* Poster — always visible until video ready */}
+          {imageSrc && (
             <img
               src={imageSrc}
               alt=""
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              style={{
+                position: "absolute", inset: 0, width: "100%", height: "100%",
+                objectFit: "cover", display: "block",
+                opacity: (showVideo && videoReady) ? 0 : 1,
+                transition: "opacity 0.6s ease",
+              }}
             />
-          ) : (
-            <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #1a1a1a 0%, #0c0c0c 100%)" }} />
           )}
+          {!imageSrc && (
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, #1a1a1a 0%, #0c0c0c 100%)" }} />
+          )}
+          {/* Video — fades in once first frame decoded */}
+          {showVideo && (
+            <video
+              ref={videoRef}
+              autoPlay muted loop playsInline preload="auto"
+              style={{
+                position: "absolute", inset: 0, width: "100%", height: "100%",
+                objectFit: "cover", display: "block",
+                opacity: videoReady ? 1 : 0,
+                transition: "opacity 0.6s ease",
+              }}
+            >
+              <source src={videoSrc} type="video/mp4" />
+            </video>
+          )}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(8,8,8,0.45) 0%, transparent 35%)", pointerEvents: "none", zIndex: 2 }} />
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "25%", background: "linear-gradient(to top, rgba(8,8,8,0.7) 0%, transparent 100%)", pointerEvents: "none", zIndex: 2 }} />
         </motion.div>
 
         {/* Sectores section - below hero */}

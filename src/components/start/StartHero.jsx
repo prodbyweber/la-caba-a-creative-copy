@@ -34,37 +34,31 @@ export default function StartHero() {
     const tryPlay = () => {
       v.muted = true;
       v.play().catch(() => {
-        // Silently retry once after 600ms
-        setTimeout(() => {
-          v.play().catch(() => setVideoError(true));
-        }, 600);
+        setTimeout(() => v.play().catch(() => {}), 400);
       });
     };
 
-    const onLoaded = () => {
-      setVideoReady(true);
-      tryPlay();
-    };
-
+    // loadeddata = first frame decoded → show video immediately
+    const onLoadedData = () => { setVideoReady(true); tryPlay(); };
+    // canplaythrough = enough buffered → fallback in case loadeddata fires late
+    const onCanPlayThrough = () => { setVideoReady(true); tryPlay(); };
     const onError = () => setVideoError(true);
-
     const onVisibility = () => {
-      if (!document.hidden && v.paused && !v.ended) {
-        v.play().catch(() => {});
-      }
+      if (!document.hidden && v.paused && !v.ended) v.play().catch(() => {});
     };
 
-    v.addEventListener("loadeddata", onLoaded);
-    v.addEventListener("canplay", onLoaded);
+    v.addEventListener("loadeddata", onLoadedData);
+    v.addEventListener("canplaythrough", onCanPlayThrough);
     v.addEventListener("error", onError);
     document.addEventListener("visibilitychange", onVisibility);
 
-    // Kick off load
+    // Force browser to start downloading immediately
     v.load();
+    tryPlay();
 
     return () => {
-      v.removeEventListener("loadeddata", onLoaded);
-      v.removeEventListener("canplay", onLoaded);
+      v.removeEventListener("loadeddata", onLoadedData);
+      v.removeEventListener("canplaythrough", onCanPlayThrough);
       v.removeEventListener("error", onError);
       document.removeEventListener("visibilitychange", onVisibility);
     };
