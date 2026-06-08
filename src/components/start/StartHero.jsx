@@ -10,60 +10,6 @@ const STATS = [
   { label: "Horario", value: "Lunes a Viernes 15:00 – 22:00" },
 ];
 
-function useAutoPlay(src) {
-  const ref = useRef(null);
-  const [retryCount, setRetryCount] = useState(0);
-  
-  useEffect(() => {
-    const v = ref.current;
-    if (!v || !src) return;
-    
-    const attemptPlay = async () => {
-      v.muted = true;
-      v.playsInline = true;
-      try {
-        await v.play();
-      } catch (e) {
-        // Reintentar con delay en caso de error
-        if (retryCount < 3) {
-          setTimeout(() => setRetryCount(c => c + 1), 500 * (retryCount + 1));
-        }
-      }
-    };
-    
-    // Intentar play cuando el video esté listo
-    const onCanPlay = () => { attemptPlay(); };
-    const onLoadedData = () => { attemptPlay(); };
-    const onPause = () => { 
-      if (!document.hidden) attemptPlay(); 
-    };
-    
-    v.addEventListener("canplay", onCanPlay);
-    v.addEventListener("loadeddata", onLoadedData);
-    v.addEventListener("pause", onPause);
-    
-    // Intento inicial
-    attemptPlay();
-    
-    // Reintentar si cambia visibilidad
-    const handleVisibility = () => {
-      if (!document.hidden && v.paused) {
-        attemptPlay();
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibility);
-    
-    return () => {
-      v.removeEventListener("canplay", onCanPlay);
-      v.removeEventListener("loadeddata", onLoadedData);
-      v.removeEventListener("pause", onPause);
-      document.removeEventListener("visibilitychange", handleVisibility);
-    };
-  }, [src, retryCount]);
-  
-  return ref;
-}
-
 export default function StartHero() {
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
@@ -73,12 +19,59 @@ export default function StartHero() {
 
   const videoSrc = cfg?.hero_video_url || null;
   const imageSrc = cfg?.hero_banner_1_image || null;
-  const videoRef = useAutoPlay(videoSrc);
 
-  const scrollToContact = () => {
-    const el = document.getElementById("contacto");
-    if (el) el.scrollIntoView({ behavior: "smooth" });
-  };
+  const videoRef = useRef(null);
+  const [videoReady, setVideoReady] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || !videoSrc) return;
+
+    setVideoReady(false);
+    setVideoError(false);
+
+    const tryPlay = () => {
+      v.muted = true;
+      v.play().catch(() => {
+        // Silently retry once after 600ms
+        setTimeout(() => {
+          v.play().catch(() => setVideoError(true));
+        }, 600);
+      });
+    };
+
+    const onLoaded = () => {
+      setVideoReady(true);
+      tryPlay();
+    };
+
+    const onError = () => setVideoError(true);
+
+    const onVisibility = () => {
+      if (!document.hidden && v.paused && !v.ended) {
+        v.play().catch(() => {});
+      }
+    };
+
+    v.addEventListener("loadeddata", onLoaded);
+    v.addEventListener("canplay", onLoaded);
+    v.addEventListener("error", onError);
+    document.addEventListener("visibilitychange", onVisibility);
+
+    // Kick off load
+    v.load();
+
+    return () => {
+      v.removeEventListener("loadeddata", onLoaded);
+      v.removeEventListener("canplay", onLoaded);
+      v.removeEventListener("error", onError);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [videoSrc]);
+
+  const showVideo = videoSrc && !videoError;
+  const showImage = imageSrc && (!showVideo || !videoReady);
 
   return (
     <section id="hero" style={{ background: "#080808", position: "relative", overflow: "hidden" }}>
@@ -109,6 +102,7 @@ export default function StartHero() {
           flex-shrink: 0;
           order: 2;
           margin-top: 24px;
+          background: #0d0d0d;
         }
         .hero-stats-grid {
           display: flex;
@@ -163,6 +157,23 @@ export default function StartHero() {
           .hero-text-col h1 {
             font-size: clamp(2.1rem, 3.5vw, 4rem) !important;
           }
+        }
+        .hero-video {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+          transition: opacity 0.6s ease;
+        }
+        .hero-poster {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
         }
       `}</style>
 
@@ -290,31 +301,43 @@ export default function StartHero() {
           className="hero-media-col"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 1.2, delay: 0.15 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
         >
-          {videoSrc ? (
-            <video
-              ref={videoRef}
-              autoPlay muted loop playsInline preload="auto"
-              poster={imageSrc || undefined}
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-            >
-              <source src={videoSrc} type="video/mp4" />
-              {videoSrc.includes('.webm') && <source src={videoSrc.replace('.webm', '.mp4')} type="video/mp4" />}
-              {videoSrc.includes('.mp4') && <source src={videoSrc.replace('.mp4', '.webm')} type="video/webm" />}
-              <track kind="captions" />
-            </video>
-          ) : imageSrc ? (
+          {/* Poster / fallback image — always visible until video is ready */}
+          {imageSrc && (
             <img
+              className="hero-poster"
               src={imageSrc}
               alt=""
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              style={{ opacity: (showVideo && videoReady) ? 0 : 1, transition: "opacity 0.6s ease" }}
             />
-          ) : (
-            <div style={{ width: "100%", height: "100%", background: "linear-gradient(160deg, #1a1a1a 0%, #0c0c0c 100%)" }} />
           )}
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(8,8,8,0.45) 0%, transparent 35%)" }} />
-          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "25%", background: "linear-gradient(to top, rgba(8,8,8,0.7) 0%, transparent 100%)" }} />
+
+          {/* Dark background if no image yet */}
+          {!imageSrc && (
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, #1a1a1a 0%, #0c0c0c 100%)" }} />
+          )}
+
+          {/* Video — fades in once loaded */}
+          {showVideo && (
+            <video
+              ref={videoRef}
+              className="hero-video"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              style={{ opacity: videoReady ? 1 : 0 }}
+            >
+              <source src={videoSrc} type="video/mp4" />
+              {videoSrc.endsWith('.webm') && <source src={videoSrc.replace('.webm', '.mp4')} type="video/mp4" />}
+            </video>
+          )}
+
+          {/* Overlays */}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(8,8,8,0.45) 0%, transparent 35%)", pointerEvents: "none", zIndex: 2 }} />
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "25%", background: "linear-gradient(to top, rgba(8,8,8,0.7) 0%, transparent 100%)", pointerEvents: "none", zIndex: 2 }} />
         </motion.div>
 
         {/* Stats — below video on mobile only */}
