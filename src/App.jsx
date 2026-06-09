@@ -147,8 +147,8 @@ const AuthenticatedApp = () => {
       <Route path="/aviso-legal" element={<AvisoLegal />} />
       <Route path="/politica-de-cookies" element={<PoliticaCookies />} />
 
-      {/* Protected pages (require login) */}
-      <Route path="/Explorar" element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}><Route index element={<Explorar />} /></Route>
+      {/* Public: Explorar is accessible without login */}
+      <Route path="/Explorar" element={<Explorar />} />
       <Route path="/StudioSession" element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}><Route index element={<StudioSession />} /></Route>
       <Route path="/meeting" element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}><Route index element={<Meeting />} /></Route>
 
