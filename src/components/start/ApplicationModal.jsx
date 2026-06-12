@@ -514,7 +514,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                           fontFamily: "'Helvetica Neue', sans-serif",
                           fontSize: "12px", color: "#FF5833", margin: 0, lineHeight: 1.5,
                         }}>
-                          Las plazas de este año son limitadas. Si estás pensando en el próximo mes, puede que ya no haya hueco.
+                          Abrimos un número cerrado de plazas cada año. Para el próximo mes puede que ya no quede ninguna.
                         </p>
                       </div>
                     )}
