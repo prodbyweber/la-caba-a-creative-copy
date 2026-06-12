@@ -43,7 +43,7 @@ const FASES_PROYECTO = [
 ];
 
 const OBJETIVOS = [
-  "Lanzar mi primer proyecto de forma profesional",
+  "Lanzar mi proyecto de forma profesional",
   "Construir una identidad artística sólida",
   "Crecer mi audiencia",
   "Mejorar la calidad de mi música y mi sonido",
