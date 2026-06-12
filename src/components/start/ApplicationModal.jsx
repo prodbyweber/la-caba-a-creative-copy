@@ -571,7 +571,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                       transition: "all 0.2s",
                     }}
                   >
-                    {sending ? "Enviando..." : "Enviar solicitud →"}
+                    {sending ? "Enviando..." : "Agendar videollamada →"}
                   </button>
                 )}
               </div>
