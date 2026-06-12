@@ -122,18 +122,12 @@ function LeadDetailModal({ lead, onClose }) {
 function ApplicationDetailModal({ app, onClose }) {
   if (!app) return null;
   const cfg = APP_STATUS_CONFIG[app.status] || APP_STATUS_CONFIG.nueva;
-  const fields = [
-    { label: "Nombre", value: `${app.nombre || ''} ${app.apellidos || ''}`.trim() },
-    { label: "Email", value: app.email, href: `mailto:${app.email}` },
-    { label: "Teléfono", value: app.telefono },
-    { label: "Fecha nacimiento", value: app.fecha_nacimiento },
-    { label: "País de residencia", value: app.pais_residencia },
-    { label: "Nacionalidad", value: app.nacionalidad },
-    { label: "Viaje a Madrid", value: app.disponibilidad_viaje_madrid === 'si' ? 'Sí' : app.disponibilidad_viaje_madrid === 'no' ? 'No' : app.disponibilidad_viaje_madrid },
-    { label: "Situación laboral", value: app.situacion_laboral },
-    { label: "Experiencia música", value: app.experiencia_musica },
-    { label: "Presupuesto", value: app.presupuesto || 'No especificado' },
-  ];
+  const generos = Array.isArray(app.generos_musicales) ? app.generos_musicales : [];
+  const fechaDisplay = app.fecha_envio
+    ? new Date(app.fecha_envio).toLocaleString("es-ES", { timeZone: "Europe/Madrid", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    : (app.created_date ? new Date(app.created_date).toLocaleString("es-ES", { timeZone: "Europe/Madrid", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : null);
+  const viajeMadridLabel = app.disponibilidad_viaje_madrid === 'si' ? 'Sí' : app.disponibilidad_viaje_madrid === 'no' ? 'No' : app.disponibilidad_viaje_madrid;
+
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
@@ -179,17 +173,93 @@ function ApplicationDetailModal({ app, onClose }) {
                 </a>
               )}
             </div>
+
+            {/* ═══ DATOS PERSONALES ═══ */}
+            <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mb-1">Datos personales</p>
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              {fields.map(f => f.value ? (
-                <div key={f.label} className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                  <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">{f.label}</p>
-                  {f.href ? (
-                    <a href={f.href} className="text-xs sm:text-sm text-[#ff5833] hover:underline break-all">{f.value}</a>
-                  ) : (
-                    <p className="text-xs sm:text-sm text-white/70">{f.value}</p>
-                  )}
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Nombre</p>
+                <p className="text-xs sm:text-sm text-white/70">{app.nombre || 'No especificado'}</p>
+              </div>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Email</p>
+                <a href={`mailto:${app.email}`} className="text-xs sm:text-sm text-[#ff5833] hover:underline break-all">{app.email}</a>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Teléfono</p>
+                <p className="text-xs sm:text-sm text-white/70">{app.telefono || 'No especificado'}</p>
+              </div>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Fecha de nacimiento</p>
+                <p className="text-xs sm:text-sm text-white/70">{app.fecha_nacimiento || 'No especificado'}</p>
+              </div>
+            </div>
+
+            {/* ═══ UBICACIÓN ═══ */}
+            <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mb-1 pt-1">Ubicación</p>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">País de residencia</p>
+                <p className="text-xs sm:text-sm text-white/70">{app.pais_residencia || 'No especificado'}</p>
+              </div>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Nacionalidad</p>
+                <p className="text-xs sm:text-sm text-white/70">{app.nacionalidad || 'No especificado'}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Viaje a Madrid</p>
+                <p className="text-xs sm:text-sm text-white/70">{viajeMadridLabel || 'No especificado'}</p>
+              </div>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] opacity-0" />
+            </div>
+
+            {/* ═══ SU PROYECTO ═══ */}
+            <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mb-1 pt-1">Su proyecto</p>
+
+            {/* Géneros — chips */}
+            <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1.5">Géneros musicales</p>
+              {generos.length > 0 ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {generos.map(g => (
+                    <span key={g} style={{ fontSize: "10px", padding: "3px 10px", borderRadius: "20px", background: "rgba(255,88,51,0.15)", border: "1px solid rgba(255,88,51,0.35)", color: "#ff5833", fontWeight: 600, fontFamily: "'Helvetica Neue', sans-serif" }}>{g}</span>
+                  ))}
                 </div>
-              ) : null)}
+              ) : (
+                <p className="text-xs text-white/25 italic">No especificado</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Fase del proyecto</p>
+                <p className="text-xs sm:text-sm text-white/70">{app.fase_proyecto || 'No especificado'}</p>
+              </div>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Objetivo con Cabaña</p>
+                <p className="text-xs sm:text-sm text-white/70">{app.objetivo_cabana || 'No especificado'}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Presupuesto</p>
+                <p className="text-xs sm:text-sm text-white/70">{app.presupuesto_disponible || 'No especificado'}</p>
+              </div>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Cuándo quiere arrancar</p>
+                <p className="text-xs sm:text-sm text-white/70">{app.timing_arranque || 'No especificado'}</p>
+              </div>
+            </div>
+
+            {/* ═══ REGISTRO ═══ */}
+            <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mb-1 pt-1">Registro</p>
+            <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+              <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Enviado el</p>
+              <p className="text-xs sm:text-sm text-white/70">{fechaDisplay || 'No disponible'}</p>
             </div>
           </div>
         </motion.div>
@@ -199,15 +269,26 @@ function ApplicationDetailModal({ app, onClose }) {
 }
 
 function exportCSV(apps) {
-  const headers = ["Nombre","Apellidos","Email","Teléfono","F. Nacimiento","País","Nacionalidad","Viaje Madrid","Sit. Laboral","Exp. Música","Presupuesto","Estado","Fecha"];
-  const rows = apps.map(a => [
-    a.nombre,a.apellidos,a.email,a.telefono,a.fecha_nacimiento,a.pais_residencia,a.nacionalidad,
-    a.disponibilidad_viaje_madrid,a.situacion_laboral,a.experiencia_musica,
-    a.presupuesto_minimo?"Sí":"No",a.status,
-    a.created_date ? format(parseISO(a.created_date),"d/MM/yyyy HH:mm"):""
-  ]);
+  const headers = ["Nombre","Apellidos","Email","Teléfono","F. Nacimiento","País","Nacionalidad","Viaje Madrid","Géneros","Fase Proyecto","Objetivo","Presupuesto","Timing","Estado","Enviado el"];
+  const rows = apps.map(a => {
+    const generos = Array.isArray(a.generos_musicales) ? a.generos_musicales : [];
+    const fechaDisplay = a.fecha_envio
+      ? new Date(a.fecha_envio).toLocaleString("es-ES", { timeZone: "Europe/Madrid", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+      : (a.created_date ? format(parseISO(a.created_date),"d/MM/yyyy HH:mm") : "");
+    return [
+      a.nombre,a.apellidos,a.email,a.telefono,a.fecha_nacimiento,a.pais_residencia,a.nacionalidad,
+      a.disponibilidad_viaje_madrid === 'si' ? 'Sí' : a.disponibilidad_viaje_madrid === 'no' ? 'No' : (a.disponibilidad_viaje_madrid || ''),
+      generos.join(", "),
+      a.fase_proyecto || '',
+      a.objetivo_cabana || '',
+      a.presupuesto_disponible || a.presupuesto || '',
+      a.timing_arranque || '',
+      a.status,
+      fechaDisplay
+    ];
+  });
   const csv = [headers,...rows].map(r=>r.map(v=>`"${(v||"").toString().replace(/"/g,'""')}"`).join(",")).join("\n");
-  const blob = new Blob([csv],{type:"text/csv;charset=utf-8;"});
+  const blob = new Blob(["\uFEFF" + csv],{type:"text/csv;charset=utf-8;"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url; a.download = "solicitudes.csv"; a.click();
@@ -286,6 +367,10 @@ export default function ContactLeads() {
   };
 
   const copyAppData = async (app) => {
+    const generos = Array.isArray(app.generos_musicales) ? app.generos_musicales : [];
+    const fechaDisplay = app.fecha_envio
+      ? new Date(app.fecha_envio).toLocaleString("es-ES", { timeZone: "Europe/Madrid", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+      : (app.created_date ? format(parseISO(app.created_date), "d MMM yyyy, HH:mm") : 'N/A');
     const text = `📋 Solicitud de Plaza
 👤 Nombre: ${app.nombre} ${app.apellidos}
 📧 Email: ${app.email}
@@ -294,11 +379,13 @@ export default function ContactLeads() {
 📍 País: ${app.pais_residencia || 'N/A'}
 🌍 Nacionalidad: ${app.nacionalidad || 'N/A'}
 ✈️ Viaje Madrid: ${app.disponibilidad_viaje_madrid === 'si' ? 'Sí' : app.disponibilidad_viaje_madrid === 'no' ? 'No' : 'N/A'}
-💼 Situación laboral: ${app.situacion_laboral || 'N/A'}
-🎵 Experiencia música: ${app.experiencia_musica || 'N/A'}
-💰 Presupuesto: ${app.presupuesto || 'No especificado'}
+🎵 Géneros: ${generos.join(', ') || 'No especificado'}
+🚀 Fase proyecto: ${app.fase_proyecto || 'N/A'}
+🎯 Objetivo: ${app.objetivo_cabana || 'N/A'}
+💰 Presupuesto: ${app.presupuesto_disponible || app.presupuesto || 'No especificado'}
+⏱️ Timing: ${app.timing_arranque || 'N/A'}
 🏷️ Estado: ${app.status}
-📅 Fecha: ${app.created_date ? format(parseISO(app.created_date), "d MMM yyyy") : 'N/A'}`;
+📅 Enviado: ${fechaDisplay}`;
     await navigator.clipboard.writeText(text);
     setCopiedId(app.id);
     setTimeout(() => setCopiedId(null), 2000);
@@ -402,7 +489,8 @@ export default function ContactLeads() {
             <div className="space-y-3 sm:space-y-4 pb-4">
               {filteredApps.map((app, i) => {
                 const cfg = APP_STATUS_CONFIG[app.status] || APP_STATUS_CONFIG.nueva;
-                const presupuestoTexto = app.presupuesto || 'No especificado';
+                const presupuestoTexto = app.presupuesto_disponible || app.presupuesto || 'No especificado';
+                const generos = Array.isArray(app.generos_musicales) ? app.generos_musicales : [];
                 return (
                   <motion.div key={app.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.025 }}
                     className="group bg-[#111113] border border-white/[0.06] hover:border-white/[0.12] rounded-xl p-3 sm:p-4 transition-all"
@@ -427,13 +515,21 @@ export default function ContactLeads() {
                           {app.telefono && <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{app.telefono}</span>}
                           {app.pais_residencia && <span className="flex items-center gap-1.5"><span className="w-3 h-3 flex items-center justify-center">📍</span>{app.pais_residencia}</span>}
                         </div>
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.situacion_laboral || 'N/A'}</span>
-                            <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.experiencia_musica || 'N/A'}</span>
+                        <div className="flex flex-col gap-1.5">
+                          {generos.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {generos.slice(0, 3).map(g => (
+                                <span key={g} style={{ fontSize: "9px", padding: "1px 6px", borderRadius: "20px", background: "rgba(255,88,51,0.12)", border: "1px solid rgba(255,88,51,0.25)", color: "#ff5833", fontWeight: 600, fontFamily: "'Helvetica Neue', sans-serif" }}>{g}</span>
+                              ))}
+                              {generos.length > 3 && <span className="text-[9px] text-white/25">+{generos.length - 3}</span>}
+                            </div>
+                          )}
+                          <div className="flex flex-wrap items-center gap-1">
+                            {app.fase_proyecto && <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.fase_proyecto}</span>}
+                            {app.timing_arranque && <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.timing_arranque}</span>}
                           </div>
                           <span className="text-[10px] px-2 py-1.5 rounded-lg bg-[#ff5833]/10 border border-[#ff5833]/20 text-[#ff5833] font-medium inline-block w-fit">
-                            Presupuesto: {presupuestoTexto}
+                            {presupuestoTexto}
                           </span>
                         </div>
                       </div>
