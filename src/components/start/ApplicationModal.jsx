@@ -45,7 +45,7 @@ const FASES_PROYECTO = [
 const OBJETIVOS = [
   "Lanzar mi primer proyecto de forma profesional",
   "Construir una identidad artística sólida",
-  "Crecer mi audiencia y salir del estancamiento",
+  "Crecer mi audiencia",
   "Mejorar la calidad de mi música y mi sonido",
   "Preparar mi proyecto para presentarlo a sellos",
 ];
@@ -470,7 +470,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
 
                   {/* Campo 3 — Objetivo */}
                   <div style={fieldWrap}>
-                    <Label required>¿Qué quieres conseguir con Cabaña?</Label>
+                    <Label required>¿Cuál es tu objetivo?</Label>
                     <select value={form.objetivo_cabana} onChange={e => set("objetivo_cabana", e.target.value)} style={{ ...inputStyle, borderColor: errors.objetivo_cabana ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
                       <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
                       {OBJETIVOS.map(o => <option key={o} value={o} style={{ background: "#141414" }}>{o}</option>)}
@@ -500,11 +500,23 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     <select value={form.timing_arranque} onChange={e => set("timing_arranque", e.target.value)} style={{ ...inputStyle, borderColor: errors.timing_arranque ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
                       <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
                       {TIMINGS.map(t => (
-                        <option key={t} value={t} style={{ background: "#141414" }}>
-                          {t}{t === "El próximo mes" ? " 🔥" : ""}
-                        </option>
+                        <option key={t} value={t} style={{ background: "#141414" }}>{t}</option>
                       ))}
                     </select>
+                    {form.timing_arranque === "El próximo mes" && (
+                      <div style={{
+                        display: "inline-flex", alignItems: "center", gap: "6px",
+                        background: "linear-gradient(135deg, #ff5833 0%, #ff8c33 100%)",
+                        borderRadius: "8px", padding: "7px 14px", marginTop: "7px",
+                        alignSelf: "flex-start",
+                      }}>
+                        <span style={{
+                          fontFamily: "'Helvetica Neue', sans-serif",
+                          fontSize: "11px", fontWeight: 800, color: "#fff",
+                          letterSpacing: "0.06em", textTransform: "uppercase",
+                        }}>Plazas limitadas</span>
+                      </div>
+                    )}
                     {form.timing_arranque === TIMING_BLOQUEANTE && (
                       <div style={{ background: "rgba(255,88,51,0.08)", border: "1px solid rgba(255,88,51,0.25)", borderRadius: "8px", padding: "10px 12px", marginTop: "4px" }}>
                         <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "12px", color: "rgba(255,88,51,0.9)", margin: 0, lineHeight: 1.5 }}>
