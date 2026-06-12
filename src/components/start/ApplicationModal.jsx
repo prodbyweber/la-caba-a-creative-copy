@@ -36,7 +36,7 @@ const GENEROS = [
 ];
 
 const FASES_PROYECTO = [
-  "Quiero crear mis canciones desde cero y empezar a construir",
+  "Quiero crear canciones desde cero y empezar a construir",
   "Tengo maquetas o demos sin producir",
   "Tengo canciones producidas que nunca lancé bien",
   "Tengo releases publicados pero no estoy creciendo",
@@ -59,12 +59,13 @@ const PRESUPUESTOS = [
 const TIMINGS = [
   "Ahora mismo, estoy listo",
   "La semana que viene",
-  "El próximo mes",
+  "El próximo mes (Plazas limitadas)",
   "Todavía no quiero comenzar",
 ];
 
 const PRESUPUESTO_BLOQUEANTE = "Todavía no estoy en posición de invertir";
 const TIMING_BLOQUEANTE = "Todavía no quiero comenzar";
+const TIMING_LIMITADAS = "El próximo mes (Plazas limitadas)";
 
 const inputStyle = {
   width: "100%",
@@ -503,7 +504,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                         <option key={t} value={t} style={{ background: "#141414" }}>{t}</option>
                       ))}
                     </select>
-                    {form.timing_arranque === "El próximo mes" && (
+                    {form.timing_arranque === "El próximo mes (Plazas limitadas)" && (
                       <div style={{
                         display: "inline-flex", alignItems: "center", gap: "6px",
                         background: "linear-gradient(135deg, #ff5833 0%, #ff8c33 100%)",
