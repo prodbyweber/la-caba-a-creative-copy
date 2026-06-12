@@ -481,7 +481,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                   {/* Campo 4 — Presupuesto */}
                   <div style={fieldWrap}>
                     <Label required>¿Estás listo para invertir en tu proyecto?</Label>
-                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "rgba(240,237,232,0.35)", margin: "0 0 5px" }}>Nuestros planes arrancan desde 3.000€</p>
+                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "#ff5833", margin: "0 0 5px" }}>Nuestros planes arrancan desde 3.000€</p>
                     <select value={form.presupuesto_disponible} onChange={e => set("presupuesto_disponible", e.target.value)} style={{ ...inputStyle, borderColor: errors.presupuesto_disponible ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
                       <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
                       {PRESUPUESTOS.map(p => <option key={p} value={p} style={{ background: "#141414" }}>{p}</option>)}
