@@ -218,6 +218,39 @@ export default function ApplicationsPanel() {
                   {app.presupuesto && (
                     <p className="text-[10px] text-white/20 mt-1 truncate">{app.presupuesto}</p>
                   )}
+                  {/* Nuevos campos paso 3 — solo artistas */}
+                  {activeTab === "artistas" && (app.generos_musicales?.length > 0 || app.fase_proyecto || app.objetivo_cabana || app.presupuesto_disponible || app.timing_arranque) && (
+                    <div className="mt-2 space-y-1.5">
+                      {app.generos_musicales?.length > 0 && (
+                        <div className="flex items-start gap-1.5 flex-wrap">
+                          <span className="text-[10px] text-white/30 font-semibold shrink-0 mt-0.5">Géneros:</span>
+                          {app.generos_musicales.map(g => (
+                            <span key={g} style={{ fontSize: "9px", padding: "2px 7px", borderRadius: "20px", background: "rgba(255,88,51,0.1)", border: "1px solid rgba(255,88,51,0.2)", color: "#ff5833", fontWeight: 600, fontFamily: "'Helvetica Neue', sans-serif" }}>
+                              {g}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {app.fase_proyecto && (
+                        <p className="text-[10px] text-white/30"><span className="font-semibold text-white/40">Fase:</span> {app.fase_proyecto}</p>
+                      )}
+                      {app.objetivo_cabana && (
+                        <p className="text-[10px] text-white/30"><span className="font-semibold text-white/40">Objetivo:</span> {app.objetivo_cabana}</p>
+                      )}
+                      {app.presupuesto_disponible && (
+                        <p className="text-[10px] text-white/30"><span className="font-semibold text-white/40">Presupuesto:</span> {app.presupuesto_disponible}</p>
+                      )}
+                      {app.timing_arranque && (
+                        <p className="text-[10px] text-white/30"><span className="font-semibold text-white/40">Arranque:</span> {app.timing_arranque}</p>
+                      )}
+                      {app.fecha_envio && (
+                        <p className="text-[10px] text-white/20">
+                          <span className="font-semibold">Enviado el:</span>{" "}
+                          {new Date(app.fecha_envio).toLocaleString("es-ES", { timeZone: "Europe/Madrid", day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <StatusSelect

@@ -46,6 +46,33 @@
       "type": "string",
       "description": "Presupuesto disponible"
     },
+    "generos_musicales": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "G\u00e9neros musicales seleccionados"
+    },
+    "fase_proyecto": {
+      "type": "string",
+      "description": "Fase actual del proyecto art\u00edstico"
+    },
+    "objetivo_cabana": {
+      "type": "string",
+      "description": "Objetivo que quiere conseguir con Caba\u00f1a"
+    },
+    "presupuesto_disponible": {
+      "type": "string",
+      "description": "Disponibilidad de inversi\u00f3n en el proyecto"
+    },
+    "timing_arranque": {
+      "type": "string",
+      "description": "Cu\u00e1ndo quiere arrancar el proyecto"
+    },
+    "fecha_envio": {
+      "type": "string",
+      "description": "Fecha y hora exacta del env\u00edo de la solicitud"
+    },
     "tipo": {
       "type": "string",
       "enum": [

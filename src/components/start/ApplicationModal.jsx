@@ -26,8 +26,45 @@ const PHONE_CODES = [
 const STEPS = [
   { id: 1, label: "Datos" },
   { id: 2, label: "Ubicación" },
-  { id: 3, label: "Experiencia" },
+  { id: 3, label: "Tu proyecto" },
 ];
+
+const GENEROS = [
+  "Reggaetón","Trap","Pop","R&B","House","Afrobeats","Drill","Indie",
+  "Electrónica","Hip-Hop","Dancehall","Latin Pop","Urbano","Experimental",
+  "Jersey Club","Salsa","Flamenco","Rock","Soul","Otro",
+];
+
+const FASES_PROYECTO = [
+  "Quiero crear mis canciones desde cero y empezar a construir",
+  "Tengo maquetas o demos sin producir",
+  "Tengo canciones producidas que nunca lancé bien",
+  "Tengo releases publicados pero no estoy creciendo",
+];
+
+const OBJETIVOS = [
+  "Lanzar mi primer proyecto de forma profesional",
+  "Construir una identidad artística sólida",
+  "Crecer mi audiencia y salir del estancamiento",
+  "Mejorar la calidad de mi música y mi sonido",
+  "Preparar mi proyecto para presentarlo a sellos",
+];
+
+const PRESUPUESTOS = [
+  "Sí, puedo invertir si el proyecto tiene sentido para mí",
+  "Sí, pero necesitaría dividirlo en dos pagos",
+  "Todavía no estoy en posición de invertir",
+];
+
+const TIMINGS = [
+  "Ahora mismo, estoy listo",
+  "La semana que viene",
+  "El próximo mes",
+  "Todavía no quiero comenzar",
+];
+
+const PRESUPUESTO_BLOQUEANTE = "Todavía no estoy en posición de invertir";
+const TIMING_BLOQUEANTE = "Todavía no quiero comenzar";
 
 const inputStyle = {
   width: "100%",
@@ -123,7 +160,8 @@ export default function ApplicationModal({ isOpen, onClose }) {
     nombre: "", apellidos: "", email: "", phoneCode: "+34", phone: "", birthdate: "",
     privacidad: false,
     pais_residencia: "", nacionalidad: "", viaje_madrid: "",
-    situacion_laboral: "", experiencia_musica: "", presupuesto: "",
+    generos_musicales: [], fase_proyecto: "", objetivo_cabana: "",
+    presupuesto_disponible: "", timing_arranque: "",
   });
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -162,12 +200,18 @@ export default function ApplicationModal({ isOpen, onClose }) {
 
   const validateStep3 = () => {
     const e = {};
-    if (!form.situacion_laboral) e.situacion_laboral = true;
-    if (!form.experiencia_musica) e.experiencia_musica = true;
-    if (!form.presupuesto) e.presupuesto = true;
+    if (form.generos_musicales.length === 0) e.generos_musicales = true;
+    if (!form.fase_proyecto) e.fase_proyecto = true;
+    if (!form.objetivo_cabana) e.objetivo_cabana = true;
+    if (!form.presupuesto_disponible) e.presupuesto_disponible = true;
+    if (!form.timing_arranque) e.timing_arranque = true;
     setErrors(e);
     return Object.keys(e).length === 0;
   };
+
+  const isSubmitBlocked =
+    form.presupuesto_disponible === PRESUPUESTO_BLOQUEANTE ||
+    form.timing_arranque === TIMING_BLOQUEANTE;
 
   const nextStep = () => {
     if (step === 1 && !validateStep1()) return;
@@ -178,6 +222,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
 
   const handleSubmit = async () => {
     if (!validateStep3()) return;
+    if (isSubmitBlocked) return;
     setSending(true);
     await base44.entities.ApplicationForm.create({
       nombre: form.nombre,
@@ -188,9 +233,12 @@ export default function ApplicationModal({ isOpen, onClose }) {
       pais_residencia: form.pais_residencia,
       nacionalidad: form.nacionalidad,
       disponibilidad_viaje_madrid: form.viaje_madrid,
-      situacion_laboral: form.situacion_laboral,
-      experiencia_musica: form.experiencia_musica,
-      presupuesto: form.presupuesto,
+      generos_musicales: form.generos_musicales,
+      fase_proyecto: form.fase_proyecto,
+      objetivo_cabana: form.objetivo_cabana,
+      presupuesto_disponible: form.presupuesto_disponible,
+      timing_arranque: form.timing_arranque,
+      fecha_envio: new Date().toISOString(),
     });
     setSending(false);
     onClose();
@@ -201,7 +249,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
     onClose();
     setTimeout(() => {
       setStep(1);
-      setForm({ nombre:"",apellidos:"",email:"",phoneCode:"+34",phone:"",birthdate:"",privacidad:false,pais_residencia:"",nacionalidad:"",viaje_madrid:"",situacion_laboral:"",experiencia_musica:"",presupuesto:"" });
+      setForm({ nombre:"",apellidos:"",email:"",phoneCode:"+34",phone:"",birthdate:"",privacidad:false,pais_residencia:"",nacionalidad:"",viaje_madrid:"",generos_musicales:[],fase_proyecto:"",objetivo_cabana:"",presupuesto_disponible:"",timing_arranque:"" });
       setErrors({});
     }, 300);
   };
@@ -365,45 +413,105 @@ export default function ApplicationModal({ isOpen, onClose }) {
                 </div>
               )}
 
-              {/* Step 3 — Experiencia */}
+              {/* Step 3 — Tu proyecto */}
               {step === 3 && (
                 <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                   <div>
-                    <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.1rem", color: "#f0ede8", margin: "0 0 3px" }}>Experiencia</h3>
-                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.3)", margin: 0 }}>Tu situación profesional actual</p>
+                    <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.1rem", color: "#f0ede8", margin: "0 0 3px" }}>Tu proyecto</h3>
+                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.3)", margin: 0 }}>Cuéntanos dónde estás y qué quieres construir</p>
                   </div>
+
+                  {/* Campo 1 — Géneros */}
                   <div style={fieldWrap}>
-                    <Label required>Situación laboral</Label>
-                    <select value={form.situacion_laboral} onChange={e => set("situacion_laboral", e.target.value)} style={{ ...inputStyle, borderColor: errors.situacion_laboral ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
+                    <label style={labelStyle}>
+                      ¿Con qué géneros musicales conectas?
+                      <span style={{ color: "rgba(240,237,232,0.35)", fontWeight: 400, marginLeft: 4 }}>(puedes elegir varios)</span>
+                      <span style={{ color: "#ff5833", marginLeft: 3 }}>*</span>
+                    </label>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "7px", marginTop: "2px" }}>
+                      {GENEROS.map(g => {
+                        const sel = form.generos_musicales.includes(g);
+                        return (
+                          <button
+                            key={g}
+                            type="button"
+                            onClick={() => set("generos_musicales", sel
+                              ? form.generos_musicales.filter(x => x !== g)
+                              : [...form.generos_musicales, g]
+                            )}
+                            style={{
+                              fontFamily: "'Helvetica Neue', sans-serif",
+                              fontSize: "12px", fontWeight: sel ? 700 : 400,
+                              padding: "5px 11px", borderRadius: "20px",
+                              border: sel ? "1px solid #ff5833" : "1px solid rgba(255,255,255,0.12)",
+                              background: sel ? "rgba(255,88,51,0.12)" : "rgba(255,255,255,0.04)",
+                              color: sel ? "#ff5833" : "rgba(240,237,232,0.55)",
+                              cursor: "pointer", transition: "all 0.15s",
+                            }}
+                          >
+                            {g}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {errors.generos_musicales && (
+                      <span style={{ fontSize: "11px", color: "#ff5833", fontFamily: "'Helvetica Neue', sans-serif" }}>Selecciona al menos un género.</span>
+                    )}
+                  </div>
+
+                  {/* Campo 2 — Fase */}
+                  <div style={fieldWrap}>
+                    <Label required>¿En qué fase está tu proyecto?</Label>
+                    <select value={form.fase_proyecto} onChange={e => set("fase_proyecto", e.target.value)} style={{ ...inputStyle, borderColor: errors.fase_proyecto ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
                       <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
-                      <option value="empleado" style={{ background: "#141414" }}>Empleado/a</option>
-                      <option value="autonomo" style={{ background: "#141414" }}>Autónomo/a</option>
-                      <option value="estudiante" style={{ background: "#141414" }}>Estudiante</option>
-                      <option value="desempleado" style={{ background: "#141414" }}>Desempleado/a</option>
-                      <option value="artista_activo" style={{ background: "#141414" }}>Artista activo/a</option>
-                      <option value="otro" style={{ background: "#141414" }}>Otro</option>
+                      {FASES_PROYECTO.map(f => <option key={f} value={f} style={{ background: "#141414" }}>{f}</option>)}
                     </select>
                   </div>
+
+                  {/* Campo 3 — Objetivo */}
                   <div style={fieldWrap}>
-                    <Label required>Experiencia creando música</Label>
-                    <select value={form.experiencia_musica} onChange={e => set("experiencia_musica", e.target.value)} style={{ ...inputStyle, borderColor: errors.experiencia_musica ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
+                    <Label required>¿Qué quieres conseguir con Cabaña?</Label>
+                    <select value={form.objetivo_cabana} onChange={e => set("objetivo_cabana", e.target.value)} style={{ ...inputStyle, borderColor: errors.objetivo_cabana ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
                       <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
-                      <option value="ninguna" style={{ background: "#141414" }}>Sin experiencia previa</option>
-                      <option value="menos_1" style={{ background: "#141414" }}>Menos de 1 año</option>
-                      <option value="1_3" style={{ background: "#141414" }}>1 – 3 años</option>
-                      <option value="3_5" style={{ background: "#141414" }}>3 – 5 años</option>
-                      <option value="mas_5" style={{ background: "#141414" }}>Más de 5 años</option>
+                      {OBJETIVOS.map(o => <option key={o} value={o} style={{ background: "#141414" }}>{o}</option>)}
                     </select>
                   </div>
+
+                  {/* Campo 4 — Presupuesto */}
                   <div style={fieldWrap}>
-                    <Label required>Presupuesto disponible</Label>
-                    <select value={form.presupuesto} onChange={e => set("presupuesto", e.target.value)} style={{ ...inputStyle, borderColor: errors.presupuesto ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
+                    <Label required>¿Estás listo para invertir en tu proyecto?</Label>
+                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "rgba(240,237,232,0.35)", margin: "0 0 5px" }}>Nuestros planes arrancan desde 3.000€</p>
+                    <select value={form.presupuesto_disponible} onChange={e => set("presupuesto_disponible", e.target.value)} style={{ ...inputStyle, borderColor: errors.presupuesto_disponible ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
                       <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
-                      <option value="Cuento con un presupuesto de 5.000€ o más para mi proyecto." style={{ background: "#141414" }}>Cuento con un presupuesto de 5.000€ o más para mi proyecto.</option>
-                      <option value="Cuento con un presupuesto mínimo de 2.000€ para comenzar." style={{ background: "#141414" }}>Cuento con un presupuesto mínimo de 2.000€ para comenzar.</option>
-                      <option value="Estoy comprometido y abierto a explorar un plan de financiamiento." style={{ background: "#141414" }}>Estoy comprometido y abierto a explorar un plan de financiamiento.</option>
-                      <option value="Por ahora no cuento con presupuesto." style={{ background: "#141414" }}>Por ahora no cuento con presupuesto.</option>
+                      {PRESUPUESTOS.map(p => <option key={p} value={p} style={{ background: "#141414" }}>{p}</option>)}
                     </select>
+                    {form.presupuesto_disponible === PRESUPUESTO_BLOQUEANTE && (
+                      <div style={{ background: "rgba(255,88,51,0.08)", border: "1px solid rgba(255,88,51,0.25)", borderRadius: "8px", padding: "10px 12px", marginTop: "4px" }}>
+                        <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "12px", color: "rgba(255,88,51,0.9)", margin: 0, lineHeight: 1.5 }}>
+                          Solo trabajamos con artistas listos para apostar por su proyecto.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Campo 5 — Timing */}
+                  <div style={fieldWrap}>
+                    <Label required>¿Cuándo quieres arrancar?</Label>
+                    <select value={form.timing_arranque} onChange={e => set("timing_arranque", e.target.value)} style={{ ...inputStyle, borderColor: errors.timing_arranque ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
+                      <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
+                      {TIMINGS.map(t => (
+                        <option key={t} value={t} style={{ background: "#141414" }}>
+                          {t}{t === "El próximo mes" ? " 🔥" : ""}
+                        </option>
+                      ))}
+                    </select>
+                    {form.timing_arranque === TIMING_BLOQUEANTE && (
+                      <div style={{ background: "rgba(255,88,51,0.08)", border: "1px solid rgba(255,88,51,0.25)", borderRadius: "8px", padding: "10px 12px", marginTop: "4px" }}>
+                        <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "12px", color: "rgba(255,88,51,0.9)", margin: 0, lineHeight: 1.5 }}>
+                          Solo trabajamos con artistas que saben cuándo quieren empezar.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -440,13 +548,13 @@ export default function ApplicationModal({ isOpen, onClose }) {
                 ) : (
                   <button
                     onClick={handleSubmit}
-                    disabled={sending}
+                    disabled={sending || isSubmitBlocked}
                     style={{
                       flex: 1, borderRadius: "9px", padding: "12px 20px", fontWeight: 900,
                       fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.9rem",
-                      border: "none", cursor: "pointer",
-                      background: "#ff5833",
-                      color: "#fff",
+                      border: "none", cursor: (sending || isSubmitBlocked) ? "not-allowed" : "pointer",
+                      background: isSubmitBlocked ? "rgba(255,88,51,0.25)" : "#ff5833",
+                      color: isSubmitBlocked ? "rgba(255,255,255,0.35)" : "#fff",
                       transition: "all 0.2s",
                     }}
                   >
