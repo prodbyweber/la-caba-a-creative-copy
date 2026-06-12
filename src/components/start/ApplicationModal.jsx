@@ -506,16 +506,16 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     </select>
                     {form.timing_arranque === "El próximo mes (Plazas limitadas)" && (
                       <div style={{
-                        display: "inline-flex", alignItems: "center", gap: "6px",
-                        background: "linear-gradient(135deg, #ff5833 0%, #ff8c33 100%)",
-                        borderRadius: "8px", padding: "7px 14px", marginTop: "7px",
-                        alignSelf: "flex-start",
+                        background: "rgba(255, 88, 51, 0.08)",
+                        border: "0.5px solid rgba(255, 88, 51, 0.25)",
+                        borderRadius: "8px", padding: "8px 12px", marginTop: "6px",
                       }}>
-                        <span style={{
+                        <p style={{
                           fontFamily: "'Helvetica Neue', sans-serif",
-                          fontSize: "11px", fontWeight: 800, color: "#fff",
-                          letterSpacing: "0.06em", textTransform: "uppercase",
-                        }}>Plazas limitadas</span>
+                          fontSize: "12px", color: "#FF5833", margin: 0, lineHeight: 1.5,
+                        }}>
+                          Las plazas de este año son limitadas. Si estás pensando en el próximo mes, puede que ya no haya hueco.
+                        </p>
                       </div>
                     )}
                     {form.timing_arranque === TIMING_BLOQUEANTE && (
