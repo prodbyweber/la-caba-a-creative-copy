@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { Users, Download, Trash2, ChevronDown, ChevronUp, Music } from "lucide-react";
+import { Users, Download, Trash2, ChevronDown, ChevronUp, Music, Mail, MessageCircle } from "lucide-react";
 
 const STATUS_OPTIONS = ["nueva", "revisada", "contactada", "aceptada", "rechazada"];
 const STATUS_COLORS = {
@@ -43,11 +43,9 @@ function exportToExcel(apps) {
     a.status || "nueva",
     a.fecha_envio ? formatDate(a.fecha_envio) : (a.created_date ? formatDate(a.created_date) : ""),
   ]);
-
   const csvContent = [headers, ...rows]
     .map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(","))
     .join("\n");
-
   const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -87,8 +85,7 @@ function StatusSelect({ current, onChange }) {
             {STATUS_OPTIONS.map(s => {
               const c = STATUS_COLORS[s];
               return (
-                <button
-                  key={s}
+                <button key={s}
                   onClick={e => { e.stopPropagation(); onChange(s); setOpen(false); }}
                   style={{
                     display: "block", width: "100%", textAlign: "left",
@@ -99,9 +96,7 @@ function StatusSelect({ current, onChange }) {
                   }}
                   onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                >
-                  {s}
-                </button>
+                >{s}</button>
               );
             })}
           </div>
@@ -111,39 +106,56 @@ function StatusSelect({ current, onChange }) {
   );
 }
 
-function DetailBlock({ title, children }) {
+/* ── reusable section header ── */
+function SectionTitle({ children }) {
   return (
-    <div style={{ marginBottom: "14px" }}>
-      <p style={{
-        fontFamily: "'Helvetica Neue', sans-serif",
-        fontSize: "9px", fontWeight: 700, letterSpacing: "0.08em",
-        color: "rgba(255,255,255,0.2)", textTransform: "uppercase",
-        marginBottom: "8px",
-      }}>{title}</p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-        {children}
+    <div style={{
+      fontFamily: "'Helvetica Neue', sans-serif",
+      fontSize: "9px", fontWeight: 700, letterSpacing: "0.08em",
+      color: "rgba(255,255,255,0.2)", textTransform: "uppercase",
+      marginBottom: "8px",
+    }}>{children}</div>
+  );
+}
+
+/* ── 2‑column row inside a section ── */
+function FieldPair({ left, right }) {
+  return (
+    <div style={{
+      display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px",
+      marginBottom: "6px",
+    }}>
+      <div>
+        <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "10px", fontWeight: 600, color: "rgba(255,255,255,0.25)", display: "block", marginBottom: "1px" }}>{left.label}</span>
+        <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: left.orange ? "#ff5833" : "rgba(240,237,232,0.7)", lineHeight: 1.4 }}>
+          {left.value || <span style={{ color: "rgba(255,255,255,0.15)" }}>No especificado</span>}
+        </span>
       </div>
+      {right && (
+        <div>
+          <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "10px", fontWeight: 600, color: "rgba(255,255,255,0.25)", display: "block", marginBottom: "1px" }}>{right.label}</span>
+          <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: right.orange ? "#ff5833" : "rgba(240,237,232,0.7)", lineHeight: 1.4 }}>
+            {right.value || <span style={{ color: "rgba(255,255,255,0.15)" }}>No especificado</span>}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
 
-function DetailRow({ label, value }) {
+/* ── full‑width row ── */
+function FieldFull({ label, value }) {
   return (
-    <div style={{ display: "flex", gap: "6px", alignItems: "flex-start" }}>
-      <span style={{
-        fontFamily: "'Helvetica Neue', sans-serif",
-        fontSize: "11px", fontWeight: 600,
-        color: "rgba(255,255,255,0.3)",
-        minWidth: "110px", flexShrink: 0,
-      }}>{label}</span>
-      <span style={{
-        fontFamily: "'Helvetica Neue', sans-serif",
-        fontSize: "11px", color: "rgba(240,237,232,0.7)",
-        lineHeight: 1.4,
-      }}>{value || <span style={{ color: "rgba(255,255,255,0.15)" }}>No especificado</span>}</span>
+    <div style={{ marginBottom: "6px" }}>
+      <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "10px", fontWeight: 600, color: "rgba(255,255,255,0.25)", display: "block", marginBottom: "1px" }}>{label}</span>
+      <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "rgba(240,237,232,0.7)", lineHeight: 1.4 }}>
+        {value || <span style={{ color: "rgba(255,255,255,0.15)" }}>No especificado</span>}
+      </span>
     </div>
   );
 }
+
+const SECTION_SEPARATOR = { borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "12px", marginTop: "12px" };
 
 export default function ApplicationsPanel() {
   const queryClient = useQueryClient();
@@ -174,6 +186,7 @@ export default function ApplicationsPanel() {
 
   return (
     <div className="bg-[#111113] border border-white/[0.07] rounded-2xl p-4 sm:p-5 mb-6">
+      {/* ── Header ── */}
       <div className="flex items-center gap-3 mb-4">
         <Users className="w-4 h-4 text-orange-400" />
         <h3 className="text-sm font-semibold text-white flex-1">Solicitudes</h3>
@@ -182,20 +195,18 @@ export default function ApplicationsPanel() {
             onClick={() => exportToExcel(visibleApps)}
             className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors"
           >
-            <Download className="w-3 h-3" />
-            Exportar
+            <Download className="w-3 h-3" /> Exportar
           </button>
         )}
       </div>
 
-      {/* Tabs */}
+      {/* ── Tabs ── */}
       <div className="flex gap-1 mb-4 p-1 bg-white/[0.03] rounded-xl border border-white/[0.05]">
         {[
           { key: "artistas", label: "Artistas", count: nuevasArtistas },
           { key: "marcas", label: "Marcas", count: nuevasMarcas },
         ].map(tab => (
-          <button
-            key={tab.key}
+          <button key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all"
             style={{
@@ -206,12 +217,7 @@ export default function ApplicationsPanel() {
           >
             {tab.label}
             {tab.count > 0 && (
-              <span style={{
-                fontSize: "9px", fontWeight: 700, padding: "1px 5px",
-                borderRadius: "20px", background: "rgba(255,88,51,0.2)", color: "#ff5833",
-              }}>
-                {tab.count}
-              </span>
+              <span style={{ fontSize: "9px", fontWeight: 700, padding: "1px 5px", borderRadius: "20px", background: "rgba(255,88,51,0.2)", color: "#ff5833" }}>{tab.count}</span>
             )}
           </button>
         ))}
@@ -232,140 +238,102 @@ export default function ApplicationsPanel() {
             const generos = Array.isArray(app.generos_musicales) ? app.generos_musicales : [];
 
             return (
-              <div
-                key={app.id}
+              <div key={app.id}
                 className="rounded-xl bg-white/[0.03] border transition-all"
                 style={{ borderColor: isExpanded ? "rgba(255,88,51,0.2)" : "rgba(255,255,255,0.06)" }}
               >
-                {/* ── Collapsed header ── */}
+                {/* ═══════════ COLLAPSED HEADER ═══════════ */}
                 <div
-                  className="p-3.5 flex items-start gap-3 cursor-pointer hover:bg-white/[0.02] rounded-xl transition-colors"
+                  className="p-3.5 flex items-start gap-3 cursor-pointer hover:bg-white/[0.02] transition-colors rounded-xl"
                   onClick={() => setExpandedId(isExpanded ? null : app.id)}
                 >
                   <div className="flex-1 min-w-0">
-                    {/* Row 1: nombre + email */}
+                    {/* Row 1: nombre · email */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-sm font-semibold text-white">
-                        {app.nombre} {app.apellidos}
-                      </p>
+                      <p className="text-sm font-semibold text-white">{app.nombre} {app.apellidos}</p>
                       <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.2)" }}>·</span>
                       <p className="text-xs text-white/30 truncate">{app.email}</p>
                     </div>
-
                     {/* Row 2: indicators */}
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                      {app.telefono && (
-                        <span className="text-[10px] text-white/25">{app.telefono}</span>
-                      )}
-                      {app.pais_residencia && (
-                        <span className="text-[10px] text-white/25">· {app.pais_residencia}</span>
-                      )}
+                      {app.telefono && <span className="text-[10px] text-white/25">{app.telefono}</span>}
+                      {app.pais_residencia && <span className="text-[10px] text-white/25">· {app.pais_residencia}</span>}
                       {generos.length > 0 && (
-                        <span style={{
-                          display: "flex", alignItems: "center", gap: "3px",
-                          fontSize: "9px", padding: "1px 6px", borderRadius: "20px",
-                          background: "rgba(255,88,51,0.08)", border: "1px solid rgba(255,88,51,0.18)",
-                          color: "#ff5833", fontWeight: 700,
-                        }}>
-                          <Music size={8} /> {generos.length} género{generos.length > 1 ? "s" : ""}
+                        <span style={{ display: "flex", alignItems: "center", gap: "3px", fontSize: "9px", padding: "1px 6px", borderRadius: "20px", background: "rgba(255,88,51,0.08)", border: "1px solid rgba(255,88,51,0.18)", color: "#ff5833", fontWeight: 700 }}>
+                          <Music size={8} /> {generos.length}
                         </span>
+                      )}
+                      {app.presupuesto_disponible && (
+                        <span className="text-[10px] text-white/25 max-w-[200px] truncate">{app.presupuesto_disponible}</span>
                       )}
                       {app.timing_arranque && (
-                        <span className="text-[10px] text-white/20 truncate max-w-[140px]">
-                          {app.timing_arranque}
-                        </span>
+                        <span className="text-[10px] text-white/20 max-w-[150px] truncate">{app.timing_arranque}</span>
                       )}
                       {fechaDisplay && (
-                        <span className="text-[10px] text-white/20 ml-auto">
-                          {fechaDisplay}
-                        </span>
+                        <span className="text-[10px] text-white/20 ml-auto">{fechaDisplay}</span>
                       )}
                     </div>
-
-                    {/* Row 3: presupuesto */}
-                    {app.presupuesto_disponible && (
-                      <p className="text-[10px] text-white/25 mt-1 truncate">{app.presupuesto_disponible}</p>
-                    )}
                   </div>
 
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <StatusSelect
-                      current={app.status || "nueva"}
-                      onChange={(status) => updateMutation.mutate({ id: app.id, status })}
-                    />
-                    <button
-                      onClick={e => { e.stopPropagation(); deleteMutation.mutate(app.id); }}
-                      className="w-7 h-7 rounded-lg bg-white/0 hover:bg-red-500/10 flex items-center justify-center transition-colors"
-                    >
+                    <StatusSelect current={app.status || "nueva"} onChange={(status) => updateMutation.mutate({ id: app.id, status })} />
+                    <button onClick={e => { e.stopPropagation(); deleteMutation.mutate(app.id); }}
+                      className="w-7 h-7 rounded-lg bg-white/0 hover:bg-red-500/10 flex items-center justify-center transition-colors">
                       <Trash2 className="w-3.5 h-3.5 text-white/20 hover:text-red-400" />
                     </button>
                     <div className="w-5 flex items-center justify-center">
-                      {isExpanded
-                        ? <ChevronUp size={13} className="text-white/30" />
-                        : <ChevronDown size={13} className="text-white/20" />}
+                      {isExpanded ? <ChevronUp size={13} className="text-white/30" /> : <ChevronDown size={13} className="text-white/20" />}
                     </div>
                   </div>
                 </div>
 
-                {/* ── Expanded detail ── */}
+                {/* ═══════════ EXPANDED DETAIL ═══════════ */}
                 {isExpanded && (
-                  <div style={{
-                    borderTop: "1px solid rgba(255,255,255,0.05)",
-                    padding: "14px 16px 16px",
-                  }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
+                  <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", padding: "14px 16px 16px" }}>
 
-                      {/* BLOQUE 1 — Datos personales */}
-                      <DetailBlock title="Datos personales">
-                        <DetailRow label="Nombre completo" value={`${app.nombre || ""} ${app.apellidos || ""}`.trim()} />
-                        <DetailRow label="Email" value={app.email} />
-                        <DetailRow label="Teléfono" value={app.telefono} />
-                        <DetailRow label="Fecha de nacimiento" value={app.fecha_nacimiento} />
-                      </DetailBlock>
+                    {/* ── DATOS PERSONALES ── */}
+                    <SectionTitle>Datos personales</SectionTitle>
+                    <FieldPair
+                      left={{ label: "Nombre", value: app.nombre }}
+                      right={{ label: "Email", value: app.email, orange: true }}
+                    />
+                    <FieldPair
+                      left={{ label: "Teléfono", value: app.telefono }}
+                      right={{ label: "Fecha de nacimiento", value: app.fecha_nacimiento }}
+                    />
 
-                      {/* BLOQUE 2 — Ubicación */}
-                      <DetailBlock title="Ubicación">
-                        <DetailRow label="País de residencia" value={app.pais_residencia} />
-                        <DetailRow label="Nacionalidad" value={app.nacionalidad} />
-                        <DetailRow
-                          label="Viaje a Madrid"
-                          value={
-                            app.disponibilidad_viaje_madrid === "si" ? "Sí"
-                            : app.disponibilidad_viaje_madrid === "no" ? "No"
-                            : app.disponibilidad_viaje_madrid || null
-                          }
-                        />
-                      </DetailBlock>
+                    {/* ── UBICACIÓN ── */}
+                    <div style={SECTION_SEPARATOR}>
+                      <SectionTitle>Ubicación</SectionTitle>
+                      <FieldPair
+                        left={{ label: "País de residencia", value: app.pais_residencia }}
+                        right={{ label: "Nacionalidad", value: app.nacionalidad }}
+                      />
+                      <FieldPair
+                        left={{
+                          label: "Viaje a Madrid",
+                          value: app.disponibilidad_viaje_madrid === "si" ? "Sí" : app.disponibilidad_viaje_madrid === "no" ? "No" : app.disponibilidad_viaje_madrid || null
+                        }}
+                        right={null}
+                      />
                     </div>
 
-                    {/* BLOQUE 3 — Su proyecto (full width) */}
-                    <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "12px", marginTop: "4px" }}>
-                      <p style={{
-                        fontFamily: "'Helvetica Neue', sans-serif",
-                        fontSize: "9px", fontWeight: 700, letterSpacing: "0.08em",
-                        color: "rgba(255,255,255,0.2)", textTransform: "uppercase",
-                        marginBottom: "10px",
-                      }}>Su proyecto</p>
+                    {/* ── SU PROYECTO ── */}
+                    <div style={SECTION_SEPARATOR}>
+                      <SectionTitle>Su proyecto</SectionTitle>
 
                       {/* Géneros — chips */}
                       <div style={{ marginBottom: "8px" }}>
-                        <span style={{
-                          fontFamily: "'Helvetica Neue', sans-serif",
-                          fontSize: "11px", fontWeight: 600,
-                          color: "rgba(255,255,255,0.3)",
-                          display: "block", marginBottom: "5px",
-                        }}>Géneros musicales</span>
+                        <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "10px", fontWeight: 600, color: "rgba(255,255,255,0.25)", display: "block", marginBottom: "4px" }}>Géneros musicales</span>
                         {generos.length > 0 ? (
-                          <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                             {generos.map(g => (
                               <span key={g} style={{
-                                fontSize: "10px", padding: "3px 9px", borderRadius: "20px",
-                                background: "rgba(255,88,51,0.1)", border: "1px solid rgba(255,88,51,0.25)",
+                                fontSize: "10px", padding: "4px 12px", borderRadius: "20px",
+                                background: "rgba(255,88,51,0.15)", border: "1px solid rgba(255,88,51,0.35)",
                                 color: "#ff5833", fontWeight: 600,
                                 fontFamily: "'Helvetica Neue', sans-serif",
-                              }}>
-                                {g}
-                              </span>
+                              }}>{g}</span>
                             ))}
                           </div>
                         ) : (
@@ -373,26 +341,20 @@ export default function ApplicationsPanel() {
                         )}
                       </div>
 
-                      <div style={{ display: "flex", flexDirection: "column", gap: "5px", marginTop: "8px" }}>
-                        <DetailRow label="Fase del proyecto" value={app.fase_proyecto} />
-                        <DetailRow label="Objetivo con Cabaña" value={app.objetivo_cabana} />
-                        <DetailRow label="Presupuesto" value={app.presupuesto_disponible} />
-                        <DetailRow label="Cuándo quiere arrancar" value={app.timing_arranque} />
-                      </div>
+                      <FieldPair
+                        left={{ label: "Fase del proyecto", value: app.fase_proyecto }}
+                        right={{ label: "Objetivo con Cabaña", value: app.objetivo_cabana }}
+                      />
+                      <FieldPair
+                        left={{ label: "Presupuesto", value: app.presupuesto_disponible }}
+                        right={{ label: "Cuándo quiere arrancar", value: app.timing_arranque }}
+                      />
                     </div>
 
-                    {/* BLOQUE 4 — Registro */}
-                    <div style={{ borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "12px", marginTop: "12px" }}>
-                      <p style={{
-                        fontFamily: "'Helvetica Neue', sans-serif",
-                        fontSize: "9px", fontWeight: 700, letterSpacing: "0.08em",
-                        color: "rgba(255,255,255,0.2)", textTransform: "uppercase",
-                        marginBottom: "8px",
-                      }}>Registro</p>
-                      <DetailRow
-                        label="Enviado el"
-                        value={fechaDisplay || "—"}
-                      />
+                    {/* ── REGISTRO ── */}
+                    <div style={SECTION_SEPARATOR}>
+                      <SectionTitle>Registro</SectionTitle>
+                      <FieldFull label="Enviado el" value={fechaDisplay || "No disponible"} />
                     </div>
                   </div>
                 )}
