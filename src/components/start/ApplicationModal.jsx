@@ -565,6 +565,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     style={{
                       flex: 1, borderRadius: "9px", padding: "12px 20px", fontWeight: 900,
                       fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.9rem",
+                      whiteSpace: "nowrap",
                       border: "none", cursor: (sending || isSubmitBlocked) ? "not-allowed" : "pointer",
                       background: isSubmitBlocked ? "rgba(255,88,51,0.25)" : "#ff5833",
                       color: isSubmitBlocked ? "rgba(255,255,255,0.35)" : "#fff",
