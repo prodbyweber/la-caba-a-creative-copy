@@ -18,6 +18,10 @@
       "type": "string",
       "description": "Tel\u00e9fono con c\u00f3digo de pa\u00eds"
     },
+    "instagram": {
+      "type": "string",
+      "description": "Usuario de Instagram (sin @)"
+    },
     "fecha_nacimiento": {
       "type": "string",
       "description": "Fecha de nacimiento"

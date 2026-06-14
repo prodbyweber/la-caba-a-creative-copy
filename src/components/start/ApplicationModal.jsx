@@ -158,7 +158,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
   }, []);
 
   const [form, setForm] = useState({
-    nombre: "", apellidos: "", email: "", phoneCode: "+34", phone: "", birthdate: "",
+    nombre: "", apellidos: "", email: "", phoneCode: "+34", phone: "", instagram: "", birthdate: "",
     privacidad: false,
     pais_residencia: "", nacionalidad: "", viaje_madrid: "",
     generos_musicales: [], fase_proyecto: "", objetivo_cabana: "",
@@ -230,6 +230,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
       apellidos: form.apellidos,
       email: form.email,
       telefono: form.phoneCode + " " + form.phone,
+      instagram: form.instagram || "",
       fecha_nacimiento: form.birthdate,
       pais_residencia: form.pais_residencia,
       nacionalidad: form.nacionalidad,
@@ -250,7 +251,7 @@ export default function ApplicationModal({ isOpen, onClose }) {
     onClose();
     setTimeout(() => {
       setStep(1);
-      setForm({ nombre:"",apellidos:"",email:"",phoneCode:"+34",phone:"",birthdate:"",privacidad:false,pais_residencia:"",nacionalidad:"",viaje_madrid:"",generos_musicales:[],fase_proyecto:"",objetivo_cabana:"",presupuesto_disponible:"",timing_arranque:"" });
+      setForm({ nombre:"",apellidos:"",email:"",phoneCode:"+34",phone:"",instagram:"",birthdate:"",privacidad:false,pais_residencia:"",nacionalidad:"",viaje_madrid:"",generos_musicales:[],fase_proyecto:"",objetivo_cabana:"",presupuesto_disponible:"",timing_arranque:"" });
       setErrors({});
     }, 300);
   };
@@ -351,7 +352,27 @@ export default function ApplicationModal({ isOpen, onClose }) {
                     {errors.birthdate === "minor" && <span style={{ fontSize: "11px", color: "#ff5833", fontFamily: "'Helvetica Neue', sans-serif" }}>Debes ser mayor de 18 años para solicitar plaza.</span>}
                   </div>
 
-                  {/* Política de privacidad */}
+                              {/* Instagram */}
+                  <div style={fieldWrap}>
+                    <Label>Instagram</Label>
+                    <div style={{ display: "flex", alignItems: "stretch" }}>
+                      <span style={{
+                        display: "flex", alignItems: "center", padding: "10px 0 10px 13px",
+                        background: "#141414", border: "1px solid rgba(255,255,255,0.1)",
+                        borderRight: "none", borderRadius: "8px 0 0 8px",
+                        fontSize: "14px", color: "rgba(240,237,232,0.35)",
+                        fontFamily: "'Helvetica Neue', sans-serif",
+                      }}>@</span>
+                      <input
+                        style={{ ...inputStyle, borderLeft: "none", borderRadius: "0 8px 8px 0", flex: 1 }}
+                        value={form.instagram?.startsWith("@") ? form.instagram.slice(1) : form.instagram}
+                        onChange={e => set("instagram", e.target.value.replace(/^@+/, ""))}
+                        placeholder="username"
+                      />
+                    </div>
+                  </div>
+
+      {/* Política de privacidad */}
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                     <div
                       onClick={() => set("privacidad", !form.privacidad)}

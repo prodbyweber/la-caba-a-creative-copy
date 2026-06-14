@@ -196,6 +196,17 @@ function ApplicationDetailModal({ app, onClose }) {
                 <p className="text-xs sm:text-sm text-white/70">{app.fecha_nacimiento || 'No especificado'}</p>
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Instagram</p>
+                {app.instagram ? (
+                  <a href={`https://instagram.com/${app.instagram}`} target="_blank" rel="noreferrer" className="text-xs sm:text-sm text-[#ff5833] hover:underline">@{app.instagram}</a>
+                ) : (
+                  <p className="text-xs sm:text-sm text-white/25 italic">No especificado</p>
+                )}
+              </div>
+              <div className="p-2.5 sm:p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] opacity-0" />
+            </div>
 
             {/* ═══ UBICACIÓN ═══ */}
             <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mb-1 pt-1">Ubicación</p>
@@ -269,14 +280,14 @@ function ApplicationDetailModal({ app, onClose }) {
 }
 
 function exportCSV(apps) {
-  const headers = ["Nombre","Apellidos","Email","Teléfono","F. Nacimiento","País","Nacionalidad","Viaje Madrid","Géneros","Fase Proyecto","Objetivo","Presupuesto","Timing","Estado","Enviado el"];
+  const headers = ["Nombre","Apellidos","Email","Teléfono","Instagram","F. Nacimiento","País","Nacionalidad","Viaje Madrid","Géneros","Fase Proyecto","Objetivo","Presupuesto","Timing","Estado","Enviado el"];
   const rows = apps.map(a => {
     const generos = Array.isArray(a.generos_musicales) ? a.generos_musicales : [];
     const fechaDisplay = a.fecha_envio
       ? new Date(a.fecha_envio).toLocaleString("es-ES", { timeZone: "Europe/Madrid", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
       : (a.created_date ? format(parseISO(a.created_date),"d/MM/yyyy HH:mm") : "");
     return [
-      a.nombre,a.apellidos,a.email,a.telefono,a.fecha_nacimiento,a.pais_residencia,a.nacionalidad,
+      a.nombre,a.apellidos,a.email,a.telefono,(a.instagram ? '@'+a.instagram : ''),a.fecha_nacimiento,a.pais_residencia,a.nacionalidad,
       a.disponibilidad_viaje_madrid === 'si' ? 'Sí' : a.disponibilidad_viaje_madrid === 'no' ? 'No' : (a.disponibilidad_viaje_madrid || ''),
       generos.join(", "),
       a.fase_proyecto || '',
@@ -375,6 +386,7 @@ export default function ContactLeads() {
 👤 Nombre: ${app.nombre} ${app.apellidos}
 📧 Email: ${app.email}
 📱 Teléfono: ${app.telefono}
+📷 Instagram: ${app.instagram ? '@' + app.instagram : 'No especificado'}
 🎂 Fecha nacimiento: ${app.fecha_nacimiento || 'N/A'}
 📍 País: ${app.pais_residencia || 'N/A'}
 🌍 Nacionalidad: ${app.nacionalidad || 'N/A'}

@@ -25,12 +25,13 @@ function formatDate(isoStr) {
 }
 
 function exportToExcel(apps) {
-  const headers = ["Nombre","Apellidos","Email","Teléfono","Fecha Nacimiento","País Residencia","Nacionalidad","Viaje Madrid","Géneros","Fase Proyecto","Objetivo","Presupuesto","Timing","Estado","Fecha Envío"];
+  const headers = ["Nombre","Apellidos","Email","Teléfono","Instagram","Fecha Nacimiento","País Residencia","Nacionalidad","Viaje Madrid","Géneros","Fase Proyecto","Objetivo","Presupuesto","Timing","Estado","Fecha Envío"];
   const rows = apps.map(a => [
     a.nombre || "",
     a.apellidos || "",
     a.email || "",
     a.telefono || "",
+    a.instagram ? "@"+a.instagram : "",
     a.fecha_nacimiento || "",
     a.pais_residencia || "",
     a.nacionalidad || "",
@@ -300,6 +301,15 @@ export default function ApplicationsPanel() {
                     <FieldPair
                       left={{ label: "Teléfono", value: app.telefono }}
                       right={{ label: "Fecha de nacimiento", value: app.fecha_nacimiento }}
+                    />
+                    <FieldPair
+                      left={{
+                        label: "Instagram",
+                        value: app.instagram ? (
+                          <a href={`https://instagram.com/${app.instagram}`} target="_blank" rel="noreferrer" style={{ color: "#ff5833", textDecoration: "none" }} onMouseEnter={e => e.target.style.textDecoration = "underline"} onMouseLeave={e => e.target.style.textDecoration = "none"}>@{app.instagram}</a>
+                        ) : null
+                      }}
+                      right={null}
                     />
 
                     {/* ── UBICACIÓN ── */}
