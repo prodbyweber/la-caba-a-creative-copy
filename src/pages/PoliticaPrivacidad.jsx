@@ -12,8 +12,7 @@ export default function PoliticaPrivacidad() {
         <Section title="1. Responsable del tratamiento">
           <p>En cumplimiento del Reglamento (UE) 2016/679 (RGPD) y la Ley Orgánica 3/2018 (LOPDGDD), le informamos que el responsable del tratamiento de sus datos personales es:</p>
           <ul>
-            <li><strong>Nombre:</strong> Santiago Alejandro Weber Hernández</li>
-            <li><strong>NIF:</strong> Z1951498E</li>
+            <li><strong>Nombre:</strong> Cabaña Creative</li>
             <li><strong>Dirección:</strong> Calle de Rufino González, 14, Madrid</li>
             <li><strong>Email:</strong> hola@cabanacreative.es</li>
             <li><strong>Sitio web:</strong> cabanacreative.es</li>
