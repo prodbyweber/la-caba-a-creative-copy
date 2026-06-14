@@ -545,7 +545,15 @@ export default function ContactLeads() {
                           </span>
                         </div>
                       </div>
-                      {app.created_date && <p className="text-[10px] text-white/25 flex items-center gap-1 mb-2"><Calendar className="w-3 h-3" />{format(parseISO(app.created_date), "d MMM yyyy", { locale: es })}</p>}
+                      <p className="text-[10px] text-white/25 flex items-center gap-1 mb-2">
+                        <Calendar className="w-3 h-3 flex-shrink-0" />
+                        {app.fecha_envio
+                          ? new Date(app.fecha_envio).toLocaleString("en-GB", { timeZone: "Europe/Madrid", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+                          : app.created_date
+                            ? format(parseISO(app.created_date), "d MMM yyyy • HH:mm", { locale: es })
+                            : 'No date available'
+                        }
+                      </p>
                       {/* Botones de acción rápida */}
                       <div className="flex items-center gap-1.5">
                           <a
