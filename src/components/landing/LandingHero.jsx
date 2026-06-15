@@ -1,91 +1,155 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 
-function useAutoPlay(src) {
-  const ref = useRef(null);
+/**
+ * Robust hero video with Windows cross-browser compatibility:
+ * - Explicit crossOrigin for CDN-hosted videos
+ * - Poster image prevents black screen during load
+ * - Error recovery: falls back to static image on failure
+ * - Fade-in transition when video starts rendering
+ * - Visibility-based play/pause for performance
+ */
+function HeroVideo({ src, poster, className = "", onError, onReady }) {
+  const videoRef = useRef(null);
+  const [status, setStatus] = useState("loading"); // loading | playing | error
+  const [videoReady, setVideoReady] = useState(false);
+  const failedRef = useRef(false);
+
+  const handleError = useCallback(() => {
+    if (failedRef.current) return;
+    failedRef.current = true;
+    console.warn("Hero video failed to load:", src?.substring(0, 80));
+    setStatus("error");
+    onError?.();
+  }, [src, onError]);
+
+  const handleLoaded = useCallback(() => {
+    const v = videoRef.current;
+    if (!v || failedRef.current) return;
+    try {
+      v.play().then(() => {
+        setStatus("playing");
+        setVideoReady(true);
+        onReady?.();
+      }).catch(() => {
+        // Autoplay blocked — video still loaded, show poster + retry on interaction
+        if (!failedRef.current) setStatus("loading");
+      });
+    } catch (e) {
+      // play() threw synchronously — rare
+    }
+  }, [onReady]);
+
   useEffect(() => {
-    const v = ref.current;
+    const v = videoRef.current;
     if (!v || !src) return;
-    
+
+    // Reset on src change
+    failedRef.current = false;
+    setStatus("loading");
+    setVideoReady(false);
+
     v.muted = true;
     v.playsInline = true;
     v.preload = "auto";
-    
-    const play = async () => {
-      try {
-        if (v.paused) {
-          await v.play();
-        }
-      } catch (err) {
-        console.warn("Video autoplay failed, will retry:", err);
+    v.crossOrigin = "anonymous";
+
+    // Retry play on user interaction (Windows autoplay policy workaround)
+    const onInteraction = () => {
+      if (v.paused && !failedRef.current) {
+        v.play().catch(() => {});
       }
     };
-    
-    // Initial play attempt
-    play();
-    
-    // Retry on events
-    v.addEventListener("canplay", play);
-    v.addEventListener("loadeddata", play);
-    v.addEventListener("pause", play);
-    
-    // Retry when page becomes visible
-    const handleVisibility = () => {
-      if (!document.hidden && v.paused) {
-        play();
+
+    // Visibility: pause when hidden, resume when visible
+    const onVisibility = () => {
+      if (document.hidden) {
+        if (!v.paused) v.pause();
+      } else {
+        if (v.paused && !failedRef.current) v.play().catch(() => {});
       }
     };
-    document.addEventListener("visibilitychange", handleVisibility);
-    
-    // Force play after short delay (Windows PC fix)
-    const timeoutId = setTimeout(play, 500);
-    
+
+    document.addEventListener("click", onInteraction, { once: true });
+    document.addEventListener("visibilitychange", onVisibility);
+
     return () => {
-      v.removeEventListener("canplay", play);
-      v.removeEventListener("loadeddata", play);
-      v.removeEventListener("pause", play);
-      document.removeEventListener("visibilitychange", handleVisibility);
-      clearTimeout(timeoutId);
+      document.removeEventListener("click", onInteraction);
+      document.removeEventListener("visibilitychange", onVisibility);
+      // Don't pause on unmount — let CSS handle cleanup
     };
   }, [src]);
-  return ref;
-}
 
-function VideoBackground({ src, className = "" }) {
-  const ref = useAutoPlay(src);
-  
-  // Extract base URL to check for MP4/WebM extensions
-  const getVideoType = (url) => {
-    if (!url) return null;
-    const lower = url.toLowerCase();
-    if (lower.includes('.mp4')) return 'video/mp4';
-    if (lower.includes('.webm')) return 'video/webm';
-    if (lower.includes('.mov')) return 'video/quicktime';
-    return 'video/mp4'; // Default fallback
-  };
-  
-  const videoType = getVideoType(src);
-  
   return (
-    <video
-      ref={ref}
-      autoPlay muted loop playsInline preload="auto"
-      className={`absolute inset-0 w-full h-full object-cover ${className}`}
-      style={{ pointerEvents: "none", background: "#080808" }}
-      poster=""
-      key={src}
-    >
-      <source src={src} type={videoType} />
-      {/* Fallback source without type for maximum compatibility */}
-      <source src={src} />
-    </video>
+    <div className={`absolute inset-0 overflow-hidden ${className}`}>
+      {/* Fallback gradient always present behind video */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: "linear-gradient(135deg, #0a0a0b 0%, #1a1a1e 50%, #0d0d11 100%)",
+        }}
+      />
+
+      {/* Poster image loads first for LCP — always visible behind video */}
+      {poster && (
+        <img
+          src={poster}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+          style={{ zIndex: 0 }}
+        />
+      )}
+
+      {/* Video with fade-in transition */}
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        crossOrigin="anonymous"
+        poster={poster || undefined}
+        onLoadedData={handleLoaded}
+        onCanPlay={handleLoaded}
+        onError={handleError}
+        onStalled={() => {
+          // Stalled can happen on slow connections — don't treat as error yet
+        }}
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{
+          pointerEvents: "none",
+          opacity: videoReady ? 1 : 0,
+          transition: "opacity 0.6s ease-out",
+          zIndex: 1,
+          background: "transparent",
+        }}
+        key={src}
+      >
+        {/* Single source with explicit MIME type for H.264 baseline */}
+        <source src={src} type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
+        <p>Tu navegador no soporta video HTML5.</p>
+      </video>
+
+      {/* Dark overlay on top of video for readability */}
+      <div
+        className="absolute inset-0"
+        style={{
+          zIndex: 2,
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 50%, rgba(0,0,0,0.75) 100%)",
+          pointerEvents: "none",
+        }}
+      />
+    </div>
   );
 }
 
 export default function LandingHero({ bottomOffset } = {}) {
-  // Default bottom offset: desktop lower (closer to corner), mobile higher, 2cm lower
   const effectiveBottomOffset = bottomOffset || "calc(clamp(12vw, 18vw, 140px) - 20px)";
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
@@ -96,6 +160,13 @@ export default function LandingHero({ bottomOffset } = {}) {
   const videoSrc = cfg?.hero_video_url || null;
   const mobileVideoSrc = cfg?.hero_video_mobile_url || null;
   const fallbackImage = cfg?.hero_banner_1_image || null;
+
+  // Track video errors to show fallback gracefully
+  const [desktopVideoError, setDesktopVideoError] = useState(false);
+  const [mobileVideoError, setMobileVideoError] = useState(false);
+
+  const hasDesktopVideo = videoSrc && !desktopVideoError;
+  const hasMobileVideo = mobileVideoSrc && !mobileVideoError;
 
   return (
     <section
@@ -109,52 +180,58 @@ export default function LandingHero({ bottomOffset } = {}) {
         background: "#080808",
       }}
     >
-      {/* Background media */}
       {/* Desktop video: hidden on mobile when a mobile video exists */}
-      {videoSrc && (
-        <>
-          <VideoBackground src={videoSrc} className={mobileVideoSrc ? "hidden md:block" : ""} />
-          {/* Fallback image behind video in case of load failure */}
-          {fallbackImage && (
-            <img src={fallbackImage} alt="" className={`absolute inset-0 w-full h-full object-cover ${mobileVideoSrc ? "hidden md:block" : ""}`} style={{ zIndex: -1 }} loading="eager" />
-          )}
-        </>
+      {hasDesktopVideo && (
+        <HeroVideo
+          src={videoSrc}
+          poster={fallbackImage}
+          className={mobileVideoSrc ? "hidden md:block" : ""}
+          onError={() => setDesktopVideoError(true)}
+        />
       )}
-      {/* Mobile-only video: only renders on mobile */}
-      {mobileVideoSrc && (
-        <>
-          <VideoBackground src={mobileVideoSrc} className="md:hidden" />
-          {/* Fallback image for mobile */}
-          {fallbackImage && (
-            <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover md:hidden" style={{ zIndex: -1 }} loading="eager" />
-          )}
-        </>
+      {/* Mobile-only video */}
+      {hasMobileVideo && (
+        <HeroVideo
+          src={mobileVideoSrc}
+          poster={fallbackImage}
+          className="md:hidden"
+          onError={() => setMobileVideoError(true)}
+        />
       )}
-      {/* Fallback image if no video */}
-      {!videoSrc && !mobileVideoSrc && fallbackImage && (
-        <img src={fallbackImage} alt="" className="absolute inset-0 w-full h-full object-cover" loading="eager" />
+      {/* Fallback image only if no video source at all or both errored */}
+      {(!videoSrc || desktopVideoError) && (!mobileVideoSrc || mobileVideoError) && fallbackImage && (
+        <img
+          src={fallbackImage}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+        />
       )}
 
-      {/* Overlay */}
-      <div className="absolute inset-0" style={{
-        background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 50%, rgba(0,0,0,0.75) 100%)"
-      }} />
+      {/* Gradient overlay for readability */}
+      {((hasDesktopVideo || hasMobileVideo) ? false : true) && (
+        <div className="absolute inset-0" style={{
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 50%, rgba(0,0,0,0.75) 100%)"
+        }} />
+      )}
 
       {/* Bottom-right: slogan */}
-       <motion.div
-         initial={{ opacity: 0, y: 16 }}
-         animate={{ opacity: 1, y: 0 }}
-         transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-         style={{
-           position: "absolute",
-           bottom: effectiveBottomOffset,
-           right: "clamp(24px, 6vw, 56px)",
-           zIndex: 20,
-           textAlign: "right",
-           pointerEvents: "none",
-           willChange: "transform",
-         }}
-       >
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          position: "absolute",
+          bottom: effectiveBottomOffset,
+          right: "clamp(24px, 6vw, 56px)",
+          zIndex: 20,
+          textAlign: "right",
+          pointerEvents: "none",
+          willChange: "transform",
+        }}
+      >
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontSize: "9px",

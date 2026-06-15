@@ -9,13 +9,26 @@ const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
 function useAutoPlayVideo(src) {
   const ref = useRef(null);
+  const failedRef = useRef(false);
+  const [error, setError] = useState(false);
+
   useEffect(() => {
     const vid = ref.current;
     if (!vid || !src) return;
+    failedRef.current = false;
+    setError(false);
+    
     vid.muted = true;
+    vid.playsInline = true;
+    vid.crossOrigin = "anonymous";
+    vid.preload = "auto";
 
     // Intento inicial y ante cualquier pausa inesperada
-    const tryPlay = () => { vid.muted = true; vid.play().catch(() => {}); };
+    const tryPlay = () => { 
+      if (failedRef.current) return;
+      vid.muted = true; 
+      vid.play().catch(() => {}); 
+    };
 
     // Arrancar inmediatamente y en cuanto haya datos
     tryPlay();
@@ -25,6 +38,13 @@ function useAutoPlayVideo(src) {
     // Si se pausa (cambio de pestaña, etc.), volver a reproducir
     vid.addEventListener("pause", tryPlay);
 
+    // Error handling
+    const onError = () => {
+      failedRef.current = true;
+      setError(true);
+    };
+    vid.addEventListener("error", onError);
+
     // Visibilidad: reanudar cuando la pestaña vuelva a ser visible
     const onVisible = () => { if (!document.hidden) tryPlay(); };
     document.addEventListener("visibilitychange", onVisible);
@@ -33,14 +53,26 @@ function useAutoPlayVideo(src) {
       vid.removeEventListener("canplay", tryPlay);
       vid.removeEventListener("loadeddata", tryPlay);
       vid.removeEventListener("pause", tryPlay);
+      vid.removeEventListener("error", onError);
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [src]);
-  return ref;
+  return { ref, error };
 }
 
 function HeroVideo({ src }) {
-  const ref = useAutoPlayVideo(src);
+  const { ref, error } = useAutoPlayVideo(src);
+
+  if (error) {
+    // Fallback: dark gradient placeholder instead of black screen
+    return (
+      <div
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(135deg, #0a0a0b 0%, #1a1a1e 50%, #0d0d11 100%)" }}
+      />
+    );
+  }
+
   return (
     <video
       ref={ref}
@@ -50,9 +82,13 @@ function HeroVideo({ src }) {
       loop
       playsInline
       preload="auto"
+      crossOrigin="anonymous"
       disablePictureInPicture
       className="absolute inset-0 w-full h-full object-cover"
-      style={{ pointerEvents: "none" }}
+      style={{
+        pointerEvents: "none",
+        background: "#0a0a0b",
+      }}
     />
   );
 }
