@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
+import BrandLeadsPanel, { BRAND_STATUS_CONFIG, exportBrandCSV } from "@/components/admin/BrandLeadsPanel";
 
 const LEAD_STATUS_CONFIG = {
   Nuevo: { label: "Nuevo", color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
@@ -310,6 +311,7 @@ export default function ContactLeads() {
   const [tab, setTab] = useState("applications");
   const [selectedLead, setSelectedLead] = useState(null);
   const [selectedApp, setSelectedApp] = useState(null);
+  const [selectedBrand, setSelectedBrand] = useState(null);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [copiedId, setCopiedId] = useState(null);
@@ -345,6 +347,22 @@ export default function ContactLeads() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['applicationForms'] }); setSelectedApp(null); }
   });
 
+  // Brand leads
+  const { data: brandLeads = [], isLoading: brandsLoading } = useQuery({
+    queryKey: ['brandLeads'],
+    queryFn: () => base44.entities.BrandLead.list('-created_date')
+  });
+
+  const updateBrandStatus = useMutation({
+    mutationFn: ({ id, status }) => base44.entities.BrandLead.update(id, { status }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['brandLeads'] })
+  });
+
+  const deleteBrand = useMutation({
+    mutationFn: (id) => base44.entities.BrandLead.delete(id),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['brandLeads'] }); setSelectedBrand(null); }
+  });
+
   // Filtered leads
   const filteredLeads = leads.filter(l => {
     const matchSearch = !search || l.name?.toLowerCase().includes(search.toLowerCase()) || l.email?.toLowerCase().includes(search.toLowerCase());
@@ -357,6 +375,14 @@ export default function ContactLeads() {
     const name = `${a.nombre || ''} ${a.apellidos || ''}`.toLowerCase();
     const matchSearch = !search || name.includes(search.toLowerCase()) || a.email?.toLowerCase().includes(search.toLowerCase());
     const matchStatus = filterStatus === "all" || a.status === filterStatus;
+    return matchSearch && matchStatus;
+  });
+
+  // Filtered brand leads
+  const filteredBrands = brandLeads.filter(b => {
+    const name = `${b.nombre || ''} ${b.apellidos || ''}`.toLowerCase();
+    const matchSearch = !search || name.includes(search.toLowerCase()) || b.email?.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = filterStatus === "all" || b.status === filterStatus;
     return matchSearch && matchStatus;
   });
 
@@ -405,6 +431,7 @@ export default function ContactLeads() {
 
   const newAppsCount = applications.filter(a => a.status === 'nueva').length;
   const newLeadsCount = leads.filter(l => l.status === 'Nuevo').length;
+  const newBrandsCount = brandLeads.filter(b => b.status === 'nueva').length;
 
   return (
     <AdminLayout activePage="ContactLeads">
@@ -444,6 +471,19 @@ export default function ContactLeads() {
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#ff5833] text-white font-bold">{newLeadsCount}</span>
             )}
           </button>
+          <button
+            onClick={() => { setTab("brand"); setSearch(""); setFilterStatus("all"); }}
+            className={`flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold transition-all border-b-2 -mb-px ${
+              tab === "brand"
+                ? "border-[#ff5833] text-white"
+                : "border-transparent text-white/35 hover:text-white/60"
+            }`}
+          >
+            Solicitudes de Marca
+            {newBrandsCount > 0 && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#ff5833] text-white font-bold">{newBrandsCount}</span>
+            )}
+          </button>
         </div>
 
         {/* Search + Filters */}
@@ -473,6 +513,20 @@ export default function ContactLeads() {
                   <Download className="w-3.5 h-3.5" /> CSV
                 </button>
               </>
+            ) : tab === "brand" ? (
+              <>
+                {["all","nueva","revisada","contactada","aceptada","rechazada"].map(s => (
+                  <button key={s} onClick={() => setFilterStatus(s)}
+                    className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-medium transition-all border ${
+                      filterStatus === s ? 'bg-white/10 text-white border-white/20' : 'bg-transparent text-white/35 border-white/[0.07] hover:border-white/15 hover:text-white/60'
+                    }`}>
+                    {s === "all" ? "Todos" : (BRAND_STATUS_CONFIG[s]?.label || s)}
+                  </button>
+                ))}
+                <button onClick={() => exportBrandCSV(brandLeads)} className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-medium border border-white/[0.07] text-white/35 hover:text-white/60 hover:border-white/15 transition-all">
+                  <Download className="w-3.5 h-3.5" /> CSV
+                </button>
+              </>
             ) : (
               ["all","Nuevo","Revisado","Archivado"].map(s => (
                 <button key={s} onClick={() => setFilterStatus(s)}
@@ -486,248 +540,218 @@ export default function ContactLeads() {
           </div>
         </div>
 
-        {/* APPLICATION FORMS */}
-        {tab === "applications" && (
-          appsLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="w-6 h-6 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
-            </div>
-          ) : filteredApps.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 rounded-2xl border border-white/[0.05] bg-white/[0.02]">
-              <FileText className="w-12 h-12 text-white/10 mb-3" />
-              <p className="text-white/25 text-sm">No hay solicitudes de plaza</p>
-            </div>
-          ) : (
-            <div className="space-y-3 sm:space-y-4 pb-4">
-              {filteredApps.map((app, i) => {
-                const cfg = APP_STATUS_CONFIG[app.status] || APP_STATUS_CONFIG.nueva;
-                const presupuestoTexto = app.presupuesto_disponible || app.presupuesto || 'No especificado';
-                const generos = Array.isArray(app.generos_musicales) ? app.generos_musicales : [];
-                return (
-                  <motion.div key={app.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.025 }}
-                    className="group bg-[#111113] border border-white/[0.06] hover:border-white/[0.12] rounded-xl p-3 sm:p-4 transition-all"
-                  >
-                    <div className="flex items-start gap-3 sm:gap-4">
-                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex-shrink-0 flex items-center justify-center font-bold text-xs sm:text-sm ${
-                        app.status === 'nueva' ? 'bg-[#ff5833]/15 text-[#ff5833]' : 'bg-white/[0.06] text-white/40'
-                      }`}>
-                        {app.nombre?.charAt(0)?.toUpperCase() || '?'}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm sm:text-base font-semibold text-white">{app.nombre} {app.apellidos}</span>
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${cfg.color}`}>{cfg.label}</span>
-                        </div>
-                        {app.status === 'nueva' && <span className="w-2 h-2 rounded-full bg-[#ff5833] animate-pulse" />}
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
-                        <div className="flex flex-col gap-1 text-xs text-white/40">
-                          <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{app.email}</span>
-                          {app.telefono && <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{app.telefono}</span>}
-                          {app.pais_residencia && <span className="flex items-center gap-1.5"><span className="w-3 h-3 flex items-center justify-center">📍</span>{app.pais_residencia}</span>}
-                        </div>
-                        <div className="flex flex-col gap-1.5">
-                          {generos.length > 0 && (
-                            <div className="flex flex-wrap gap-1">
-                              {generos.slice(0, 3).map(g => (
-                                <span key={g} style={{ fontSize: "9px", padding: "1px 6px", borderRadius: "20px", background: "rgba(255,88,51,0.12)", border: "1px solid rgba(255,88,51,0.25)", color: "#ff5833", fontWeight: 600, fontFamily: "'Helvetica Neue', sans-serif" }}>{g}</span>
-                              ))}
-                              {generos.length > 3 && <span className="text-[9px] text-white/25">+{generos.length - 3}</span>}
-                            </div>
-                          )}
-                          <div className="flex flex-wrap items-center gap-1">
-                            {app.fase_proyecto && <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.fase_proyecto}</span>}
-                            {app.timing_arranque && <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.timing_arranque}</span>}
-                          </div>
-                          <span className="text-[10px] px-2 py-1.5 rounded-lg bg-[#ff5833]/10 border border-[#ff5833]/20 text-[#ff5833] font-medium inline-block w-fit">
-                            {presupuestoTexto}
-                          </span>
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-white/25 flex items-center gap-1 mb-2">
-                        <Calendar className="w-3 h-3 flex-shrink-0" />
-                        {app.fecha_envio
-                          ? new Date(app.fecha_envio).toLocaleString("en-GB", { timeZone: "Europe/Madrid", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
-                          : app.created_date
-                            ? format(parseISO(app.created_date), "d MMM yyyy • HH:mm", { locale: es })
-                            : 'No date available'
-                        }
-                      </p>
-                      {/* Botones de acción rápida */}
-                      <div className="flex items-center gap-1.5">
-                          <a
-                            href={`mailto:${app.email}`}
-                            className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white hover:border-white/15 transition-all text-[10px] font-medium"
-                            title="Enviar email"
-                          >
-                            <Mail className="w-3 h-3" />
-                          </a>
-                          {app.telefono && app.telefono !== '-' && (
-                            <>
-                              <a
-                                href={`tel:${app.telefono}`}
-                                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white hover:border-white/15 transition-all text-[10px] font-medium"
-                                title="Llamar"
-                              >
-                                <Phone className="w-3 h-3" />
-                              </a>
-                              <a
-                                href={`https://wa.me/${app.telefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${app.nombre}, soy el equipo de Cabaña Creative. Hemos recibido tu solicitud y nos gustaría conocer más sobre tu proyecto. ¿Tienes disponibilidad para una videollamada esta semana?`)}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-emerald-400 hover:border-emerald-500/30 transition-all text-[10px] font-medium"
-                                title="WhatsApp"
-                              >
-                                <MessageSquare className="w-3 h-3" />
-                              </a>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <button
-                        onClick={() => copyAppData(app)}
-                        className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-[#ff5833]/20 flex items-center justify-center transition-colors"
-                        title="Copiar datos"
-                      >
-                        {copiedId === app.id ? (
-                          <Check className="w-3.5 h-3.5 text-[#ff5833]" />
-                        ) : (
-                          <Copy className="w-3.5 h-3.5 text-white/50" />
-                        )}
-                      </button>
-                      <button onClick={() => setSelectedApp(app)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
-                        <Eye className="w-3.5 h-3.5 text-white/50" />
-                      </button>
-                      <select
-                        value={app.status}
-                        onChange={e => updateAppStatus.mutate({ id: app.id, status: e.target.value })}
-                        className="h-7 sm:h-8 px-1.5 sm:px-2 rounded-lg bg-white/[0.05] border border-white/[0.08] text-white/50 text-[10px] sm:text-xs focus:outline-none hover:bg-white/10 transition-colors cursor-pointer"
-                        style={{ appearance: "none", paddingRight: "6px" }}
-                      >
-                        {Object.entries(APP_STATUS_CONFIG).map(([k, v]) => (
-                          <option key={k} value={k} style={{ background: "#111" }}>{v.label}</option>
-                        ))}
-                      </select>
-                      <button onClick={() => deleteApp.mutate(app.id)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-red-500/10 flex items-center justify-center transition-colors group/del" title="Eliminar">
-                        <Trash2 className="w-3.5 h-3.5 text-white/30 group-hover/del:text-red-400 transition-colors" />
-                      </button>
-                      </div>
-                      </div>
-                      </motion.div>
-                      );
-              })}
-            </div>
-          )
+      {/* BRAND LEADS */}
+        {tab === "brand" && (
+          <BrandLeadsPanel
+            brands={filteredBrands}
+            isLoading={brandsLoading}
+            updateBrandStatus={updateBrandStatus}
+            deleteBrand={deleteBrand}
+            selectedBrand={selectedBrand}
+            setSelectedBrand={setSelectedBrand}
+            copiedId={copiedId}
+            setCopiedId={setCopiedId}
+            filterStatus={filterStatus}
+          />
         )}
 
-        {/* CONTACT LEADS */}
-        {tab === "contact" && (
-          leadsLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="w-6 h-6 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
-            </div>
-          ) : filteredLeads.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 rounded-2xl border border-white/[0.05] bg-white/[0.02]">
-              <Mail className="w-12 h-12 text-white/10 mb-3" />
-              <p className="text-white/25 text-sm">No hay mensajes de contacto</p>
-            </div>
-          ) : (
-            <div className="space-y-3 sm:space-y-4 pb-4">
-              {filteredLeads.map((lead, i) => {
-                const cfg = LEAD_STATUS_CONFIG[lead.status] || LEAD_STATUS_CONFIG.Nuevo;
-                return (
-                  <motion.div key={lead.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
-                    className="group bg-[#111113] border border-white/[0.06] hover:border-white/[0.12] rounded-xl p-3 sm:p-4 transition-all"
-                  >
-                    <div className="flex items-start gap-3 sm:gap-4">
-                      <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex-shrink-0 flex items-center justify-center font-bold text-xs sm:text-sm ${
-                        lead.status === 'Nuevo' ? 'bg-[#ff5833]/15 text-[#ff5833]' : 'bg-white/[0.06] text-white/40'
-                      }`}>
-                        {lead.name?.charAt(0)?.toUpperCase() || '?'}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-2">
-                          <span className="text-sm sm:text-base font-semibold text-white">{lead.name}</span>
-                          <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${cfg.color}`}>{cfg.label}</span>
-                        </div>
-                        {lead.status === 'Nuevo' && <span className="w-2 h-2 rounded-full bg-[#ff5833] animate-pulse mb-2" />}
-                        <div className="flex flex-col gap-2 text-xs text-white/40 mb-2">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{lead.email}</span>
+        {tab !== "brand" && (
+          <>
+            {/* APPLICATION FORMS */}
+            {tab === "applications" && (
+              appsLoading ? (
+                <div className="flex items-center justify-center py-20">
+                  <div className="w-6 h-6 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
+                </div>
+              ) : filteredApps.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 rounded-2xl border border-white/[0.05] bg-white/[0.02]">
+                  <FileText className="w-12 h-12 text-white/10 mb-3" />
+                  <p className="text-white/25 text-sm">No hay solicitudes de plaza</p>
+                </div>
+              ) : (
+                <div className="space-y-3 sm:space-y-4 pb-4">
+                  {filteredApps.map((app, i) => {
+                    const cfg = APP_STATUS_CONFIG[app.status] || APP_STATUS_CONFIG.nueva;
+                    const presupuestoTexto = app.presupuesto_disponible || app.presupuesto || 'No especificado';
+                    const generos = Array.isArray(app.generos_musicales) ? app.generos_musicales : [];
+                    return (
+                      <motion.div key={app.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.025 }}
+                        className="group bg-[#111113] border border-white/[0.06] hover:border-white/[0.12] rounded-xl p-3 sm:p-4 transition-all"
+                      >
+                        <div className="flex items-start gap-3 sm:gap-4">
+                          <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex-shrink-0 flex items-center justify-center font-bold text-xs sm:text-sm ${
+                            app.status === 'nueva' ? 'bg-[#ff5833]/15 text-[#ff5833]' : 'bg-white/[0.06] text-white/40'
+                          }`}>
+                            {app.nombre?.charAt(0)?.toUpperCase() || '?'}
                           </div>
-                          {lead.phone && lead.phone !== '-' && (
-                            <div className="flex items-center gap-2">
-                              <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{lead.phone}</span>
-                              <a href={`tel:${lead.phone}`} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/[0.06] text-white/60 border border-white/[0.08] hover:bg-white/[0.1] hover:text-white transition-all text-[10px] font-medium">
-                                <Phone className="w-3 h-3" /> Llamar
-                              </a>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2 mb-2">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-sm sm:text-base font-semibold text-white">{app.nombre} {app.apellidos}</span>
+                                <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${cfg.color}`}>{cfg.label}</span>
+                              </div>
+                              {app.status === 'nueva' && <span className="w-2 h-2 rounded-full bg-[#ff5833] animate-pulse" />}
                             </div>
-                          )}
-                        </div>
-                        <p className="text-xs text-white/50 leading-relaxed mb-2 line-clamp-2">{lead.message}</p>
-                        {lead.created_date && <p className="text-[10px] text-white/25 flex items-center gap-1"><Calendar className="w-3 h-3" />{format(parseISO(lead.created_date), "d MMM yyyy", { locale: es })}</p>}
-                        {/* Botones de acción rápida */}
-                        <div className="flex items-center gap-1.5 mt-2">
-                          <a
-                            href={`mailto:${lead.email}`}
-                            className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white hover:border-white/15 transition-all text-[10px] font-medium"
-                            title="Enviar email"
-                          >
-                            <Mail className="w-3 h-3" />
-                          </a>
-                          {lead.phone && lead.phone !== '-' && (
-                            <>
-                              <a
-                                href={`tel:${lead.phone}`}
-                                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white hover:border-white/15 transition-all text-[10px] font-medium"
-                                title="Llamar"
-                              >
-                                <Phone className="w-3 h-3" />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                              <div className="flex flex-col gap-1 text-xs text-white/40">
+                                <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{app.email}</span>
+                                {app.telefono && <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{app.telefono}</span>}
+                                {app.pais_residencia && <span className="flex items-center gap-1.5"><span className="w-3 h-3 flex items-center justify-center">📍</span>{app.pais_residencia}</span>}
+                              </div>
+                              <div className="flex flex-col gap-1.5">
+                                {generos.length > 0 && (
+                                  <div className="flex flex-wrap gap-1">
+                                    {generos.slice(0, 3).map(g => (
+                                      <span key={g} style={{ fontSize: "9px", padding: "1px 6px", borderRadius: "20px", background: "rgba(255,88,51,0.12)", border: "1px solid rgba(255,88,51,0.25)", color: "#ff5833", fontWeight: 600, fontFamily: "'Helvetica Neue', sans-serif" }}>{g}</span>
+                                    ))}
+                                    {generos.length > 3 && <span className="text-[9px] text-white/25">+{generos.length - 3}</span>}
+                                  </div>
+                                )}
+                                <div className="flex flex-wrap items-center gap-1">
+                                  {app.fase_proyecto && <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.fase_proyecto}</span>}
+                                  {app.timing_arranque && <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50">{app.timing_arranque}</span>}
+                                </div>
+                                <span className="text-[10px] px-2 py-1.5 rounded-lg bg-[#ff5833]/10 border border-[#ff5833]/20 text-[#ff5833] font-medium inline-block w-fit">
+                                  {presupuestoTexto}
+                                </span>
+                              </div>
+                            </div>
+                            <p className="text-[10px] text-white/25 flex items-center gap-1 mb-2">
+                              <Calendar className="w-3 h-3 flex-shrink-0" />
+                              {app.fecha_envio
+                                ? new Date(app.fecha_envio).toLocaleString("en-GB", { timeZone: "Europe/Madrid", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+                                : app.created_date
+                                  ? format(parseISO(app.created_date), "d MMM yyyy • HH:mm", { locale: es })
+                                  : 'No date available'
+                              }
+                            </p>
+                            <div className="flex items-center gap-1.5">
+                              <a href={`mailto:${app.email}`} className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white hover:border-white/15 transition-all text-[10px] font-medium" title="Enviar email">
+                                <Mail className="w-3 h-3" />
                               </a>
-                              <a
-                                href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${lead.name}, soy el equipo de Cabaña Creative. Hemos recibido tu mensaje y estamos aquí para ayudarte. ¿Cuándo te vendría bien una videollamada?`)}`}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-emerald-400 hover:border-emerald-500/30 transition-all text-[10px] font-medium"
-                                title="WhatsApp"
-                              >
-                                <MessageSquare className="w-3 h-3" />
-                              </a>
-                            </>
-                          )}
+                              {app.telefono && app.telefono !== '-' && (
+                                <>
+                                  <a href={`tel:${app.telefono}`} className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white hover:border-white/15 transition-all text-[10px] font-medium" title="Llamar">
+                                    <Phone className="w-3 h-3" />
+                                  </a>
+                                  <a href={`https://wa.me/${app.telefono.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${app.nombre}, soy el equipo de Cabaña Creative. Hemos recibido tu solicitud y nos gustaría conocer más sobre tu proyecto. ¿Tienes disponibilidad para una videollamada esta semana?`)}`} target="_blank" rel="noreferrer" className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-emerald-400 hover:border-emerald-500/30 transition-all text-[10px] font-medium" title="WhatsApp">
+                                    <MessageSquare className="w-3 h-3" />
+                                  </a>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <button onClick={() => copyAppData(app)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-[#ff5833]/20 flex items-center justify-center transition-colors" title="Copiar datos">
+                              {copiedId === app.id ? <Check className="w-3.5 h-3.5 text-[#ff5833]" /> : <Copy className="w-3.5 h-3.5 text-white/50" />}
+                            </button>
+                            <button onClick={() => setSelectedApp(app)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
+                              <Eye className="w-3.5 h-3.5 text-white/50" />
+                            </button>
+                            <select value={app.status} onChange={e => updateAppStatus.mutate({ id: app.id, status: e.target.value })}
+                              className="h-7 sm:h-8 px-1.5 sm:px-2 rounded-lg bg-white/[0.05] border border-white/[0.08] text-white/50 text-[10px] sm:text-xs focus:outline-none hover:bg-white/10 transition-colors cursor-pointer"
+                              style={{ appearance: "none", paddingRight: "6px" }}>
+                              {Object.entries(APP_STATUS_CONFIG).map(([k, v]) => (
+                                <option key={k} value={k} style={{ background: "#111" }}>{v.label}</option>
+                              ))}
+                            </select>
+                            <button onClick={() => deleteApp.mutate(app.id)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-red-500/10 flex items-center justify-center transition-colors group/del" title="Eliminar">
+                              <Trash2 className="w-3.5 h-3.5 text-white/30 group-hover/del:text-red-400 transition-colors" />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <button
-                          onClick={() => copyLeadData(lead)}
-                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-[#ff5833]/20 flex items-center justify-center transition-colors"
-                          title="Copiar datos"
-                        >
-                          {copiedId === lead.id ? (
-                            <Check className="w-3.5 h-3.5 text-[#ff5833]" />
-                          ) : (
-                            <Copy className="w-3.5 h-3.5 text-white/50" />
-                          )}
-                        </button>
-                        <button onClick={() => handleViewLead(lead)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
-                          <Eye className="w-3.5 h-3.5 text-white/50" />
-                        </button>
-                        <button onClick={() => updateLeadStatus.mutate({ id: lead.id, status: lead.status === 'Archivado' ? 'Revisado' : 'Archivado' })}
-                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title={lead.status === 'Archivado' ? 'Desarchivar' : 'Archivar'}>
-                          <Archive className={`w-3.5 h-3.5 ${lead.status === 'Archivado' ? 'text-[#ff5833]' : 'text-white/50'}`} />
-                        </button>
-                        <button onClick={() => deleteLead.mutate(lead.id)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-red-500/10 flex items-center justify-center transition-colors group/del" title="Eliminar">
-                          <Trash2 className="w-3.5 h-3.5 text-white/30 group-hover/del:text-red-400 transition-colors" />
-                        </button>
-                      </div>
-                      </div>
                       </motion.div>
-                      );
-              })}
-            </div>
-          )
+                    );
+                  })}
+                </div>
+              )
+            )}
+
+            {/* CONTACT LEADS */}
+            {tab === "contact" && (
+              leadsLoading ? (
+                <div className="flex items-center justify-center py-20">
+                  <div className="w-6 h-6 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
+                </div>
+              ) : filteredLeads.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 rounded-2xl border border-white/[0.05] bg-white/[0.02]">
+                  <Mail className="w-12 h-12 text-white/10 mb-3" />
+                  <p className="text-white/25 text-sm">No hay mensajes de contacto</p>
+                </div>
+              ) : (
+                <div className="space-y-3 sm:space-y-4 pb-4">
+                  {filteredLeads.map((lead, i) => {
+                    const cfg = LEAD_STATUS_CONFIG[lead.status] || LEAD_STATUS_CONFIG.Nuevo;
+                    return (
+                      <motion.div key={lead.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
+                        className="group bg-[#111113] border border-white/[0.06] hover:border-white/[0.12] rounded-xl p-3 sm:p-4 transition-all"
+                      >
+                        <div className="flex items-start gap-3 sm:gap-4">
+                          <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex-shrink-0 flex items-center justify-center font-bold text-xs sm:text-sm ${
+                            lead.status === 'Nuevo' ? 'bg-[#ff5833]/15 text-[#ff5833]' : 'bg-white/[0.06] text-white/40'
+                          }`}>
+                            {lead.name?.charAt(0)?.toUpperCase() || '?'}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-2">
+                              <span className="text-sm sm:text-base font-semibold text-white">{lead.name}</span>
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full border font-medium ${cfg.color}`}>{cfg.label}</span>
+                            </div>
+                            {lead.status === 'Nuevo' && <span className="w-2 h-2 rounded-full bg-[#ff5833] animate-pulse mb-2" />}
+                            <div className="flex flex-col gap-2 text-xs text-white/40 mb-2">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="flex items-center gap-1.5"><Mail className="w-3 h-3" />{lead.email}</span>
+                              </div>
+                              {lead.phone && lead.phone !== '-' && (
+                                <div className="flex items-center gap-2">
+                                  <span className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{lead.phone}</span>
+                                  <a href={`tel:${lead.phone}`} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/[0.06] text-white/60 border border-white/[0.08] hover:bg-white/[0.1] hover:text-white transition-all text-[10px] font-medium">
+                                    <Phone className="w-3 h-3" /> Llamar
+                                  </a>
+                                </div>
+                              )}
+                            </div>
+                            <p className="text-xs text-white/50 leading-relaxed mb-2 line-clamp-2">{lead.message}</p>
+                            {lead.created_date && <p className="text-[10px] text-white/25 flex items-center gap-1"><Calendar className="w-3 h-3" />{format(parseISO(lead.created_date), "d MMM yyyy", { locale: es })}</p>}
+                            <div className="flex items-center gap-1.5 mt-2">
+                              <a href={`mailto:${lead.email}`} className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white hover:border-white/15 transition-all text-[10px] font-medium" title="Enviar email">
+                                <Mail className="w-3 h-3" />
+                              </a>
+                              {lead.phone && lead.phone !== '-' && (
+                                <>
+                                  <a href={`tel:${lead.phone}`} className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-white hover:border-white/15 transition-all text-[10px] font-medium" title="Llamar">
+                                    <Phone className="w-3 h-3" />
+                                  </a>
+                                  <a href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hola ${lead.name}, soy el equipo de Cabaña Creative. Hemos recibido tu mensaje y estamos aquí para ayudarte. ¿Cuándo te vendría bien una videollamada?`)}`} target="_blank" rel="noreferrer" className="flex items-center gap-1 px-2 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 hover:text-emerald-400 hover:border-emerald-500/30 transition-all text-[10px] font-medium" title="WhatsApp">
+                                    <MessageSquare className="w-3 h-3" />
+                                  </a>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <button onClick={() => copyLeadData(lead)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-[#ff5833]/20 flex items-center justify-center transition-colors" title="Copiar datos">
+                              {copiedId === lead.id ? <Check className="w-3.5 h-3.5 text-[#ff5833]" /> : <Copy className="w-3.5 h-3.5 text-white/50" />}
+                            </button>
+                            <button onClick={() => handleViewLead(lead)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title="Ver detalle">
+                              <Eye className="w-3.5 h-3.5 text-white/50" />
+                            </button>
+                            <button onClick={() => updateLeadStatus.mutate({ id: lead.id, status: lead.status === 'Archivado' ? 'Revisado' : 'Archivado' })}
+                              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-white/10 flex items-center justify-center transition-colors" title={lead.status === 'Archivado' ? 'Desarchivar' : 'Archivar'}>
+                              <Archive className={`w-3.5 h-3.5 ${lead.status === 'Archivado' ? 'text-[#ff5833]' : 'text-white/50'}`} />
+                            </button>
+                            <button onClick={() => deleteLead.mutate(lead.id)} className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/[0.05] hover:bg-red-500/10 flex items-center justify-center transition-colors group/del" title="Eliminar">
+                              <Trash2 className="w-3.5 h-3.5 text-white/30 group-hover/del:text-red-400 transition-colors" />
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )
+            )}
+          </>
         )}
       </div>
 

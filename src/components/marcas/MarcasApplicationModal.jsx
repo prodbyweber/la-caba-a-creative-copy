@@ -1,123 +1,96 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
 
-const COUNTRIES_CITIES = {
-  "España": ["Madrid", "Barcelona", "Valencia", "Sevilla", "Bilbao", "Málaga", "Zaragoza", "Murcia", "Palma", "Las Palmas", "Alicante", "Córdoba", "Valladolid", "Vigo", "Gijón", "Granada", "Otra"],
-  "México": ["Ciudad de México", "Guadalajara", "Monterrey", "Puebla", "Tijuana", "León", "Juárez", "Cancún", "Mérida", "Querétaro", "Otra"],
-  "Argentina": ["Buenos Aires", "Córdoba", "Rosario", "Mendoza", "Tucumán", "La Plata", "Mar del Plata", "Salta", "Santa Fe", "Otra"],
-  "Colombia": ["Bogotá", "Medellín", "Cali", "Barranquilla", "Cartagena", "Bucaramanga", "Pereira", "Manizales", "Otra"],
-  "Chile": ["Santiago", "Valparaíso", "Concepción", "La Serena", "Antofagasta", "Temuco", "Iquique", "Puerto Montt", "Otra"],
-  "Perú": ["Lima", "Arequipa", "Trujillo", "Chiclayo", "Iquitos", "Cusco", "Piura", "Otra"],
-  "Venezuela": ["Caracas", "Maracaibo", "Valencia", "Barquisimeto", "Maracay", "Otra"],
-  "Ecuador": ["Quito", "Guayaquil", "Cuenca", "Ambato", "Santo Domingo", "Otra"],
-  "Bolivia": ["La Paz", "Santa Cruz", "Cochabamba", "Sucre", "Oruro", "Otra"],
-  "Paraguay": ["Asunción", "Ciudad del Este", "San Lorenzo", "Luque", "Otra"],
-  "Uruguay": ["Montevideo", "Salto", "Paysandú", "Las Piedras", "Otra"],
-  "Cuba": ["La Habana", "Santiago de Cuba", "Holguín", "Camagüey", "Otra"],
-  "República Dominicana": ["Santo Domingo", "Santiago", "La Romana", "San Pedro de Macorís", "Otra"],
-  "Guatemala": ["Ciudad de Guatemala", "Mixco", "Villa Nueva", "Antigua", "Otra"],
-  "Honduras": ["Tegucigalpa", "San Pedro Sula", "Choloma", "Otra"],
-  "El Salvador": ["San Salvador", "Santa Ana", "San Miguel", "Otra"],
-  "Nicaragua": ["Managua", "León", "Masaya", "Chinandega", "Otra"],
-  "Costa Rica": ["San José", "Alajuela", "Desamparados", "San Carlos", "Otra"],
-  "Panamá": ["Ciudad de Panamá", "San Miguelito", "Colón", "David", "Otra"],
-  "Puerto Rico": ["San Juan", "Bayamón", "Carolina", "Ponce", "Otra"],
-  "Estados Unidos": ["Nueva York", "Los Ángeles", "Chicago", "Miami", "Houston", "Phoenix", "Philadelphia", "Dallas", "San Antonio", "San Diego", "San José", "Austin", "Jacksonville", "Otra"],
-  "Reino Unido": ["Londres", "Birmingham", "Manchester", "Glasgow", "Liverpool", "Leeds", "Sheffield", "Edinburgh", "Otra"],
-  "Francia": ["París", "Marsella", "Lyon", "Toulouse", "Niza", "Nantes", "Estrasburgo", "Burdeos", "Otra"],
-  "Alemania": ["Berlín", "Hamburgo", "Múnich", "Colonia", "Frankfurt", "Stuttgart", "Düsseldorf", "Otra"],
-  "Italia": ["Roma", "Milán", "Nápoles", "Turín", "Palermo", "Génova", "Bolonia", "Otra"],
-  "Portugal": ["Lisboa", "Oporto", "Braga", "Setúbal", "Coímbra", "Otra"],
-  "Países Bajos": ["Ámsterdam", "Rotterdam", "La Haya", "Utrecht", "Eindhoven", "Otra"],
-  "Bélgica": ["Bruselas", "Amberes", "Gante", "Lieja", "Brujas", "Otra"],
-  "Suiza": ["Zúrich", "Ginebra", "Basilea", "Berna", "Lausana", "Otra"],
-  "Austria": ["Viena", "Graz", "Linz", "Salzburgo", "Innsbruck", "Otra"],
-  "Polonia": ["Varsovia", "Cracovia", "Lodz", "Wroclaw", "Poznan", "Otra"],
-  "Rumania": ["Bucarest", "Cluj-Napoca", "Timisoara", "Iasi", "Otra"],
-  "Suecia": ["Estocolmo", "Gotemburgo", "Malmö", "Uppsala", "Otra"],
-  "Noruega": ["Oslo", "Bergen", "Trondheim", "Stavanger", "Otra"],
-  "Dinamarca": ["Copenhague", "Aarhus", "Odense", "Aalborg", "Otra"],
-  "Finlandia": ["Helsinki", "Espoo", "Tampere", "Vantaa", "Otra"],
-  "Japón": ["Tokio", "Osaka", "Kioto", "Yokohama", "Kobe", "Sapporo", "Otra"],
-  "China": ["Pekín", "Shanghái", "Cantón", "Shenzhen", "Chengdu", "Otra"],
-  "India": ["Bombay", "Delhi", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Otra"],
-  "Brasil": ["São Paulo", "Río de Janeiro", "Brasilia", "Salvador", "Fortaleza", "Belo Horizonte", "Otra"],
-  "Australia": ["Sídney", "Melbourne", "Brisbane", "Perth", "Adelaida", "Otra"],
-  "Canadá": ["Toronto", "Montreal", "Vancouver", "Calgary", "Edmonton", "Ottawa", "Otra"],
-  "Otro": ["Otra"],
-};
-
-const COUNTRIES = Object.keys(COUNTRIES_CITIES);
-
-const PHONE_CODES = [
-  { code: "+34", country: "🇪🇸 ES" },
-  { code: "+52", country: "🇲🇽 MX" },
-  { code: "+54", country: "🇦🇷 AR" },
-  { code: "+57", country: "🇨🇴 CO" },
-  { code: "+56", country: "🇨🇱 CL" },
-  { code: "+51", country: "🇵🇪 PE" },
-  { code: "+58", country: "🇻🇪 VE" },
-  { code: "+593", country: "🇪🇨 EC" },
-  { code: "+1", country: "🇺🇸 US" },
-  { code: "+44", country: "🇬🇧 UK" },
-  { code: "+33", country: "🇫🇷 FR" },
-  { code: "+49", country: "🇩🇪 DE" },
-  { code: "+55", country: "🇧🇷 BR" },
-];
-
+// ── Step definitions ────────────────────────────────────────────────────────
 const STEPS = [
-  { id: 1, label: "Datos" },
-  { id: 2, label: "Ubicación" },
-  { id: 3, label: "Experiencia" },
+  { id: 1, label: "Contacto" },
+  { id: 2, label: "Empresa" },
+  { id: 3, label: "Tu Marca" },
 ];
 
-const SECTORES_EMPRESA = [
-  "Moda y Streetwear",
-  "Calzado",
-  "Bebidas",
-  "Belleza y Cosmética",
-  "Audio y Tecnología",
-  "Eventos y Conciertos",
-  "Hostelería",
+// ── Form options ─────────────────────────────────────────────────────────────
+const CARGOS = [
+  "CEO / Fundador",
+  "Socio / Co-fundador",
+  "Director General",
+  "Director de Marketing",
+  "Director Creativo",
+  "Responsable de Marca",
+  "Responsable de Comunicación",
+  "Responsable de Contenido / Social Media",
   "Otro",
 ];
 
-const PRESUPUESTO_OPTIONS = [
-  "Cuento con un presupuesto de 5.000€ o más para mi proyecto.",
-  "Cuento con un presupuesto mínimo de 3.000€ para comenzar.",
-  "Estoy comprometido y abierto a explorar un plan de financiamiento.",
-  "Por ahora no cuento con presupuesto disponible.",
+const SECTORES = [
+  "Moda", "Belleza", "Tecnología", "Hostelería", "Fitness",
+  "Educación", "Inmobiliaria", "Salud", "Entretenimiento", "Retail",
+  "Automoción", "Finanzas", "Gastronomía", "Turismo", "Marca personal",
+  "Música y Audio", "Otro",
 ];
 
-const BLOCKED_PRESUPUESTO = "Por ahora no cuento con presupuesto disponible.";
+const TAMANO_EQUIPO = [
+  "Solo yo o un equipo muy pequeño",
+  "Entre 2 y 10 personas",
+  "Entre 11 y 50 personas",
+  "Más de 50 personas",
+];
 
+const UBICACION = [
+  "Sí, estoy en Madrid o cerca",
+  "Sí, tengo disposición de viajar",
+  "No, prefiero trabajar de forma remota",
+];
+
+const PRESENCIA_DIGITAL = [
+  "Apenas tenemos presencia, queremos arrancar",
+  "Tenemos redes pero no conectan con la Gen Z",
+  "Tenemos contenido pero no convierte",
+  "Ya tenemos tracción y queremos escalar",
+];
+
+const OBJETIVO = [
+  "Conectar con audiencia Gen Z",
+  "Aumentar ventas y conversión",
+  "Construir una identidad de marca sólida",
+  "Crear contenido recurrente y consistente",
+];
+
+const PRESUPUESTO = [
+  "Sí, puedo invertir si el proyecto tiene sentido para mí",
+  "Sí, pero necesitaría dividirlo en dos pagos",
+  "Todavía no estoy en posición de invertir",
+];
+
+const BLOCKED_PRESUPUESTO = "Todavía no estoy en posición de invertir";
+
+const TIMING = [
+  "Ahora mismo, estoy listo",
+  "La semana que viene",
+  "El próximo mes",
+  "Todavía no quiero comenzar",
+];
+
+const BLOCKED_TIMING = "Todavía no quiero comenzar";
+
+// ── Styles ───────────────────────────────────────────────────────────────────
 const inputStyle = {
-  width: "100%",
-  background: "#141414",
-  border: "1px solid rgba(255,255,255,0.1)",
-  borderRadius: "8px",
-  padding: "10px 13px",
-  fontSize: "14px",
-  color: "#f0ede8",
-  fontFamily: "'Helvetica Neue', sans-serif",
-  outline: "none",
-  boxSizing: "border-box",
+  width: "100%", background: "#141414", border: "1px solid rgba(255,255,255,0.1)",
+  borderRadius: "8px", padding: "10px 13px", fontSize: "14px", color: "#f0ede8",
+  fontFamily: "'Helvetica Neue', sans-serif", outline: "none", boxSizing: "border-box",
   transition: "border-color 0.2s",
 };
 
 const labelStyle = {
-  fontFamily: "'Helvetica Neue', sans-serif",
-  fontSize: "12px",
-  fontWeight: 600,
-  color: "rgba(240,237,232,0.6)",
-  marginBottom: "5px",
-  display: "block",
+  fontFamily: "'Helvetica Neue', sans-serif", fontSize: "12px", fontWeight: 600,
+  color: "rgba(240,237,232,0.6)", marginBottom: "5px", display: "block",
 };
 
 const fieldWrap = { display: "flex", flexDirection: "column", gap: "4px" };
 
+// ── Sub-components ───────────────────────────────────────────────────────────
 function Label({ children, required }) {
   return (
     <label style={labelStyle}>
@@ -148,8 +121,7 @@ function StepIndicator({ current }) {
                 {done ? "✓" : s.id}
               </div>
               <span style={{
-                fontFamily: "'Helvetica Neue', sans-serif",
-                fontSize: "10px",
+                fontFamily: "'Helvetica Neue', sans-serif", fontSize: "10px",
                 fontWeight: active ? 700 : 400,
                 color: active ? "#f0ede8" : "rgba(240,237,232,0.3)",
               }}>{s.label}</span>
@@ -158,8 +130,7 @@ function StepIndicator({ current }) {
               <div style={{
                 flex: 1, height: "1px", margin: "0 6px",
                 background: done ? "#ff5833" : "rgba(255,255,255,0.1)",
-                marginBottom: "18px",
-                transition: "background 0.3s",
+                marginBottom: "18px", transition: "background 0.3s",
               }} />
             )}
           </React.Fragment>
@@ -169,14 +140,110 @@ function StepIndicator({ current }) {
   );
 }
 
+/** Dropdown / accordion selector — closed by default, click to open */
+function AccordionSelect({ value, onChange, options, placeholder = "Selecciona una opción", hasError = false }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div style={{ position: "relative" }}>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        style={{
+          ...inputStyle,
+          borderColor: hasError ? "#ff5833" : open ? "rgba(255,88,51,0.5)" : "rgba(255,255,255,0.1)",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          cursor: "pointer", textAlign: "left", paddingRight: "10px",
+        }}
+      >
+        <span style={{ color: value ? "#f0ede8" : "rgba(240,237,232,0.25)" }}>
+          {value || placeholder}
+        </span>
+        <ChevronDown size={15} style={{
+          color: "rgba(240,237,232,0.3)",
+          transform: open ? "rotate(180deg)" : "rotate(0deg)",
+          transition: "transform 0.2s", flexShrink: 0,
+        }} />
+      </button>
+      {open && (
+        <div style={{
+          position: "absolute", top: "100%", left: 0, right: 0, zIndex: 50,
+          background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: "8px", marginTop: "4px", maxHeight: "200px", overflowY: "auto",
+          boxShadow: "0 8px 30px rgba(0,0,0,0.5)",
+        }}>
+          {options.map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => { onChange(opt); setOpen(false); }}
+              style={{
+                width: "100%", textAlign: "left", background: value === opt ? "rgba(255,88,51,0.12)" : "transparent",
+                border: "none", padding: "10px 13px", fontSize: "13px", color: value === opt ? "#ff5833" : "rgba(240,237,232,0.7)",
+                fontFamily: "'Helvetica Neue', sans-serif", cursor: "pointer",
+                borderBottom: "1px solid rgba(255,255,255,0.04)",
+              }}
+              onMouseEnter={e => { if (value !== opt) e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
+              onMouseLeave={e => { if (value !== opt) e.currentTarget.style.background = "transparent"; }}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Multi-select chip group — always visible */
+function ChipGroup({ options, selected = [], onChange }) {
+  const toggle = (opt) => {
+    if (selected.includes(opt)) {
+      onChange(selected.filter(s => s !== opt));
+    } else {
+      onChange([...selected, opt]);
+    }
+  };
+
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+      {options.map((opt) => {
+        const active = selected.includes(opt);
+        return (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => toggle(opt)}
+            style={{
+              padding: "6px 14px", borderRadius: "20px", border: active ? "1px solid rgba(255,88,51,0.35)" : "1px solid rgba(255,255,255,0.08)",
+              background: active ? "rgba(255,88,51,0.15)" : "transparent",
+              color: active ? "#ff5833" : "rgba(240,237,232,0.45)",
+              fontSize: "12px", fontWeight: 600, fontFamily: "'Helvetica Neue', sans-serif",
+              cursor: "pointer", transition: "all 0.15s",
+            }}
+          >
+            {opt}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── INITIAL FORM ─────────────────────────────────────────────────────────────
 const INITIAL_FORM = {
-  nombre: "", apellidos: "", email: "", phoneCode: "+34", phone: "", birthdate: "",
+  nombre: "", apellidos: "", email: "", telefono: "", cargo_empresa: "",
   privacidad: false,
-  pais_empresa: "", ciudad_empresa: "",
-  gestion_produccion: "",
-  trayectoria: "", sector_empresa: "", presupuesto: "",
+  sector_empresa: [],
+  tamano_equipo: "",
+  disponibilidad_ubicacion: "",
+  presencia_digital: "",
+  objetivo_marca: "",
+  presupuesto_disponible: "",
+  timing_arranque: "",
 };
 
+// ── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function MarcasApplicationModal({ isOpen, onClose }) {
   const [step, setStep] = useState(1);
   const [sending, setSending] = useState(false);
@@ -185,26 +252,14 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  // Reset ciudad when country changes
-  const setCountry = (v) => setForm(f => ({ ...f, pais_empresa: v, ciudad_empresa: "" }));
-
-  const isAdult = (dateStr) => {
-    if (!dateStr) return false;
-    const birth = new Date(dateStr);
-    const today = new Date();
-    const age = today.getFullYear() - birth.getFullYear();
-    const m = today.getMonth() - birth.getMonth();
-    return age > 18 || (age === 18 && m >= 0 && today.getDate() >= birth.getDate());
-  };
-
+  // ── Validation ────────────────────────────────────────────────────────────
   const validateStep1 = () => {
     const e = {};
     if (!form.nombre.trim()) e.nombre = true;
     if (!form.apellidos.trim()) e.apellidos = true;
     if (!form.email.trim() || !form.email.includes("@")) e.email = true;
-    if (!form.phone.trim()) e.phone = true;
-    if (!form.birthdate) e.birthdate = true;
-    else if (!isAdult(form.birthdate)) e.birthdate = "minor";
+    if (!form.telefono.trim()) e.telefono = true;
+    if (!form.cargo_empresa) e.cargo_empresa = true;
     if (!form.privacidad) e.privacidad = true;
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -212,18 +267,19 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
 
   const validateStep2 = () => {
     const e = {};
-    if (!form.pais_empresa) e.pais_empresa = true;
-    if (!form.ciudad_empresa) e.ciudad_empresa = true;
-    if (!form.gestion_produccion) e.gestion_produccion = true;
+    if (form.sector_empresa.length === 0) e.sector_empresa = true;
+    if (!form.tamano_equipo) e.tamano_equipo = true;
+    if (!form.disponibilidad_ubicacion) e.disponibilidad_ubicacion = true;
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
   const validateStep3 = () => {
     const e = {};
-    if (!form.trayectoria) e.trayectoria = true;
-    if (!form.sector_empresa) e.sector_empresa = true;
-    if (!form.presupuesto) e.presupuesto = true;
+    if (!form.presencia_digital) e.presencia_digital = true;
+    if (!form.objetivo_marca) e.objetivo_marca = true;
+    if (!form.presupuesto_disponible) e.presupuesto_disponible = true;
+    if (!form.timing_arranque) e.timing_arranque = true;
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -235,22 +291,29 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
     setErrors({});
   };
 
+  // ── Blocking logic ────────────────────────────────────────────────────────
+  const isBlockedPresupuesto = form.presupuesto_disponible === BLOCKED_PRESUPUESTO;
+  const isBlockedTiming = form.timing_arranque === BLOCKED_TIMING;
+  const isSubmitDisabled = isBlockedPresupuesto || isBlockedTiming || sending;
+
   const handleSubmit = async () => {
     if (!validateStep3()) return;
-    if (form.presupuesto === BLOCKED_PRESUPUESTO) return;
+    if (isSubmitDisabled) return;
     setSending(true);
-    await base44.entities.ApplicationForm.create({
+    await base44.entities.BrandLead.create({
       nombre: form.nombre,
       apellidos: form.apellidos,
       email: form.email,
-      telefono: form.phoneCode + " " + form.phone,
-      fecha_nacimiento: form.birthdate,
-      pais_residencia: form.pais_empresa + (form.ciudad_empresa ? ` — ${form.ciudad_empresa}` : ""),
-      nacionalidad: form.gestion_produccion,
-      disponibilidad_viaje_madrid: form.trayectoria,
-      situacion_laboral: form.sector_empresa,
-      presupuesto: form.presupuesto,
-      tipo: "Marca",
+      telefono: form.telefono,
+      cargo_empresa: form.cargo_empresa,
+      sector_empresa: form.sector_empresa,
+      tamano_equipo: form.tamano_equipo,
+      disponibilidad_ubicacion: form.disponibilidad_ubicacion,
+      presencia_digital: form.presencia_digital,
+      objetivo_marca: form.objetivo_marca,
+      presupuesto_disponible: form.presupuesto_disponible,
+      timing_arranque: form.timing_arranque,
+      fecha_envio: new Date().toISOString(),
     });
     setSending(false);
     onClose();
@@ -266,10 +329,6 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
     }, 300);
   };
 
-  const isBlocked = form.presupuesto === BLOCKED_PRESUPUESTO;
-
-  const cities = form.pais_empresa ? (COUNTRIES_CITIES[form.pais_empresa] || ["Otra"]) : [];
-
   if (!isOpen) return null;
 
   return (
@@ -283,8 +342,7 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
           position: "fixed", inset: 0, zIndex: 9999,
           background: "rgba(0,0,0,0.82)", backdropFilter: "blur(8px)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          padding: "16px",
-          overflowY: "auto",
+          padding: "16px", overflowY: "auto",
         }}
         onClick={e => { if (e.target === e.currentTarget) handleClose(); }}
       >
@@ -300,11 +358,8 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
               width: 36, height: 36, borderRadius: "50%",
               background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", transition: "all 0.2s",
-              color: "#f0ede8", flexShrink: 0,
+              cursor: "pointer", transition: "all 0.2s", color: "#f0ede8", flexShrink: 0,
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.2)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; }}
             aria-label="Cerrar"
           >
             <svg width="14" height="14" viewBox="0 0 12 12" fill="none">
@@ -318,199 +373,254 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
             exit={{ scale: 0.96, opacity: 0 }}
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             style={{
-              background: "#0e0e0e",
-              borderRadius: "18px",
-              width: "100%",
-              maxHeight: "90dvh",
-              overflowY: "auto",
-              overflowX: "hidden",
-              padding: "20px",
-              boxSizing: "border-box",
-              border: "1px solid rgba(255,255,255,0.08)",
-              position: "relative",
+              background: "#0e0e0e", borderRadius: "18px", width: "100%",
+              maxHeight: "90dvh", overflowY: "auto", overflowX: "hidden",
+              padding: "20px", boxSizing: "border-box",
+              border: "1px solid rgba(255,255,255,0.08)", position: "relative",
             }}
           >
-            <>
-                <StepIndicator current={step} />
+            <StepIndicator current={step} />
 
-                {/* Step 1 — Datos */}
-                {step === 1 && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                    <div>
-                      <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.1rem", color: "#f0ede8", margin: "0 0 3px" }}>Datos de contacto</h3>
-                      <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.3)", margin: 0 }}>Información de la persona de contacto</p>
-                    </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                      <div style={fieldWrap}>
-                        <Label required>Nombre</Label>
-                        <input style={{ ...inputStyle, borderColor: errors.nombre ? "#ff5833" : "rgba(255,255,255,0.1)" }} value={form.nombre} onChange={e => set("nombre", e.target.value)} placeholder="Tu nombre" />
-                      </div>
-                      <div style={fieldWrap}>
-                        <Label required>Apellidos</Label>
-                        <input style={{ ...inputStyle, borderColor: errors.apellidos ? "#ff5833" : "rgba(255,255,255,0.1)" }} value={form.apellidos} onChange={e => set("apellidos", e.target.value)} placeholder="Tus apellidos" />
-                      </div>
-                    </div>
-                    <div style={fieldWrap}>
-                      <Label required>Email</Label>
-                      <input type="email" style={{ ...inputStyle, borderColor: errors.email ? "#ff5833" : "rgba(255,255,255,0.1)" }} value={form.email} onChange={e => set("email", e.target.value)} placeholder="tu@empresa.com" />
-                    </div>
-                    <div style={fieldWrap}>
-                      <Label required>Teléfono</Label>
-                      <div style={{ display: "flex", gap: "8px" }}>
-                        <select value={form.phoneCode} onChange={e => set("phoneCode", e.target.value)} style={{ ...inputStyle, width: "105px", flexShrink: 0 }}>
-                          {PHONE_CODES.map(p => <option key={p.code} value={p.code} style={{ background: "#141414" }}>{p.country} {p.code}</option>)}
-                        </select>
-                        <input type="tel" style={{ ...inputStyle, borderColor: errors.phone ? "#ff5833" : "rgba(255,255,255,0.1)" }} value={form.phone} onChange={e => set("phone", e.target.value)} placeholder="612 345 678" />
-                      </div>
-                    </div>
-                    <div style={fieldWrap}>
-                      <Label required>Fecha de nacimiento</Label>
-                      <input type="date" style={{ ...inputStyle, borderColor: errors.birthdate ? "#ff5833" : "rgba(255,255,255,0.1)", colorScheme: "dark" }} value={form.birthdate} onChange={e => set("birthdate", e.target.value)} max={new Date(new Date().setFullYear(new Date().getFullYear()-18)).toISOString().split("T")[0]} />
-                      {errors.birthdate === "minor" && <span style={{ fontSize: "11px", color: "#ff5833", fontFamily: "'Helvetica Neue', sans-serif" }}>Debes ser mayor de 18 años.</span>}
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                      <div
-                        onClick={() => set("privacidad", !form.privacidad)}
-                        style={{
-                          width: "16px", height: "16px", borderRadius: "4px", flexShrink: 0,
-                          background: form.privacidad ? "#ff5833" : "transparent",
-                          border: form.privacidad ? "none" : "1.5px solid rgba(255,255,255,0.2)",
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          transition: "all 0.2s", cursor: "pointer",
-                        }}
-                      >
-                        {form.privacidad && <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 6L8 1" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-                      </div>
-                      <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: errors.privacidad ? "#ff5833" : "rgba(240,237,232,0.5)", lineHeight: 1.4, cursor: "pointer" }} onClick={() => set("privacidad", !form.privacidad)}>
-                        Acepto la{" "}
-                        <Link to="/politica-de-privacidad" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: "#ff5833", textDecoration: "underline", textDecorationColor: "rgba(255,88,51,0.4)" }}>
-                          política de privacidad y protección de datos
-                        </Link>
-                      </span>
-                    </div>
+            {/* ═══════════════ STEP 1 — Datos de contacto ═══════════════ */}
+            {step === 1 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div>
+                  <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.1rem", color: "#f0ede8", margin: "0 0 3px" }}>Datos de contacto</h3>
+                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.3)", margin: 0 }}>Información de la persona de contacto</p>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                  <div style={fieldWrap}>
+                    <Label required>Nombre</Label>
+                    <input style={{ ...inputStyle, borderColor: errors.nombre ? "#ff5833" : "rgba(255,255,255,0.1)" }} value={form.nombre} onChange={e => set("nombre", e.target.value)} placeholder="Tu nombre" />
                   </div>
-                )}
-
-                {/* Step 2 — Ubicación */}
-                {step === 2 && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                    <div>
-                      <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.1rem", color: "#f0ede8", margin: "0 0 3px" }}>Ubicación de la empresa</h3>
-                      <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.3)", margin: 0 }}>Dónde opera tu marca</p>
-                    </div>
-                    <div style={fieldWrap}>
-                      <Label required>País de la empresa</Label>
-                      <select value={form.pais_empresa} onChange={e => setCountry(e.target.value)} style={{ ...inputStyle, borderColor: errors.pais_empresa ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
-                        <option value="" style={{ background: "#141414" }}>Selecciona país</option>
-                        {COUNTRIES.map(c => <option key={c} value={c} style={{ background: "#141414" }}>{c}</option>)}
-                      </select>
-                    </div>
-                    <div style={fieldWrap}>
-                      <Label required>Ciudad de la empresa</Label>
-                      <select value={form.ciudad_empresa} onChange={e => set("ciudad_empresa", e.target.value)} style={{ ...inputStyle, borderColor: errors.ciudad_empresa ? "#ff5833" : "rgba(255,255,255,0.1)" }} disabled={!form.pais_empresa}>
-                        <option value="" style={{ background: "#141414" }}>{form.pais_empresa ? "Selecciona ciudad" : "Selecciona primero un país"}</option>
-                        {cities.map(c => <option key={c} value={c} style={{ background: "#141414" }}>{c}</option>)}
-                      </select>
-                    </div>
-                    <div style={fieldWrap}>
-                      <Label required>¿Cómo gestionamos la producción de contenido?</Label>
-                      <select value={form.gestion_produccion} onChange={e => set("gestion_produccion", e.target.value)} style={{ ...inputStyle, borderColor: errors.gestion_produccion ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
-                        <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
-                        <option value="Tenemos disposición de viajar a Madrid para producir el contenido." style={{ background: "#141414" }}>Tenemos disposición de viajar a Madrid para producir el contenido.</option>
-                        <option value="Preferimos cubrir los costes de desplazamiento para que el equipo venga a nosotros." style={{ background: "#141414" }}>Preferimos cubrir los costes de desplazamiento para que el equipo venga a nosotros.</option>
-                        <option value="Aún no lo hemos definido, lo valoramos en la reunión." style={{ background: "#141414" }}>Aún no lo hemos definido, lo valoramos en la reunión.</option>
-                      </select>
-                    </div>
+                  <div style={fieldWrap}>
+                    <Label required>Apellidos</Label>
+                    <input style={{ ...inputStyle, borderColor: errors.apellidos ? "#ff5833" : "rgba(255,255,255,0.1)" }} value={form.apellidos} onChange={e => set("apellidos", e.target.value)} placeholder="Tus apellidos" />
                   </div>
-                )}
-
-                {/* Step 3 — Experiencia */}
-                {step === 3 && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                    <div>
-                      <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.1rem", color: "#f0ede8", margin: "0 0 3px" }}>Tu empresa</h3>
-                      <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.3)", margin: 0 }}>Cuéntanos sobre tu marca</p>
-                    </div>
-                    <div style={fieldWrap}>
-                      <Label required>Trayectoria de la empresa</Label>
-                      <select value={form.trayectoria} onChange={e => set("trayectoria", e.target.value)} style={{ ...inputStyle, borderColor: errors.trayectoria ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
-                        <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
-                        <option value="Menos de 1 año" style={{ background: "#141414" }}>Menos de 1 año</option>
-                        <option value="De 1 a 3 años" style={{ background: "#141414" }}>De 1 a 3 años</option>
-                        <option value="De 3 a 5 años" style={{ background: "#141414" }}>De 3 a 5 años</option>
-                        <option value="Más de 5 años" style={{ background: "#141414" }}>Más de 5 años</option>
-                      </select>
-                    </div>
-                    <div style={fieldWrap}>
-                      <Label required>Sector de la empresa</Label>
-                      <select value={form.sector_empresa} onChange={e => set("sector_empresa", e.target.value)} style={{ ...inputStyle, borderColor: errors.sector_empresa ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
-                        <option value="" style={{ background: "#141414" }}>Selecciona un sector</option>
-                        {SECTORES_EMPRESA.map(s => <option key={s} value={s} style={{ background: "#141414" }}>{s}</option>)}
-                      </select>
-                    </div>
-                    <div style={fieldWrap}>
-                      <Label required>Presupuesto disponible</Label>
-                      <select value={form.presupuesto} onChange={e => set("presupuesto", e.target.value)} style={{ ...inputStyle, borderColor: errors.presupuesto ? "#ff5833" : "rgba(255,255,255,0.1)" }}>
-                        <option value="" style={{ background: "#141414" }}>Selecciona una opción</option>
-                        {PRESUPUESTO_OPTIONS.map(p => <option key={p} value={p} style={{ background: "#141414" }}>{p}</option>)}
-                      </select>
-                      {isBlocked && (
-                        <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "#ff5833", margin: "4px 0 0", lineHeight: 1.4 }}>
-                          Actualmente solo trabajamos con marcas que buscan invertir en su proyecto.
-                        </p>
-                      )}
-                    </div>
+                </div>
+                <div style={fieldWrap}>
+                  <Label required>Email</Label>
+                  <input type="email" style={{ ...inputStyle, borderColor: errors.email ? "#ff5833" : "rgba(255,255,255,0.1)" }} value={form.email} onChange={e => set("email", e.target.value)} placeholder="tu@empresa.com" />
+                </div>
+                <div style={fieldWrap}>
+                  <Label required>Teléfono</Label>
+                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "10px", color: "rgba(240,237,232,0.25)", margin: "0 0 4px" }}>
+                    Indícanos un número de contacto directo
+                  </p>
+                  <input type="tel" style={{ ...inputStyle, borderColor: errors.telefono ? "#ff5833" : "rgba(255,255,255,0.1)" }} value={form.telefono} onChange={e => set("telefono", e.target.value)} placeholder="612 345 678" />
+                </div>
+                <div style={fieldWrap}>
+                  <Label required>Cargo en la empresa</Label>
+                  <AccordionSelect
+                    value={form.cargo_empresa}
+                    onChange={v => set("cargo_empresa", v)}
+                    options={CARGOS}
+                    placeholder="Selecciona tu cargo"
+                    hasError={errors.cargo_empresa}
+                  />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div
+                    onClick={() => set("privacidad", !form.privacidad)}
+                    style={{
+                      width: "16px", height: "16px", borderRadius: "4px", flexShrink: 0,
+                      background: form.privacidad ? "#ff5833" : "transparent",
+                      border: form.privacidad ? "none" : "1.5px solid rgba(255,255,255,0.2)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      transition: "all 0.2s", cursor: "pointer",
+                    }}
+                  >
+                    {form.privacidad && <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.2 6L8 1" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                   </div>
-                )}
+                  <span style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: errors.privacidad ? "#ff5833" : "rgba(240,237,232,0.5)", lineHeight: 1.4, cursor: "pointer" }} onClick={() => set("privacidad", !form.privacidad)}>
+                    Acepto la{" "}
+                    <Link to="/politica-de-privacidad" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ color: "#ff5833", textDecoration: "underline", textDecorationColor: "rgba(255,88,51,0.4)" }}>
+                      política de privacidad y protección de datos
+                    </Link>
+                  </span>
+                </div>
+              </div>
+            )}
 
-                {/* Navigation */}
-                <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>
-                  {step > 1 && (
-                    <button
-                      onClick={() => { setStep(s => s - 1); setErrors({}); }}
-                      style={{
-                        flex: "0 0 auto", background: "transparent", border: "1px solid rgba(255,255,255,0.12)",
-                        borderRadius: "9px", padding: "12px 16px", color: "rgba(240,237,232,0.5)",
-                        fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 600, fontSize: "0.85rem",
-                        cursor: "pointer",
-                      }}
-                    >
-                      ← Atrás
-                    </button>
-                  )}
-                  {step < 3 ? (
-                    <button
-                      onClick={nextStep}
-                      style={{
-                        flex: 1, background: "#ff5833", border: "none", borderRadius: "9px",
-                        padding: "12px 20px", color: "#fff",
-                        fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "0.9rem",
-                        cursor: "pointer", transition: "background 0.2s",
-                      }}
-                      onMouseEnter={e => e.currentTarget.style.background = "#e04a28"}
-                      onMouseLeave={e => e.currentTarget.style.background = "#ff5833"}
-                    >
-                      Continuar →
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleSubmit}
-                      disabled={sending || isBlocked}
-                      style={{
-                        flex: 1, borderRadius: "9px", padding: "12px 20px", fontWeight: 900,
-                        fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.9rem",
-                        border: "none",
-                        cursor: isBlocked ? "not-allowed" : "pointer",
-                        background: isBlocked ? "rgba(255,255,255,0.06)" : "#ff5833",
-                        color: isBlocked ? "rgba(255,255,255,0.2)" : "#fff",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      {sending ? "Enviando..." : "Enviar solicitud →"}
-                    </button>
+            {/* ═══════════════ STEP 2 — Tu empresa ═══════════════ */}
+            {step === 2 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                <div>
+                  <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.1rem", color: "#f0ede8", margin: "0 0 3px" }}>Tu empresa</h3>
+                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.3)", margin: 0 }}>Cuéntanos sobre tu negocio</p>
+                </div>
+
+                {/* Sector — chips multi-select */}
+                <div style={fieldWrap}>
+                  <Label required>¿A qué se dedica tu empresa?</Label>
+                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "10px", color: "rgba(240,237,232,0.25)", margin: "0 0 6px" }}>
+                    (puedes elegir varios)
+                  </p>
+                  <ChipGroup
+                    options={SECTORES}
+                    selected={form.sector_empresa}
+                    onChange={v => set("sector_empresa", v)}
+                  />
+                  {errors.sector_empresa && (
+                    <span style={{ fontSize: "11px", color: "#ff5833", fontFamily: "'Helvetica Neue', sans-serif" }}>Selecciona al menos un sector</span>
                   )}
                 </div>
-              </>
+
+                {/* Tamaño del equipo */}
+                <div style={fieldWrap}>
+                  <Label required>¿Cuántas personas tiene tu equipo?</Label>
+                  <AccordionSelect
+                    value={form.tamano_equipo}
+                    onChange={v => set("tamano_equipo", v)}
+                    options={TAMANO_EQUIPO}
+                    placeholder="Selecciona una opción"
+                    hasError={errors.tamano_equipo}
+                  />
+                </div>
+
+                {/* Ubicación / disponibilidad */}
+                <div style={fieldWrap}>
+                  <Label required>Producimos en Madrid. ¿Estás cerca o tienes disposición de viajar?</Label>
+                  <AccordionSelect
+                    value={form.disponibilidad_ubicacion}
+                    onChange={v => set("disponibilidad_ubicacion", v)}
+                    options={UBICACION}
+                    placeholder="Selecciona una opción"
+                    hasError={errors.disponibilidad_ubicacion}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* ═══════════════ STEP 3 — Tu marca ═══════════════ */}
+            {step === 3 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                <div>
+                  <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "1.1rem", color: "#f0ede8", margin: "0 0 3px" }}>Tu marca</h3>
+                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 300, fontSize: "0.78rem", color: "rgba(240,237,232,0.3)", margin: 0 }}>Define tu estrategia de marca</p>
+                </div>
+
+                {/* Presencia digital */}
+                <div style={fieldWrap}>
+                  <Label required>¿En qué momento está tu presencia digital?</Label>
+                  <AccordionSelect
+                    value={form.presencia_digital}
+                    onChange={v => set("presencia_digital", v)}
+                    options={PRESENCIA_DIGITAL}
+                    placeholder="Selecciona una opción"
+                    hasError={errors.presencia_digital}
+                  />
+                </div>
+
+                {/* Objetivo */}
+                <div style={fieldWrap}>
+                  <Label required>¿Qué quieres conseguir?</Label>
+                  <AccordionSelect
+                    value={form.objetivo_marca}
+                    onChange={v => set("objetivo_marca", v)}
+                    options={OBJETIVO}
+                    placeholder="Selecciona una opción"
+                    hasError={errors.objetivo_marca}
+                  />
+                </div>
+
+                {/* Presupuesto */}
+                <div style={fieldWrap}>
+                  <Label required>¿Estás listo para invertir en tu marca?</Label>
+                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "10px", color: "rgba(240,237,232,0.25)", margin: "0 0 4px" }}>
+                    Nuestros planes para marcas arrancan desde 5.000€
+                  </p>
+                  <AccordionSelect
+                    value={form.presupuesto_disponible}
+                    onChange={v => set("presupuesto_disponible", v)}
+                    options={PRESUPUESTO}
+                    placeholder="Selecciona una opción"
+                    hasError={errors.presupuesto_disponible}
+                  />
+                  {isBlockedPresupuesto && (
+                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "#ff5833", margin: "4px 0 0", lineHeight: 1.4 }}>
+                      Solo trabajamos con marcas listas para apostar por su proyecto.
+                    </p>
+                  )}
+                </div>
+
+                {/* Timing */}
+                <div style={fieldWrap}>
+                  <Label required>¿Cuándo quieres arrancar?</Label>
+                  <AccordionSelect
+                    value={form.timing_arranque}
+                    onChange={v => set("timing_arranque", v)}
+                    options={TIMING}
+                    placeholder="Selecciona una opción"
+                    hasError={errors.timing_arranque}
+                  />
+                  {form.timing_arranque === "El próximo mes" && (
+                    <div style={{
+                      background: "rgba(255,88,51,0.08)", border: "0.5px solid rgba(255,88,51,0.25)",
+                      borderRadius: "8px", padding: "8px 12px", fontSize: "12px",
+                      color: "#ff5833", fontFamily: "'Helvetica Neue', sans-serif",
+                      marginTop: "4px", lineHeight: 1.4,
+                    }}>
+                      Abrimos un número cerrado de plazas cada año. Para el próximo mes puede que ya no quede ninguna.
+                    </div>
+                  )}
+                  {isBlockedTiming && (
+                    <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "11px", color: "#ff5833", margin: "4px 0 0", lineHeight: 1.4 }}>
+                      Solo trabajamos con marcas que saben cuándo quieren empezar.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ── Navigation buttons ──────────────────────────────────────── */}
+            <div style={{ display: "flex", gap: "8px", marginTop: "20px" }}>
+              {step > 1 && (
+                <button
+                  type="button"
+                  onClick={() => { setStep(s => s - 1); setErrors({}); }}
+                  style={{
+                    flex: "0 0 auto", background: "transparent", border: "1px solid rgba(255,255,255,0.12)",
+                    borderRadius: "9px", padding: "12px 16px", color: "rgba(240,237,232,0.5)",
+                    fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 600, fontSize: "0.85rem", cursor: "pointer",
+                  }}
+                >
+                  ← Atrás
+                </button>
+              )}
+              {step < 3 ? (
+                <button
+                  type="button"
+                  onClick={nextStep}
+                  style={{
+                    flex: 1, background: "#ff5833", border: "none", borderRadius: "9px",
+                    padding: "12px 20px", color: "#fff",
+                    fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "0.9rem",
+                    cursor: "pointer", transition: "background 0.2s",
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#e04a28"}
+                  onMouseLeave={e => e.currentTarget.style.background = "#ff5833"}
+                >
+                  Continuar →
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={isSubmitDisabled}
+                  style={{
+                    flex: 1, borderRadius: "9px", padding: "12px 20px", fontWeight: 900,
+                    fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.9rem", border: "none",
+                    cursor: isSubmitDisabled ? "not-allowed" : "pointer",
+                    background: isSubmitDisabled ? "rgba(255,255,255,0.06)" : "#ff5833",
+                    color: isSubmitDisabled ? "rgba(255,255,255,0.2)" : "#fff",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  {sending ? "Enviando..." : "Agendar videollamada →"}
+                </button>
+              )}
+            </div>
           </motion.div>
         </div>
       </motion.div>

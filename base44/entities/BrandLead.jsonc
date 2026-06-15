@@ -1,0 +1,77 @@
+{
+  "name": "BrandLead",
+  "type": "object",
+  "properties": {
+    "nombre": {
+      "type": "string",
+      "description": "Nombre del contacto"
+    },
+    "apellidos": {
+      "type": "string",
+      "description": "Apellidos del contacto"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email de contacto"
+    },
+    "telefono": {
+      "type": "string",
+      "description": "Tel\u00e9fono de contacto"
+    },
+    "cargo_empresa": {
+      "type": "string",
+      "description": "Cargo en la empresa"
+    },
+    "sector_empresa": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Sectores de la empresa (multi-select)"
+    },
+    "tamano_equipo": {
+      "type": "string",
+      "description": "Tama\u00f1o del equipo"
+    },
+    "disponibilidad_ubicacion": {
+      "type": "string",
+      "description": "Disponibilidad / ubicaci\u00f3n respecto a Madrid"
+    },
+    "presencia_digital": {
+      "type": "string",
+      "description": "Estado de la presencia digital"
+    },
+    "objetivo_marca": {
+      "type": "string",
+      "description": "Objetivo de la marca"
+    },
+    "presupuesto_disponible": {
+      "type": "string",
+      "description": "Disponibilidad de presupuesto"
+    },
+    "timing_arranque": {
+      "type": "string",
+      "description": "Cu\u00e1ndo quiere arrancar el proyecto"
+    },
+    "fecha_envio": {
+      "type": "string",
+      "description": "Fecha y hora exacta del env\u00edo"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "nueva",
+        "revisada",
+        "contactada",
+        "aceptada",
+        "rechazada"
+      ],
+      "default": "nueva",
+      "description": "Estado de la solicitud de marca"
+    }
+  },
+  "required": [
+    "nombre",
+    "email"
+  ]
+}
