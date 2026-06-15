@@ -16,11 +16,23 @@
     },
     "telefono": {
       "type": "string",
-      "description": "Tel\u00e9fono de contacto"
+      "description": "Telefono de contacto"
     },
     "cargo_empresa": {
       "type": "string",
       "description": "Cargo en la empresa"
+    },
+    "instagram_marca": {
+      "type": "string",
+      "description": "Instagram de la marca (con @)"
+    },
+    "tiene_web": {
+      "type": "string",
+      "description": "Indica si tiene pagina web (si/no)"
+    },
+    "web_url": {
+      "type": "string",
+      "description": "URL del sitio web"
     },
     "sector_empresa": {
       "type": "array",
@@ -29,13 +41,17 @@
       },
       "description": "Sectores de la empresa (multi-select)"
     },
+    "trayectoria_empresa": {
+      "type": "string",
+      "description": "Trayectoria de la marca o empresa"
+    },
     "tamano_equipo": {
       "type": "string",
-      "description": "Tama\u00f1o del equipo"
+      "description": "Tamano del equipo (legacy)"
     },
     "disponibilidad_ubicacion": {
       "type": "string",
-      "description": "Disponibilidad / ubicaci\u00f3n respecto a Madrid"
+      "description": "Disponibilidad / ubicacion respecto a Madrid"
     },
     "presencia_digital": {
       "type": "string",
@@ -51,11 +67,11 @@
     },
     "timing_arranque": {
       "type": "string",
-      "description": "Cu\u00e1ndo quiere arrancar el proyecto"
+      "description": "Cuando quiere arrancar el proyecto"
     },
     "fecha_envio": {
       "type": "string",
-      "description": "Fecha y hora exacta del env\u00edo"
+      "description": "Fecha y hora exacta del envio"
     },
     "status": {
       "type": "string",

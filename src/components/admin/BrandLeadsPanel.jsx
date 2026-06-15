@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Phone, MessageSquare, Trash2, Eye, User, Calendar, X, Download, Copy, Check, Building2, MapPin, Target, Clock, DollarSign, MonitorSmartphone, Users } from "lucide-react";
+import { Mail, Phone, MessageSquare, Trash2, Eye, User, Calendar, X, Download, Copy, Check, Building2, MapPin, Target, Clock, DollarSign, MonitorSmartphone, History, Instagram, Globe } from "lucide-react";
 
 export const BRAND_STATUS_CONFIG = {
   nueva: { label: "Nueva", color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
@@ -11,7 +11,7 @@ export const BRAND_STATUS_CONFIG = {
 };
 
 export function exportBrandCSV(brands) {
-  const headers = ["Nombre","Apellidos","Email","Teléfono","Cargo","Sectores","Tamaño Equipo","Ubicación","Presencia Digital","Objetivo","Presupuesto","Timing","Estado","Enviado el"];
+  const headers = ["Nombre","Apellidos","Email","Teléfono","Cargo","Instagram","Web","Sectores","Trayectoria","Ubicación","Presencia Digital","Objetivo","Presupuesto","Timing","Estado","Enviado el"];
   const rows = brands.map(b => {
     const sectores = Array.isArray(b.sector_empresa) ? b.sector_empresa.join(", ") : "";
     const fechaDisplay = b.fecha_envio
@@ -19,7 +19,8 @@ export function exportBrandCSV(brands) {
       : (b.created_date ? new Date(b.created_date).toLocaleString("es-ES", { timeZone: "Europe/Madrid", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "");
     return [
       b.nombre, b.apellidos, b.email, b.telefono, b.cargo_empresa,
-      sectores, b.tamano_equipo, b.disponibilidad_ubicacion,
+      b.instagram_marca || "", b.tiene_web === "si" ? b.web_url : "No tiene web",
+      sectores, b.trayectoria_empresa || "", b.disponibilidad_ubicacion,
       b.presencia_digital, b.objetivo_marca, b.presupuesto_disponible,
       b.timing_arranque, b.status, fechaDisplay
     ];
@@ -97,6 +98,10 @@ function BrandDetailModal({ brand, onClose }) {
               <Field label="Cargo" value={brand.cargo_empresa} />
               <Field label="Estado" value={cfg.label} />
             </div>
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <Field label="Instagram" value={brand.instagram_marca} />
+              <Field label="Web" value={brand.tiene_web === "si" ? brand.web_url : "No tiene web"} link={brand.tiene_web === "si" ? "https://" + brand.web_url : null} />
+            </div>
 
             {/* Empresa */}
             <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mb-1 pt-1">Empresa</p>
@@ -111,7 +116,7 @@ function BrandDetailModal({ brand, onClose }) {
               ) : <p className="text-xs text-white/25 italic">No especificado</p>}
             </div>
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              <Field label="Tamaño equipo" value={brand.tamano_equipo} />
+              <Field label="Trayectoria" value={brand.trayectoria_empresa} />
               <Field label="Ubicación" value={brand.disponibilidad_ubicacion} />
             </div>
 
@@ -186,8 +191,10 @@ export default function BrandLeadsPanel({
 📧 Email: ${brand.email}
 📱 Teléfono: ${brand.telefono || 'No especificado'}
 💼 Cargo: ${brand.cargo_empresa || 'No especificado'}
+📷 Instagram: ${brand.instagram_marca || 'No especificado'}
+🌐 Web: ${brand.tiene_web === "si" ? brand.web_url : 'No tiene web'}
 🏢 Sectores: ${sectores.join(', ') || 'No especificado'}
-👥 Tamaño equipo: ${brand.tamano_equipo || 'No especificado'}
+📅 Trayectoria: ${brand.trayectoria_empresa || 'No especificado'}
 📍 Ubicación: ${brand.disponibilidad_ubicacion || 'No especificado'}
 🖥️ Presencia digital: ${brand.presencia_digital || 'No especificado'}
 🎯 Objetivo: ${brand.objetivo_marca || 'No especificado'}
@@ -240,7 +247,7 @@ export default function BrandLeadsPanel({
                         </div>
                       )}
                       <div className="flex flex-wrap items-center gap-1">
-                        {brand.tamano_equipo && <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 flex items-center gap-1"><Users className="w-2.5 h-2.5" />{brand.tamano_equipo}</span>}
+                        {brand.trayectoria_empresa && <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 flex items-center gap-1"><History className="w-2.5 h-2.5" />{brand.trayectoria_empresa}</span>}
                         {brand.presupuesto_disponible && <span className="text-[10px] px-2 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06] text-white/50 flex items-center gap-1"><DollarSign className="w-2.5 h-2.5" />{brand.presupuesto_disponible}</span>}
                       </div>
                     </div>

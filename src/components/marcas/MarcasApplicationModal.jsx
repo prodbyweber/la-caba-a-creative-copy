@@ -31,11 +31,12 @@ const SECTORES = [
   "Música y Audio", "Otro",
 ];
 
-const TAMANO_EQUIPO = [
-  "Solo yo o un equipo muy pequeño",
-  "Entre 2 y 10 personas",
-  "Entre 11 y 50 personas",
-  "Más de 50 personas",
+const TRAYECTORIA_EMPRESA = [
+  "Menos de 1 año",
+  "Entre 1 y 3 años",
+  "Entre 3 y 5 años",
+  "Entre 5 y 10 años",
+  "Más de 10 años",
 ];
 
 const UBICACION = [
@@ -233,9 +234,10 @@ function ChipGroup({ options, selected = [], onChange }) {
 // ── INITIAL FORM ─────────────────────────────────────────────────────────────
 const INITIAL_FORM = {
   nombre: "", apellidos: "", email: "", telefono: "", cargo_empresa: "",
+  instagram_marca: "", tiene_web: "", web_url: "",
   privacidad: false,
   sector_empresa: [],
-  tamano_equipo: "",
+  trayectoria_empresa: "",
   disponibilidad_ubicacion: "",
   presencia_digital: "",
   objetivo_marca: "",
@@ -268,7 +270,7 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
   const validateStep2 = () => {
     const e = {};
     if (form.sector_empresa.length === 0) e.sector_empresa = true;
-    if (!form.tamano_equipo) e.tamano_equipo = true;
+    if (!form.trayectoria_empresa) e.trayectoria_empresa = true;
     if (!form.disponibilidad_ubicacion) e.disponibilidad_ubicacion = true;
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -306,8 +308,11 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
       email: form.email,
       telefono: form.telefono,
       cargo_empresa: form.cargo_empresa,
+      instagram_marca: "@" + form.instagram_marca,
+      tiene_web: form.tiene_web,
+      web_url: form.tiene_web === "si" ? form.web_url : "",
       sector_empresa: form.sector_empresa,
-      tamano_equipo: form.tamano_equipo,
+      trayectoria_empresa: form.trayectoria_empresa,
       disponibilidad_ubicacion: form.disponibilidad_ubicacion,
       presencia_digital: form.presencia_digital,
       objetivo_marca: form.objetivo_marca,
@@ -419,6 +424,96 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
                     hasError={errors.cargo_empresa}
                   />
                 </div>
+
+                {/* Instagram */}
+                <div style={fieldWrap}>
+                  <Label>Instagram de tu marca</Label>
+                  <div style={{ display: "flex", alignItems: "stretch" }}>
+                    <span style={{
+                      display: "flex", alignItems: "center", padding: "10px 0 10px 13px",
+                      background: "#141414", border: "1px solid rgba(255,255,255,0.1)",
+                      borderRight: "none", borderRadius: "8px 0 0 8px",
+                      fontSize: "14px", color: "rgba(240,237,232,0.4)",
+                      fontFamily: "'Helvetica Neue', sans-serif",
+                    }}>@</span>
+                    <input
+                      style={{ ...inputStyle, borderLeft: "none", borderRadius: "0 8px 8px 0", flex: 1 }}
+                      value={form.instagram_marca}
+                      onChange={e => set("instagram_marca", e.target.value)}
+                      placeholder="tumarca"
+                    />
+                  </div>
+                </div>
+
+                {/* ¿Tienes web? */}
+                <div style={fieldWrap}>
+                  <Label>¿Tienes página web?</Label>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        set("tiene_web", "si");
+                        if (form.tiene_web === "no") set("web_url", "");
+                      }}
+                      style={{
+                        flex: 1, padding: "8px 16px", borderRadius: "8px",
+                        border: form.tiene_web === "si" ? "1px solid rgba(255,88,51,0.35)" : "1px solid rgba(255,255,255,0.1)",
+                        background: form.tiene_web === "si" ? "rgba(255,88,51,0.15)" : "#141414",
+                        color: form.tiene_web === "si" ? "#ff5833" : "rgba(240,237,232,0.45)",
+                        fontFamily: "'Helvetica Neue', sans-serif", fontSize: "13px", fontWeight: 600,
+                        cursor: "pointer", transition: "all 0.2s",
+                      }}
+                    >
+                      Sí
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { set("tiene_web", "no"); set("web_url", ""); }}
+                      style={{
+                        flex: 1, padding: "8px 16px", borderRadius: "8px",
+                        border: form.tiene_web === "no" ? "1px solid rgba(255,88,51,0.35)" : "1px solid rgba(255,255,255,0.1)",
+                        background: form.tiene_web === "no" ? "rgba(255,88,51,0.15)" : "#141414",
+                        color: form.tiene_web === "no" ? "#ff5833" : "rgba(240,237,232,0.45)",
+                        fontFamily: "'Helvetica Neue', sans-serif", fontSize: "13px", fontWeight: 600,
+                        cursor: "pointer", transition: "all 0.2s",
+                      }}
+                    >
+                      No
+                    </button>
+                  </div>
+                </div>
+
+                {/* Conditional: web URL */}
+                <motion.div
+                  initial={false}
+                  animate={{
+                    height: form.tiene_web === "si" ? "auto" : 0,
+                    opacity: form.tiene_web === "si" ? 1 : 0,
+                    marginBottom: form.tiene_web === "si" ? 0 : -4,
+                  }}
+                  transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
+                  style={{ overflow: "hidden" }}
+                >
+                  <div style={{ ...fieldWrap, marginTop: form.tiene_web === "si" ? "10px" : "0" }}>
+                    <Label>Tu sitio web</Label>
+                    <div style={{ display: "flex", alignItems: "stretch" }}>
+                      <span style={{
+                        display: "flex", alignItems: "center", padding: "10px 0 10px 13px",
+                        background: "#141414", border: "1px solid rgba(255,255,255,0.1)",
+                        borderRight: "none", borderRadius: "8px 0 0 8px",
+                        fontSize: "14px", color: "rgba(240,237,232,0.3)",
+                        fontFamily: "'Helvetica Neue', sans-serif",
+                      }}>https://</span>
+                      <input
+                        style={{ ...inputStyle, borderLeft: "none", borderRadius: "0 8px 8px 0", flex: 1 }}
+                        value={form.web_url}
+                        onChange={e => set("web_url", e.target.value)}
+                        placeholder="tumarca.com"
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <div
                     onClick={() => set("privacidad", !form.privacidad)}
@@ -466,15 +561,15 @@ export default function MarcasApplicationModal({ isOpen, onClose }) {
                   )}
                 </div>
 
-                {/* Tamaño del equipo */}
+                {/* Trayectoria */}
                 <div style={fieldWrap}>
-                  <Label required>¿Cuántas personas tiene tu equipo?</Label>
+                  <Label required>¿Cuál es la trayectoria de tu marca o empresa?</Label>
                   <AccordionSelect
-                    value={form.tamano_equipo}
-                    onChange={v => set("tamano_equipo", v)}
-                    options={TAMANO_EQUIPO}
+                    value={form.trayectoria_empresa}
+                    onChange={v => set("trayectoria_empresa", v)}
+                    options={TRAYECTORIA_EMPRESA}
                     placeholder="Selecciona una opción"
-                    hasError={errors.tamano_equipo}
+                    hasError={errors.trayectoria_empresa}
                   />
                 </div>
 
