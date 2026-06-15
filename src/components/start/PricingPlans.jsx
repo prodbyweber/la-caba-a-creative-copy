@@ -9,19 +9,17 @@ const CHECK = (
 
 const PLANS = [
   {
-    name: "Plan Cabaña Creative",
+    name: "Plan Pro",
     tagline: "Desarrollo artístico completo",
     badge: "Experiencia completa",
     items: [
-      "Producción musical profesional",
-      "Videoclip o mini-film",
-      "Identidad visual y branding",
-      "Fotografía editorial y portadas",
-      "Contenido para redes sociales",
-      "Estrategia y plan de lanzamiento",
-      "Campañas de marketing",
-      "Mentoría y dirección artística",
-      "Acceso a plataforma Cabaña Creative",
+      "Identidad sonora",
+      "Producción musical",
+      "Producción audiovisual",
+      "Branding",
+      "Estrategia de marca",
+      "Marketing",
+      "Posicionamiento",
     ],
     cta: "Solicitar plaza",
     featured: true,
