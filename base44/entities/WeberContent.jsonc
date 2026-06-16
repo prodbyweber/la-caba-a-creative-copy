@@ -1,0 +1,70 @@
+{
+  "name": "WeberContent",
+  "type": "object",
+  "properties": {
+    "section": {
+      "type": "string",
+      "enum": [
+        "hero",
+        "work",
+        "catalog",
+        "about",
+        "cabana",
+        "services",
+        "journal",
+        "contact"
+      ],
+      "description": "Section this content belongs to"
+    },
+    "title": {
+      "type": "string",
+      "description": "Title of the item"
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "Subtitle"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description text"
+    },
+    "category": {
+      "type": "string",
+      "description": "Category label"
+    },
+    "year": {
+      "type": "string",
+      "description": "Year of the work"
+    },
+    "cover_image": {
+      "type": "string",
+      "description": "URL of the cover image"
+    },
+    "youtube_url": {
+      "type": "string",
+      "description": "Full YouTube embed URL"
+    },
+    "spotify_url": {
+      "type": "string",
+      "description": "Spotify embed URL"
+    },
+    "preview_video": {
+      "type": "string",
+      "description": "URL for silent hover preview video"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Display order within section"
+    },
+    "visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Visibility toggle"
+    }
+  },
+  "required": [
+    "section",
+    "title"
+  ]
+}

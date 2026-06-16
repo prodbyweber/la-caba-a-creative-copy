@@ -39,6 +39,8 @@ import CreatorProfile from './pages/CreatorProfile';
 import Marcas from './pages/Marcas';
 import Gracias from './pages/Gracias';
 import Solicitud from './pages/Solicitud';
+import Weber from './pages/Weber';
+import WeberAdmin from './pages/WeberAdmin';
 import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
@@ -137,6 +139,7 @@ const AuthenticatedApp = () => {
       <Route path="/Marcas" element={<Marcas />} />
       <Route path="/gracias" element={<Gracias />} />
       <Route path="/solicitud" element={<Solicitud />} />
+      <Route path="/weber" element={<Weber />} />
       <Route path="/Pricing" element={<Pricing />} />
       <Route path="/GuestCatalogPreview" element={<GuestCatalogPreview />} />
       <Route path="/ContactLeads" element={<ContactLeads />} />
@@ -161,6 +164,7 @@ const AuthenticatedApp = () => {
       <Route path="/CatalogoAdmin" element={<ProtectedAdminRoute element={<CatalogoAdmin />} />} />
       <Route path="/ArtistPanelList" element={<ProtectedAdminRoute element={<ArtistPanelList />} />} />
       <Route path="/ADNdeMarca" element={<ProtectedAdminRoute element={<ADNdeMarca />} />} />
+      <Route path="/WeberAdmin" element={<ProtectedAdminRoute element={<WeberAdmin />} />} />
 
       {/* Legacy pages config loop */}
       {Object.entries(Pages).map(([path, Page]) => (

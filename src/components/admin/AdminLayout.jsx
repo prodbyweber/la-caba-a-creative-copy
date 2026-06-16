@@ -9,6 +9,7 @@ import {
   User,
   LogOut,
   ChevronRight,
+  Film,
 } from "lucide-react";
 import AdminBottomNav from "@/components/admin/AdminBottomNav";
 import { Link, useLocation } from "react-router-dom";
@@ -21,6 +22,7 @@ const navItems = [
   { icon: Calendar, label: "Calendario", page: "Calendars" },
   { icon: Inbox, label: "Solicitudes", page: "ContactLeads" },
   { icon: Monitor, label: "Design Editor", page: "DesignEditor" },
+  { icon: Film, label: "Weber", page: "WeberAdmin" },
 ];
 
 export default function AdminLayout({ children, activePage }) {
