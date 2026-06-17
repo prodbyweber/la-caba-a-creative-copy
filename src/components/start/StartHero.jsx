@@ -86,23 +86,6 @@ export default function StartHero() {
         {/* Text content */}
         <div className="hero-text-col-new">
           <div style={{ display: "flex", flexDirection: "column", gap: "clamp(14px, 2.2vw, 20px)", maxWidth: "800px", margin: "0 auto" }}>
-            {/* Pre-label */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                fontFamily: "'Helvetica Neue', sans-serif",
-                fontSize: "clamp(0.78rem, 1.3vw, 0.92rem)",
-                fontWeight: 500,
-                color: "rgba(240,237,232,0.45)",
-                letterSpacing: "0.04em",
-                margin: 0,
-              }}
-            >
-              ¿Tienes el talento pero no el plan?
-            </motion.p>
-
             {/* Headline */}
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
@@ -184,12 +167,22 @@ export default function StartHero() {
           transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
         >
           {!videoLoaded && (
-            <div className={`hero-video-loader ${videoLoaded ? "hidden" : ""}`}>
+            <div className={`hero-video-loader ${videoLoaded ? "hidden" : ""}`} style={{
+              backgroundImage: `url(https://img.youtube.com/vi/${YOUTUBE_VIDEO_ID}/maxresdefault.jpg)`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}>
               <div style={{
-                width: "28px", height: "28px", borderRadius: "50%",
-                border: "2px solid rgba(255,88,51,0.3)", borderTopColor: "#ff5833",
-                animation: "spin-hero 0.8s linear infinite",
-              }} />
+                position: "absolute", inset: 0,
+                background: "rgba(13,13,13,0.55)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <div style={{
+                  width: "28px", height: "28px", borderRadius: "50%",
+                  border: "2px solid rgba(255,88,51,0.3)", borderTopColor: "#ff5833",
+                  animation: "spin-hero 0.8s linear infinite",
+                }} />
+              </div>
               <style>{`@keyframes spin-hero { to { transform: rotate(360deg); } }`}</style>
             </div>
           )}
