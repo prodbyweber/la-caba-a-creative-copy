@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import StartNav from "@/components/start/StartNav";
 import StartHero from "@/components/start/StartHero";
-import StartBrandsCarousel from "@/components/start/StartBrandsCarousel";
 import CatalogoCarousel from "@/components/start/CatalogoCarousel";
 import ProblemSolution from "@/components/start/ProblemSolution";
 import HowItWorksAccordion from "@/components/start/HowItWorksAccordion";
@@ -32,29 +31,19 @@ export default function Start() {
     }}>
       <StartNav />
 
-      {/* 1. Hero — con YouTube embed y CTA debajo del vídeo */}
+      {/* 1. Hero — con YouTube embed, CTA y carrusel de marcas */}
       <StartHero />
 
-      {/* 2. Carrusel de marcas colaboradoras — loop infinito */}
-      <section style={{
-        background: "#0a0a0a",
-        padding: "28px 0",
-        borderTop: "1px solid rgba(255,255,255,0.04)",
-        borderBottom: "1px solid rgba(255,255,255,0.04)",
-      }}>
-        <StartBrandsCarousel />
-      </section>
-
-      {/* 3. Sección de Agitación del Problema */}
+      {/* 2. Sección de Agitación del Problema */}
       <ProblemSolution />
 
-      {/* 4. Sección del Proceso — acordeones desplegables */}
+      {/* 3. Sección del Proceso — acordeones desplegables */}
       <HowItWorksAccordion />
 
-      {/* 5. Catálogo / Portafolio */}
+      {/* 4. Catálogo / Portafolio */}
       <CatalogoCarousel />
 
-      {/* 6. Cierre de embudo — "Comenzar" con Calendly integrado */}
+      {/* 5. Cierre de embudo — "Comenzar" con Calendly integrado */}
       <div id="contacto">
         <StartChoosePath />
       </div>
