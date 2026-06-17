@@ -6,13 +6,8 @@ const YOUTUBE_VIDEO_ID = "im6BfAvTsLA";
 
 export default function StartHero() {
   const [videoLoaded, setVideoLoaded] = useState(false);
-  const [showPlayOverlay, setShowPlayOverlay] = useState(true);
 
   const youtubeEmbedUrl = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&mute=0&loop=1&playlist=${YOUTUBE_VIDEO_ID}&controls=1&fs=1&showinfo=0&rel=0&modestbranding=1&playsinline=1`;
-
-  const handlePlayClick = () => {
-    setShowPlayOverlay(false);
-  };
 
   return (
     <section id="hero" style={{ background: "#080808", position: "relative", overflow: "hidden" }}>
@@ -57,38 +52,6 @@ export default function StartHero() {
         .hero-video-loader.hidden {
           opacity: 0;
           pointer-events: none;
-        }
-        .cinematic-play-overlay {
-          position: absolute;
-          inset: 0;
-          z-index: 3;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: rgba(0,0,0,0.15);
-          transition: opacity 0.5s ease;
-          cursor: pointer;
-        }
-        .cinematic-play-overlay.fading {
-          opacity: 0;
-          pointer-events: none;
-        }
-        .cinematic-play-btn {
-          width: clamp(64px, 8vw, 88px);
-          height: clamp(64px, 8vw, 88px);
-          border-radius: 50%;
-          background: #000000;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: none;
-          cursor: pointer;
-          box-shadow: 0 0 40px rgba(0,0,0,0.6), 0 0 80px rgba(0,0,0,0.35), 0 8px 32px rgba(0,0,0,0.5);
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .cinematic-play-btn:hover {
-          transform: scale(1.06);
-          box-shadow: 0 0 50px rgba(0,0,0,0.75), 0 0 100px rgba(0,0,0,0.45), 0 10px 40px rgba(0,0,0,0.6);
         }
         .hero-text-col-new {
           order: 1;
@@ -210,21 +173,6 @@ export default function StartHero() {
               height: "100%",
             }}
           />
-          {/* Custom cinematic play overlay */}
-          <div
-            className={`cinematic-play-overlay ${!showPlayOverlay ? "fading" : ""}`}
-            onClick={handlePlayClick}
-          >
-            <button
-              className="cinematic-play-btn"
-              onClick={(e) => { e.stopPropagation(); handlePlayClick(); }}
-              aria-label="Reproducir vídeo"
-            >
-              <svg width="28" height="32" viewBox="0 0 28 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginLeft: "4px" }}>
-                <path d="M0 0L28 16L0 32V0Z" fill="#FFFFFF" />
-              </svg>
-            </button>
-          </div>
         </motion.div>
 
         {/* CTA — debajo del vídeo */}
