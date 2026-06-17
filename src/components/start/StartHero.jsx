@@ -123,7 +123,7 @@ export default function StartHero() {
               Lleva tu música del estudio al mercado real.
             </motion.h1>
 
-            {/* Description */}
+            {/* Subtitle */}
             <motion.p
               initial={{ opacity: 0, y: 25 }}
               animate={{ opacity: 1, y: 0 }}
@@ -137,7 +137,24 @@ export default function StartHero() {
                 margin: 0,
               }}
             >
-              Dejemos atrás las maquetas. Diseñamos, producimos y posicionamos tu proyecto musical con la estética visual y el sonido premium que exige la industria hoy.
+              El fin de las maquetas. Creamos el sonido y la identidad visual de tu próximo proyecto.
+            </motion.p>
+
+            {/* Video hint */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                fontFamily: "'Helvetica Neue', sans-serif",
+                fontWeight: 600,
+                fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)",
+                color: "rgba(240,237,232,0.7)",
+                lineHeight: 1.5,
+                margin: 0,
+              }}
+            >
+              Mira este video de 5 minutos antes de agendar. Es el filtro para ver si tu visión conecta con el estudio y entras en los 10 artistas de este año.
             </motion.p>
           </div>
         </div>
