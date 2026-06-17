@@ -183,7 +183,7 @@ export default function StartHero() {
           transition={{ duration: 0.7, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
         >
           <button
-            onClick={() => { document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth" }); }}
+            onClick={() => { document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}
             style={{
               fontFamily: "'Helvetica Neue', sans-serif",
               fontWeight: 900,
