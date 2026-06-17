@@ -140,7 +140,7 @@ export default function StartHero() {
               El fin de las maquetas. Creamos el sonido y la identidad visual de tu próximo proyecto.
             </motion.p>
 
-            {/* Video hint */}
+            {/* Video hint — line 1 */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -149,12 +149,29 @@ export default function StartHero() {
                 fontFamily: "'Helvetica Neue', sans-serif",
                 fontWeight: 600,
                 fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)",
-                color: "rgba(240,237,232,0.7)",
+                color: "#ff5833",
                 lineHeight: 1.5,
                 margin: 0,
               }}
             >
-              Mira este video de 5 minutos antes de agendar. Es el filtro para entrar en los 10 artistas de este año.
+              Mira este video de 5 minutos antes de agendar.
+            </motion.p>
+
+            {/* Video hint — line 2 */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                fontFamily: "'Helvetica Neue', sans-serif",
+                fontWeight: 500,
+                fontSize: "clamp(0.75rem, 1.1vw, 0.82rem)",
+                color: "rgba(240,237,232,0.55)",
+                lineHeight: 1.5,
+                margin: 0,
+              }}
+            >
+              Es el filtro para entrar en los 10 artistas de este año.
             </motion.p>
           </div>
         </div>
