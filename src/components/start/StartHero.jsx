@@ -154,7 +154,7 @@ export default function StartHero() {
                 margin: 0,
               }}
             >
-              Mira este video de 5 minutos antes de agendar. Es el filtro para ver si tu visión conecta con el estudio y entras en los 10 artistas de este año.
+              Mira este video de 5 minutos antes de agendar. Es el filtro para entrar en los 10 artistas de este año.
             </motion.p>
           </div>
         </div>
