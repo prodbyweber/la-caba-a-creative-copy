@@ -30,13 +30,6 @@ export default function StartBrandsCarousel() {
           animation: infinite-scroll 30s linear infinite;
           width: max-content;
         }
-        .scroll-track:hover {
-          animation-play-state: paused;
-        }
-        .scroll-track:hover .brand-cell img {
-          filter: brightness(1) !important;
-          opacity: 1 !important;
-        }
         .brand-cell {
           display: flex;
           align-items: center;
@@ -51,19 +44,18 @@ export default function StartBrandsCarousel() {
           max-width: 100%;
           max-height: 100%;
           object-fit: contain;
-          filter: grayscale(1) brightness(0.7);
-          opacity: 0.6;
-          transition: filter 0.4s ease, opacity 0.4s ease;
+          filter: brightness(1);
+          opacity: 1;
+          transition: filter 0.35s ease, opacity 0.35s ease, transform 0.35s ease;
+        }
+        .brand-cell img:hover {
+          filter: brightness(1.3) drop-shadow(0 0 14px rgba(255,255,255,0.35));
+          transform: scale(1.05);
         }
         @media (max-width: 640px) {
           .brand-cell {
             height: 80px;
-            width: 160px;
             padding: 14px 18px;
-          }
-          @keyframes infinite-scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-${logos.length * 160}px); }
           }
         }
       `}</style>

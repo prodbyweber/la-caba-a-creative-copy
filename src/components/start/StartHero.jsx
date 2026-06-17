@@ -6,7 +6,7 @@ const YOUTUBE_VIDEO_ID = "im6BfAvTsLA";
 export default function StartHero() {
   const [videoLoaded, setVideoLoaded] = useState(false);
 
-  const youtubeEmbedUrl = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&mute=1&loop=1&playlist=${YOUTUBE_VIDEO_ID}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1`;
+  const youtubeEmbedUrl = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&mute=0&loop=1&playlist=${YOUTUBE_VIDEO_ID}&showinfo=0&rel=0&modestbranding=1&playsinline=1`;
 
   return (
     <section id="hero" style={{ background: "#080808", position: "relative", overflow: "hidden" }}>
@@ -189,7 +189,7 @@ export default function StartHero() {
             onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; e.currentTarget.style.transform = "translateY(-1px)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.transform = "translateY(0)"; }}
           >
-            Solicitar información →
+            Agendar videollamada →
           </button>
         </motion.div>
       </div>
