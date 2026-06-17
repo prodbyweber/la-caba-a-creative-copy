@@ -183,7 +183,7 @@ export default function StartHero() {
           transition={{ duration: 0.7, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
         >
           <button
-            onClick={() => { window.dispatchEvent(new CustomEvent("open-application-modal")); }}
+            onClick={() => { document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth" }); }}
             style={{
               fontFamily: "'Helvetica Neue', sans-serif",
               fontWeight: 900,
