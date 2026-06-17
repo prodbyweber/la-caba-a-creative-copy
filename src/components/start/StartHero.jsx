@@ -154,7 +154,7 @@ export default function StartHero() {
                 margin: 0,
               }}
             >
-              Mira este video de 5 minutos antes de agendar.
+              Mira este video de 5 minutos antes de agendar tu sesión
             </motion.p>
 
             {/* Video hint — line 2 */}
