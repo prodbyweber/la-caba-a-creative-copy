@@ -234,7 +234,7 @@ export default function StartHero() {
             onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; e.currentTarget.style.transform = "translateY(-1px)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.transform = "translateY(0)"; }}
           >
-            Agendar videollamada →
+            Sesión de descubrimiento gratis
           </button>
         </motion.div>
 
