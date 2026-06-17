@@ -14,45 +14,56 @@ export default function StartBrandsCarousel() {
 
   if (!logos || logos.length === 0) return null;
 
+  // Duplicate logos for seamless loop
+  const loopLogos = [...logos, ...logos, ...logos];
+
   return (
-    <div style={{ width: "100%" }}>
+    <div style={{ width: "100%", overflow: "hidden" }}>
       <style>{`
-        .brands-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 12px;
-          max-width: 1400px;
-          margin: 0 auto;
-          padding: 0 20px;
+        @keyframes infinite-scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-${logos.length * 200}px); }
+        }
+        .scroll-track {
+          display: flex;
+          gap: 0;
+          animation: infinite-scroll 30s linear infinite;
+          width: max-content;
+        }
+        .scroll-track:hover {
+          animation-play-state: paused;
+        }
+        .scroll-track:hover .brand-cell img {
+          filter: brightness(1) !important;
+          opacity: 1 !important;
         }
         .brand-cell {
           display: flex;
           align-items: center;
           justify-content: center;
-          height: 120px;
-          min-height: 120px;
-          background: rgba(255,255,255,0.015);
-          border-radius: 16px;
-          padding: 20px;
-          border: 1px solid rgba(255,255,255,0.04);
+          height: 100px;
+          width: 200px;
+          flex-shrink: 0;
+          padding: 18px 24px;
           box-sizing: border-box;
         }
-        @media (min-width: 1280px) {
-          .brands-grid {
-            gap: 16px;
-            padding: 0 40px;
-          }
+        .brand-cell img {
+          max-width: 100%;
+          max-height: 100%;
+          object-fit: contain;
+          filter: grayscale(1) brightness(0.7);
+          opacity: 0.6;
+          transition: filter 0.4s ease, opacity 0.4s ease;
         }
         @media (max-width: 640px) {
-          .brands-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            padding: 0 12px;
-          }
           .brand-cell {
-            height: 140px;
-            min-height: 140px;
-            padding: 22px;
+            height: 80px;
+            width: 160px;
+            padding: 14px 18px;
+          }
+          @keyframes infinite-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-${logos.length * 160}px); }
           }
         }
       `}</style>
@@ -76,32 +87,19 @@ export default function StartBrandsCarousel() {
         Con quienes hemos colaborado
       </motion.p>
 
-      {/* Grid */}
-      <div className="brands-grid">
-        {logos.map((logo, idx) => (
-          <motion.div
-            key={idx}
-            className="brand-cell"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.4 + idx * 0.07, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <motion.img
-              src={logo}
-              alt="Brand"
-              draggable={false}
-              whileHover={{ scale: 1.04, filter: "brightness(1.35) drop-shadow(0 0 10px rgba(255,255,255,0.18))" }}
-              transition={{ duration: 0.35, ease: "easeOut" }}
-              style={{
-                maxWidth: "100%",
-                maxHeight: "100%",
-                objectFit: "contain",
-                opacity: 1,
-                filter: "brightness(1)",
-              }}
-            />
-          </motion.div>
-        ))}
+      {/* Infinite scroll track */}
+      <div style={{ overflow: "hidden", maskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)", WebkitMaskImage: "linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)" }}>
+        <div className="scroll-track">
+          {loopLogos.map((logo, idx) => (
+            <div key={idx} className="brand-cell">
+              <img
+                src={logo}
+                alt="Brand logo"
+                draggable={false}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

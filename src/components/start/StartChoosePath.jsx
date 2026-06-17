@@ -1,8 +1,7 @@
-import React, { useRef, useEffect, useState, lazy } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { useNavigate } from "react-router-dom";
 import PhoneInput from "./PhoneInput";
 
 function useAutoPlay(src) {
@@ -527,8 +526,6 @@ function InlineContactForm() {
 export default function StartChoosePath() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-  const [openPanel, setOpenPanel] = useState(null); // "artist" | "brand" | null
-  const navigate = useNavigate();
 
   const { data: cfg } = useQuery({
     queryKey: ["landingConfig"],
@@ -538,16 +535,6 @@ export default function StartChoosePath() {
 
   const bgSrc = cfg?.comenzar_bg_image || "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/a32a65d3c_Still2026-05-22190754_1431.jpg";
   const vidRef = useAutoPlay(isVideo(bgSrc) ? bgSrc : null);
-
-  const PATHS = [
-    { key: "artist", label: "Artista / Creador" },
-  ];
-
-  const toggle = (key) => {
-    window.dispatchEvent(new CustomEvent("open-application-modal"));
-  };
-
-  const btnColor = (key) => key === "artist" ? "#ff5833" : "rgba(240,237,232,0.6)";
 
   return (
     <section
@@ -654,94 +641,14 @@ export default function StartChoosePath() {
           Una reunión para conocer tu visión creativa, analizar tu proyecto y explorar cómo podemos ayudarte a desarrollar tu sonido, identidad visual y dirección artística a través de Cabaña Creative.
         </motion.p>
 
-        {/* Contacto — colapsable minimalista */}
+        {/* Calendly widget directo — sin toggle ni texto "Artista / Creador" */}
         <motion.div
-          initial={{ opacity: 0, x: -16 }}
-          animate={inView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.65, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          style={{ marginBottom: "clamp(24px, 5vw, 40px)" }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
-          <InlineContactForm />
+          <CalendlyEmbed />
         </motion.div>
-
-        {/* Paths */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-          {PATHS.map((path, i) => (
-            <div key={path.key}>
-              <motion.button
-                initial={{ opacity: 0, x: -16 }}
-                animate={inView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.65, delay: 0.4 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
-                onClick={() => toggle(path.key)}
-                style={{
-                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                  fontWeight: 900,
-                  fontSize: "clamp(1.8rem, 6vw, 4rem)",
-                  letterSpacing: "-0.03em",
-                  color: btnColor(path.key),
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "16px",
-                  textAlign: "left",
-                  width: "100%",
-                  paddingBottom: "clamp(10px, 2vw, 16px)",
-                  borderBottom: "1px solid rgba(255,255,255,0.08)",
-                  marginBottom: openPanel === path.key ? "0" : "clamp(10px, 2vw, 16px)",
-                  transition: "color 0.35s cubic-bezier(0.22, 1, 0.36, 1), gap 0.35s cubic-bezier(0.22, 1, 0.36, 1), textShadow 0.35s ease",
-                  textShadow: btnColor(path.key) === "#ff5833"
-                    ? "0 0 16px rgba(255,88,51,0.5), 0 0 32px rgba(255,88,51,0.25)"
-                    : "none",
-                }}
-                onMouseEnter={e => { 
-                  e.currentTarget.style.color = "#f0ede8"; 
-                  e.currentTarget.style.gap = "24px";
-                  e.currentTarget.style.textShadow = "0 0 20px rgba(255,88,51,0.6), 0 0 40px rgba(255,88,51,0.3)";
-                }}
-                onMouseLeave={e => { 
-                  e.currentTarget.style.color = btnColor(path.key); 
-                  e.currentTarget.style.gap = "16px";
-                  e.currentTarget.style.textShadow = btnColor(path.key) === "#ff5833"
-                    ? "0 0 16px rgba(255,88,51,0.5), 0 0 32px rgba(255,88,51,0.25)"
-                    : "none";
-                }}
-              >
-                {path.label}
-                <motion.span
-                  animate={{ 
-                    rotate: openPanel === path.key ? 90 : 0,
-                    x: openPanel === path.key ? 4 : 0,
-                  }}
-                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ fontSize: "clamp(1.2rem, 3vw, 2rem)", opacity: 0.6, display: "inline-block" }}
-                >
-                  →
-                </motion.span>
-              </motion.button>
-
-              <AnimatePresence>
-                {openPanel === path.key && (
-                  <motion.div
-                    key={path.key + "-panel"}
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                    style={{ overflow: "visible", marginBottom: "clamp(10px, 2vw, 16px)" }}
-                  >
-                    <CalendlyPanel />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ))}
-
-        </div>
-
-
       </div>
     </section>
   );

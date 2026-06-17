@@ -1,180 +1,80 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
-import { base44 } from "@/api/base44Client";
 
-const STATS = [
-  { label: "Método de trabajo", value: "Presencial · Online" },
-  { label: "Duración", value: "90 días" },
-  { label: "Plazas disponibles", value: "27" },
-  { label: "Horario", value: "Lunes a Viernes 15:00 – 22:00" },
-];
+const YOUTUBE_VIDEO_ID = "im6BfAvTsLA";
 
 export default function StartHero() {
-  const { data: cfg } = useQuery({
-    queryKey: ["landingConfig"],
-    queryFn: async () => { const c = await base44.entities.LandingConfig.list(); return c[0] || null; },
-    staleTime: 30000,
-  });
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
-  const videoSrc = cfg?.hero_video_url || null;
-  const imageSrc = cfg?.hero_banner_1_image || null;
-
-  const videoRef = useRef(null);
-  const [videoReady, setVideoReady] = useState(false);
-  const [videoError, setVideoError] = useState(false);
-
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v || !videoSrc) return;
-
-    setVideoReady(false);
-    setVideoError(false);
-
-    const tryPlay = () => {
-      v.muted = true;
-      v.play().catch(() => {
-        setTimeout(() => v.play().catch(() => {}), 400);
-      });
-    };
-
-    // loadeddata = first frame decoded → show video immediately
-    const onLoadedData = () => { setVideoReady(true); tryPlay(); };
-    // canplaythrough = enough buffered → fallback in case loadeddata fires late
-    const onCanPlayThrough = () => { setVideoReady(true); tryPlay(); };
-    const onError = () => setVideoError(true);
-    const onVisibility = () => {
-      if (!document.hidden && v.paused && !v.ended) v.play().catch(() => {});
-    };
-
-    v.addEventListener("loadeddata", onLoadedData);
-    v.addEventListener("canplaythrough", onCanPlayThrough);
-    v.addEventListener("error", onError);
-    document.addEventListener("visibilitychange", onVisibility);
-
-    // Force browser to start downloading immediately
-    v.load();
-    tryPlay();
-
-    return () => {
-      v.removeEventListener("loadeddata", onLoadedData);
-      v.removeEventListener("canplaythrough", onCanPlayThrough);
-      v.removeEventListener("error", onError);
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
-  }, [videoSrc]);
-
-  const showVideo = videoSrc && !videoError;
-  const showImage = imageSrc && (!showVideo || !videoReady);
+  const youtubeEmbedUrl = `https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}?autoplay=1&mute=1&loop=1&playlist=${YOUTUBE_VIDEO_ID}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1`;
 
   return (
     <section id="hero" style={{ background: "#080808", position: "relative", overflow: "hidden" }}>
       <style>{`
-        .hero-wrap {
+        .hero-wrap-new {
           display: flex;
           flex-direction: column;
           min-height: 100dvh;
-          max-width: 1920px;
+          max-width: 1200px;
           margin: 0 auto;
+          padding: clamp(80px, 10vw, 120px) clamp(20px, 6vw, 56px) clamp(40px, 6vw, 80px);
         }
-        .hero-text-col {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          padding: clamp(80px, 10vw, 120px) clamp(24px, 6vw, 56px) 0;
-          position: relative;
-          z-index: 10;
-          order: 1;
-        }
-        .hero-media-col {
+        .hero-video-container {
           width: 100%;
-          height: 52vw;
-          max-height: 52vh;
-          min-height: 220px;
+          position: relative;
+          border-radius: 14px;
           overflow: hidden;
-          position: relative;
-          flex-shrink: 0;
-          order: 2;
-          margin-top: 24px;
+          box-shadow: 0 0 60px rgba(0,0,0,0.7), 0 0 120px rgba(0,0,0,0.4), 0 20px 60px rgba(0,0,0,0.5);
+          aspect-ratio: 16 / 9;
           background: #0d0d0d;
+          margin-top: clamp(24px, 4vw, 40px);
+          margin-bottom: clamp(28px, 5vw, 48px);
+          order: 2;
         }
-        .hero-stats-grid {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-          margin-top: 16px;
-          order: 3;
-          padding: 0 20px 40px;
+        .hero-video-container iframe {
+          position: absolute;
+          inset: 0;
           width: 100%;
-          box-sizing: border-box;
+          height: 100%;
+          border: none;
         }
-        .hero-stats-inline {
-          display: none;
+        .hero-video-loader {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #0d0d0d;
+          z-index: 2;
+          transition: opacity 0.5s ease;
+        }
+        .hero-video-loader.hidden {
+          opacity: 0;
+          pointer-events: none;
+        }
+        .hero-text-col-new {
+          order: 1;
+          text-align: center;
+        }
+        .hero-cta-row-new {
+          order: 3;
+          display: flex;
+          justify-content: center;
         }
         @media (min-width: 768px) {
-          .hero-wrap {
-            flex-direction: row;
-            height: 100dvh;
-          }
-          .hero-text-col {
-            width: 54%;
-            flex: none;
-            padding: 80px clamp(40px, 6vw, 56px) 60px;
-            order: 1;
-            display: flex;
-            flex-direction: column;
+          .hero-wrap-new {
             justify-content: center;
           }
-          .hero-media-col {
-            width: 46%;
-            max-height: none;
-            height: 100%;
-            flex: 1;
-            order: 2;
-            margin-top: 0;
+          .hero-text-col-new {
+            text-align: center;
           }
-          .hero-stats-grid {
-            display: none;
-          }
-          .hero-stats-inline {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: clamp(20px, 3vw, 32px);
-            width: 100%;
-          }
-        }
-        @media (min-width: 1200px) {
-          .hero-text-col { padding: 120px clamp(56px, 8vw, 80px) 80px; }
-        }
-        @media (min-width: 1280px) {
-          .hero-text-col h1 {
-            font-size: clamp(2.1rem, 3.5vw, 4rem) !important;
-          }
-        }
-        .hero-video {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-          transition: opacity 0.6s ease;
-        }
-        .hero-poster {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
         }
       `}</style>
 
-      <div className="hero-wrap">
-        {/* Left: content */}
-        <div className="hero-text-col">
-          <div style={{ display: "flex", flexDirection: "column", gap: "clamp(14px, 2.2vw, 20px)", maxWidth: "600px" }}>
+      <div className="hero-wrap-new">
+        {/* Text content */}
+        <div className="hero-text-col-new">
+          <div style={{ display: "flex", flexDirection: "column", gap: "clamp(14px, 2.2vw, 20px)", maxWidth: "800px", margin: "0 auto" }}>
             {/* Pre-label */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -200,12 +100,11 @@ export default function StartHero() {
               style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 900,
-                fontSize: "clamp(2.1rem, 4vw, 4rem)",
+                fontSize: "clamp(2.1rem, 5vw, 4rem)",
                 letterSpacing: "-0.04em",
                 lineHeight: 0.93,
                 color: "#f0ede8",
                 margin: 0,
-                maxWidth: "100%",
                 wordBreak: "break-word",
                 overflowWrap: "break-word",
               }}
@@ -225,141 +124,73 @@ export default function StartHero() {
                 color: "rgba(240,237,232,0.52)",
                 lineHeight: 1.65,
                 margin: 0,
-                maxWidth: "480px",
               }}
             >
               Dejemos atrás las maquetas. Diseñamos, producimos y posicionamos tu proyecto musical con la estética visual y el sonido premium que exige la industria hoy.
             </motion.p>
-
-            {/* CTA row */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center" }}
-            >
-              <button
-                onClick={() => { window.dispatchEvent(new CustomEvent("open-application-modal")); }}
-                style={{
-                  fontFamily: "'Helvetica Neue', sans-serif",
-                  fontWeight: 900,
-                  fontSize: "clamp(0.85rem, 1.4vw, 0.95rem)",
-                  letterSpacing: "0.01em",
-                  background: "#ff5833",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "8px",
-                  padding: "clamp(13px, 1.8vw, 17px) clamp(22px, 3vw, 36px)",
-                  cursor: "pointer",
-                  transition: "background 0.2s ease, transform 0.2s ease",
-                  flexShrink: 0,
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.transform = "translateY(0)"; }}
-              >
-                Solicitar información →
-              </button>
-            </motion.div>
-
-            {/* Stats inline — desktop only */}
-            <motion.div
-              className="hero-stats-inline"
-              initial={{ opacity: 0, y: 25 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.75, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            >
-              {STATS.map((stat, idx) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.9 + (idx * 0.1), ease: [0.22, 1, 0.36, 1] }}
-                  style={{
-                    background: "#111",
-                    borderRadius: "10px",
-                    padding: "12px 14px",
-                    border: "1px solid rgba(255,255,255,0.05)",
-                  }}
-                >
-                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "8px", fontWeight: 700, color: "rgba(240,237,232,0.28)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 3px" }}>{stat.label}</p>
-                  <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)", fontWeight: 700, color: "#f0ede8", margin: 0, letterSpacing: "-0.02em" }}>{stat.value}</p>
-                </motion.div>
-              ))}
-            </motion.div>
-
           </div>
         </div>
 
-        {/* Right: Media */}
+        {/* YouTube Embed */}
         <motion.div
-          className="hero-media-col"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
+          className="hero-video-container"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
         >
-          {/* Poster / fallback image — always visible until video is ready */}
-          {imageSrc && (
-            <img
-              className="hero-poster"
-              src={imageSrc}
-              alt=""
-              style={{ opacity: (showVideo && videoReady) ? 0 : 1, transition: "opacity 0.6s ease" }}
-            />
+          {!videoLoaded && (
+            <div className={`hero-video-loader ${videoLoaded ? "hidden" : ""}`}>
+              <div style={{
+                width: "28px", height: "28px", borderRadius: "50%",
+                border: "2px solid rgba(255,88,51,0.3)", borderTopColor: "#ff5833",
+                animation: "spin-hero 0.8s linear infinite",
+              }} />
+              <style>{`@keyframes spin-hero { to { transform: rotate(360deg); } }`}</style>
+            </div>
           )}
-
-          {/* Dark background if no image yet */}
-          {!imageSrc && (
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, #1a1a1a 0%, #0c0c0c 100%)" }} />
-          )}
-
-          {/* Video — fades in once loaded */}
-          {showVideo && (
-            <video
-              ref={videoRef}
-              className="hero-video"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-              style={{ opacity: videoReady ? 1 : 0 }}
-            >
-              <source src={videoSrc} type="video/mp4" />
-              {videoSrc.endsWith('.webm') && <source src={videoSrc.replace('.webm', '.mp4')} type="video/mp4" />}
-            </video>
-          )}
-
-          {/* Overlays */}
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(8,8,8,0.45) 0%, transparent 35%)", pointerEvents: "none", zIndex: 2 }} />
-          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: "25%", background: "linear-gradient(to top, rgba(8,8,8,0.7) 0%, transparent 100%)", pointerEvents: "none", zIndex: 2 }} />
+          <iframe
+            src={youtubeEmbedUrl}
+            title="Cabaña Creative — Lleva tu música del estudio al mercado real"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            allowFullScreen
+            onLoad={() => setVideoLoaded(true)}
+            style={{
+              border: "none",
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+            }}
+          />
         </motion.div>
 
-        {/* Stats — below video on mobile only */}
+        {/* CTA — debajo del vídeo */}
         <motion.div
-          className="hero-stats-grid"
-          initial={{ opacity: 0, y: 25 }}
+          className="hero-cta-row-new"
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.75, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.7, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
         >
-          {STATS.map((stat, idx) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.9 + (idx * 0.1), ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                background: "rgba(255,255,255,0.04)",
-                borderRadius: "16px",
-                padding: "28px 24px",
-                border: "1px solid rgba(255,255,255,0.08)",
-                width: "100%",
-                boxSizing: "border-box",
-              }}
-            >
-              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "1.15rem", fontWeight: 700, color: "#f0ede8", margin: "0 0 8px", letterSpacing: "-0.01em" }}>{stat.label}</p>
-              <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "0.95rem", fontWeight: 400, color: "rgba(240,237,232,0.5)", margin: 0, lineHeight: 1.4 }}>{stat.value}</p>
-            </motion.div>
-          ))}
+          <button
+            onClick={() => { window.dispatchEvent(new CustomEvent("open-application-modal")); }}
+            style={{
+              fontFamily: "'Helvetica Neue', sans-serif",
+              fontWeight: 900,
+              fontSize: "clamp(0.85rem, 1.4vw, 0.95rem)",
+              letterSpacing: "0.01em",
+              background: "#ff5833",
+              color: "#fff",
+              border: "none",
+              borderRadius: "8px",
+              padding: "clamp(13px, 1.8vw, 17px) clamp(22px, 3vw, 36px)",
+              cursor: "pointer",
+              transition: "background 0.2s ease, transform 0.2s ease",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.transform = "translateY(0)"; }}
+          >
+            Solicitar información →
+          </button>
         </motion.div>
       </div>
     </section>
