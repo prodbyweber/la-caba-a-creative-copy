@@ -100,7 +100,7 @@ export default function StartHero() {
                 margin: 0,
               }}
             >
-              ¿Tienes el talento pero no el plan?
+              Mira este video de 5 minutos antes de agendar. Es el filtro para ver si tu visión conecta con el estudio y entras en los 10 artistas de este año.
             </motion.p>
 
             {/* Headline */}
@@ -120,7 +120,7 @@ export default function StartHero() {
                 overflowWrap: "break-word",
               }}
             >
-              Lleva tu música del estudio al mercado real.
+              El fin de las maquetas. Creamos el sonido y la identidad visual de tu próximo proyecto.
             </motion.h1>
 
             {/* Description */}
@@ -200,7 +200,7 @@ export default function StartHero() {
             onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; e.currentTarget.style.transform = "translateY(-1px)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.transform = "translateY(0)"; }}
           >
-            Agendar videollamada →
+            Solicitar sesión estratégica gratuita →
           </button>
         </motion.div>
 
