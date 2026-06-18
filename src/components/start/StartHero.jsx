@@ -203,6 +203,35 @@ export default function StartHero() {
 
         </motion.div>
 
+        {/* Video card CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          style={{ display: "flex", justifyContent: "center", marginBottom: "clamp(24px, 4vw, 40px)" }}
+        >
+          <button
+            onClick={() => { document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}
+            style={{
+              fontFamily: "'Helvetica Neue', sans-serif",
+              fontWeight: 600,
+              fontSize: "clamp(0.8rem, 1.2vw, 0.9rem)",
+              letterSpacing: "0.02em",
+              background: "#000",
+              color: "#fff",
+              border: "1px solid rgba(255,255,255,0.15)",
+              borderRadius: "8px",
+              padding: "clamp(10px, 1.4vw, 14px) clamp(20px, 2.8vw, 32px)",
+              cursor: "pointer",
+              transition: "background 0.2s ease, border-color 0.2s ease, transform 0.2s ease",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#1a1a1a"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#000"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; e.currentTarget.style.transform = "translateY(0)"; }}
+          >
+            Agendar sesión de descubrimiento gratis →
+          </button>
+        </motion.div>
+
         {/* CTA */}
         <motion.div
           className="hero-cta-row-new"
