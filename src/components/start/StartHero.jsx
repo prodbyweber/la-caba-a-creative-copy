@@ -140,22 +140,7 @@ export default function StartHero() {
               Mira este video de 5 minutos antes de agendar tu sesión
             </motion.p>
 
-            {/* Video hint — line 2 */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                fontFamily: "'Helvetica Neue', sans-serif",
-                fontWeight: 500,
-                fontSize: "clamp(0.75rem, 1.1vw, 0.82rem)",
-                color: "rgba(240,237,232,0.55)",
-                lineHeight: 1.5,
-                margin: 0,
-              }}
-            >
-              Es el filtro para entrar en los 10 artistas de este año.
-            </motion.p>
+
           </div>
         </div>
 
