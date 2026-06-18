@@ -184,22 +184,7 @@ export default function StartHero() {
               El fin de las maquetas. Creamos el sonido y la identidad visual de tu próximo proyecto.
             </motion.p>
 
-            {/* Video hint */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                fontFamily: "'Helvetica Neue', sans-serif",
-                fontWeight: 600,
-                fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)",
-                color: "#ff5833",
-                lineHeight: 1.5,
-                margin: 0,
-              }}
-            >
-              Mira este video de 5 minutos antes de agendar tu sesión
-            </motion.p>
+
           </div>
         </div>
 
