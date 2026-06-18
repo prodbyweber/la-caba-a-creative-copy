@@ -214,35 +214,6 @@ export default function StartHero() {
             onClick={() => { document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}
             style={{
               fontFamily: "'Helvetica Neue', sans-serif",
-              fontWeight: 600,
-              fontSize: "clamp(0.8rem, 1.2vw, 0.9rem)",
-              letterSpacing: "0.02em",
-              background: "#000",
-              color: "#fff",
-              border: "1px solid rgba(255,255,255,0.15)",
-              borderRadius: "8px",
-              padding: "clamp(10px, 1.4vw, 14px) clamp(20px, 2.8vw, 32px)",
-              cursor: "pointer",
-              transition: "background 0.2s ease, border-color 0.2s ease, transform 0.2s ease",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#1a1a1a"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "#000"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; e.currentTarget.style.transform = "translateY(0)"; }}
-          >
-            Agendar sesión de descubrimiento gratis →
-          </button>
-        </motion.div>
-
-        {/* CTA */}
-        <motion.div
-          className="hero-cta-row-new"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.65, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <button
-            onClick={() => { document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}
-            style={{
-              fontFamily: "'Helvetica Neue', sans-serif",
               fontWeight: 900,
               fontSize: "clamp(0.85rem, 1.4vw, 0.95rem)",
               letterSpacing: "0.01em",
@@ -257,7 +228,7 @@ export default function StartHero() {
             onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; e.currentTarget.style.transform = "translateY(-1px)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.transform = "translateY(0)"; }}
           >
-            Sesión de descubrimiento gratis →
+            Agendar sesión de descubrimiento gratuita →
           </button>
         </motion.div>
 
