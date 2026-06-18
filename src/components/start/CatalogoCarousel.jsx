@@ -36,7 +36,7 @@ export default function CatalogoCarousel() {
 
   const scroll = (direction) => {
     if (!carouselRef.current) return;
-    const scrollAmount = carouselRef.current.offsetWidth * 0.8;
+    const scrollAmount = carouselRef.current.offsetWidth * 0.55;
     carouselRef.current.scrollBy({
       left: direction === "left" ? -scrollAmount : scrollAmount,
       behavior: "smooth",
@@ -180,9 +180,9 @@ export default function CatalogoCarousel() {
                   onClick={() => handleCardClick(item.id)}
                   style={{
                     flex: "0 0 auto",
-                    width: isMobile ? "calc(100vw - 56px)" : "calc(20% - 16px)",
-                    minWidth: "280px",
-                    maxWidth: "400px",
+                    width: isMobile ? "calc(82vw - 16px)" : "calc(58% - 16px)",
+                    minWidth: isMobile ? "260px" : "340px",
+                    maxWidth: "600px",
                     aspectRatio: "16/9",
                     borderRadius: "12px",
                     overflow: "hidden",
