@@ -74,24 +74,29 @@ export default function StartHero() {
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          width: 72px;
-          height: 72px;
+          width: 80px;
+          height: 80px;
           border-radius: 50%;
-          background: rgba(255,255,255,0.85);
+          background: rgba(0,0,0,0.45);
+          backdrop-filter: blur(8px);
+          border: 1.5px solid rgba(255,255,255,0.2);
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: transform 0.3s ease, background 0.2s ease;
+          transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+          box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
         .hero-video-card:hover .hero-play-icon {
           transform: translate(-50%, -50%) scale(1.08);
-          background: #ff5833;
+          background: rgba(0,0,0,0.65);
+          border-color: rgba(255,255,255,0.35);
+          box-shadow: 0 0 40px rgba(0,0,0,0.7);
         }
         .hero-play-icon svg {
-          width: 28px;
-          height: 28px;
+          width: 30px;
+          height: 30px;
         }
-        .hero-video-card:hover .hero-play-icon svg path {
+        .hero-play-icon svg path {
           fill: white;
         }
 
@@ -203,7 +208,7 @@ export default function StartHero() {
 
           {/* Play icon */}
           <div className="hero-play-icon">
-            <svg viewBox="0 0 24 24" fill="black">
+            <svg viewBox="0 0 24 24" fill="white">
               <path d="M8 5V19L19 12L8 5Z" fill="currentColor"/>
             </svg>
           </div>
