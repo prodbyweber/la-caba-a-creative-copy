@@ -156,7 +156,7 @@ export default function StartHero() {
                 overflowWrap: "break-word",
               }}
             >
-              Lleva tu música del estudio al mercado actual.
+              ¿Cómo llevar tu música al mercado actual?
             </motion.h1>
 
             {/* Subtitle */}
