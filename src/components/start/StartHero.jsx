@@ -100,19 +100,6 @@ export default function StartHero() {
           fill: white;
         }
 
-        /* Card label */
-        .hero-card-label {
-          position: absolute;
-          bottom: 16px;
-          left: 16px;
-          right: 16px;
-          font-family: 'Helvetica Neue', sans-serif;
-          font-weight: 700;
-          font-size: 16px;
-          color: #ffffff;
-          margin: 0;
-        }
-
         @media (min-width: 768px) {
           .hero-wrap-new {
             justify-content: center;
@@ -213,10 +200,7 @@ export default function StartHero() {
             </svg>
           </div>
 
-          {/* Card label */}
-          <div className="hero-card-label">
-            Cabaña Creative
-          </div>
+
         </motion.div>
 
         {/* CTA */}
