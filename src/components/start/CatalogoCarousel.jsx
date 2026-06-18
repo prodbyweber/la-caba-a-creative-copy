@@ -180,9 +180,9 @@ export default function CatalogoCarousel() {
                   onClick={() => handleCardClick(item.id)}
                   style={{
                     flex: "0 0 auto",
-                    width: isMobile ? "calc(82vw - 16px)" : "calc(58% - 16px)",
-                    minWidth: isMobile ? "260px" : "340px",
-                    maxWidth: "600px",
+                    width: isMobile ? "calc(65vw - 16px)" : "calc(30% - 12px)",
+                    minWidth: isMobile ? "200px" : "240px",
+                    maxWidth: "360px",
                     aspectRatio: "16/9",
                     borderRadius: "12px",
                     overflow: "hidden",
