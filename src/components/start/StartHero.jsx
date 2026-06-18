@@ -156,7 +156,7 @@ export default function StartHero() {
                 overflowWrap: "break-word",
               }}
             >
-              ¿Cómo llevar tu música al mercado actual?
+              ¿Cómo llevar mi música del estudio al mercado actual?
             </motion.h1>
 
             {/* Subtitle */}
@@ -228,7 +228,7 @@ export default function StartHero() {
             onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; e.currentTarget.style.transform = "translateY(-1px)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.transform = "translateY(0)"; }}
           >
-            Agendar sesión de descubrimiento gratuita →
+            Agendar sesión de descubrimiento gratis →
           </button>
         </motion.div>
 
