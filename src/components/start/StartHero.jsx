@@ -205,10 +205,11 @@ export default function StartHero() {
 
         {/* Video card CTA */}
         <motion.div
+          className="hero-cta-row-new"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          style={{ display: "flex", justifyContent: "center", marginBottom: "clamp(24px, 4vw, 40px)" }}
+          style={{ marginBottom: "clamp(24px, 4vw, 40px)" }}
         >
           <button
             onClick={() => { document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}
