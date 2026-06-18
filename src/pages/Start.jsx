@@ -59,11 +59,11 @@ export default function Start() {
       {/* 1. Hero — con YouTube embed, CTA y carrusel de marcas */}
       <StartHero />
 
-      {/* 2. Catálogo Prod. by Weber — justo debajo del hero */}
-      <CatalogoCarousel />
-
-      {/* 3. Sección de Agitación del Problema */}
+      {/* 2. Sección de Agitación del Problema */}
       <ProblemSolution />
+
+      {/* 3. Catálogo Prod. by Weber — debajo de El Problema */}
+      <CatalogoCarousel />
 
       {/* 4. Sección del Proceso — acordeones desplegables */}
       <HowItWorksAccordion />
