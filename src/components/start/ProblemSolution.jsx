@@ -129,39 +129,7 @@ export default function ProblemSolution() {
         ))}
       </div>
 
-      {/* Divider → Solución */}
-      <motion.div
-        initial={{ opacity: 0, scaleX: 0 }}
-        animate={inView ? { opacity: 1, scaleX: 1 } : {}}
-        transition={{ duration: 0.8, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        style={{ height: "1px", background: "rgba(255,88,51,0.2)", marginBottom: "clamp(36px, 5vw, 56px)", transformOrigin: "left" }}
-      />
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={inView ? { opacity: 1 } : {}}
-        transition={{ duration: 0.6, delay: 0.6 }}
-        style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 700, fontSize: "9px", letterSpacing: "0.35em", textTransform: "uppercase", color: "#ff5833", marginBottom: "clamp(20px, 3vw, 32px)" }}
-      >
-        La solución
-      </motion.p>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: "clamp(14px, 2.5vw, 20px)" }}>
-        {SOLUTIONS.map((s, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -16 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.65, delay: 0.65 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-            style={{ display: "flex", alignItems: "flex-start", gap: "14px" }}
-          >
-            <div style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(255,88,51,0.15)", border: "1px solid rgba(255,88,51,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
-              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="#ff5833" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </div>
-            <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 700, fontSize: "clamp(0.95rem, 1.8vw, 1.1rem)", color: "#f0ede8", letterSpacing: "-0.02em", margin: 0, lineHeight: 1.3 }}>{s}</p>
-          </motion.div>
-        ))}
-      </div>
     </section>
   );
 }
