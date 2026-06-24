@@ -93,7 +93,7 @@ function BookingModal({ option, cfg, onClose }) {
             maxHeight: "90dvh",
             borderRadius: "16px",
             overflow: "hidden",
-            background: "#0d0d0d",
+            background: "#ffffff",
             border: "1px solid rgba(255,255,255,0.07)",
             boxShadow: "0 32px 80px rgba(0,0,0,0.8)",
             display: "flex",
@@ -103,18 +103,19 @@ function BookingModal({ option, cfg, onClose }) {
           {/* Modal header */}
           <div style={{
             padding: "20px 24px 18px",
-            borderBottom: "1px solid rgba(255,255,255,0.06)",
+            borderBottom: "1px solid rgba(0,0,0,0.08)",
             flexShrink: 0,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             gap: "12px",
+            background: "#ffffff",
           }}>
             <div>
               <p style={{ fontFamily: "'Helvetica Neue', sans-serif", fontSize: "9px", fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "#ff5833", margin: "0 0 4px" }}>
                 Reservar sesión
               </p>
-              <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "clamp(1rem, 2.5vw, 1.25rem)", letterSpacing: "-0.03em", color: "#f0ede8", margin: 0, lineHeight: 1.1 }}>
+              <h3 style={{ fontFamily: "'Helvetica Neue', sans-serif", fontWeight: 900, fontSize: "clamp(1rem, 2.5vw, 1.25rem)", letterSpacing: "-0.03em", color: "#111111", margin: 0, lineHeight: 1.1 }}>
                 {option.label}
               </h3>
             </div>
@@ -122,25 +123,25 @@ function BookingModal({ option, cfg, onClose }) {
               onClick={onClose}
               style={{
                 width: "36px", height: "36px", borderRadius: "50%",
-                background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+                background: "rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.1)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: "pointer", flexShrink: 0, transition: "background 0.2s",
-                color: "rgba(240,237,232,0.6)",
+                color: "rgba(0,0,0,0.5)",
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.12)"}
-              onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
+              onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.12)"}
+              onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.06)"}
             >
               <X size={16} />
             </button>
           </div>
 
-          {/* Iframe area */}
-          <div style={{ position: "relative", flex: 1, overflow: "hidden", minHeight: "520px" }}>
+          {/* Iframe area — fondo blanco para legibilidad del calendario */}
+          <div style={{ position: "relative", flex: 1, overflow: "auto", minHeight: "520px", background: "#ffffff" }}>
             {!loaded && (
               <div style={{
                 position: "absolute", inset: 0, display: "flex",
                 alignItems: "center", justifyContent: "center",
-                background: "#0d0d0d", zIndex: 2,
+                background: "#ffffff", zIndex: 2,
               }}>
                 <div style={{
                   width: "28px", height: "28px", borderRadius: "50%",
@@ -151,7 +152,7 @@ function BookingModal({ option, cfg, onClose }) {
             )}
             <iframe
               src={iframeSrc}
-              style={{ border: 0, display: "block", width: "100%", height: "100%", minHeight: "520px" }}
+              style={{ border: 0, display: "block", width: "100%", height: "600px", minHeight: "520px", background: "#ffffff" }}
               frameBorder="0"
               title={option.label}
               onLoad={() => setLoaded(true)}
