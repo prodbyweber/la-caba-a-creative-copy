@@ -1,0 +1,28 @@
+{
+  "name": "StudioSessionConfig",
+  "type": "object",
+  "properties": {
+    "bg_image_url": {
+      "type": "string",
+      "description": "URL de la imagen de fondo del estudio"
+    },
+    "overlay_opacity": {
+      "type": "number",
+      "default": 0.72,
+      "description": "Opacidad del overlay negro (0.0 a 1.0)"
+    },
+    "iframe_2h": {
+      "type": "string",
+      "description": "URL src del iframe de Google Calendar para sesi\u00f3n de 2 horas"
+    },
+    "iframe_4h": {
+      "type": "string",
+      "description": "URL src del iframe de Google Calendar para sesi\u00f3n de 4 horas"
+    },
+    "iframe_6h": {
+      "type": "string",
+      "description": "URL src del iframe de Google Calendar para sesi\u00f3n de 6 horas"
+    }
+  },
+  "required": []
+}

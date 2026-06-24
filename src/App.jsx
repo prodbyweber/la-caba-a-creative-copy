@@ -41,6 +41,7 @@ import Gracias from './pages/Gracias';
 import Solicitud from './pages/Solicitud';
 import Weber from './pages/Weber';
 import WeberAdmin from './pages/WeberAdmin';
+import StudioSessionEditor from './pages/StudioSessionEditor';
 import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
@@ -165,6 +166,7 @@ const AuthenticatedApp = () => {
       <Route path="/ArtistPanelList" element={<ProtectedAdminRoute element={<ArtistPanelList />} />} />
       <Route path="/ADNdeMarca" element={<ProtectedAdminRoute element={<ADNdeMarca />} />} />
       <Route path="/WeberAdmin" element={<ProtectedAdminRoute element={<WeberAdmin />} />} />
+      <Route path="/StudioSessionEditor" element={<ProtectedAdminRoute element={<StudioSessionEditor />} />} />
 
       {/* Legacy pages config loop */}
       {Object.entries(Pages).map(([path, Page]) => (
