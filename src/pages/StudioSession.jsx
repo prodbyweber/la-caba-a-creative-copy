@@ -90,7 +90,7 @@ function BookingModal({ option, cfg, onClose }) {
             position: "relative",
             width: "100%",
             maxWidth: "720px",
-            maxHeight: "85dvh",
+            maxHeight: "92dvh",
             borderRadius: "16px",
             overflow: "hidden",
             background: "#ffffff",
@@ -135,8 +135,8 @@ function BookingModal({ option, cfg, onClose }) {
             </button>
           </div>
 
-          {/* Iframe area — recorta la metadata superior del embed de Google */}
-          <div style={{ position: "relative", flex: 1, overflow: "hidden", background: "#ffffff", minHeight: "480px" }}>
+          {/* Iframe area — oculta solo la cabecera de metadata, muestra el calendario completo */}
+          <div style={{ position: "relative", flex: 1, background: "#ffffff", display: "flex", flexDirection: "column", overflow: "hidden" }}>
             {!loaded && (
               <div style={{
                 position: "absolute", inset: 0, display: "flex",
@@ -150,23 +150,22 @@ function BookingModal({ option, cfg, onClose }) {
                 }} />
               </div>
             )}
-            {/* El iframe se desplaza -220px arriba para ocultar la sección de título/descripción
-                y se aumenta la altura para compensar el recorte */}
-            <iframe
-              src={iframeSrc}
-              style={{
-                border: 0,
-                display: "block",
-                width: "100%",
-                height: "calc(100% + 220px)",
-                minHeight: "740px",
-                marginTop: "-220px",
-                background: "#ffffff",
-              }}
-              frameBorder="0"
-              title={option.label}
-              onLoad={() => setLoaded(true)}
-            />
+            {/* Wrapper que recorta solo la parte superior (metadata) pero deja el resto scrollable */}
+            <div style={{ flex: 1, overflow: "auto", marginTop: "-180px", paddingBottom: "0" }}>
+              <iframe
+                src={iframeSrc}
+                style={{
+                  border: 0,
+                  display: "block",
+                  width: "100%",
+                  height: "900px",
+                  background: "#ffffff",
+                }}
+                frameBorder="0"
+                title={option.label}
+                onLoad={() => setLoaded(true)}
+              />
+            </div>
           </div>
         </motion.div>
       </motion.div>
