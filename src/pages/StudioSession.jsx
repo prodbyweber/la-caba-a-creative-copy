@@ -18,23 +18,26 @@ const SESSION_OPTIONS = [
   {
     key: "2h",
     hours: "2",
-    label: "Sesión de 2 Horas",
-    desc: "Consultoría, estrategia o feedback de proyecto.",
+    label: "Sesión de Estudio",
+    subtitle: "2 Horas",
+    desc: "Espacio de grabación profesional y captura vocal de alto rendimiento. Ingeniería de sonido y monitoreo incluidos.",
     tag: "Bloque corto",
   },
   {
     key: "4h",
     hours: "4",
-    label: "Sesión de 4 Horas",
-    desc: "Producción activa, grabación de voz o refinamiento de mezcla.",
+    label: "Sesión de Estudio",
+    subtitle: "4 Horas",
+    desc: "Espacio de grabación profesional y captura vocal de alto rendimiento. Ingeniería de sonido y monitoreo incluidos.",
     tag: "Bloque medio",
     featured: true,
   },
   {
     key: "6h",
     hours: "6",
-    label: "Sesión de 6 Horas",
-    desc: "Jornada intensiva: grabación de catálogo, mezcla o film scoring.",
+    label: "Sesión de Estudio",
+    subtitle: "6 Horas",
+    desc: "Espacio de grabación profesional y captura vocal de alto rendimiento. Ingeniería de sonido y monitoreo incluidos.",
     tag: "Jornada completa",
   },
 ];
@@ -442,10 +445,21 @@ export default function StudioSession() {
                 fontFamily: "'Helvetica Neue', sans-serif",
                 fontWeight: 900, fontSize: "clamp(1rem, 1.8vw, 1.15rem)",
                 letterSpacing: "-0.03em", color: "#f0ede8",
-                margin: "0 0 8px", lineHeight: 1.1,
+                margin: "0 0 4px", lineHeight: 1.1,
               }}>
                 {opt.label}
               </h3>
+
+              {/* Subtitle (hours) */}
+              <p style={{
+                fontFamily: "'Helvetica Neue', sans-serif",
+                fontWeight: 700, fontSize: "clamp(0.78rem, 1.2vw, 0.88rem)",
+                letterSpacing: "-0.01em",
+                color: opt.featured ? "rgba(255,88,51,0.8)" : "rgba(240,237,232,0.45)",
+                margin: "0 0 10px",
+              }}>
+                {opt.subtitle}
+              </p>
 
               {/* Description */}
               <p style={{
