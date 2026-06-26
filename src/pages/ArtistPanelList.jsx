@@ -3,15 +3,16 @@ import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { createPageUrl } from "@/utils";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { User, Search, ExternalLink, ChevronRight, Mail, AtSign } from "lucide-react";
+import CreatorEditModal from "@/components/admin/CreatorEditModal";
+import { User, Search, ChevronRight, Pencil } from "lucide-react";
 
 export default function ArtistPanelList() {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = React.useState(null);
   const [authChecked, setAuthChecked] = React.useState(false);
   const [search, setSearch] = useState("");
+  const [editingCreator, setEditingCreator] = useState(null);
 
   React.useEffect(() => {
     base44.auth.me().then(u => {
@@ -175,14 +176,14 @@ export default function ArtistPanelList() {
                     exit={{ opacity: 0 }}
                     transition={{ delay: idx * 0.01 }}
                     onClick={() => {
-      const uid = c.artist?.user_id || c.profile?.user_id || c.platformUser?.id || c.userId;
-      if (c.artist?.id) {
-        navigate(`/ArtistDashboard?artistId=${c.artist.id}`);
-      } else if (uid) {
-        navigate(`/ArtistDashboard?userId=${uid}`);
-      }
-    }}
-    className="group flex items-center gap-3 px-4 py-3 bg-[#080809] hover:bg-white/[0.04] transition-colors cursor-pointer"
+                      const uid = c.artist?.user_id || c.profile?.user_id || c.platformUser?.id || c.userId;
+                      if (c.artist?.id) {
+                        navigate(`/ArtistDashboard?artistId=${c.artist.id}`);
+                      } else if (uid) {
+                        navigate(`/ArtistDashboard?userId=${uid}`);
+                      }
+                    }}
+                    className="group flex items-center gap-3 px-4 py-3 bg-[#080809] hover:bg-white/[0.04] transition-colors cursor-pointer"
                   >
                     {/* Avatar circular pequeño */}
                     <div className="relative w-10 h-10 rounded-full overflow-hidden bg-[#1a1a1c] flex-shrink-0 ring-1 ring-white/10">
@@ -212,7 +213,17 @@ export default function ArtistPanelList() {
                       </p>
                     </div>
 
-                    {/* Chevron / link */}
+                    {/* Edit button (solo si tiene Artist entity) */}
+                    {c.artist?.id && (
+                      <button
+                        onClick={e => { e.stopPropagation(); setEditingCreator(c); }}
+                        className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                        style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
+                        title="Editar creador"
+                      >
+                        <Pencil className="w-3 h-3 text-white/50" />
+                      </button>
+                    )}
                     <ChevronRight className="w-3.5 h-3.5 text-white/15 flex-shrink-0 group-hover:text-white/40 transition-colors" />
                   </motion.div>
                 ))}
@@ -221,6 +232,14 @@ export default function ArtistPanelList() {
           )}
         </div>
       </div>
+
+      {/* Creator Edit Modal */}
+      {editingCreator && (
+        <CreatorEditModal
+          creator={editingCreator}
+          onClose={() => setEditingCreator(null)}
+        />
+      )}
     </AdminLayout>
   );
 }

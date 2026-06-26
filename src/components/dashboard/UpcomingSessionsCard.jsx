@@ -110,13 +110,14 @@ export default function UpcomingSessionsCard({ artistId }) {
             <p className="text-[9px] text-gray-500">{sessions.length} programadas</p>
           </div>
         </div>
-        <button
-          onClick={() => setShowScheduleModal(true)}
-          className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white text-[9px] font-medium transition-all flex items-center gap-1"
+        <a
+          href="/StudioSession"
+          className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white text-[9px] font-medium transition-all flex items-center gap-1 no-underline"
+          style={{ textDecoration: "none" }}
         >
           <Plus className="w-2.5 h-2.5" />
           Agendar
-        </button>
+        </a>
       </div>
 
       {/* Studio Hours Block */}

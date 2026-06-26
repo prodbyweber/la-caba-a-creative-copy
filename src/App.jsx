@@ -153,7 +153,7 @@ const AuthenticatedApp = () => {
 
       {/* Public: Explorar is accessible without login */}
       <Route path="/Explorar" element={<Explorar />} />
-      <Route path="/StudioSession" element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}><Route index element={<StudioSession />} /></Route>
+      <Route path="/StudioSession" element={<StudioSession />} />
       <Route path="/meeting" element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}><Route index element={<Meeting />} /></Route>
 
       {/* Admin-only pages */}
