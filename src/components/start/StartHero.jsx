@@ -160,7 +160,7 @@ export default function StartHero() {
                 overflowWrap: "break-word",
               }}
             >
-              Construimos tu catálogo musical y tu universo visual en menos de 90 días.
+              Construimos tu catálogo musical y la identidad que lidera el mercado joven.
             </motion.h1>
 
             {/* Subtitle */}
