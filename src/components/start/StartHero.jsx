@@ -160,7 +160,7 @@ export default function StartHero() {
                 overflowWrap: "break-word",
               }}
             >
-              ¿Cómo llevar mi música del estudio al mercado actual?
+              Construimos tu catálogo musical y tu universo visual en menos de 90 días.
             </motion.h1>
 
             {/* Subtitle */}
@@ -177,7 +177,7 @@ export default function StartHero() {
                 margin: 0,
               }}
             >
-              El fin de las maquetas. Creamos el sonido y la identidad visual de tu próximo proyecto.
+              Obten acceso a La Cabaña y cuenta con una infraestructura completa para tu proyecto musical.
             </motion.p>
 
 
