@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import StartBrandsCarousel from "@/components/start/StartBrandsCarousel";
 
-const YOUTUBE_VIDEO_ID = "im6BfAvTsLA";
+const YOUTUBE_VIDEO_ID = "5x2e8RIdILU";
 
 export default function StartHero() {
   const [showModal, setShowModal] = useState(false);
