@@ -372,7 +372,6 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
   const TABS = [
     { id: "profile", label: "Perfil" },
     { id: "social",  label: "Redes" },
-    { id: "contacto", label: "Contacto" },
     ...(artist?.id ? [{ id: "sessions", label: "Sesiones" }] : []),
   ];
 

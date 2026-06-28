@@ -488,21 +488,7 @@ export default function StudioSession() {
           ))}
         </motion.div>
 
-        {/* Divider + tagline */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.7, delay: 0.95 }}
-          style={{ marginTop: "clamp(32px, 5vw, 56px)", textAlign: "center" }}
-        >
-          <div style={{ height: "1px", width: "36px", background: "rgba(255,255,255,0.1)", margin: "0 auto 14px" }} />
-          <p style={{
-            fontSize: "9px", fontWeight: 600, letterSpacing: "0.28em",
-            textTransform: "uppercase", color: "rgba(240,237,232,0.15)",
-          }}>
-            Música · Films · Creadores
-          </p>
-        </motion.div>
+
       </div>
 
       {/* ── Booking Modal ────────────────────────────────────────────── */}
