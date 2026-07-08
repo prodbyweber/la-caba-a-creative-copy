@@ -1,30 +1,30 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Check, AlertCircle, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
 
 const CALENDLY_URL = "https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5833&hide_gdpr_banner=0&background_color=080808&text_color=f0ede8&hide_event_type_details=1";
-// Tiempo de espera simulando verificación de correo (ms)
-const VERIFICATION_WAIT_MS = 9000;
+const MAILERLITE_FORM_ID = "Ezjvmn";
+// Tiempo de espera estimado para recibir el correo de confirmación (ms)
+const VERIFICATION_WAIT_MS = 12000;
 
 export default function DiscoverySessionModal({ open, onClose }) {
   const [step, setStep] = useState("email"); // "email" | "loading" | "calendar"
-  const [email, setEmail] = useState("");
-  const [accepted, setAccepted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
   const [calendlyLoaded, setCalendlyLoaded] = useState(false);
+  const [mlReady, setMlReady] = useState(false);
   const waitTimer = useRef(null);
+  const mlContainerRef = useRef(null);
+  const observerRef = useRef(null);
+  const submittedRef = useRef(false);
 
   // Reset al cerrar
   useEffect(() => {
     if (!open) {
       setStep("email");
-      setEmail("");
-      setAccepted(false);
-      setSubmitting(false);
-      setError("");
       setCalendlyLoaded(false);
-      if (waitTimer.current) clearTimeout(waitTimer.current);
+      setMlReady(false);
+      submittedRef.current = false;
+      if (waitTimer.current) { clearTimeout(waitTimer.current); waitTimer.current = null; }
+      if (observerRef.current) { observerRef.current.disconnect(); observerRef.current = null; }
     }
   }, [open]);
 
@@ -43,42 +43,103 @@ export default function DiscoverySessionModal({ open, onClose }) {
     return () => window.removeEventListener("keydown", handler);
   }, [open, onClose]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setError("");
+  // Inicializar formulario embebido de MailerLite y detectar envío exitoso
+  useEffect(() => {
+    if (!open || step !== "email") return;
 
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("Introduce un correo válido");
-      return;
-    }
-    if (!accepted) {
-      setError("Debes confirmar que revisarás tu bandeja de spam");
-      return;
-    }
+    // Esperar a que el SDK universal de MailerLite esté disponible
+    const initForm = () => {
+      const container = mlContainerRef.current;
+      if (!container) return;
 
-    setSubmitting(true);
-
-    // Suscripción a MailerLite (best-effort usando el SDK universal cargado globalmente)
-    try {
+      // El div ml-embedded ya está renderizado; MailerLite universal JS
+      // lo detecta automáticamente. Si no aparece el formulario tras un
+      // breve instante, forzamos el re-escaneo.
       if (window.ml && typeof window.ml === "function") {
-        // El SDK universal de MailerLite gestiona la suscripción a través de formularios embebidos;
-        // aquí enviamos el evento de suscripción para tracking.
-        window.ml("subscribe", { email });
+        try {
+          // Re-inicializa los formularios embebidos detectados dinámicamente
+          if (typeof window.ml("reinit") !== "undefined") window.ml("reinit");
+        } catch (e) { /* no-op */ }
       }
-    } catch (err) {
-      // No bloqueamos el flujo si falla el tracking
-    }
 
-    // Transición a estado de carga
-    setTimeout(() => {
-      setSubmitting(false);
+      setMlReady(true);
+
+      // MutationObserver: detecta cuando MailerLite reemplaza el formulario
+      // por el mensaje de éxito tras la suscripción, o cuando aparece un
+      // elemento de confirmación dentro del contenedor.
+      if (observerRef.current) observerRef.current.disconnect();
+      observerRef.current = new MutationObserver(() => {
+        detectSuccess();
+      });
+      observerRef.current.observe(container, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        characterData: true,
+      });
+
+      // También capturamos el envío del formulario por si MailerLite
+      // no muestra un mensaje de éxito inmediato.
+      const tryAttachSubmit = () => {
+        const form = container.querySelector("form");
+        if (form && !form.__cabanaAttached) {
+          form.__cabanaAttached = true;
+          form.addEventListener("submit", () => {
+            // Damos un pequeño margen para que MailerLite procese la suscripción
+            setTimeout(() => transitionToLoading(), 400);
+          });
+        }
+      };
+      tryAttachSubmit();
+
+      // Re-intentar adjuntar el listener si el formulario se inyecta más tarde
+      const submitInterval = setInterval(() => {
+        if (submittedRef.current) {
+          clearInterval(submitInterval);
+          return;
+        }
+        tryAttachSubmit();
+      }, 500);
+      // Limpieza del intervalo tras 30s
+      setTimeout(() => clearInterval(submitInterval), 30000);
+    };
+
+    const detectSuccess = () => {
+      const container = mlContainerRef.current;
+      if (!container || submittedRef.current) return;
+
+      // MailerLite reemplaza el form con un mensaje de éxito.
+      // Detectamos: el form desapareció y hay contenido de texto,
+      // o aparece un elemento con clase que indica éxito.
+      const form = container.querySelector("form");
+      const hasSuccessText =
+        container.textContent && (
+          /gracias|thank you|suscrib|success|confirmado|confirmada/i.test(container.textContent)
+        );
+
+      // Si ya no hay formulario y hay texto de éxito, transicionamos
+      if (!form && hasSuccessText && container.children.length > 0) {
+        transitionToLoading();
+      }
+    };
+
+    const transitionToLoading = () => {
+      if (submittedRef.current) return;
+      submittedRef.current = true;
       setStep("loading");
-      // Tras el tiempo de espera, mostrar el calendario
+      if (observerRef.current) { observerRef.current.disconnect(); observerRef.current = null; }
       waitTimer.current = setTimeout(() => {
         setStep("calendar");
       }, VERIFICATION_WAIT_MS);
-    }, 600);
-  };
+    };
+
+    // Pequeño retraso para asegurar que el div está en el DOM
+    const t = setTimeout(initForm, 200);
+    return () => {
+      clearTimeout(t);
+      if (observerRef.current) { observerRef.current.disconnect(); observerRef.current = null; }
+    };
+  }, [open, step]);
 
   if (!open) return null;
 
@@ -153,7 +214,7 @@ export default function DiscoverySessionModal({ open, onClose }) {
           </button>
 
           <AnimatePresence mode="wait">
-            {/* ── STEP: EMAIL ── */}
+            {/* ── STEP: EMAIL (MailerLite embedded form) ── */}
             {step === "email" && (
               <motion.div
                 key="step-email"
@@ -163,29 +224,14 @@ export default function DiscoverySessionModal({ open, onClose }) {
                 transition={{ duration: 0.25 }}
                 style={{ padding: "clamp(28px, 4vw, 40px) clamp(24px, 4vw, 36px)" }}
               >
-                {/* Icon */}
-                <div style={{
-                  width: "44px",
-                  height: "44px",
-                  borderRadius: "12px",
-                  background: "rgba(255,88,51,0.1)",
-                  border: "1px solid rgba(255,88,51,0.2)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: "20px",
-                }}>
-                  <Mail size={20} color="#ff5833" />
-                </div>
-
                 <p style={{
                   fontFamily: "'Helvetica Neue', sans-serif",
                   fontSize: "9px",
                   fontWeight: 700,
                   letterSpacing: "0.3em",
                   textTransform: "uppercase",
-                  color: "rgba(240,237,232,0.3)",
-                  margin: "0 0 8px 0",
+                  color: "#ff5833",
+                  margin: "0 0 10px 0",
                 }}>
                   Sesión de descubrimiento
                 </p>
@@ -199,7 +245,7 @@ export default function DiscoverySessionModal({ open, onClose }) {
                   margin: "0 0 12px 0",
                   lineHeight: 1.15,
                 }}>
-                  Confirma tu correo para agendar
+                  Suscríbete para agendar
                 </h3>
 
                 <p style={{
@@ -208,151 +254,59 @@ export default function DiscoverySessionModal({ open, onClose }) {
                   fontSize: "clamp(0.82rem, 1.4vw, 0.92rem)",
                   color: "rgba(240,237,232,0.45)",
                   lineHeight: 1.6,
-                  margin: "0 0 24px 0",
+                  margin: "0 0 20px 0",
                 }}>
-                  Te enviaremos la confirmación de la sesión. Revisa también tu bandeja de correo no deseado (spam) para asegurarte de recibirla.
+                  Introduce tu correo para recibir la confirmación. Revisa también tu bandeja de spam para asegurarte de recibirla.
                 </p>
 
-                <form onSubmit={handleSubmit}>
-                  {/* Email input */}
-                  <div style={{ position: "relative", marginBottom: "16px" }}>
-                    <Mail size={15} color="rgba(240,237,232,0.3)" style={{
-                      position: "absolute",
-                      left: "14px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                    }} />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => { setEmail(e.target.value); setError(""); }}
-                      placeholder="tu@correo.com"
-                      required
-                      style={{
-                        width: "100%",
-                        fontFamily: "'Helvetica Neue', sans-serif",
-                        fontSize: "0.9rem",
-                        color: "#f0ede8",
-                        background: "rgba(255,255,255,0.04)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        borderRadius: "10px",
-                        padding: "14px 14px 14px 42px",
-                        outline: "none",
-                        transition: "border-color 0.2s",
-                      }}
-                      onFocus={(e) => e.currentTarget.style.borderColor = "rgba(255,88,51,0.4)"}
-                      onBlur={(e) => e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"}
-                    />
-                  </div>
+                {/* ── MailerLite embedded form ── */}
+                <div
+                  ref={mlContainerRef}
+                  className="ml-embedded-container"
+                  style={{
+                    minHeight: mlReady ? "auto" : "160px",
+                    position: "relative",
+                  }}
+                >
+                  {/* Formulario embebido de MailerLite (form ID Ezjvmn) */}
+                  <div className="ml-embedded" data-form={MAILERLITE_FORM_ID}></div>
 
-                  {/* Aceptación / confirmación spam */}
-                  <button
-                    type="button"
-                    onClick={() => { setAccepted(!accepted); setError(""); }}
-                    style={{
-                      display: "flex",
-                      alignItems: "flex-start",
-                      gap: "10px",
-                      width: "100%",
-                      background: "transparent",
-                      border: "none",
-                      cursor: "pointer",
-                      textAlign: "left",
-                      padding: "0",
-                      marginBottom: "20px",
-                    }}
-                  >
+                  {/* Placeholder mientras MailerLite inyecta el formulario */}
+                  {!mlReady && (
                     <div style={{
-                      width: "18px",
-                      height: "18px",
-                      borderRadius: "5px",
-                      border: accepted ? "1px solid #ff5833" : "1px solid rgba(255,255,255,0.2)",
-                      background: accepted ? "#ff5833" : "transparent",
+                      position: "absolute",
+                      inset: 0,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      flexShrink: 0,
-                      marginTop: "2px",
-                      transition: "all 0.2s",
                     }}>
-                      {accepted && <Check size={12} color="#fff" strokeWidth={3} />}
-                    </div>
-                    <span style={{
-                      fontFamily: "'Helvetica Neue', sans-serif",
-                      fontSize: "0.78rem",
-                      color: "rgba(240,237,232,0.5)",
-                      lineHeight: 1.55,
-                    }}>
-                      Confirmo que revisaré mi bandeja de entrada y la carpeta de spam para validar la confirmación de la sesión.
-                    </span>
-                  </button>
-
-                  {/* Error */}
-                  {error && (
-                    <div style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      marginBottom: "16px",
-                      padding: "10px 14px",
-                      borderRadius: "8px",
-                      background: "rgba(239,68,68,0.08)",
-                      border: "1px solid rgba(239,68,68,0.2)",
-                    }}>
-                      <AlertCircle size={14} color="#ef4444" />
-                      <span style={{
-                        fontFamily: "'Helvetica Neue', sans-serif",
-                        fontSize: "0.78rem",
-                        color: "#fca5a5",
-                      }}>
-                        {error}
-                      </span>
+                      <div style={{
+                        width: "24px",
+                        height: "24px",
+                        borderRadius: "50%",
+                        border: "2px solid rgba(255,88,51,0.2)",
+                        borderTopColor: "#ff5833",
+                        animation: "spin 0.7s linear infinite",
+                      }} />
                     </div>
                   )}
+                </div>
 
-                  {/* Submit */}
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    style={{
-                      width: "100%",
-                      fontFamily: "'Helvetica Neue', sans-serif",
-                      fontWeight: 900,
-                      fontSize: "0.9rem",
-                      letterSpacing: "0.01em",
-                      background: "#ff5833",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "10px",
-                      padding: "15px",
-                      cursor: submitting ? "wait" : "pointer",
-                      transition: "background 0.2s",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "8px",
-                      opacity: submitting ? 0.7 : 1,
-                    }}
-                    onMouseEnter={(e) => { if (!submitting) e.currentTarget.style.background = "#e04a28"; }}
-                    onMouseLeave={(e) => { if (!submitting) e.currentTarget.style.background = "#ff5833"; }}
-                  >
-                    {submitting ? (
-                      <>
-                        <div style={{
-                          width: "16px",
-                          height: "16px",
-                          borderRadius: "50%",
-                          border: "2px solid rgba(255,255,255,0.4)",
-                          borderTopColor: "transparent",
-                          animation: "spin 0.7s linear infinite",
-                        }} />
-                        Enviando...
-                      </>
-                    ) : (
-                      <>Confirmar y agendar →</>
-                    )}
-                  </button>
-                </form>
+                {/* Nota sobre spam */}
+                <p style={{
+                  fontFamily: "'Helvetica Neue', sans-serif",
+                  fontWeight: 300,
+                  fontSize: "0.72rem",
+                  color: "rgba(240,237,232,0.3)",
+                  lineHeight: 1.55,
+                  margin: "16px 0 0 0",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "8px",
+                }}>
+                  <span style={{ color: "#ff5833", flexShrink: 0 }}>●</span>
+                  <span>Tras suscribirte, esperaremos la confirmación de tu correo antes de habilitar el calendario. Verifica tu bandeja de entrada y la carpeta de spam.</span>
+                </p>
               </motion.div>
             )}
 
