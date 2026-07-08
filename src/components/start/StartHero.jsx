@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import StartBrandsCarousel from "@/components/start/StartBrandsCarousel";
-import DiscoverySessionModal from "@/components/start/DiscoverySessionModal";
 
 const YOUTUBE_VIDEO_ID = "5x2e8RIdILU";
 
 export default function StartHero() {
   const [showModal, setShowModal] = useState(false);
   const [showCalendly, setShowCalendly] = useState(false);
+  const [calendlyLoaded, setCalendlyLoaded] = useState(false);
 
   const thumbnailUrl = `https://img.youtube.com/vi/${YOUTUBE_VIDEO_ID}/maxresdefault.jpg`;
+
+  const calendlyUrl = "https://calendly.com/hola-cabanacreative/creadores?primary_color=ff5833&hide_gdpr_banner=0&background_color=080808&text_color=f0ede8&hide_event_type_details=1";
 
   return (
     <section id="hero" style={{ background: "#080808", position: "relative", overflow: "hidden" }}>
@@ -246,8 +248,142 @@ export default function StartHero() {
         </motion.div>
       </div>
 
-      {/* Discovery Session Modal — email confirmation + Calendly */}
-      <DiscoverySessionModal open={showCalendly} onClose={() => setShowCalendly(false)} />
+      {/* Hidden Calendly preloader */}
+      <div style={{ position: "absolute", width: 0, height: 0, overflow: "hidden", opacity: 0, pointerEvents: "none" }}>
+        <iframe
+          src={calendlyUrl}
+          width="1"
+          height="1"
+          frameBorder="0"
+          title="Calendly preload"
+          onLoad={() => setCalendlyLoaded(true)}
+        />
+      </div>
+
+      {/* Calendly Popup Modal */}
+      {showCalendly && (
+        <div
+          onClick={() => setShowCalendly(false)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.92)",
+            backdropFilter: "blur(20px)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="modal-content"
+            style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: "700px",
+              maxHeight: "90dvh",
+              background: "#0f0f0f",
+              borderRadius: "16px",
+              overflow: "hidden",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.8)",
+              border: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => setShowCalendly(false)}
+              style={{
+                position: "absolute",
+                top: "16px",
+                right: "16px",
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                background: "rgba(0,0,0,0.7)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                zIndex: 10,
+                transition: "background 0.2s",
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.9)"}
+              onMouseLeave={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.7)"}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6L18 18" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+
+            {/* Header */}
+            <div style={{
+              padding: "clamp(20px, 3vw, 28px) clamp(20px, 3vw, 32px)",
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
+            }}>
+              <p style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontWeight: 700,
+                fontSize: "10px",
+                letterSpacing: "0.3em",
+                textTransform: "uppercase",
+                color: "rgba(240,237,232,0.3)",
+                margin: "0 0 6px 0",
+              }}>
+                Sesión de descubrimiento
+              </p>
+              <h3 style={{
+                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                fontWeight: 900,
+                fontSize: "clamp(1.1rem, 2.5vw, 1.4rem)",
+                letterSpacing: "-0.03em",
+                color: "#f0ede8",
+                margin: 0,
+                lineHeight: 1.15,
+              }}>
+                Agenda tu reunión con nosotros
+              </h3>
+            </div>
+
+            {/* Calendly iframe */}
+            <div style={{ width: "100%", position: "relative" }}>
+              {!calendlyLoaded && (
+                <div style={{
+                  position: "absolute", inset: 0, display: "flex",
+                  alignItems: "center", justifyContent: "center",
+                  background: "#0f0f0f", zIndex: 1, minHeight: "500px",
+                }}>
+                  <div style={{
+                    width: "28px", height: "28px", borderRadius: "50%",
+                    border: "2px solid #ff5833", borderTopColor: "transparent",
+                    animation: "spin 0.7s linear infinite",
+                  }} />
+                </div>
+              )}
+              <iframe
+                src={calendlyUrl}
+                width="100%"
+                frameBorder="0"
+                scrolling="no"
+                title="Agendar sesión"
+                onLoad={() => setCalendlyLoaded(true)}
+                style={{
+                  display: "block",
+                  border: "none",
+                  width: "100%",
+                  height: "580px",
+                  minHeight: "580px",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Premium Modal — same style as CatalogoCarousel */}
       {showModal && (
