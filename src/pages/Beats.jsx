@@ -4,31 +4,39 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
-import { Search, Lock, LogIn, TrendingUp, ChevronDown, X } from "lucide-react";
+import { Search, Lock, Menu, ChevronDown, X, TrendingUp } from "lucide-react";
 import BeatCard from "@/components/beats/BeatCard";
 import BeatsFeaturedCarousel from "@/components/beats/BeatsFeaturedCarousel";
 import BeatsTrendingList from "@/components/beats/BeatsTrendingList";
 import BeatLicensesModal from "@/components/beats/BeatLicensesModal";
 
-// Curation filter chips (not genre tags — cinematic curation)
-const FILTER_CHIPS = [
+// Curation + genre category chips (horizontal scroll on mobile)
+const CURATION_CHIPS = [
+  { id: "todos", label: "Todos" },
   { id: "staff", label: "Staff Picks" },
   { id: "nuevos", label: "Nuevos" },
   { id: "populares", label: "Populares" },
   { id: "descargas", label: "Descargas" },
   { id: "gratis", label: "Gratis" },
 ];
+const GENRE_CHIPS = [
+  "Reggaetón", "Afrobeats", "Jersey Club", "Trap", "House",
+  "R&B", "Drill", "Hip-Hop", "Lo-Fi", "Experimental",
+];
+const ALL_CHIPS = [
+  ...CURATION_CHIPS,
+  ...GENRE_CHIPS.map(g => ({ id: `genre:${g}`, label: g })),
+];
 
-// Section tabs
-const TABS = ["EXPLORE", "NUEVOS", "TRENDING"];
+const TABS = ["Explorar", "Nuevos", "Trending"];
 
 export default function Beats() {
   const qc = useQueryClient();
   const { playingTrack, isPlaying, playQueue } = useGlobalAudio();
 
   const [search, setSearch] = useState("");
-  const [activeChip, setActiveChip] = useState("staff");
-  const [activeTab, setActiveTab] = useState("EXPLORE");
+  const [activeChip, setActiveChip] = useState("todos");
+  const [activeTab, setActiveTab] = useState("Explorar");
   const [licensesModal, setLicensesModal] = useState(null);
   const [likedIds, setLikedIds] = useState(new Set());
   const [savedIds, setSavedIds] = useState(new Set());
@@ -38,19 +46,16 @@ export default function Beats() {
   const trendingRef = useRef(null);
   const nuevosRef = useRef(null);
 
-  // Check auth
   useEffect(() => {
     base44.auth.isAuthenticated().then(async (authed) => {
       if (!authed) {
         const timer = setTimeout(() => setAuthGate(true), 5000);
         return () => clearTimeout(timer);
       }
-      const u = await base44.auth.me();
-      setUser(u);
+      setUser(await base44.auth.me());
     });
   }, []);
 
-  // Fetch published beats
   const { data: beats = [], isLoading } = useQuery({
     queryKey: ["beats-public"],
     queryFn: async () => {
@@ -59,33 +64,23 @@ export default function Beats() {
     },
   });
 
-  // Fetch user likes & saves
   const { data: likes = [] } = useQuery({
     queryKey: ["beat-likes-me", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return [];
-      return base44.entities.BeatLike.filter({ user_id: user.id });
-    },
+    queryFn: async () => user?.id ? base44.entities.BeatLike.filter({ user_id: user.id }) : [],
     enabled: !!user?.id,
   });
-
   const { data: saves = [] } = useQuery({
     queryKey: ["beat-saves-me", user?.id],
-    queryFn: async () => {
-      if (!user?.id) return [];
-      return base44.entities.BeatSave.filter({ user_id: user.id });
-    },
+    queryFn: async () => user?.id ? base44.entities.BeatSave.filter({ user_id: user.id }) : [],
     enabled: !!user?.id,
   });
 
   useEffect(() => { setLikedIds(new Set(likes.map(l => l.beat_id))); }, [likes]);
   useEffect(() => { setSavedIds(new Set(saves.map(s => s.beat_id))); }, [saves]);
 
-  // Like mutation
   const likeMutation = useMutation({
     mutationFn: async (beat) => {
-      const isLiked = likedIds.has(beat.id);
-      if (isLiked) {
+      if (likedIds.has(beat.id)) {
         const like = likes.find(l => l.beat_id === beat.id);
         if (like) await base44.entities.BeatLike.delete(like.id);
       } else {
@@ -95,52 +90,29 @@ export default function Beats() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["beat-likes-me", user?.id] }),
   });
 
-  const saveMutation = useMutation({
-    mutationFn: async (beat) => {
-      const isSaved = savedIds.has(beat.id);
-      if (isSaved) {
-        const save = saves.find(s => s.beat_id === beat.id);
-        if (save) await base44.entities.BeatSave.delete(save.id);
-      } else {
-        await base44.entities.BeatSave.create({ beat_id: beat.id, user_id: user.id });
-      }
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["beat-saves-me", user?.id] }),
-  });
-
-  // Download (preserves filename)
   const handleDownload = useCallback(async (beat) => {
     if (!beat.free_mp3_url) return;
     try {
-      if (user?.id) {
-        await base44.entities.BeatDownload.create({ beat_id: beat.id, user_id: user.id, license_type: "mp3_free" });
-      }
-      const response = await fetch(beat.free_mp3_url);
-      const blob = await response.blob();
+      if (user?.id) await base44.entities.BeatDownload.create({ beat_id: beat.id, user_id: user.id, license_type: "mp3_free" });
+      const res = await fetch(beat.free_mp3_url);
+      const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      const urlPath = new URL(beat.free_mp3_url).pathname;
-      const filename = urlPath.split("/").pop() || `${beat.title}.mp3`;
-      a.download = decodeURIComponent(filename);
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      const fn = new URL(beat.free_mp3_url).pathname.split("/").pop() || `${beat.title}.mp3`;
+      a.download = decodeURIComponent(fn);
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
       qc.invalidateQueries({ queryKey: ["beats-public"] });
-    } catch (e) {
-      window.open(beat.free_mp3_url, "_blank");
-    }
+    } catch { window.open(beat.free_mp3_url, "_blank"); }
   }, [user, qc]);
 
-  // Play handler
   const handlePlay = useCallback((beat, allBeats) => {
     const queue = allBeats.map(b => ({ ...b, beat_id: b.id }));
     const idx = queue.findIndex(b => b.beat_id === beat.id);
     playQueue(queue, idx >= 0 ? idx : 0);
   }, [playQueue]);
 
-  // Featured beats (admin-featured, fallback to most-played)
   const featuredBeats = useMemo(() => {
     const featured = beats.filter(b => b.featured);
     if (featured.length >= 3) return featured.slice(0, 6);
@@ -148,19 +120,16 @@ export default function Beats() {
     return [...featured, ...sorted.filter(b => !featured.includes(b))].slice(0, 6);
   }, [beats]);
 
-  // Trending (top 10 by plays + downloads)
   const trendingBeats = useMemo(() => {
     return [...beats]
       .sort((a, b) => ((b.plays_count || 0) + (b.downloads_count || 0)) - ((a.plays_count || 0) + (a.downloads_count || 0)))
       .slice(0, 10);
   }, [beats]);
 
-  // New releases (recent)
   const newReleases = useMemo(() => {
     return [...beats].sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0));
   }, [beats]);
 
-  // Filtered beats by chip + search
   const filteredBeats = useMemo(() => {
     let result = [...beats];
     if (search) {
@@ -173,111 +142,122 @@ export default function Beats() {
         (b.scale || "").toLowerCase().includes(q)
       );
     }
-    switch (activeChip) {
-      case "staff": result = result.filter(b => b.featured); break;
-      case "nuevos": result.sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0)); break;
-      case "populares": result.sort((a, b) => (b.plays_count || 0) - (a.plays_count || 0)); break;
-      case "descargas": result.sort((a, b) => (b.downloads_count || 0) - (a.downloads_count || 0)); break;
-      case "gratis": result = result.filter(b => (b.licenses || []).some(l => l.type === "mp3_free")); break;
-      default: break;
+    if (activeChip.startsWith("genre:")) {
+      const g = activeChip.slice(6);
+      result = result.filter(b => (b.genres || []).includes(g));
+    } else {
+      switch (activeChip) {
+        case "staff": result = result.filter(b => b.featured); break;
+        case "nuevos": result.sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0)); break;
+        case "populares": result.sort((a, b) => (b.plays_count || 0) - (a.plays_count || 0)); break;
+        case "descargas": result.sort((a, b) => (b.downloads_count || 0) - (a.downloads_count || 0)); break;
+        case "gratis": result = result.filter(b => (b.licenses || []).some(l => l.type === "mp3_free")); break;
+        default: break;
+      }
     }
     return result;
   }, [beats, search, activeChip]);
 
-  // Tab scroll
   const handleTabClick = (tab) => {
     setActiveTab(tab);
-    if (tab === "NUEVOS") nuevosRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    if (tab === "TRENDING") trendingRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    if (tab === "EXPLORE") window.scrollTo({ top: 0, behavior: "smooth" });
+    if (tab === "Nuevos") nuevosRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (tab === "Trending") trendingRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (tab === "Explorar") window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
-    <div className="min-h-screen pb-32" style={{ background: "#0e0e0e", fontFamily: "'Inter', -apple-system, sans-serif" }}>
+    <div className="min-h-screen pb-32" style={{ background: "#121212", fontFamily: "'Inter', -apple-system, sans-serif" }}>
       {/* ── Top promotional banner ─────────────────────────────────── */}
-      <div className="w-full px-4 py-2 text-center text-xs font-semibold text-white" style={{ background: "#6366f1" }}>
+      <div className="w-full px-4 py-2 text-center text-[11px] font-semibold text-white" style={{ background: "#7c4dff" }}>
         Únete y obtén acceso completo gratis por 3 días →
       </div>
 
-      {/* ── Navigation header ─────────────────────────────────────── */}
-      <div
-        className="sticky top-0 z-40 flex items-center justify-between px-5 sm:px-10 py-3.5"
-        style={{ background: "rgba(14,14,14,0.95)", backdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
-      >
-        <Link to="/Explorar" className="flex items-center gap-2">
-          <img src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png" alt="Cabaña" className="h-6 w-auto opacity-80" />
-        </Link>
-        <div className="flex items-center gap-2 sm:gap-3">
-          {user ? (
-            <Link to="/ArtistDashboard" className="text-xs font-semibold text-white/70 hover:text-white px-4 py-2 rounded-full bg-white/5 border border-white/10 transition-colors">
-              Mi catálogo
-            </Link>
-          ) : (
-            <>
-              <Link to="/login" className="text-xs font-semibold text-white/70 hover:text-white px-3 py-2 transition-colors hidden sm:block">
-                Login
+      {/* ── Sticky nav + search + tabs ─────────────────────────────── */}
+      <div className="sticky top-0 z-40" style={{ background: "rgba(18,18,18,0.95)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+        {/* Nav header */}
+        <div className="flex items-center justify-between px-4 sm:px-10 py-3">
+          {/* Left: menu */}
+          <Link to="/Explorar" className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white/5 transition-colors text-white/70">
+            <Menu className="w-5 h-5" />
+          </Link>
+          {/* Center: logo */}
+          <Link to="/beats" className="absolute left-1/2 -translate-x-1/2">
+            <img src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png" alt="Cabaña" className="h-6 w-auto opacity-90" />
+          </Link>
+          {/* Right: actions */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {user ? (
+              <Link to="/ArtistDashboard" className="text-xs font-semibold text-white/70 hover:text-white px-4 py-2 rounded-full bg-white/5 border border-white/10 transition-colors">
+                Mi catálogo
               </Link>
-              <Link
-                to="/register"
-                className="text-xs font-bold text-[#0e0e0e] px-4 py-2 rounded-full transition-transform hover:scale-105"
-                style={{ background: "#a7f3d0" }}
-              >
-                Empezar gratis →
-              </Link>
-            </>
-          )}
+            ) : (
+              <>
+                <Link to="/login" className="text-xs font-semibold text-white/70 hover:text-white px-2 sm:px-3 py-2 transition-colors">
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="text-xs font-bold text-[#0e0e0e] px-3 sm:px-4 py-2 rounded-full transition-transform hover:scale-105"
+                  style={{ background: "#d4f7c7" }}
+                >
+                  Empezar gratis →
+                </Link>
+              </>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* ── Search bar + Tabs ─────────────────────────────────────── */}
-      <div className="px-5 sm:px-10 max-w-7xl mx-auto pt-5">
-        {/* Search pill */}
-        <div className="flex items-center gap-2 w-full rounded-full px-4 py-3 mb-4" style={{ background: "#1a1a1a", border: "1px solid #262626" }}>
-          <button className="flex items-center gap-1.5 text-xs font-semibold text-white/60 hover:text-white transition-colors flex-shrink-0">
-            Beats
-            <ChevronDown className="w-3.5 h-3.5" />
-          </button>
-          <span className="w-px h-4 bg-white/10" />
-          <Search className="w-4 h-4 text-white/30 flex-shrink-0" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar beats..."
-            className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none min-w-0"
-          />
-          {search && (
-            <button onClick={() => setSearch("")} className="text-white/30 hover:text-white">
-              <X className="w-4 h-4" />
+        {/* Search bar */}
+        <div className="px-4 sm:px-10 max-w-3xl mx-auto pb-3">
+          <div className="flex items-center gap-2 w-full rounded-full px-4 py-3" style={{ background: "#1c1c1c", border: "1px solid #262626" }}>
+            <button className="flex items-center gap-1.5 text-xs font-semibold text-white/70 hover:text-white transition-colors flex-shrink-0">
+              Beats
+              <ChevronDown className="w-3.5 h-3.5" />
             </button>
-          )}
+            <span className="w-px h-4 bg-white/10 flex-shrink-0" />
+            <Search className="w-4 h-4 text-white/30 flex-shrink-0" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar beats..."
+              className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none min-w-0"
+            />
+            {search && (
+              <button onClick={() => setSearch("")} className="text-white/30 hover:text-white flex-shrink-0">
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-6 border-b border-white/8 mb-5">
-          {TABS.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => handleTabClick(tab)}
-              className="relative pb-3 text-xs font-bold tracking-wider transition-colors"
-              style={{ color: activeTab === tab ? "#ffffff" : "#a0a0a0" }}
-            >
-              {tab}
-              {activeTab === tab && (
-                <motion.div
-                  layoutId="beats-tab-underline"
-                  className="absolute left-0 right-0 -bottom-px h-0.5 rounded-full"
-                  style={{ background: "#ffffff" }}
-                />
-              )}
-            </button>
-          ))}
+        <div className="px-4 sm:px-10 max-w-3xl mx-auto">
+          <div className="flex items-center gap-6 border-b border-white/8 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+            {TABS.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => handleTabClick(tab)}
+                className="relative pb-3 pt-1 text-xs font-bold tracking-wider transition-colors whitespace-nowrap"
+                style={{ color: activeTab === tab ? "#ffffff" : "#a0a0a0" }}
+              >
+                {tab.toUpperCase()}
+                {activeTab === tab && (
+                  <motion.div
+                    layoutId="beats-tab-underline"
+                    className="absolute left-0 right-0 -bottom-px h-0.5 rounded-full"
+                    style={{ background: "#ffffff" }}
+                  />
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* ── Featured carousel ─────────────────────────────────────── */}
       {featuredBeats.length > 0 && (
-        <div className="px-5 sm:px-10 max-w-7xl mx-auto mb-10">
+        <div className="px-4 sm:px-10 max-w-7xl mx-auto pt-5 mb-10">
           <BeatsFeaturedCarousel
             beats={featuredBeats}
             isPlaying={isPlaying}
@@ -289,20 +269,20 @@ export default function Beats() {
       )}
 
       {/* ── New Releases ──────────────────────────────────────────── */}
-      <div ref={nuevosRef} className="px-5 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-20">
+      <div ref={nuevosRef} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-40">
         <h2 className="text-2xl sm:text-3xl font-black text-white mb-4" style={{ letterSpacing: "-0.03em" }}>
           {search ? "Resultados" : "New releases"}
         </h2>
 
-        {/* Filter chips */}
+        {/* Category chips */}
         <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-          {FILTER_CHIPS.map((chip) => (
+          {ALL_CHIPS.map((chip) => (
             <button
               key={chip.id}
               onClick={() => setActiveChip(chip.id)}
-              className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-colors"
+              className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all"
               style={{
-                background: activeChip === chip.id ? "#ffffff" : "#1a1a1a",
+                background: activeChip === chip.id ? "#ffffff" : "#1c1c1c",
                 color: activeChip === chip.id ? "#0e0e0e" : "#a0a0a0",
                 border: activeChip === chip.id ? "1px solid #ffffff" : "1px solid #262626",
               }}
@@ -346,7 +326,7 @@ export default function Beats() {
 
       {/* ── Trending ───────────────────────────────────────────────── */}
       {trendingBeats.length > 0 && (
-        <div ref={trendingRef} className="px-5 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-20">
+        <div ref={trendingRef} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-40">
           <div className="flex items-center gap-2 mb-1">
             <TrendingUp className="w-5 h-5 text-[#8b5cf6]" />
             <h2 className="text-2xl sm:text-3xl font-black text-white" style={{ letterSpacing: "-0.03em" }}>
@@ -428,8 +408,6 @@ export default function Beats() {
           <BeatLicensesModal beat={licensesModal} onClose={() => setLicensesModal(null)} user={user} />
         )}
       </AnimatePresence>
-
-      {/* Expanded player is rendered globally in App.jsx */}
     </div>
   );
 }

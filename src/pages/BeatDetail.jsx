@@ -1,0 +1,303 @@
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useParams, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { base44 } from "@/api/base44Client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useGlobalAudio } from "@/context/GlobalAudioContext";
+import { Play, Pause, Heart, Download, FolderOpen, ArrowLeft, Activity, Zap } from "lucide-react";
+import { getCoverForBeat, timeAgo } from "@/lib/beatsUtils";
+import { formatDuration } from "@/lib/musicConstants";
+import BeatCard from "@/components/beats/BeatCard";
+import BeatLicensesModal from "@/components/beats/BeatLicensesModal";
+
+export default function BeatDetail() {
+  const { id } = useParams();
+  const qc = useQueryClient();
+  const { playingTrack, isPlaying, playQueue } = useGlobalAudio();
+  const [user, setUser] = useState(null);
+  const [licensesModal, setLicensesModal] = useState(false);
+  const [likedIds, setLikedIds] = useState(new Set());
+  const [savedIds, setSavedIds] = useState(new Set());
+
+  useEffect(() => {
+    base44.auth.isAuthenticated().then(async (authed) => {
+      if (authed) setUser(await base44.auth.me());
+    });
+  }, []);
+
+  const { data: beat, isLoading } = useQuery({
+    queryKey: ["beat", id],
+    queryFn: async () => base44.entities.Beat.get(id),
+    enabled: !!id,
+  });
+
+  const { data: allBeats = [] } = useQuery({
+    queryKey: ["beats-public"],
+    queryFn: async () => {
+      const all = await base44.entities.Beat.filter({ status: "Publicado" });
+      return all.filter(b => !b.archived);
+    },
+  });
+
+  const { data: likes = [] } = useQuery({
+    queryKey: ["beat-likes-me", user?.id],
+    queryFn: async () => user?.id ? base44.entities.BeatLike.filter({ user_id: user.id }) : [],
+    enabled: !!user?.id,
+  });
+  const { data: saves = [] } = useQuery({
+    queryKey: ["beat-saves-me", user?.id],
+    queryFn: async () => user?.id ? base44.entities.BeatSave.filter({ user_id: user.id }) : [],
+    enabled: !!user?.id,
+  });
+
+  useEffect(() => { setLikedIds(new Set(likes.map(l => l.beat_id))); }, [likes]);
+  useEffect(() => { setSavedIds(new Set(saves.map(s => s.beat_id))); }, [saves]);
+
+  const likeMutation = useMutation({
+    mutationFn: async (b) => {
+      if (likedIds.has(b.id)) {
+        const like = likes.find(l => l.beat_id === b.id);
+        if (like) await base44.entities.BeatLike.delete(like.id);
+      } else {
+        await base44.entities.BeatLike.create({ beat_id: b.id, user_id: user.id });
+      }
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["beat-likes-me", user?.id] }),
+  });
+  const saveMutation = useMutation({
+    mutationFn: async (b) => {
+      if (savedIds.has(b.id)) {
+        const save = saves.find(s => s.beat_id === b.id);
+        if (save) await base44.entities.BeatSave.delete(save.id);
+      } else {
+        await base44.entities.BeatSave.create({ beat_id: b.id, user_id: user.id });
+      }
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["beat-saves-me", user?.id] }),
+  });
+
+  const handleDownload = useCallback(async (b) => {
+    if (!b.free_mp3_url) return;
+    try {
+      if (user?.id) await base44.entities.BeatDownload.create({ beat_id: b.id, user_id: user.id, license_type: "mp3_free" });
+      const res = await fetch(b.free_mp3_url);
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      const fn = new URL(b.free_mp3_url).pathname.split("/").pop() || `${b.title}.mp3`;
+      a.download = decodeURIComponent(fn);
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch { window.open(b.free_mp3_url, "_blank"); }
+  }, [user]);
+
+  const handlePlay = useCallback((b, list) => {
+    const queue = list.map(x => ({ ...x, beat_id: x.id }));
+    const idx = queue.findIndex(x => x.beat_id === b.id);
+    playQueue(queue, idx >= 0 ? idx : 0);
+  }, [playQueue]);
+
+  const active = playingTrack?.beat_id === beat?.id;
+
+  // Related: same genre or producer, exclude self
+  const related = useMemo(() => {
+    if (!beat) return [];
+    return allBeats
+      .filter(b => b.id !== beat.id && (
+        (b.genres || []).some(g => (beat.genres || []).includes(g)) ||
+        b.producer === beat.producer
+      ))
+      .slice(0, 10);
+  }, [beat, allBeats]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0e0e0e" }}>
+        <div className="w-8 h-8 rounded-full border-2 border-[#8b5cf6] border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  if (!beat) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: "#0e0e0e" }}>
+        <p className="text-white/60">Beat no encontrado</p>
+        <Link to="/beats" className="text-[#a78bfa] text-sm font-semibold">Volver a Beats</Link>
+      </div>
+    );
+  }
+
+  const cover = getCoverForBeat(beat);
+
+  return (
+    <div className="min-h-screen pb-32" style={{ background: "#0e0e0e", fontFamily: "'Inter', -apple-system, sans-serif" }}>
+      {/* Back */}
+      <div className="sticky top-0 z-40 flex items-center justify-between px-5 sm:px-10 py-3.5" style={{ background: "rgba(14,14,14,0.92)", backdropFilter: "blur(16px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+        <Link to="/beats" className="flex items-center gap-2 text-xs font-semibold text-white/60 hover:text-white transition-colors">
+          <ArrowLeft className="w-4 h-4" />
+          Beats
+        </Link>
+        {user ? (
+          <Link to="/ArtistDashboard" className="text-xs font-semibold text-white/70 hover:text-white px-4 py-2 rounded-full bg-white/5 border border-white/10">Mi catálogo</Link>
+        ) : (
+          <Link to="/register" className="text-xs font-bold text-[#0e0e0e] px-4 py-2 rounded-full" style={{ background: "#a7f3d0" }}>Empezar gratis →</Link>
+        )}
+      </div>
+
+      {/* Hero */}
+      <div className="relative w-full overflow-hidden" style={{ height: "min(70vh, 560px)" }}>
+        <img src={cover} alt={beat.title} className="absolute inset-0 w-full h-full object-cover" style={{ filter: "saturate(0.7) brightness(0.4)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, #0e0e0e 5%, rgba(14,14,14,0.4) 50%, rgba(14,14,14,0.6) 100%)" }} />
+
+        <div className="relative h-full flex flex-col justify-end px-5 sm:px-10 max-w-5xl mx-auto pb-8">
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
+            <p className="text-[10px] font-bold text-[#a78bfa] uppercase tracking-[0.3em] mb-3">{beat.producer || "Cabaña Creative"}</p>
+            <h1 className="text-4xl sm:text-7xl font-black text-white mb-4" style={{ letterSpacing: "-0.04em", lineHeight: 0.92 }}>{beat.title}</h1>
+
+            {/* Meta row */}
+            <div className="flex items-center gap-4 flex-wrap mb-6">
+              {beat.bpm && <span className="text-xs text-white/60 font-semibold">{beat.bpm} BPM</span>}
+              {(beat.scale || beat.key) && <span className="text-xs text-white/60 font-semibold">{beat.scale || beat.key}</span>}
+              {beat.duration > 0 && <span className="text-xs text-white/60 font-semibold">{formatDuration(beat.duration)}</span>}
+              <span className="text-xs text-white/40 font-semibold flex items-center gap-1"><Activity className="w-3 h-3" /> {beat.plays_count || 0}</span>
+              <span className="text-xs text-white/40 font-semibold flex items-center gap-1"><Download className="w-3 h-3" /> {beat.downloads_count || 0}</span>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <button
+                onClick={() => handlePlay(beat, [beat, ...related])}
+                className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-105"
+                style={{ background: "#8b5cf6" }}
+              >
+                {active && isPlaying ? <Pause className="w-7 h-7 text-white" fill="white" /> : <Play className="w-7 h-7 text-white ml-1" fill="white" />}
+              </button>
+              <button
+                onClick={() => likeMutation.mutate(beat)}
+                className="w-12 h-12 rounded-full flex items-center justify-center border border-white/15 hover:bg-white/10 transition-colors"
+              >
+                <Heart className={`w-5 h-5 ${likedIds.has(beat.id) ? "fill-[#8b5cf6] text-[#8b5cf6]" : "text-white"}`} />
+              </button>
+              <button
+                onClick={() => saveMutation.mutate(beat)}
+                className="w-12 h-12 rounded-full flex items-center justify-center border border-white/15 hover:bg-white/10 transition-colors"
+              >
+                <Zap className={`w-5 h-5 ${savedIds.has(beat.id) ? "fill-[#a78bfa] text-[#a78bfa]" : "text-white"}`} />
+              </button>
+              {beat.free_mp3_url && (
+                <button
+                  onClick={() => handleDownload(beat)}
+                  className="w-12 h-12 rounded-full flex items-center justify-center border border-white/15 hover:bg-white/10 transition-colors"
+                >
+                  <Download className="w-5 h-5 text-white" />
+                </button>
+              )}
+              {beat.drive_folder_url && (
+                <a
+                  href={beat.drive_folder_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-12 h-12 rounded-full flex items-center justify-center border border-white/15 hover:bg-white/10 transition-colors"
+                >
+                  <FolderOpen className="w-5 h-5 text-white" />
+                </a>
+              )}
+              <button
+                onClick={() => setLicensesModal(true)}
+                className="px-5 h-12 rounded-full text-sm font-bold transition-all"
+                style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.25), rgba(167,139,250,0.12))", border: "1px solid rgba(139,92,246,0.35)", color: "#c4b5fd" }}
+              >
+                Licencias
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Details */}
+      <div className="px-5 sm:px-10 max-w-5xl mx-auto pt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          {/* Description */}
+          <div className="sm:col-span-2">
+            {beat.description && (
+              <>
+                <h2 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-3">Descripción</h2>
+                <p className="text-sm text-white/70 leading-relaxed mb-8 whitespace-pre-wrap">{beat.description}</p>
+              </>
+            )}
+
+            {/* Genres + Moods */}
+            <div className="space-y-5">
+              {beat.genres && beat.genres.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-2">Géneros</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {beat.genres.map(g => (
+                      <span key={g} className="px-3 py-1.5 rounded-full text-xs font-semibold text-white/80" style={{ background: "#1a1a1a", border: "1px solid #262626" }}>{g}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {beat.moods && beat.moods.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-2">Moods</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {beat.moods.map(m => (
+                      <span key={m} className="px-3 py-1.5 rounded-full text-xs font-semibold text-white/80" style={{ background: "#1a1a1a", border: "1px solid #262626" }}>{m}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Tech specs */}
+          <div>
+            <h2 className="text-xs font-bold text-white/40 uppercase tracking-wider mb-3">Ficha técnica</h2>
+            <div className="rounded-2xl p-4 space-y-3" style={{ background: "#1a1a1a", border: "1px solid #262626" }}>
+              {[
+                ["Productor", beat.producer],
+                ["BPM", beat.bpm ? `${beat.bpm}` : "—"],
+                ["Tonalidad", beat.key || "—"],
+                ["Escala", beat.scale || "—"],
+                ["Duración", beat.duration ? formatDuration(beat.duration) : "—"],
+                ["Subido", timeAgo(beat.created_date) || "—"],
+              ].map(([k, v]) => (
+                <div key={k} className="flex items-center justify-between">
+                  <span className="text-xs text-[#a0a0a0]">{k}</span>
+                  <span className="text-xs font-semibold text-white">{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Related */}
+      {related.length > 0 && (
+        <div className="px-5 sm:px-10 max-w-7xl mx-auto pt-12">
+          <h2 className="text-2xl font-black text-white mb-5" style={{ letterSpacing: "-0.03em" }}>Relacionados</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {related.map((b, i) => (
+              <BeatCard
+                key={b.id}
+                beat={b}
+                index={i}
+                isPlaying={playingTrack?.beat_id === b.id && isPlaying}
+                onPlay={() => handlePlay(b, related)}
+                onLike={user ? (x) => likeMutation.mutate(x) : null}
+                liked={likedIds.has(b.id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Licenses modal */}
+      {licensesModal && (
+        <BeatLicensesModal beat={beat} onClose={() => setLicensesModal(false)} user={user} />
+      )}
+    </div>
+  );
+}

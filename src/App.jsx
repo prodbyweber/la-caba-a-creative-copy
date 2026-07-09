@@ -44,6 +44,7 @@ import WeberAdmin from './pages/WeberAdmin';
 import StudioSessionEditor from './pages/StudioSessionEditor';
 import Beats from './pages/Beats';
 import BeatsAdmin from './pages/BeatsAdmin';
+import BeatDetail from './pages/BeatDetail';
 import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
@@ -158,6 +159,7 @@ const AuthenticatedApp = () => {
       {/* Public: Explorar is accessible without login */}
       <Route path="/Explorar" element={<Explorar />} />
       <Route path="/beats" element={<Beats />} />
+      <Route path="/beats/:id" element={<BeatDetail />} />
       <Route path="/StudioSession" element={<StudioSession />} />
       <Route path="/meeting" element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}><Route index element={<Meeting />} /></Route>
 
