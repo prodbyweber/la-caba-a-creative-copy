@@ -94,6 +94,9 @@ export default function GlobalAudioPlayer() {
     }
   }, [playingTrack?.id]);
 
+  // Don't render for beat tracks — handled by BeatMiniPlayer
+  if (playingTrack?.beat_id) return null;
+
   return (
     <AnimatePresence>
       {playingTrack && !hidden && (

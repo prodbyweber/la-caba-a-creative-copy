@@ -37,6 +37,8 @@ export default function DesktopAudioPlayer() {
     return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
+  // Don't render for beat tracks — handled by BeatMiniPlayer
+  if (playingTrack?.beat_id) return null;
   if (!isDesktop || !playingTrack) return null;
 
   return (

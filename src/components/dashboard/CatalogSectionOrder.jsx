@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { X, Check, ChevronUp, ChevronDown } from "lucide-react";
 
-export const DEFAULT_SECTION_ORDER = ["tracks", "video", "shorts", "projects"];
+export const DEFAULT_SECTION_ORDER = ["savedbeats", "tracks", "video", "shorts", "projects"];
 
 const SECTION_META = {
-  tracks:   { label: "Soundtracks" },
-  video:    { label: "Films" },
-  shorts:   { label: "Shorts" },
-  projects: { label: "Proyectos" },
+  savedbeats: { label: "Ritmos Guardados" },
+  tracks:     { label: "Soundtracks" },
+  video:      { label: "Films" },
+  shorts:     { label: "Shorts" },
+  projects:   { label: "Proyectos" },
 };
 
 export default function CatalogSectionOrder({ order, onChange, onClose, isMobile }) {

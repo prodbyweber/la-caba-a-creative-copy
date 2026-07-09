@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Calendar, Clock, MapPin, Plus, ChevronRight, CheckCircle2, AlertCircle } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,6 +12,7 @@ export default function UpcomingSessionsCard({ artistId }) {
   const [selectedSession, setSelectedSession] = useState(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const updateSessionMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Session.update(id, data),
@@ -18,6 +20,11 @@ export default function UpcomingSessionsCard({ artistId }) {
       queryClient.invalidateQueries({ queryKey: ['artist-sessions', artistId] });
     }
   });
+
+  const [isAdmin, setIsAdmin] = useState(false);
+  React.useEffect(() => {
+    base44.auth.me().then(u => { if (u?.role === 'admin') setIsAdmin(true); }).catch(() => {});
+  }, []);
   const { data: sessions = [], isLoading } = useQuery({
     queryKey: ['artist-sessions', artistId],
     queryFn: async () => {
@@ -110,19 +117,18 @@ export default function UpcomingSessionsCard({ artistId }) {
             <p className="text-[9px] text-gray-500">{sessions.length} programadas</p>
           </div>
         </div>
-        <a
-          href="/StudioSession"
-          className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white text-[9px] font-medium transition-all flex items-center gap-1 no-underline"
-          style={{ textDecoration: "none" }}
+        <button
+          onClick={() => navigate("/StudioSession")}
+          className="px-2 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white text-[9px] font-medium transition-all flex items-center gap-1"
         >
           <Plus className="w-2.5 h-2.5" />
           Agendar
-        </a>
+        </button>
       </div>
 
       {/* Studio Hours Block */}
       <div className="px-2 pt-2">
-        <StudioHoursBlock artist={{ id: artistId }} />
+        <StudioHoursBlock artist={{ id: artistId }} isAdmin={isAdmin} />
       </div>
 
       {/* Sessions List Compacta */}

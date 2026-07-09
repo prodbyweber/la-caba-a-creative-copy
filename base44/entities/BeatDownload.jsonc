@@ -1,0 +1,27 @@
+{
+  "name": "BeatDownload",
+  "type": "object",
+  "properties": {
+    "beat_id": {
+      "type": "string",
+      "description": "ID del beat descargado"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario que descarg\u00f3 (si est\u00e1 autenticado)"
+    },
+    "license_type": {
+      "type": "string",
+      "enum": [
+        "mp3_free",
+        "wav",
+        "wav_premium",
+        "exclusive"
+      ],
+      "description": "Tipo de licencia descargada"
+    }
+  },
+  "required": [
+    "beat_id"
+  ]
+}

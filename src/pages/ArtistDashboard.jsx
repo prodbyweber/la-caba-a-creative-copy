@@ -14,6 +14,7 @@ import BrandCampaignsSection from "@/components/dashboard/BrandCampaignsSection"
 import PhotosGallery from "@/components/dashboard/PhotosGallery";
 import FilmsSection from "@/components/dashboard/FilmsSection";
 import CatalogSectionOrder, { DEFAULT_SECTION_ORDER } from "@/components/dashboard/CatalogSectionOrder";
+import SavedBeatsSection from "@/components/dashboard/SavedBeatsSection";
 
 export default function ArtistDashboard() {
   const [showProfileDrawer, setShowProfileDrawer] = useState(false);
@@ -235,6 +236,13 @@ export default function ArtistDashboard() {
         );
       case "photos":
         return null; // Movido al panel de cuenta
+      case "savedbeats":
+        return (
+          <div key="savedbeats">
+            <SectionLabel label="Ritmos Guardados" />
+            <SavedBeatsSection />
+          </div>
+        );
       default:
         return null;
     }

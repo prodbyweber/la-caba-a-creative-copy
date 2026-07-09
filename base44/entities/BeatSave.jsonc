@@ -1,0 +1,18 @@
+{
+  "name": "BeatSave",
+  "type": "object",
+  "properties": {
+    "beat_id": {
+      "type": "string",
+      "description": "ID del beat"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario"
+    }
+  },
+  "required": [
+    "beat_id",
+    "user_id"
+  ]
+}

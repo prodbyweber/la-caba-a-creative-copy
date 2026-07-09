@@ -42,9 +42,12 @@ import Solicitud from './pages/Solicitud';
 import Weber from './pages/Weber';
 import WeberAdmin from './pages/WeberAdmin';
 import StudioSessionEditor from './pages/StudioSessionEditor';
+import Beats from './pages/Beats';
+import BeatsAdmin from './pages/BeatsAdmin';
 import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
+import BeatMiniPlayer from '@/components/audio/BeatMiniPlayer';
 import OnboardingForm from '@/components/onboarding/OnboardingForm';
 
 const { Pages, Layout, mainPage } = pagesConfig;
@@ -153,6 +156,7 @@ const AuthenticatedApp = () => {
 
       {/* Public: Explorar is accessible without login */}
       <Route path="/Explorar" element={<Explorar />} />
+      <Route path="/beats" element={<Beats />} />
       <Route path="/StudioSession" element={<StudioSession />} />
       <Route path="/meeting" element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}><Route index element={<Meeting />} /></Route>
 
@@ -167,6 +171,7 @@ const AuthenticatedApp = () => {
       <Route path="/ADNdeMarca" element={<ProtectedAdminRoute element={<ADNdeMarca />} />} />
       <Route path="/WeberAdmin" element={<ProtectedAdminRoute element={<WeberAdmin />} />} />
       <Route path="/StudioSessionEditor" element={<ProtectedAdminRoute element={<StudioSessionEditor />} />} />
+      <Route path="/BeatsAdmin" element={<ProtectedAdminRoute element={<BeatsAdmin />} />} />
 
       {/* Legacy pages config loop */}
       {Object.entries(Pages).map(([path, Page]) => (
@@ -198,6 +203,11 @@ function App() {
             <AuthenticatedApp />
             <GlobalAudioPlayer />
             <DesktopAudioPlayer />
+            <BeatMiniPlayer onExpand={() => {
+              // Set expanded in context — handled by ExpandedPlayer on Beats page
+              const event = new CustomEvent('cabana-expand-player');
+              window.dispatchEvent(event);
+            }} />
           </Router>
           <CookieBanner />
           <Toaster />

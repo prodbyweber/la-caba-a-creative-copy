@@ -1,0 +1,146 @@
+{
+  "name": "Beat",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo del beat"
+    },
+    "producer": {
+      "type": "string",
+      "description": "Nombre del productor"
+    },
+    "cover_url": {
+      "type": "string",
+      "description": "URL de la portada del beat"
+    },
+    "preview_mp3_url": {
+      "type": "string",
+      "description": "URL del MP3 con tag (preview)"
+    },
+    "free_mp3_url": {
+      "type": "string",
+      "description": "URL del MP3 gratuito descargable"
+    },
+    "drive_folder_url": {
+      "type": "string",
+      "description": "URL de la carpeta de Google Drive"
+    },
+    "bpm": {
+      "type": "number",
+      "description": "Beats por minuto"
+    },
+    "key": {
+      "type": "string",
+      "description": "Tonalidad (ej: C, F#, A)"
+    },
+    "scale": {
+      "type": "string",
+      "description": "Escala (ej: A Major, F# Minor)"
+    },
+    "genres": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "G\u00e9neros del beat (sistema centralizado)"
+    },
+    "moods": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Moods del beat (sistema centralizado)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n del beat"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Etiquetas adicionales"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Publicado",
+        "Borrador"
+      ],
+      "default": "Borrador",
+      "description": "Estado del beat"
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si el beat est\u00e1 destacado globalmente"
+    },
+    "archived": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si el beat est\u00e1 archivado"
+    },
+    "duration": {
+      "type": "number",
+      "description": "Duraci\u00f3n en segundos"
+    },
+    "licenses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "mp3_free",
+              "wav",
+              "wav_premium",
+              "exclusive"
+            ]
+          },
+          "price": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          },
+          "files_included": {
+            "type": "string"
+          },
+          "drive_folder_url": {
+            "type": "string"
+          },
+          "download_url": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Licencias del beat"
+    },
+    "plays_count": {
+      "type": "number",
+      "default": 0,
+      "description": "N\u00famero de reproducciones"
+    },
+    "downloads_count": {
+      "type": "number",
+      "default": 0,
+      "description": "N\u00famero de descargas"
+    },
+    "saves_count": {
+      "type": "number",
+      "default": 0,
+      "description": "N\u00famero de guardados"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}
