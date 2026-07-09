@@ -48,6 +48,7 @@ import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
 import BeatMiniPlayer from '@/components/audio/BeatMiniPlayer';
+import ExpandedPlayer from '@/components/audio/ExpandedPlayer';
 import OnboardingForm from '@/components/onboarding/OnboardingForm';
 
 const { Pages, Layout, mainPage } = pagesConfig;
@@ -203,11 +204,8 @@ function App() {
             <AuthenticatedApp />
             <GlobalAudioPlayer />
             <DesktopAudioPlayer />
-            <BeatMiniPlayer onExpand={() => {
-              // Set expanded in context — handled by ExpandedPlayer on Beats page
-              const event = new CustomEvent('cabana-expand-player');
-              window.dispatchEvent(event);
-            }} />
+            <BeatMiniPlayer />
+            <ExpandedPlayer />
           </Router>
           <CookieBanner />
           <Toaster />

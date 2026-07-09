@@ -1,123 +1,101 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Play, Pause, Heart, Download, FolderOpen, Music2, ChevronRight } from "lucide-react";
+import { Play, Pause, Heart, Activity } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
+import { getCoverForBeat, timeAgo } from "@/lib/beatsUtils";
 
-export default function BeatCard({ beat, isPlaying, onPlay, onLike, onDownload, onDrive, onLicenses, liked, index }) {
+export default function BeatCard({ beat, isPlaying, onPlay, onLike, liked, index }) {
   const { playingTrack } = useGlobalAudio();
   const active = playingTrack?.beat_id === beat.id;
   const [imgError, setImgError] = useState(false);
+  const cover = imgError ? null : getCoverForBeat(beat);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: (index || 0) * 0.03 }}
-      className="group relative rounded-xl overflow-hidden cursor-pointer"
-      style={{ background: "#161616", border: "1px solid rgba(255,255,255,0.05)" }}
+      transition={{ delay: (index || 0) * 0.04, duration: 0.5 }}
+      className="group cursor-pointer"
       onClick={onPlay}
     >
       {/* Cover */}
-      <div className="relative aspect-square overflow-hidden" style={{ background: "#1a1a1c" }}>
-        {beat.cover_url && !imgError ? (
+      <div className="relative aspect-square rounded-2xl overflow-hidden mb-3" style={{ background: "#161616" }}>
+        {cover ? (
           <img
-            src={beat.cover_url}
+            src={cover}
             alt={beat.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             onError={() => setImgError(true)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Music2 className="w-8 h-8 text-white/15" />
+            <Activity className="w-8 h-8 text-white/10" />
           </div>
         )}
 
-        {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+        {/* Cinematic gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/10 pointer-events-none" />
+
+        {/* Soundwave + play count (bottom-left) */}
+        <div
+          className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold text-white"
+          style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(8px)" }}
+        >
+          <Activity className="w-2.5 h-2.5 text-[#8b5cf6]" />
+          {beat.plays_count || 0}
+        </div>
+
+        {/* Time ago (top-right) */}
+        <div
+          className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold text-white/80 tracking-wider"
+          style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)" }}
+        >
+          {timeAgo(beat.created_date)}
+        </div>
+
+        {/* Like button (top-left, on hover) */}
+        {onLike && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onLike(beat); }}
+            className="absolute top-2.5 left-2.5 w-8 h-8 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+            style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
+          >
+            <Heart className={`w-3.5 h-3.5 ${liked ? "fill-[#8b5cf6] text-[#8b5cf6]" : "text-white"}`} />
+          </button>
+        )}
+
+        {/* Hover play button (center) */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div
-            className="w-12 h-12 rounded-full flex items-center justify-center shadow-xl"
-            style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
+            className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-transform group-hover:scale-110"
+            style={{ background: "#8b5cf6" }}
           >
             {active && isPlaying ? (
-              <Pause className="w-5 h-5 text-white" fill="white" />
+              <Pause className="w-6 h-6 text-white" fill="white" />
             ) : (
-              <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
+              <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
             )}
           </div>
         </div>
 
-        {/* Sample count badge (bottom-left) */}
-        <div className="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold text-white"
-          style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}
-        >
-          <Music2 className="w-2.5 h-2.5" />
-          {beat.bpm ? `${beat.bpm}` : "—"}
-        </div>
-
-        {/* Like button (top-right) */}
-        {onLike && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onLike(beat); }}
-            className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center transition-all"
-            style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
-          >
-            <Heart className={`w-3.5 h-3.5 ${liked ? "fill-red-500 text-red-500" : "text-white/70"}`} />
-          </button>
+        {/* Active state ring */}
+        {active && (
+          <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ border: "2px solid #8b5cf6" }} />
         )}
       </div>
 
       {/* Info */}
-      <div className="p-3">
-        <h3 className="text-sm font-bold text-white truncate leading-tight">{beat.title}</h3>
-        <p className="text-xs text-white/40 mt-0.5 truncate">{beat.producer || "Cabaña"}</p>
+      <h3 className="text-sm font-bold text-white truncate leading-tight">{beat.title}</h3>
+      <p className="text-xs text-[#a0a0a0] mt-0.5 truncate">{beat.producer || "Cabaña"}</p>
 
-        {/* Meta */}
-        <div className="flex items-center gap-2 mt-2 flex-wrap">
-          {beat.key && (
-            <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/8 text-white/50 font-semibold uppercase tracking-wider">{beat.key}</span>
-          )}
-          {beat.scale && (
-            <span className="text-[9px] px-1.5 py-0.5 rounded bg-white/8 text-white/50 font-semibold">{beat.scale}</span>
-          )}
-          {(beat.genres || []).slice(0, 1).map((g, i) => (
-            <span key={i} className="text-[9px] px-1.5 py-0.5 rounded bg-white/8 text-white/50 font-semibold uppercase tracking-wider">{g}</span>
-          ))}
-        </div>
-
-        {/* Action row */}
-        <div className="flex items-center gap-1 mt-3 pt-3 border-t border-white/5">
-          {onDownload && (
-            <button
-              onClick={(e) => { e.stopPropagation(); onDownload(beat); }}
-              className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-white/10 text-[10px] font-semibold text-white/50 hover:text-white transition-colors"
-            >
-              <Download className="w-3 h-3" />
-              MP3
-            </button>
-          )}
-          {onDrive && beat.drive_folder_url && (
-            <a
-              href={beat.drive_folder_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1 px-2 py-1 rounded-md hover:bg-white/10 text-[10px] font-semibold text-white/50 hover:text-white transition-colors"
-            >
-              <FolderOpen className="w-3 h-3" />
-              Drive
-            </a>
-          )}
-          {onLicenses && (
-            <button
-              onClick={(e) => { e.stopPropagation(); onLicenses(beat); }}
-              className="flex items-center gap-0.5 ml-auto px-2 py-1 rounded-md text-[10px] font-semibold transition-colors"
-              style={{ background: "rgba(124,77,255,0.12)", color: "#c4b5fd" }}
-            >
-              Licencias
-              <ChevronRight className="w-3 h-3" />
-            </button>
-          )}
-        </div>
+      {/* BPM / Key (no genre tags — cinematic curation) */}
+      <div className="flex items-center gap-2 mt-1.5">
+        {beat.bpm ? <span className="text-[10px] text-[#a0a0a0] font-medium">{beat.bpm} BPM</span> : null}
+        {beat.scale ? (
+          <span className="text-[10px] text-[#a0a0a0] font-medium">{beat.scale}</span>
+        ) : beat.key ? (
+          <span className="text-[10px] text-[#a0a0a0] font-medium">{beat.key}</span>
+        ) : null}
       </div>
     </motion.div>
   );
