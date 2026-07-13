@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock, Trash2, FolderOpen, Upload, Check, Link } from "lucide-react";
+import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock, Trash2, FolderOpen, Upload, Check, Link, Share2 } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { shareTrackLink } from "@/lib/trackShare";
 
 const statusConfig = {
   idea:       { label: "Idea",          color: "#6b7280" },
@@ -364,7 +365,19 @@ function TrackDetailModal({ track, onClose, onEdit, onDelete, onTogglePublic }) 
   const ytId = getYoutubeId(track.youtube_music_url);
   const [playing, setPlaying] = useState(false);
   const [showYtPlayer, setShowYtPlayer] = useState(false);
+  const [shareFeedback, setShareFeedback] = useState("");
   const audioRef = useRef(null);
+
+  const handleShare = async () => {
+    const result = await shareTrackLink(track.id, track.title);
+    if (result.copied) {
+      setShareFeedback("Enlace copiado");
+      setTimeout(() => setShareFeedback(""), 2000);
+    } else if (result.copied === false) {
+      setShareFeedback("No se pudo copiar");
+      setTimeout(() => setShareFeedback(""), 2000);
+    }
+  };
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -442,6 +455,20 @@ function TrackDetailModal({ track, onClose, onEdit, onDelete, onTogglePublic }) 
             )}
             <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all" style={{ background: "rgba(255,255,255,0.06)" }}>
               <Edit className="w-3.5 h-3.5 text-white/60" /> <span className="text-white/60 hover:text-white">Editar</span>
+            </button>
+            <button onClick={handleShare} className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all" style={{ background: "rgba(255,255,255,0.06)" }}>
+              <Share2 className="w-3.5 h-3.5 text-white/60" /> <span className="text-white/60 hover:text-white">Compartir</span>
+              <AnimatePresence>
+                {shareFeedback && (
+                  <motion.span
+                    initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                    className="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded-md text-[10px] font-bold text-white whitespace-nowrap"
+                    style={{ background: "rgba(0,0,0,0.85)", border: "1px solid rgba(255,255,255,0.15)" }}
+                  >
+                    {shareFeedback}
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </button>
             <button onClick={onTogglePublic} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all ${isPublic ? "bg-emerald-500/15 text-emerald-400" : "text-white/30"}`} style={!isPublic ? { background: "rgba(255,255,255,0.05)" } : {}}>
               {isPublic ? <Globe className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}

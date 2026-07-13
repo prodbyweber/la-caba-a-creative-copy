@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect, createContext, useContext, useCallback } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Globe, Lock } from "lucide-react";
+import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Globe, Lock, Share2 } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient } from "@tanstack/react-query";
+import { shareTrackLink } from "@/lib/trackShare";
 
 // ─── Fallback local audio context (deprecado, usar useGlobalAudio) ───────────
 const AudioContext = createContext(null);
@@ -80,6 +81,18 @@ export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, o
   const isPublic = track.is_public === true;
   const hasYoutube = !!track.youtube_music_url;
   const [showYtPlayer, setShowYtPlayer] = useState(false);
+  const [shareFeedback, setShareFeedback] = useState("");
+
+  const handleShare = async () => {
+    const result = await shareTrackLink(track.id, track.title);
+    if (result.copied) {
+      setShareFeedback("Enlace copiado");
+      setTimeout(() => setShareFeedback(""), 2000);
+    } else if (result.copied === false) {
+      setShareFeedback("No se pudo copiar");
+      setTimeout(() => setShareFeedback(""), 2000);
+    }
+  };
 
   // Lock body scroll — iOS Safari requires position:fixed trick
   useEffect(() => {
@@ -196,6 +209,21 @@ export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, o
             <button onClick={() => { onEdit(track); onClose(); }}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold flex-1 justify-center hover:bg-white/15 transition-colors">
               <Edit className="w-4 h-4" /> Editar
+            </button>
+            <button onClick={handleShare}
+              className="relative flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold flex-1 justify-center hover:bg-white/15 transition-colors">
+              <Share2 className="w-4 h-4" /> Compartir
+              <AnimatePresence>
+                {shareFeedback && (
+                  <motion.span
+                    initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                    className="absolute -top-9 left-1/2 -translate-x-1/2 px-2 py-1 rounded-md text-[10px] font-bold text-white whitespace-nowrap"
+                    style={{ background: "rgba(0,0,0,0.85)", border: "1px solid rgba(255,255,255,0.15)" }}
+                  >
+                    {shareFeedback}
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </button>
             {onDelete && (
               <button
