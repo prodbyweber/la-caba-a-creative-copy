@@ -83,30 +83,16 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
           background: "rgba(12, 12, 14, 0.97)",
         }}
       >
-        {/* Progress bar */}
+        {/* Progress waveform (mismo formato que Reproduciendo) */}
         <div className="relative h-3 flex items-center px-3 sm:px-5 group">
           <div
             ref={progressRef}
-            className="w-full h-1 sm:h-1.5 bg-white/8 cursor-pointer hover:bg-white/12 relative rounded-full transition-all"
+            className="w-full h-full cursor-pointer relative flex items-center"
             onMouseDown={(e) => { e.preventDefault(); setIsDragging(true); }}
             onTouchStart={(e) => setIsDragging(true)}
             onClick={(e) => performSeek(e.clientX)}
           >
-            <div
-              className="h-full rounded-full transition-all"
-              style={{
-                width: `${progress * 100}%`,
-                background: "linear-gradient(90deg, #ff5833, #ff7a52)",
-              }}
-            />
-            <div
-              className="absolute top-1/2 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full shadow-lg border border-white cursor-grab active:cursor-grabbing transition-all"
-              style={{
-                left: `${progress * 100}%`,
-                transform: "translate(-50%, -50%)",
-                background: "#ff5833",
-              }}
-            />
+            <WaveformBars progress={progress} isPlaying={isPlaying} bars={56} color="#ff5833" />
           </div>
         </div>
 
