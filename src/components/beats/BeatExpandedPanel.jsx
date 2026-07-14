@@ -187,7 +187,7 @@ export default function BeatExpandedPanel({
                 className="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white transition-colors hover:bg-white/10"
                 style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}
               >
-                <Download className="w-4 h-4" /> Descargar Preview
+                <Download className="w-4 h-4" /> Descargar MP3
               </button>
             )}
             {hasBuy && (
@@ -196,7 +196,7 @@ export default function BeatExpandedPanel({
                 className="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white transition-transform hover:scale-[1.03]"
                 style={{ background: BEATS_GRADIENTS.orange }}
               >
-                <ShoppingBag className="w-4 h-4" /> Comprar Beat
+                <ShoppingBag className="w-4 h-4" /> Comprar licencia
               </button>
             )}
             <button
@@ -243,11 +243,11 @@ export default function BeatExpandedPanel({
 function MetaChip({ label, value }) {
   return (
     <div
-      className="rounded-xl px-3 py-2.5"
-      style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+      className="rounded-xl px-4 py-3 transition-colors hover:bg-white/[0.06]"
+      style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}
     >
-      <p className="text-[9px] font-bold uppercase tracking-wider text-white/35">{label}</p>
-      <p className="text-sm font-semibold text-white/90 truncate mt-0.5">{value}</p>
+      <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/30">{label}</p>
+      <p className="text-[15px] font-bold text-white truncate mt-1.5" style={{ letterSpacing: "-0.01em" }}>{value}</p>
     </div>
   );
 }

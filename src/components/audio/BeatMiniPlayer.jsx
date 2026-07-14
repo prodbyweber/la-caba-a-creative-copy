@@ -125,13 +125,13 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
             </div>
           </button>
 
-          {/* Title + time */}
-          <div className="flex-1 min-w-0">
+          {/* Title + time — clic abre el panel de reproduciendo */}
+          <button onClick={() => setExpanded(true)} className="flex-1 min-w-0 text-left hover:opacity-80 transition-opacity">
             <p className="text-xs sm:text-sm font-bold text-white truncate leading-snug">{playingTrack.title}</p>
             <p className="text-[10px] sm:text-xs text-white/45 font-medium truncate">
               {playingTrack.artist} · {formatTime(currentTime)} / {formatTime(duration)}
             </p>
-          </div>
+          </button>
 
           {/* Beat actions (desktop only inline) */}
           {isBeat && (
