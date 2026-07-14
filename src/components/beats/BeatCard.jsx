@@ -4,6 +4,7 @@ import { Activity, Pause, Play } from "lucide-react";
 import { useBeatPlayer } from "@/hooks/useBeatPlayer";
 import { getCoverForBeat } from "@/lib/beatsUtils";
 import { BEATS_BRAND } from "@/lib/beatsTheme";
+import { preloadBeatAudio } from "@/lib/beatPreload";
 
 // Tarjeta de beat — una única superficie interactiva.
 // Cualquier clic abre la vista cinematográfica completa del beat.
@@ -34,6 +35,8 @@ export default function BeatCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: (index || 0) * 0.04, duration: 0.5 }}
       className="group"
+      onMouseEnter={() => preloadBeatAudio(beat.preview_mp3_url)}
+      onTouchStart={() => preloadBeatAudio(beat.preview_mp3_url)}
     >
       {/* Toda la tarjeta abre la vista cinematográfica */}
       <button

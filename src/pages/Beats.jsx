@@ -28,11 +28,6 @@ const GENRE_CHIPS = [
   "Reggaetón", "Afrobeats", "Jersey Club", "Trap", "House",
   "R&B", "Drill", "Hip-Hop", "Lo-Fi", "Experimental",
 ];
-const ALL_CHIPS = [
-  ...CURATION_CHIPS,
-  ...GENRE_CHIPS.map(g => ({ id: `genre:${g}`, label: g })),
-];
-
 const TABS = ["Explorar", "Nuevos", "Trending"];
 
 export default function Beats() {
@@ -40,7 +35,8 @@ export default function Beats() {
   const { toggle, playingTrack, isPlaying } = useBeatPlayer();
 
   const [search, setSearch] = useState("");
-  const [activeChip, setActiveChip] = useState("todos");
+  const [activeCuration, setActiveCuration] = useState("todos");
+  const [selectedGenres, setSelectedGenres] = useState([]);
   const [activeTab, setActiveTab] = useState("Explorar");
   const [licensesModal, setLicensesModal] = useState(null);
   const [likedIds, setLikedIds] = useState(new Set());
@@ -55,7 +51,7 @@ export default function Beats() {
   useEffect(() => {
     base44.auth.isAuthenticated().then(async (authed) => {
       if (!authed) {
-        const timer = setTimeout(() => setAuthGate(true), 5000);
+        const timer = setTimeout(() => setAuthGate(true), 120000);
         return () => clearTimeout(timer);
       }
       setUser(await base44.auth.me());
@@ -185,6 +181,10 @@ export default function Beats() {
       .slice(0, 5);
   }, [beats, rankingSection]);
 
+  const toggleGenre = useCallback((g) => {
+    setSelectedGenres(prev => prev.includes(g) ? prev.filter(x => x !== g) : (prev.length >= 4 ? prev : [...prev, g]));
+  }, []);
+
   const filteredBeats = useMemo(() => {
     let result = [...beats];
     if (search) {
@@ -194,24 +194,23 @@ export default function Beats() {
         b.producer?.toLowerCase().includes(q) ||
         `${b.bpm}`.includes(q) ||
         (b.key || "").toLowerCase().includes(q) ||
-        (b.scale || "").toLowerCase().includes(q)
+        (b.scale || "").toLowerCase().includes(q) ||
+        (b.genres || []).some(g => g.toLowerCase().includes(q))
       );
     }
-    if (activeChip.startsWith("genre:")) {
-      const g = activeChip.slice(6);
-      result = result.filter(b => (b.genres || []).includes(g));
-    } else {
-      switch (activeChip) {
-        case "staff": result = result.filter(b => b.featured); break;
-        case "nuevos": result.sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0)); break;
-        case "populares": result.sort((a, b) => (b.plays_count || 0) - (a.plays_count || 0)); break;
-        case "descargas": result.sort((a, b) => (b.downloads_count || 0) - (a.downloads_count || 0)); break;
-        case "gratis": result = result.filter(b => (b.licenses || []).some(l => l.type === "mp3_free")); break;
-        default: break;
-      }
+    switch (activeCuration) {
+      case "staff": result = result.filter(b => b.featured); break;
+      case "nuevos": result.sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0)); break;
+      case "populares": result.sort((a, b) => (b.plays_count || 0) - (a.plays_count || 0)); break;
+      case "descargas": result.sort((a, b) => (b.downloads_count || 0) - (a.downloads_count || 0)); break;
+      case "gratis": result = result.filter(b => (b.licenses || []).some(l => l.type === "mp3_free")); break;
+      default: break;
+    }
+    if (selectedGenres.length > 0) {
+      result = result.filter(b => selectedGenres.every(g => (b.genres || []).includes(g)));
     }
     return result;
-  }, [beats, search, activeChip]);
+  }, [beats, search, activeCuration, selectedGenres]);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -233,7 +232,7 @@ export default function Beats() {
           </div>
         );
       case "grid": {
-        const browsing = !!search || activeChip !== "todos";
+        const browsing = !!search || activeCuration !== "todos" || selectedGenres.length > 0;
         const displayBeats = browsing ? filteredBeats : sBeats;
         return (
           <div key={section.id} ref={nuevosRef} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-40">
@@ -241,12 +240,31 @@ export default function Beats() {
               {search ? "Resultados" : (section.title || "New releases")}
             </h2>
             <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-              {ALL_CHIPS.map((chip) => (
-                <button key={chip.id} onClick={() => setActiveChip(chip.id)} className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all"
-                  style={{ background: activeChip === chip.id ? "#ffffff" : "#1c1c1c", color: activeChip === chip.id ? "#0e0e0e" : "#a0a0a0", border: activeChip === chip.id ? "1px solid #ffffff" : "1px solid #262626" }}>
-                  {chip.label}
+              {CURATION_CHIPS.map((chip) => {
+                const active = activeCuration === chip.id;
+                return (
+                  <button key={chip.id} onClick={() => setActiveCuration(chip.id)} className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all"
+                    style={{ background: active ? "#ffffff" : "#1c1c1c", color: active ? "#0e0e0e" : "#a0a0a0", border: active ? "1px solid #ffffff" : "1px solid #262626" }}>
+                    {chip.label}
+                  </button>
+                );
+              })}
+              <span className="w-px h-4 bg-white/10 flex-shrink-0" />
+              {GENRE_CHIPS.map((g) => {
+                const active = selectedGenres.includes(g);
+                const disabled = !active && selectedGenres.length >= 4;
+                return (
+                  <button key={g} onClick={() => toggleGenre(g)} disabled={disabled} className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all disabled:opacity-30"
+                    style={{ background: active ? "#ff5833" : "#1c1c1c", color: active ? "#ffffff" : "#a0a0a0", border: active ? "1px solid #ff5833" : "1px solid #262626" }}>
+                    {g}{active ? " ×" : ""}
+                  </button>
+                );
+              })}
+              {selectedGenres.length > 0 && (
+                <button onClick={() => setSelectedGenres([])} className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold text-white/50 hover:text-white transition-colors">
+                  Limpiar
                 </button>
-              ))}
+              )}
             </div>
             {isLoading ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
