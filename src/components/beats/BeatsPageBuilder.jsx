@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { GripVertical, Plus, Trash2, Eye, EyeOff, Copy, Music2, Check, Save } from "lucide-react";
-import { GENRES, MOODS } from "@/lib/musicConstants";
 import PageSectionPreview from "./PageSectionPreview";
 import BeatPicker from "./BeatPicker";
+import SectionTagSelector from "./SectionTagSelector";
 
 const LAYOUTS = [
   { id: "grid", label: "Grid" },
@@ -15,35 +15,30 @@ const LAYOUTS = [
   { id: "ranking", label: "Ranking" },
   { id: "compact", label: "Lista compacta" },
 ];
-const FILTER_TYPES = [
+const ORDERINGS = [
   { id: "recent", label: "Más recientes" },
   { id: "oldest", label: "Más antiguos" },
   { id: "popular", label: "Más reproducidos" },
   { id: "downloads", label: "Más descargados" },
-  { id: "sold", label: "Más vendidos" },
   { id: "featured", label: "Destacados" },
-  { id: "az", label: "Alfabético A-Z" },
-  { id: "za", label: "Alfabético Z-A" },
-  { id: "genre", label: "Por género" },
-  { id: "mood", label: "Por mood" },
-  { id: "producer", label: "Por productor" },
+  { id: "az", label: "A-Z" },
+  { id: "za", label: "Z-A" },
 ];
 const DEFAULT_SECTION = {
   title: "Nueva sección", subtitle: "", description: "", icon: "Music2",
-  color: "#ff5833", order: 0, layout: "grid", columns: 5, limit: 10,
-  source_mode: "auto", manual_beat_ids: [], filter_type: "recent", filter_value: "", is_visible: true,
+  color: "#ff5833", layout: "grid", columns: 5, limit: 10,
+  source_mode: "auto", manual_beat_ids: [], filter_type: "recent", filter_value: "", filter_tags: [], is_visible: true,
 };
 
 const iCls = "w-full px-3 py-2.5 rounded-xl text-sm text-white bg-white/[0.05] border border-white/[0.08] focus:outline-none focus:border-white/20 transition-colors";
 const labelCls = "block text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5";
 
-// Editor visual tipo Shopify de la página BEATS.
+// Editor visual (drag & drop) de la página BEATS.
 export default function BeatsPageBuilder() {
   const qc = useQueryClient();
-  const [selectedId, setSelectedId] = useState(null);
-  const [localOrder, setLocalOrder] = useState(null);
-  const [draft, setDraft] = useState(null);
-  const [dirty, setDirty] = useState(false);
+  const [selectedId, setSelectedId] = React.useState(null);
+  const [draft, setDraft] = React.useState(null);
+  const [dirty, setDirty] = React.useState(false);
 
   const { data: sections = [], isLoading } = useQuery({
     queryKey: ["beat-sections"],
@@ -54,15 +49,12 @@ export default function BeatsPageBuilder() {
     queryFn: async () => base44.entities.Beat.list("-created_date"),
   });
 
-  useEffect(() => {
-    if (sections && !localOrder) setLocalOrder(sections);
-  }, [sections, localOrder]);
+  // ordered se deriva directamente de `sections` (ya viene ordenado por `order`).
+  // Antes usábamos un localOrder que no se refrescaba tras crear/eliminar → bug.
+  const ordered = sections;
 
-  const ordered = localOrder || sections;
-
-  // Sección seleccionada: si es la editada, usa el draft (vista previa en tiempo real)
   const previewSections = useMemo(
-    () => ordered.map(s => (draft && s.id === selectedId ? { ...s, ...draft } : s)),
+    () => ordered.map((s) => (draft && s.id === selectedId ? { ...s, ...draft } : s)),
     [ordered, draft, selectedId]
   );
 
@@ -85,10 +77,7 @@ export default function BeatsPageBuilder() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }) => base44.entities.BeatSection.update(id, data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["beat-sections"] });
-      setDirty(false);
-    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["beat-sections"] }); setDirty(false); },
   });
 
   const deleteMutation = useMutation({
@@ -110,34 +99,25 @@ export default function BeatsPageBuilder() {
   });
 
   const onDragEnd = (result) => {
-    if (!result.destination) return;
+    if (!result.destination || result.destination.index === result.source.index) return;
     const reordered = Array.from(ordered);
     const [moved] = reordered.splice(result.source.index, 1);
     reordered.splice(result.destination.index, 0, moved);
-    setLocalOrder(reordered);
     persistOrder.mutate(reordered);
   };
 
   const selectSection = (s) => {
-    if (dirty && draft && selectedId) {
-      updateMutation.mutate({ id: selectedId, data: draft });
-    }
+    if (dirty && draft && selectedId) updateMutation.mutate({ id: selectedId, data: draft });
     setSelectedId(s.id);
     setDraft({ ...s });
     setDirty(false);
   };
 
-  const set = (field, value) => { setDraft(d => ({ ...d, [field]: value })); setDirty(true); };
+  const set = (field, value) => { setDraft((d) => ({ ...d, [field]: value })); setDirty(true); };
+  const save = () => { if (draft && selectedId) updateMutation.mutate({ id: selectedId, data: draft }); };
+  const addSection = () => createMutation.mutate({ ...DEFAULT_SECTION });
 
-  const save = () => {
-    if (draft && selectedId) updateMutation.mutate({ id: selectedId, data: draft });
-  };
-
-  const addSection = () => {
-    createMutation.mutate({ ...DEFAULT_SECTION });
-  };
-
-  const selected = ordered.find(s => s.id === selectedId);
+  const selected = ordered.find((s) => s.id === selectedId);
   const cfg = draft || selected;
 
   return (
@@ -157,8 +137,8 @@ export default function BeatsPageBuilder() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr_280px] gap-3 p-3">
-        {/* ── Panel izquierdo: lista de secciones ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[230px_1fr_290px] gap-3 p-3">
+        {/* ── Panel izquierdo: lista de secciones (drag & drop) ── */}
         <div className="space-y-2">
           <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest px-1">Secciones</p>
           {isLoading ? (
@@ -180,8 +160,8 @@ export default function BeatsPageBuilder() {
                             onClick={() => selectSection(s)}
                             className="flex items-center gap-2 p-2 rounded-xl cursor-pointer transition-all"
                             style={{
-                              background: snap.isDragging ? "rgba(255,88,51,0.1)" : selectedId === s.id ? "rgba(255,88,51,0.06)" : "#161616",
-                              border: `1px solid ${snap.isDragging ? "rgba(255,88,51,0.3)" : selectedId === s.id ? "rgba(255,88,51,0.25)" : "rgba(255,255,255,0.05)"}`,
+                              background: snap.isDragging ? "rgba(255,88,51,0.12)" : selectedId === s.id ? "rgba(255,88,51,0.08)" : "#161616",
+                              border: `1px solid ${snap.isDragging ? "rgba(255,88,51,0.35)" : selectedId === s.id ? "rgba(255,88,51,0.3)" : "rgba(255,255,255,0.06)"}`,
                               ...p.draggableProps.style,
                             }}>
                             <GripVertical className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
@@ -194,6 +174,10 @@ export default function BeatsPageBuilder() {
                               className="w-6 h-6 rounded flex items-center justify-center hover:bg-white/10 flex-shrink-0">
                               {s.is_visible === false ? <EyeOff className="w-3 h-3 text-white/40" /> : <Eye className="w-3 h-3 text-white/70" />}
                             </button>
+                            <button onClick={(e) => { e.stopPropagation(); if (confirm(`¿Eliminar "${s.title}"?`)) deleteMutation.mutate(s.id); }}
+                              className="w-6 h-6 rounded flex items-center justify-center hover:bg-red-500/15 text-white/40 hover:text-red-400 flex-shrink-0">
+                              <Trash2 className="w-3 h-3" />
+                            </button>
                           </div>
                         )}
                       </Draggable>
@@ -204,7 +188,7 @@ export default function BeatsPageBuilder() {
               </Droppable>
             </DragDropContext>
           )}
-          <p className="text-[10px] text-white/25 px-1 pt-1">Arrastra para reordenar · guarda automáticamente.</p>
+          <p className="text-[10px] text-white/25 px-1 pt-1">Arrastra para reordenar · clic para editar.</p>
         </div>
 
         {/* ── Panel central: vista previa en tiempo real ── */}
@@ -213,11 +197,11 @@ export default function BeatsPageBuilder() {
           <div className="rounded-xl p-3 max-h-[560px] overflow-y-auto" style={{ background: "#121212", border: "1px solid rgba(255,255,255,0.05)" }}>
             {previewSections.length === 0 ? (
               <p className="text-center text-white/30 text-xs py-10">Añade una sección para verla aquí</p>
-            ) : previewSections.map(s => (
+            ) : previewSections.map((s) => (
               <div key={s.id} className="mb-3 last:mb-0">
                 <PageSectionPreview
                   section={s}
-                  beats={beats.filter(b => b.status === "Publicado" && !b.archived)}
+                  beats={beats.filter((b) => b.status === "Publicado" && !b.archived)}
                   selected={s.id === selectedId}
                   onSelect={() => selectSection(s)}
                 />
@@ -243,16 +227,12 @@ export default function BeatsPageBuilder() {
                 <label className={labelCls}>Subtítulo</label>
                 <input value={cfg.subtitle || ""} onChange={(e) => set("subtitle", e.target.value)} className={iCls} placeholder="Subtítulo" />
               </div>
-              <div>
-                <label className={labelCls}>Descripción</label>
-                <textarea value={cfg.description || ""} onChange={(e) => set("description", e.target.value)} rows={2} className={iCls + " resize-none"} placeholder="Descripción interna" />
-              </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className={labelCls}>Tipo</label>
                   <select value={cfg.layout} onChange={(e) => set("layout", e.target.value)} className={iCls}>
-                    {LAYOUTS.map(l => <option key={l.id} value={l.id}>{l.label}</option>)}
+                    {LAYOUTS.map((l) => <option key={l.id} value={l.id}>{l.label}</option>)}
                   </select>
                 </div>
                 <div>
@@ -268,7 +248,7 @@ export default function BeatsPageBuilder() {
                 <div>
                   <label className={labelCls}>Columnas</label>
                   <select value={cfg.columns || 5} onChange={(e) => set("columns", parseInt(e.target.value))} className={iCls}>
-                    {[2, 3, 4, 5].map(c => <option key={c} value={c}>{c}</option>)}
+                    {[2, 3, 4, 5].map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
@@ -295,28 +275,17 @@ export default function BeatsPageBuilder() {
               </div>
 
               {cfg.source_mode === "auto" ? (
-                <div className="space-y-2 p-2.5 rounded-xl" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                <div className="space-y-2">
+                  <SectionTagSelector
+                    selected={cfg.filter_tags || []}
+                    onChange={(tags) => set("filter_tags", tags)}
+                  />
                   <div>
-                    <label className={labelCls}>Orden / Filtro</label>
+                    <label className={labelCls}>Orden</label>
                     <select value={cfg.filter_type} onChange={(e) => set("filter_type", e.target.value)} className={iCls}>
-                      {FILTER_TYPES.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
+                      {ORDERINGS.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}
                     </select>
                   </div>
-                  {cfg.filter_type === "genre" && (
-                    <select value={cfg.filter_value || ""} onChange={(e) => set("filter_value", e.target.value)} className={iCls}>
-                      <option value="">—</option>
-                      {GENRES.map(v => <option key={v} value={v}>{v}</option>)}
-                    </select>
-                  )}
-                  {cfg.filter_type === "mood" && (
-                    <select value={cfg.filter_value || ""} onChange={(e) => set("filter_value", e.target.value)} className={iCls}>
-                      <option value="">—</option>
-                      {MOODS.map(v => <option key={v} value={v}>{v}</option>)}
-                    </select>
-                  )}
-                  {cfg.filter_type === "producer" && (
-                    <input value={cfg.filter_value || ""} onChange={(e) => set("filter_value", e.target.value)} className={iCls} placeholder="Nombre del productor" />
-                  )}
                 </div>
               ) : (
                 <BeatPicker selectedIds={cfg.manual_beat_ids || []} beats={beats} onChange={(ids) => set("manual_beat_ids", ids)} />
@@ -330,7 +299,7 @@ export default function BeatsPageBuilder() {
               </button>
 
               {/* Acciones */}
-              <div className="flex items-center gap-2 pt-1">
+              <div className="flex items-center gap-2">
                 <button onClick={() => duplicateMutation.mutate(cfg)}
                   className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 text-xs font-bold transition-colors flex items-center justify-center gap-1.5">
                   <Copy className="w-3.5 h-3.5" /> Duplicar

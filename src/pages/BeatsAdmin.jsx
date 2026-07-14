@@ -1,10 +1,9 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBeatPlayer } from "@/hooks/useBeatPlayer";
-import { Play, Pause, Plus, Search, Grid3x3, List, MoreVertical, Download, FolderOpen, Music2, TrendingUp, BarChart3, Heart, Archive, Copy, Trash2, Eye, EyeOff, Pencil, X, Star, LayoutPanelTop, ExternalLink, ChevronDown, Users } from "lucide-react";
+import { Play, Pause, Plus, Search, Grid3x3, List, MoreVertical, Download, FolderOpen, Music2, TrendingUp, BarChart3, Heart, Archive, Copy, Trash2, Eye, EyeOff, Pencil, X, Star, LayoutPanelTop, ChevronDown, Users } from "lucide-react";
 import { GENRES, MOODS, KEYS, BEAT_STATUS } from "@/lib/musicConstants";
 import BeatFormModal from "@/components/beats/BeatFormModal";
 import BeatsPageBuilder from "@/components/beats/BeatsPageBuilder";
@@ -26,6 +25,7 @@ export default function BeatsAdmin() {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [genreExpanded, setGenreExpanded] = useState(false);
   const [moodExpanded, setMoodExpanded] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   // Fetch all beats
   const { data: beats = [], isLoading } = useQuery({
@@ -172,14 +172,14 @@ export default function BeatsAdmin() {
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-black text-white tracking-tight">Beats</h1>
           <span className="text-xs text-white/30">{beats.length} total</span>
-          <Link to="/beats" target="_blank"
+          <button onClick={() => setShowPreview(true)}
             className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-white/60 hover:text-white transition-colors"
             style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.08)" }}
             title="Ver página pública de Beats"
           >
-            <ExternalLink className="w-3 h-3" />
+            <LayoutPanelTop className="w-3 h-3" />
             Ver página
-          </Link>
+          </button>
         </div>
         <div className="flex items-center gap-2">
           {/* Tabs */}
@@ -384,6 +384,35 @@ export default function BeatsAdmin() {
       <AnimatePresence>
         {showForm && (
           <BeatFormModal beat={editingBeat} onClose={() => { setShowForm(false); setEditingBeat(null); }} />
+        )}
+      </AnimatePresence>
+
+      {/* Vista previa in-app de la página Beats pública (sin salir del panel) */}
+      <AnimatePresence>
+        {showPreview && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] flex flex-col"
+            style={{ background: "#0a0a0b" }}
+          >
+            <div className="flex items-center justify-between px-4 py-3" style={{ background: "#0c0c0d", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+              <div className="flex items-center gap-2">
+                <LayoutPanelTop className="w-4 h-4 text-[#ff5833]" />
+                <h2 className="text-sm font-bold text-white">Vista previa · Página Beats</h2>
+              </div>
+              <button onClick={() => setShowPreview(false)}
+                className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                <X className="w-4 h-4 text-white/70" />
+              </button>
+            </div>
+            <iframe
+              src={`${window.location.origin}/beats`}
+              title="Vista previa Beats"
+              className="flex-1 w-full border-0 bg-[#121212]"
+            />
+          </motion.div>
         )}
       </AnimatePresence>
 

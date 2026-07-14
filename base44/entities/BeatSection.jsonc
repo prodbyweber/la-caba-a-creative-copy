@@ -87,11 +87,18 @@
         "producer"
       ],
       "default": "recent",
-      "description": "Criterio de orden/filtro autom\u00e1tico para generar la secci\u00f3n"
+      "description": "Criterio de orden para generar la secci\u00f3n"
     },
     "filter_value": {
       "type": "string",
-      "description": "Valor del filtro (ej: nombre de g\u00e9nero, mood, productor)"
+      "description": "Valor del filtro legacy (ej: nombre de g\u00e9nero, mood, productor)"
+    },
+    "filter_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags (g\u00e9neros + moods) para filtrar autom\u00e1ticamente los beats que coincidan"
     },
     "is_visible": {
       "type": "boolean",
