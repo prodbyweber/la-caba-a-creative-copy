@@ -24,6 +24,24 @@ export function getCoverForBeat(beat) {
   return CINEMATIC_COVERS[hash % CINEMATIC_COVERS.length];
 }
 
+// ─── Original filename extraction (preserve uploaded name + extension) ────────
+// Devuelve el nombre original del archivo tal como se subió (sin renombrar),
+// decodificando de forma segura y conservando la extensión/formato.
+export function getOriginalFilename(url) {
+  if (!url) return "";
+  try {
+    const path = new URL(url).pathname;
+    const last = decodeURIComponentSafe(path.split("/").pop() || "");
+    return last;
+  } catch {
+    return "";
+  }
+}
+
+function decodeURIComponentSafe(s) {
+  try { return decodeURIComponent(s); } catch { return s; }
+}
+
 // ─── Time ago formatter (compact, uppercase) ─────────────────────────────────
 export function timeAgo(dateStr) {
   if (!dateStr) return "";

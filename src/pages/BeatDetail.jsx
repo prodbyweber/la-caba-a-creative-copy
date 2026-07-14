@@ -5,7 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBeatPlayer } from "@/hooks/useBeatPlayer";
 import { Play, Pause, Heart, Bookmark, Download, FolderOpen, ArrowLeft, Activity, ShoppingBag, Share2 } from "lucide-react";
-import { getCoverForBeat } from "@/lib/beatsUtils";
+import { getCoverForBeat, getOriginalFilename } from "@/lib/beatsUtils";
 import { formatDuration } from "@/lib/musicConstants";
 import BeatCard from "@/components/beats/BeatCard";
 import BeatLicensesModal from "@/components/beats/BeatLicensesModal";
@@ -97,8 +97,7 @@ export default function BeatDetail() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      const fn = new URL(b.free_mp3_url).pathname.split("/").pop() || `${b.title}.mp3`;
-      a.download = decodeURIComponent(fn);
+      a.download = getOriginalFilename(b.free_mp3_url) || `${b.title}.mp3`;
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     } catch { window.open(b.free_mp3_url, "_blank"); }

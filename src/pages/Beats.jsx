@@ -5,6 +5,7 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBeatPlayer } from "@/hooks/useBeatPlayer";
 import { resolveSectionBeats } from "@/lib/beatSections";
+import { getOriginalFilename } from "@/lib/beatsUtils";
 import { Search, Lock, Menu, ChevronDown, X, TrendingUp, ShoppingBag } from "lucide-react";
 import BeatCard from "@/components/beats/BeatCard";
 import BeatsFeaturedCarousel from "@/components/beats/BeatsFeaturedCarousel";
@@ -127,8 +128,7 @@ export default function Beats() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      const fn = new URL(beat.free_mp3_url).pathname.split("/").pop() || `${beat.title}.mp3`;
-      a.download = decodeURIComponent(fn);
+      a.download = getOriginalFilename(beat.free_mp3_url) || `${beat.title}.mp3`;
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
       qc.invalidateQueries({ queryKey: ["beats-public"] });
