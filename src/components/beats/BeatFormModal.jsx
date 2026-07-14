@@ -21,6 +21,7 @@ export default function BeatFormModal({ beat, onClose }) {
     if (form.title) setForm(f => ({ ...f, slug: slugify(f.title) }));
   };
   const [uploading, setUploading] = useState(null);
+  const [mp3Error, setMp3Error] = useState(null);
   const coverRef = useRef(null);
   const previewRef = useRef(null);
 
@@ -48,8 +49,16 @@ export default function BeatFormModal({ beat, onClose }) {
   };
 
   // MP3 único: el mismo archivo con tag sirve para preview y descarga.
+  // Solo se aceptan archivos .mp3 (audio/mpeg).
   const handleUploadMp3 = async (file) => {
     if (!file) return;
+    const isMp3 = file.name.toLowerCase().endsWith(".mp3") ||
+      ["audio/mpeg", "audio/mp3"].includes(file.type);
+    if (!isMp3) {
+      setMp3Error("El archivo debe ser un MP3 (.mp3).");
+      return;
+    }
+    setMp3Error(null);
     setUploading("mp3");
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
@@ -196,15 +205,18 @@ export default function BeatFormModal({ beat, onClose }) {
           <div>
             <label className={labelCls}>MP3 (Preview y descarga)</label>
             <label className="cursor-pointer">
-              <input type="file" accept="audio/*" className="hidden" ref={previewRef}
+              <input type="file" accept="audio/mpeg,.mp3" className="hidden" ref={previewRef}
                 onChange={(e) => e.target.files?.[0] && handleUploadMp3(e.target.files[0])} />
               <div className={`${iCls} flex items-center gap-2 hover:bg-white/[0.08] cursor-pointer`}>
                 <Music2 className="w-3.5 h-3.5 text-white/40" />
                 {uploading === "mp3" ? "Subiendo..." : form.preview_mp3_url ? "Archivo subido — Cambiar" : "Subir MP3 (con tag)"}
               </div>
             </label>
+            {mp3Error && (
+              <p className="text-[11px] font-semibold text-red-400 mt-1.5">{mp3Error}</p>
+            )}
             <p className="text-[10px] text-white/35 mt-1.5 leading-relaxed">
-              Un único archivo MP3 con tag sirve para la previsualización y la descarga gratuita. Al descargar, el usuario acepta los términos de uso: el beat se entrega con tag y es para uso personal / no comercial salvo licencia adquirida.
+              Solo archivos MP3 (.mp3). Un único archivo con tag sirve para la previsualización y la descarga gratuita. Al descargar, el usuario acepta los términos de uso: el beat se entrega con tag y es para uso personal / no comercial salvo licencia adquirida.
             </p>
           </div>
 
