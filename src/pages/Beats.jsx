@@ -219,6 +219,95 @@ export default function Beats() {
     if (tab === "Explorar") window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // Render dinámico de cada sección configurada en el editor (admin → público).
+  const renderSection = (section) => {
+    if (!isVisible(section)) return null;
+    const sBeats = resolveSectionBeats(section, beats);
+    switch (section.layout) {
+      case "carousel":
+        if (sBeats.length === 0) return null;
+        return (
+          <div key={section.id} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10">
+            <BeatsFeaturedCarousel beats={sBeats} isPlaying={isPlaying} onPlay={handlePlay} onLike={user ? (b) => likeMutation.mutate(b) : null} likedIds={likedIds} />
+          </div>
+        );
+      case "grid": {
+        const browsing = !!search || activeChip !== "todos";
+        const displayBeats = browsing ? filteredBeats : sBeats;
+        return (
+          <div key={section.id} ref={nuevosRef} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-40">
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-4" style={{ letterSpacing: "-0.03em" }}>
+              {search ? "Resultados" : (section.title || "New releases")}
+            </h2>
+            <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+              {ALL_CHIPS.map((chip) => (
+                <button key={chip.id} onClick={() => setActiveChip(chip.id)} className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all"
+                  style={{ background: activeChip === chip.id ? "#ffffff" : "#1c1c1c", color: activeChip === chip.id ? "#0e0e0e" : "#a0a0a0", border: activeChip === chip.id ? "1px solid #ffffff" : "1px solid #262626" }}>
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+            {isLoading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <div key={i}><div className="aspect-square rounded-2xl animate-pulse" style={{ background: "#1a1a1a" }} /><div className="h-3.5 bg-white/5 rounded w-3/4 mt-3 animate-pulse" /><div className="h-3 bg-white/5 rounded w-1/2 mt-2 animate-pulse" /></div>
+                ))}
+              </div>
+            ) : displayBeats.length === 0 ? (
+              <div className="text-center py-20"><p className="text-[#a0a0a0] text-sm">No se encontraron beats</p></div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                {displayBeats.map((beat, i) => (
+                  <BeatCard key={beat.id} beat={beat} index={i} user={user} liked={likedIds.has(beat.id)} saved={savedIds.has(beat.id)}
+                    onLike={user ? (b) => likeMutation.mutate(b) : null} onSave={user ? (b) => saveMutation.mutate(b) : null}
+                    onDownload={user ? handleDownload : null} onBuy={handleBuy} onPlay={handlePlay} onOpen={setCinematicBeat} listBeats={displayBeats} />
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      }
+      case "ranking":
+        if (sBeats.length === 0) return null;
+        return (
+          <div key={section.id} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-40">
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-1" style={{ letterSpacing: "-0.03em" }}>{section.title || "Hot Right Now"}</h2>
+            <p className="text-sm text-[#a0a0a0] mb-5">{section.subtitle || "The hottest samples right now."}</p>
+            <BeatsRankingList beats={sBeats} isPlaying={isPlaying} onPlay={handlePlay} onLike={user ? (b) => likeMutation.mutate(b) : null} onDownload={user ? handleDownload : null}
+              onShare={(beat) => { const url = `${window.location.origin}/beats/${beat.slug || beat.id}`; if (navigator.share) navigator.share({ title: beat.title, url }).catch(() => {}); else navigator.clipboard?.writeText(url).catch(() => {}); }}
+              likedIds={likedIds} user={user} onOpen={setCinematicBeat} listBeats={sBeats} />
+          </div>
+        );
+      case "list":
+      case "compact":
+        if (sBeats.length === 0) return null;
+        return (
+          <div key={section.id} ref={section.layout === "list" ? trendingRef : null} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-40">
+            <div className="flex items-center gap-2 mb-1"><TrendingUp className="w-5 h-5" style={{ color: section.color || "#ff5833" }} /><h2 className="text-2xl sm:text-3xl font-black text-white" style={{ letterSpacing: "-0.03em" }}>{section.title || "Trending"}</h2></div>
+            <p className="text-sm text-[#a0a0a0] mb-5">{section.subtitle || "Los beats más calientes ahora mismo."}</p>
+            <BeatsTrendingList beats={sBeats} isPlaying={isPlaying} onPlay={handlePlay} onLike={user ? (b) => likeMutation.mutate(b) : null} onDownload={user ? handleDownload : null} likedIds={likedIds} user={user} />
+          </div>
+        );
+      case "horizontal":
+        if (sBeats.length === 0) return null;
+        return (
+          <div key={section.id} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10">
+            <h2 className="text-2xl sm:text-3xl font-black text-white mb-4" style={{ letterSpacing: "-0.03em" }}>{section.title || "Beats"}</h2>
+            {section.subtitle && <p className="text-sm text-[#a0a0a0] mb-4">{section.subtitle}</p>}
+            <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
+              {sBeats.map((beat, i) => (
+                <div key={beat.id} className="w-44 flex-shrink-0">
+                  <BeatCard beat={beat} index={i} user={user} liked={likedIds.has(beat.id)} saved={savedIds.has(beat.id)} onLike={user ? (b) => likeMutation.mutate(b) : null} onSave={user ? (b) => saveMutation.mutate(b) : null} onDownload={user ? handleDownload : null} onBuy={handleBuy} onPlay={handlePlay} onOpen={setCinematicBeat} listBeats={sBeats} />
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen pb-32" style={{ background: "#121212", fontFamily: "'Inter', -apple-system, sans-serif" }}>
       {/* ── Sticky nav + search + tabs ─────────────────────────────── */}
@@ -304,169 +393,14 @@ export default function Beats() {
         </div>
       </div>
 
-      {/* ── Featured carousel ─────────────────────────────────────── */}
-      {isVisible(featuredSection) && featuredBeats.length > 0 && (
-        <div className="px-4 sm:px-10 max-w-7xl mx-auto pt-5 mb-10">
-          <BeatsFeaturedCarousel
-            beats={featuredBeats}
-            isPlaying={isPlaying}
-            onPlay={handlePlay}
-            onLike={user ? (b) => likeMutation.mutate(b) : null}
-            likedIds={likedIds}
-          />
-        </div>
-      )}
-
-      {/* ── New Releases ──────────────────────────────────────────── */}
-      {isVisible(gridSection) && (
-      <div ref={nuevosRef} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-40">
-        <h2 className="text-2xl sm:text-3xl font-black text-white mb-4" style={{ letterSpacing: "-0.03em" }}>
-          {search ? "Resultados" : (gridSection?.title || "New releases")}
-        </h2>
-
-        {/* Category chips */}
-        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-          {ALL_CHIPS.map((chip) => (
-            <button
-              key={chip.id}
-              onClick={() => setActiveChip(chip.id)}
-              className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all"
-              style={{
-                background: activeChip === chip.id ? "#ffffff" : "#1c1c1c",
-                color: activeChip === chip.id ? "#0e0e0e" : "#a0a0a0",
-                border: activeChip === chip.id ? "1px solid #ffffff" : "1px solid #262626",
-              }}
-            >
-              {chip.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Card grid: browse (search/chip) o curación de la sección */}
-        {(() => {
-          const browsing = !!search || activeChip !== "todos";
-          const displayBeats = browsing ? filteredBeats : gridBeats;
-          if (isLoading) {
-            return (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                {Array.from({ length: 10 }).map((_, i) => (
-                  <div key={i}>
-                    <div className="aspect-square rounded-2xl animate-pulse" style={{ background: "#1a1a1a" }} />
-                    <div className="h-3.5 bg-white/5 rounded w-3/4 mt-3 animate-pulse" />
-                    <div className="h-3 bg-white/5 rounded w-1/2 mt-2 animate-pulse" />
-                  </div>
-                ))}
-              </div>
-            );
-          }
-          if (displayBeats.length === 0) {
-            return (
-              <div className="text-center py-20">
-                <p className="text-[#a0a0a0] text-sm">No se encontraron beats</p>
-              </div>
-            );
-          }
-          return (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-              {displayBeats.map((beat, i) => (
-                <BeatCard
-                  key={beat.id}
-                  beat={beat}
-                  index={i}
-                  user={user}
-                  liked={likedIds.has(beat.id)}
-                  saved={savedIds.has(beat.id)}
-                  onLike={user ? (b) => likeMutation.mutate(b) : null}
-                  onSave={user ? (b) => saveMutation.mutate(b) : null}
-                  onDownload={user ? handleDownload : null}
-                  onBuy={handleBuy}
-                  onPlay={handlePlay}
-                  onOpen={setCinematicBeat}
-                  listBeats={displayBeats}
-                />
-              ))}
-            </div>
-          );
-        })()}
+      {/* ── Secciones dinámicas (editor de la página Beats) ─────────── */}
+      <div className="pt-5">
+        {sections.map((section) => renderSection(section))}
       </div>
-      )}
 
-      {/* ── Nueva sección (ranking) ──────────────────────────────── */}
-      {isVisible(rankingSection) && rankingBeats.length > 0 && (
-        <div className="px-4 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-40">
-          <h2 className="text-2xl sm:text-3xl font-black text-white mb-1" style={{ letterSpacing: "-0.03em" }}>
-            {rankingSection?.title || "Hot Right Now"}
-          </h2>
-          <p className="text-sm text-[#a0a0a0] mb-5">{rankingSection?.subtitle || "The hottest samples right now."}</p>
-
-          {isLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-3 p-2.5">
-                  <div className="w-8 h-8 rounded-full animate-pulse" style={{ background: "#1a1a1a" }} />
-                  <div className="w-12 h-12 rounded-xl animate-pulse" style={{ background: "#1a1a1a" }} />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-3.5 bg-white/5 rounded w-1/3 animate-pulse" />
-                    <div className="h-3 bg-white/5 rounded w-1/4 animate-pulse" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <BeatsRankingList
-              beats={rankingBeats}
-              isPlaying={isPlaying}
-              onPlay={handlePlay}
-              onLike={user ? (b) => likeMutation.mutate(b) : null}
-              onDownload={user ? handleDownload : null}
-              onShare={(beat) => {
-                const url = `${window.location.origin}/beats/${beat.slug || beat.id}`;
-                if (navigator.share) navigator.share({ title: beat.title, url }).catch(() => {});
-                else navigator.clipboard?.writeText(url).catch(() => {});
-              }}
-              likedIds={likedIds}
-              user={user}
-              onOpen={setCinematicBeat}
-              listBeats={rankingBeats}
-            />
-          )}
-        </div>
-      )}
-
-      {/* ── Trending ───────────────────────────────────────────────── */}
-      {isVisible(listSection) && trendingBeats.length > 0 && (
-        <div ref={trendingRef} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-40">
-          <div className="flex items-center gap-2 mb-1">
-            <TrendingUp className="w-5 h-5 text-[#ff5833]" />
-            <h2 className="text-2xl sm:text-3xl font-black text-white" style={{ letterSpacing: "-0.03em" }}>
-              {listSection?.title || "Trending"}
-            </h2>
-          </div>
-          <p className="text-sm text-[#a0a0a0] mb-5">{listSection?.subtitle || "Los beats más calientes ahora mismo."}</p>
-
-          {isLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-3 p-2">
-                  <div className="w-14 h-14 rounded-xl animate-pulse" style={{ background: "#1a1a1a" }} />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-3.5 bg-white/5 rounded w-1/3 animate-pulse" />
-                    <div className="h-3 bg-white/5 rounded w-1/4 animate-pulse" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <BeatsTrendingList
-              beats={trendingBeats}
-              isPlaying={isPlaying}
-              onPlay={handlePlay}
-              onLike={user ? (b) => likeMutation.mutate(b) : null}
-              onDownload={user ? handleDownload : null}
-              likedIds={likedIds}
-              user={user}
-            />
-          )}
+      {!isLoading && sections.filter(isVisible).length === 0 && (
+        <div className="px-4 sm:px-10 max-w-7xl mx-auto pt-10 text-center">
+          <p className="text-white/30 text-sm">No hay secciones configuradas en el panel de BEATS.</p>
         </div>
       )}
 
