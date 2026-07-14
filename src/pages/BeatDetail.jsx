@@ -4,9 +4,11 @@ import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
-import { Play, Pause, Heart, Download, FolderOpen, ArrowLeft, Activity, Zap } from "lucide-react";
+import { Play, Pause, Heart, Download, FolderOpen, ArrowLeft, Activity, Zap, Share2, ShoppingBag, Check } from "lucide-react";
 import { getCoverForBeat, timeAgo } from "@/lib/beatsUtils";
 import { formatDuration } from "@/lib/musicConstants";
+import { resolveBeatBySlugOrId, beatSlug } from "@/lib/beatSlug";
+import { shareBeatLink } from "@/lib/beatShare";
 import BeatCard from "@/components/beats/BeatCard";
 import BeatLicensesModal from "@/components/beats/BeatLicensesModal";
 
@@ -18,6 +20,7 @@ export default function BeatDetail() {
   const [licensesModal, setLicensesModal] = useState(false);
   const [likedIds, setLikedIds] = useState(new Set());
   const [savedIds, setSavedIds] = useState(new Set());
+  const [shareCopied, setShareCopied] = useState(false);
 
   useEffect(() => {
     base44.auth.isAuthenticated().then(async (authed) => {
@@ -27,7 +30,7 @@ export default function BeatDetail() {
 
   const { data: beat, isLoading } = useQuery({
     queryKey: ["beat", id],
-    queryFn: async () => base44.entities.Beat.get(id),
+    queryFn: async () => resolveBeatBySlugOrId(id),
     enabled: !!id,
   });
 
@@ -52,6 +55,12 @@ export default function BeatDetail() {
 
   useEffect(() => { setLikedIds(new Set(likes.map(l => l.beat_id))); }, [likes]);
   useEffect(() => { setSavedIds(new Set(saves.map(s => s.beat_id))); }, [saves]);
+
+  const handleShare = async (b) => {
+    const ok = await shareBeatLink(b);
+    setShareCopied(ok);
+    setTimeout(() => setShareCopied(false), 1800);
+  };
 
   const likeMutation = useMutation({
     mutationFn: async (b) => {
@@ -110,6 +119,8 @@ export default function BeatDetail() {
       ))
       .slice(0, 10);
   }, [beat, allBeats]);
+
+  const slug = beat ? beatSlug(beat) : "";
 
   if (isLoading) {
     return (
@@ -209,6 +220,25 @@ export default function BeatDetail() {
                 style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.25), rgba(167,139,250,0.12))", border: "1px solid rgba(139,92,246,0.35)", color: "#c4b5fd" }}
               >
                 Licencias
+              </button>
+              {beat.buy_link && beat.checkout_type !== "internal" && (
+                <a
+                  href={beat.buy_link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-5 h-12 rounded-full text-sm font-bold text-white flex items-center gap-2 transition-transform hover:scale-105"
+                  style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  Comprar Beat
+                </a>
+              )}
+              <button
+                onClick={() => handleShare(beat)}
+                className="px-5 h-12 rounded-full text-sm font-bold border border-white/15 hover:bg-white/10 transition-colors flex items-center gap-2 text-white"
+              >
+                <Share2 className="w-4 h-4" />
+                {shareCopied ? "Copiado" : "Compartir"}
               </button>
             </div>
           </motion.div>
