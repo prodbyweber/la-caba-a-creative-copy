@@ -108,7 +108,7 @@ export default function GlobalAudioPlayer() {
           transition={{ duration: 0.3 }}
           className="fixed left-0 right-0 z-[100] border-t border-white/10 backdrop-blur-xl"
           style={{
-            bottom: isMobile ? "65px" : "0px",
+            bottom: isMobile ? "calc(72px + env(safe-area-inset-bottom, 0px))" : "0px",
             background: "rgba(10, 10, 11, 0.95)"
           }}
           onMouseMove={handleMouseMove}

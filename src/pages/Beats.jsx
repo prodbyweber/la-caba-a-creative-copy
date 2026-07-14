@@ -330,18 +330,9 @@ export default function Beats() {
                 Mi catálogo
               </Link>
             ) : (
-              <>
-                <Link to="/login" className="text-xs font-semibold text-white/70 hover:text-white px-2 sm:px-3 py-2 transition-colors">
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="text-xs font-bold text-[#0e0e0e] px-3 sm:px-4 py-2 rounded-full transition-transform hover:scale-105"
-                  style={{ background: "#d4f7c7" }}
-                >
-                  Empezar gratis →
-                </Link>
-              </>
+              <Link to="/login" className="text-xs font-semibold text-white/60 hover:text-white px-2 sm:px-3 py-2 transition-colors">
+                Login
+              </Link>
             )}
           </div>
         </div>
