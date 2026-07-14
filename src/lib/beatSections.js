@@ -26,6 +26,10 @@ export function resolveSectionBeats(section, allBeats) {
   else if (ft === "producer") result = result.filter((b) => (b.producer || "").toLowerCase() === (section.filter_value || "").toLowerCase());
   else if (ft === "popular") result.sort((a, b) => (b.plays_count || 0) - (a.plays_count || 0));
   else if (ft === "downloads") result.sort((a, b) => (b.downloads_count || 0) - (a.downloads_count || 0));
+  else if (ft === "sold") result.sort((a, b) => (b.downloads_count || 0) - (a.downloads_count || 0));
+  else if (ft === "oldest") result.sort((a, b) => new Date(a.created_date || 0) - new Date(b.created_date || 0));
+  else if (ft === "az") result.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+  else if (ft === "za") result.sort((a, b) => (b.title || "").localeCompare(a.title || ""));
   else result.sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0)); // recent
 
   return result.slice(0, limit);

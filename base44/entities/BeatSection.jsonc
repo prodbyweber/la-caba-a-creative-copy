@@ -8,7 +8,11 @@
     },
     "subtitle": {
       "type": "string",
-      "description": "Subt\u00edtulo / descripci\u00f3n de la secci\u00f3n"
+      "description": "Subt\u00edtulo / descripci\u00f3n corta de la secci\u00f3n"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n interna de la secci\u00f3n"
     },
     "icon": {
       "type": "string",
@@ -17,7 +21,7 @@
     },
     "color": {
       "type": "string",
-      "default": "#8b5cf6",
+      "default": "#ff5833",
       "description": "Color de acento de la secci\u00f3n (hex)"
     },
     "order": {
@@ -31,7 +35,9 @@
         "grid",
         "carousel",
         "horizontal",
-        "list"
+        "list",
+        "ranking",
+        "compact"
       ],
       "default": "grid",
       "description": "Dise\u00f1o de bloque de la secci\u00f3n"
@@ -66,9 +72,13 @@
       "type": "string",
       "enum": [
         "recent",
+        "oldest",
         "popular",
         "downloads",
+        "sold",
         "featured",
+        "az",
+        "za",
         "genre",
         "mood",
         "bpm",
@@ -77,11 +87,11 @@
         "producer"
       ],
       "default": "recent",
-      "description": "Tipo de filtro autom\u00e1tico para generar la secci\u00f3n"
+      "description": "Criterio de orden/filtro autom\u00e1tico para generar la secci\u00f3n"
     },
     "filter_value": {
       "type": "string",
-      "description": "Valor del filtro (ej: nombre de g\u00e9nero, mood, productor, rango BPM)"
+      "description": "Valor del filtro (ej: nombre de g\u00e9nero, mood, productor)"
     },
     "is_visible": {
       "type": "boolean",

@@ -10,6 +10,7 @@ import { Search, Lock, Menu, ChevronDown, X, TrendingUp, ShoppingBag } from "luc
 import BeatCard from "@/components/beats/BeatCard";
 import BeatsFeaturedCarousel from "@/components/beats/BeatsFeaturedCarousel";
 import BeatsTrendingList from "@/components/beats/BeatsTrendingList";
+import BeatsRankingList from "@/components/beats/BeatsRankingList";
 import BeatLicensesModal from "@/components/beats/BeatLicensesModal";
 import BeatExpandedPanel from "@/components/beats/BeatExpandedPanel";
 
@@ -153,6 +154,7 @@ export default function Beats() {
   const featuredSection = useMemo(() => sections.find(s => s.layout === "carousel"), [sections]);
   const gridSection = useMemo(() => sections.find(s => s.layout === "grid"), [sections]);
   const listSection = useMemo(() => sections.find(s => s.layout === "list"), [sections]);
+  const rankingSection = useMemo(() => sections.find(s => s.layout === "ranking"), [sections]);
   const isVisible = (s) => !s || s.is_visible !== false;
 
   const featuredBeats = useMemo(() => {
@@ -174,6 +176,13 @@ export default function Beats() {
     if (gridSection) return resolveSectionBeats(gridSection, beats);
     return [...beats].sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0));
   }, [beats, gridSection]);
+
+  const rankingBeats = useMemo(() => {
+    if (rankingSection) return resolveSectionBeats(rankingSection, beats);
+    return [...beats]
+      .sort((a, b) => ((b.plays_count || 0) + (b.downloads_count || 0)) - ((a.plays_count || 0) + (a.downloads_count || 0)))
+      .slice(0, 5);
+  }, [beats, rankingSection]);
 
   const filteredBeats = useMemo(() => {
     let result = [...beats];
@@ -380,6 +389,48 @@ export default function Beats() {
           );
         })()}
       </div>
+      )}
+
+      {/* ── Nueva sección (ranking) ──────────────────────────────── */}
+      {isVisible(rankingSection) && rankingBeats.length > 0 && (
+        <div className="px-4 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-40">
+          <h2 className="text-2xl sm:text-3xl font-black text-white mb-1" style={{ letterSpacing: "-0.03em" }}>
+            {rankingSection?.title || "Hot Right Now"}
+          </h2>
+          <p className="text-sm text-[#a0a0a0] mb-5">{rankingSection?.subtitle || "The hottest samples right now."}</p>
+
+          {isLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-3 p-2.5">
+                  <div className="w-8 h-8 rounded-full animate-pulse" style={{ background: "#1a1a1a" }} />
+                  <div className="w-12 h-12 rounded-xl animate-pulse" style={{ background: "#1a1a1a" }} />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3.5 bg-white/5 rounded w-1/3 animate-pulse" />
+                    <div className="h-3 bg-white/5 rounded w-1/4 animate-pulse" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <BeatsRankingList
+              beats={rankingBeats}
+              isPlaying={isPlaying}
+              onPlay={handlePlay}
+              onLike={user ? (b) => likeMutation.mutate(b) : null}
+              onDownload={user ? handleDownload : null}
+              onShare={(beat) => {
+                const url = `${window.location.origin}/beats/${beat.slug || beat.id}`;
+                if (navigator.share) navigator.share({ title: beat.title, url }).catch(() => {});
+                else navigator.clipboard?.writeText(url).catch(() => {});
+              }}
+              likedIds={likedIds}
+              user={user}
+              onOpen={setCinematicBeat}
+              listBeats={rankingBeats}
+            />
+          )}
+        </div>
       )}
 
       {/* ── Trending ───────────────────────────────────────────────── */}
