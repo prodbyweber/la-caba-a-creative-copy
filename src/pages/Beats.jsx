@@ -13,6 +13,7 @@ import BeatsTrendingList from "@/components/beats/BeatsTrendingList";
 import BeatsRankingList from "@/components/beats/BeatsRankingList";
 import BeatLicensesModal from "@/components/beats/BeatLicensesModal";
 import BeatExpandedPanel from "@/components/beats/BeatExpandedPanel";
+import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 
 // Curation + genre category chips (horizontal scroll on mobile)
 const CURATION_CHIPS = [
@@ -471,6 +472,9 @@ export default function Beats() {
           />
         )}
       </AnimatePresence>
+
+      {/* Mobile bottom nav */}
+      <MobileBottomNav isAdmin={user?.role === "admin"} />
     </div>
   );
 }
