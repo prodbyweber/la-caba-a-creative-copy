@@ -238,6 +238,13 @@
           }
         }
       }
+    },
+    "catalog_section_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Orden personalizado de las secciones del cat\u00e1logo del artista (persistente entre dispositivos)"
     }
   },
   "required": [

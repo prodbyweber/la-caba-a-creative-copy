@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { X, Check, ChevronUp, ChevronDown } from "lucide-react";
 
-export const DEFAULT_SECTION_ORDER = ["savedbeats", "tracks", "video", "shorts", "projects"];
+export const DEFAULT_SECTION_ORDER = ["tracks", "savedbeats", "video", "shorts", "projects"];
 
 const SECTION_META = {
   savedbeats: { label: "Ritmos Guardados" },

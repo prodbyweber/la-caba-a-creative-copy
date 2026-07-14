@@ -6,6 +6,7 @@ import { base44 } from "@/api/base44Client";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { formatDuration } from "@/lib/musicConstants";
 import { getTrackShareUrl, shareTrackLink } from "@/lib/trackShare";
+import { resolveTrackBySlugOrId } from "@/lib/trackSlug";
 import {
   Play, Pause, Volume2, VolumeX, Lock, Share2, FolderOpen,
   Home, Compass, LogIn, UserPlus, LayoutDashboard, User, Music2,
@@ -119,7 +120,7 @@ export default function TrackShare() {
 
   const { data: track, isLoading, isError } = useQuery({
     queryKey: ["track-share", id],
-    queryFn: async () => base44.entities.Track.get(id),
+    queryFn: async () => resolveTrackBySlugOrId(id),
     enabled: !!id,
     retry: false,
   });
@@ -140,7 +141,7 @@ export default function TrackShare() {
   }, [track, hasAccess, active, isPlaying, pauseTrack, resumeTrack, playTrack]);
 
   const handleShare = async () => {
-    const result = await shareTrackLink(track.id, track.title);
+    const result = await shareTrackLink(track);
     if (result.copied) {
       setShareFeedback("Enlace copiado");
       setTimeout(() => setShareFeedback(""), 2200);

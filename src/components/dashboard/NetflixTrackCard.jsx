@@ -6,6 +6,7 @@ import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { shareTrackLink } from "@/lib/trackShare";
+import { ensureUniqueSlug } from "@/lib/trackSlug";
 
 const statusConfig = {
   idea:       { label: "Idea",          color: "#6b7280" },
@@ -68,10 +69,17 @@ function TrackEditModal({ track, onClose, onSaved }) {
   }, []);
 
   const saveMutation = useMutation({
-    mutationFn: (data) => {
+    mutationFn: async (data) => {
       const clean = Object.fromEntries(
         Object.entries(data).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
       );
+      // Generar slug limpio si cambió el título o no existe slug aún.
+      const titleChanged = (data.title || "").trim() !== (track.title || "").trim();
+      if (data.title && (titleChanged || !track.slug)) {
+        try {
+          clean.slug = await ensureUniqueSlug(data.title, track.id);
+        } catch { /* si falla, sin slug */ }
+      }
       return base44.entities.Track.update(track.id, clean);
     },
     onSuccess: (updated) => {
@@ -369,7 +377,7 @@ function TrackDetailModal({ track, onClose, onEdit, onDelete, onTogglePublic }) 
   const audioRef = useRef(null);
 
   const handleShare = async () => {
-    const result = await shareTrackLink(track.id, track.title);
+    const result = await shareTrackLink(track);
     if (result.copied) {
       setShareFeedback("Enlace copiado");
       setTimeout(() => setShareFeedback(""), 2000);

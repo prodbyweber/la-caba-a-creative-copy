@@ -1,38 +1,55 @@
-import React, { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { Clock, Plus, Minus, Check, X } from "lucide-react";
+import { Clock, Plus, Minus, X } from "lucide-react";
+import { useStudioHours } from "@/hooks/useStudioHours";
 
 export default function StudioHoursBlock({ artist, isAdmin }) {
-  const totalHours = artist?.studio_hours_total || 0;
+  const artistId = artist?.id;
+  const { totalHours, consumed, remaining } = useStudioHours(artistId);
   const [editMode, setEditMode] = useState(false);
   const [newTotal, setNewTotal] = useState(totalHours);
   const queryClient = useQueryClient();
 
-  const { data: logs = [] } = useQuery({
-    queryKey: ["studio-hours-log", artist?.id],
-    queryFn: () => base44.entities.StudioHoursLog.filter({ artist_id: artist.id }),
-    enabled: !!artist?.id
-  });
+  React.useEffect(() => { if (editMode) setNewTotal(totalHours); }, [editMode]);
 
   const updateHoursMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Artist.update(id, data),
+    mutationFn: async ({ id, data, adminName, adminId, prevTotal }) => {
+      const next = data.studio_hours_total;
+      await base44.entities.Artist.update(id, data);
+      // Registrar el ajuste como movimiento trazable con saldo final.
+      const delta = next - prevTotal;
+      await base44.entities.StudioHoursLog.create({
+        artist_id: id,
+        type: "adjustment",
+        hours: Math.abs(delta),
+        delta,
+        balance_after: Math.max(next - consumed, 0),
+        date: new Date().toISOString().split("T")[0],
+        concept: delta >= 0 ? "Ajuste de horas (admin)" : "Descuento de horas (admin)",
+        admin_user_id: adminId,
+        admin_user_name: adminName,
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["studio-hours-log", artist?.id] });
+      queryClient.invalidateQueries({ queryKey: ["studio-hours-log", artistId] });
       queryClient.invalidateQueries({ queryKey: ["artists"] });
-      queryClient.invalidateQueries({ queryKey: ["artist", artist?.id] });
+      queryClient.invalidateQueries({ queryKey: ["artist", artistId] });
     },
   });
 
-  const consumed = logs.reduce((sum, l) => sum + (l.hours || 0), 0);
-  const remaining = Math.max(totalHours - consumed, 0);
   const pct = totalHours > 0 ? Math.min((consumed / totalHours) * 100, 100) : 0;
 
-  const handleSave = () => {
-    updateHoursMutation.mutate(
-      { id: artist.id, data: { studio_hours_total: newTotal } },
-      { onSuccess: () => setEditMode(false) }
-    );
+  const handleSave = async () => {
+    const admin = await base44.auth.me().catch(() => null);
+    await updateHoursMutation.mutateAsync({
+      id: artistId,
+      data: { studio_hours_total: newTotal },
+      adminName: admin?.full_name || admin?.email || "Admin",
+      adminId: admin?.id,
+      prevTotal: totalHours,
+    });
+    setEditMode(false);
   };
 
   return (
@@ -42,7 +59,7 @@ export default function StudioHoursBlock({ artist, isAdmin }) {
           <Clock className="w-3.5 h-3.5 text-white/30" />
           <span className="text-[10px] font-semibold text-white/30 uppercase tracking-widest">Hrs. Estudio</span>
         </div>
-        {isAdmin && artist?.id && !editMode && (
+        {isAdmin && artistId && !editMode && (
           <button
             onClick={() => { setNewTotal(totalHours); setEditMode(true); }}
             className="text-[10px] font-semibold text-white/30 hover:text-white transition-colors"

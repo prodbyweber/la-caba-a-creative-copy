@@ -6,6 +6,10 @@
       "type": "string",
       "description": "T\u00edtulo de la canci\u00f3n"
     },
+    "slug": {
+      "type": "string",
+      "description": "Slug \u00fanico para URL p\u00fablica limpia (ej: midnight-drive)"
+    },
     "artist_id": {
       "type": "string",
       "description": "ID del artista principal"

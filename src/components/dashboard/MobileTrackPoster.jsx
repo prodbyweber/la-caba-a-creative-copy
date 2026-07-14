@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, createContext, useContext, useCallback } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Globe, Lock, Share2 } from "lucide-react";
+import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Globe, Lock, Share2, FolderOpen } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -84,7 +84,7 @@ export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, o
   const [shareFeedback, setShareFeedback] = useState("");
 
   const handleShare = async () => {
-    const result = await shareTrackLink(track.id, track.title);
+    const result = await shareTrackLink(track);
     if (result.copied) {
       setShareFeedback("Enlace copiado");
       setTimeout(() => setShareFeedback(""), 2000);
@@ -274,6 +274,27 @@ export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, o
             <div>
               <p className="text-[10px] text-white/25 uppercase tracking-wider mb-1">Productores</p>
               <p className="text-xs text-white/60">{track.producers.join(", ")}</p>
+            </div>
+          )}
+
+          {/* Tarjeta Drive — accesible también en móvil */}
+          {track.versions?.drive_folder && (
+            <div className="rounded-xl border border-white/[0.08] p-3.5" style={{ background: "rgba(139,92,246,0.06)" }}>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(139,92,246,0.15)" }}>
+                  <FolderOpen className="w-5 h-5 text-[#a78bfa]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-white">Carpeta de Drive</p>
+                  <p className="text-[11px] text-white/40 mt-0.5 leading-relaxed">Accede a los archivos y versiones del soundtrack directamente desde Google Drive.</p>
+                  <a href={track.versions.drive_folder} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 mt-2.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-colors"
+                    style={{ background: "#8b5cf6", color: "white" }}>
+                    <FolderOpen className="w-3.5 h-3.5" /> Abrir Drive
+                    <ExternalLink className="w-3 h-3 opacity-70" />
+                  </a>
+                </div>
+              </div>
             </div>
           )}
 

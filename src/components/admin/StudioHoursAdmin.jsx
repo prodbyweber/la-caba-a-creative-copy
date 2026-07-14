@@ -1,55 +1,79 @@
 import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, Clock, Save } from "lucide-react";
-import { format } from "date-fns";
+import { Plus, Trash2, Clock, Save, ArrowUp, ArrowDown, User } from "lucide-react";
+
+import { useStudioHours } from "@/hooks/useStudioHours";
 
 export default function StudioHoursAdmin({ artist }) {
   const queryClient = useQueryClient();
+  const artistId = artist?.id;
+  const { totalHours, consumed, remaining, logs } = useStudioHours(artistId);
   const [form, setForm] = useState({ hours: "", date: new Date().toISOString().split("T")[0], concept: "" });
 
-  const totalHours = artist?.studio_hours_total || 0;
-
-  const { data: logs = [] } = useQuery({
-    queryKey: ["studio-hours-log", artist.id],
-    queryFn: () => base44.entities.StudioHoursLog.filter({ artist_id: artist.id }),
-  });
-
-  const consumed = logs.reduce((sum, l) => sum + (l.hours || 0), 0);
-  const remaining = Math.max(totalHours - consumed, 0);
-
   const addLogMutation = useMutation({
-    mutationFn: (data) => base44.entities.StudioHoursLog.create(data),
+    mutationFn: async (data) => {
+      const admin = await base44.auth.me().catch(() => null);
+      const balanceAfter = Math.max(totalHours - consumed - data.hours, 0);
+      return base44.entities.StudioHoursLog.create({
+        ...data,
+        type: "consumption",
+        delta: -Math.abs(data.hours),
+        balance_after: balanceAfter,
+        admin_user_id: admin?.id,
+        admin_user_name: admin?.full_name || admin?.email || "Admin",
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["studio-hours-log", artist.id] });
+      queryClient.invalidateQueries({ queryKey: ["studio-hours-log", artistId] });
       setForm({ hours: "", date: new Date().toISOString().split("T")[0], concept: "" });
     }
   });
 
   const deleteLogMutation = useMutation({
     mutationFn: (id) => base44.entities.StudioHoursLog.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["studio-hours-log", artist.id] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["studio-hours-log", artistId] })
   });
 
   const updateTotalMutation = useMutation({
-    mutationFn: (val) => base44.entities.Artist.update(artist.id, { studio_hours_total: val }),
+    mutationFn: async (val) => {
+      const admin = await base44.auth.me().catch(() => null);
+      const prev = totalHours;
+      await base44.entities.Artist.update(artistId, { studio_hours_total: val });
+      const delta = val - prev;
+      if (delta !== 0) {
+        await base44.entities.StudioHoursLog.create({
+          artist_id: artistId,
+          type: "adjustment",
+          hours: Math.abs(delta),
+          delta,
+          balance_after: Math.max(val - consumed, 0),
+          date: new Date().toISOString().split("T")[0],
+          concept: delta >= 0 ? "Ajuste de horas (admin)" : "Descuento de horas (admin)",
+          admin_user_id: admin?.id,
+          admin_user_name: admin?.full_name || admin?.email || "Admin",
+        });
+      }
+    },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["studio-hours-log", artistId] });
       queryClient.invalidateQueries({ queryKey: ["artists"] });
-      queryClient.invalidateQueries({ queryKey: ["artist", artist.id] });
+      queryClient.invalidateQueries({ queryKey: ["artist", artistId] });
     }
   });
 
   const [editTotal, setEditTotal] = useState(String(totalHours));
+  React.useEffect(() => { setEditTotal(String(totalHours)); }, [totalHours]);
 
   const handleAddLog = () => {
     const h = parseFloat(form.hours);
     if (!h || h <= 0 || !form.date) return;
-    addLogMutation.mutate({ artist_id: artist.id, hours: h, date: form.date, concept: form.concept });
+    addLogMutation.mutate({ artist_id: artistId, hours: h, date: form.date, concept: form.concept });
   };
 
   const handleSaveTotal = () => {
     const v = parseFloat(editTotal);
-    if (!isNaN(v) && v >= 0) updateTotalMutation.mutate(v);
+    if (!isNaN(v) && v >= 0 && v !== totalHours) updateTotalMutation.mutate(v);
   };
 
   return (
@@ -89,6 +113,9 @@ export default function StudioHoursAdmin({ artist }) {
             Guardar
           </button>
         </div>
+        {updateTotalMutation.isError && (
+          <p className="text-[10px] text-red-400 mt-1.5">Error al guardar</p>
+        )}
       </div>
 
       {/* Registrar consumo */}
@@ -149,23 +176,45 @@ export default function StudioHoursAdmin({ artist }) {
           <p className="text-xs text-white/20 text-center py-6">Sin registros aún</p>
         ) : (
           <div className="space-y-2">
-            {[...logs].sort((a, b) => new Date(b.date) - new Date(a.date)).map(log => (
-              <div key={log.id} className="flex items-center justify-between p-3 bg-white/[0.03] rounded-xl border border-white/[0.05] group">
-                <div className="flex items-center gap-3">
-                  <div className="text-xs font-mono text-white/30">{log.date}</div>
-                  <div>
-                    <span className="text-sm font-semibold text-amber-400">-{log.hours}h</span>
-                    {log.concept && <span className="text-xs text-white/35 ml-2">{log.concept}</span>}
+            {logs.map(log => {
+              const isAdjust = log.type === "adjustment";
+              const delta = log.delta ?? (isAdjust ? 0 : -Math.abs(log.hours));
+              const positive = delta >= 0;
+              return (
+                <div key={log.id} className="flex items-center justify-between p-3 bg-white/[0.03] rounded-xl border border-white/[0.05] group">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${positive ? "bg-emerald-500/15" : "bg-amber-500/15"}`}>
+                      {positive ? <ArrowUp className="w-3 h-3 text-emerald-400" /> : <ArrowDown className="w-3 h-3 text-amber-400" />}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm font-semibold ${positive ? "text-emerald-400" : "text-amber-400"}`}>
+                          {positive ? "+" : "-"}{Math.abs(log.hours)}h
+                        </span>
+                        <span className="text-[10px] text-white/30 font-mono">{log.date}</span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-0.5 min-w-0">
+                        {log.concept && <span className="text-xs text-white/35 truncate">{log.concept}</span>}
+                        {log.admin_user_name && (
+                          <span className="flex items-center gap-1 text-[10px] text-white/25 flex-shrink-0">
+                            <User className="w-2.5 h-2.5" /> {log.admin_user_name}
+                          </span>
+                        )}
+                      </div>
+                      {typeof log.balance_after === "number" && (
+                        <span className="text-[10px] text-white/20">Saldo: {log.balance_after}h</span>
+                      )}
+                    </div>
                   </div>
+                  <button
+                    onClick={() => deleteLogMutation.mutate(log.id)}
+                    className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-500/20 rounded-lg text-red-400 transition-all flex-shrink-0"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => deleteLogMutation.mutate(log.id)}
-                  className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-500/20 rounded-lg text-red-400 transition-all"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

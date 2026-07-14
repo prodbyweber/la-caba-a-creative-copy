@@ -161,6 +161,7 @@ const AuthenticatedApp = () => {
       <Route path="/Explorar" element={<Explorar />} />
       <Route path="/beats" element={<Beats />} />
       <Route path="/beats/:id" element={<BeatDetail />} />
+      <Route path="/t/:slug" element={<TrackShare />} />
       <Route path="/track/:id" element={<TrackShare />} />
       <Route path="/StudioSession" element={<StudioSession />} />
       <Route path="/meeting" element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}><Route index element={<Meeting />} /></Route>

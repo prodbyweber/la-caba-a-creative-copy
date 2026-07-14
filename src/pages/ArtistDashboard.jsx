@@ -139,6 +139,7 @@ export default function ArtistDashboard() {
   const isMobileView = windowWidth < 768;
 
   const storageKey = `catalog_order_${currentUser?.id || "default"}`;
+  const savedOrder = userProfile?.catalog_section_order;
   const [sectionOrder, setSectionOrder] = useState(() => {
     try {
       const saved = localStorage.getItem(storageKey);
@@ -148,9 +149,22 @@ export default function ArtistDashboard() {
     }
   });
 
-  const handleOrderChange = (newOrder) => {
+  // Sobrescribir el estado cuando llega el orden persistido en el perfil (fuente única).
+  useEffect(() => {
+    if (Array.isArray(savedOrder) && savedOrder.length > 0) {
+      setSectionOrder(savedOrder);
+    }
+  }, [JSON.stringify(savedOrder)]);
+
+  const handleOrderChange = async (newOrder) => {
     setSectionOrder(newOrder);
     try { localStorage.setItem(storageKey, JSON.stringify(newOrder)); } catch {}
+    // Persistir en la base de datos (UserProfile) para sobrevivir logout / cambio de dispositivo.
+    if (userProfile?.id) {
+      try {
+        await base44.entities.UserProfile.update(userProfile.id, { catalog_section_order: newOrder });
+      } catch { /* error silencioso: ya quedó en localStorage como respaldo */ }
+    }
   };
 
   // Solo mostrar loading si realmente estamos resolviendo (currentUser ya cargó pero selfArtist aún no)
