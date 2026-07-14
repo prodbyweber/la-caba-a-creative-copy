@@ -19,7 +19,7 @@ function useTrackMeta(track, hasAccess) {
     document.title = `${track.title} · Cabaña Creative`;
 
     const desc = `${track.title}${track.producers?.length ? " — Prod. " + track.producers.join(", ") : ""} · Escucha en Cabaña Creative.`;
-    const url = getTrackShareUrl(track.id);
+    const url = getTrackShareUrl(track);
     const image = track.cover_url || "";
 
     const tags = [
@@ -100,7 +100,8 @@ function TopNav({ user, profileUsername }) {
 }
 
 export default function TrackShare() {
-  const { id } = useParams();
+  const { slug, id } = useParams();
+  const routeKey = slug || id;
   const { playingTrack, isPlaying, currentTime, duration, volume, playTrack, pauseTrack, resumeTrack, seekTrack, setVolume } = useGlobalAudio();
   const [user, setUser] = useState(null);
   const [profileUsername, setProfileUsername] = useState(null);
@@ -119,9 +120,9 @@ export default function TrackShare() {
   }, []);
 
   const { data: track, isLoading, isError } = useQuery({
-    queryKey: ["track-share", id],
-    queryFn: async () => resolveTrackBySlugOrId(id),
-    enabled: !!id,
+    queryKey: ["track-share", routeKey],
+    queryFn: async () => resolveTrackBySlugOrId(routeKey),
+    enabled: !!routeKey,
     retry: false,
   });
 

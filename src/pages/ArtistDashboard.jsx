@@ -163,6 +163,7 @@ export default function ArtistDashboard() {
     if (userProfile?.id) {
       try {
         await base44.entities.UserProfile.update(userProfile.id, { catalog_section_order: newOrder });
+        queryClient.invalidateQueries({ queryKey: ["userProfile", profileUserId] });
       } catch { /* error silencioso: ya quedó en localStorage como respaldo */ }
     }
   };

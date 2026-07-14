@@ -20,18 +20,11 @@ export function slugify(text) {
 // Comprueba duplicados contra todos los tracks existentes (excluyendo el propio).
 export async function ensureUniqueSlug(baseTitle, excludeId) {
   const base = slugify(baseTitle) || "track";
-  let all = [];
-  let skip = 0;
-  // paginación simple por si hay muchos tracks
-  while (true) {
-    const batch = await base44.entities.Track.list("-updated_date", 500, skip);
-    all = all.concat(batch);
-    if (!batch || batch.length < 500) break;
-    skip += 500;
-    if (skip > 5000) break; // safety
-  }
+  const batch = await base44.entities.Track.list("-updated_date", 500);
   const existing = new Set(
-    all.filter((t) => t.id !== excludeId && t.slug).map((t) => t.slug)
+    (batch || [])
+      .filter((t) => t.id !== excludeId && t.slug)
+      .map((t) => t.slug)
   );
   if (!existing.has(base)) return base;
   let i = 2;
