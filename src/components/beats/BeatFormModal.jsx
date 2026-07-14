@@ -26,7 +26,6 @@ export default function BeatFormModal({ beat, onClose }) {
   const [tagInput, setTagInput] = useState("");
   const coverRef = useRef(null);
   const previewRef = useRef(null);
-  const freeRef = useRef(null);
 
   const saveMutation = useMutation({
     mutationFn: async (data) => {
@@ -46,6 +45,18 @@ export default function BeatFormModal({ beat, onClose }) {
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setForm(f => ({ ...f, [field]: file_url }));
+    } finally {
+      setUploading(null);
+    }
+  };
+
+  // MP3 único: el mismo archivo con tag sirve para preview y descarga.
+  const handleUploadMp3 = async (file) => {
+    if (!file) return;
+    setUploading("mp3");
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setForm(f => ({ ...f, preview_mp3_url: file_url, free_mp3_url: file_url }));
     } finally {
       setUploading(null);
     }
@@ -83,7 +94,9 @@ export default function BeatFormModal({ beat, onClose }) {
   };
 
   const handleSubmit = () => {
-    saveMutation.mutate(form);
+    const data = { ...form };
+    if (data.preview_mp3_url) data.free_mp3_url = data.preview_mp3_url;
+    saveMutation.mutate(data);
   };
 
   const iCls = "w-full px-3 py-2.5 rounded-xl text-sm text-white bg-white/[0.05] border border-white/[0.08] focus:outline-none focus:border-white/20 transition-colors placeholder-white/20";
@@ -183,30 +196,20 @@ export default function BeatFormModal({ beat, onClose }) {
             </div>
           </div>
 
-          {/* MP3 Preview (tagged) */}
+          {/* MP3 único — preview y descarga (mismo archivo con tag) */}
           <div>
-            <label className={labelCls}>Preview MP3 (Tagged)</label>
+            <label className={labelCls}>MP3 (Preview y descarga)</label>
             <label className="cursor-pointer">
               <input type="file" accept="audio/*" className="hidden" ref={previewRef}
-                onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0], "preview_mp3_url")} />
+                onChange={(e) => e.target.files?.[0] && handleUploadMp3(e.target.files[0])} />
               <div className={`${iCls} flex items-center gap-2 hover:bg-white/[0.08] cursor-pointer`}>
                 <Music2 className="w-3.5 h-3.5 text-white/40" />
-                {uploading === "preview_mp3_url" ? "Subiendo..." : form.preview_mp3_url ? "Archivo subido — Cambiar" : "Subir MP3 con tag"}
+                {uploading === "mp3" ? "Subiendo..." : form.preview_mp3_url ? "Archivo subido — Cambiar" : "Subir MP3 (con tag)"}
               </div>
             </label>
-          </div>
-
-          {/* Free MP3 */}
-          <div>
-            <label className={labelCls}>MP3 Gratuito (descargable)</label>
-            <label className="cursor-pointer">
-              <input type="file" accept="audio/*" className="hidden" ref={freeRef}
-                onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0], "free_mp3_url")} />
-              <div className={`${iCls} flex items-center gap-2 hover:bg-white/[0.08] cursor-pointer`}>
-                <Music2 className="w-3.5 h-3.5 text-white/40" />
-                {uploading === "free_mp3_url" ? "Subiendo..." : form.free_mp3_url ? "Archivo subido — Cambiar" : "Subir MP3 gratuito"}
-              </div>
-            </label>
+            <p className="text-[10px] text-white/35 mt-1.5 leading-relaxed">
+              Un único archivo MP3 con tag sirve para la previsualización y la descarga gratuita. Al descargar, el usuario acepta los términos de uso: el beat se entrega con tag y es para uso personal / no comercial salvo licencia adquirida.
+            </p>
           </div>
 
           {/* Drive folder */}

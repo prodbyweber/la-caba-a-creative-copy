@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Play, Pause, Download, ShoppingBag, Bookmark, Heart, Share2, Music2, X,
@@ -27,6 +27,7 @@ export default function BeatExpandedPanel({
   const licenses = beat.licenses || [];
   const hasBuy = !!(beat.buy_link || licenses.length > 0);
   const cover = getCoverForBeat(beat);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose?.(); };
@@ -47,6 +48,8 @@ export default function BeatExpandedPanel({
       } else {
         await navigator.clipboard.writeText(url);
       }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch {}
   };
 
@@ -181,7 +184,7 @@ export default function BeatExpandedPanel({
               className="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white transition-colors hover:bg-white/10"
               style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}
             >
-              <Share2 className="w-4 h-4" /> Compartir
+              <Share2 className="w-4 h-4" /> {copied ? "¡Enlace copiado!" : "Compartir"}
             </button>
             <div className="flex-1" />
             {onLike && (

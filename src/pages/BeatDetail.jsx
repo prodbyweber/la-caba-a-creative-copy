@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBeatPlayer } from "@/hooks/useBeatPlayer";
-import { Play, Pause, Heart, Bookmark, Download, FolderOpen, ArrowLeft, Activity, ShoppingBag } from "lucide-react";
+import { Play, Pause, Heart, Bookmark, Download, FolderOpen, ArrowLeft, Activity, ShoppingBag, Share2 } from "lucide-react";
 import { getCoverForBeat } from "@/lib/beatsUtils";
 import { formatDuration } from "@/lib/musicConstants";
 import BeatCard from "@/components/beats/BeatCard";
@@ -18,6 +18,7 @@ export default function BeatDetail() {
   const [licensesModal, setLicensesModal] = useState(false);
   const [likedIds, setLikedIds] = useState(new Set());
   const [savedIds, setSavedIds] = useState(new Set());
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     base44.auth.isAuthenticated().then(async (authed) => {
@@ -87,6 +88,7 @@ export default function BeatDetail() {
   });
 
   const handleDownload = useCallback(async (b) => {
+    if (!user) { window.location.href = "/login"; return; }
     if (!b.free_mp3_url) return;
     try {
       if (user?.id) await base44.entities.BeatDownload.create({ beat_id: b.id, user_id: user.id, license_type: "mp3_free" });
@@ -108,8 +110,22 @@ export default function BeatDetail() {
   }, []);
 
   const handlePlay = useCallback((b, list) => {
+    if (!user) { window.location.href = "/login"; return; }
     toggle(b, list);
-  }, [toggle]);
+  }, [toggle, user]);
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/beats/${beat.slug || beat.id}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: beat.title, text: `${beat.title} — ${beat.producer || "Cabaña"}`, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
+  };
 
   const active = playingTrack?.beat_id === beat?.id;
 
@@ -199,6 +215,14 @@ export default function BeatDetail() {
               >
                 <Bookmark className={`w-5 h-5 ${savedIds.has(beat.id) ? "fill-[#ffd23f] text-[#ffd23f]" : "text-white"}`} />
               </button>
+              <button
+                onClick={handleShare}
+                className="w-12 h-12 rounded-full flex items-center justify-center border border-white/15 hover:bg-white/10 transition-colors"
+                title="Compartir"
+              >
+                <Share2 className="w-5 h-5 text-white" />
+              </button>
+              {copied && <span className="text-xs text-[#a7f3d0] font-semibold self-center">¡Copiado!</span>}
               {beat.free_mp3_url && (
                 <button
                   onClick={() => handleDownload(beat)}
@@ -314,6 +338,7 @@ export default function BeatDetail() {
                 onSave={user ? (x) => saveMutation.mutate(x) : null}
                 onDownload={user ? handleDownload : null}
                 onBuy={handleBuy}
+                onPlay={handlePlay}
                 listBeats={related}
               />
             ))}
