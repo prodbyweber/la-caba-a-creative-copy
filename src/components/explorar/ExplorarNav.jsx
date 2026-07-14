@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, User, Home, BookOpen, Compass, Music2 } from "lucide-react";
+import { Search, User, Home, BookOpen, Compass, Heart } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -31,7 +31,7 @@ export default function ExplorarNav({ currentUser, activeSection, setActiveSecti
 
   const bottomNavItems = [
     { icon: Home,     label: "Inicio",      page: "Landing" },
-    { icon: Music2, label: "Beats",      page: "beats" },
+    { icon: Heart,    label: "Para Ti",     action: onParaTiOpen },
     { icon: Compass,  label: "Explorar",    page: "Explorar" },
     { icon: BookOpen, label: "Tu catálogo", page: catalogPage, highlight: true },
   ];
