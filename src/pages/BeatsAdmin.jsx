@@ -7,6 +7,7 @@ import { Play, Pause, Plus, Search, Grid3x3, List, MoreVertical, Download, Folde
 import { GENRES, MOODS, SCALES, KEYS, BEAT_STATUS } from "@/lib/musicConstants";
 import BeatFormModal from "@/components/beats/BeatFormModal";
 import BeatsPageBuilder from "@/components/beats/BeatsPageBuilder";
+import AdminBottomNav from "@/components/admin/AdminBottomNav";
 
 export default function BeatsAdmin() {
   const qc = useQueryClient();
@@ -127,7 +128,7 @@ export default function BeatsAdmin() {
   return (
     <div className="min-h-screen pb-32" style={{ background: "#0a0a0b" }}>
       {/* Header */}
-      <div className="sticky top-0 z-40 px-5 sm:px-10 py-4 flex items-center justify-between"
+      <div className="sticky top-0 z-40 px-4 sm:px-10 py-3 flex flex-wrap items-center justify-between gap-3"
         style={{ background: "rgba(10,10,11,0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
       >
         <div className="flex items-center gap-3">
@@ -156,7 +157,7 @@ export default function BeatsAdmin() {
             <button
               onClick={() => { setEditingBeat(null); setShowForm(true); }}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-white transition-colors"
-              style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
+              style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
             >
               <Plus className="w-4 h-4" />
               Crear Beat
@@ -179,7 +180,7 @@ export default function BeatsAdmin() {
           <StatCard label="Total Beats" value={beats.length} icon={Music2} />
           <StatCard label="Publicados" value={analytics.published} icon={Eye} color="#10b981" />
           <StatCard label="Borradores" value={analytics.drafts} icon={Pencil} color="#f59e0b" />
-          <StatCard label="Descargas" value={allDownloads.length} icon={Download} color="#a78bfa" />
+          <StatCard label="Descargas" value={allDownloads.length} icon={Download} color="#ff5833" />
         </div>
 
         {/* Top lists */}
@@ -202,7 +203,7 @@ export default function BeatsAdmin() {
                 <div key={genre} className="flex items-center gap-3">
                   <span className="text-xs text-white/60 w-28 truncate">{genre}</span>
                   <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${(count / analytics.topGenres[0][1]) * 100}%`, background: "linear-gradient(90deg, #7c4dff, #a78bfa)" }} />
+                    <div className="h-full rounded-full" style={{ width: `${(count / analytics.topGenres[0][1]) * 100}%`, background: "linear-gradient(90deg, #ff5833, #e0451f)" }} />
                   </div>
                   <span className="text-xs text-white/40 w-6 text-right">{count}</span>
                 </div>
@@ -221,7 +222,7 @@ export default function BeatsAdmin() {
                 <div key={mood} className="flex items-center gap-3">
                   <span className="text-xs text-white/60 w-28 truncate">{mood}</span>
                   <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${(count / analytics.topMoods[0][1]) * 100}%`, background: "linear-gradient(90deg, #7c4dff, #a78bfa)" }} />
+                    <div className="h-full rounded-full" style={{ width: `${(count / analytics.topMoods[0][1]) * 100}%`, background: "linear-gradient(90deg, #ff5833, #e0451f)" }} />
                   </div>
                   <span className="text-xs text-white/40 w-6 text-right">{count}</span>
                 </div>
@@ -268,7 +269,7 @@ export default function BeatsAdmin() {
           <div className="text-center py-20">
             <p className="text-white/30 text-sm mb-3">No hay beats</p>
             <button onClick={() => { setEditingBeat(null); setShowForm(true); }}
-              className="text-sm font-semibold text-[#a78bfa] hover:text-white transition-colors">
+              className="text-sm font-semibold text-[#ff8866] hover:text-white transition-colors">
               Crear el primer beat
             </button>
           </div>
@@ -322,11 +323,13 @@ export default function BeatsAdmin() {
           <BeatFormModal beat={editingBeat} onClose={() => { setShowForm(false); setEditingBeat(null); }} />
         )}
       </AnimatePresence>
+
+      <AdminBottomNav />
     </div>
   );
 }
 
-function StatCard({ label, value, icon: Icon, color = "#a78bfa" }) {
+function StatCard({ label, value, icon: Icon, color = "#ff5833" }) {
   return (
     <div className="p-4 rounded-xl" style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.05)" }}>
       <div className="flex items-center gap-2 mb-2">
@@ -378,7 +381,7 @@ function BeatAdminCard({ beat, isPlaying, onPlay, onEdit, onDelete, onDuplicate,
           <div className="w-full h-full flex items-center justify-center cursor-pointer"><Music2 className="w-8 h-8 text-white/15" /></div>
         )}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}>
             {isPlaying ? <Pause className="w-4 h-4 text-white" fill="white" /> : <Play className="w-4 h-4 text-white ml-0.5" fill="white" />}
           </div>
         </div>

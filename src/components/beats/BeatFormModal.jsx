@@ -248,7 +248,7 @@ export default function BeatFormModal({ beat, onClose }) {
                 const active = (form.genres || []).includes(g);
                 return (
                   <button key={g} type="button" onClick={() => toggleGenre(g)}
-                    className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all ${active ? "bg-[#7c4dff] text-white" : "bg-white/5 text-white/40 hover:bg-white/10 border border-white/10"}`}
+                    className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all ${active ? "bg-[#ff5833] text-white" : "bg-white/5 text-white/40 hover:bg-white/10 border border-white/10"}`}
                   >{g}</button>
                 );
               })}
@@ -263,7 +263,7 @@ export default function BeatFormModal({ beat, onClose }) {
                 const active = (form.moods || []).includes(m);
                 return (
                   <button key={m} type="button" onClick={() => toggleMood(m)}
-                    className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all ${active ? "bg-[#7c4dff] text-white" : "bg-white/5 text-white/40 hover:bg-white/10 border border-white/10"}`}
+                    className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all ${active ? "bg-[#ff5833] text-white" : "bg-white/5 text-white/40 hover:bg-white/10 border border-white/10"}`}
                   >{m}</button>
                 );
               })}
@@ -318,7 +318,7 @@ export default function BeatFormModal({ beat, onClose }) {
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className={labelCls}>Licencias</label>
-              <button type="button" onClick={addLicense} className="flex items-center gap-1 text-xs font-semibold text-[#a78bfa] hover:text-white transition-colors">
+              <button type="button" onClick={addLicense} className="flex items-center gap-1 text-xs font-semibold text-[#ff8866] hover:text-white transition-colors">
                 <Plus className="w-3 h-3" /> Añadir licencia
               </button>
             </div>
@@ -352,7 +352,7 @@ export default function BeatFormModal({ beat, onClose }) {
             <button onClick={onClose} className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white/50 text-sm font-semibold transition-colors">Cancelar</button>
             <button onClick={handleSubmit} disabled={saveMutation.isPending || !form.title}
               className="flex-1 py-3 rounded-xl text-white text-sm font-bold transition-colors disabled:opacity-40"
-              style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
+              style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
             >
               {saveMutation.isPending ? "Guardando..." : "Guardar"}
             </button>

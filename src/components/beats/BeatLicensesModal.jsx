@@ -67,7 +67,7 @@ export default function BeatLicensesModal({ beat, onClose, user }) {
                 const typeInfo = LICENSE_TYPES.find(t => t.id === license.type) || { label: license.type };
                 return (
                   <div key={i} className="p-4 rounded-xl border transition-all"
-                    style={{ background: "rgba(124,77,255,0.05)", borderColor: "rgba(124,77,255,0.15)" }}
+                    style={{ background: "rgba(255,88,51,0.06)", borderColor: "rgba(255,88,51,0.25)" }}
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex-1">
@@ -97,7 +97,7 @@ export default function BeatLicensesModal({ beat, onClose, user }) {
                         onClick={() => handleDownloadLicense(license)}
                         disabled={!license.download_url && !license.drive_folder_url}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors disabled:opacity-30"
-                        style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
+                        style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
                       >
                         <Download className="w-3 h-3" />
                         Descargar
