@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBeatPlayer } from "@/hooks/useBeatPlayer";
-import { Play, Pause, Plus, Search, Grid3x3, List, MoreVertical, Download, FolderOpen, Music2, TrendingUp, BarChart3, Heart, Archive, Copy, Trash2, Eye, EyeOff, Pencil, X, Star, LayoutPanelTop } from "lucide-react";
-import { GENRES, MOODS, SCALES, KEYS, BEAT_STATUS } from "@/lib/musicConstants";
+import { Play, Pause, Plus, Search, Grid3x3, List, MoreVertical, Download, FolderOpen, Music2, TrendingUp, BarChart3, Heart, Archive, Copy, Trash2, Eye, EyeOff, Pencil, X, Star, LayoutPanelTop, ExternalLink, ChevronDown, Users } from "lucide-react";
+import { GENRES, MOODS, KEYS, BEAT_STATUS } from "@/lib/musicConstants";
 import BeatFormModal from "@/components/beats/BeatFormModal";
 import BeatsPageBuilder from "@/components/beats/BeatsPageBuilder";
 import AdminBottomNav from "@/components/admin/AdminBottomNav";
@@ -22,6 +23,9 @@ export default function BeatsAdmin() {
   const [showForm, setShowForm] = useState(false);
   const [editingBeat, setEditingBeat] = useState(null);
   const [menuOpen, setMenuOpen] = useState(null);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [genreExpanded, setGenreExpanded] = useState(false);
+  const [moodExpanded, setMoodExpanded] = useState(false);
 
   // Fetch all beats
   const { data: beats = [], isLoading } = useQuery({
@@ -29,7 +33,7 @@ export default function BeatsAdmin() {
     queryFn: async () => base44.entities.Beat.list("-created_date"),
   });
 
-  // Fetch likes & saves for analytics
+  // Engagement data
   const { data: allLikes = [] } = useQuery({
     queryKey: ["beat-likes-all"],
     queryFn: async () => base44.entities.BeatLike.list(),
@@ -42,6 +46,30 @@ export default function BeatsAdmin() {
     queryKey: ["beat-downloads-all"],
     queryFn: async () => base44.entities.BeatDownload.list(),
   });
+
+  // Users — para mostrar quién guardó / descargó / dio like
+  const { data: users = [] } = useQuery({
+    queryKey: ["users-all"],
+    queryFn: async () => base44.entities.User.list(),
+  });
+
+  const userMap = useMemo(() => {
+    const m = {};
+    (users || []).forEach(u => { m[u.id] = u; });
+    return m;
+  }, [users]);
+
+  const nameFor = useCallback((uid) => {
+    const u = userMap[uid];
+    if (!u) return null;
+    return u.full_name || (u.email ? u.email.split("@")[0] : null);
+  }, [userMap]);
+
+  const namesForBeat = useCallback((beatId, arr) => {
+    const ids = (arr || []).filter(x => x.beat_id === beatId).map(x => x.user_id).filter(Boolean);
+    const names = ids.map(nameFor).filter(Boolean);
+    return names;
+  }, [nameFor]);
 
   // Mutations
   const deleteMutation = useMutation({
@@ -76,17 +104,19 @@ export default function BeatsAdmin() {
   const analytics = useMemo(() => {
     const published = beats.filter(b => b.status === "Publicado" && !b.archived).length;
     const drafts = beats.filter(b => b.status === "Borrador" && !b.archived).length;
+    const likeCount = (b) => allLikes.filter(l => l.beat_id === b.id).length;
+    const mostLiked = [...beats].sort((a, b) => likeCount(b) - likeCount(a)).slice(0, 5);
     const mostSaved = [...beats].sort((a, b) => (allSaves.filter(s => s.beat_id === b.id).length) - (allSaves.filter(s => s.beat_id === a.id).length)).slice(0, 5);
     const mostDownloaded = [...beats].sort((a, b) => (allDownloads.filter(d => d.beat_id === b.id).length) - (allDownloads.filter(d => d.beat_id === a.id).length)).slice(0, 5);
     const mostPlayed = [...beats].sort((a, b) => (b.plays_count || 0) - (a.plays_count || 0)).slice(0, 5);
     const genreCounts = {};
     beats.forEach(b => (b.genres || []).forEach(g => { genreCounts[g] = (genreCounts[g] || 0) + 1; }));
-    const topGenres = Object.entries(genreCounts).sort(([, a], [, b]) => b - a).slice(0, 5);
+    const topGenres = Object.entries(genreCounts).sort(([, a], [, b]) => b - a);
     const moodCounts = {};
     beats.forEach(b => (b.moods || []).forEach(m => { moodCounts[m] = (moodCounts[m] || 0) + 1; }));
-    const topMoods = Object.entries(moodCounts).sort(([, a], [, b]) => b - a).slice(0, 5);
-    return { published, drafts, mostSaved, mostDownloaded, mostPlayed, topGenres, topMoods };
-  }, [beats, allSaves, allDownloads]);
+    const topMoods = Object.entries(moodCounts).sort(([, a], [, b]) => b - a);
+    return { published, drafts, mostLiked, mostSaved, mostDownloaded, mostPlayed, topGenres, topMoods, totalLikes: allLikes.length };
+  }, [beats, allLikes, allSaves, allDownloads]);
 
   // Filter
   const filteredBeats = useMemo(() => {
@@ -125,6 +155,14 @@ export default function BeatsAdmin() {
     }
   };
 
+  const statPills = [
+    { label: "Total", value: beats.length, icon: Music2, color: "#ffffff" },
+    { label: "Publicados", value: analytics.published, icon: Eye, color: "#10b981" },
+    { label: "Borradores", value: analytics.drafts, icon: Pencil, color: "#f59e0b" },
+    { label: "Likes", value: analytics.totalLikes, icon: Heart, color: "#ff5833" },
+    { label: "Descargas", value: allDownloads.length, icon: Download, color: "#ff8866" },
+  ];
+
   return (
     <div className="min-h-screen pb-32" style={{ background: "#0a0a0b" }}>
       {/* Header */}
@@ -134,6 +172,14 @@ export default function BeatsAdmin() {
         <div className="flex items-center gap-3">
           <h1 className="text-xl font-black text-white tracking-tight">Beats</h1>
           <span className="text-xs text-white/30">{beats.length} total</span>
+          <Link to="/beats" target="_blank"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-white/60 hover:text-white transition-colors"
+            style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.08)" }}
+            title="Ver página pública de Beats"
+          >
+            <ExternalLink className="w-3 h-3" />
+            Ver página
+          </Link>
         </div>
         <div className="flex items-center gap-2">
           {/* Tabs */}
@@ -160,7 +206,8 @@ export default function BeatsAdmin() {
               style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
             >
               <Plus className="w-4 h-4" />
-              Crear Beat
+              <span className="hidden sm:inline">Crear Beat</span>
+              <span className="sm:hidden">Subir</span>
             </button>
           )}
         </div>
@@ -168,70 +215,26 @@ export default function BeatsAdmin() {
 
       {/* Page builder tab */}
       {tab === "page" && (
-        <div className="px-5 sm:px-10 max-w-7xl mx-auto mt-6">
+        <div className="px-4 sm:px-10 max-w-7xl mx-auto mt-6">
           <BeatsPageBuilder />
         </div>
       )}
 
       {tab === "beats" && (
-      <div className="px-5 sm:px-10 max-w-7xl mx-auto">
-        {/* Analytics */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6 mb-6">
-          <StatCard label="Total Beats" value={beats.length} icon={Music2} />
-          <StatCard label="Publicados" value={analytics.published} icon={Eye} color="#10b981" />
-          <StatCard label="Borradores" value={analytics.drafts} icon={Pencil} color="#f59e0b" />
-          <StatCard label="Descargas" value={allDownloads.length} icon={Download} color="#ff5833" />
+      <div className="px-4 sm:px-10 max-w-7xl mx-auto">
+        {/* Compact stats strip */}
+        <div className="flex flex-wrap gap-2 mt-5 mb-5">
+          {statPills.map(p => (
+            <div key={p.label} className="flex items-center gap-2 px-3 py-2 rounded-xl"
+              style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.05)" }}>
+              <p.icon className="w-3.5 h-3.5" style={{ color: p.color }} />
+              <span className="text-sm font-black text-white leading-none">{p.value}</span>
+              <span className="text-[10px] font-bold text-white/35 uppercase tracking-wider leading-none">{p.label}</span>
+            </div>
+          ))}
         </div>
 
-        {/* Top lists */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-          <TopList title="Más Guardados" icon={Heart} beats={analytics.mostSaved} allSaves={allSaves} />
-          <TopList title="Más Descargados" icon={Download} beats={analytics.mostDownloaded} allDownloads={allDownloads} />
-        </div>
-
-        {/* Genre/Mood analytics */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
-          <div className="p-4 rounded-xl" style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.05)" }}>
-            <div className="flex items-center gap-2 mb-3">
-              <BarChart3 className="w-4 h-4 text-white/40" />
-              <h3 className="text-sm font-bold text-white">Géneros más usados</h3>
-            </div>
-            <div className="space-y-2">
-              {analytics.topGenres.length === 0 ? (
-                <p className="text-xs text-white/30">Sin datos</p>
-              ) : analytics.topGenres.map(([genre, count]) => (
-                <div key={genre} className="flex items-center gap-3">
-                  <span className="text-xs text-white/60 w-28 truncate">{genre}</span>
-                  <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${(count / analytics.topGenres[0][1]) * 100}%`, background: "linear-gradient(90deg, #ff5833, #e0451f)" }} />
-                  </div>
-                  <span className="text-xs text-white/40 w-6 text-right">{count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="p-4 rounded-xl" style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.05)" }}>
-            <div className="flex items-center gap-2 mb-3">
-              <BarChart3 className="w-4 h-4 text-white/40" />
-              <h3 className="text-sm font-bold text-white">Mood más usados</h3>
-            </div>
-            <div className="space-y-2">
-              {analytics.topMoods.length === 0 ? (
-                <p className="text-xs text-white/30">Sin datos</p>
-              ) : analytics.topMoods.map(([mood, count]) => (
-                <div key={mood} className="flex items-center gap-3">
-                  <span className="text-xs text-white/60 w-28 truncate">{mood}</span>
-                  <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${(count / analytics.topMoods[0][1]) * 100}%`, background: "linear-gradient(90deg, #ff5833, #e0451f)" }} />
-                  </div>
-                  <span className="text-xs text-white/40 w-6 text-right">{count}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Toolbar */}
+        {/* Toolbar — priorizar la gestión */}
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
@@ -314,6 +317,66 @@ export default function BeatsAdmin() {
             ))}
           </div>
         )}
+
+        {/* Analytics — plegable */}
+        <div className="mt-8">
+          <button
+            onClick={() => setShowAnalytics(v => !v)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-colors w-full justify-between"
+            style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            <span className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-[#ff5833]" />
+              Analíticas
+            </span>
+            <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${showAnalytics ? "rotate-180" : ""}`} />
+          </button>
+
+          <AnimatePresence>
+            {showAnalytics && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="pt-4 space-y-4">
+                  {/* Top lists con detalle de usuarios */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                    <EngagementList title="Más Likes" icon={Heart} beats={analytics.mostLiked} arr={allLikes} userMap={userMap} namesForBeat={namesForBeat} />
+                    <EngagementList title="Más Guardados" icon={Star} beats={analytics.mostSaved} arr={allSaves} userMap={userMap} namesForBeat={namesForBeat} />
+                    <EngagementList title="Más Descargados" icon={Download} beats={analytics.mostDownloaded} arr={allDownloads} userMap={userMap} namesForBeat={namesForBeat} />
+                  </div>
+
+                  {/* Más reproducidos (plays_count) */}
+                  <div className="p-3 rounded-xl" style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.05)" }}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingUp className="w-3.5 h-3.5 text-white/40" />
+                      <h3 className="text-xs font-bold text-white">Más Reproducidos</h3>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {analytics.mostPlayed.filter(b => (b.plays_count || 0) > 0).length === 0 ? (
+                        <p className="text-xs text-white/30">Sin reproducciones</p>
+                      ) : analytics.mostPlayed.filter(b => (b.plays_count || 0) > 0).map((beat, i) => (
+                        <span key={beat.id} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-white/70" style={{ background: "rgba(255,255,255,0.04)" }}>
+                          <span className="text-white/30">{i + 1}</span>
+                          <span className="truncate max-w-[120px]">{beat.title}</span>
+                          <span className="font-bold text-[#ff8866]">{beat.plays_count || 0}</span>
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Genre / Mood bars expandibles */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    <BarsCard title="Géneros más usados" data={analytics.topGenres} expanded={genreExpanded} setExpanded={setGenreExpanded} defaultCount={10} />
+                    <BarsCard title="Moods más usados" data={analytics.topMoods} expanded={moodExpanded} setExpanded={setMoodExpanded} defaultCount={15} />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
       )}
 
@@ -329,40 +392,78 @@ export default function BeatsAdmin() {
   );
 }
 
-function StatCard({ label, value, icon: Icon, color = "#ff5833" }) {
+function EngagementList({ title, icon: Icon, beats, arr, namesForBeat }) {
   return (
-    <div className="p-4 rounded-xl" style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.05)" }}>
-      <div className="flex items-center gap-2 mb-2">
-        <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: `${color}15` }}>
-          <Icon className="w-3.5 h-3.5" style={{ color }} />
-        </div>
-        <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">{label}</p>
+    <div className="p-3 rounded-xl" style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.05)" }}>
+      <div className="flex items-center gap-2 mb-3">
+        <Icon className="w-3.5 h-3.5 text-white/40" />
+        <h3 className="text-xs font-bold text-white">{title}</h3>
       </div>
-      <p className="text-2xl font-black text-white">{value}</p>
+      <div className="space-y-2">
+        {beats.filter(b => (arr || []).some(x => x.beat_id === b.id)).slice(0, 5).map((beat, i) => {
+          const count = (arr || []).filter(x => x.beat_id === beat.id).length;
+          const names = namesForBeat(beat.id, arr);
+          return (
+            <div key={beat.id} className="flex items-start gap-2.5">
+              <span className="text-[10px] text-white/30 w-3 pt-0.5">{i + 1}</span>
+              {beat.cover_url ? (
+                <img src={beat.cover_url} alt="" className="w-7 h-7 rounded-md object-cover flex-shrink-0" />
+              ) : (
+                <div className="w-7 h-7 rounded-md bg-white/5 flex items-center justify-center flex-shrink-0"><Music2 className="w-3 h-3 text-white/20" /></div>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[11px] text-white/70 truncate">{beat.title}</span>
+                  <span className="text-[11px] font-bold text-[#ff8866] flex-shrink-0">{count}</span>
+                </div>
+                {names.length > 0 ? (
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <Users className="w-2.5 h-2.5 text-white/25 flex-shrink-0" />
+                    <p className="text-[9px] text-white/35 truncate">
+                      {names.slice(0, 3).join(", ")}{names.length > 3 ? ` +${names.length - 3}` : ""}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-[9px] text-white/20 mt-0.5">Usuarios no identificados</p>
+                )}
+              </div>
+            </div>
+          );
+        })}
+        {beats.filter(b => (arr || []).some(x => x.beat_id === b.id)).length === 0 && (
+          <p className="text-xs text-white/30">Sin datos</p>
+        )}
+      </div>
     </div>
   );
 }
 
-function TopList({ title, icon: Icon, beats, allSaves, allDownloads }) {
+function BarsCard({ title, data, expanded, setExpanded, defaultCount }) {
+  const max = data[0]?.[1] || 1;
+  const visible = expanded ? data : data.slice(0, defaultCount);
   return (
-    <div className="p-4 rounded-xl" style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.05)" }}>
-      <div className="flex items-center gap-2 mb-3">
-        <Icon className="w-4 h-4 text-white/40" />
-        <h3 className="text-sm font-bold text-white">{title}</h3>
+    <div className="p-3 rounded-xl" style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.05)" }}>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <BarChart3 className="w-3.5 h-3.5 text-white/40" />
+          <h3 className="text-xs font-bold text-white">{title}</h3>
+        </div>
+        {data.length > defaultCount && (
+          <button onClick={() => setExpanded(v => !v)} className="text-[10px] font-bold text-[#ff8866] hover:text-white transition-colors">
+            {expanded ? "Ver menos" : `Ver todos (${data.length})`}
+          </button>
+        )}
       </div>
-      <div className="space-y-2">
-        {beats.filter(b => b).slice(0, 5).map((beat, i) => (
-          <div key={beat.id} className="flex items-center gap-3">
-            <span className="text-xs text-white/30 w-4">{i + 1}</span>
-            {beat.cover_url ? (
-              <img src={beat.cover_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
-            ) : (
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center"><Music2 className="w-3 h-3 text-white/20" /></div>
-            )}
-            <span className="text-xs text-white/70 flex-1 truncate">{beat.title}</span>
-            <span className="text-xs text-white/40">
-              {allSaves ? allSaves.filter(s => s.beat_id === beat.id).length : allDownloads ? allDownloads.filter(d => d.beat_id === beat.id).length : 0}
-            </span>
+      <div className="space-y-1.5">
+        {data.length === 0 ? (
+          <p className="text-xs text-white/30">Sin datos</p>
+        ) : visible.map(([name, count]) => (
+          <div key={name} className="flex items-center gap-2">
+            <span className="text-[10px] text-white/60 w-24 truncate">{name}</span>
+            <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+              <div className="h-full rounded-full" style={{ width: `${(count / max) * 100}%`, background: "linear-gradient(90deg, #ff5833, #e0451f)" }} />
+            </div>
+            <span className="text-[10px] text-white/40 w-5 text-right">{count}</span>
           </div>
         ))}
       </div>
@@ -432,7 +533,7 @@ function BeatAdminRow({ beat, isPlaying, onPlay, onEdit, onDelete, onDuplicate, 
           <div className="w-full h-full flex items-center justify-center cursor-pointer"><Music2 className="w-4 h-4 text-white/15" /></div>
         )}
       </div>
-      <div className="flex-1 min-w-0" onClick={onPlay} className="cursor-pointer">
+      <div className="flex-1 min-w-0 cursor-pointer" onClick={onPlay}>
         <h3 className="text-sm font-bold text-white truncate">{beat.title}</h3>
         <p className="text-xs text-white/40 truncate">{beat.producer}</p>
       </div>
@@ -466,11 +567,10 @@ function BeatAdminRow({ beat, isPlaying, onPlay, onEdit, onDelete, onDuplicate, 
   );
 }
 
-function MenuItem({ icon: Icon, label, onClick, danger, Icon2 }) {
+function MenuItem({ icon: Icon, label, onClick, danger }) {
   return (
     <button onClick={onClick} className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium hover:bg-white/10 transition-colors w-full text-left ${danger ? "text-red-400" : "text-white/70"}`}>
       {Icon && <Icon className="w-3 h-3" />}
-      {Icon2 && <Icon2 className="w-3 h-3" />}
       {label}
     </button>
   );

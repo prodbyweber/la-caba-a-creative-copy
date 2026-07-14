@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { X, Upload, Music2, FolderOpen, Plus, Trash2, Check } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { GENRES, MOODS, SCALES, KEYS, BEAT_STATUS, LICENSE_TYPES } from "@/lib/musicConstants";
+import { GENRES, MOODS, KEYS, BEAT_STATUS, LICENSE_TYPES } from "@/lib/musicConstants";
 
 export default function BeatFormModal({ beat, onClose }) {
   const qc = useQueryClient();
@@ -14,16 +14,13 @@ export default function BeatFormModal({ beat, onClose }) {
     checkout_type: "internal", buy_link: "",
   });
 
-  // Generar slug automático desde el título si está vacío
+  // Generar slug válido automáticamente desde el título
+  const slugify = (str) => (str || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   const ensureSlug = () => {
-    if (!form.slug && form.title) {
-      const slug = form.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-      setForm(f => ({ ...f, slug }));
-    }
+    if (form.title) setForm(f => ({ ...f, slug: slugify(f.title) }));
   };
   const [uploading, setUploading] = useState(null);
-  const [tagInput, setTagInput] = useState("");
   const coverRef = useRef(null);
   const previewRef = useRef(null);
 
@@ -68,14 +65,9 @@ export default function BeatFormModal({ beat, onClose }) {
   const toggleMood = (m) => {
     setForm(f => ({ ...f, moods: f.moods.includes(m) ? f.moods.filter(x => x !== m) : [...f.moods, m] }));
   };
-  const addTag = () => {
-    if (tagInput.trim() && !form.tags.includes(tagInput.trim())) {
-      setForm(f => ({ ...f, tags: [...f.tags, tagInput.trim()] }));
-      setTagInput("");
-    }
-  };
-  const removeTag = (t) => {
-    setForm(f => ({ ...f, tags: f.tags.filter(x => x !== t) }));
+  // Etiquetas como chips (mismos géneros disponibles)
+  const toggleTag = (g) => {
+    setForm(f => ({ ...f, tags: (f.tags || []).includes(g) ? f.tags.filter(x => x !== g) : [...(f.tags || []), g] }));
   };
 
   // License management
@@ -157,7 +149,10 @@ export default function BeatFormModal({ beat, onClose }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className={labelCls}>Título</label>
-              <input value={form.title || ""} onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))} className={iCls} placeholder="Título del beat" />
+              <input value={form.title || ""} onChange={(e) => {
+                const title = e.target.value;
+                setForm(f => ({ ...f, title, slug: f.slug && f.slug !== slugify(f.title) ? f.slug : slugify(title) }));
+              }} className={iCls} placeholder="Título del beat" />
             </div>
             <div>
               <label className={labelCls}>Productor</label>
@@ -191,7 +186,8 @@ export default function BeatFormModal({ beat, onClose }) {
               <label className={labelCls}>Escala</label>
               <select value={form.scale || ""} onChange={(e) => setForm(f => ({ ...f, scale: e.target.value }))} className={iCls}>
                 <option value="">—</option>
-                {SCALES.map(s => <option key={s} value={s}>{s}</option>)}
+                <option value="Mayor">Mayor</option>
+                <option value="Menor">Menor</option>
               </select>
             </div>
           </div>
@@ -270,29 +266,19 @@ export default function BeatFormModal({ beat, onClose }) {
             </div>
           </div>
 
-          {/* Description */}
-          <div>
-            <label className={labelCls}>Descripción</label>
-            <textarea value={form.description || ""} onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))} rows={3} className={iCls + " resize-none"} placeholder="Descripción del beat" />
-          </div>
-
-          {/* Tags */}
+          {/* Tags — chips (mismos que géneros) */}
           <div>
             <label className={labelCls}>Etiquetas</label>
-            <div className="flex gap-2 mb-2">
-              <input value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }} className={iCls} placeholder="Añadir etiqueta..." />
-              <button type="button" onClick={addTag} className="px-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white transition-colors flex items-center"><Plus className="w-4 h-4" /></button>
+            <div className="flex flex-wrap gap-1.5">
+              {GENRES.map(g => {
+                const active = (form.tags || []).includes(g);
+                return (
+                  <button key={g} type="button" onClick={() => toggleTag(g)}
+                    className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all ${active ? "bg-[#ff5833] text-white" : "bg-white/5 text-white/40 hover:bg-white/10 border border-white/10"}`}
+                  >{g}</button>
+                );
+              })}
             </div>
-            {(form.tags || []).length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {form.tags.map(t => (
-                  <span key={t} className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/8 text-white/60">
-                    {t}
-                    <button onClick={() => removeTag(t)}><X className="w-3 h-3" /></button>
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Status + Featured */}
