@@ -3,8 +3,8 @@ import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useGlobalAudio } from "@/context/GlobalAudioContext";
-import { Play, Pause, Heart, Download, FolderOpen, ArrowLeft, Activity, Zap } from "lucide-react";
+import { useBeatPlayer } from "@/hooks/useBeatPlayer";
+import { Play, Pause, Heart, Download, FolderOpen, ArrowLeft, Activity, Zap, ShoppingBag } from "lucide-react";
 import { getCoverForBeat, timeAgo } from "@/lib/beatsUtils";
 import { formatDuration } from "@/lib/musicConstants";
 import BeatCard from "@/components/beats/BeatCard";
@@ -13,7 +13,7 @@ import BeatLicensesModal from "@/components/beats/BeatLicensesModal";
 export default function BeatDetail() {
   const { id } = useParams();
   const qc = useQueryClient();
-  const { playingTrack, isPlaying, playQueue } = useGlobalAudio();
+  const { toggle, playingTrack, isPlaying } = useBeatPlayer();
   const [user, setUser] = useState(null);
   const [licensesModal, setLicensesModal] = useState(false);
   const [likedIds, setLikedIds] = useState(new Set());
@@ -25,18 +25,24 @@ export default function BeatDetail() {
     });
   }, []);
 
-  const { data: beat, isLoading } = useQuery({
-    queryKey: ["beat", id],
-    queryFn: async () => base44.entities.Beat.get(id),
-    enabled: !!id,
-  });
-
-  const { data: allBeats = [] } = useQuery({
+  const { data: allBeats = [], isLoading: loadingAll } = useQuery({
     queryKey: ["beats-public"],
     queryFn: async () => {
       const all = await base44.entities.Beat.filter({ status: "Publicado" });
       return all.filter(b => !b.archived);
     },
+  });
+
+  // Resolver por slug (URL limpia) o por id (legacy)
+  const isLikelyId = (id || "").length >= 20 && !/[^a-zA-Z0-9]/.test(id);
+  const bySlug = allBeats.find(b => b.slug && b.slug === id);
+  const { data: beat, isLoading } = useQuery({
+    queryKey: ["beat", bySlug?.id || id],
+    queryFn: async () => {
+      if (bySlug) return bySlug;
+      return base44.entities.Beat.get(id);
+    },
+    enabled: !!id && (!!bySlug || isLikelyId),
   });
 
   const { data: likes = [] } = useQuery({
@@ -73,7 +79,11 @@ export default function BeatDetail() {
         await base44.entities.BeatSave.create({ beat_id: b.id, user_id: user.id });
       }
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["beat-saves-me", user?.id] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["beat-saves-me", user?.id] });
+      qc.invalidateQueries({ queryKey: ["saved-beats"] });
+      qc.invalidateQueries({ queryKey: ["saved-beats", user?.id] });
+    },
   });
 
   const handleDownload = useCallback(async (b) => {
@@ -92,11 +102,14 @@ export default function BeatDetail() {
     } catch { window.open(b.free_mp3_url, "_blank"); }
   }, [user]);
 
+  const handleBuy = useCallback((b) => {
+    if (b.buy_link) window.open(b.buy_link, "_blank", "noopener,noreferrer");
+    else setLicensesModal(true);
+  }, []);
+
   const handlePlay = useCallback((b, list) => {
-    const queue = list.map(x => ({ ...x, beat_id: x.id }));
-    const idx = queue.findIndex(x => x.beat_id === b.id);
-    playQueue(queue, idx >= 0 ? idx : 0);
-  }, [playQueue]);
+    toggle(b, list);
+  }, [toggle]);
 
   const active = playingTrack?.beat_id === beat?.id;
 
@@ -111,7 +124,8 @@ export default function BeatDetail() {
       .slice(0, 10);
   }, [beat, allBeats]);
 
-  if (isLoading) {
+  const resolvingSlug = !isLikelyId && !bySlug;
+  if (isLoading || (resolvingSlug && loadingAll)) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "#0e0e0e" }}>
         <div className="w-8 h-8 rounded-full border-2 border-[#8b5cf6] border-t-transparent animate-spin" />
@@ -203,6 +217,16 @@ export default function BeatDetail() {
                   <FolderOpen className="w-5 h-5 text-white" />
                 </a>
               )}
+              {(beat.buy_link || (beat.licenses && beat.licenses.length > 0)) && (
+                <button
+                  onClick={() => handleBuy(beat)}
+                  className="flex items-center gap-2 px-5 h-12 rounded-full text-sm font-bold text-white transition-transform hover:scale-105"
+                  style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
+                >
+                  <ShoppingBag className="w-4 h-4" />
+                  Comprar Beat
+                </button>
+              )}
               <button
                 onClick={() => setLicensesModal(true)}
                 className="px-5 h-12 rounded-full text-sm font-bold transition-all"
@@ -284,10 +308,14 @@ export default function BeatDetail() {
                 key={b.id}
                 beat={b}
                 index={i}
-                isPlaying={playingTrack?.beat_id === b.id && isPlaying}
-                onPlay={() => handlePlay(b, related)}
-                onLike={user ? (x) => likeMutation.mutate(x) : null}
+                user={user}
                 liked={likedIds.has(b.id)}
+                saved={savedIds.has(b.id)}
+                onLike={user ? (x) => likeMutation.mutate(x) : null}
+                onSave={user ? (x) => saveMutation.mutate(x) : null}
+                onDownload={user ? handleDownload : null}
+                onBuy={handleBuy}
+                listBeats={related}
               />
             ))}
           </div>

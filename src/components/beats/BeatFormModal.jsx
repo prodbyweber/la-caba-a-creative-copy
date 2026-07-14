@@ -8,10 +8,20 @@ import { GENRES, MOODS, SCALES, KEYS, BEAT_STATUS, LICENSE_TYPES } from "@/lib/m
 export default function BeatFormModal({ beat, onClose }) {
   const qc = useQueryClient();
   const [form, setForm] = useState(beat ? { ...beat } : {
-    title: "", producer: "", cover_url: "", preview_mp3_url: "", free_mp3_url: "",
+    title: "", producer: "", slug: "", cover_url: "", preview_mp3_url: "", free_mp3_url: "",
     drive_folder_url: "", bpm: null, key: "", scale: "", genres: [], moods: [],
     description: "", tags: [], status: "Borrador", featured: false, licenses: [],
+    checkout_type: "internal", buy_link: "",
   });
+
+  // Generar slug automático desde el título si está vacío
+  const ensureSlug = () => {
+    if (!form.slug && form.title) {
+      const slug = form.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      setForm(f => ({ ...f, slug }));
+    }
+  };
   const [uploading, setUploading] = useState(null);
   const [tagInput, setTagInput] = useState("");
   const coverRef = useRef(null);
@@ -142,6 +152,15 @@ export default function BeatFormModal({ beat, onClose }) {
             </div>
           </div>
 
+          {/* Slug (URL pública) */}
+          <div>
+            <label className={labelCls}>Slug (URL pública)</label>
+            <div className="flex gap-2">
+              <input value={form.slug || ""} onBlur={ensureSlug} onChange={(e) => setForm(f => ({ ...f, slug: e.target.value }))} className={iCls} placeholder="auto desde título" />
+              <button type="button" onClick={ensureSlug} className="px-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white text-xs font-semibold transition-colors">Generar</button>
+            </div>
+          </div>
+
           {/* BPM + Key + Scale */}
           <div className="grid grid-cols-3 gap-3">
             <div>
@@ -196,6 +215,25 @@ export default function BeatFormModal({ beat, onClose }) {
             <div className="relative">
               <FolderOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
               <input value={form.drive_folder_url || ""} onChange={(e) => setForm(f => ({ ...f, drive_folder_url: e.target.value }))} className={iCls + " pl-9"} placeholder="https://drive.google.com/..." />
+            </div>
+          </div>
+
+          {/* Compra del beat (buy link + checkout type) */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelCls}>Tipo de checkout</label>
+              <select value={form.checkout_type || "internal"} onChange={(e) => setForm(f => ({ ...f, checkout_type: e.target.value }))} className={iCls}>
+                <option value="internal">Interno (licencias)</option>
+                <option value="stripe">Stripe</option>
+                <option value="shopify">Shopify</option>
+                <option value="lemonsqueezy">Lemon Squeezy</option>
+                <option value="gumroad">Gumroad</option>
+                <option value="custom">Personalizado</option>
+              </select>
+            </div>
+            <div>
+              <label className={labelCls}>Link de compra</label>
+              <input value={form.buy_link || ""} onChange={(e) => setForm(f => ({ ...f, buy_link: e.target.value }))} className={iCls} placeholder="https://..." />
             </div>
           </div>
 

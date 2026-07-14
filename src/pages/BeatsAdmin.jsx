@@ -2,15 +2,17 @@ import React, { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useGlobalAudio } from "@/context/GlobalAudioContext";
-import { Play, Pause, Plus, Search, Grid3x3, List, MoreVertical, Download, FolderOpen, Music2, TrendingUp, BarChart3, Heart, Archive, Copy, Trash2, Eye, EyeOff, Pencil, X, Star } from "lucide-react";
+import { useBeatPlayer } from "@/hooks/useBeatPlayer";
+import { Play, Pause, Plus, Search, Grid3x3, List, MoreVertical, Download, FolderOpen, Music2, TrendingUp, BarChart3, Heart, Archive, Copy, Trash2, Eye, EyeOff, Pencil, X, Star, LayoutPanelTop } from "lucide-react";
 import { GENRES, MOODS, SCALES, KEYS, BEAT_STATUS } from "@/lib/musicConstants";
 import BeatFormModal from "@/components/beats/BeatFormModal";
+import BeatsPageBuilder from "@/components/beats/BeatsPageBuilder";
 
 export default function BeatsAdmin() {
   const qc = useQueryClient();
-  const { playingTrack, isPlaying, playQueue, pauseTrack, resumeTrack } = useGlobalAudio();
+  const { toggle, playingTrack, isPlaying } = useBeatPlayer();
 
+  const [tab, setTab] = useState("beats"); // beats | page
   const [view, setView] = useState("grid"); // grid | list
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -100,10 +102,8 @@ export default function BeatsAdmin() {
   }, [beats, search, statusFilter, genreFilter, sort]);
 
   const handlePlay = useCallback((beat) => {
-    const queue = filteredBeats.map(b => ({ ...b, beat_id: b.id }));
-    const idx = queue.findIndex(b => b.beat_id === beat.id);
-    playQueue(queue, idx >= 0 ? idx : 0);
-  }, [filteredBeats, playQueue]);
+    toggle(beat, filteredBeats);
+  }, [filteredBeats, toggle]);
 
   const downloadMp3 = async (beat) => {
     if (!beat.free_mp3_url) return;
@@ -134,16 +134,45 @@ export default function BeatsAdmin() {
           <h1 className="text-xl font-black text-white tracking-tight">Beats</h1>
           <span className="text-xs text-white/30">{beats.length} total</span>
         </div>
-        <button
-          onClick={() => { setEditingBeat(null); setShowForm(true); }}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-white transition-colors"
-          style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
-        >
-          <Plus className="w-4 h-4" />
-          Crear Beat
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Tabs */}
+          <div className="flex items-center gap-1 p-1 rounded-xl" style={{ background: "#141416", border: "1px solid rgba(255,255,255,0.06)" }}>
+            <button
+              onClick={() => setTab("beats")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${tab === "beats" ? "bg-white text-black" : "text-white/50 hover:text-white"}`}
+            >
+              <Music2 className="w-3.5 h-3.5" />
+              Beats
+            </button>
+            <button
+              onClick={() => setTab("page")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${tab === "page" ? "bg-white text-black" : "text-white/50 hover:text-white"}`}
+            >
+              <LayoutPanelTop className="w-3.5 h-3.5" />
+              Página
+            </button>
+          </div>
+          {tab === "beats" && (
+            <button
+              onClick={() => { setEditingBeat(null); setShowForm(true); }}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-white transition-colors"
+              style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
+            >
+              <Plus className="w-4 h-4" />
+              Crear Beat
+            </button>
+          )}
+        </div>
       </div>
 
+      {/* Page builder tab */}
+      {tab === "page" && (
+        <div className="px-5 sm:px-10 max-w-7xl mx-auto mt-6">
+          <BeatsPageBuilder />
+        </div>
+      )}
+
+      {tab === "beats" && (
       <div className="px-5 sm:px-10 max-w-7xl mx-auto">
         {/* Analytics */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6 mb-6">
@@ -285,6 +314,7 @@ export default function BeatsAdmin() {
           </div>
         )}
       </div>
+      )}
 
       {/* Form modal */}
       <AnimatePresence>

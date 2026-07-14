@@ -1,16 +1,30 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Play, Pause, Heart, Activity, Zap } from "lucide-react";
-import { useGlobalAudio } from "@/context/GlobalAudioContext";
+import { Play, Pause, Heart, Activity, Zap, ChevronDown } from "lucide-react";
+import { useBeatPlayer } from "@/hooks/useBeatPlayer";
 import { getCoverForBeat, timeAgo } from "@/lib/beatsUtils";
+import BeatExpandedPanel from "./BeatExpandedPanel";
 
-export default function BeatCard({ beat, isPlaying, onPlay, onLike, liked, index }) {
-  const { playingTrack } = useGlobalAudio();
-  const active = playingTrack?.beat_id === beat.id;
+export default function BeatCard({
+  beat,
+  index,
+  user,
+  liked,
+  saved,
+  onLike,
+  onSave,
+  onDownload,
+  onBuy,
+  listBeats,
+}) {
+  const { toggle, playingTrack, isPlaying } = useBeatPlayer();
   const [imgError, setImgError] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const cover = imgError ? null : getCoverForBeat(beat);
   const genre = (beat.genres && beat.genres[0]) || "";
+  const active = playingTrack?.beat_id === beat.id;
+  const list = listBeats && listBeats.length ? listBeats : null;
 
   return (
     <motion.div
@@ -20,7 +34,7 @@ export default function BeatCard({ beat, isPlaying, onPlay, onLike, liked, index
       className="group"
     >
       {/* Cover — clickable to detail */}
-      <Link to={`/beats/${beat.id}`} className="block">
+      <Link to={`/beats/${beat.slug || beat.id}`} className="block">
         <div className="relative aspect-square rounded-2xl overflow-hidden mb-2.5" style={{ background: "#161616" }}>
           {cover ? (
             <img
@@ -71,7 +85,7 @@ export default function BeatCard({ beat, isPlaying, onPlay, onLike, liked, index
           {/* Hover play button (center) */}
           <div
             className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); onPlay(beat); }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(beat, list); }}
           >
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-2xl transition-transform group-hover:scale-110" style={{ background: "#8b5cf6" }}>
               {active && isPlaying ? (
@@ -89,11 +103,20 @@ export default function BeatCard({ beat, isPlaying, onPlay, onLike, liked, index
         </div>
       </Link>
 
-      {/* Info */}
-      <Link to={`/beats/${beat.id}`}>
-        <h3 className="text-sm font-bold text-white truncate leading-tight hover:text-[#a78bfa] transition-colors">{beat.title}</h3>
-      </Link>
-      <p className="text-xs text-[#a0a0a0] mt-0.5 truncate">{beat.producer || "Cabaña"}</p>
+      {/* Info row: title (link) + expand toggle */}
+      <div className="flex items-start gap-1">
+        <Link to={`/beats/${beat.slug || beat.id}`} className="flex-1 min-w-0">
+          <h3 className="text-sm font-bold text-white truncate leading-tight hover:text-[#a78bfa] transition-colors">{beat.title}</h3>
+          <p className="text-xs text-[#a0a0a0] mt-0.5 truncate">{beat.producer || "Cabaña"}</p>
+        </Link>
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="mt-0.5 w-6 h-6 rounded-full flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all flex-shrink-0"
+          title={expanded ? "Cerrar" : "Ver detalles"}
+        >
+          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${expanded ? "rotate-180" : ""}`} />
+        </button>
+      </div>
 
       {/* Genre label (uppercase) + BPM/Key */}
       <div className="flex items-center gap-2 mt-1.5">
@@ -103,6 +126,19 @@ export default function BeatCard({ beat, isPlaying, onPlay, onLike, liked, index
           <span className="text-[10px] text-[#707070] font-medium">{beat.scale || beat.key}</span>
         )}
       </div>
+
+      {/* Expansion panel */}
+      <BeatExpandedPanel
+        beat={beat}
+        expanded={expanded}
+        user={user}
+        liked={liked}
+        saved={saved}
+        onLike={onLike}
+        onSave={onSave}
+        onDownload={onDownload}
+        onBuy={onBuy}
+      />
     </motion.div>
   );
 }

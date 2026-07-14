@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useGlobalAudio } from "@/context/GlobalAudioContext";
-import { Search, Lock, Menu, ChevronDown, X, TrendingUp } from "lucide-react";
+import { useBeatPlayer } from "@/hooks/useBeatPlayer";
+import { resolveSectionBeats } from "@/lib/beatSections";
+import { Search, Lock, Menu, ChevronDown, X, TrendingUp, ShoppingBag } from "lucide-react";
 import BeatCard from "@/components/beats/BeatCard";
 import BeatsFeaturedCarousel from "@/components/beats/BeatsFeaturedCarousel";
 import BeatsTrendingList from "@/components/beats/BeatsTrendingList";
@@ -32,7 +33,7 @@ const TABS = ["Explorar", "Nuevos", "Trending"];
 
 export default function Beats() {
   const qc = useQueryClient();
-  const { playingTrack, isPlaying, playQueue } = useGlobalAudio();
+  const { toggle, playingTrack, isPlaying } = useBeatPlayer();
 
   const [search, setSearch] = useState("");
   const [activeChip, setActiveChip] = useState("todos");
@@ -75,6 +76,12 @@ export default function Beats() {
     enabled: !!user?.id,
   });
 
+  // Secciones editables de la página (título, beats, visibilidad, orden)
+  const { data: sections = [] } = useQuery({
+    queryKey: ["beats-page-sections"],
+    queryFn: async () => base44.entities.BeatSection.list("order"),
+  });
+
   useEffect(() => { setLikedIds(new Set(likes.map(l => l.beat_id))); }, [likes]);
   useEffect(() => { setSavedIds(new Set(saves.map(s => s.beat_id))); }, [saves]);
 
@@ -87,7 +94,26 @@ export default function Beats() {
         await base44.entities.BeatLike.create({ beat_id: beat.id, user_id: user.id });
       }
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["beat-likes-me", user?.id] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["beat-likes-me", user?.id] });
+      qc.invalidateQueries({ queryKey: ["beat-likes"] });
+    },
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: async (beat) => {
+      if (savedIds.has(beat.id)) {
+        const save = saves.find(s => s.beat_id === beat.id);
+        if (save) await base44.entities.BeatSave.delete(save.id);
+      } else {
+        await base44.entities.BeatSave.create({ beat_id: beat.id, user_id: user.id });
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["beat-saves-me", user?.id] });
+      qc.invalidateQueries({ queryKey: ["saved-beats"] });
+      qc.invalidateQueries({ queryKey: ["saved-beats", user?.id] });
+    },
   });
 
   const handleDownload = useCallback(async (beat) => {
@@ -107,28 +133,45 @@ export default function Beats() {
     } catch { window.open(beat.free_mp3_url, "_blank"); }
   }, [user, qc]);
 
+  const handleBuy = useCallback((beat) => {
+    // Buy link directo o licencias (modal)
+    if (beat.buy_link) {
+      window.open(beat.buy_link, "_blank", "noopener,noreferrer");
+    } else if (beat.licenses && beat.licenses.length > 0) {
+      setLicensesModal(beat);
+    }
+  }, []);
+
+  // handlePlay usa el toggle del hook (play/pause/resume, una sola reproducción)
   const handlePlay = useCallback((beat, allBeats) => {
-    const queue = allBeats.map(b => ({ ...b, beat_id: b.id }));
-    const idx = queue.findIndex(b => b.beat_id === beat.id);
-    playQueue(queue, idx >= 0 ? idx : 0);
-  }, [playQueue]);
+    toggle(beat, allBeats);
+  }, [toggle]);
+
+  // Secciones por layout (editable desde el admin). Fallback al comportamiento actual.
+  const featuredSection = useMemo(() => sections.find(s => s.layout === "carousel"), [sections]);
+  const gridSection = useMemo(() => sections.find(s => s.layout === "grid"), [sections]);
+  const listSection = useMemo(() => sections.find(s => s.layout === "list"), [sections]);
+  const isVisible = (s) => !s || s.is_visible !== false;
 
   const featuredBeats = useMemo(() => {
+    if (featuredSection) return resolveSectionBeats(featuredSection, beats);
     const featured = beats.filter(b => b.featured);
     if (featured.length >= 3) return featured.slice(0, 6);
     const sorted = [...beats].sort((a, b) => (b.plays_count || 0) - (a.plays_count || 0));
     return [...featured, ...sorted.filter(b => !featured.includes(b))].slice(0, 6);
-  }, [beats]);
+  }, [beats, featuredSection]);
 
   const trendingBeats = useMemo(() => {
+    if (listSection) return resolveSectionBeats(listSection, beats);
     return [...beats]
       .sort((a, b) => ((b.plays_count || 0) + (b.downloads_count || 0)) - ((a.plays_count || 0) + (a.downloads_count || 0)))
       .slice(0, 10);
-  }, [beats]);
+  }, [beats, listSection]);
 
-  const newReleases = useMemo(() => {
+  const gridBeats = useMemo(() => {
+    if (gridSection) return resolveSectionBeats(gridSection, beats);
     return [...beats].sort((a, b) => new Date(b.created_date || 0) - new Date(a.created_date || 0));
-  }, [beats]);
+  }, [beats, gridSection]);
 
   const filteredBeats = useMemo(() => {
     let result = [...beats];
@@ -256,7 +299,7 @@ export default function Beats() {
       </div>
 
       {/* ── Featured carousel ─────────────────────────────────────── */}
-      {featuredBeats.length > 0 && (
+      {isVisible(featuredSection) && featuredBeats.length > 0 && (
         <div className="px-4 sm:px-10 max-w-7xl mx-auto pt-5 mb-10">
           <BeatsFeaturedCarousel
             beats={featuredBeats}
@@ -269,9 +312,10 @@ export default function Beats() {
       )}
 
       {/* ── New Releases ──────────────────────────────────────────── */}
+      {isVisible(gridSection) && (
       <div ref={nuevosRef} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-40">
         <h2 className="text-2xl sm:text-3xl font-black text-white mb-4" style={{ letterSpacing: "-0.03em" }}>
-          {search ? "Resultados" : "New releases"}
+          {search ? "Resultados" : (gridSection?.title || "New releases")}
         </h2>
 
         {/* Category chips */}
@@ -292,48 +336,63 @@ export default function Beats() {
           ))}
         </div>
 
-        {/* Card grid */}
-        {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i}>
-                <div className="aspect-square rounded-2xl animate-pulse" style={{ background: "#1a1a1a" }} />
-                <div className="h-3.5 bg-white/5 rounded w-3/4 mt-3 animate-pulse" />
-                <div className="h-3 bg-white/5 rounded w-1/2 mt-2 animate-pulse" />
+        {/* Card grid: browse (search/chip) o curación de la sección */}
+        {(() => {
+          const browsing = !!search || activeChip !== "todos";
+          const displayBeats = browsing ? filteredBeats : gridBeats;
+          if (isLoading) {
+            return (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <div key={i}>
+                    <div className="aspect-square rounded-2xl animate-pulse" style={{ background: "#1a1a1a" }} />
+                    <div className="h-3.5 bg-white/5 rounded w-3/4 mt-3 animate-pulse" />
+                    <div className="h-3 bg-white/5 rounded w-1/2 mt-2 animate-pulse" />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        ) : filteredBeats.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-[#a0a0a0] text-sm">No se encontraron beats</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {filteredBeats.map((beat, i) => (
-              <BeatCard
-                key={beat.id}
-                beat={beat}
-                index={i}
-                isPlaying={playingTrack?.beat_id === beat.id && isPlaying}
-                onPlay={() => handlePlay(beat, filteredBeats)}
-                onLike={user ? (b) => likeMutation.mutate(b) : null}
-                liked={likedIds.has(beat.id)}
-              />
-            ))}
-          </div>
-        )}
+            );
+          }
+          if (displayBeats.length === 0) {
+            return (
+              <div className="text-center py-20">
+                <p className="text-[#a0a0a0] text-sm">No se encontraron beats</p>
+              </div>
+            );
+          }
+          return (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {displayBeats.map((beat, i) => (
+                <BeatCard
+                  key={beat.id}
+                  beat={beat}
+                  index={i}
+                  user={user}
+                  liked={likedIds.has(beat.id)}
+                  saved={savedIds.has(beat.id)}
+                  onLike={user ? (b) => likeMutation.mutate(b) : null}
+                  onSave={user ? (b) => saveMutation.mutate(b) : null}
+                  onDownload={user ? handleDownload : null}
+                  onBuy={handleBuy}
+                  listBeats={displayBeats}
+                />
+              ))}
+            </div>
+          );
+        })()}
       </div>
+      )}
 
       {/* ── Trending ───────────────────────────────────────────────── */}
-      {trendingBeats.length > 0 && (
+      {isVisible(listSection) && trendingBeats.length > 0 && (
         <div ref={trendingRef} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-40">
           <div className="flex items-center gap-2 mb-1">
             <TrendingUp className="w-5 h-5 text-[#8b5cf6]" />
             <h2 className="text-2xl sm:text-3xl font-black text-white" style={{ letterSpacing: "-0.03em" }}>
-              Trending
+              {listSection?.title || "Trending"}
             </h2>
           </div>
-          <p className="text-sm text-[#a0a0a0] mb-5">Los beats más calientes ahora mismo.</p>
+          <p className="text-sm text-[#a0a0a0] mb-5">{listSection?.subtitle || "Los beats más calientes ahora mismo."}</p>
 
           {isLoading ? (
             <div className="space-y-3">

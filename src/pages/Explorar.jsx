@@ -14,6 +14,7 @@ import PricingModal from "@/components/explorar/PricingModal";
 import { ExplorarProvider } from "@/context/ExplorarContext.jsx";
 import GlobalModals from "@/components/explorar/GlobalModals";
 import ParaTiFeed from "@/components/explorar/ParaTiFeed";
+import BeatsExplorarBlock from "@/components/explorar/BeatsExplorarBlock";
 
 // Legacy fallback labels (for items with row_category but no ExplorarSection yet)
 const LEGACY_ROW_LABELS = {
