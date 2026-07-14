@@ -4,24 +4,13 @@ import { X, Upload, Music2, FolderOpen, Plus, Trash2, Check } from "lucide-react
 import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { GENRES, MOODS, SCALES, KEYS, BEAT_STATUS, LICENSE_TYPES } from "@/lib/musicConstants";
-import { ensureUniqueBeatSlug } from "@/lib/beatSlug";
-
-const CHECKOUT_TYPES = [
-  { id: "internal", label: "Checkout interno (licencias)" },
-  { id: "shopify", label: "Shopify" },
-  { id: "stripe", label: "Stripe" },
-  { id: "lemonsqueezy", label: "Lemon Squeezy" },
-  { id: "gumroad", label: "Gumroad" },
-  { id: "custom", label: "URL personalizada" },
-];
 
 export default function BeatFormModal({ beat, onClose }) {
   const qc = useQueryClient();
   const [form, setForm] = useState(beat ? { ...beat } : {
-    title: "", slug: "", producer: "", cover_url: "", preview_mp3_url: "", free_mp3_url: "",
+    title: "", producer: "", cover_url: "", preview_mp3_url: "", free_mp3_url: "",
     drive_folder_url: "", bpm: null, key: "", scale: "", genres: [], moods: [],
     description: "", tags: [], status: "Borrador", featured: false, licenses: [],
-    checkout_type: "internal", buy_link: "",
   });
   const [uploading, setUploading] = useState(null);
   const [tagInput, setTagInput] = useState("");
@@ -31,13 +20,8 @@ export default function BeatFormModal({ beat, onClose }) {
 
   const saveMutation = useMutation({
     mutationFn: async (data) => {
-      let payload = { ...data };
-      // Generar slug si no existe
-      if (!payload.slug && payload.title) {
-        payload.slug = await ensureUniqueBeatSlug(payload.title, beat?.id);
-      }
-      if (beat?.id) return base44.entities.Beat.update(beat.id, payload);
-      return base44.entities.Beat.create(payload);
+      if (beat?.id) return base44.entities.Beat.update(beat.id, data);
+      return base44.entities.Beat.create(data);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["beats-admin"] });
@@ -155,26 +139,6 @@ export default function BeatFormModal({ beat, onClose }) {
             <div>
               <label className={labelCls}>Productor</label>
               <input value={form.producer || ""} onChange={(e) => setForm(f => ({ ...f, producer: e.target.value }))} className={iCls} placeholder="Nombre del productor" />
-            </div>
-          </div>
-
-          {/* Slug (URL) */}
-          <div>
-            <label className={labelCls}>URL pública (slug) — dejar vacío para autogenerar</label>
-            <input value={form.slug || ""} onChange={(e) => setForm(f => ({ ...f, slug: e.target.value }))} className={iCls} placeholder="night-drive (autogenerado si vacío)" />
-          </div>
-
-          {/* Compra del beat */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelCls}>Tipo de checkout</label>
-              <select value={form.checkout_type || "internal"} onChange={(e) => setForm(f => ({ ...f, checkout_type: e.target.value }))} className={iCls}>
-                {CHECKOUT_TYPES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
-              </select>
-            </div>
-            <div>
-              <label className={labelCls}>Link de compra</label>
-              <input value={form.buy_link || ""} onChange={(e) => setForm(f => ({ ...f, buy_link: e.target.value }))} className={iCls} placeholder="https://..." disabled={form.checkout_type === "internal"} />
             </div>
           </div>
 

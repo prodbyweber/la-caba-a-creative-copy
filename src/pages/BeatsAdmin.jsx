@@ -3,16 +3,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
-import { Play, Pause, Plus, Search, Grid3x3, List, MoreVertical, Download, FolderOpen, Music2, TrendingUp, BarChart3, Heart, Archive, Copy, Trash2, Eye, EyeOff, Pencil, X, Star, Layout } from "lucide-react";
+import { Play, Pause, Plus, Search, Grid3x3, List, MoreVertical, Download, FolderOpen, Music2, TrendingUp, BarChart3, Heart, Archive, Copy, Trash2, Eye, EyeOff, Pencil, X, Star } from "lucide-react";
 import { GENRES, MOODS, SCALES, KEYS, BEAT_STATUS } from "@/lib/musicConstants";
 import BeatFormModal from "@/components/beats/BeatFormModal";
-import BeatsPageBuilder from "@/components/beats/BeatsPageBuilder";
 
 export default function BeatsAdmin() {
   const qc = useQueryClient();
   const { playingTrack, isPlaying, playQueue, pauseTrack, resumeTrack } = useGlobalAudio();
 
-  const [tab, setTab] = useState("beats"); // beats | page
   const [view, setView] = useState("grid"); // grid | list
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -126,10 +124,6 @@ export default function BeatsAdmin() {
     }
   };
 
-  if (tab === "page") {
-    return <BeatsPageBuilder beats={beats} onBack={() => setTab("beats")} />;
-  }
-
   return (
     <div className="min-h-screen pb-32" style={{ background: "#0a0a0b" }}>
       {/* Header */}
@@ -140,23 +134,14 @@ export default function BeatsAdmin() {
           <h1 className="text-xl font-black text-white tracking-tight">Beats</h1>
           <span className="text-xs text-white/30">{beats.length} total</span>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setTab("page")}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold text-white/70 hover:text-white bg-white/5 border border-white/10 transition-colors"
-          >
-            <Layout className="w-4 h-4" />
-            Editar página
-          </button>
-          <button
-            onClick={() => { setEditingBeat(null); setShowForm(true); }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-white transition-colors"
-            style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
-          >
-            <Plus className="w-4 h-4" />
-            Crear Beat
-          </button>
-        </div>
+        <button
+          onClick={() => { setEditingBeat(null); setShowForm(true); }}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-white transition-colors"
+          style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
+        >
+          <Plus className="w-4 h-4" />
+          Crear Beat
+        </button>
       </div>
 
       <div className="px-5 sm:px-10 max-w-7xl mx-auto">

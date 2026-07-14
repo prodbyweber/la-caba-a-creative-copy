@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 
 export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
   const {
-    playingTrack, isPlaying, isLoading, currentTime, duration,
+    playingTrack, isPlaying, currentTime, duration,
     pauseTrack, resumeTrack, seekTrack, stopTrack,
     playNext, playPrevious, repeat, shuffle, setRepeat, setShuffle,
     volume, setVolume, setExpanded,
@@ -190,9 +190,7 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
               style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
               title={isPlaying ? "Pausar" : "Reproducir"}
             >
-              {isLoading ? (
-                <div className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" />
-              ) : isPlaying ? (
+              {isPlaying ? (
                 <Pause className="w-4 h-4" fill="currentColor" />
               ) : (
                 <Play className="w-4 h-4 ml-0.5" fill="currentColor" />
