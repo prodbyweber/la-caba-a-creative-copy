@@ -6,6 +6,10 @@
       "type": "string",
       "description": "T\u00edtulo del beat"
     },
+    "slug": {
+      "type": "string",
+      "description": "Slug \u00fanico para URL p\u00fablica limpia (ej: night-drive)"
+    },
     "producer": {
       "type": "string",
       "description": "Nombre del productor"
@@ -118,6 +122,23 @@
         }
       },
       "description": "Licencias del beat"
+    },
+    "checkout_type": {
+      "type": "string",
+      "enum": [
+        "internal",
+        "shopify",
+        "stripe",
+        "lemonsqueezy",
+        "gumroad",
+        "custom"
+      ],
+      "default": "internal",
+      "description": "Tipo de checkout para la compra del beat"
+    },
+    "buy_link": {
+      "type": "string",
+      "description": "URL de compra configurada para el beat (Shopify, Stripe, Lemon Squeezy, Gumroad o personalizada)"
     },
     "plays_count": {
       "type": "number",

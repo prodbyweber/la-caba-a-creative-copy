@@ -1,0 +1,95 @@
+{
+  "name": "BeatSection",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo visible de la secci\u00f3n"
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "Subt\u00edtulo / descripci\u00f3n de la secci\u00f3n"
+    },
+    "icon": {
+      "type": "string",
+      "default": "Music2",
+      "description": "Nombre del icono (lucide-react) de la secci\u00f3n"
+    },
+    "color": {
+      "type": "string",
+      "default": "#8b5cf6",
+      "description": "Color de acento de la secci\u00f3n (hex)"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n en la p\u00e1gina p\u00fablica"
+    },
+    "layout": {
+      "type": "string",
+      "enum": [
+        "grid",
+        "carousel",
+        "horizontal",
+        "list"
+      ],
+      "default": "grid",
+      "description": "Dise\u00f1o de bloque de la secci\u00f3n"
+    },
+    "columns": {
+      "type": "number",
+      "default": 5,
+      "description": "N\u00famero de columnas (2-5) para layout grid"
+    },
+    "limit": {
+      "type": "number",
+      "default": 10,
+      "description": "Cantidad m\u00e1xima de beats a mostrar"
+    },
+    "source_mode": {
+      "type": "string",
+      "enum": [
+        "manual",
+        "auto"
+      ],
+      "default": "auto",
+      "description": "Selecci\u00f3n manual de beats o autom\u00e1tica por filtros"
+    },
+    "manual_beat_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs de beats asignados manualmente (en orden)"
+    },
+    "filter_type": {
+      "type": "string",
+      "enum": [
+        "recent",
+        "popular",
+        "downloads",
+        "featured",
+        "genre",
+        "mood",
+        "bpm",
+        "key",
+        "tag",
+        "producer"
+      ],
+      "default": "recent",
+      "description": "Tipo de filtro autom\u00e1tico para generar la secci\u00f3n"
+    },
+    "filter_value": {
+      "type": "string",
+      "description": "Valor del filtro (ej: nombre de g\u00e9nero, mood, productor, rango BPM)"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la secci\u00f3n es visible en la p\u00e1gina p\u00fablica"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

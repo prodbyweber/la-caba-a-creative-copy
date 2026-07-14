@@ -55,6 +55,7 @@ function loadStoredState() {
 export function GlobalAudioProvider({ children }) {
   const [playingTrack, setPlayingTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [hidden, setHidden] = useState(false);
@@ -159,6 +160,7 @@ export function GlobalAudioProvider({ children }) {
     setHidden(false);
     setExpanded(false);
     setCurrentTime(0);
+    setIsLoading(true);
 
     const audio = new Audio(track.audio_file_url);
     audio.volume = volume;
@@ -166,12 +168,16 @@ export function GlobalAudioProvider({ children }) {
 
     audio.onloadedmetadata = () => {
       setDuration(audio.duration);
+      setIsLoading(false);
       if ("mediaSession" in navigator) {
         try {
           navigator.mediaSession.setPositionState({ duration: audio.duration, playbackRate: 1, position: 0 });
         } catch {}
       }
     };
+    audio.oncanplay = () => setIsLoading(false);
+    audio.onwaiting = () => setIsLoading(true);
+    audio.onplaying = () => setIsLoading(false);
 
     audio.ontimeupdate = () => setCurrentTime(audio.currentTime);
 
@@ -207,14 +213,14 @@ export function GlobalAudioProvider({ children }) {
       }
     };
 
-    audio.onerror = () => setIsPlaying(false);
+    audio.onerror = () => { setIsPlaying(false); setIsLoading(false); };
 
     audioRef.current = audio;
 
     updateMediaSession(track, true);
     setupMediaSession(audio, track);
 
-    audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+    audio.play().then(() => { setIsPlaying(true); setIsLoading(false); }).catch(() => { setIsPlaying(false); setIsLoading(false); });
   }, [volume, setupMediaSession]);
 
   // ─── playTrack: backward-compatible single-track play ───────────────────────
@@ -355,6 +361,7 @@ export function GlobalAudioProvider({ children }) {
         // existing
         playingTrack,
         isPlaying,
+        isLoading,
         currentTime,
         duration,
         hidden,
