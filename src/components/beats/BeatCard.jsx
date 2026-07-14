@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Activity, Pause } from "lucide-react";
+import { Activity, Pause, Play } from "lucide-react";
 import { useBeatPlayer } from "@/hooks/useBeatPlayer";
 import { getCoverForBeat } from "@/lib/beatsUtils";
 import { BEATS_BRAND } from "@/lib/beatsTheme";
@@ -18,6 +18,7 @@ export default function BeatCard({
   onSave,
   onDownload,
   onBuy,
+  onPlay,
   onOpen,
   listBeats,
 }) {
@@ -26,7 +27,6 @@ export default function BeatCard({
   const cover = imgError ? null : getCoverForBeat(beat);
   const genre = (beat.genres && beat.genres[0]) || "";
   const active = playingTrack?.beat_id === beat.id;
-  const playingNow = active && isPlaying;
 
   return (
     <motion.div
@@ -62,36 +62,22 @@ export default function BeatCard({
           {/* Gradiente cinematográfico */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/5 pointer-events-none" />
 
-          {/* Reproducciones (abajo-izquierda) */}
-          <div
-            className="absolute bottom-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold text-white"
-            style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(8px)" }}
-          >
-            <Activity className="w-2.5 h-2.5" style={{ color: BEATS_BRAND.orange }} />
-            {beat.plays_count || 0}
-          </div>
-
-          {/* Indicador "sonando" (abajo-derecha, no interactivo) */}
-          {active && (
-            <div
-              className="absolute bottom-2 right-2 flex items-end gap-[2px] h-5 px-1.5 py-1 rounded-full pointer-events-none"
-              style={{ background: BEATS_BRAND.orange }}
+          {/* Botón de play minimalista centrado */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onPlay?.(beat, listBeats); }}
+              className="pointer-events-auto w-12 h-12 rounded-full flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
+              style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.18)" }}
+              title={active && isPlaying ? "Pausar" : "Reproducir"}
             >
-              {playingNow ? (
-                [0, 1, 2].map((i) => (
-                  <motion.span
-                    key={i}
-                    className="w-[2px] rounded-full bg-white"
-                    animate={{ height: [4, 13, 4] }}
-                    transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.14, ease: "easeInOut" }}
-                    style={{ height: 6 }}
-                  />
-                ))
+              {active && isPlaying ? (
+                <Pause className="w-5 h-5 text-white" fill="white" />
               ) : (
-                <Pause className="w-3 h-3 text-white" fill="white" />
+                <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
               )}
-            </div>
-          )}
+            </button>
+          </div>
 
           {/* Anillo de estado activo */}
           {active && (

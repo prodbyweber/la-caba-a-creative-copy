@@ -95,29 +95,7 @@ export default function BeatExpandedPanel({
             className="absolute inset-0"
             style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(14,14,16,0) 45%, rgba(14,14,16,0.96) 100%)" }}
           />
-          {active && (
-            <div
-              className="absolute top-4 left-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold text-white"
-              style={{ background: BEATS_BRAND.orange }}
-            >
-              {isPlaying ? (
-                <span className="flex items-end gap-[2px] h-3">
-                  {[0, 1, 2].map((i) => (
-                    <motion.span
-                      key={i}
-                      className="w-[2px] rounded-full bg-white"
-                      animate={{ height: [4, 10, 4] }}
-                      transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.14 }}
-                      style={{ height: 6 }}
-                    />
-                  ))}
-                </span>
-              ) : (
-                <Pause className="w-3 h-3 text-white" fill="white" />
-              )}
-              {isPlaying ? "Sonando" : "En pausa"}
-            </div>
-          )}
+
         </div>
 
         {/* Cuerpo */}
@@ -150,7 +128,6 @@ export default function BeatExpandedPanel({
             <MetaChip label="Key" value={beat.key || beat.scale || "—"} />
             <MetaChip label="Mood" value={(beat.moods || []).join(", ") || "—"} />
             <MetaChip label="Duración" value={beat.duration > 0 ? formatDuration(beat.duration) : "—"} />
-            <MetaChip label="Repros" value={`${beat.plays_count || 0}`} />
           </div>
 
           {/* Descripción */}

@@ -371,6 +371,7 @@ export default function Beats() {
                   onSave={user ? (b) => saveMutation.mutate(b) : null}
                   onDownload={user ? handleDownload : null}
                   onBuy={handleBuy}
+                  onPlay={handlePlay}
                   onOpen={setCinematicBeat}
                   listBeats={displayBeats}
                 />

@@ -4,6 +4,8 @@ import { Play, Pause, Heart, Download, Activity } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { getCoverForBeat } from "@/lib/beatsUtils";
 
+// Listado vertical de Trending — filas limpias y minimalistas:
+// rank · artwork · título + productor · botón circular de play/pause.
 export default function BeatsTrendingList({ beats, isPlaying, onPlay, onLike, onDownload, likedIds, user }) {
   const { playingTrack } = useGlobalAudio();
   if (!beats || beats.length === 0) return null;
@@ -22,70 +24,64 @@ export default function BeatsTrendingList({ beats, isPlaying, onPlay, onLike, on
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.03 }}
-            className="flex items-center gap-3 p-2 rounded-xl transition-colors cursor-pointer hover:bg-white/5"
+            className="group flex items-center gap-3 p-2.5 rounded-xl transition-colors cursor-pointer hover:bg-white/[0.04]"
             style={{ borderBottom: i < beats.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none" }}
             onClick={() => onPlay(beat, beats)}
           >
-            {/* Left: thumbnail (active) or rank circle */}
-            {active ? (
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden flex-shrink-0" style={{ background: "#161616" }}>
+            {/* Rank */}
+            <span className="w-5 text-center text-sm font-black text-white/25 flex-shrink-0">{i + 1}</span>
+
+            {/* Artwork */}
+            <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden flex-shrink-0" style={{ background: "#161616" }}>
+              {cover ? (
                 <img src={cover} alt="" className="w-full h-full object-cover" />
-                <div className="absolute inset-0 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.45)" }}>
-                  <Activity className="w-5 h-5" style={{ color: "#ff5833" }} />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-white/15" />
                 </div>
-              </div>
-            ) : (
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "#2a2a2a" }}>
-                <span className="text-base sm:text-lg font-black text-[#a0a0a0]">{i + 1}</span>
-              </div>
-            )}
+              )}
+              {active && <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.35)" }} />}
+            </div>
 
             {/* Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-white truncate">{beat.title}</h3>
                 {hasStems && (
-                  <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[8px] font-bold text-white/70 tracking-wider" style={{ background: "rgba(0,0,0,0.4)" }}>STEMS</span>
+                  <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[8px] font-bold text-white/60 tracking-wider" style={{ background: "rgba(255,255,255,0.08)" }}>STEMS</span>
                 )}
               </div>
               <p className="text-xs text-[#a0a0a0] truncate">{beat.producer || "Cabaña"}</p>
             </div>
 
-            {/* Right controls */}
-            {active ? (
-              <div className="flex items-center gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                {onLike && (
-                  <button onClick={() => onLike(beat)} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10">
-                    <Heart className={`w-4 h-4 ${liked ? "fill-[#ff3b3b] text-[#ff3b3b]" : "text-white/60"}`} />
-                  </button>
-                )}
-                {onDownload && beat.free_mp3_url && (
-                  <button onClick={() => onDownload(beat)} className="w-8 h-8 rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10">
-                    <Download className="w-4 h-4" />
-                  </button>
-                )}
-                <button
-                  onClick={() => onPlay(beat, beats)}
-                  className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
-                  style={{ background: "#ff5833" }}
-                >
-                  {active && isPlaying ? <Pause className="w-4 h-4 text-white" fill="white" /> : <Play className="w-4 h-4 text-white ml-0.5" fill="white" />}
+            {/* Right: actions */}
+            <div className="flex items-center gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+              {onLike && (
+                <button onClick={() => onLike(beat)} className="w-8 h-8 rounded-full hidden sm:flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <Heart className={`w-4 h-4 ${liked ? "fill-[#ff3b3b] text-[#ff3b3b]" : "text-white/50"}`} />
                 </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <div className="hidden sm:flex items-center gap-1 text-[10px] text-[#a0a0a0] font-medium">
-                  <Activity className="w-3 h-3" />
-                  {beat.plays_count || 0}
-                </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); onPlay(beat, beats); }}
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors"
-                >
-                  <Play className="w-4 h-4" fill="currentColor" />
+              )}
+              {onDownload && beat.free_mp3_url && (
+                <button onClick={() => onDownload(beat)} className="w-8 h-8 rounded-full hidden sm:flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-colors">
+                  <Download className="w-4 h-4" />
                 </button>
-              </div>
-            )}
+              )}
+              <button
+                onClick={() => onPlay(beat, beats)}
+                className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-105 active:scale-95"
+                style={{
+                  background: active ? "#ff5833" : "rgba(255,255,255,0.06)",
+                  border: active ? "none" : "1px solid rgba(255,255,255,0.1)",
+                }}
+                title={active && isPlaying ? "Pausar" : "Reproducir"}
+              >
+                {active && isPlaying ? (
+                  <Pause className="w-4 h-4 text-white" fill="white" />
+                ) : (
+                  <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+                )}
+              </button>
+            </div>
           </motion.div>
         );
       })}
