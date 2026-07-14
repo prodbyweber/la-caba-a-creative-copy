@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Activity, ChevronDown, Pause } from "lucide-react";
+import { Activity, Pause } from "lucide-react";
 import { useBeatPlayer } from "@/hooks/useBeatPlayer";
 import { getCoverForBeat } from "@/lib/beatsUtils";
 import { BEATS_BRAND } from "@/lib/beatsTheme";
-import BeatExpandedPanel from "./BeatExpandedPanel";
 
 // Tarjeta de beat — una única superficie interactiva.
-// Cualquier clic abre la ficha técnica expandida (mismo componente que Mi Catálogo).
-// Sin menús hover, sin overlays flotantes, sin icono de rayo.
+// Cualquier clic abre la vista cinematográfica completa del beat.
+// Sin menús hover, sin paneles flotantes, sin overlays inferiores.
 export default function BeatCard({
   beat,
   index,
@@ -19,15 +18,14 @@ export default function BeatCard({
   onSave,
   onDownload,
   onBuy,
+  onOpen,
   listBeats,
 }) {
-  const { toggle, playingTrack, isPlaying } = useBeatPlayer();
+  const { playingTrack, isPlaying } = useBeatPlayer();
   const [imgError, setImgError] = useState(false);
-  const [expanded, setExpanded] = useState(false);
   const cover = imgError ? null : getCoverForBeat(beat);
   const genre = (beat.genres && beat.genres[0]) || "";
   const active = playingTrack?.beat_id === beat.id;
-  const list = listBeats && listBeats.length ? listBeats : null;
   const playingNow = active && isPlaying;
 
   return (
@@ -37,15 +35,14 @@ export default function BeatCard({
       transition={{ delay: (index || 0) * 0.04, duration: 0.5 }}
       className="group"
     >
-      {/* Toda la tarjeta es una sola superficie clicable → abre la ficha */}
+      {/* Toda la tarjeta abre la vista cinematográfica */}
       <button
         type="button"
-        onClick={() => setExpanded((v) => !v)}
+        onClick={() => onOpen?.(beat)}
         className="block w-full text-left"
-        aria-expanded={expanded}
       >
         <div
-          className="relative aspect-square rounded-2xl overflow-hidden mb-2.5 transition-all duration-300"
+          className="relative aspect-square rounded-2xl overflow-hidden mb-2.5 transition-transform duration-300 group-hover:scale-[1.02]"
           style={{ background: "#161616" }}
         >
           {cover ? (
@@ -105,20 +102,12 @@ export default function BeatCard({
           )}
         </div>
 
-        {/* Título + indicador de expansión */}
-        <div className="flex items-start gap-1">
-          <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-bold text-white truncate leading-tight group-hover:text-white/90 transition-colors">
-              {beat.title}
-            </h3>
-            <p className="text-xs text-[#a0a0a0] mt-0.5 truncate">{beat.producer || "Cabaña"}</p>
-          </div>
-          <span
-            className="mt-0.5 w-6 h-6 rounded-full flex items-center justify-center transition-all flex-shrink-0"
-            style={expanded ? { color: BEATS_BRAND.orange, background: BEATS_BRAND.orangeSoft } : { color: "rgba(255,255,255,0.4)" }}
-          >
-            <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${expanded ? "rotate-180" : ""}`} />
-          </span>
+        {/* Título + productor */}
+        <div className="min-w-0">
+          <h3 className="text-sm font-bold text-white truncate leading-tight group-hover:text-white/90 transition-colors">
+            {beat.title}
+          </h3>
+          <p className="text-xs text-[#a0a0a0] mt-0.5 truncate">{beat.producer || "Cabaña"}</p>
         </div>
 
         {/* Género + BPM / Key */}
@@ -134,22 +123,6 @@ export default function BeatCard({
           )}
         </div>
       </button>
-
-      {/* Ficha técnica expandida (mismo componente que Mi Catálogo) */}
-      <BeatExpandedPanel
-        beat={beat}
-        expanded={expanded}
-        user={user}
-        liked={liked}
-        saved={saved}
-        active={active}
-        isPlaying={isPlaying}
-        onLike={onLike}
-        onSave={onSave}
-        onDownload={onDownload}
-        onBuy={onBuy}
-        onPlay={() => toggle(beat, list)}
-      />
     </motion.div>
   );
 }

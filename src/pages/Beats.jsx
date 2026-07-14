@@ -10,6 +10,7 @@ import BeatCard from "@/components/beats/BeatCard";
 import BeatsFeaturedCarousel from "@/components/beats/BeatsFeaturedCarousel";
 import BeatsTrendingList from "@/components/beats/BeatsTrendingList";
 import BeatLicensesModal from "@/components/beats/BeatLicensesModal";
+import BeatExpandedPanel from "@/components/beats/BeatExpandedPanel";
 
 // Curation + genre category chips (horizontal scroll on mobile)
 const CURATION_CHIPS = [
@@ -42,6 +43,7 @@ export default function Beats() {
   const [likedIds, setLikedIds] = useState(new Set());
   const [savedIds, setSavedIds] = useState(new Set());
   const [authGate, setAuthGate] = useState(false);
+  const [cinematicBeat, setCinematicBeat] = useState(null);
   const [user, setUser] = useState(null);
 
   const trendingRef = useRef(null);
@@ -210,11 +212,6 @@ export default function Beats() {
 
   return (
     <div className="min-h-screen pb-32" style={{ background: "#121212", fontFamily: "'Inter', -apple-system, sans-serif" }}>
-      {/* ── Top promotional banner ─────────────────────────────────── */}
-      <div className="w-full px-4 py-2 text-center text-[11px] font-semibold text-white" style={{ background: "#ff5833" }}>
-        Únete y obtén acceso completo gratis por 3 días →
-      </div>
-
       {/* ── Sticky nav + search + tabs ─────────────────────────────── */}
       <div className="sticky top-0 z-40" style={{ background: "rgba(18,18,18,0.95)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
         {/* Nav header */}
@@ -374,6 +371,7 @@ export default function Beats() {
                   onSave={user ? (b) => saveMutation.mutate(b) : null}
                   onDownload={user ? handleDownload : null}
                   onBuy={handleBuy}
+                  onOpen={setCinematicBeat}
                   listBeats={displayBeats}
                 />
               ))}
@@ -465,6 +463,26 @@ export default function Beats() {
       <AnimatePresence>
         {licensesModal && (
           <BeatLicensesModal beat={licensesModal} onClose={() => setLicensesModal(null)} user={user} />
+        )}
+      </AnimatePresence>
+
+      {/* ── Cinematic beat view ───────────────────────────────────── */}
+      <AnimatePresence>
+        {cinematicBeat && (
+          <BeatExpandedPanel
+            beat={cinematicBeat}
+            onClose={() => setCinematicBeat(null)}
+            user={user}
+            liked={likedIds.has(cinematicBeat.id)}
+            saved={savedIds.has(cinematicBeat.id)}
+            active={playingTrack?.beat_id === cinematicBeat.id}
+            isPlaying={isPlaying}
+            onLike={user ? (b) => likeMutation.mutate(b) : null}
+            onSave={user ? (b) => saveMutation.mutate(b) : null}
+            onDownload={user ? handleDownload : null}
+            onBuy={handleBuy}
+            onPlay={() => handlePlay(cinematicBeat, beats)}
+          />
         )}
       </AnimatePresence>
     </div>
