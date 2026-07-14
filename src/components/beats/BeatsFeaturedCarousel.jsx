@@ -54,7 +54,7 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onLike
               transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               className="max-w-xl"
             >
-              <p className="text-[10px] font-bold text-[#a78bfa] uppercase tracking-[0.3em] mb-2">
+              <p className="text-[10px] font-bold text-[#ff8866] uppercase tracking-[0.3em] mb-2">
                 {current.producer || "Cabaña Creative"}
               </p>
               <h2
@@ -78,7 +78,7 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onLike
         <button
           onClick={() => onPlay(current, beats)}
           className="absolute bottom-5 right-5 sm:bottom-10 sm:right-10 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-110 z-10"
-          style={{ background: "#8b5cf6" }}
+          style={{ background: "#ff5833" }}
         >
           {active && isPlaying ? (
             <Pause className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="white" />

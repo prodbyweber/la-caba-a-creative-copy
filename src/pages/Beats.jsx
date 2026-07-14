@@ -211,7 +211,7 @@ export default function Beats() {
   return (
     <div className="min-h-screen pb-32" style={{ background: "#121212", fontFamily: "'Inter', -apple-system, sans-serif" }}>
       {/* ── Top promotional banner ─────────────────────────────────── */}
-      <div className="w-full px-4 py-2 text-center text-[11px] font-semibold text-white" style={{ background: "#7c4dff" }}>
+      <div className="w-full px-4 py-2 text-center text-[11px] font-semibold text-white" style={{ background: "#ff5833" }}>
         Únete y obtén acceso completo gratis por 3 días →
       </div>
 
@@ -387,7 +387,7 @@ export default function Beats() {
       {isVisible(listSection) && trendingBeats.length > 0 && (
         <div ref={trendingRef} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10 scroll-mt-40">
           <div className="flex items-center gap-2 mb-1">
-            <TrendingUp className="w-5 h-5 text-[#8b5cf6]" />
+            <TrendingUp className="w-5 h-5 text-[#ff5833]" />
             <h2 className="text-2xl sm:text-3xl font-black text-white" style={{ letterSpacing: "-0.03em" }}>
               {listSection?.title || "Trending"}
             </h2>
@@ -438,8 +438,8 @@ export default function Beats() {
                 className="w-full max-w-sm rounded-3xl p-8 text-center"
                 style={{ background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)" }}
               >
-                <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: "rgba(139,92,246,0.15)" }}>
-                  <Lock className="w-6 h-6 text-[#a78bfa]" />
+                <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: "rgba(255,88,51,0.15)" }}>
+                  <Lock className="w-6 h-6 text-[#ff8866]" />
                 </div>
                 <h2 className="text-xl font-black text-white mb-2" style={{ letterSpacing: "-0.03em" }}>
                   Accede a Cabaña Beats
@@ -448,7 +448,7 @@ export default function Beats() {
                   Inicia sesión para descargar, guardar y reproducir beats completos.
                 </p>
                 <div className="space-y-2">
-                  <Link to="/login" className="block w-full py-3 rounded-xl text-sm font-bold text-white transition-colors" style={{ background: "#8b5cf6" }}>
+                  <Link to="/login" className="block w-full py-3 rounded-xl text-sm font-bold text-white transition-colors" style={{ background: "#ff5833" }}>
                     Iniciar sesión
                   </Link>
                   <Link to="/register" className="block w-full py-3 rounded-xl text-sm font-semibold text-[#a0a0a0] hover:text-white bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">

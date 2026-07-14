@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBeatPlayer } from "@/hooks/useBeatPlayer";
-import { Play, Pause, Heart, Download, FolderOpen, ArrowLeft, Activity, Zap, ShoppingBag } from "lucide-react";
-import { getCoverForBeat, timeAgo } from "@/lib/beatsUtils";
+import { Play, Pause, Heart, Bookmark, Download, FolderOpen, ArrowLeft, Activity, ShoppingBag } from "lucide-react";
+import { getCoverForBeat } from "@/lib/beatsUtils";
 import { formatDuration } from "@/lib/musicConstants";
 import BeatCard from "@/components/beats/BeatCard";
 import BeatLicensesModal from "@/components/beats/BeatLicensesModal";
@@ -128,7 +128,7 @@ export default function BeatDetail() {
   if (isLoading || (resolvingSlug && loadingAll)) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "#0e0e0e" }}>
-        <div className="w-8 h-8 rounded-full border-2 border-[#8b5cf6] border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-[#ff5833] border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -137,7 +137,7 @@ export default function BeatDetail() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: "#0e0e0e" }}>
         <p className="text-white/60">Beat no encontrado</p>
-        <Link to="/beats" className="text-[#a78bfa] text-sm font-semibold">Volver a Beats</Link>
+        <Link to="/beats" className="text-[#ff8866] text-sm font-semibold">Volver a Beats</Link>
       </div>
     );
   }
@@ -166,7 +166,7 @@ export default function BeatDetail() {
 
         <div className="relative h-full flex flex-col justify-end px-5 sm:px-10 max-w-5xl mx-auto pb-8">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}>
-            <p className="text-[10px] font-bold text-[#a78bfa] uppercase tracking-[0.3em] mb-3">{beat.producer || "Cabaña Creative"}</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#ff8866" }}>{beat.producer || "Cabaña Creative"}</p>
             <h1 className="text-4xl sm:text-7xl font-black text-white mb-4" style={{ letterSpacing: "-0.04em", lineHeight: 0.92 }}>{beat.title}</h1>
 
             {/* Meta row */}
@@ -183,7 +183,7 @@ export default function BeatDetail() {
               <button
                 onClick={() => handlePlay(beat, [beat, ...related])}
                 className="w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-105"
-                style={{ background: "#8b5cf6" }}
+                style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
               >
                 {active && isPlaying ? <Pause className="w-7 h-7 text-white" fill="white" /> : <Play className="w-7 h-7 text-white ml-1" fill="white" />}
               </button>
@@ -191,13 +191,13 @@ export default function BeatDetail() {
                 onClick={() => likeMutation.mutate(beat)}
                 className="w-12 h-12 rounded-full flex items-center justify-center border border-white/15 hover:bg-white/10 transition-colors"
               >
-                <Heart className={`w-5 h-5 ${likedIds.has(beat.id) ? "fill-[#8b5cf6] text-[#8b5cf6]" : "text-white"}`} />
+                <Heart className={`w-5 h-5 ${likedIds.has(beat.id) ? "fill-[#ff3b3b] text-[#ff3b3b]" : "text-white"}`} />
               </button>
               <button
                 onClick={() => saveMutation.mutate(beat)}
                 className="w-12 h-12 rounded-full flex items-center justify-center border border-white/15 hover:bg-white/10 transition-colors"
               >
-                <Zap className={`w-5 h-5 ${savedIds.has(beat.id) ? "fill-[#a78bfa] text-[#a78bfa]" : "text-white"}`} />
+                <Bookmark className={`w-5 h-5 ${savedIds.has(beat.id) ? "fill-[#ffd23f] text-[#ffd23f]" : "text-white"}`} />
               </button>
               {beat.free_mp3_url && (
                 <button
@@ -221,7 +221,7 @@ export default function BeatDetail() {
                 <button
                   onClick={() => handleBuy(beat)}
                   className="flex items-center gap-2 px-5 h-12 rounded-full text-sm font-bold text-white transition-transform hover:scale-105"
-                  style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
+                  style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
                 >
                   <ShoppingBag className="w-4 h-4" />
                   Comprar Beat
@@ -230,7 +230,7 @@ export default function BeatDetail() {
               <button
                 onClick={() => setLicensesModal(true)}
                 className="px-5 h-12 rounded-full text-sm font-bold transition-all"
-                style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.25), rgba(167,139,250,0.12))", border: "1px solid rgba(139,92,246,0.35)", color: "#c4b5fd" }}
+                style={{ background: "linear-gradient(135deg, rgba(255,88,51,0.22), rgba(255,88,51,0.08))", border: "1px solid rgba(255,88,51,0.35)", color: "#ff8866" }}
               >
                 Licencias
               </button>
@@ -286,7 +286,6 @@ export default function BeatDetail() {
                 ["Tonalidad", beat.key || "—"],
                 ["Escala", beat.scale || "—"],
                 ["Duración", beat.duration ? formatDuration(beat.duration) : "—"],
-                ["Subido", timeAgo(beat.created_date) || "—"],
               ].map(([k, v]) => (
                 <div key={k} className="flex items-center justify-between">
                   <span className="text-xs text-[#a0a0a0]">{k}</span>

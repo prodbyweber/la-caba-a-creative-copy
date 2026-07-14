@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, SkipBack, SkipForward, Repeat, Repeat1, Shuffle, ChevronDown, X, Heart, Download, FolderOpen, Share2, Music2, Volume2, VolumeX } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Repeat, Repeat1, Shuffle, ChevronDown, X, Heart, Bookmark, Download, FolderOpen, Share2, Music2, Volume2, VolumeX } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import WaveformBars from "./WaveformBars";
 
@@ -155,7 +155,7 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
                   transition={{ duration: 8, repeat: Infinity, repeatType: "reverse", ease: "linear" }}
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(124,77,255,0.15), rgba(167,139,250,0.05))" }}>
+                <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(255,88,51,0.15), rgba(255,88,51,0.05))" }}>
                   <Music2 className="w-16 h-16 text-white/20" />
                 </div>
               )}
@@ -192,7 +192,7 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
                 onTouchStart={(e) => setIsDragging(true)}
                 onClick={(e) => performSeek(e.clientX)}
               >
-                <WaveformBars progress={progress} isPlaying={isPlaying} bars={56} color="#a78bfa" />
+                <WaveformBars progress={progress} isPlaying={isPlaying} bars={56} color="#ff5833" />
               </div>
               <div className="flex justify-between text-xs text-white/40 font-medium mt-1">
                 <span>{formatTime(currentTime)}</span>
@@ -204,7 +204,7 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
             <div className="flex items-center justify-center gap-5 mb-6">
               <button
                 onClick={() => setShuffle(!shuffle)}
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${shuffle ? "text-[#a78bfa]" : "text-white/40 hover:text-white"}`}
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${shuffle ? "text-[#ff5833]" : "text-white/40 hover:text-white"}`}
               >
                 <Shuffle className="w-4 h-4" />
               </button>
@@ -218,7 +218,7 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
                 whileTap={{ scale: 0.92 }}
                 onClick={isPlaying ? pauseTrack : resumeTrack}
                 className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-2xl"
-                style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
+                style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
               >
                 {isPlaying ? (
                   <Pause className="w-7 h-7" fill="currentColor" />
@@ -234,7 +234,7 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
               </button>
               <button
                 onClick={toggleRepeat}
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${repeat !== "off" ? "text-[#a78bfa]" : "text-white/40 hover:text-white"}`}
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${repeat !== "off" ? "text-[#ff5833]" : "text-white/40 hover:text-white"}`}
               >
                 {repeat === "one" ? <Repeat1 className="w-4 h-4" /> : <Repeat className="w-4 h-4" />}
               </button>
@@ -256,7 +256,7 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
                   onClick={onSave}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white/70 transition-all"
                 >
-                  <Heart className={`w-3.5 h-3.5 ${saved ? "fill-[#a78bfa] text-[#a78bfa]" : ""}`} />
+                  <Bookmark className={`w-3.5 h-3.5 ${saved ? "fill-[#ffd23f] text-[#ffd23f]" : ""}`} />
                   Guardar
                 </button>
               )}
@@ -273,7 +273,7 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
                 <button
                   onClick={onLicenses}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all"
-                  style={{ background: "linear-gradient(135deg, rgba(124,77,255,0.2), rgba(167,139,250,0.1))", border: "1px solid rgba(124,77,255,0.3)", color: "#c4b5fd" }}
+                  style={{ background: "linear-gradient(135deg, rgba(255,88,51,0.2), rgba(255,88,51,0.08))", border: "1px solid rgba(255,88,51,0.35)", color: "#ff8866" }}
                 >
                   Licencias
                 </button>
@@ -312,7 +312,7 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
                 step={0.01}
                 value={volume}
                 onChange={(e) => setVolume(parseFloat(e.target.value))}
-                className="flex-1 accent-[#a78bfa]"
+                className="flex-1 accent-[#ff5833]"
               />
             </div>
           </div>

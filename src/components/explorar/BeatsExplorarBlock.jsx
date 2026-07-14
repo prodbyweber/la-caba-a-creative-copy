@@ -6,10 +6,10 @@ import { base44 } from "@/api/base44Client";
 import { Play, Pause, ArrowRight, Music2 } from "lucide-react";
 import { useBeatPlayer } from "@/hooks/useBeatPlayer";
 import { getCoverForBeat } from "@/lib/beatsUtils";
+import { BEATS_BRAND } from "@/lib/beatsTheme";
 
 // Bloque BEATS para la página Explorar.
-// Respeta el lenguaje visual existente (fondo #080808, tipografía, overlays).
-// Muestra beats destacados en scroll horizontal + botón "Explorar Beats".
+// Sin menús hover: el play es siempre visible y con el branding naranja de la plataforma.
 export default function BeatsExplorarBlock() {
   const { toggle, playingTrack, isPlaying } = useBeatPlayer();
 
@@ -18,7 +18,6 @@ export default function BeatsExplorarBlock() {
     queryFn: async () => {
       const all = await base44.entities.Beat.filter({ status: "Publicado" });
       const visible = all.filter((b) => !b.archived);
-      // Priorizar destacados, luego más reproducidos
       const featured = visible.filter((b) => b.featured);
       const sorted = [...visible].sort((a, b) => (b.plays_count || 0) - (a.plays_count || 0));
       const merged = [...featured, ...sorted.filter((b) => !featured.includes(b))];
@@ -33,8 +32,8 @@ export default function BeatsExplorarBlock() {
       {/* Header */}
       <div className="flex items-end justify-between mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "rgba(124,77,255,0.12)" }}>
-            <Music2 className="w-3.5 h-3.5 text-[#a78bfa]" />
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: BEATS_BRAND.orangeSoft }}>
+            <Music2 className="w-3.5 h-3.5" style={{ color: BEATS_BRAND.orange }} />
           </div>
           <div>
             <h2 className="text-base sm:text-lg font-bold text-white" style={{ letterSpacing: "-0.02em" }}>Beats</h2>
@@ -61,6 +60,7 @@ export default function BeatsExplorarBlock() {
             ))
           : beats.map((beat, i) => {
               const active = playingTrack?.beat_id === beat.id;
+              const playingNow = active && isPlaying;
               const cover = getCoverForBeat(beat);
               return (
                 <motion.div
@@ -87,19 +87,25 @@ export default function BeatsExplorarBlock() {
                         <Music2 className="w-8 h-8 text-white/10" />
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-                    {/* Play overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="w-11 h-11 rounded-full flex items-center justify-center shadow-2xl" style={{ background: "#8b5cf6" }}>
-                        {active && isPlaying ? (
-                          <Pause className="w-5 h-5 text-white" fill="white" />
-                        ) : (
-                          <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
-                        )}
-                      </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent pointer-events-none" />
+
+                    {/* Play / Pause siempre visible ( branding naranja ) */}
+                    <div
+                      className="absolute bottom-2 right-2 w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-transform group-hover:scale-110"
+                      style={{ background: BEATS_BRAND.orange }}
+                    >
+                      {playingNow ? (
+                        <Pause className="w-4 h-4 text-white" fill="white" />
+                      ) : (
+                        <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+                      )}
                     </div>
+
                     {active && (
-                      <div className="absolute inset-0 rounded-xl pointer-events-none" style={{ border: "2px solid #8b5cf6" }} />
+                      <div
+                        className="absolute inset-0 rounded-xl pointer-events-none"
+                        style={{ border: `2px solid ${BEATS_BRAND.orange}` }}
+                      />
                     )}
                   </div>
                   <p className="text-xs font-bold text-white truncate mt-2">{beat.title}</p>

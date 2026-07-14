@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Play, Pause, Heart, Download, MoreVertical, Activity } from "lucide-react";
+import { Play, Pause, Heart, Download, Activity } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { getCoverForBeat } from "@/lib/beatsUtils";
 
@@ -31,7 +31,7 @@ export default function BeatsTrendingList({ beats, isPlaying, onPlay, onLike, on
               <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden flex-shrink-0" style={{ background: "#161616" }}>
                 <img src={cover} alt="" className="w-full h-full object-cover" />
                 <div className="absolute inset-0 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.45)" }}>
-                  <Activity className="w-5 h-5 text-[#8b5cf6]" />
+                  <Activity className="w-5 h-5" style={{ color: "#ff5833" }} />
                 </div>
               </div>
             ) : (
@@ -54,12 +54,9 @@ export default function BeatsTrendingList({ beats, isPlaying, onPlay, onLike, on
             {/* Right controls */}
             {active ? (
               <div className="flex items-center gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                <button className="hidden sm:flex w-8 h-8 rounded-full items-center justify-center text-white/40 hover:text-white hover:bg-white/10">
-                  <MoreVertical className="w-4 h-4" />
-                </button>
                 {onLike && (
                   <button onClick={() => onLike(beat)} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10">
-                    <Heart className={`w-4 h-4 ${liked ? "fill-[#8b5cf6] text-[#8b5cf6]" : "text-white/60"}`} />
+                    <Heart className={`w-4 h-4 ${liked ? "fill-[#ff3b3b] text-[#ff3b3b]" : "text-white/60"}`} />
                   </button>
                 )}
                 {onDownload && beat.free_mp3_url && (
@@ -70,7 +67,7 @@ export default function BeatsTrendingList({ beats, isPlaying, onPlay, onLike, on
                 <button
                   onClick={() => onPlay(beat, beats)}
                   className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
-                  style={{ background: "#8b5cf6" }}
+                  style={{ background: "#ff5833" }}
                 >
                   {active && isPlaying ? <Pause className="w-4 h-4 text-white" fill="white" /> : <Play className="w-4 h-4 text-white ml-0.5" fill="white" />}
                 </button>

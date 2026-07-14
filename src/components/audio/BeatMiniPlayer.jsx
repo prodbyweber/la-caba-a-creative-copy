@@ -96,7 +96,7 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
               className="h-full rounded-full transition-all"
               style={{
                 width: `${progress * 100}%`,
-                background: "linear-gradient(90deg, #7c4dff, #a78bfa)",
+                background: "linear-gradient(90deg, #ff5833, #ff7a52)",
               }}
             />
             <div
@@ -104,7 +104,7 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
               style={{
                 left: `${progress * 100}%`,
                 transform: "translate(-50%, -50%)",
-                background: "#a78bfa",
+                background: "#ff5833",
               }}
             />
           </div>
@@ -172,7 +172,7 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
           <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
             <button
               onClick={() => setShuffle(!shuffle)}
-              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-colors ${shuffle ? "text-[#a78bfa]" : "text-white/40 hover:text-white"}`}
+              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-colors ${shuffle ? "text-[#ff5833]" : "text-white/40 hover:text-white"}`}
               title="Aleatorio"
             >
               <Shuffle className="w-3.5 h-3.5" />
@@ -187,7 +187,7 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
             <button
               onClick={isPlaying ? pauseTrack : resumeTrack}
               className="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all text-white shadow-lg"
-              style={{ background: "linear-gradient(135deg, #7c4dff, #a78bfa)" }}
+              style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
               title={isPlaying ? "Pausar" : "Reproducir"}
             >
               {isPlaying ? (
@@ -205,7 +205,7 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
             </button>
             <button
               onClick={toggleRepeat}
-              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-colors ${repeat !== "off" ? "text-[#a78bfa]" : "text-white/40 hover:text-white"}`}
+              className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-colors ${repeat !== "off" ? "text-[#ff5833]" : "text-white/40 hover:text-white"}`}
               title="Repetir"
             >
               {repeat === "one" ? <Repeat1 className="w-3.5 h-3.5" /> : <Repeat className="w-3.5 h-3.5" />}
