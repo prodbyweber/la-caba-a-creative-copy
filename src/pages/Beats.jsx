@@ -403,9 +403,16 @@ export default function Beats() {
         </div>
       </div>
 
+      {/* ── Hero carrusel (primer bloque único de la página) ───────── */}
+      {featuredBeats.length > 0 && (!featuredSection || isVisible(featuredSection)) && (
+        <div className="px-4 sm:px-10 max-w-7xl mx-auto pt-5 mb-10">
+          <BeatsFeaturedCarousel beats={featuredBeats} isPlaying={isPlaying} onPlay={handlePlay} onOpen={setCinematicBeat} section={featuredSection || { auto_play: true, auto_play_interval: 6 }} />
+        </div>
+      )}
+
       {/* ── Secciones dinámicas (editor de la página Beats) ─────────── */}
-      <div className="pt-5">
-        {sections.map((section) => renderSection(section))}
+      <div className={featuredBeats.length > 0 && (!featuredSection || isVisible(featuredSection)) ? "" : "pt-5"}>
+        {sections.filter((section) => section.id !== featuredSection?.id).map((section) => renderSection(section))}
       </div>
 
       {!isLoading && sections.filter(isVisible).length === 0 && (
