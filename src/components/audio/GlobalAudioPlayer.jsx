@@ -4,7 +4,7 @@ import { Play, Pause, ChevronDown, X, Music2 } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 
 export default function GlobalAudioPlayer() {
-  const { playingTrack, isPlaying, currentTime, duration, hidden, pauseTrack, resumeTrack, stopTrack, setHidden, seekTrack } = useGlobalAudio();
+  const { playingTrack, isPlaying, currentTime, duration, hidden, pauseTrack, resumeTrack, stopTrack, closePlayer, setHidden, seekTrack } = useGlobalAudio();
   const [isDragging, setIsDragging] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const progressRef = useRef(null);
@@ -171,7 +171,7 @@ export default function GlobalAudioPlayer() {
 
               {/* Close button */}
               <button
-                onClick={stopTrack}
+                onClick={closePlayer}
                 className="w-8 sm:w-9 h-8 sm:h-9 rounded-full flex items-center justify-center hover:bg-red-500/10 active:bg-red-500/15 transition-colors text-white/50 hover:text-red-400"
                 title="Cerrar"
               >

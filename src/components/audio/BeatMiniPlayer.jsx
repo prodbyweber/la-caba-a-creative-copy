@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
   const {
     playingTrack, isPlaying, currentTime, duration,
-    pauseTrack, resumeTrack, seekTrack, stopTrack,
+    pauseTrack, resumeTrack, seekTrack, stopTrack, closePlayer, hidden,
     playNext, playPrevious, repeat, shuffle, setRepeat, setShuffle,
     volume, setVolume, setExpanded,
   } = useGlobalAudio();
@@ -65,7 +65,7 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
     else setRepeat("off");
   };
 
-  if (!playingTrack) return null;
+  if (!playingTrack || hidden) return null;
 
   // Hide if this is not a beat (playingTrack.beat_id set by normalizeTrack)
   const isBeat = !!playingTrack.beat_id;
@@ -84,7 +84,7 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
         }}
       >
         {/* Progress waveform (mismo formato que Reproduciendo) */}
-        <div className="relative h-3 flex items-center px-3 sm:px-5 group">
+        <div className="relative h-2 sm:h-3 flex items-center px-3 sm:px-5 group">
           <div
             ref={progressRef}
             className="w-full h-full cursor-pointer relative flex items-center"
@@ -96,11 +96,11 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
           </div>
         </div>
 
-        <div className="px-3 sm:px-5 py-2.5 flex items-center gap-3">
+        <div className="px-3 sm:px-5 py-1.5 sm:py-2.5 flex items-center gap-2 sm:gap-3">
           {/* Cover */}
           <button onClick={() => setExpanded(true)} className="flex-shrink-0">
             <div
-              className="w-11 h-11 sm:w-12 sm:h-12 rounded-lg overflow-hidden flex items-center justify-center shadow-md"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-md sm:rounded-lg overflow-hidden flex items-center justify-center shadow-md"
               style={{ background: "#1a1a1c", border: "1px solid rgba(255,255,255,0.06)" }}
             >
               {playingTrack.cover_url ? (
@@ -197,6 +197,15 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
               {repeat === "one" ? <Repeat1 className="w-3.5 h-3.5" /> : <Repeat className="w-3.5 h-3.5" />}
             </button>
           </div>
+
+          {/* Close player */}
+          <button
+            onClick={closePlayer}
+            className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center hover:bg-white/10 text-white/40 hover:text-white transition-colors flex-shrink-0"
+            title="Cerrar reproductor"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
 
           {/* Expand button (desktop) */}
           <button

@@ -315,7 +315,7 @@ export default function Beats() {
             {section.subtitle && <p className="text-sm text-[#a0a0a0] mb-4">{section.subtitle}</p>}
             <div className="flex gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
               {sBeats.map((beat, i) => (
-                <div key={beat.id} className="w-44 flex-shrink-0">
+                <div key={beat.id} className="w-[48%] max-w-[440px] flex-shrink-0">
                   <BeatCard beat={beat} index={i} user={user} liked={likedIds.has(beat.id)} saved={savedIds.has(beat.id)} onLike={user ? (b) => likeMutation.mutate(b) : null} onSave={user ? (b) => saveMutation.mutate(b) : null} onDownload={user ? handleDownload : null} onBuy={handleBuy} onPlay={handlePlay} onOpen={setCinematicBeat} listBeats={sBeats} />
                 </div>
               ))}

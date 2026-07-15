@@ -348,6 +348,26 @@ export function GlobalAudioProvider({ children }) {
     }
   }, []);
 
+  // Cierre total del reproductor: detiene, limpia la cola y oculta el reproductor.
+  const closePlayer = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    setPlayingTrack(null);
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setDuration(0);
+    setExpanded(false);
+    setQueue([]);
+    setCurrentIndex(-1);
+    setHidden(true);
+    if ("mediaSession" in navigator) {
+      navigator.mediaSession.playbackState = "none";
+      navigator.mediaSession.metadata = null;
+    }
+  }, []);
+
   // ─── Volume control ──────────────────────────────────────────────────────────
   const changeVolume = useCallback((vol) => {
     const clamped = Math.max(0, Math.min(1, vol));
@@ -370,6 +390,7 @@ export function GlobalAudioProvider({ children }) {
         resumeTrack,
         seekTrack,
         stopTrack,
+        closePlayer,
         setHidden,
         // new
         queue,

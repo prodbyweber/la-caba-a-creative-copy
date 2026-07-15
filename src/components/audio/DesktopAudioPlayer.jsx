@@ -4,7 +4,7 @@ import { Play, Pause, Volume2, VolumeX, Music2, ChevronUp, ChevronDown, X } from
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 
 export default function DesktopAudioPlayer() {
-  const { playingTrack, isPlaying, currentTime, duration, pauseTrack, resumeTrack, stopTrack, seekTrack } = useGlobalAudio();
+  const { playingTrack, isPlaying, currentTime, duration, pauseTrack, resumeTrack, stopTrack, closePlayer, hidden, seekTrack } = useGlobalAudio();
   const [isDragging, setIsDragging] = useState(false);
   const [volume, setVolume] = useState(1);
   const [expanded, setExpanded] = useState(true);
@@ -39,7 +39,7 @@ export default function DesktopAudioPlayer() {
 
   // Don't render for beat tracks — handled by BeatMiniPlayer
   if (playingTrack?.beat_id) return null;
-  if (!isDesktop || !playingTrack) return null;
+  if (!isDesktop || !playingTrack || hidden) return null;
 
   return (
     <motion.div
@@ -146,9 +146,9 @@ export default function DesktopAudioPlayer() {
                   )}
                 </button>
                 <button
-                  onClick={stopTrack}
+                  onClick={closePlayer}
                   className="w-10 h-10 rounded-full hover:bg-white/10 active:bg-white/15 flex items-center justify-center transition-colors text-white/70 hover:text-white"
-                  title="Detener"
+                  title="Cerrar"
                 >
                   <X className="w-5 h-5" />
                 </button>
