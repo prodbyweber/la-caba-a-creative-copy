@@ -51,8 +51,9 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
 
   return (
     <div>
+      {/* ── Móvil: versión original sin cambios ───────────────────── */}
       <div
-        className="relative rounded-2xl overflow-hidden aspect-[16/10] sm:aspect-[16/9] cursor-pointer group select-none"
+        className="sm:hidden relative rounded-2xl overflow-hidden aspect-[16/10] cursor-pointer group select-none"
         style={{ background: "#161616" }}
         onClick={() => onOpen?.(current)}
         onTouchStart={onTouchStart}
@@ -157,9 +158,130 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
         </button>
       </div>
 
-      {/* Indicadores inferiores — píldoras (activo 24px / inactivo 12px) */}
+      {/* ── Desktop: hero cinematográfico reducido (21:9) ────────── */}
+      <div
+        className="hidden sm:block relative rounded-2xl overflow-hidden cursor-pointer group select-none"
+        style={{ aspectRatio: "21 / 9", background: "#162130" }}
+        onClick={() => onOpen?.(current)}
+      >
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={current.id}
+            src={cover}
+            alt={current.title}
+            initial={{ opacity: 0, scale: 1.04 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.55 }}
+            className="absolute inset-0 w-full h-full object-cover"
+            draggable={false}
+          />
+        </AnimatePresence>
+
+        {/* Overlay navy cinematográfico (fragmentado / reducido) */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "linear-gradient(90deg, rgba(11,18,32,0.92) 0%, rgba(11,18,32,0.55) 45%, rgba(11,18,32,0.12) 100%)" }}
+        />
+
+        {/* Contenido — izquierda, centrado vertical */}
+        <div className="absolute inset-0 flex items-center px-8 lg:px-12 pointer-events-none">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current.id}
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              className="max-w-xl pointer-events-auto"
+              onClick={(e) => { e.stopPropagation(); onOpen?.(current); }}
+            >
+              <h2
+                className="text-[34px] lg:text-[40px] font-black text-white mb-3"
+                style={{ letterSpacing: "-0.03em", lineHeight: 0.98 }}
+              >
+                {current.title}
+              </h2>
+              <div className="flex items-center gap-2 mb-5">
+                <div
+                  className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center"
+                  style={{ background: "#2a2a2a", border: "1px solid rgba(255,255,255,0.18)" }}
+                >
+                  {beatCover ? (
+                    <img src={beatCover} alt="" className="w-full h-full object-cover" draggable={false} />
+                  ) : (
+                    <Music2 className="w-3 h-3 text-white/40" />
+                  )}
+                </div>
+                <p className="text-sm text-white/70 font-medium truncate">
+                  {meta}{tags ? ` • ${tags}` : ""}
+                </p>
+              </div>
+              {/* Controles: Play circular + pill Ver beat */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={(e) => { e.stopPropagation(); onPlay?.(current, beats); }}
+                  className="w-12 h-12 rounded-full flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
+                  style={{ background: "#ff5833", boxShadow: "0 8px 26px rgba(255,88,51,0.4)" }}
+                  aria-label={active && isPlaying ? "Pausar" : "Reproducir"}
+                >
+                  {active && isPlaying ? (
+                    <Pause className="w-5 h-5 text-white" fill="white" />
+                  ) : (
+                    <Play className="w-5 h-5 text-white ml-0.5" fill="white" />
+                  )}
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onOpen?.(current); }}
+                  className="px-5 py-2.5 rounded-full text-sm font-bold text-white transition-colors hover:bg-white/10"
+                  style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.14)", backdropFilter: "blur(8px)" }}
+                >
+                  Ver beat
+                </button>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Flechas de navegación — esquina inferior derecha */}
+        {beats.length > 1 && (
+          <div className="absolute bottom-5 right-6 flex items-center gap-2 z-10">
+            <button
+              onClick={(e) => { e.stopPropagation(); go(-1); }}
+              className="w-9 h-9 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.14)" }}
+              aria-label="Anterior"
+            >
+              <ChevronLeft className="w-4 h-4 text-white" />
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); go(1); }}
+              className="w-9 h-9 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.14)" }}
+              aria-label="Siguiente"
+            >
+              <ChevronRight className="w-4 h-4 text-white" />
+            </button>
+          </div>
+        )}
+
+        {/* Puntos de paginación tenues — centro inferior */}
+        {beats.length > 1 && (
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none z-10">
+            {beats.map((_, i) => (
+              <span
+                key={i}
+                className="h-1.5 rounded-full transition-all duration-300"
+                style={{ width: i === idx ? 18 : 6, background: i === idx ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.3)" }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Indicadores inferiores — píldoras (móvil) */}
       {beats.length > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-4">
+        <div className="sm:hidden flex items-center justify-center gap-2 mt-4">
           {beats.map((_, i) => (
             <button
               key={i}
