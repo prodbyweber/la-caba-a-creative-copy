@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, createContext, useContext, useCallback } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Globe, Lock, Share2, FolderOpen } from "lucide-react";
+import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Globe, Lock, Share2, FolderOpen, Download } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -324,6 +324,7 @@ export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, o
 export default function MobileTrackPoster({ track, onEdit, onDelete, onOpenDetail }) {
   const globalAudio = useGlobalAudio();
   const isPlaying = globalAudio?.playingTrack?.id === track.id;
+  const [downloading, setDownloading] = useState(false);
 
   const hasAudio = !!track.audio_file_url;
   const hasYoutube = !!track.youtube_music_url;
@@ -341,6 +342,28 @@ export default function MobileTrackPoster({ track, onEdit, onDelete, onOpenDetai
   const openDetail = useCallback(() => {
     onOpenDetail && onOpenDetail(track);
   }, [onOpenDetail, track]);
+
+  const handleDownload = useCallback(async (e) => {
+    if (e) e.stopPropagation();
+    if (!track.audio_file_url || downloading) return;
+    try {
+      setDownloading(true);
+      const res = await fetch(track.audio_file_url);
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${track.title || "soundtrack"}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch {
+      window.open(track.audio_file_url, "_blank");
+    } finally {
+      setDownloading(false);
+    }
+  }, [track, downloading]);
 
   return (
     <>
@@ -413,6 +436,30 @@ export default function MobileTrackPoster({ track, onEdit, onDelete, onOpenDetai
           >
             <ChevronDown className="w-3 h-3 text-white/70" />
           </div>
+
+          {/* Download MP3 — top-left, minimalist */}
+          {hasAudio && (
+            <button
+              type="button"
+              onClick={handleDownload}
+              aria-label="Descargar MP3"
+              className="absolute top-1.5 left-1.5 flex items-center justify-center rounded-full"
+              style={{
+                width: 24, height: 24,
+                background: "rgba(0,0,0,0.5)",
+                backdropFilter: "blur(4px)",
+                WebkitBackdropFilter: "blur(4px)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                zIndex: 2,
+                touchAction: "manipulation",
+                WebkitTapHighlightColor: "transparent",
+              }}
+            >
+              {downloading
+                ? <div className="w-2.5 h-2.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                : <Download className="w-3 h-3 text-white/90" />}
+            </button>
+          )}
 
           {/* Title */}
           <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 pointer-events-none">

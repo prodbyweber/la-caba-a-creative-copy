@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock, Trash2, FolderOpen, Upload, Check, Link, Share2 } from "lucide-react";
+import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock, Trash2, FolderOpen, Upload, Check, Link, Share2, Download } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
@@ -558,6 +558,7 @@ function TrackCard({ track, onEdit, isFirst }) {
   const [showPreviewAnimation, setShowPreviewAnimation] = useState(false);
   const [ytPlaying, setYtPlaying] = useState(false); // inline YT embed active
   const [localTrack, setLocalTrack] = useState(track);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => { setLocalTrack(track); }, [track]);
 
@@ -633,6 +634,28 @@ function TrackCard({ track, onEdit, isFirst }) {
     queryClient.invalidateQueries({ queryKey: ['tracks'] });
   };
 
+  const handleDownload = async (e) => {
+    if (e) e.stopPropagation();
+    if (!localTrack.audio_file_url || downloading) return;
+    try {
+      setDownloading(true);
+      const res = await fetch(localTrack.audio_file_url);
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${localTrack.title || "soundtrack"}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch {
+      window.open(localTrack.audio_file_url, "_blank");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   return (
     <>
       <div
@@ -705,18 +728,25 @@ function TrackCard({ track, onEdit, isFirst }) {
                   <p className="text-white font-bold text-[12px] leading-tight line-clamp-2">{localTrack.title}</p>
                   {localTrack.genre && <p className="text-white/40 text-[9px] truncate mt-1">{localTrack.genre}</p>}
                 </div>
-                {(hasAudio || hasYoutube) && (
-                  <button onClick={(e) => {
-                    e.stopPropagation();
-                    if (hasAudio) { togglePlay(e); }
-                    else if (hasYoutube) {
-                      stopPreview();
-                      setYtPlaying(v => !v);
-                    }
-                  }} className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center" style={{ background: (playing || ytPlaying) ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.88)", border: (playing || ytPlaying) ? "1px solid rgba(255,255,255,0.18)" : "none" }}>
-                    {(playing || ytPlaying) ? <Pause className="w-2.5 h-2.5 text-white" fill="white" /> : <Play className="w-2.5 h-2.5 text-black ml-0.5" fill="black" />}
-                  </button>
-                )}
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  {hasAudio && (
+                    <button onClick={handleDownload} className="w-6 h-6 rounded-full flex items-center justify-center transition-transform hover:scale-110" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.18)" }} title="Descargar MP3">
+                      {downloading ? <div className="w-2.5 h-2.5 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <Download className="w-3 h-3 text-white" />}
+                    </button>
+                  )}
+                  {(hasAudio || hasYoutube) && (
+                    <button onClick={(e) => {
+                      e.stopPropagation();
+                      if (hasAudio) { togglePlay(e); }
+                      else if (hasYoutube) {
+                        stopPreview();
+                        setYtPlaying(v => !v);
+                      }
+                    }} className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center" style={{ background: (playing || ytPlaying) ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.88)", border: (playing || ytPlaying) ? "1px solid rgba(255,255,255,0.18)" : "none" }}>
+                      {(playing || ytPlaying) ? <Pause className="w-2.5 h-2.5 text-white" fill="white" /> : <Play className="w-2.5 h-2.5 text-black ml-0.5" fill="black" />}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
