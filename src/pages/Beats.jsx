@@ -228,7 +228,7 @@ export default function Beats() {
         if (sBeats.length === 0) return null;
         return (
           <div key={section.id} className="px-4 sm:px-10 max-w-7xl mx-auto mb-10">
-            <BeatsFeaturedCarousel beats={sBeats} isPlaying={isPlaying} onPlay={handlePlay} onLike={user ? (b) => likeMutation.mutate(b) : null} likedIds={likedIds} />
+            <BeatsFeaturedCarousel beats={sBeats} isPlaying={isPlaying} onPlay={handlePlay} onOpen={setCinematicBeat} section={section} />
           </div>
         );
       case "grid": {

@@ -34,7 +34,25 @@ export default function PageSectionPreview({ section, beats, selected, onSelect 
             ))}
           </div>
         );
-      case "carousel":
+      case "carousel": {
+        const b = resolved[0];
+        const cover = section.hero_image_url || getCoverForBeat(b);
+        return (
+          <div className="relative rounded-xl overflow-hidden aspect-[16/10]" style={{ background: "#161616" }}>
+            {cover ? (
+              <img src={cover} alt="" loading="lazy" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center"><Music2 className="w-5 h-5 text-white/15" /></div>
+            )}
+            <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 45%, rgba(0,0,0,0.92))" }} />
+            <div className="absolute bottom-2 left-2 right-8">
+              <p className="text-[11px] font-black text-white truncate">{b.title}</p>
+              <p className="text-[9px] text-white/55 truncate">{b.producer}{((b.genres || [])[0]) ? ` · ${b.genres[0]}` : ""}</p>
+            </div>
+            <div className="absolute bottom-2 right-2 w-6 h-6 rounded-full" style={{ background: "#ff5833" }} />
+          </div>
+        );
+      }
       case "horizontal":
         return (
           <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>

@@ -228,6 +228,34 @@ export default function BeatsPageBuilder() {
                 <input value={cfg.subtitle || ""} onChange={(e) => set("subtitle", e.target.value)} className={iCls} placeholder="Subtítulo" />
               </div>
 
+              {/* Configuración del hero carrusel */}
+              {cfg.layout === "carousel" && (
+                <div className="space-y-3 p-3 rounded-xl" style={{ background: "rgba(255,88,51,0.06)", border: "1px solid rgba(255,88,51,0.18)" }}>
+                  <p className="text-[10px] font-bold text-[#ff8866] uppercase tracking-widest">Hero carrusel</p>
+                  <div>
+                    <label className={labelCls}>Texto auxiliar</label>
+                    <textarea value={cfg.aux_text || ""} onChange={(e) => set("aux_text", e.target.value)} className={iCls} rows={2} placeholder="Texto secundario sobre la tarjeta" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Imagen del Hero (override · opcional)</label>
+                    <input value={cfg.hero_image_url || ""} onChange={(e) => set("hero_image_url", e.target.value)} className={iCls} placeholder="https://... (vacío = portada del beat)" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className={labelCls}>Auto-transición</label>
+                      <button type="button" onClick={() => set("auto_play", cfg.auto_play === false ? true : false)}
+                        className={`${iCls} flex items-center justify-center ${cfg.auto_play !== false ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" : ""}`}>
+                        {cfg.auto_play !== false ? "Activada" : "Desactivada"}
+                      </button>
+                    </div>
+                    <div>
+                      <label className={labelCls}>Intervalo (s)</label>
+                      <input type="number" value={cfg.auto_play_interval || 6} onChange={(e) => set("auto_play_interval", parseInt(e.target.value) || 6)} className={iCls} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className={labelCls}>Tipo</label>

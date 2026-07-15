@@ -104,6 +104,24 @@
       "type": "boolean",
       "default": true,
       "description": "Si la secci\u00f3n es visible en la p\u00e1gina p\u00fablica"
+    },
+    "aux_text": {
+      "type": "string",
+      "description": "Texto auxiliar configurable sobre la tarjeta del hero (carrusel)"
+    },
+    "hero_image_url": {
+      "type": "string",
+      "description": "URL de imagen de fondo opcional para el hero (override de la portada del beat)"
+    },
+    "auto_play": {
+      "type": "boolean",
+      "default": true,
+      "description": "Transici\u00f3n autom\u00e1tica del carrusel hero"
+    },
+    "auto_play_interval": {
+      "type": "number",
+      "default": 6,
+      "description": "Segundos entre transiciones autom\u00e1ticas del carrusel hero"
     }
   },
   "required": [
