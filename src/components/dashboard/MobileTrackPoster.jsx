@@ -437,30 +437,6 @@ export default function MobileTrackPoster({ track, onEdit, onDelete, onOpenDetai
             <ChevronDown className="w-3 h-3 text-white/70" />
           </div>
 
-          {/* Download MP3 — top-left, minimalist */}
-          {hasAudio && (
-            <button
-              type="button"
-              onClick={handleDownload}
-              aria-label="Descargar MP3"
-              className="absolute top-1.5 left-1.5 flex items-center justify-center rounded-full"
-              style={{
-                width: 24, height: 24,
-                background: "rgba(0,0,0,0.5)",
-                backdropFilter: "blur(4px)",
-                WebkitBackdropFilter: "blur(4px)",
-                border: "1px solid rgba(255,255,255,0.15)",
-                zIndex: 2,
-                touchAction: "manipulation",
-                WebkitTapHighlightColor: "transparent",
-              }}
-            >
-              {downloading
-                ? <div className="w-2.5 h-2.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                : <Download className="w-3 h-3 text-white/90" />}
-            </button>
-          )}
-
           {/* Title */}
           <div className="absolute bottom-0 left-0 right-0 px-2 pb-2 pointer-events-none">
             <p className="text-white font-bold text-[11px] leading-tight line-clamp-2">{track.title}</p>
@@ -478,6 +454,30 @@ export default function MobileTrackPoster({ track, onEdit, onDelete, onOpenDetai
             )}
           </AnimatePresence>
         </div>
+
+        {/* Download MP3 — minimalist, top-left */}
+        {hasAudio && (
+          <button
+            type="button"
+            onClick={handleDownload}
+            aria-label="Descargar MP3"
+            className="absolute top-1.5 left-1.5 flex items-center justify-center rounded-full"
+            style={{
+              width: 26, height: 26,
+              background: "rgba(0,0,0,0.55)",
+              backdropFilter: "blur(4px)",
+              WebkitBackdropFilter: "blur(4px)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              zIndex: 3,
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
+            }}
+          >
+            {downloading
+              ? <div className="w-2.5 h-2.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              : <Download className="w-3 h-3 text-white/90" />}
+          </button>
+        )}
 
         {/* Play button — nested button stops propagation to card */}
         {hasPlayable && (
