@@ -231,7 +231,7 @@ export default function BeatsPageBuilder() {
               {/* Configuración del hero carrusel */}
               {cfg.layout === "carousel" && (
                 <div className="space-y-3 p-3 rounded-xl" style={{ background: "rgba(255,88,51,0.06)", border: "1px solid rgba(255,88,51,0.18)" }}>
-                  <p className="text-[10px] font-bold text-[#ff8866] uppercase tracking-widest">Hero carrusel</p>
+                  <p className="text-[10px] font-bold text-[#ff8866] uppercase tracking-widest">Hero Carousel</p>
                   <div>
                     <label className={labelCls}>Texto auxiliar</label>
                     <textarea value={cfg.aux_text || ""} onChange={(e) => set("aux_text", e.target.value)} className={iCls} rows={2} placeholder="Texto secundario sobre la tarjeta" />

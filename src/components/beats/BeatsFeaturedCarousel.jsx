@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, Music2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { getCoverForBeat } from "@/lib/beatsUtils";
 import { preloadBeatAudio } from "@/lib/beatPreload";
 
-// Hero carrusel horizontal — escaparate de Beats Destacados.
-// Composición fiel a la referencia; botón Play en naranja corporativo (#ff5833).
-// Clic en la tarjeta abre la ficha cinematográfica; el botón Play reproduce.
+// Hero Carousel — réplica fiel del blueprint de referencia.
+// Botón Play en naranja corporativo (#ff5833). Clic en la tarjeta abre la
+// ficha cinematográfica; el botón Play reproduce inmediatamente.
 export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen, section }) {
   const { playingTrack } = useGlobalAudio();
   const [idx, setIdx] = useState(0);
+  const touchStartX = useRef(null);
 
   const autoPlay = section?.auto_play !== false;
   const intervalMs = Math.max(3, section?.auto_play_interval || 6) * 1000;
@@ -21,7 +22,7 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
     return () => clearInterval(t);
   }, [beats, autoPlay, intervalMs]);
 
-  // Precarga del primer beat (audio) para reproducción inmediata.
+  // Precarga del primer beat (audio) para reproducción inmediata + slide siguiente.
   useEffect(() => {
     if (beats?.[0]?.preview_mp3_url) preloadBeatAudio(beats[0].preview_mp3_url);
   }, [beats]);
@@ -39,47 +40,59 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
 
   const go = (n) => setIdx((i) => (i + n + beats.length) % beats.length);
 
+  // Swipe táctil (móvil)
+  const onTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const onTouchEnd = (e) => {
+    if (touchStartX.current == null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 45) go(dx > 0 ? -1 : 1);
+    touchStartX.current = null;
+  };
+
   return (
     <div>
       <div
-        className="relative rounded-3xl overflow-hidden aspect-[16/10] sm:aspect-[21/9] cursor-pointer group"
+        className="relative rounded-2xl overflow-hidden aspect-[16/10] sm:aspect-[16/9] cursor-pointer group select-none"
         style={{ background: "#161616" }}
         onClick={() => onOpen?.(current)}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
       >
         <AnimatePresence mode="wait">
           <motion.img
             key={current.id}
             src={cover}
             alt={current.title}
-            initial={{ opacity: 0, scale: 1.06 }}
+            initial={{ opacity: 0, scale: 1.05 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.55 }}
             className="absolute inset-0 w-full h-full object-cover"
             loading={idx === 0 ? "eager" : "lazy"}
+            draggable={false}
           />
         </AnimatePresence>
 
-        {/* Degradado cinematográfico inferior */}
+        {/* Degradado cinematográfico: fuerte abajo, desaparece hacia el centro */}
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: "linear-gradient(180deg, rgba(14,14,14,0.2) 0%, rgba(14,14,14,0.05) 38%, rgba(14,14,14,0.92) 100%)" }}
+          style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 42%, rgba(0,0,0,0.92) 100%)" }}
         />
 
-        {/* Contenido superpuesto — abajo a la izquierda */}
-        <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-8 pointer-events-none">
+        {/* Contenido superpuesto — esquina inferior izquierda */}
+        <div className="absolute inset-0 flex flex-col justify-end p-5 sm:p-6 pointer-events-none">
           <AnimatePresence mode="wait">
             <motion.div
               key={current.id}
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 22 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               className="max-w-xl pointer-events-auto"
               onClick={(e) => { e.stopPropagation(); onOpen?.(current); }}
             >
               <h2
-                className="text-3xl sm:text-5xl font-black text-white mb-2.5"
+                className="text-[30px] sm:text-[44px] font-black text-white mb-2.5"
                 style={{ letterSpacing: "-0.03em", lineHeight: 0.98 }}
               >
                 {current.title}
@@ -87,16 +100,16 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
               {/* Sub-label: avatar + productor · géneros · tags */}
               <div className="flex items-center gap-2">
                 <div
-                  className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center"
+                  className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center"
                   style={{ background: "#2a2a2a", border: "1px solid rgba(255,255,255,0.15)" }}
                 >
                   {beatCover ? (
-                    <img src={beatCover} alt="" className="w-full h-full object-cover" />
+                    <img src={beatCover} alt="" className="w-full h-full object-cover" draggable={false} />
                   ) : (
                     <Music2 className="w-3 h-3 text-white/40" />
                   )}
                 </div>
-                <p className="text-xs sm:text-sm text-white/70 font-medium truncate">
+                <p className="text-xs sm:text-sm text-white/75 font-medium truncate">
                   {meta}{tags ? ` · ${tags}` : ""}
                 </p>
               </div>
@@ -113,7 +126,7 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
             <button
               onClick={(e) => { e.stopPropagation(); go(-1); }}
               className="hidden sm:flex absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
-              style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.12)" }}
+              style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.12)" }}
               aria-label="Anterior"
             >
               <ChevronLeft className="w-5 h-5 text-white" />
@@ -121,7 +134,7 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
             <button
               onClick={(e) => { e.stopPropagation(); go(1); }}
               className="hidden sm:flex absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
-              style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.12)" }}
+              style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.12)" }}
               aria-label="Siguiente"
             >
               <ChevronRight className="w-5 h-5 text-white" />
@@ -129,11 +142,11 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
           </>
         )}
 
-        {/* Botón Play grande — naranja corporativo — reproduce inmediatamente */}
+        {/* Botón Play grande — naranja corporativo — reproduce al instante */}
         <button
           onClick={(e) => { e.stopPropagation(); onPlay?.(current, beats); }}
-          className="absolute bottom-5 right-5 sm:bottom-8 sm:right-8 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-110 active:scale-95 z-10"
-          style={{ background: "#ff5833" }}
+          className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center transition-transform hover:scale-110 active:scale-95 z-10"
+          style={{ background: "#ff5833", boxShadow: "0 8px 30px rgba(255,88,51,0.45)" }}
           aria-label={active && isPlaying ? "Pausar" : "Reproducir"}
         >
           {active && isPlaying ? (
@@ -144,7 +157,7 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
         </button>
       </div>
 
-      {/* Indicadores inferiores (píldoras) */}
+      {/* Indicadores inferiores — píldoras (activo 24px / inactivo 12px) */}
       {beats.length > 1 && (
         <div className="flex items-center justify-center gap-2 mt-4">
           {beats.map((_, i) => (
@@ -152,7 +165,7 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
               key={i}
               onClick={() => setIdx(i)}
               className="h-1.5 rounded-full transition-all duration-300"
-              style={{ width: i === idx ? 28 : 8, background: i === idx ? "#ffffff" : "rgba(255,255,255,0.2)" }}
+              style={{ width: i === idx ? 24 : 12, background: i === idx ? "#ffffff" : "#4b4b4b" }}
               aria-label={`Slide ${i + 1}`}
             />
           ))}
