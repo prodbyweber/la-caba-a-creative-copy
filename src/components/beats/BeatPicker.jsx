@@ -1,21 +1,31 @@
 import React, { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { Search, Check, Music2, GripVertical, X } from "lucide-react";
+import { GENRES } from "@/lib/musicConstants";
 
 // Selector visual de beats para una sección manual:
-// búsqueda + selección por chip + reorden por drag & drop.
+// filtro por géneros (chips) + búsqueda + selección por chip + reorden por drag & drop.
 export default function BeatPicker({ selectedIds, beats, onChange }) {
   const [search, setSearch] = useState("");
+  const [genreFilter, setGenreFilter] = useState([]);
   const ids = selectedIds || [];
   const selected = ids.map(id => beats.find(b => b.id === id)).filter(Boolean);
+
   const filtered = beats.filter(b => {
-    if (!search) return true;
-    const q = search.toLowerCase();
-    return b.title?.toLowerCase().includes(q) || b.producer?.toLowerCase().includes(q);
+    if (search) {
+      const q = search.toLowerCase();
+      if (!(b.title?.toLowerCase().includes(q) || b.producer?.toLowerCase().includes(q))) return false;
+    }
+    if (genreFilter.length > 0) {
+      const bGenres = b.genres || [];
+      if (!genreFilter.some(g => bGenres.includes(g))) return false;
+    }
+    return true;
   });
 
   const toggle = (id) => onChange(ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id]);
   const remove = (id) => onChange(ids.filter(x => x !== id));
+  const toggleGenre = (g) => setGenreFilter(arr => arr.includes(g) ? arr.filter(x => x !== g) : [...arr, g]);
 
   const onDragEnd = (r) => {
     if (!r.destination) return;
@@ -55,7 +65,7 @@ export default function BeatPicker({ selectedIds, beats, onChange }) {
                             <p className="text-xs font-bold text-white truncate">{b.title}</p>
                             <p className="text-[10px] text-white/35 truncate">{b.producer}</p>
                           </div>
-                          <button onClick={() => remove(b.id)} className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-red-500/10 text-white/40 hover:text-red-400">
+                          <button onClick={() => remove(b.id)} className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-red-500/10 text-white/40 hover:text-red-400 flex-shrink-0">
                             <X className="w-3 h-3" />
                           </button>
                         </div>
@@ -70,6 +80,44 @@ export default function BeatPicker({ selectedIds, beats, onChange }) {
         </div>
       )}
 
+      {/* Filtro por géneros (chips touch) */}
+      <div>
+        <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1.5">Filtrar por género</p>
+        <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-0.5 px-0.5" style={{ scrollbarWidth: "none" }}>
+          <button
+            type="button"
+            onClick={() => setGenreFilter([])}
+            className="flex-shrink-0 px-2.5 py-1.5 rounded-full text-[11px] font-semibold transition-all"
+            style={{
+              background: genreFilter.length === 0 ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.05)",
+              color: genreFilter.length === 0 ? "#fff" : "rgba(255,255,255,0.55)",
+              border: genreFilter.length === 0 ? "1px solid rgba(255,255,255,0.2)" : "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            Todos
+          </button>
+          {GENRES.map((g) => {
+            const on = genreFilter.includes(g);
+            return (
+              <button
+                key={g}
+                type="button"
+                onClick={() => toggleGenre(g)}
+                className="flex-shrink-0 px-2.5 py-1.5 rounded-full text-[11px] font-semibold transition-all flex items-center gap-1"
+                style={{
+                  background: on ? "#ff5833" : "rgba(255,255,255,0.05)",
+                  color: on ? "#fff" : "rgba(255,255,255,0.55)",
+                  border: on ? "1px solid #ff5833" : "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                {on && <Check className="w-2.5 h-2.5" />}
+                {g}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Búsqueda + selección */}
       <div>
         <div className="relative">
@@ -79,7 +127,9 @@ export default function BeatPicker({ selectedIds, beats, onChange }) {
             placeholder="Buscar beats..." />
         </div>
         <div className="max-h-56 overflow-y-auto space-y-1.5 mt-2">
-          {filtered.map(b => {
+          {filtered.length === 0 ? (
+            <p className="text-center text-white/30 text-xs py-6">Sin resultados</p>
+          ) : filtered.map(b => {
             const sel = ids.includes(b.id);
             return (
               <button key={b.id} type="button" onClick={() => toggle(b.id)}
