@@ -161,7 +161,7 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
       {/* ── Desktop: hero cinematográfico reducido (21:9) ────────── */}
       <div
         className="hidden sm:block relative rounded-2xl overflow-hidden cursor-pointer group select-none"
-        style={{ aspectRatio: "21 / 9", background: "#162130" }}
+        style={{ aspectRatio: "2.6 / 1", background: "#162130" }}
         onClick={() => onOpen?.(current)}
       >
         <AnimatePresence mode="wait">
