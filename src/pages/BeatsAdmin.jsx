@@ -8,6 +8,7 @@ import { GENRES, MOODS, KEYS, BEAT_STATUS } from "@/lib/musicConstants";
 import BeatFormModal from "@/components/beats/BeatFormModal";
 import BeatsPageBuilder from "@/components/beats/BeatsPageBuilder";
 import AdminBottomNav from "@/components/admin/AdminBottomNav";
+import AdminTopNav from "@/components/admin/AdminTopNav";
 
 export default function BeatsAdmin() {
   const qc = useQueryClient();
@@ -164,9 +165,10 @@ export default function BeatsAdmin() {
   ];
 
   return (
-    <div className="min-h-screen pb-32" style={{ background: "#0a0a0b" }}>
+    <div className="min-h-screen pb-32 pt-14" style={{ background: "#0a0a0b" }}>
+      <AdminTopNav activePage="BeatsAdmin" />
       {/* Header */}
-      <div className="sticky top-0 z-40 px-4 sm:px-10 py-3 flex flex-wrap items-center justify-between gap-3"
+      <div className="sticky top-14 z-40 px-4 sm:px-10 py-3 flex flex-wrap items-center justify-between gap-3"
         style={{ background: "rgba(10,10,11,0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
       >
         <div className="flex items-center gap-3">
