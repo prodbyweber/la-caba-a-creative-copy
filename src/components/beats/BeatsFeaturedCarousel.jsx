@@ -161,7 +161,7 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
       {/* ── Desktop: hero cinematográfico reducido (21:9) ────────── */}
       <div
         className="hidden sm:block relative rounded-2xl overflow-hidden cursor-pointer group select-none"
-        style={{ aspectRatio: "2.6 / 1", background: "#162130" }}
+        style={{ aspectRatio: "2.6 / 1", background: "#0d0d0f" }}
         onClick={() => onOpen?.(current)}
       >
         <AnimatePresence mode="wait">
@@ -178,14 +178,18 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
           />
         </AnimatePresence>
 
-        {/* Overlay navy cinematográfico (fragmentado / reducido) */}
+        {/* Overlay cinemático neutro (sin tinte azul) */}
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: "linear-gradient(90deg, rgba(11,18,32,0.92) 0%, rgba(11,18,32,0.55) 45%, rgba(11,18,32,0.12) 100%)" }}
+          style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.42) 48%, rgba(0,0,0,0.04) 100%)" }}
+        />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,0.6) 100%)" }}
         />
 
-        {/* Contenido — izquierda, centrado vertical */}
-        <div className="absolute inset-0 flex items-center px-8 lg:px-12 pointer-events-none">
+        {/* Contenido — esquina inferior izquierda */}
+        <div className="absolute inset-0 flex items-end px-8 lg:px-12 pb-7 pointer-events-none">
           <AnimatePresence mode="wait">
             <motion.div
               key={current.id}
@@ -197,12 +201,12 @@ export default function BeatsFeaturedCarousel({ beats, isPlaying, onPlay, onOpen
               onClick={(e) => { e.stopPropagation(); onOpen?.(current); }}
             >
               <h2
-                className="text-[34px] lg:text-[40px] font-black text-white mb-3"
-                style={{ letterSpacing: "-0.03em", lineHeight: 0.98 }}
+                className="text-[32px] lg:text-[38px] font-black text-white mb-2.5"
+                style={{ letterSpacing: "-0.03em", lineHeight: 1 }}
               >
                 {current.title}
               </h2>
-              <div className="flex items-center gap-2 mb-5">
+              <div className="flex items-center gap-2 mb-4">
                 <div
                   className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center"
                   style={{ background: "#2a2a2a", border: "1px solid rgba(255,255,255,0.18)" }}
