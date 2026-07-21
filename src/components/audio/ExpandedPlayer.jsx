@@ -90,8 +90,11 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
   };
 
   const handleShare = () => {
-    if (navigator.share && playingTrack) {
-      navigator.share({ title: playingTrack.title, text: `${playingTrack.title} - ${playingTrack.artist}` }).catch(() => {});
+    if (!playingTrack) return;
+    if (navigator.share) {
+      navigator.share({ title: playingTrack.title, text: `${playingTrack.title} — ${playingTrack.artist}`, url: shareUrl }).catch(() => {});
+    } else {
+      copyLink();
     }
   };
 
@@ -132,7 +135,7 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
           )}
 
           {/* Top bar */}
-          <div className="relative z-10 flex items-center justify-between px-5 pt-5 pb-3 flex-shrink-0">
+          <div className="relative z-20 flex items-center justify-between px-5 pt-5 pb-3 flex-shrink-0">
             <button
               onClick={() => setExpanded(false)}
               className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/10 text-white/60 hover:text-white transition-colors"
@@ -159,12 +162,13 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -6, scale: 0.96 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-11 z-20 w-56 rounded-xl py-1.5 shadow-2xl"
+                      className="absolute right-0 top-12 z-30 w-60 max-w-[calc(100vw-2rem)] rounded-xl py-1.5 shadow-2xl"
                       style={{ background: "rgba(20,20,22,0.98)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" }}
                     >
                       {[
-                        { label: "Ver créditos", icon: Users, action: () => { setInfoPanel("credits"); setMenuOpen(false); } },
+                        { label: "Compartir", icon: Share2, action: () => { handleShare(); setMenuOpen(false); } },
                         { label: "Copiar enlace del track", icon: Link2, action: () => { copyLink(); setMenuOpen(false); } },
+                        { label: "Ver créditos", icon: Users, action: () => { setInfoPanel("credits"); setMenuOpen(false); } },
                         { label: "Información del beat", icon: Info, action: () => { setInfoPanel("info"); setMenuOpen(false); } },
                         { label: "Configuración de reproducción", icon: Settings2, action: () => { setInfoPanel("settings"); setMenuOpen(false); } },
                       ].map((opt) => (
