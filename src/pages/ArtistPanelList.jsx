@@ -213,8 +213,8 @@ export default function ArtistPanelList() {
                       </p>
                     </div>
 
-                    {/* Edit button (solo si tiene Artist entity) */}
-                    {c.artist?.id && (
+                    {/* Edit button (artista, perfil o usuario de plataforma) */}
+                    {(c.artist?.id || c.profile?.id || c.platformUser?.id) && (
                       <button
                         onClick={e => { e.stopPropagation(); setEditingCreator(c); }}
                         className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
