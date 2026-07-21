@@ -10,12 +10,12 @@ import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 export default function CreatorRowMenu({ onEdit, onDelete }) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef(null);
+  const menuRef = useRef(null);
   const [coords, setCoords] = useState({ top: 0, right: 0 });
 
   const updatePos = () => {
     const r = btnRef.current?.getBoundingClientRect();
     if (!r) return;
-    // Coloca el menú justo debajo del botón, alineado a su borde derecho.
     setCoords({
       top: r.bottom + 4,
       right: window.innerWidth - r.right,
@@ -26,14 +26,18 @@ export default function CreatorRowMenu({ onEdit, onDelete }) {
     if (!open) return;
     updatePos();
     const handler = (e) => {
-      if (btnRef.current && !btnRef.current.contains(e.target)) setOpen(false);
+      if (
+        btnRef.current?.contains(e.target) ||
+        menuRef.current?.contains(e.target)
+      ) return;
+      setOpen(false);
     };
     const onScroll = () => setOpen(false);
-    document.addEventListener("mousedown", handler);
+    document.addEventListener("mousedown", handler, true);
     window.addEventListener("scroll", onScroll, true);
     window.addEventListener("resize", onScroll);
     return () => {
-      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("mousedown", handler, true);
       window.removeEventListener("scroll", onScroll, true);
       window.removeEventListener("resize", onScroll);
     };
@@ -63,6 +67,7 @@ export default function CreatorRowMenu({ onEdit, onDelete }) {
       {open && createPortal(
         <AnimatePresence>
           <motion.div
+            ref={menuRef}
             initial={{ opacity: 0, y: -6, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.96 }}
