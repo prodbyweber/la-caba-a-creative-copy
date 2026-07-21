@@ -20,11 +20,15 @@ export default function SavedBeatsSection() {
       if (!currentUser?.id) return [];
       const saves = await base44.entities.BeatSave.filter({ user_id: currentUser.id });
       if (saves.length === 0) return [];
-      const allBeats = await base44.entities.Beat.filter({ status: "Publicado" });
       const savedIds = new Set(saves.map(s => s.beat_id));
+      // Trae todos los beats (sin filtrar por estado) para que cualquier ritmo
+      // guardado se muestre en el catálogo del usuario.
+      const allBeats = await base44.entities.Beat.list("-updated_date", 200);
       return allBeats.filter(b => savedIds.has(b.id));
     },
     enabled: !!currentUser?.id,
+    refetchOnWindowFocus: true,
+    staleTime: 0,
   });
 
   const unsaveMutation = useMutation({

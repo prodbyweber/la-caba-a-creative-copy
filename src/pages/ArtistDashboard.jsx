@@ -2,17 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { GripVertical } from "lucide-react";
+import { GripVertical, ArrowUpRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import { ensureUserSetupComplete } from "@/lib/ensureUserProvisioned";
 import ArtistProfileDrawer, { ArtistAvatarButton } from "@/components/dashboard/ArtistProfileDrawer";
 import ProjectsSection from "@/components/dashboard/ProjectsSection.jsx";
 import TracksSection from "@/components/dashboard/TracksSection";
-import ShortsSection from "@/components/dashboard/ShortsSection";
 import BrandCampaignsSection from "@/components/dashboard/BrandCampaignsSection";
 import PhotosGallery from "@/components/dashboard/PhotosGallery";
-import FilmsSection from "@/components/dashboard/FilmsSection";
 import CatalogSectionOrder, { DEFAULT_SECTION_ORDER } from "@/components/dashboard/CatalogSectionOrder";
 import SavedBeatsSection from "@/components/dashboard/SavedBeatsSection";
 
@@ -123,9 +122,7 @@ export default function ArtistDashboard() {
   }, [userProfile?.account_type]);
 
   const showAudioSection = accountType === "artist";
-  const showVideoSection = true;
   const showProjectsSection = true;
-  const showShortsSection = true;
   const showCampaignsSection = accountType === "brand";
 
   const [windowWidth, setWindowWidth] = React.useState(
@@ -210,6 +207,13 @@ export default function ArtistDashboard() {
     currentUser?.full_name ||
     "Mi catálogo";
 
+  // Solo estas secciones son visibles en el catálogo del creador
+  const VISIBLE_CATALOG_KEYS = ["tracks", "projects", "savedbeats"];
+  const effectiveOrder = [
+    ...sectionOrder.filter(k => VISIBLE_CATALOG_KEYS.includes(k)),
+    ...VISIBLE_CATALOG_KEYS.filter(k => !sectionOrder.includes(k)),
+  ];
+
   // Render a catalog section by key
   const renderSection = (key) => {
     switch (key) {
@@ -222,25 +226,8 @@ export default function ArtistDashboard() {
           </div>
         );
       case "video":
-        if (!showVideoSection) return null;
-        return (
-          <div key="video">
-            <SectionLabel label="Films" />
-            <FilmsSection artistId={effectiveArtist?.id || artistId} userProfileId={userProfile?.id} userEmail={catalogOwnerEmail} />
-          </div>
-        );
       case "shorts":
-        if (!showShortsSection) return null;
-        return (
-          <div key="shorts">
-            <SectionLabel label="Shorts" />
-            <ShortsSection
-              artistId={effectiveArtist?.id || artistId}
-              userProfileId={userProfile?.id}
-              userEmail={catalogOwnerEmail}
-            />
-          </div>
-        );
+        return null;
       case "projects":
         if (!showProjectsSection) return null;
         return (
@@ -294,40 +281,61 @@ export default function ArtistDashboard() {
                   </h1>
                 </div>
 
-                {/* Reorder button */}
-                <div className="relative flex-shrink-0">
-                  <button
-                    onClick={() => setShowOrderMenu(v => !v)}
+                {/* Actions */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {/* Explorar beats — botón minimalista premium, siempre visible */}
+                  <Link
+                    to="/beats"
                     className="flex items-center gap-1.5 rounded-xl border transition-all"
                     style={{
                       padding: isMobileView ? "9px 12px" : "8px 14px",
                       fontSize: isMobileView ? "12px" : "11px",
                       fontFamily: "'Helvetica Neue', sans-serif",
                       fontWeight: 600,
-                      background: showOrderMenu ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)",
-                      borderColor: showOrderMenu ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.08)",
-                      color: showOrderMenu ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.35)",
+                      background: "rgba(255,255,255,0.04)",
+                      borderColor: "rgba(255,255,255,0.08)",
+                      color: "rgba(255,255,255,0.45)",
                     }}
                   >
-                    <GripVertical style={{ width: isMobileView ? 15 : 13, height: isMobileView ? 15 : 13 }} />
-                    Ordenar
-                  </button>
-                  <AnimatePresence>
-                    {showOrderMenu && (
-                      <CatalogSectionOrder
-                        order={sectionOrder}
-                        onChange={handleOrderChange}
-                        onClose={() => setShowOrderMenu(false)}
-                        isMobile={isMobileView}
-                      />
-                    )}
-                  </AnimatePresence>
+                    Explorar beats
+                    <ArrowUpRight style={{ width: isMobileView ? 14 : 12, height: isMobileView ? 14 : 12 }} />
+                  </Link>
+
+                  {/* Reorder button */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowOrderMenu(v => !v)}
+                      className="flex items-center gap-1.5 rounded-xl border transition-all"
+                      style={{
+                        padding: isMobileView ? "9px 12px" : "8px 14px",
+                        fontSize: isMobileView ? "12px" : "11px",
+                        fontFamily: "'Helvetica Neue', sans-serif",
+                        fontWeight: 600,
+                        background: showOrderMenu ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)",
+                        borderColor: showOrderMenu ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.08)",
+                        color: showOrderMenu ? "rgba(255,255,255,0.8)" : "rgba(255,255,255,0.35)",
+                      }}
+                    >
+                      <GripVertical style={{ width: isMobileView ? 15 : 13, height: isMobileView ? 15 : 13 }} />
+                      Ordenar
+                    </button>
+                    <AnimatePresence>
+                      {showOrderMenu && (
+                        <CatalogSectionOrder
+                          order={effectiveOrder}
+                          onChange={handleOrderChange}
+                          onClose={() => setShowOrderMenu(false)}
+                          isMobile={isMobileView}
+                        />
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
               </div>
 
               {/* Sections stacked in user order */}
               <div className="space-y-6">
-                {sectionOrder.map(key => renderSection(key))}
+                {effectiveOrder.map(key => renderSection(key))}
                 {showCampaignsSection && (
                   <div key="campaigns">
                     <SectionLabel label="Campañas" />
