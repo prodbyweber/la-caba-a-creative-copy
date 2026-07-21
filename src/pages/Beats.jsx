@@ -33,6 +33,7 @@ const GENRE_CHIPS_MORE = [
   "Dembow", "Dancehall", "Afropop", "Funk", "Techno",
   "Soul", "Kizomba",
 ];
+const ALL_GENRES = [...GENRE_CHIPS_PRIMARY, ...GENRE_CHIPS_MORE];
 
 export default function Beats() {
   const qc = useQueryClient();
@@ -189,6 +190,10 @@ export default function Beats() {
     setSelectedGenres(prev => prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g]);
   }, []);
 
+  useEffect(() => {
+    if (search || selectedGenres.length > 0) setGenresExpanded(true);
+  }, [search, selectedGenres]);
+
   const filteredBeats = useMemo(() => {
     let result = [...beats];
     if (search) {
@@ -215,6 +220,8 @@ export default function Beats() {
     }
     return result;
   }, [beats, search, activeCuration, selectedGenres]);
+
+  const isBrowsing = !!search || selectedGenres.length > 0;
 
   // Render dinámico de cada sección configurada en el editor (admin → público).
   const renderSection = (section) => {
@@ -425,11 +432,11 @@ export default function Beats() {
                     <div className="flex items-center gap-2 mb-3">
                       <span className="h-1 w-6 rounded-full" style={{ background: "#F5C518" }} />
                       <p className="text-[10px] font-bold tracking-widest uppercase" style={{ color: "#F5C518" }}>
-                        Top géneros · Urban
+                        Géneros
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {GENRE_CHIPS_MORE.map((g) => {
+                      {ALL_GENRES.map((g) => {
                         const active = selectedGenres.includes(g);
                         return (
                           <button
@@ -457,22 +464,58 @@ export default function Beats() {
 
       </div>
 
-      {/* ── Hero carrusel (primer bloque único de la página) ───────── */}
-      {featuredBeats.length > 0 && (!featuredSection || isVisible(featuredSection)) && (
-        <div className="px-4 sm:px-10 max-w-7xl mx-auto pt-5 mb-10">
-          <BeatsFeaturedCarousel beats={featuredBeats} isPlaying={isPlaying} onPlay={handlePlay} onOpen={setCinematicBeat} section={featuredSection || { auto_play: true, auto_play_interval: 6 }} />
+      {isBrowsing ? (
+        /* ── Vista catálogo full-wide (búsqueda / géneros seleccionados) ─── */
+        <div className="px-4 sm:px-10 max-w-[1600px] mx-auto pt-6 pb-16">
+          <div className="flex items-end justify-between mb-5">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-black text-white" style={{ letterSpacing: "-0.03em" }}>
+                {search ? "Resultados" : "Beats"}
+              </h2>
+              <p className="text-xs text-white/40 mt-1">
+                {selectedGenres.length > 0 ? selectedGenres.join(" · ") : "Catálogo completo"}
+              </p>
+            </div>
+            <span className="text-xs font-semibold text-white/50">{filteredBeats.length} beats</span>
+          </div>
+          {isLoading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {Array.from({ length: 10 }).map((_, i) => (
+                <div key={i}><div className="aspect-square rounded-2xl animate-pulse" style={{ background: "#1a1a1a" }} /><div className="h-3.5 bg-white/5 rounded w-3/4 mt-3 animate-pulse" /><div className="h-3 bg-white/5 rounded w-1/2 mt-2 animate-pulse" /></div>
+              ))}
+            </div>
+          ) : filteredBeats.length === 0 ? (
+            <div className="text-center py-20"><p className="text-[#a0a0a0] text-sm">No se encontraron beats</p></div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {filteredBeats.map((beat, i) => (
+                <BeatCard key={beat.id} beat={beat} index={i} user={user} liked={likedIds.has(beat.id)} saved={savedIds.has(beat.id)}
+                  onLike={user ? (b) => likeMutation.mutate(b) : null} onSave={user ? (b) => saveMutation.mutate(b) : null}
+                  onDownload={user ? handleDownload : null} onBuy={handleBuy} onPlay={handlePlay} onOpen={setCinematicBeat} listBeats={filteredBeats} />
+              ))}
+            </div>
+          )}
         </div>
-      )}
+      ) : (
+        <>
+          {/* ── Hero carrusel (primer bloque único de la página) ───────── */}
+          {featuredBeats.length > 0 && (!featuredSection || isVisible(featuredSection)) && (
+            <div className="px-4 sm:px-10 max-w-7xl mx-auto pt-5 mb-10">
+              <BeatsFeaturedCarousel beats={featuredBeats} isPlaying={isPlaying} onPlay={handlePlay} onOpen={setCinematicBeat} section={featuredSection || { auto_play: true, auto_play_interval: 6 }} />
+            </div>
+          )}
 
-      {/* ── Secciones dinámicas (editor de la página Beats) ─────────── */}
-      <div className={featuredBeats.length > 0 && (!featuredSection || isVisible(featuredSection)) ? "" : "pt-5"}>
-        {sections.filter((section) => section.id !== featuredSection?.id).map((section) => renderSection(section))}
-      </div>
+          {/* ── Secciones dinámicas (editor de la página Beats) ─────────── */}
+          <div className={featuredBeats.length > 0 && (!featuredSection || isVisible(featuredSection)) ? "" : "pt-5"}>
+            {sections.filter((section) => section.id !== featuredSection?.id).map((section) => renderSection(section))}
+          </div>
 
-      {!isLoading && sections.filter(isVisible).length === 0 && (
-        <div className="px-4 sm:px-10 max-w-7xl mx-auto pt-10 text-center">
-          <p className="text-white/30 text-sm">No hay secciones configuradas en el panel de BEATS.</p>
-        </div>
+          {!isLoading && sections.filter(isVisible).length === 0 && (
+            <div className="px-4 sm:px-10 max-w-7xl mx-auto pt-10 text-center">
+              <p className="text-white/30 text-sm">No hay secciones configuradas en el panel de BEATS.</p>
+            </div>
+          )}
+        </>
       )}
 
       {/* ── Auth gate ─────────────────────────────────────────────── */}
