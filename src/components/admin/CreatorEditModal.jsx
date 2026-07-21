@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Upload, Save, AlertTriangle, Loader2 } from "lucide-react";
+import { X, Upload, Save, AlertTriangle, Loader2, Trash2 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import CreatorDeleteZone from "@/components/admin/CreatorDeleteZone";
+import CreatorDeleteConfirm from "@/components/admin/CreatorDeleteConfirm";
 
 const inputStyle = {
   width: "100%", padding: "9px 11px",
@@ -52,6 +52,7 @@ export default function CreatorEditModal({ creator, onClose }) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [uploading, setUploading] = useState(null); // 'artist' | 'profile' | null
+  const [showDelete, setShowDelete] = useState(false);
 
   // Artist form
   const [af, setAf] = useState({
@@ -440,18 +441,37 @@ export default function CreatorEditModal({ creator, onClose }) {
 
             {tab === "danger" && (
               <div style={sectionStyle}>
-                <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+                <div style={{ display: "flex", gap: "8px", marginBottom: "14px" }}>
                   <AlertTriangle size={16} color="#ef4444" style={{ flexShrink: 0, marginTop: "1px" }} />
                   <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.65)", margin: 0, lineHeight: 1.5 }}>
                     Zona de peligro. El borrado elimina al creador y <b>todo</b> su contenido e historial de la plataforma.
                   </p>
                 </div>
-                <CreatorDeleteZone creator={creator} onComplete={onClose} />
+                <button
+                  type="button"
+                  onClick={() => setShowDelete(true)}
+                  style={{
+                    width: "100%", padding: "11px",
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                    background: "#ef4444", border: "none", borderRadius: "10px",
+                    color: "#fff", fontSize: "12px", fontWeight: 700, cursor: "pointer",
+                  }}
+                >
+                  <Trash2 size={13} /> Eliminar creador por completo
+                </button>
               </div>
             )}
           </div>
         </motion.div>
       </motion.div>
+
+      {showDelete && (
+        <CreatorDeleteConfirm
+          creator={creator}
+          onClose={() => setShowDelete(false)}
+          onDone={onClose}
+        />
+      )}
     </AnimatePresence>
   );
 }

@@ -5,7 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import CreatorEditModal from "@/components/admin/CreatorEditModal";
-import { User, Search, ChevronRight, Pencil } from "lucide-react";
+import CreatorRowMenu from "@/components/admin/CreatorRowMenu";
+import CreatorDeleteConfirm from "@/components/admin/CreatorDeleteConfirm";
+import { User, Search, ChevronRight } from "lucide-react";
 
 export default function ArtistPanelList() {
   const navigate = useNavigate();
@@ -13,6 +15,7 @@ export default function ArtistPanelList() {
   const [authChecked, setAuthChecked] = React.useState(false);
   const [search, setSearch] = useState("");
   const [editingCreator, setEditingCreator] = useState(null);
+  const [deletingCreator, setDeletingCreator] = useState(null);
 
   React.useEffect(() => {
     base44.auth.me().then(u => {
@@ -213,16 +216,12 @@ export default function ArtistPanelList() {
                       </p>
                     </div>
 
-                    {/* Edit button (artista, perfil o usuario de plataforma) */}
+                    {/* Menú de tres puntos — siempre visible */}
                     {(c.artist?.id || c.profile?.id || c.platformUser?.id) && (
-                      <button
-                        onClick={e => { e.stopPropagation(); setEditingCreator(c); }}
-                        className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-                        style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}
-                        title="Editar creador"
-                      >
-                        <Pencil className="w-3 h-3 text-white/50" />
-                      </button>
+                      <CreatorRowMenu
+                        onEdit={() => setEditingCreator(c)}
+                        onDelete={() => setDeletingCreator(c)}
+                      />
                     )}
                     <ChevronRight className="w-3.5 h-3.5 text-white/15 flex-shrink-0 group-hover:text-white/40 transition-colors" />
                   </motion.div>
@@ -238,6 +237,14 @@ export default function ArtistPanelList() {
         <CreatorEditModal
           creator={editingCreator}
           onClose={() => setEditingCreator(null)}
+        />
+      )}
+
+      {/* Confirmación rápida de borrado */}
+      {deletingCreator && (
+        <CreatorDeleteConfirm
+          creator={deletingCreator}
+          onClose={() => setDeletingCreator(null)}
         />
       )}
     </AdminLayout>
