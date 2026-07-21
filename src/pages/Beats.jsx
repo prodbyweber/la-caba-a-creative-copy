@@ -333,10 +333,29 @@ export default function Beats() {
       <div className="sticky top-0 z-40" style={{ background: "rgba(18,18,18,0.95)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
         {/* Nav header */}
         <div className="flex items-center justify-between px-4 sm:px-10 py-3">
-          {/* Left: menu */}
-          <Link to="/Explorar" className="flex items-center justify-center w-9 h-9 rounded-full hover:bg-white/5 transition-colors text-white/70">
-            <Menu className="w-5 h-5" />
-          </Link>
+          {/* Left: nav (desktop) + hamburger (mobile) */}
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            {/* Mobile: hamburger */}
+            <Link to="/Explorar" className="sm:hidden flex items-center justify-center w-9 h-9 rounded-full hover:bg-white/5 transition-colors text-white/70">
+              <Menu className="w-5 h-5" />
+            </Link>
+            {/* Desktop: nav buttons */}
+            <nav className="hidden sm:flex items-center gap-1">
+              <Link to="/" className="px-3 py-2 rounded-full text-xs font-semibold text-white/55 hover:text-white hover:bg-white/5 transition-colors">
+                Inicio
+              </Link>
+              <Link to="/Explorar" className="px-3 py-2 rounded-full text-xs font-semibold text-white/55 hover:text-white hover:bg-white/5 transition-colors">
+                Explorar
+              </Link>
+              <Link to="/ArtistDashboard" className="px-3 py-2 rounded-full text-xs font-semibold text-white/55 hover:text-white hover:bg-white/5 transition-colors">
+                Tu catálogo
+              </Link>
+              {/* Página actual */}
+              <span className="px-3 py-2 rounded-full text-xs font-bold text-white bg-white/10 border border-white/15">
+                Beats
+              </span>
+            </nav>
+          </div>
           {/* Center: logo */}
           <Link to="/beats" className="absolute left-1/2 -translate-x-1/2">
             <img src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png" alt="Cabaña" className="h-6 w-auto opacity-90" />
