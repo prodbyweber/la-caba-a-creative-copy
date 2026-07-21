@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBeatPlayer } from "@/hooks/useBeatPlayer";
 import { resolveSectionBeats } from "@/lib/beatSections";
 import { getOriginalFilename } from "@/lib/beatsUtils";
-import { Search, Lock, Menu, X, TrendingUp, ShoppingBag } from "lucide-react";
+import { Search, Lock, Menu, X, TrendingUp, ShoppingBag, ChevronDown } from "lucide-react";
 import BeatCard from "@/components/beats/BeatCard";
 import BeatsFeaturedCarousel from "@/components/beats/BeatsFeaturedCarousel";
 import BeatsTrendingList from "@/components/beats/BeatsTrendingList";
@@ -24,11 +24,15 @@ const CURATION_CHIPS = [
   { id: "descargas", label: "Descargas" },
   { id: "gratis", label: "Gratis" },
 ];
-const GENRE_CHIPS = [
+const GENRE_CHIPS_PRIMARY = [
   "Reggaetón", "Afrobeats", "Jersey Club", "Trap", "House",
-  "R&B", "Drill", "Hip-Hop", "Lo-Fi", "Experimental",
+  "R&B", "Drill", "Hip-Hop",
 ];
-const TABS = ["Explorar", "Nuevos", "Trending"];
+const GENRE_CHIPS_MORE = [
+  "Pop", "Bachata", "Salsa", "Afro House", "Amapiano",
+  "Dembow", "Dancehall", "Afropop", "Funk", "Techno",
+  "Soul", "Kizomba",
+];
 
 export default function Beats() {
   const qc = useQueryClient();
@@ -37,7 +41,7 @@ export default function Beats() {
   const [search, setSearch] = useState("");
   const [activeCuration, setActiveCuration] = useState("todos");
   const [selectedGenres, setSelectedGenres] = useState([]);
-  const [activeTab, setActiveTab] = useState("Explorar");
+  const [genresExpanded, setGenresExpanded] = useState(false);
   const [licensesModal, setLicensesModal] = useState(null);
   const [likedIds, setLikedIds] = useState(new Set());
   const [savedIds, setSavedIds] = useState(new Set());
@@ -212,13 +216,6 @@ export default function Beats() {
     return result;
   }, [beats, search, activeCuration, selectedGenres]);
 
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-    if (tab === "Nuevos") nuevosRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    if (tab === "Trending") trendingRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    if (tab === "Explorar") window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   // Render dinámico de cada sección configurada en el editor (admin → público).
   const renderSection = (section) => {
     if (!isVisible(section)) return null;
@@ -372,55 +369,92 @@ export default function Beats() {
               </button>
             )}
           </div>
-          {/* Genre chips — multi-select, responsive */}
-          <div className="flex items-center gap-2 mt-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-            {GENRE_CHIPS.map((g) => {
-              const active = selectedGenres.includes(g);
-              return (
-                <button
-                  key={g}
-                  onClick={() => toggleGenre(g)}
-                  className="flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all"
-                  style={{
-                    background: active ? "#ff5833" : "#1c1c1c",
-                    color: active ? "#ffffff" : "#a0a0a0",
-                    border: active ? "1px solid #ff5833" : "1px solid #262626",
-                  }}
-                >
-                  {g}{active ? " ×" : ""}
-                </button>
-              );
-            })}
-            {selectedGenres.length > 0 && (
-              <button onClick={() => setSelectedGenres([])} className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold text-white/50 hover:text-white transition-colors whitespace-nowrap">
-                Limpiar
+          {/* Genre chips — fixed 8 + expandable popup (amarillo cinemático premium) */}
+          <div className="mt-3 relative">
+            <div className="flex items-center gap-2 flex-wrap">
+              {GENRE_CHIPS_PRIMARY.map((g) => {
+                const active = selectedGenres.includes(g);
+                return (
+                  <button
+                    key={g}
+                    onClick={() => toggleGenre(g)}
+                    className="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all"
+                    style={{
+                      background: active ? "#F5C518" : "#1c1c1c",
+                      color: active ? "#0a0a0b" : "#a0a0a0",
+                      border: active ? "1px solid #F5C518" : "1px solid #262626",
+                      boxShadow: active ? "0 4px 16px rgba(245,197,24,0.22)" : "none",
+                    }}
+                  >
+                    {g}{active ? " ×" : ""}
+                  </button>
+                );
+              })}
+              {/* Botón amarillo cinemático — expandir más géneros */}
+              <button
+                onClick={() => setGenresExpanded((v) => !v)}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all"
+                style={{
+                  background: genresExpanded ? "#F5C518" : "transparent",
+                  color: "#F5C518",
+                  border: "1px solid #F5C518",
+                  boxShadow: genresExpanded ? "0 4px 16px rgba(245,197,24,0.28)" : "none",
+                }}
+              >
+                Más géneros
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${genresExpanded ? "rotate-180" : ""}`} />
               </button>
-            )}
+              {selectedGenres.length > 0 && (
+                <button onClick={() => setSelectedGenres([])} className="px-3 py-1.5 rounded-full text-xs font-semibold text-white/50 hover:text-white transition-colors whitespace-nowrap">
+                  Limpiar
+                </button>
+              )}
+            </div>
+
+            {/* Popup panel — se despliega hacia abajo con todos los géneros */}
+            <AnimatePresence>
+              {genresExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-3 rounded-2xl p-4" style={{ background: "#141414", border: "1px solid #262626" }}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="h-1 w-6 rounded-full" style={{ background: "#F5C518" }} />
+                      <p className="text-[10px] font-bold tracking-widest uppercase" style={{ color: "#F5C518" }}>
+                        Top géneros · Urban
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {GENRE_CHIPS_MORE.map((g) => {
+                        const active = selectedGenres.includes(g);
+                        return (
+                          <button
+                            key={g}
+                            onClick={() => toggleGenre(g)}
+                            className="px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all"
+                            style={{
+                              background: active ? "#F5C518" : "#1c1c1c",
+                              color: active ? "#0a0a0b" : "#a0a0a0",
+                              border: active ? "1px solid #F5C518" : "1px solid #262626",
+                              boxShadow: active ? "0 4px 16px rgba(245,197,24,0.22)" : "none",
+                            }}
+                          >
+                            {g}{active ? " ×" : ""}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="px-4 sm:px-10 max-w-3xl mx-auto">
-          <div className="flex items-center gap-6 border-b border-white/8 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-            {TABS.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => handleTabClick(tab)}
-                className="relative pb-3 pt-1 text-xs font-bold tracking-wider transition-colors whitespace-nowrap"
-                style={{ color: activeTab === tab ? "#ffffff" : "#a0a0a0" }}
-              >
-                {tab.toUpperCase()}
-                {activeTab === tab && (
-                  <motion.div
-                    layoutId="beats-tab-underline"
-                    className="absolute left-0 right-0 -bottom-px h-0.5 rounded-full"
-                    style={{ background: "#ffffff" }}
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* ── Hero carrusel (primer bloque único de la página) ───────── */}
