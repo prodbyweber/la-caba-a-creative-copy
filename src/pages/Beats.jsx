@@ -30,8 +30,11 @@ const GENRE_CHIPS_PRIMARY = [
 ];
 const GENRE_CHIPS_MORE = [
   "Pop", "Bachata", "Salsa", "Afro House", "Amapiano",
-  "Dembow", "Dancehall", "Afropop", "Funk", "Techno",
-  "Soul", "Kizomba",
+  "Dancehall", "Afropop", "Funk", "Techno", "Soul",
+  "Kizomba", "Drum and Bass", "Synthwave", "Lo-Fi", "Experimental",
+  "Freestyle", "Disco", "Dance", "Electronic", "Ambient",
+  "Hyperpop", "Bedroom Pop", "Alternative", "Indie Pop", "Reggae",
+  "Latin Pop", "Merengue", "Cumbia", "Bolero", "Tropical",
 ];
 const ALL_GENRES = [...GENRE_CHIPS_PRIMARY, ...GENRE_CHIPS_MORE];
 
@@ -418,24 +421,38 @@ export default function Beats() {
               )}
             </div>
 
-            {/* Popup panel — se despliega hacia abajo con todos los géneros */}
+            {/* Panel overlay — se sobrepone sobre los 8 chips sin empujar el contenido */}
             <AnimatePresence>
               {genresExpanded && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                  className="overflow-hidden"
-                >
-                  <div className="mt-3 rounded-2xl p-4" style={{ background: "#141414", border: "1px solid #262626" }}>
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="h-1 w-6 rounded-full" style={{ background: "#F5C518" }} />
-                      <p className="text-[10px] font-bold tracking-widest uppercase" style={{ color: "#F5C518" }}>
-                        Géneros
-                      </p>
+                <>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 z-30"
+                    style={{ background: "rgba(8,8,10,0.55)", backdropFilter: "blur(2px)" }}
+                    onClick={() => setGenresExpanded(false)}
+                  />
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                    transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute left-0 right-0 top-0 z-40 rounded-2xl p-4"
+                    style={{ background: "#141414", border: "1px solid #262626", boxShadow: "0 20px 60px rgba(0,0,0,0.6)" }}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="h-1 w-6 rounded-full" style={{ background: "#F5C518" }} />
+                        <p className="text-[10px] font-bold tracking-widest uppercase" style={{ color: "#F5C518" }}>
+                          Géneros
+                        </p>
+                      </div>
+                      <button onClick={() => setGenresExpanded(false)} className="text-white/40 hover:text-white transition-colors">
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 max-h-[40vh] overflow-y-auto pb-1" style={{ scrollbarWidth: "thin" }}>
                       {ALL_GENRES.map((g) => {
                         const active = selectedGenres.includes(g);
                         return (
@@ -455,8 +472,8 @@ export default function Beats() {
                         );
                       })}
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </>
               )}
             </AnimatePresence>
           </div>
