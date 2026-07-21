@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, BarChart3, BookOpen, Compass, Menu, X } from "lucide-react";
+import { Home, BarChart3, BookOpen, Compass, Menu, X, Music2 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
@@ -37,6 +37,7 @@ export default function DashboardNav({ artistName, artistId, children }) {
   const menuItems = [
     { icon: BookOpen, label: "Tu catálogo", page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
     { icon: Compass, label: "Explorar", page: "Explorar" },
+    { icon: Music2, label: "Beats", page: "beats" },
   ];
 
   const isActivePage = (page) => {
