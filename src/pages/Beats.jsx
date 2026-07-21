@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useBeatPlayer } from "@/hooks/useBeatPlayer";
 import { resolveSectionBeats } from "@/lib/beatSections";
 import { getOriginalFilename } from "@/lib/beatsUtils";
-import { Search, Lock, Menu, ChevronDown, X, TrendingUp, ShoppingBag } from "lucide-react";
+import { Search, Lock, Menu, X, TrendingUp, ShoppingBag } from "lucide-react";
 import BeatCard from "@/components/beats/BeatCard";
 import BeatsFeaturedCarousel from "@/components/beats/BeatsFeaturedCarousel";
 import BeatsTrendingList from "@/components/beats/BeatsTrendingList";
@@ -182,7 +182,7 @@ export default function Beats() {
   }, [beats, rankingSection]);
 
   const toggleGenre = useCallback((g) => {
-    setSelectedGenres(prev => prev.includes(g) ? prev.filter(x => x !== g) : (prev.length >= 4 ? prev : [...prev, g]));
+    setSelectedGenres(prev => prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g]);
   }, []);
 
   const filteredBeats = useMemo(() => {
@@ -249,22 +249,6 @@ export default function Beats() {
                   </button>
                 );
               })}
-              <span className="w-px h-4 bg-white/10 flex-shrink-0" />
-              {GENRE_CHIPS.map((g) => {
-                const active = selectedGenres.includes(g);
-                const disabled = !active && selectedGenres.length >= 4;
-                return (
-                  <button key={g} onClick={() => toggleGenre(g)} disabled={disabled} className="flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold transition-all disabled:opacity-30"
-                    style={{ background: active ? "#ff5833" : "#1c1c1c", color: active ? "#ffffff" : "#a0a0a0", border: active ? "1px solid #ff5833" : "1px solid #262626" }}>
-                    {g}{active ? " ×" : ""}
-                  </button>
-                );
-              })}
-              {selectedGenres.length > 0 && (
-                <button onClick={() => setSelectedGenres([])} className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold text-white/50 hover:text-white transition-colors">
-                  Limpiar
-                </button>
-              )}
             </div>
             {isLoading ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -347,9 +331,6 @@ export default function Beats() {
               <Link to="/Explorar" className="px-3 py-2 rounded-full text-xs font-semibold text-white/55 hover:text-white hover:bg-white/5 transition-colors">
                 Explorar
               </Link>
-              <Link to="/ArtistDashboard" className="px-3 py-2 rounded-full text-xs font-semibold text-white/55 hover:text-white hover:bg-white/5 transition-colors">
-                Tu catálogo
-              </Link>
               {/* Página actual */}
               <span className="px-3 py-2 rounded-full text-xs font-bold text-white bg-white/10 border border-white/15">
                 Beats
@@ -364,7 +345,7 @@ export default function Beats() {
           <div className="flex items-center gap-2 sm:gap-3">
             {user ? (
               <Link to="/ArtistDashboard" className="text-xs font-semibold text-white/70 hover:text-white px-4 py-2 rounded-full bg-white/5 border border-white/10 transition-colors">
-                Mi catálogo
+                Tu catálogo
               </Link>
             ) : (
               <Link to="/login" className="text-xs font-semibold text-white/60 hover:text-white px-2 sm:px-3 py-2 transition-colors">
@@ -374,14 +355,9 @@ export default function Beats() {
           </div>
         </div>
 
-        {/* Search bar */}
+        {/* Search bar + genre selector */}
         <div className="px-4 sm:px-10 max-w-3xl mx-auto pb-3">
           <div className="flex items-center gap-2 w-full rounded-full px-4 py-3" style={{ background: "#1c1c1c", border: "1px solid #262626" }}>
-            <button className="flex items-center gap-1.5 text-xs font-semibold text-white/70 hover:text-white transition-colors flex-shrink-0">
-              Beats
-              <ChevronDown className="w-3.5 h-3.5" />
-            </button>
-            <span className="w-px h-4 bg-white/10 flex-shrink-0" />
             <Search className="w-4 h-4 text-white/30 flex-shrink-0" />
             <input
               type="text"
@@ -393,6 +369,31 @@ export default function Beats() {
             {search && (
               <button onClick={() => setSearch("")} className="text-white/30 hover:text-white flex-shrink-0">
                 <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          {/* Genre chips — multi-select, responsive */}
+          <div className="flex items-center gap-2 mt-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+            {GENRE_CHIPS.map((g) => {
+              const active = selectedGenres.includes(g);
+              return (
+                <button
+                  key={g}
+                  onClick={() => toggleGenre(g)}
+                  className="flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all"
+                  style={{
+                    background: active ? "#ff5833" : "#1c1c1c",
+                    color: active ? "#ffffff" : "#a0a0a0",
+                    border: active ? "1px solid #ff5833" : "1px solid #262626",
+                  }}
+                >
+                  {g}{active ? " ×" : ""}
+                </button>
+              );
+            })}
+            {selectedGenres.length > 0 && (
+              <button onClick={() => setSelectedGenres([])} className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold text-white/50 hover:text-white transition-colors whitespace-nowrap">
+                Limpiar
               </button>
             )}
           </div>
