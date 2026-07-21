@@ -321,7 +321,7 @@ export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, o
 
 // ─── Poster card ──────────────────────────────────────────────────────────────
 // onOpenDetail(track) — lifts selection state to parent (mirrors Explorar pattern)
-export default function MobileTrackPoster({ track, onEdit, onDelete, onOpenDetail }) {
+export default function MobileTrackPoster({ track, tracks, index, onEdit, onDelete, onOpenDetail }) {
   const globalAudio = useGlobalAudio();
   const isPlaying = globalAudio?.playingTrack?.id === track.id;
   const [downloading, setDownloading] = useState(false);
@@ -331,13 +331,17 @@ export default function MobileTrackPoster({ track, onEdit, onDelete, onOpenDetai
   const hasPlayable = hasAudio || hasYoutube;
 
   const handleTogglePlay = useCallback(() => {
-    if (hasAudio) {
-      if (isPlaying) globalAudio.pauseTrack();
-      else globalAudio.playTrack(track);
-    } else if (hasYoutube) {
-      onOpenDetail && onOpenDetail(track);
+    if (!hasAudio) {
+      if (hasYoutube) onOpenDetail && onOpenDetail(track);
+      return;
     }
-  }, [isPlaying, hasAudio, hasYoutube, globalAudio, track, onOpenDetail]);
+    if (isPlaying) { globalAudio.pauseTrack(); return; }
+    if (globalAudio.playingTrack?.id === track.id) { globalAudio.resumeTrack(); return; }
+    // Cola = soundtracks del propio artista, en su orden, desde el track actual.
+    const playable = (tracks && tracks.length ? tracks : [track]).filter(t => !!t.audio_file_url);
+    const startIdx = playable.findIndex(t => t.id === track.id);
+    globalAudio.playQueue(playable, startIdx >= 0 ? startIdx : 0);
+  }, [hasAudio, hasYoutube, isPlaying, globalAudio, track, tracks, onOpenDetail]);
 
   const openDetail = useCallback(() => {
     onOpenDetail && onOpenDetail(track);

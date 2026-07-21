@@ -11,17 +11,20 @@ import { createSoundtrack, updateSoundtrack, uploadFile } from "@/lib/mediaCreat
 
 // Same architecture as Explorar: modal state in parent, rendered OUTSIDE the scroll container.
 // This guarantees reliable mounting on ALL mobile browsers (iOS Safari, Android Chrome, etc.)
-function MobileDetailWrapper({ track, onClose, onEdit, onDelete }) {
+function MobileDetailWrapper({ track, tracks, onClose, onEdit, onDelete }) {
   const globalAudio = useGlobalAudio();
   const queryClient = useQueryClient();
   const isPlaying = globalAudio?.playingTrack?.id === track.id;
 
   const handleTogglePlay = useCallback(() => {
-    if (track.audio_file_url) {
-      if (isPlaying) globalAudio.pauseTrack();
-      else globalAudio.playTrack(track);
-    }
-  }, [track, isPlaying, globalAudio]);
+    if (!track.audio_file_url) return;
+    if (isPlaying) { globalAudio.pauseTrack(); return; }
+    if (globalAudio.playingTrack?.id === track.id) { globalAudio.resumeTrack(); return; }
+    // Cola = soundtracks del propio artista, en orden, desde el track actual.
+    const playable = (tracks && tracks.length ? tracks : [track]).filter(t => !!t.audio_file_url);
+    const startIdx = playable.findIndex(t => t.id === track.id);
+    globalAudio.playQueue(playable, startIdx >= 0 ? startIdx : 0);
+  }, [track, tracks, isPlaying, globalAudio]);
 
   const handleTogglePublic = useCallback(async () => {
     await base44.entities.Track.update(track.id, { is_public: !track.is_public });
@@ -171,8 +174,8 @@ export default function TracksSection({ jlyArtistId, userEmail }) {
               */}
               <div style={{ overflowX: "auto", overflowY: "visible", scrollbarWidth: "none", msOverflowStyle: "none" }}>
                 <div className="flex gap-2.5 py-1" style={{ width: "max-content" }}>
-                  {tracks.map((track) => (
-                    <MobileTrackPoster key={track.id} track={track} onEdit={setEditingTrack} onDelete={(id) => deleteMutation.mutate(id)} onOpenDetail={setSelectedTrack} />
+                  {tracks.map((track, i) => (
+                    <MobileTrackPoster key={track.id} track={track} tracks={tracks} index={i} onEdit={setEditingTrack} onDelete={(id) => deleteMutation.mutate(id)} onOpenDetail={setSelectedTrack} />
                   ))}
                   <div className="flex-shrink-0 w-1" />
                 </div>
@@ -186,6 +189,7 @@ export default function TracksSection({ jlyArtistId, userEmail }) {
         {selectedTrack && ReactDOM.createPortal(
           <MobileDetailWrapper
             track={selectedTrack}
+            tracks={tracks}
             onClose={() => setSelectedTrack(null)}
             onEdit={(t) => { setEditingTrack(t); setSelectedTrack(null); }}
             onDelete={(id) => { deleteMutation.mutate(id); setSelectedTrack(null); }}
