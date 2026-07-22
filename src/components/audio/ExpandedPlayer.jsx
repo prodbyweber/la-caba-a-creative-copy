@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, SkipBack, SkipForward, Repeat, Repeat1, Shuffle, ChevronDown, X, Heart, Bookmark, Download, FolderOpen, Share2, Music2, Volume2, VolumeX, MoreHorizontal, Users, Link2, Info, Settings2 } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Repeat, Repeat1, Shuffle, ChevronDown, X, Heart, Bookmark, Download, FolderOpen, Share2, Music2, Volume2, VolumeX, MoreHorizontal, Users } from "lucide-react";
 import toast from "react-hot-toast";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
+import { base44 } from "@/api/base44Client";
 import WaveformBars from "./WaveformBars";
 
 export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, onLicenses, liked, saved }) {
@@ -17,8 +18,28 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
   const [isDragging, setIsDragging] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [infoPanel, setInfoPanel] = useState(null);
+  const [resolvedArtist, setResolvedArtist] = useState("");
   const progressRef = useRef(null);
   const startY = useRef(null);
+
+  // Resolver el nombre artístico desde la entidad Artist vinculada cuando el track no trae uno real.
+  useEffect(() => {
+    if (!playingTrack) { setResolvedArtist(""); return; }
+    if (playingTrack.artist && playingTrack.artist !== "Cabaña Creative") { setResolvedArtist(""); return; }
+    if (playingTrack.artist_id) {
+      let cancelled = false;
+      base44.entities.Artist.get(playingTrack.artist_id)
+        .then((a) => { if (!cancelled) setResolvedArtist(a?.stageName || ""); })
+        .catch(() => {});
+      return () => { cancelled = true; };
+    }
+    setResolvedArtist("");
+  }, [playingTrack]);
+
+  const displayArtist =
+    playingTrack?.artist && playingTrack.artist !== "Cabaña Creative"
+      ? playingTrack.artist
+      : (resolvedArtist || (playingTrack?.producers?.length ? playingTrack.producers.join(", ") : ""));
 
   const performSeek = useCallback((clientX) => {
     if (!progressRef.current || !duration) return;
@@ -89,13 +110,15 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
     else setRepeat("off");
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (!playingTrack) return;
     if (navigator.share) {
-      navigator.share({ title: playingTrack.title, text: `${playingTrack.title} — ${playingTrack.artist}`, url: shareUrl }).catch(() => {});
-    } else {
-      copyLink();
+      try {
+        await navigator.share({ title: playingTrack.title, text: `${playingTrack.title} — ${displayArtist || playingTrack.artist}`, url: shareUrl });
+        return;
+      } catch { /* cae al copiar */ }
     }
+    copyLink();
   };
 
   const shareUrl = playingTrack
@@ -156,28 +179,25 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
               <AnimatePresence>
                 {menuOpen && (
                   <>
-                    <div className="fixed inset-0 z-0" onClick={() => setMenuOpen(false)} />
+                    <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
                     <motion.div
                       initial={{ opacity: 0, y: -6, scale: 0.96 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -6, scale: 0.96 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute right-0 top-12 z-30 w-60 max-w-[calc(100vw-2rem)] rounded-xl py-1.5 shadow-2xl"
+                      className="absolute right-0 top-12 z-50 w-60 max-w-[calc(100vw-2rem)] rounded-xl py-1.5 shadow-2xl"
                       style={{ background: "rgba(20,20,22,0.98)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(12px)" }}
                     >
                       {[
                         { label: "Compartir", icon: Share2, action: () => { handleShare(); setMenuOpen(false); } },
-                        { label: "Copiar enlace del track", icon: Link2, action: () => { copyLink(); setMenuOpen(false); } },
                         { label: "Ver créditos", icon: Users, action: () => { setInfoPanel("credits"); setMenuOpen(false); } },
-                        { label: "Información del beat", icon: Info, action: () => { setInfoPanel("info"); setMenuOpen(false); } },
-                        { label: "Configuración de reproducción", icon: Settings2, action: () => { setInfoPanel("settings"); setMenuOpen(false); } },
                       ].map((opt) => (
                         <button
                           key={opt.label}
                           onClick={opt.action}
-                          className="w-full flex items-center gap-2.5 px-3.5 py-2 text-sm text-white/75 hover:text-white hover:bg-white/8 transition-colors text-left"
+                          className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/8 transition-colors text-left"
                         >
-                          <opt.icon className="w-4 h-4 text-white/50 flex-shrink-0" />
+                          <opt.icon className="w-4 h-4 text-white/55 flex-shrink-0" />
                           {opt.label}
                         </button>
                       ))}
@@ -201,47 +221,19 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
                 <div className="px-6 max-w-md mx-auto w-full">
                   <div className="rounded-xl p-3.5 mb-2" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}>
                     <div className="flex items-center justify-between mb-2.5">
-                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                        {infoPanel === "credits" ? "Créditos" : infoPanel === "info" ? "Información del beat" : "Configuración de reproducción"}
-                      </p>
+                      <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Créditos</p>
                       <button onClick={() => setInfoPanel(null)} className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-white/10 text-white/40 hover:text-white transition-colors">
                         <X className="w-3 h-3" />
                       </button>
                     </div>
                     {infoPanel === "credits" && (
                       <div className="space-y-1.5 text-xs text-white/70">
+                        {displayArtist && <p><span className="text-white/40">Artista: </span>{displayArtist}</p>}
                         {playingTrack.composers?.length > 0 && <p><span className="text-white/40">Compositores: </span>{playingTrack.composers.join(", ")}</p>}
                         {playingTrack.producers?.length > 0 && <p><span className="text-white/40">Productores: </span>{playingTrack.producers.join(", ")}</p>}
                         {playingTrack.mix_engineer && <p><span className="text-white/40">Mezcla: </span>{playingTrack.mix_engineer}</p>}
                         {playingTrack.master_engineer && <p><span className="text-white/40">Master: </span>{playingTrack.master_engineer}</p>}
-                        {!playingTrack.composers?.length && !playingTrack.producers?.length && !playingTrack.mix_engineer && !playingTrack.master_engineer && <p className="text-white/40">Sin créditos disponibles</p>}
-                      </div>
-                    )}
-                    {infoPanel === "info" && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {playingTrack.bpm != null && <span className="px-2 py-0.5 rounded-full bg-white/8 text-white/70 text-xs font-medium">{playingTrack.bpm} BPM</span>}
-                        {playingTrack.key && <span className="px-2 py-0.5 rounded-full bg-white/8 text-white/70 text-xs font-medium">{playingTrack.key}</span>}
-                        {playingTrack.scale && <span className="px-2 py-0.5 rounded-full bg-white/8 text-white/70 text-xs font-medium">{playingTrack.scale}</span>}
-                        {(playingTrack.genres || []).map((g, i) => <span key={i} className="px-2 py-0.5 rounded-full bg-white/8 text-white/70 text-xs font-medium">{g}</span>)}
-                        {(playingTrack.moods || []).map((m, i) => <span key={i} className="px-2 py-0.5 rounded-full bg-white/8 text-white/70 text-xs font-medium">{m}</span>)}
-                        {duration > 0 && <span className="px-2 py-0.5 rounded-full bg-white/8 text-white/70 text-xs font-medium">{formatTime(duration)}</span>}
-                        {playingTrack.bpm == null && !playingTrack.key && (playingTrack.genres || []).length === 0 && <p className="text-white/40 text-xs">Sin información adicional</p>}
-                      </div>
-                    )}
-                    {infoPanel === "settings" && (
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2">
-                          {volume === 0 ? <VolumeX className="w-4 h-4 text-white/40 flex-shrink-0" /> : <Volume2 className="w-4 h-4 text-white/40 flex-shrink-0" />}
-                          <input type="range" min={0} max={1} step={0.01} value={volume} onChange={(e) => setVolume(parseFloat(e.target.value))} className="flex-1 accent-[#ff5833]" />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => setShuffle(!shuffle)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-colors" style={shuffle ? { background: "rgba(255,88,51,0.12)", color: "#ff5833" } : { background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)" }}>
-                            <Shuffle className="w-3.5 h-3.5" /> Aleatorio
-                          </button>
-                          <button onClick={toggleRepeat} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-colors" style={repeat !== "off" ? { background: "rgba(255,88,51,0.12)", color: "#ff5833" } : { background: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.6)" }}>
-                            {repeat === "one" ? <Repeat1 className="w-3.5 h-3.5" /> : <Repeat className="w-3.5 h-3.5" />} Repetir
-                          </button>
-                        </div>
+                        {!displayArtist && !playingTrack.composers?.length && !playingTrack.producers?.length && !playingTrack.mix_engineer && !playingTrack.master_engineer && <p className="text-white/40">Sin créditos disponibles</p>}
                       </div>
                     )}
                   </div>
@@ -284,7 +276,10 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
               <h2 className="text-2xl font-black text-white tracking-tight mb-1" style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.03em" }}>
                 {playingTrack.title}
               </h2>
-              <p className="text-sm text-white/50">{playingTrack.artist}</p>
+              {displayArtist && (
+                <p className="text-sm text-white/80 font-semibold">{displayArtist}</p>
+              )}
+              <p className="text-[10px] uppercase tracking-[0.25em] text-white/30 mt-1.5">Cabaña Creative</p>
               <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
                 {playingTrack.bpm != null && (
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/8 text-white/50 font-semibold">{playingTrack.bpm} BPM</span>
