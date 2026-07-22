@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
-import { sendVerificationEmail } from "../../shared/emailVerification.ts";
 
 Deno.serve(async (req) => {
   try {
@@ -15,37 +14,21 @@ Deno.serve(async (req) => {
     const track = await base44.asServiceRole.entities.Track.get(track_id);
     if (!track) return Response.json({ error: 'Track no encontrado' }, { status: 404 });
 
-    // Resolver el email vinculado al artista del track
+    // El correo se envía siempre al email registrado del artista dueño del catálogo (nunca al admin).
     let toEmail = '';
-    let emailVerified = false;
-    let linkedUserId = null;
-    let linkedArtist = null;
     if (track.artist_id) {
       try {
         const artist = await base44.asServiceRole.entities.Artist.get(track.artist_id);
-        linkedArtist = artist;
-        if (artist?.user_id) linkedUserId = artist.user_id;
+        if (artist?.user_id) {
+          try {
+            const linkedUser = await base44.asServiceRole.entities.User.get(artist.user_id);
+            if (linkedUser?.email) toEmail = linkedUser.email;
+          } catch (_e) { /* sin usuario vinculado */ }
+        }
+        if (!toEmail && artist?.email) toEmail = artist.email;
       } catch (_e) { /* sin artista vinculado */ }
     }
-    if (linkedUserId) {
-      try {
-        const linkedUser = await base44.asServiceRole.entities.User.get(linkedUserId);
-        if (linkedUser?.email) toEmail = linkedUser.email;
-        emailVerified = !!linkedUser?.email_verified;
-      } catch (_e) { /* sin usuario vinculado */ }
-    }
-    if (!toEmail) {
-      toEmail = user.email || '';
-      emailVerified = !!user.email_verified;
-      if (!linkedUserId) linkedUserId = user.id || null;
-    }
-    if (!toEmail) return Response.json({ error: 'Sin email de destino' }, { status: 400 });
-
-    // Si el correo del artista aún no está verificado, se envía la verificación en lugar de la notificación.
-    if (!emailVerified) {
-      await sendVerificationEmail(base44, { userId: linkedUserId, app_url, artist: linkedArtist });
-      return Response.json({ success: true, verification_sent: true });
-    }
+    if (!toEmail) return Response.json({ error: 'Sin email de artista' }, { status: 400 });
 
     const origin = (app_url || 'https://app.cabanacreative.es').replace(/\/$/, '');
     const slugOrId = track.slug || track.id;
@@ -62,7 +45,6 @@ Deno.serve(async (req) => {
 
     const body = `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 24px;">
-  <p style="font-size: 18px; font-weight: 700; letter-spacing: -0.01em; color: #0a0a0b; margin: 0 0 22px;">Cabaña Creative</p>
   <p style="font-size: 15px; line-height: 1.5; color: #1a1a1a; margin: 0 0 28px;">${content}</p>
   <a href="${ctaUrl}" style="display: inline-block; background: #0a0a0b; color: #ffffff; text-decoration: none; font-weight: 600; padding: 14px 30px; border-radius: 10px; font-size: 15px;">${ctaLabel}</a>
   <p style="margin: 22px 0 0; font-size: 12px; color: #aaa; line-height: 1.5; word-break: break-all;">${ctaUrl}</p>

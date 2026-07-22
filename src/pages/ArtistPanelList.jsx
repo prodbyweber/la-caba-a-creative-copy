@@ -8,7 +8,6 @@ import CreatorEditModal from "@/components/admin/CreatorEditModal";
 import CreatorRowMenu from "@/components/admin/CreatorRowMenu";
 import CreatorDeleteConfirm from "@/components/admin/CreatorDeleteConfirm";
 import { User, Search, ChevronRight } from "lucide-react";
-import toast from "react-hot-toast";
 
 export default function ArtistPanelList() {
   const navigate = useNavigate();
@@ -67,7 +66,6 @@ export default function ArtistPanelList() {
           username: profile?.username,
           email: artist.email || profile?.user_email,
           userId: artist.user_id,
-          email_verified: !!platformUsers.find(u => u.id === artist.user_id)?.email_verified,
         });
       }
     }
@@ -89,8 +87,7 @@ export default function ArtistPanelList() {
             username: profile.username,
             email: profile.user_email || profile.contact_email,
             userId: profile.user_id,
-            email_verified: !!platformUsers.find(u => u.id === profile.user_id)?.email_verified,
-          });
+            });
         }
       }
     }
@@ -109,7 +106,6 @@ export default function ArtistPanelList() {
           username: null,
           email: u.email,
           userId: u.id,
-          email_verified: !!u.email_verified,
         });
       }
     }
@@ -125,18 +121,6 @@ export default function ArtistPanelList() {
       c.username?.toLowerCase().includes(search.toLowerCase())
     );
   });
-
-  const handleSendVerification = async (c) => {
-    const uid = c.userId || c.artist?.user_id || c.profile?.user_id || c.platformUser?.id;
-    if (!uid) { toast.error("Sin usuario vinculado"); return; }
-    try {
-      const res = await base44.functions.invoke("sendEmailVerification", { user_id: uid, app_url: window.location.origin });
-      if (res?.data?.already_verified) toast("El correo ya estaba verificado");
-      else toast.success("Correo de verificación enviado");
-    } catch (e) {
-      toast.error("No se pudo enviar la verificación");
-    }
-  };
 
   return (
     <AdminLayout activePage="ArtistPanelList">
@@ -229,15 +213,9 @@ export default function ArtistPanelList() {
                       <p className="text-[13px] font-semibold text-white truncate leading-tight">
                         {c.displayName}
                       </p>
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-[11px] text-white/35 truncate flex-1 min-w-0">
-                          {c.username ? `@${c.username}` : c.genre || c.email || "—"}
-                        </p>
-                        <span className={`flex items-center gap-1 text-[9px] font-semibold flex-shrink-0 ${c.email_verified ? "text-emerald-400" : "text-amber-400"}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${c.email_verified ? "bg-emerald-400" : "bg-amber-400"}`} />
-                          {c.email_verified ? "Verificado" : "Pendiente"}
-                        </span>
-                      </div>
+                      <p className="text-[11px] text-white/35 truncate">
+                        {c.username ? `@${c.username}` : c.genre || c.email || "—"}
+                      </p>
                     </div>
 
                     {/* Menú de tres puntos — siempre visible */}
@@ -245,8 +223,6 @@ export default function ArtistPanelList() {
                       <CreatorRowMenu
                         onEdit={() => setEditingCreator(c)}
                         onDelete={() => setDeletingCreator(c)}
-                        verified={c.email_verified}
-                        onSendVerification={() => handleSendVerification(c)}
                       />
                     )}
                     <ChevronRight className="w-3.5 h-3.5 text-white/15 flex-shrink-0 group-hover:text-white/40 transition-colors" />
