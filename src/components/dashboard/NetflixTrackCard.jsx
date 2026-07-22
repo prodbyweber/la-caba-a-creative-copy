@@ -61,6 +61,7 @@ function TrackEditModal({ track, onClose, onSaved }) {
   const [newProducer, setNewProducer] = useState("");
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
+  const [notifyReplace, setNotifyReplace] = useState(true);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -82,8 +83,25 @@ function TrackEditModal({ track, onClose, onSaved }) {
       }
       return base44.entities.Track.update(track.id, clean);
     },
-    onSuccess: (updated) => {
+    onSuccess: async (updated) => {
       queryClient.invalidateQueries({ queryKey: ['tracks'] });
+      // Notificación por email de subida/actualización del MP3
+      const hadAudio = !!track?.audio_file_url;
+      const newAudio = updated?.audio_file_url || formData.audio_file_url;
+      const isFirstUpload = !hadAudio && !!newAudio;
+      const isReplace = hadAudio && !!newAudio && newAudio !== track?.audio_file_url;
+      const shouldNotify = isFirstUpload || (isReplace && notifyReplace);
+      if (shouldNotify && (updated?.id || track?.id)) {
+        try {
+          await base44.functions.invoke('notifyTrackMp3Upload', {
+            track_id: updated?.id || track?.id,
+            is_first_upload: isFirstUpload,
+            app_url: window.location.origin,
+          });
+        } catch (e) {
+          console.warn('[NetflixTrackCard] notify failed', e);
+        }
+      }
       onSaved({ ...formData, ...updated });
     },
   });
@@ -190,18 +208,30 @@ function TrackEditModal({ track, onClose, onSaved }) {
               </div>
             </div>
             {audioMode === "file" ? (
-              <div className="flex items-center gap-3">
-                <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.04)" }}>
-                  {formData.audio_file_url ? <Check className="w-6 h-6 text-emerald-400" /> : <Music2 className="w-6 h-6 text-white/20" />}
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(255,255,255,0.04)" }}>
+                    {formData.audio_file_url ? <Check className="w-6 h-6 text-emerald-400" /> : <Music2 className="w-6 h-6 text-white/20" />}
+                  </div>
+                  <div>
+                    <label className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-sm font-medium transition-colors">
+                      <Upload className="w-4 h-4" />
+                      {uploadingAudio ? 'Subiendo...' : formData.audio_file_url ? 'Cambiar MP3' : 'Subir MP3'}
+                      <input type="file" accept=".mp3,audio/mpeg" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
+                    </label>
+                    {formData.audio_file_url && <p className="text-xs text-emerald-400 mt-1">✓ MP3 cargado</p>}
+                  </div>
                 </div>
-                <div>
-                  <label className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-sm font-medium transition-colors">
-                    <Upload className="w-4 h-4" />
-                    {uploadingAudio ? 'Subiendo...' : formData.audio_file_url ? 'Cambiar MP3' : 'Subir MP3'}
-                    <input type="file" accept=".mp3,audio/mpeg" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
+                {track?.audio_file_url && (
+                  <label className="flex items-center gap-2 mt-3 cursor-pointer">
+                    <div className="relative">
+                      <input type="checkbox" checked={notifyReplace} onChange={(e) => setNotifyReplace(e.target.checked)} className="sr-only peer" />
+                      <div className="w-9 h-5 bg-white/10 rounded-full peer-checked:bg-emerald-500 transition-colors" />
+                      <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
+                    </div>
+                    <span className="text-[11px] text-white/50">Notificar al artista la actualización del MP3</span>
                   </label>
-                  {formData.audio_file_url && <p className="text-xs text-emerald-400 mt-1">✓ MP3 cargado</p>}
-                </div>
+                )}
               </div>
             ) : (
               <input

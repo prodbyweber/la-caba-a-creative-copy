@@ -257,6 +257,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
   const [audioMode, setAudioMode] = useState("file");
   const [newComposer, setNewComposer] = useState("");
   const [newProducer, setNewProducer] = useState("");
+  const [notifyReplace, setNotifyReplace] = useState(true);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -280,10 +281,28 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
       }
       return createSoundtrack(data, jlyArtistId);
     },
-    onSuccess: () => {
+    onSuccess: async (saved) => {
       queryClient.invalidateQueries({ queryKey: ['tracks'] });
       queryClient.invalidateQueries({ queryKey: ['artist-films'] });
       queryClient.invalidateQueries({ queryKey: ['artist-shorts'] });
+
+      // Notificación por email de subida/actualización del MP3
+      const hadAudio = !!track?.audio_file_url;
+      const newAudio = saved?.audio_file_url || formData.audio_file_url;
+      const isFirstUpload = !hadAudio && !!newAudio;
+      const isReplace = hadAudio && !!newAudio && newAudio !== track?.audio_file_url;
+      const shouldNotify = isFirstUpload || (isReplace && notifyReplace);
+      if (shouldNotify && saved?.id) {
+        try {
+          await base44.functions.invoke('notifyTrackMp3Upload', {
+            track_id: saved.id,
+            is_first_upload: isFirstUpload,
+            app_url: window.location.origin,
+          });
+        } catch (e) {
+          console.warn('[TracksSection] notify failed', e);
+        }
+      }
       onClose();
     },
     onError: (error) => {
@@ -419,6 +438,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
               </div>
 
               {audioMode === "file" ? (
+                <>
                 <label className="cursor-pointer flex items-center gap-3 px-4 py-3 rounded-xl transition-colors"
                   style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -433,6 +453,17 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
                   </div>
                   <input type="file" accept=".mp3,audio/mpeg" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
                 </label>
+                {track?.audio_file_url && (
+                  <label className="flex items-center gap-2 mt-2 cursor-pointer">
+                    <div className="relative">
+                      <input type="checkbox" checked={notifyReplace} onChange={(e) => setNotifyReplace(e.target.checked)} className="sr-only peer" />
+                      <div className="w-9 h-5 bg-white/10 rounded-full peer-checked:bg-emerald-500 transition-colors" />
+                      <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
+                    </div>
+                    <span className="text-[11px] text-white/50">Notificar al artista la actualización del MP3</span>
+                  </label>
+                )}
+                </>
               ) : (
                 <input type="url" value={formData.youtube_music_url || ""}
                   onChange={(e) => setFormData(f => ({ ...f, youtube_music_url: e.target.value }))}
