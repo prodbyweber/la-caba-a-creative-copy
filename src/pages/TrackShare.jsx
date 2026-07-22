@@ -8,9 +8,10 @@ import { formatDuration } from "@/lib/musicConstants";
 import { getTrackShareUrl, shareTrackLink } from "@/lib/trackShare";
 import { resolveTrackBySlugOrId } from "@/lib/trackSlug";
 import {
-  Play, Pause, Volume2, VolumeX, Lock, Share2, FolderOpen,
+  Play, Pause, Lock, Share2, FolderOpen,
   Home, Compass, LogIn, UserPlus, LayoutDashboard, User, Music2,
 } from "lucide-react";
+import WaveformBars from "@/components/audio/WaveformBars";
 
 function useTrackMeta(track, hasAccess) {
   useEffect(() => {
@@ -102,7 +103,7 @@ function TopNav({ user, profileUsername }) {
 export default function TrackShare() {
   const { slug, id } = useParams();
   const routeKey = slug || id;
-  const { playingTrack, isPlaying, currentTime, duration, volume, playTrack, pauseTrack, resumeTrack, seekTrack, setVolume } = useGlobalAudio();
+  const { playingTrack, isPlaying, currentTime, duration, playTrack, pauseTrack, resumeTrack, seekTrack } = useGlobalAudio();
   const [user, setUser] = useState(null);
   const [profileUsername, setProfileUsername] = useState(null);
   const [shareFeedback, setShareFeedback] = useState("");
@@ -125,6 +126,22 @@ export default function TrackShare() {
     enabled: !!routeKey,
     retry: false,
   });
+
+  const { data: artist } = useQuery({
+    queryKey: ["track-share-artist", track?.artist_id],
+    queryFn: () => base44.entities.Artist.get(track.artist_id),
+    enabled: !!track?.artist_id,
+    retry: false,
+  });
+
+  const { data: ownerProfile } = useQuery({
+    queryKey: ["track-share-owner", track?.created_by_id],
+    queryFn: () => base44.entities.UserProfile.filter({ user_id: track.created_by_id }).then(p => p[0] || null),
+    enabled: !track?.artist_id && !!track?.created_by_id,
+    retry: false,
+  });
+
+  const artistName = artist?.stageName || ownerProfile?.artist_name || ownerProfile?.display_name || ownerProfile?.full_name || "";
 
   const isOwnerOrAdmin = !!user && (user.role === "admin" || track?.created_by_id === user.id);
   const hasAccess = track?.is_public === true || isOwnerOrAdmin;
@@ -175,8 +192,6 @@ export default function TrackShare() {
     };
   }, [dragging, updateSeekFromClientX]);
 
-  const progressPct = active && duration ? (currentTime / duration) * 100 : 0;
-
   const formatTime = (s) => {
     if (!s || isNaN(s)) return "0:00";
     const m = Math.floor(s / 60);
@@ -187,7 +202,7 @@ export default function TrackShare() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "#0a0a0b" }}>
-        <div className="w-8 h-8 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-yellow-400 border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -197,7 +212,7 @@ export default function TrackShare() {
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center px-6" style={{ background: "#0a0a0b" }}>
         <Music2 className="w-12 h-12 text-white/15" />
         <p className="text-white/60">Este track no existe o ya no está disponible.</p>
-        <Link to="/" className="text-purple-400 text-sm font-semibold">Volver al inicio</Link>
+        <Link to="/" className="text-yellow-400 text-sm font-semibold">Volver al inicio</Link>
       </div>
     );
   }
@@ -232,7 +247,7 @@ export default function TrackShare() {
               {track.cover_url ? (
                 <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, #1e0a3c 0%, #0a1628 50%, #0a0a0b 100%)" }}>
+                <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(250,204,21,0.10) 0%, #1a1a0e 50%, #0a0a0b 100%)" }}>
                   <Music2 className="w-16 h-16 text-white/10" />
                 </div>
               )}
@@ -245,7 +260,12 @@ export default function TrackShare() {
 
             {/* Info */}
             <div className="flex-1 text-center sm:text-left min-w-0 w-full">
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: "#a78bfa" }}>
+              {artistName && (
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-1" style={{ color: "#facc15" }}>
+                  {artistName}
+                </p>
+              )}
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: "rgba(240,237,232,0.4)" }}>
                 Cabaña Creative
               </p>
               <h1 className="text-3xl sm:text-5xl font-black text-white mb-2" style={{ letterSpacing: "-0.03em", lineHeight: 1.02 }}>
@@ -277,9 +297,9 @@ export default function TrackShare() {
                   onClick={handleTogglePlay}
                   disabled={!hasAccess || !track.audio_file_url}
                   className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed"
-                  style={{ background: "#8b5cf6" }}
+                  style={{ background: "linear-gradient(135deg, #facc15, #eab308)" }}
                 >
-                  {active && isPlaying ? <Pause className="w-6 h-6 text-white" fill="white" /> : <Play className="w-6 h-6 text-white ml-0.5" fill="white" />}
+                  {active && isPlaying ? <Pause className="w-6 h-6 text-[#0a0a0b]" fill="#0a0a0b" /> : <Play className="w-6 h-6 text-[#0a0a0b] ml-0.5" fill="#0a0a0b" />}
                 </button>
 
                 <div className="relative">
@@ -309,7 +329,7 @@ export default function TrackShare() {
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-2 px-5 h-14 rounded-full text-sm font-bold transition-colors"
-                    style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.3)", color: "#c4b5fd" }}
+                    style={{ background: "rgba(250,204,21,0.12)", border: "1px solid rgba(250,204,21,0.3)", color: "#fde047" }}
                   >
                     <FolderOpen className="w-4 h-4" /> Drive
                   </a>
@@ -330,33 +350,15 @@ export default function TrackShare() {
               <div className="space-y-4">
                 <div
                   ref={progressRef}
-                  className="relative h-2 rounded-full cursor-pointer group"
-                  style={{ background: "rgba(255,255,255,0.1)" }}
+                  className="relative h-16 flex items-center cursor-pointer group"
                   onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
                   onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
                 >
-                  <div className="absolute h-full rounded-full pointer-events-none" style={{ width: `${progressPct}%`, background: "#8b5cf6" }} />
-                  <div
-                    className="absolute top-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                    style={{ left: `${progressPct}%`, transform: "translate(-50%, -50%)" }}
-                  />
+                  <WaveformBars progress={active && duration ? currentTime / duration : 0} isPlaying={active && isPlaying} bars={64} color="#facc15" />
                 </div>
                 <div className="flex items-center justify-between text-xs font-medium text-white/40">
                   <span>{formatTime(active ? currentTime : 0)}</span>
                   <span>{formatTime(active ? duration : track.duration)}</span>
-                </div>
-
-                <div className="flex items-center gap-3 pt-1">
-                  <button onClick={() => setVolume(volume === 0 ? 1 : 0)} className="text-white/40 hover:text-white transition-colors">
-                    {volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                  </button>
-                  <input
-                    type="range" min="0" max="1" step="0.01" value={volume}
-                    onChange={(e) => setVolume(parseFloat(e.target.value))}
-                    className="flex-1 h-1 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:cursor-pointer"
-                    style={{ background: "rgba(255,255,255,0.1)" }}
-                  />
-                  <span className="text-xs text-white/30 w-8 text-right">{Math.round(volume * 100)}%</span>
                 </div>
 
                 {!track.audio_file_url && (
@@ -365,14 +367,14 @@ export default function TrackShare() {
               </div>
             ) : (
               <div className="flex flex-col items-center text-center gap-3 py-4">
-                <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "rgba(139,92,246,0.15)" }}>
-                  <Lock className="w-5 h-5 text-[#a78bfa]" />
+                <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "rgba(250,204,21,0.15)" }}>
+                  <Lock className="w-5 h-5 text-[#facc15]" />
                 </div>
                 <p className="text-sm text-white/60 max-w-sm">
                   Este track es privado. Inicia sesión o crea una cuenta para acceder si tienes permisos.
                 </p>
                 <div className="flex items-center gap-3 pt-1">
-                  <Link to="/login" className="px-5 py-2.5 rounded-full text-sm font-bold text-white transition-colors" style={{ background: "#8b5cf6" }}>
+                  <Link to="/login" className="px-5 py-2.5 rounded-full text-sm font-bold transition-colors" style={{ background: "linear-gradient(135deg, #facc15, #eab308)", color: "#0a0a0b" }}>
                     Iniciar sesión
                   </Link>
                   <Link to="/register" className="px-5 py-2.5 rounded-full text-sm font-semibold text-white/70 hover:text-white bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
