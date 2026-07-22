@@ -5,6 +5,15 @@
     "avatar_url": {
       "type": "string",
       "description": "URL de la foto de perfil del usuario"
+    },
+    "email_verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si el correo del usuario ha sido verificado"
+    },
+    "email_verification_token": {
+      "type": "string",
+      "description": "Token \u00fanico para verificar el correo (se borra al verificar)"
     }
   },
   "required": []

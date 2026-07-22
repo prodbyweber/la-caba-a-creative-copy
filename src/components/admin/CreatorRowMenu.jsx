@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { MoreVertical, Pencil, Trash2, MailCheck, Mail } from "lucide-react";
 
 // Menú de tres puntos visible en cada fila de creador.
 // Se renderiza en un portal (position: fixed) para evitar que
 // contenedores padres con overflow-hidden recorten el dropdown,
 // incluso en la última fila de la lista.
-export default function CreatorRowMenu({ onEdit, onDelete }) {
+export default function CreatorRowMenu({ onEdit, onDelete, verified, onSendVerification }) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef(null);
   const menuRef = useRef(null);
@@ -77,7 +77,7 @@ export default function CreatorRowMenu({ onEdit, onDelete }) {
               position: "fixed", top: `${coords.top}px`, right: `${coords.right}px`,
               zIndex: 10001,
               background: "#1a1a1c", border: "1px solid rgba(255,255,255,0.12)",
-              borderRadius: "10px", padding: "4px", minWidth: "150px",
+              borderRadius: "10px", padding: "4px", minWidth: "160px",
               boxShadow: "0 12px 40px rgba(0,0,0,0.5)",
             }}
           >
@@ -94,6 +94,35 @@ export default function CreatorRowMenu({ onEdit, onDelete }) {
             >
               <Pencil size={13} /> Editar datos
             </button>
+
+            {verified ? (
+              <button
+                disabled
+                style={{
+                  width: "100%", padding: "9px 10px", display: "flex", alignItems: "center", gap: "8px",
+                  background: "transparent", border: "none", borderRadius: "7px",
+                  color: "rgba(52,211,153,0.85)", fontSize: "12px", fontWeight: 600, cursor: "default",
+                  textAlign: "left", opacity: 0.6,
+                }}
+              >
+                <MailCheck size={13} /> Correo ya verificado
+              </button>
+            ) : (
+              <button
+                onClick={e => { e.stopPropagation(); setOpen(false); onSendVerification?.(); }}
+                style={{
+                  width: "100%", padding: "9px 10px", display: "flex", alignItems: "center", gap: "8px",
+                  background: "transparent", border: "none", borderRadius: "7px",
+                  color: "rgba(255,255,255,0.75)", fontSize: "12px", fontWeight: 600, cursor: "pointer",
+                  textAlign: "left",
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
+                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+              >
+                <Mail size={13} /> Enviar verificación
+              </button>
+            )}
+
             <button
               onClick={e => { e.stopPropagation(); setOpen(false); onDelete?.(); }}
               style={{

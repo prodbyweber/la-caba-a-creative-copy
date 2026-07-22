@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.23';
+import { sendVerificationEmail } from "../../shared/emailVerification.ts";
 
 Deno.serve(async (req) => {
   try {
@@ -14,27 +15,40 @@ Deno.serve(async (req) => {
 
     // Resolver el email vinculado al artista del track
     let toEmail = '';
-    let artistName = '';
+    let emailVerified = false;
+    let linkedUserId = null;
+    let linkedArtist = null;
     if (track.artist_id) {
       try {
         const artist = await base44.asServiceRole.entities.Artist.get(track.artist_id);
-        artistName = artist?.stageName || artist?.legalName || '';
-        if (artist?.user_id) {
-          const linkedUser = await base44.asServiceRole.entities.User.get(artist.user_id);
-          if (linkedUser?.email) toEmail = linkedUser.email;
-        }
+        linkedArtist = artist;
+        if (artist?.user_id) linkedUserId = artist.user_id;
       } catch (_e) { /* sin artista vinculado */ }
     }
-    if (!toEmail) toEmail = user.email || '';
+    if (linkedUserId) {
+      try {
+        const linkedUser = await base44.asServiceRole.entities.User.get(linkedUserId);
+        if (linkedUser?.email) toEmail = linkedUser.email;
+        emailVerified = !!linkedUser?.email_verified;
+      } catch (_e) { /* sin usuario vinculado */ }
+    }
+    if (!toEmail) {
+      toEmail = user.email || '';
+      emailVerified = !!user.email_verified;
+      if (!linkedUserId) linkedUserId = user.id || null;
+    }
     if (!toEmail) return Response.json({ error: 'Sin email de destino' }, { status: 400 });
+
+    // Si el correo del artista aún no está verificado, se envía la verificación en lugar de la notificación.
+    if (!emailVerified) {
+      await sendVerificationEmail(base44, { userId: linkedUserId, app_url, artist: linkedArtist });
+      return Response.json({ success: true, verification_sent: true });
+    }
 
     const origin = (app_url || 'https://app.cabanacreative.es').replace(/\/$/, '');
     const slugOrId = track.slug || track.id;
     const streamUrl = `${origin}/t/${slugOrId}`;
     const appLink = `${origin}`;
-
-    const title = track.title || 'tu soundtrack';
-    const greeting = artistName ? `¡Hola, ${artistName}!` : '¡Hola!';
 
     const subject = is_first_upload ? 'Nuevo soundtrack disponible' : 'Soundtrack actualizado';
     const content = is_first_upload
