@@ -1,28 +1,24 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import DashboardNav from "@/components/dashboard/DashboardNav";
 import {
-  ArrowLeft, Plus, Music2, Film, Image as ImageIcon,
-  Play, Pause, Trash2, X, Check
+  ArrowLeft, Plus, Music2,
+  Play, Pause, X, Loader2
 } from "lucide-react";
 import ProjectAssetPicker from "@/components/project/ProjectAssetPicker";
 
 const FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 
-function getYoutubeId(url) {
-  if (!url) return null;
-  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  return m ? m[1] : null;
-}
-
 const TYPE_LABELS = {
   Single: "Single", EP: "EP", Album: "Álbum",
   Film: "Film", MiniFilm: "Mini Film", Serie: "Serie",
+  Videoclip: "Videoclip", Visualizer: "Visualizer",
+  ContentPack: "Content Pack", MixMaster: "Mix & Master",
 };
 
-// ── Mini audio player ────────────────────────────────────────────────────────
+// ── Mini audio player row ────────────────────────────────────────────────────
 function TrackRow({ track, index, playing, onPlay, onRemove }) {
   const audioRef = useRef(null);
 
@@ -69,11 +65,16 @@ function TrackRow({ track, index, playing, onPlay, onRemove }) {
         <p className="text-sm text-white truncate font-semibold" style={{ fontFamily: FONT, letterSpacing: "-0.01em" }}>
           {track.title}
         </p>
-        {track.duration && (
-          <p className="text-[10px] text-white/30">
-            {Math.floor(track.duration / 60)}:{String(Math.floor(track.duration % 60)).padStart(2, "0")}
-          </p>
-        )}
+        <div className="flex items-center gap-2">
+          {track.duration && (
+            <p className="text-[10px] text-white/30">
+              {Math.floor(track.duration / 60)}:{String(Math.floor(track.duration % 60)).padStart(2, "0")}
+            </p>
+          )}
+          <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${track.is_public ? "bg-emerald-500/15 text-emerald-400" : "bg-white/5 text-white/30"}`}>
+            {track.is_public ? "Público" : "Privado"}
+          </span>
+        </div>
       </div>
 
       <button
@@ -86,67 +87,11 @@ function TrackRow({ track, index, playing, onPlay, onRemove }) {
   );
 }
 
-// ── Video card ────────────────────────────────────────────────────────────────
-function VideoCard({ item, index, onRemove }) {
-  const ytId = getYoutubeId(item.youtube_url);
-  const thumb = item.thumbnail_url || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : null);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: index * 0.05 }}
-      className="group relative rounded-xl overflow-hidden"
-      style={{ aspectRatio: "16/9", background: "rgba(255,255,255,0.05)" }}
-    >
-      {thumb
-        ? <img src={thumb} alt={item.title} className="w-full h-full object-cover" />
-        : <div className="w-full h-full flex items-center justify-center"><Film className="w-8 h-8 text-white/15" /></div>}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 p-3">
-        <p className="text-xs font-bold text-white truncate" style={{ fontFamily: FONT }}>{item.title}</p>
-        {item.content_type && (
-          <p className="text-[9px] text-white/40 uppercase tracking-widest mt-0.5">{TYPE_LABELS[item.content_type] || item.content_type}</p>
-        )}
-      </div>
-      <button
-        onClick={() => onRemove(item.id)}
-        className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/70"
-      >
-        <X className="w-3 h-3 text-white" />
-      </button>
-    </motion.div>
-  );
-}
-
-// ── Photo card ────────────────────────────────────────────────────────────────
-function PhotoCard({ item, index, onRemove }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: index * 0.04 }}
-      className="group relative rounded-xl overflow-hidden aspect-square"
-      style={{ background: "rgba(255,255,255,0.05)" }}
-    >
-      {item.url
-        ? <img src={item.url} alt={item.title} className="w-full h-full object-cover" />
-        : <div className="w-full h-full flex items-center justify-center"><ImageIcon className="w-6 h-6 text-white/15" /></div>}
-      <button
-        onClick={() => onRemove(item.id)}
-        className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/70"
-      >
-        <X className="w-3 h-3 text-white" />
-      </button>
-    </motion.div>
-  );
-}
-
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function ProjectDetail() {
-  const [activeTab, setActiveTab] = useState("tracks");
   const [playingId, setPlayingId] = useState(null);
-  const [picker, setPicker] = useState(null); // "tracks" | "videos" | "photos" | null
+  const [picker, setPicker] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
   const projectId = urlParams.get("id");
@@ -179,18 +124,14 @@ export default function ProjectDetail() {
     enabled: !!currentUser?.id,
   });
 
-  // UserProfile for this user
-  const { data: userProfile } = useQuery({
-    queryKey: ["user-profile-me", currentUser?.id],
-    queryFn: async () => {
-      if (!currentUser?.id) return null;
-      const r = await base44.entities.UserProfile.filter({ user_id: currentUser.id });
-      return r[0] || null;
-    },
-    enabled: !!currentUser?.id,
+  // Soundtracks vinculados a este proyecto (fuente de verdad: Track.project_id)
+  const { data: projectTracks = [], isLoading: loadingTracks } = useQuery({
+    queryKey: ["project-tracks", projectId],
+    queryFn: () => base44.entities.Track.filter({ project_id: projectId }),
+    enabled: !!projectId,
   });
 
-  // All tracks of the artist/user
+  // Todos los soundtracks del artista/usuario (para el picker)
   const { data: allUserTracks = [] } = useQuery({
     queryKey: ["user-tracks", selfArtist?.id],
     queryFn: () => selfArtist?.id
@@ -199,73 +140,42 @@ export default function ProjectDetail() {
     enabled: !!currentUser,
   });
 
-  // All videos (ExplorarItems) of the artist/user
-  const { data: allUserVideos = [] } = useQuery({
-    queryKey: ["user-videos", selfArtist?.id, currentUser?.email],
-    queryFn: async () => {
-      let items = [];
-      if (selfArtist?.id) {
-        items = await base44.entities.ExplorarItem.filter({ artist_id: selfArtist.id });
-      } else {
-        const all = await base44.entities.ExplorarItem.list("-created_date", 100);
-        items = all.filter((i) => i.created_by === currentUser?.email);
-      }
-      return items.filter((i) => ["film", "minifilm", "series", "Film", "MiniFilm", "Serie"].includes(i.content_type));
-    },
-    enabled: !!currentUser,
-  });
-
-  // User photos from profile media_items
-  const userPhotos = (userProfile?.media_items || []).filter((m) => m.type === "image");
-
-  // Project linked asset IDs (stored in project.assets_links as JSON)
-  const [linkedAssets, setLinkedAssets] = useState({ tracks: [], videos: [], photos: [] });
-
-  useEffect(() => {
-    if (!project) return;
+  // Asociar soundtracks seleccionados (diff frente a los actuales)
+  const handlePickerConfirm = async (selectedIds) => {
+    setSaving(true);
     try {
-      const parsed = JSON.parse(project.assets_links?.[0] || "{}");
-      setLinkedAssets({
-        tracks: parsed.tracks || [],
-        videos: parsed.videos || [],
-        photos: parsed.photos || [],
-      });
-    } catch {
-      setLinkedAssets({ tracks: [], videos: [], photos: [] });
+      const currentIds = projectTracks.map(t => t.id);
+      const toAdd = selectedIds.filter(id => !currentIds.includes(id));
+      const toRemove = currentIds.filter(id => !selectedIds.includes(id));
+      // Asociar nuevos
+      for (const id of toAdd) {
+        await base44.entities.Track.update(id, { project_id: projectId });
+      }
+      // Desasociar los que ya no están
+      for (const id of toRemove) {
+        await base44.entities.Track.update(id, { project_id: null });
+      }
+      queryClient.invalidateQueries({ queryKey: ["project-tracks", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["all-tracks"] });
+      queryClient.invalidateQueries({ queryKey: ["tracks"] });
+    } finally {
+      setSaving(false);
+      setPicker(false);
     }
-  }, [project]);
-
-  const updateProjectMutation = useMutation({
-    mutationFn: (data) => base44.entities.Project.update(projectId, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["project", projectId] }),
-  });
-
-  const saveAssets = (next) => {
-    setLinkedAssets(next);
-    updateProjectMutation.mutate({ assets_links: [JSON.stringify(next)] });
   };
 
-  const handlePickerConfirm = (mode, ids) => {
-    const next = { ...linkedAssets, [mode]: ids };
-    saveAssets(next);
-    setPicker(null);
+  const removeTrack = async (trackId) => {
+    await base44.entities.Track.update(trackId, { project_id: null });
+    queryClient.invalidateQueries({ queryKey: ["project-tracks", projectId] });
+    queryClient.invalidateQueries({ queryKey: ["projects"] });
+    queryClient.invalidateQueries({ queryKey: ["all-tracks"] });
+    queryClient.invalidateQueries({ queryKey: ["tracks"] });
   };
 
-  const removeAsset = (mode, id) => {
-    const next = { ...linkedAssets, [mode]: linkedAssets[mode].filter((x) => x !== id) };
-    saveAssets(next);
-  };
-
-  // Resolve linked items
-  const linkedTracks = allUserTracks.filter((t) => linkedAssets.tracks.includes(t.id));
-  const linkedVideos = allUserVideos.filter((v) => linkedAssets.videos.includes(v.id));
-  const linkedPhotos = userPhotos.filter((p) => linkedAssets.photos.includes(p.id));
-
-  const TABS = [
-    { id: "tracks", label: "Tracks", icon: Music2, count: linkedTracks.length },
-    { id: "videos", label: "Videos", icon: Film, count: linkedVideos.length },
-    { id: "photos", label: "Fotos", icon: ImageIcon, count: linkedPhotos.length },
-  ];
+  const getProjectYear = (project) => project?.start_date
+    ? new Date(project.start_date).getFullYear()
+    : new Date(project?.created_date || Date.now()).getFullYear();
 
   if (!project) {
     return (
@@ -282,7 +192,6 @@ export default function ProjectDetail() {
       <main className="pt-14">
         {/* ── HERO ── */}
         <div className="relative overflow-hidden" style={{ minHeight: 280 }}>
-          {/* Blurred cover bg */}
           {project.cover_url && (
             <div className="absolute inset-0">
               <img src={project.cover_url} alt="" className="w-full h-full object-cover scale-110 blur-2xl opacity-25" />
@@ -326,178 +235,64 @@ export default function ProjectDetail() {
                     <span className="text-sm text-white/40" style={{ fontFamily: FONT }}>{project.year}</span>
                   )}
                   <span className="w-1 h-1 rounded-full bg-white/20" />
-                  <span className="text-sm text-white/30">{linkedTracks.length} tracks · {linkedVideos.length} videos · {linkedPhotos.length} fotos</span>
+                  <span className="text-sm text-white/30">{projectTracks.length} soundtracks</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* ── TABS ── */}
-        <div className="px-5 sm:px-8 lg:px-12 max-w-5xl mx-auto">
-          <div className="flex gap-0 border-b border-white/[0.07] mb-6">
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className="relative flex items-center gap-1.5 px-4 pb-3 pt-1 text-xs font-semibold transition-colors mr-1"
-                style={{
-                  fontFamily: FONT,
-                  color: activeTab === tab.id ? "white" : "rgba(255,255,255,0.3)",
-                }}
-              >
-                <tab.icon className="w-3.5 h-3.5" />
-                {tab.label}
-                {tab.count > 0 && (
-                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-white/10 text-white/40">{tab.count}</span>
-                )}
-                {activeTab === tab.id && (
-                  <motion.div
-                    layoutId="projectTabLine"
-                    className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-white"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  />
-                )}
-              </button>
-            ))}
+        {/* ── SOUNDTRACKS ── */}
+        <div className="px-5 sm:px-8 lg:px-12 max-w-5xl mx-auto pb-16">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-[10px] font-bold text-white/25 uppercase tracking-[0.18em]">Soundtracks del proyecto</p>
+            <button
+              onClick={() => setPicker(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white/50 hover:text-white transition-all"
+              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
+            >
+              <Plus className="w-3 h-3" /> Añadir soundtrack
+            </button>
           </div>
 
-          {/* ── CONTENT ── */}
-          <AnimatePresence mode="wait">
-
-            {/* TRACKS */}
-            {activeTab === "tracks" && (
-              <motion.div key="tracks" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-[10px] font-bold text-white/25 uppercase tracking-[0.18em]">Tracks del proyecto</p>
-                  <button
-                    onClick={() => setPicker("tracks")}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white/50 hover:text-white transition-all"
-                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
-                  >
-                    <Plus className="w-3 h-3" /> Añadir track
-                  </button>
-                </div>
-
-                {linkedTracks.length === 0 ? (
-                  <button
-                    onClick={() => setPicker("tracks")}
-                    className="w-full py-16 rounded-2xl border border-dashed border-white/[0.07] flex flex-col items-center gap-3 hover:border-white/15 transition-colors"
-                  >
-                    <Music2 className="w-8 h-8 text-white/10" />
-                    <p className="text-xs text-white/20">Añade tracks de tu catálogo a este proyecto</p>
-                  </button>
-                ) : (
-                  <div className="space-y-2 pb-8">
-                    {linkedTracks.map((t, i) => (
-                      <TrackRow
-                        key={t.id}
-                        track={t}
-                        index={i}
-                        playing={playingId === t.id}
-                        onPlay={setPlayingId}
-                        onRemove={(id) => removeAsset("tracks", id)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
-
-            {/* VIDEOS */}
-            {activeTab === "videos" && (
-              <motion.div key="videos" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-[10px] font-bold text-white/25 uppercase tracking-[0.18em]">Videos del proyecto</p>
-                  <button
-                    onClick={() => setPicker("videos")}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white/50 hover:text-white transition-all"
-                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
-                  >
-                    <Plus className="w-3 h-3" /> Añadir video
-                  </button>
-                </div>
-
-                {linkedVideos.length === 0 ? (
-                  <button
-                    onClick={() => setPicker("videos")}
-                    className="w-full py-16 rounded-2xl border border-dashed border-white/[0.07] flex flex-col items-center gap-3 hover:border-white/15 transition-colors"
-                  >
-                    <Film className="w-8 h-8 text-white/10" />
-                    <p className="text-xs text-white/20">Añade videos de tu catálogo a este proyecto</p>
-                  </button>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-8">
-                    {linkedVideos.map((v, i) => (
-                      <VideoCard key={v.id} item={v} index={i} onRemove={(id) => removeAsset("videos", id)} />
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
-
-            {/* PHOTOS */}
-            {activeTab === "photos" && (
-              <motion.div key="photos" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-[10px] font-bold text-white/25 uppercase tracking-[0.18em]">Fotos del proyecto</p>
-                  <button
-                    onClick={() => setPicker("photos")}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white/50 hover:text-white transition-all"
-                    style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
-                  >
-                    <Plus className="w-3 h-3" /> Añadir foto
-                  </button>
-                </div>
-
-                {linkedPhotos.length === 0 ? (
-                  <button
-                    onClick={() => setPicker("photos")}
-                    className="w-full py-16 rounded-2xl border border-dashed border-white/[0.07] flex flex-col items-center gap-3 hover:border-white/15 transition-colors"
-                  >
-                    <ImageIcon className="w-8 h-8 text-white/10" />
-                    <p className="text-xs text-white/20">Añade fotos de tu galería a este proyecto</p>
-                  </button>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 pb-8">
-                    {linkedPhotos.map((p, i) => (
-                      <PhotoCard key={p.id} item={p} index={i} onRemove={(id) => removeAsset("photos", id)} />
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {loadingTracks ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="w-5 h-5 text-white/20 animate-spin" />
+            </div>
+          ) : projectTracks.length === 0 ? (
+            <button
+              onClick={() => setPicker(true)}
+              className="w-full py-16 rounded-2xl border border-dashed border-white/[0.07] flex flex-col items-center gap-3 hover:border-white/15 transition-colors"
+            >
+              <Music2 className="w-8 h-8 text-white/10" />
+              <p className="text-xs text-white/20">Añade soundtracks de tu catálogo a este proyecto</p>
+            </button>
+          ) : (
+            <div className="space-y-2">
+              {projectTracks.map((t, i) => (
+                <TrackRow
+                  key={t.id}
+                  track={t}
+                  index={i}
+                  playing={playingId === t.id}
+                  onPlay={setPlayingId}
+                  onRemove={removeTrack}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </main>
 
-      {/* Asset Picker */}
+      {/* Asset Picker — solo soundtracks */}
       <AnimatePresence>
-        {picker === "tracks" && (
+        {picker && (
           <ProjectAssetPicker
             mode="tracks"
             items={allUserTracks}
-            selectedIds={linkedAssets.tracks}
-            onConfirm={(ids) => handlePickerConfirm("tracks", ids)}
-            onClose={() => setPicker(null)}
-          />
-        )}
-        {picker === "videos" && (
-          <ProjectAssetPicker
-            mode="videos"
-            items={allUserVideos}
-            selectedIds={linkedAssets.videos}
-            onConfirm={(ids) => handlePickerConfirm("videos", ids)}
-            onClose={() => setPicker(null)}
-          />
-        )}
-        {picker === "photos" && (
-          <ProjectAssetPicker
-            mode="photos"
-            items={userPhotos}
-            selectedIds={linkedAssets.photos}
-            onConfirm={(ids) => handlePickerConfirm("photos", ids)}
-            onClose={() => setPicker(null)}
+            selectedIds={projectTracks.map(t => t.id)}
+            onConfirm={handlePickerConfirm}
+            onClose={() => setPicker(false)}
           />
         )}
       </AnimatePresence>

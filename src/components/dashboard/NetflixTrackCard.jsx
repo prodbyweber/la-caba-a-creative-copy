@@ -659,10 +659,21 @@ function TrackCard({ track, onEdit, isFirst }) {
   };
 
   const handleTogglePublic = async () => {
-    const updated = { ...localTrack, is_public: !localTrack.is_public };
-    await base44.entities.Track.update(localTrack.id, { is_public: updated.is_public });
-    setLocalTrack(updated);
-    queryClient.invalidateQueries({ queryKey: ['tracks'] });
+    const newVal = !localTrack.is_public;
+    // Actualización optimista: UI inmediata, sin refetch que cause pantalla negra.
+    setLocalTrack(t => ({ ...t, is_public: newVal }));
+    queryClient.setQueriesData({ queryKey: ['tracks'] }, (old) =>
+      Array.isArray(old) ? old.map(t => t.id === localTrack.id ? { ...t, is_public: newVal } : t) : old
+    );
+    try {
+      await base44.entities.Track.update(localTrack.id, { is_public: newVal });
+    } catch {
+      // Revertir si falla
+      setLocalTrack(t => ({ ...t, is_public: !newVal }));
+      queryClient.setQueriesData({ queryKey: ['tracks'] }, (old) =>
+        Array.isArray(old) ? old.map(t => t.id === localTrack.id ? { ...t, is_public: !newVal } : t) : old
+      );
+    }
   };
 
   const handleDelete = async () => {

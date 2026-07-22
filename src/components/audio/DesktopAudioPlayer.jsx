@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Volume2, VolumeX, Music2, ChevronUp, ChevronDown, X } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music2, ChevronUp, ChevronDown, X } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 
 export default function DesktopAudioPlayer() {
-  const { playingTrack, isPlaying, currentTime, duration, pauseTrack, resumeTrack, stopTrack, closePlayer, hidden, seekTrack } = useGlobalAudio();
+  const { playingTrack, isPlaying, currentTime, duration, pauseTrack, resumeTrack, stopTrack, closePlayer, hidden, seekTrack, playNext, playPrevious } = useGlobalAudio();
   const [isDragging, setIsDragging] = useState(false);
   const [volume, setVolume] = useState(1);
   const [expanded, setExpanded] = useState(true);
@@ -134,7 +134,14 @@ export default function DesktopAudioPlayer() {
               </div>
 
               {/* Controls */}
-              <div className="flex items-center justify-center gap-3">
+              <div className="relative flex items-center justify-center gap-3">
+                <button
+                  onClick={playPrevious}
+                  className="w-10 h-10 rounded-full hover:bg-white/10 active:bg-white/15 flex items-center justify-center transition-colors text-white/70 hover:text-white"
+                  title="Anterior"
+                >
+                  <SkipBack className="w-5 h-5" fill="currentColor" />
+                </button>
                 <button
                   onClick={isPlaying ? pauseTrack : resumeTrack}
                   className="w-12 h-12 rounded-full bg-emerald-500 hover:bg-emerald-600 active:scale-95 flex items-center justify-center transition-all text-white shadow-lg"
@@ -146,8 +153,15 @@ export default function DesktopAudioPlayer() {
                   )}
                 </button>
                 <button
-                  onClick={closePlayer}
+                  onClick={playNext}
                   className="w-10 h-10 rounded-full hover:bg-white/10 active:bg-white/15 flex items-center justify-center transition-colors text-white/70 hover:text-white"
+                  title="Siguiente"
+                >
+                  <SkipForward className="w-5 h-5" fill="currentColor" />
+                </button>
+                <button
+                  onClick={closePlayer}
+                  className="absolute right-0 w-10 h-10 rounded-full hover:bg-white/10 active:bg-white/15 flex items-center justify-center transition-colors text-white/70 hover:text-white"
                   title="Cerrar"
                 >
                   <X className="w-5 h-5" />

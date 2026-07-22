@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Plus, FolderOpen, Music2, Pencil, Globe, Lock, X, Film,
+  Plus, FolderOpen, Music2, Pencil, Globe, Lock, X,
   Check, Loader2, Image as ImageIcon, ChevronDown, Disc
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -11,18 +11,9 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import useEmblaCarousel from "embla-carousel-react";
 
-// Film-derived project types (excluding singles)
-const FILM_PROJECT_TYPES = ["Film","MiniFilm","Serie","Videoclip","Visualizer","Album"];
-const TYPE_LABELS = {
-  Film: "Film", MiniFilm: "Mini Film", Serie: "Serie",
-  Videoclip: "Videoclip", Visualizer: "Visualizer", Album: "Álbum",
-};
-
-function getYoutubeThumbnail(url) {
-  if (!url) return null;
-  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : null;
-}
+// Tipos de proyecto simplificados: solo Álbum y EP
+const PROJECT_TYPES = ["Album", "EP"];
+const TYPE_LABELS = { Album: "Álbum", EP: "EP" };
 
 const ic = "w-full px-3 py-2.5 bg-white/5 border border-white/[0.08] rounded-xl text-white text-sm focus:outline-none focus:border-white/25 placeholder-white/20 transition-colors";
 const currentYear = new Date().getFullYear();
@@ -39,7 +30,8 @@ function ProjectModal({ onClose, jlyArtistId, project = null, existingTracks = [
     year: project?.year || currentYear,
     cover_url: project?.cover_url || "",
     description: project?.description || "",
-    track_ids: project?.track_ids || [],
+    // Calcular soundtracks vinculados desde la relación Track.project_id (fuente de verdad)
+    track_ids: isEdit ? existingTracks.filter(t => t.project_id === project.id).map(t => t.id) : [],
   }));
 
   const handleUpload = async (file) => {
@@ -64,6 +56,7 @@ function ProjectModal({ onClose, jlyArtistId, project = null, existingTracks = [
     if (!form.title.trim()) return;
     setLoading(true);
     try {
+      let created = null;
       const payload = {
         title: form.title,
         type: form.type,
@@ -82,13 +75,16 @@ function ProjectModal({ onClose, jlyArtistId, project = null, existingTracks = [
           if (!shouldLink && isLinked) await base44.entities.Track.update(t.id, { project_id: null });
         }
       } else {
-        const created = await base44.entities.Project.create(payload);
+        created = await base44.entities.Project.create(payload);
         for (const tid of form.track_ids) {
           await base44.entities.Track.update(tid, { project_id: created.id });
         }
       }
       qc.invalidateQueries({ queryKey: ["projects"] });
       qc.invalidateQueries({ queryKey: ["all-tracks"] });
+      qc.invalidateQueries({ queryKey: ["tracks"] });
+      if (isEdit) qc.invalidateQueries({ queryKey: ["project-tracks", project.id] });
+      if (!isEdit && created?.id) qc.invalidateQueries({ queryKey: ["project-tracks", created.id] });
       onClose();
     } finally { setLoading(false); }
   };
@@ -135,7 +131,7 @@ function ProjectModal({ onClose, jlyArtistId, project = null, existingTracks = [
           <div>
             <label className="text-[10px] text-white/30 uppercase tracking-widest font-bold mb-2 block">Tipo</label>
             <div className="flex flex-wrap gap-2">
-              {FILM_PROJECT_TYPES.map(t => (
+              {PROJECT_TYPES.map(t => (
                 <button key={t} type="button" onClick={() => setForm(f => ({ ...f, type: t }))}
                   className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                   style={{
@@ -212,25 +208,12 @@ export default function ProjectsSection({ jlyArtistId, userEmail }) {
     staleTime: 0,
   });
 
-  const { data: allFilms = [] } = useQuery({
-    queryKey: ["artist-films", jlyArtistId],
-    queryFn: async () => {
-      if (!jlyArtistId) return [];
-      const items = await base44.entities.ExplorarItem.filter({ artist_id: jlyArtistId });
-      return items.filter(i => ["film","minifilm","series","videoclip","visualizer"].includes(i.content_type));
-    },
-    enabled: !!jlyArtistId,
-    staleTime: 0,
-  });
-
-  // Only film-type projects (exclude Singles/EP)
-  const FILM_TYPES = ["Film","MiniFilm","Serie","Videoclip","Visualizer","Album","ContentPack"];
-  const projects = allProjects.filter(p => FILM_TYPES.includes(p.type));
+  // Solo proyectos de tipo Álbum o EP
+  const projects = allProjects.filter(p => ["Album", "EP"].includes(p.type));
 
   const artistTracks = allTracks;
 
   const getProjectTracks = (projectId) => allTracks.filter(t => t.project_id === projectId);
-  const getProjectFilm = (project) => allFilms.find(f => f.title === project.title);
   const getProjectYear = (project) => project.start_date
     ? new Date(project.start_date).getFullYear()
     : new Date(project.created_date).getFullYear();
@@ -284,8 +267,7 @@ export default function ProjectsSection({ jlyArtistId, userEmail }) {
                 <div className="flex gap-2.5" style={{ width: "max-content" }}>
                   {projects.map(project => {
                     const projectTracks = getProjectTracks(project.id);
-                    const film = getProjectFilm(project);
-                    const cover = project.cover_url || film?.thumbnail_url || getYoutubeThumbnail(film?.youtube_url) || projectTracks[0]?.cover_url;
+                    const cover = project.cover_url || projectTracks[0]?.cover_url;
                     return (
                       <div key={project.id} className="flex-shrink-0 w-[120px] relative group/proj">
                         <Link to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
@@ -319,8 +301,7 @@ export default function ProjectsSection({ jlyArtistId, userEmail }) {
                 <div className="flex gap-4">
                   {projects.map((project, i) => {
                     const projectTracks = getProjectTracks(project.id);
-                    const film = getProjectFilm(project);
-                    const cover = project.cover_url || film?.thumbnail_url || getYoutubeThumbnail(film?.youtube_url) || projectTracks[0]?.cover_url;
+                    const cover = project.cover_url || projectTracks[0]?.cover_url;
                     return (
                       <div key={project.id} className="flex-[0_0_160px]">
                         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}

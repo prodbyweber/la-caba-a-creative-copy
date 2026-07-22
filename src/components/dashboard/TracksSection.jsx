@@ -15,26 +15,40 @@ import ArtistPicker from "@/components/tracks/ArtistPicker";
 function MobileDetailWrapper({ track, tracks, onClose, onEdit, onDelete }) {
   const globalAudio = useGlobalAudio();
   const queryClient = useQueryClient();
-  const isPlaying = globalAudio?.playingTrack?.id === track.id;
+  const [localTrack, setLocalTrack] = useState(track);
+  useEffect(() => { setLocalTrack(track); }, [track]);
+  const isPlaying = globalAudio?.playingTrack?.id === localTrack.id;
 
   const handleTogglePlay = useCallback(() => {
-    if (!track.audio_file_url) return;
+    if (!localTrack.audio_file_url) return;
     if (isPlaying) { globalAudio.pauseTrack(); return; }
-    if (globalAudio.playingTrack?.id === track.id) { globalAudio.resumeTrack(); return; }
+    if (globalAudio.playingTrack?.id === localTrack.id) { globalAudio.resumeTrack(); return; }
     // Cola = soundtracks del propio artista, en orden, desde el track actual.
-    const playable = (tracks && tracks.length ? tracks : [track]).filter(t => !!t.audio_file_url);
-    const startIdx = playable.findIndex(t => t.id === track.id);
+    const playable = (tracks && tracks.length ? tracks : [localTrack]).filter(t => !!t.audio_file_url);
+    const startIdx = playable.findIndex(t => t.id === localTrack.id);
     globalAudio.playQueue(playable, startIdx >= 0 ? startIdx : 0);
-  }, [track, tracks, isPlaying, globalAudio]);
+  }, [localTrack, tracks, isPlaying, globalAudio]);
 
   const handleTogglePublic = useCallback(async () => {
-    await base44.entities.Track.update(track.id, { is_public: !track.is_public });
-    queryClient.invalidateQueries({ queryKey: ['tracks'] });
-  }, [track, queryClient]);
+    const newVal = !localTrack.is_public;
+    // Actualización optimista: cambio inmediato sin refetch (evita pantalla negra en Windows).
+    setLocalTrack(t => ({ ...t, is_public: newVal }));
+    queryClient.setQueriesData({ queryKey: ['tracks'] }, (old) =>
+      Array.isArray(old) ? old.map(t => t.id === localTrack.id ? { ...t, is_public: newVal } : t) : old
+    );
+    try {
+      await base44.entities.Track.update(localTrack.id, { is_public: newVal });
+    } catch {
+      setLocalTrack(t => ({ ...t, is_public: !newVal }));
+      queryClient.setQueriesData({ queryKey: ['tracks'] }, (old) =>
+        Array.isArray(old) ? old.map(t => t.id === localTrack.id ? { ...t, is_public: !newVal } : t) : old
+      );
+    }
+  }, [localTrack, queryClient]);
 
   return (
     <MobileTrackDetail
-      track={track}
+      track={localTrack}
       onClose={onClose}
       onEdit={onEdit}
       onDelete={onDelete}
