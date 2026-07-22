@@ -4,9 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock, Trash2, FolderOpen, Upload, Check, Link, Share2, Download } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { base44 } from "@/api/base44Client";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { shareTrackLink } from "@/lib/trackShare";
 import { ensureUniqueSlug } from "@/lib/trackSlug";
+import ArtistPicker from "@/components/tracks/ArtistPicker";
 
 const statusConfig = {
   idea:       { label: "Idea",          color: "#6b7280" },
@@ -62,6 +63,18 @@ function TrackEditModal({ track, onClose, onSaved }) {
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
   const [notifyReplace, setNotifyReplace] = useState(false);
+
+  // Perfil del creador actual → nombre artístico por defecto
+  const { data: myProfile } = useQuery({
+    queryKey: ["my-artist-profile"],
+    queryFn: async () => {
+      const user = await base44.auth.me();
+      const profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
+      return profiles[0] || null;
+    },
+    staleTime: 60000,
+  });
+  const myArtistName = myProfile?.artist_name || myProfile?.display_name || myProfile?.full_name || "";
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -175,6 +188,16 @@ function TrackEditModal({ track, onClose, onSaved }) {
                 <input type="file" accept="image/*" onChange={handleCoverUpload} className="hidden" disabled={uploadingCover} />
               </label>
             </div>
+          </div>
+
+          {/* Artista */}
+          <div>
+            <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-2">Artista</label>
+            <ArtistPicker
+              value={formData.display_artist || ""}
+              onChange={(name) => setFormData(f => ({ ...f, display_artist: name }))}
+              defaultName={myArtistName}
+            />
           </div>
 
           {/* Audio */}

@@ -14,6 +14,10 @@
       "type": "string",
       "description": "ID del artista principal"
     },
+    "display_artist": {
+      "type": "string",
+      "description": "Nombre art\u00edstico que se muestra p\u00fablicamente en la landing del soundtrack. Se auto-asigna desde el perfil del creador, puede elegirse otro usuario de la plataforma por su tag, o escribirse manualmente."
+    },
     "project_id": {
       "type": "string",
       "description": "ID del proyecto al que pertenece (opcional)"

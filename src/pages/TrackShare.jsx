@@ -19,7 +19,8 @@ function useTrackMeta(track, hasAccess) {
     const prevTitle = document.title;
     document.title = `${track.title} · Cabaña Creative`;
 
-    const desc = `${track.title}${track.producers?.length ? " — Prod. " + track.producers.join(", ") : ""} · Escucha en Cabaña Creative.`;
+    const artistLabel = track.display_artist || "";
+    const desc = `${track.title}${artistLabel ? " — " + artistLabel : ""} · Escucha en Cabaña Creative.`;
     const url = getTrackShareUrl(track);
     const image = track.cover_url || "";
 
@@ -141,7 +142,8 @@ export default function TrackShare() {
     retry: false,
   });
 
-  const artistName = artist?.stageName || ownerProfile?.artist_name || ownerProfile?.display_name || ownerProfile?.full_name || "";
+  const resolvedArtistName = artist?.stageName || ownerProfile?.artist_name || ownerProfile?.display_name || ownerProfile?.full_name || "";
+  const artistName = track?.display_artist || resolvedArtistName;
 
   const isOwnerOrAdmin = !!user && (user.role === "admin" || track?.created_by_id === user.id);
   const hasAccess = track?.is_public === true || isOwnerOrAdmin;
@@ -217,8 +219,6 @@ export default function TrackShare() {
     );
   }
 
-  const producerLabel = track.producers?.join(", ") || track.composers?.join(", ") || "";
-
   return (
     <div className="min-h-screen pb-24" style={{ background: "#0a0a0b", fontFamily: "'Inter', -apple-system, sans-serif" }}>
       {/* Cinematic ambient backdrop from the cover */}
@@ -271,7 +271,6 @@ export default function TrackShare() {
               <h1 className="text-3xl sm:text-5xl font-black text-white mb-2" style={{ letterSpacing: "-0.03em", lineHeight: 1.02 }}>
                 {track.title}
               </h1>
-              {producerLabel && <p className="text-sm sm:text-base text-white/50 font-medium mb-4">{producerLabel}</p>}
 
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mb-6">
                 <span

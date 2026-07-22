@@ -8,6 +8,7 @@ import { base44 } from "@/api/base44Client";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import NetflixTrackCard from "./NetflixTrackCard";
 import { createSoundtrack, updateSoundtrack, uploadFile } from "@/lib/mediaCreation";
+import ArtistPicker from "@/components/tracks/ArtistPicker";
 
 // Same architecture as Explorar: modal state in parent, rendered OUTSIDE the scroll container.
 // This guarantees reliable mounting on ALL mobile browsers (iOS Safari, Android Chrome, etc.)
@@ -247,9 +248,20 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
 
   const [formData, setFormData] = useState({
     title: "", project_id: "", cover_url: "", audio_file_url: "",
-    youtube_music_url: "", composers: [], producers: [],
+    youtube_music_url: "", display_artist: "", composers: [], producers: [],
     genre: "", genre_secondary: "", status: "idea", notes: "", versions: {}
   });
+  // Perfil del creador actual → nombre artístico por defecto
+  const { data: myProfile } = useQuery({
+    queryKey: ["my-artist-profile"],
+    queryFn: async () => {
+      const user = await base44.auth.me();
+      const profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
+      return profiles[0] || null;
+    },
+    staleTime: 60000,
+  });
+  const myArtistName = myProfile?.artist_name || myProfile?.display_name || myProfile?.full_name || "";
   const [showGenrePanel, setShowGenrePanel] = useState(false);
   const [genreTarget, setGenreTarget] = useState("primary");
   const [uploadingCover, setUploadingCover] = useState(false);
@@ -267,7 +279,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
     } else {
       setFormData({
         title: "", project_id: "", cover_url: "", audio_file_url: "",
-        youtube_music_url: "", composers: [], producers: [],
+        youtube_music_url: "", display_artist: "", composers: [], producers: [],
         genre: "", genre_secondary: "", status: "demo", notes: "", versions: {}
       });
       setAudioMode("file");
@@ -407,6 +419,16 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Artista */}
+            <div>
+              <label className={lbl}>Artista</label>
+              <ArtistPicker
+                value={formData.display_artist || ""}
+                onChange={(name) => setFormData((f) => ({ ...f, display_artist: name }))}
+                defaultName={myArtistName}
+              />
             </div>
 
             {/* Audio */}
