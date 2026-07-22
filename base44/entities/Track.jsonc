@@ -140,6 +140,11 @@
         }
       },
       "description": "Versiones del track"
+    },
+    "notify_mp3_update": {
+      "type": "boolean",
+      "default": false,
+      "description": "Flag temporal: el administrador quiere notificar al artista la actualizaci\u00f3n del MP3. Lo consume y resetea el evento de entidad del backend."
     }
   },
   "required": [

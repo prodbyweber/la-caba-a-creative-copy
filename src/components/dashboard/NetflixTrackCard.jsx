@@ -61,7 +61,7 @@ function TrackEditModal({ track, onClose, onSaved }) {
   const [newProducer, setNewProducer] = useState("");
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState(false);
-  const [notifyReplace, setNotifyReplace] = useState(true);
+  const [notifyReplace, setNotifyReplace] = useState(false);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -85,23 +85,8 @@ function TrackEditModal({ track, onClose, onSaved }) {
     },
     onSuccess: async (updated) => {
       queryClient.invalidateQueries({ queryKey: ['tracks'] });
-      // Notificación por email de subida/actualización del MP3
-      const hadAudio = !!track?.audio_file_url;
-      const newAudio = updated?.audio_file_url || formData.audio_file_url;
-      const isFirstUpload = !hadAudio && !!newAudio;
-      const isReplace = hadAudio && !!newAudio && newAudio !== track?.audio_file_url;
-      const shouldNotify = isFirstUpload || (isReplace && notifyReplace);
-      if (shouldNotify && (updated?.id || track?.id)) {
-        try {
-          await base44.functions.invoke('notifyTrackMp3Upload', {
-            track_id: updated?.id || track?.id,
-            is_first_upload: isFirstUpload,
-            app_url: window.location.origin,
-          });
-        } catch (e) {
-          console.warn('[NetflixTrackCard] notify failed', e);
-        }
-      }
+      // El envío de correos lo dispara un EVENTO DE ENTIDAD en el backend
+      // (automación sobre Track) según el flag notify_mp3_update.
       onSaved({ ...formData, ...updated });
     },
   });
@@ -172,7 +157,7 @@ function TrackEditModal({ track, onClose, onSaved }) {
           </button>
         </div>
 
-        <form onSubmit={(e) => { e.preventDefault(); if (!formData.title?.trim()) { alert('El título es requerido'); return; } saveMutation.mutate(formData); }} className="p-5 space-y-5">
+        <form onSubmit={(e) => { e.preventDefault(); if (!formData.title?.trim()) { alert('El título es requerido'); return; } saveMutation.mutate({ ...formData, notify_mp3_update: notifyReplace }); }} className="p-5 space-y-5">
 
           {/* Cover */}
           <div>

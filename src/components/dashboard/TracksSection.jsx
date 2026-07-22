@@ -286,25 +286,9 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
       queryClient.invalidateQueries({ queryKey: ['tracks'] });
       queryClient.invalidateQueries({ queryKey: ['artist-films'] });
       queryClient.invalidateQueries({ queryKey: ['artist-shorts'] });
-
-      // Notificaciones solo para administradores (la función verifica el rol):
-      //  - Crear soundtrack -> siempre.
-      //  - Actualizar MP3 -> solo si se activa "Notificar al artista por correo".
-      const isCreate = !track;
-      const newAudio = saved?.audio_file_url || formData.audio_file_url;
-      const mp3Changed = !!track && !!newAudio && newAudio !== track?.audio_file_url;
-      const shouldNotify = isCreate || (mp3Changed && notifyReplace);
-      if (shouldNotify && saved?.id) {
-        try {
-          await base44.functions.invoke('notifyTrackMp3Upload', {
-            track_id: saved.id,
-            action: isCreate ? 'create' : 'mp3_update',
-            app_url: window.location.origin,
-          });
-        } catch (e) {
-          console.warn('[TracksSection] notify failed', e);
-        }
-      }
+      // El envío de correos lo dispara ahora un EVENTO DE ENTIDAD en el backend
+      // (automación sobre Track) al confirmarse create/update. No depende de la UI.
+      // La casilla "Notificar al artista por correo" se persiste como flag notify_mp3_update.
       onClose();
     },
     onError: (error) => {
@@ -382,7 +366,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
           </div>
 
           {/* Scrollable body */}
-          <form onSubmit={(e) => { e.preventDefault(); if (!formData.title.trim()) { alert('El título es requerido'); return; } saveMutation.mutate(formData); }}
+          <form onSubmit={(e) => { e.preventDefault(); if (!formData.title.trim()) { alert('El título es requerido'); return; } saveMutation.mutate({ ...formData, notify_mp3_update: notifyReplace }); }}
             className="overflow-y-auto flex-1 px-5 py-5 space-y-5">
 
             {/* Cover + Título — row */}
