@@ -38,7 +38,7 @@ export default function MobileBottomNav({ artistId, isAdmin }) {
         borderTop: "1px solid rgba(255,255,255,0.06)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)",
+        paddingBottom: "env(safe-area-inset-bottom, 0px)",
       }}
     >
       <div className="flex items-center justify-around px-2 pt-2 pb-3">

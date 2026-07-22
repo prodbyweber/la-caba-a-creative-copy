@@ -439,7 +439,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
                   </div>
                   <input type="file" accept=".mp3,audio/mpeg" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
                 </label>
-                {track && formData.audio_file_url && formData.audio_file_url !== (track.audio_file_url || "") && (
+                {formData.audio_file_url && (!track || formData.audio_file_url !== (track.audio_file_url || "")) && (
                   <label className="flex items-center gap-2 mt-2 cursor-pointer">
                     <div className="relative">
                       <input type="checkbox" checked={notifyReplace} onChange={(e) => setNotifyReplace(e.target.checked)} className="sr-only peer" />

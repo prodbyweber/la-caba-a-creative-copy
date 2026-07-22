@@ -207,14 +207,14 @@ function TrackEditModal({ track, onClose, onSaved }) {
                     {formData.audio_file_url && <p className="text-xs text-emerald-400 mt-1">✓ MP3 cargado</p>}
                   </div>
                 </div>
-                {track?.audio_file_url && (
+                {formData.audio_file_url && formData.audio_file_url !== (track?.audio_file_url || "") && (
                   <label className="flex items-center gap-2 mt-3 cursor-pointer">
                     <div className="relative">
                       <input type="checkbox" checked={notifyReplace} onChange={(e) => setNotifyReplace(e.target.checked)} className="sr-only peer" />
                       <div className="w-9 h-5 bg-white/10 rounded-full peer-checked:bg-emerald-500 transition-colors" />
                       <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
                     </div>
-                    <span className="text-[11px] text-white/50">Notificar al artista la actualización del MP3</span>
+                    <span className="text-[11px] text-white/50">Notificar al artista por correo</span>
                   </label>
                 )}
               </div>

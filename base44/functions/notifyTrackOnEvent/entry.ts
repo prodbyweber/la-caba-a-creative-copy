@@ -46,6 +46,11 @@ Deno.serve(async (req) => {
         console.log('[notifyTrack] create skipped (non-admin creator)', logBase);
         return Response.json({ success: true, skipped: 'non-admin-creator' });
       }
+      // Crear: solo se notifica si el administrador marca manualmente la casilla.
+      if (track?.notify_mp3_update !== true) {
+        console.log('[notifyTrack] create skipped (no manual notify)', logBase);
+        return Response.json({ success: true, skipped: 'no-manual-notify' });
+      }
       return await sendNotify(sr, track, 'create', logBase);
     }
 

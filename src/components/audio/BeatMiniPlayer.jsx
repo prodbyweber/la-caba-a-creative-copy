@@ -79,7 +79,7 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
         transition={{ duration: 0.3 }}
         className="fixed left-0 right-0 z-[100] border-t border-white/10 backdrop-blur-xl"
         style={{
-          bottom: isMobile ? "calc(72px + env(safe-area-inset-bottom, 0px))" : "0px",
+          bottom: isMobile ? "calc(60px + env(safe-area-inset-bottom, 0px))" : "0px",
           background: "rgba(12, 12, 14, 0.97)",
         }}
       >
