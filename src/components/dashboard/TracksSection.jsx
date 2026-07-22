@@ -257,7 +257,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
   const [audioMode, setAudioMode] = useState("file");
   const [newComposer, setNewComposer] = useState("");
   const [newProducer, setNewProducer] = useState("");
-  const [notifyReplace, setNotifyReplace] = useState(true);
+  const [notifyReplace, setNotifyReplace] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -272,6 +272,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
       });
       setAudioMode("file");
     }
+    setNotifyReplace(false);
   }, [track, isOpen]);
 
   const saveMutation = useMutation({
@@ -286,17 +287,18 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
       queryClient.invalidateQueries({ queryKey: ['artist-films'] });
       queryClient.invalidateQueries({ queryKey: ['artist-shorts'] });
 
-      // Notificación por email de subida/actualización del MP3
-      const hadAudio = !!track?.audio_file_url;
+      // Notificaciones solo para administradores (la función verifica el rol):
+      //  - Crear soundtrack -> siempre.
+      //  - Actualizar MP3 -> solo si se activa "Notificar al artista por correo".
+      const isCreate = !track;
       const newAudio = saved?.audio_file_url || formData.audio_file_url;
-      const isFirstUpload = !hadAudio && !!newAudio;
-      const isReplace = hadAudio && !!newAudio && newAudio !== track?.audio_file_url;
-      const shouldNotify = isFirstUpload || (isReplace && notifyReplace);
+      const mp3Changed = !!track && !!newAudio && newAudio !== track?.audio_file_url;
+      const shouldNotify = isCreate || (mp3Changed && notifyReplace);
       if (shouldNotify && saved?.id) {
         try {
           await base44.functions.invoke('notifyTrackMp3Upload', {
             track_id: saved.id,
-            is_first_upload: isFirstUpload,
+            action: isCreate ? 'create' : 'mp3_update',
             app_url: window.location.origin,
           });
         } catch (e) {
@@ -453,14 +455,14 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
                   </div>
                   <input type="file" accept=".mp3,audio/mpeg" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
                 </label>
-                {track?.audio_file_url && (
+                {track && formData.audio_file_url && formData.audio_file_url !== (track.audio_file_url || "") && (
                   <label className="flex items-center gap-2 mt-2 cursor-pointer">
                     <div className="relative">
                       <input type="checkbox" checked={notifyReplace} onChange={(e) => setNotifyReplace(e.target.checked)} className="sr-only peer" />
                       <div className="w-9 h-5 bg-white/10 rounded-full peer-checked:bg-emerald-500 transition-colors" />
                       <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
                     </div>
-                    <span className="text-[11px] text-white/50">Notificar al artista la actualización del MP3</span>
+                    <span className="text-[11px] text-white/50">Notificar al artista por correo</span>
                   </label>
                 )}
                 </>

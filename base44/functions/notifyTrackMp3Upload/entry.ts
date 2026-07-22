@@ -6,8 +6,10 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    // Solo las acciones de administrador disparan correos. El artista nunca recibe correos por sus propias acciones.
+    if (user.role !== 'admin') return Response.json({ success: true, skipped: 'non-admin' });
 
-    const { track_id, is_first_upload, app_url } = await req.json().catch(() => ({}));
+    const { track_id, action, app_url } = await req.json().catch(() => ({}));
     if (!track_id) return Response.json({ error: 'track_id requerido' }, { status: 400 });
 
     const track = await base44.asServiceRole.entities.Track.get(track_id);
@@ -50,12 +52,13 @@ Deno.serve(async (req) => {
     const streamUrl = `${origin}/t/${slugOrId}`;
     const appLink = `${origin}`;
 
-    const subject = is_first_upload ? 'Nuevo soundtrack disponible' : 'Soundtrack actualizado';
-    const content = is_first_upload
+    const isCreate = action === 'create';
+    const subject = isCreate ? 'Nuevo soundtrack disponible' : 'Soundtrack actualizado';
+    const content = isCreate
       ? 'Tu soundtrack ya está en tu catálogo. Escúchalo, compártelo o descárgalo ahora.'
       : 'Hay una nueva versión de tu soundtrack en tu catálogo. Escúchala o descárgala ahora.';
-    const ctaLabel = is_first_upload ? 'Ir al catálogo' : 'Escuchar ahora';
-    const ctaUrl = is_first_upload ? appLink : streamUrl;
+    const ctaLabel = isCreate ? 'Ir al catálogo' : 'Escuchar ahora';
+    const ctaUrl = isCreate ? appLink : streamUrl;
 
     const body = `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 24px;">
