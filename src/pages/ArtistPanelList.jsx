@@ -214,7 +214,7 @@ export default function ArtistPanelList() {
                         {c.displayName}
                       </p>
                       <p className="text-[11px] text-white/35 truncate">
-                        {c.username ? `@${c.username}` : c.genre || c.email || "—"}
+                        {c.email || (c.username ? `@${c.username}` : c.genre || "—")}
                       </p>
                     </div>
 

@@ -30,9 +30,10 @@ Deno.serve(async (req) => {
     }
     if (!toEmail) return Response.json({ error: 'Sin email de artista' }, { status: 400 });
 
-    const origin = (app_url || 'https://app.cabanacreative.es').replace(/\/$/, '');
+    // Enlaces siempre al dominio de producción (nunca a URLs de previsualización).
+    const origin = 'https://cabanacreative.es';
     const slugOrId = track.slug || track.id;
-    const streamUrl = `${origin}/t/${slugOrId}`;
+    const streamUrl = `${origin}/track/${slugOrId}`;
     const appLink = `${origin}`;
 
     const isCreate = action === 'create';
