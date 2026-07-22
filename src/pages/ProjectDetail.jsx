@@ -132,11 +132,20 @@ export default function ProjectDetail() {
   });
 
   // Todos los soundtracks del artista/usuario (para el picker)
+  // Incluye los vinculados por artist_id Y los creados por el usuario (created_by email),
+  // coherente con TracksSection, para que el picker muestre todo el catálogo del creador.
   const { data: allUserTracks = [] } = useQuery({
-    queryKey: ["user-tracks", selfArtist?.id],
-    queryFn: () => selfArtist?.id
-      ? base44.entities.Track.filter({ artist_id: selfArtist.id })
-      : base44.entities.Track.list("-created_date", 200),
+    queryKey: ["user-tracks", selfArtist?.id, currentUser?.email],
+    queryFn: async () => {
+      if (!currentUser) return [];
+      const byArtist = selfArtist?.id
+        ? await base44.entities.Track.filter({ artist_id: selfArtist.id })
+        : [];
+      const all = await base44.entities.Track.list("-created_date", 200);
+      const byCreator = all.filter(t => t.created_by === currentUser.email);
+      const seen = new Set(byArtist.map(t => t.id));
+      return [...byArtist, ...byCreator.filter(t => !seen.has(t.id))];
+    },
     enabled: !!currentUser,
   });
 

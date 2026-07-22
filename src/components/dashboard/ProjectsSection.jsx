@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, FolderOpen, Music2, Pencil, Globe, Lock, X,
-  Check, Loader2, Image as ImageIcon, ChevronDown, Disc
+  Check, Loader2, Image as ImageIcon, ChevronDown, Disc, Trash2
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
@@ -224,6 +224,25 @@ export default function ProjectsSection({ jlyArtistId, userEmail }) {
     qc.invalidateQueries({ queryKey: ["projects"] });
   };
 
+  const handleDeleteProject = async (e, project) => {
+    e.preventDefault(); e.stopPropagation();
+    if (!window.confirm(`¿Eliminar el proyecto "${project.title}"? Los soundtracks vinculados se desvincularán pero no se borrarán.`)) return;
+    try {
+      // Desvincular soundtracks (no los borra, solo quita la relación)
+      const linked = allTracks.filter(t => t.project_id === project.id);
+      for (const t of linked) {
+        await base44.entities.Track.update(t.id, { project_id: null });
+      }
+      await base44.entities.Project.delete(project.id);
+      qc.invalidateQueries({ queryKey: ["projects"] });
+      qc.invalidateQueries({ queryKey: ["all-tracks"] });
+      qc.invalidateQueries({ queryKey: ["tracks"] });
+    } catch (err) {
+      console.error('[ProjectsSection] delete failed', err);
+      alert('No se pudo eliminar el proyecto: ' + (err?.message || err));
+    }
+  };
+
   if (isLoading) return (
     <div className="bg-[#141414] rounded-2xl border border-white/5 p-8">
       <div className="animate-pulse space-y-4">
@@ -284,6 +303,10 @@ export default function ProjectsSection({ jlyArtistId, userEmail }) {
                                 className="w-5 h-5 rounded-md bg-black/60 flex items-center justify-center">
                                 <Pencil className="w-2.5 h-2.5 text-white/50" />
                               </button>
+                              <button onClick={e => handleDeleteProject(e, project)}
+                                className="w-5 h-5 rounded-md bg-black/60 hover:bg-red-500/30 flex items-center justify-center">
+                                <Trash2 className="w-2.5 h-2.5 text-white/50" />
+                              </button>
                             </div>
                           </div>
                           <p className="text-[11px] font-semibold text-white truncate leading-tight">{project.title}</p>
@@ -320,6 +343,10 @@ export default function ProjectsSection({ jlyArtistId, userEmail }) {
                               <button onClick={e => { e.preventDefault(); e.stopPropagation(); setEditingProject(project); setShowCreateModal(true); }}
                                 className="w-6 h-6 rounded-md bg-black/70 hover:bg-black/90 flex items-center justify-center">
                                 <Pencil className="w-3 h-3 text-white/50" />
+                              </button>
+                              <button onClick={e => handleDeleteProject(e, project)}
+                                className="w-6 h-6 rounded-md bg-black/70 hover:bg-red-500/30 flex items-center justify-center">
+                                <Trash2 className="w-3 h-3 text-white/50" />
                               </button>
                             </div>
                           </div>
