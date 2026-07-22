@@ -14,21 +14,35 @@ Deno.serve(async (req) => {
     const track = await base44.asServiceRole.entities.Track.get(track_id);
     if (!track) return Response.json({ error: 'Track no encontrado' }, { status: 404 });
 
-    // El correo se envía siempre al email registrado del artista dueño del catálogo (nunca al admin).
+    // Destinatario: SIEMPRE el email de la cuenta registrada del artista (Artist.user_id -> User.email).
+    // Nunca el admin, nunca emails temporales, nunca el email del remitente.
     let toEmail = '';
+    let artistInfo = null;
     if (track.artist_id) {
       try {
         const artist = await base44.asServiceRole.entities.Artist.get(track.artist_id);
+        artistInfo = { id: artist?.id, stageName: artist?.stageName, user_id: artist?.user_id, artist_email: artist?.email };
         if (artist?.user_id) {
           try {
             const linkedUser = await base44.asServiceRole.entities.User.get(artist.user_id);
             if (linkedUser?.email) toEmail = linkedUser.email;
-          } catch (_e) { /* sin usuario vinculado */ }
+          } catch (e) { console.log('[notify] User lookup failed', artist.user_id, e?.message); }
         }
-        if (!toEmail && artist?.email) toEmail = artist.email;
-      } catch (_e) { /* sin artista vinculado */ }
+      } catch (e) { console.log('[notify] Artist lookup failed', track.artist_id, e?.message); }
     }
-    if (!toEmail) return Response.json({ error: 'Sin email de artista' }, { status: 400 });
+
+    const event = action === 'create' ? 'soundtrack_create' : 'mp3_update';
+    console.log('[notify] start', { event, track_id: track.id, artist: artistInfo, recipient: toEmail });
+
+    if (!toEmail) {
+      console.error('[notify] Sin email registrado para el artista', { event, track_id: track.id, artist: artistInfo });
+      return Response.json({
+        error: 'Sin email de artista registrado',
+        event,
+        track_id: track.id,
+        artist: artistInfo,
+      }, { status: 400 });
+    }
 
     // Enlaces siempre al dominio de producción (nunca a URLs de previsualización).
     const origin = 'https://cabanacreative.es';
@@ -51,15 +65,29 @@ Deno.serve(async (req) => {
   <p style="margin: 22px 0 0; font-size: 12px; color: #aaa; line-height: 1.5; word-break: break-all;">${ctaUrl}</p>
 </div>`.trim();
 
-    await base44.asServiceRole.integrations.Core.SendEmail({
-      to: toEmail,
-      from_name: 'Cabaña Creative',
-      subject,
-      body,
-    });
+    let sendResult;
+    try {
+      sendResult = await base44.asServiceRole.integrations.Core.SendEmail({
+        to: toEmail,
+        from_name: 'Cabaña Creative',
+        subject,
+        body,
+      });
+      console.log('[notify] SendEmail OK', { event, to: toEmail, result: sendResult });
+    } catch (sendError) {
+      console.error('[notify] SendEmail FAILED', { event, to: toEmail, error: sendError?.message, response: sendError?.data || sendError });
+      return Response.json({
+        error: 'Fallo al enviar el correo',
+        event,
+        recipient: toEmail,
+        provider_error: sendError?.message || String(sendError),
+        provider_response: sendError?.data || null,
+      }, { status: 502 });
+    }
 
-    return Response.json({ success: true, sent_to: toEmail });
+    return Response.json({ success: true, sent_to: toEmail, event });
   } catch (error) {
+    console.error('[notify] Function error', error?.message, error?.stack);
     return Response.json({ error: error.message || 'Error interno' }, { status: 500 });
   }
 });
