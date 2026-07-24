@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect, createContext, useContext, useCallback } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Globe, Lock, Share2, FolderOpen, Download } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Globe, Lock, Share2, FolderOpen, Download, BarChart3 } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -243,6 +244,16 @@ export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, o
               {isPublic ? <Globe className="w-4 h-4 text-emerald-400" /> : <Lock className="w-4 h-4 text-white/30" />}
             </button>
           </div>
+
+          {/* Acceso rápido a Analytics */}
+          <Link
+            to={track.slug ? `/t/${track.slug}/analytics` : `/track/${track.id}/analytics`}
+            onClick={onClose}
+            className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-bold transition-colors"
+            style={{ background: "rgba(250,204,21,0.10)", border: "1px solid rgba(250,204,21,0.25)", color: "#facc15" }}
+          >
+            <BarChart3 className="w-4 h-4" /> Ver Analytics
+          </Link>
 
           {/* Status badges */}
           <div className="flex items-center gap-2 flex-wrap">

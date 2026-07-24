@@ -33,8 +33,22 @@ export function activePlatforms(streamingLinks, order) {
 
 // Detección de origen de tráfico.
 // Prioridad: User-Agent del navegador in-app (más fiable que el referrer, que los
-// navegadores in-app de WhatsApp/Instagram/TikTok suelen vaciar) → referrer → directo.
-export function detectRefererSource(referrer, userAgent) {
+// navegadores in-app de WhatsApp/Instagram/TikTok suelen vaciar) → UTM → referrer → directo.
+const UTM_SOURCE_MAP = {
+  instagram: "instagram", ig: "instagram",
+  tiktok: "tiktok", tt: "tiktok",
+  whatsapp: "whatsapp", wa: "whatsapp",
+  facebook: "facebook", fb: "facebook",
+  threads: "threads",
+  twitter: "x", x: "x",
+  youtube: "youtube", yt: "youtube",
+  google: "google",
+  discord: "discord",
+  telegram: "telegram",
+  email: "email", newsletter: "email", mail: "email",
+};
+
+export function detectRefererSource(referrer, userAgent, utmSource) {
   const ua = (userAgent || (typeof navigator !== "undefined" ? navigator.userAgent : "")).toLowerCase();
   // 1) Navegador in-app detectado por User-Agent
   if (ua) {
@@ -48,7 +62,12 @@ export function detectRefererSource(referrer, userAgent) {
     if (ua.includes("discord")) return "discord";
     if (ua.includes("threads")) return "threads";
   }
-  // 2) Referrer
+  // 2) Parámetro UTM (intención explícita de la campaña) — solo coincidencia exacta para no asignar fuentes incorrectas
+  if (utmSource) {
+    const u = String(utmSource).toLowerCase().trim();
+    if (UTM_SOURCE_MAP[u]) return UTM_SOURCE_MAP[u];
+  }
+  // 3) Referrer
   if (!referrer) return "direct";
   const r = referrer.toLowerCase();
   if (r.includes("instagram") || r.includes("l.instagram")) return "instagram";
@@ -69,7 +88,7 @@ export function detectRefererSource(referrer, userAgent) {
 export const REFERER_LABELS = {
   instagram: "Instagram", tiktok: "TikTok", whatsapp: "WhatsApp", facebook: "Facebook",
   snapchat: "Snapchat", threads: "Threads", x: "X", youtube: "YouTube", google: "Google",
-  discord: "Discord", telegram: "Telegram", email: "Email", direct: "Directo", other: "Otros",
+  discord: "Discord", telegram: "Telegram", email: "Email", direct: "Directo / Desconocido", other: "Otros",
 };
 export function refererLabel(src) { return REFERER_LABELS[src] || src; }
 

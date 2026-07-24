@@ -163,7 +163,7 @@ export default function TrackShare() {
       track_id: track.id,
       visitor_id: getOrCreateVisitorId(),
       referer: document.referrer || null,
-      referer_source: detectRefererSource(document.referrer, navigator.userAgent),
+      referer_source: detectRefererSource(document.referrer, navigator.userAgent, utm.utm_source),
       ...utm,
     });
   }, [track?.id]);

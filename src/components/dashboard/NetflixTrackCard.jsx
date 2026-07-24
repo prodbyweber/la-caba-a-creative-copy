@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
+import { Link as RouterLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock, Trash2, FolderOpen, Upload, Check, Link, Share2, Download } from "lucide-react";
+import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock, Trash2, FolderOpen, Upload, Check, Link, Share2, Download, BarChart3 } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
@@ -519,6 +520,9 @@ function TrackDetailModal({ track, onClose, onEdit, onDelete, onTogglePublic }) 
                 )}
               </AnimatePresence>
             </button>
+            <RouterLink to={track.slug ? `/t/${track.slug}/analytics` : `/track/${track.id}/analytics`} onClick={onClose} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all" style={{ background: "rgba(250,204,21,0.12)" }}>
+              <BarChart3 className="w-3.5 h-3.5 text-[#facc15]" /> <span className="text-[#facc15]">Analytics</span>
+            </RouterLink>
             <button onClick={onTogglePublic} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all ${isPublic ? "bg-emerald-500/15 text-emerald-400" : "text-white/30"}`} style={!isPublic ? { background: "rgba(255,255,255,0.05)" } : {}}>
               {isPublic ? <Globe className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
               {isPublic ? "Público" : "Privado"}
