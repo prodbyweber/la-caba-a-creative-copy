@@ -8,7 +8,7 @@ import { resolveTrackBySlugOrId } from "@/lib/trackSlug";
 import {
   activePlatforms, detectRefererSource, parseUTM, getOrCreateVisitorId, trackEvent,
 } from "@/lib/releaseUtils";
-import { Play, Pause, Lock, Share2, ExternalLink, Music2 } from "lucide-react";
+import { Play, Pause, Lock, Share2, ExternalLink, Music2, BarChart3 } from "lucide-react";
 import WaveformBars from "@/components/audio/WaveformBars";
 
 const PREVIEW_SECONDS = 15;
@@ -337,74 +337,6 @@ export default function TrackShare() {
           {track.title}
         </motion.h1>
 
-        {/* Metadata */}
-        <motion.div
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.36 }}
-          className="mt-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] font-medium"
-        >
-          {track.genre && <span className="text-white/45">{track.genre}</span>}
-          {track.genre && track.created_date && <span className="text-white/15">·</span>}
-          {track.created_date && <span className="text-white/30">{formatDate(track.created_date)}</span>}
-          {track.created_date && <span className="text-white/15">·</span>}
-          <span
-            className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
-            style={{
-              background: track.is_public ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.06)",
-              color: track.is_public ? "#34d399" : "rgba(255,255,255,0.5)",
-            }}
-          >
-            {track.is_public ? "Público" : "Privado"}
-          </span>
-        </motion.div>
-
-        {/* Compact 15s preview player */}
-        {hasAccess && track.audio_file_url && (
-          <motion.div
-            initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-5 w-full rounded-2xl px-3.5 py-3 flex items-center gap-3"
-            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}
-          >
-            <audio
-              ref={audioRef}
-              src={track.audio_file_url}
-              preload="metadata"
-              onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
-              onTimeUpdate={(e) => {
-                const t = e.currentTarget.currentTime;
-                if (t >= PREVIEW_SECONDS) {
-                  e.currentTarget.pause();
-                  e.currentTarget.currentTime = 0;
-                  setCurrentTime(0);
-                  setIsPlaying(false);
-                } else {
-                  setCurrentTime(t);
-                }
-              }}
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              onEnded={() => { setIsPlaying(false); setCurrentTime(0); }}
-            />
-            <button
-              onClick={handleTogglePlay}
-              className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
-              style={{ background: "linear-gradient(135deg, #facc15, #eab308)" }}
-            >
-              {isPlaying ? <Pause className="w-4 h-4 text-[#0a0a0b]" fill="#0a0a0b" /> : <Play className="w-4 h-4 text-[#0a0a0b] ml-0.5" fill="#0a0a0b" />}
-            </button>
-            <div
-              ref={progressRef}
-              className="flex-1 h-9 flex items-center cursor-pointer"
-              onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
-              onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
-            >
-              <WaveformBars progress={cappedDuration ? currentTime / cappedDuration : 0} isPlaying={isPlaying} bars={40} color="#facc15" />
-            </div>
-            <span className="flex-shrink-0 text-[10px] font-semibold text-white/40 tabular-nums">
-              {formatTime(currentTime)}/{formatTime(cappedDuration)}
-            </span>
-          </motion.div>
-        )}
-
         {/* Private state */}
         {!hasAccess && (
           <motion.div
@@ -433,7 +365,7 @@ export default function TrackShare() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.48 }}
             className="mt-7 w-full space-y-3"
           >
-            <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/30">Escucha el lanzamiento</p>
+            <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/30">Stream la señal</p>
             {platforms.map((p, i) => (
               <motion.button
                 key={p.key}
@@ -451,6 +383,54 @@ export default function TrackShare() {
                 <ExternalLink className="w-4 h-4 text-white/70 flex-shrink-0" />
               </motion.button>
             ))}
+          </motion.div>
+        )}
+
+        {/* Slim preview player — sutil */}
+        {hasAccess && track.audio_file_url && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.45 }}
+            className="mt-4 w-full flex items-center gap-2.5 px-3 py-2 rounded-full"
+            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            <audio
+              ref={audioRef}
+              src={track.audio_file_url}
+              preload="metadata"
+              onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
+              onTimeUpdate={(e) => {
+                const t = e.currentTarget.currentTime;
+                if (t >= PREVIEW_SECONDS) {
+                  e.currentTarget.pause();
+                  e.currentTarget.currentTime = 0;
+                  setCurrentTime(0);
+                  setIsPlaying(false);
+                } else {
+                  setCurrentTime(t);
+                }
+              }}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onEnded={() => { setIsPlaying(false); setCurrentTime(0); }}
+            />
+            <button
+              onClick={handleTogglePlay}
+              className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
+              style={{ background: "rgba(250,204,21,0.16)" }}
+            >
+              {isPlaying ? <Pause className="w-3 h-3 text-[#facc15]" fill="#facc15" /> : <Play className="w-3 h-3 text-[#facc15] ml-0.5" fill="#facc15" />}
+            </button>
+            <div
+              ref={progressRef}
+              className="flex-1 h-6 flex items-center cursor-pointer"
+              onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
+              onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
+            >
+              <WaveformBars progress={cappedDuration ? currentTime / cappedDuration : 0} isPlaying={isPlaying} bars={28} color="#facc15" />
+            </div>
+            <span className="flex-shrink-0 text-[9px] font-medium text-white/35 tabular-nums">
+              {formatTime(currentTime)}
+            </span>
           </motion.div>
         )}
 
@@ -479,15 +459,13 @@ export default function TrackShare() {
           </AnimatePresence>
         </motion.div>
 
-        {isOwnerOrAdmin && track.versions?.drive_folder && (
-          <a
-            href={track.versions.drive_folder}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 text-[11px] font-semibold text-white/40 hover:text-white/70 transition-colors"
+        {isOwnerOrAdmin && (
+          <Link
+            to={(track.slug ? `/t/${track.slug}` : `/track/${track.id}`) + "/analytics"}
+            className="mt-4 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/30 hover:text-[#facc15] transition-colors"
           >
-            Carpeta de Drive →
-          </a>
+            <BarChart3 className="w-3 h-3" /> Analítica en vivo
+          </Link>
         )}
 
         {/* Footer — Cabaña Creative branding */}
