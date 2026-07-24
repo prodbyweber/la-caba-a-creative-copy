@@ -1,0 +1,62 @@
+{
+  "name": "ReleaseClick",
+  "type": "object",
+  "properties": {
+    "session_id": {
+      "type": "string",
+      "description": "ID de la sesi\u00f3n de visita a la que pertenece el clic"
+    },
+    "track_id": {
+      "type": "string",
+      "description": "ID del soundtrack"
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "ID del due\u00f1o del soundtrack (ancla el RLS de anal\u00edticas)"
+    },
+    "platform": {
+      "type": "string",
+      "description": "Plataforma de streaming pulsada: spotify, apple_music, youtube_music"
+    }
+  },
+  "required": [
+    "session_id",
+    "track_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.owner_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.owner_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

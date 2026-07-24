@@ -99,9 +99,19 @@ export function getOrCreateVisitorId() {
   }
 }
 
-// Registra un evento (view/click) en el backend. Nunca rompe la UX: falla en silencio.
-export async function trackEvent(payload) {
+// Crea una sesión de Analytics al cargar la página pública del soundtrack.
+// Devuelve el session_id para vincular los clics posteriores. Falla en silencio.
+export async function createReleaseSession(payload) {
   try {
-    await base44.functions.invoke("trackReleaseEvent", payload);
+    const res = await base44.functions.invoke("trackReleaseEvent", { mode: "session", ...payload });
+    return res?.session_id || null;
+  } catch { return null; }
+}
+
+// Registra un clic de plataforma vinculado a la sesión existente.
+// No recalcula la fuente de tráfico ni crea una nueva sesión.
+export async function trackReleaseClick(payload) {
+  try {
+    await base44.functions.invoke("trackReleaseEvent", { mode: "click", ...payload });
   } catch (_) { /* silent */ }
 }

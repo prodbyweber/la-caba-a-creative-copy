@@ -6,7 +6,8 @@ import { base44 } from "@/api/base44Client";
 import { getTrackShareUrl, shareTrackLink } from "@/lib/trackShare";
 import { resolveTrackBySlugOrId } from "@/lib/trackSlug";
 import {
-  activePlatforms, detectRefererSource, parseUTM, getOrCreateVisitorId, trackEvent,
+  activePlatforms, detectRefererSource, parseUTM, getOrCreateVisitorId,
+  createReleaseSession, trackReleaseClick,
 } from "@/lib/releaseUtils";
 import { Play, Pause, Lock, Share2, ExternalLink, Music2, BarChart3 } from "lucide-react";
 import WaveformBars from "@/components/audio/WaveformBars";
@@ -106,7 +107,7 @@ export default function TrackShare() {
   const audioRef = useRef(null);
   const progressRef = useRef(null);
   const [dragging, setDragging] = useState(false);
-  const trackedViewRef = useRef(false);
+  const sessionPromiseRef = useRef(null);
 
   useEffect(() => {
     base44.auth.isAuthenticated().then(async (authed) => {
@@ -153,16 +154,16 @@ export default function TrackShare() {
 
   useTrackMeta(track);
 
-  // Registro de visita (view) — una sola vez, en silencio.
+  // Creación de la sesión de Analytics — una sola vez al cargar la página.
+  // Toda la info del visitante (fuente, geo, dispositivo...) se fija aquí y no se recalcula.
   useEffect(() => {
-    if (!track?.id || trackedViewRef.current) return;
-    trackedViewRef.current = true;
+    if (!track?.id || sessionPromiseRef.current) return;
     const utm = parseUTM();
-    trackEvent({
+    sessionPromiseRef.current = createReleaseSession({
       track_id: track.id,
-      event_type: "view",
       visitor_id: getOrCreateVisitorId(),
-      referer_source: detectRefererSource(document.referrer),
+      referer: document.referrer || null,
+      referer_source: detectRefererSource(document.referrer, navigator.userAgent),
       ...utm,
     });
   }, [track?.id]);
@@ -206,16 +207,12 @@ export default function TrackShare() {
     };
   }, [dragging, updateSeekFromClientX]);
 
-  const handlePlatformClick = useCallback((p) => {
-    const utm = parseUTM();
-    trackEvent({
-      track_id: track.id,
-      event_type: "click",
-      platform: p.key,
-      visitor_id: getOrCreateVisitorId(),
-      referer_source: detectRefererSource(document.referrer),
-      ...utm,
-    });
+  // El clic NO recalcula la fuente ni crea sesión: se vincula a la sesión existente.
+  const handlePlatformClick = useCallback(async (p) => {
+    try {
+      const sid = await sessionPromiseRef.current;
+      if (sid) await trackReleaseClick({ session_id: sid, track_id: track.id, platform: p.key });
+    } catch { /* silent */ }
     window.open(p.url, "_blank", "noopener,noreferrer");
   }, [track?.id]);
 

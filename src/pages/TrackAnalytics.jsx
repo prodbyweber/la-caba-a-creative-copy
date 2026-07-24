@@ -5,7 +5,7 @@ import { ArrowLeft, BarChart3 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { resolveTrackBySlugOrId } from "@/lib/trackSlug";
 import { computeStats, dailySeries } from "@/lib/analyticsStats";
-import { refererLabel } from "@/lib/releaseUtils";
+import { refererLabel, platformMeta } from "@/lib/releaseUtils";
 
 function Stat({ label, value, hint }) {
   return (
@@ -46,6 +46,51 @@ function Chart({ data }) {
   );
 }
 
+// Conversión por canal: visitas → clics → tasa, con desglose por plataforma.
+function ConversionSection({ sources, sourceClicks, sourcePlatformClicks, totalVisits }) {
+  if (!sources.length) {
+    return (
+      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
+        <p className="text-sm text-white/30 py-4 text-center">Aún no hay datos de conversión.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-3">
+      {sources.map(([src, visits]) => {
+        const clicks = sourceClicks[src] || 0;
+        const rate = visits ? Math.round((clicks / visits) * 100) : 0;
+        const plBreakdown = sourcePlatformClicks[src] || {};
+        const plEntries = Object.entries(plBreakdown).sort((a, b) => b[1] - a[1]);
+        return (
+          <div key={src} className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-bold text-white/80">{refererLabel(src)}</span>
+              <span className="text-xs text-white/40">{visits} visitas · {clicks} clics · <span className="text-yellow-400 font-semibold">{rate}%</span></span>
+            </div>
+            <div className="h-1.5 rounded-full bg-white/5 overflow-hidden mb-3">
+              <div className="h-full rounded-full" style={{ width: `${rate}%`, background: "#facc15" }} />
+            </div>
+            {plEntries.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {plEntries.map(([pl, n]) => {
+                  const meta = platformMeta(pl);
+                  return (
+                    <span key={pl} className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] text-white/70" style={{ background: "rgba(255,255,255,0.04)" }}>
+                      <span className="w-2 h-2 rounded-full" style={{ background: meta.color }} />
+                      {meta.label} · {n}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function TrackAnalytics() {
   const { slug, id } = useParams();
   const routeKey = slug || id;
@@ -57,14 +102,20 @@ export default function TrackAnalytics() {
     retry: false,
   });
 
-  const { data: events = [], isLoading } = useQuery({
-    queryKey: ["track-events", track?.id],
-    queryFn: () => base44.entities.ReleaseEvent.filter({ track_id: track.id }),
+  const { data: sessions = [], isLoading: loadingSessions } = useQuery({
+    queryKey: ["track-sessions", track?.id],
+    queryFn: () => base44.entities.ReleaseSession.filter({ track_id: track.id }),
     enabled: !!track?.id,
   });
 
-  const stats = useMemo(() => computeStats(events, track?.platform_order), [events, track?.platform_order]);
-  const series = useMemo(() => dailySeries(events.filter((e) => e.event_type === "view"), 14), [events]);
+  const { data: clicks = [] } = useQuery({
+    queryKey: ["track-clicks", track?.id],
+    queryFn: () => base44.entities.ReleaseClick.filter({ track_id: track.id }),
+    enabled: !!track?.id,
+  });
+
+  const stats = useMemo(() => computeStats(sessions, clicks, track?.platform_order), [sessions, clicks, track?.platform_order]);
+  const series = useMemo(() => dailySeries(sessions, 14), [sessions]);
 
   const title = track?.title || "Soundtrack";
 
@@ -111,7 +162,32 @@ export default function TrackAnalytics() {
           </div>
         </section>
 
-        {/* Plataformas */}
+        {/* Tráfico por canal */}
+        <section>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-white/25 mb-3">Tráfico por canal</p>
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
+            {stats.sources.length === 0 ? (
+              <p className="text-sm text-white/30 py-4 text-center">Sin datos.</p>
+            ) : (
+              stats.sources.map(([src, n]) => (
+                <BarRow key={src} label={refererLabel(src)} count={n} total={stats.views} color="#facc15" />
+              ))
+            )}
+          </div>
+        </section>
+
+        {/* Conversión por canal */}
+        <section>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-white/25 mb-3">Conversión por canal</p>
+          <ConversionSection
+            sources={stats.sources}
+            sourceClicks={stats.sourceClicks}
+            sourcePlatformClicks={stats.sourcePlatformClicks}
+            totalVisits={stats.views}
+          />
+        </section>
+
+        {/* Clics por plataforma */}
         <section>
           <p className="text-[10px] font-bold uppercase tracking-widest text-white/25 mb-3">Clics por plataforma</p>
           <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
@@ -131,20 +207,6 @@ export default function TrackAnalytics() {
                     <div className="h-full rounded-full" style={{ width: `${stats.platformTotal ? (count / stats.platformTotal) * 100 : 0}%`, background: meta.color }} />
                   </div>
                 </div>
-              ))
-            )}
-          </div>
-        </section>
-
-        {/* Origen */}
-        <section>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-white/25 mb-3">Origen del tráfico</p>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
-            {stats.sources.length === 0 ? (
-              <p className="text-sm text-white/30 py-4 text-center">Sin datos.</p>
-            ) : (
-              stats.sources.map(([src, n]) => (
-                <BarRow key={src} label={refererLabel(src)} count={n} total={stats.views} color="#facc15" />
               ))
             )}
           </div>
@@ -210,7 +272,7 @@ export default function TrackAnalytics() {
           </div>
         </section>
 
-        {isLoading && <p className="text-center text-white/30 text-sm">Cargando analíticas…</p>}
+        {loadingSessions && <p className="text-center text-white/30 text-sm">Cargando analíticas…</p>}
       </div>
     </div>
   );

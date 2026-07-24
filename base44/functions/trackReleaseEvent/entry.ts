@@ -27,64 +27,84 @@ function getIP(req) {
   return req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip') || null;
 }
 
+// Geolocalización por IP con dos proveedores (fallback) para máxima fiabilidad.
+async function geolocate(ip) {
+  if (!ip) return { country: null, country_code: null, city: null };
+  // 1) ipapi.co
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2500);
+    const r = await fetch(`https://ipapi.co/${ip}/json/`, { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (r.ok) {
+      const j = await r.json();
+      if (j && !j.error && (j.country_name || j.country_code)) {
+        return { country: j.country_name || null, country_code: j.country_code || null, city: j.city || null };
+      }
+    }
+  } catch (_) { /* continúa al fallback */ }
+  // 2) Fallback: ipwho.is
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2500);
+    const r = await fetch(`https://ipwho.is/${ip}/`, { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (r.ok) {
+      const j = await r.json();
+      if (j && j.success !== false && (j.country || j.country_code)) {
+        return { country: j.country || null, country_code: j.country_code || null, city: j.city || null };
+      }
+    }
+  } catch (_) { /* geo no bloquea el tracking */ }
+  return { country: null, country_code: null, city: null };
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
+    const { mode = 'session', track_id } = body;
+
+    if (!track_id) return Response.json({ error: 'track_id required' }, { status: 400 });
+
+    const ua = req.headers.get('user-agent') || '';
+
+    // Resolver dueño del soundtrack para anclar el RLS de analíticas.
+    let owner_id = null;
+    try {
+      const track = await base44.asServiceRole.entities.Track.get(track_id);
+      if (track) owner_id = track.created_by_id || null;
+    } catch (_) { /* track no encontrado — aún registramos */ }
+
+    // ---- Modo CLIC: registra la interacción vinculada a la sesión existente ----
+    // No recalcula la fuente de tráfico ni crea una nueva sesión.
+    if (mode === 'click') {
+      const { session_id = null, platform = null } = body;
+      if (!session_id) return Response.json({ error: 'session_id required' }, { status: 400 });
+      await base44.asServiceRole.entities.ReleaseClick.create({
+        session_id,
+        track_id,
+        owner_id,
+        platform,
+      });
+      return Response.json({ ok: true });
+    }
+
+    // ---- Modo SESIÓN: crea la sesión de visita con toda la info del visitante ----
+    // La fuente de tráfico se fija aquí (al inicio de la sesión) y se mantiene.
     const {
-      track_id,
-      event_type = 'view',
-      platform = null,
       visitor_id = null,
+      referer = null,
+      referer_source = null,
       utm_source = null,
       utm_medium = null,
       utm_campaign = null,
       utm_term = null,
       utm_content = null,
-      referer_source = null,
     } = body;
 
-    if (!track_id) return Response.json({ error: 'track_id required' }, { status: 400 });
-
-    const ua = req.headers.get('user-agent') || '';
     const ip = getIP(req);
-
-    // Geolocalización por IP con dos proveedores (fallback) para máxima fiabilidad.
-    let country = null, country_code = null, city = null;
-    if (ip) {
-      // 1) ipapi.co
-      try {
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 2500);
-        const r = await fetch(`https://ipapi.co/${ip}/json/`, { signal: ctrl.signal });
-        clearTimeout(timer);
-        if (r.ok) {
-          const j = await r.json();
-          if (j && !j.error && (j.country_name || j.country_code)) {
-            country = j.country_name || null;
-            country_code = j.country_code || null;
-            city = j.city || null;
-          }
-        }
-      } catch (_) { /* continúa al fallback */ }
-      // 2) Fallback: ipwho.is
-      if (!country && !country_code) {
-        try {
-          const ctrl = new AbortController();
-          const timer = setTimeout(() => ctrl.abort(), 2500);
-          const r = await fetch(`https://ipwho.is/${ip}/`, { signal: ctrl.signal });
-          clearTimeout(timer);
-          if (r.ok) {
-            const j = await r.json();
-            if (j && j.success !== false && (j.country || j.country_code)) {
-              country = j.country || null;
-              country_code = j.country_code || null;
-              city = j.city || null;
-            }
-          }
-        } catch (_) { /* geo no bloquea el tracking */ }
-      }
-    }
+    const { country, country_code, city } = await geolocate(ip);
 
     // Usuario registrado (opcional — la página es pública)
     let is_registered = false, user_id = null;
@@ -93,38 +113,28 @@ Deno.serve(async (req) => {
       if (u && u.id) { is_registered = true; user_id = u.id; }
     } catch (_) { /* anónimo */ }
 
-    // Resolver dueño del soundtrack para anclar el RLS de analíticas
-    let owner_id = null;
-    try {
-      const track = await base44.asServiceRole.entities.Track.get(track_id);
-      if (track) {
-        owner_id = track.created_by_id || null;
-      }
-    } catch (_) { /* track no encontrado — aún registramos el evento */ }
-
-    await base44.asServiceRole.entities.ReleaseEvent.create({
+    const session = await base44.asServiceRole.entities.ReleaseSession.create({
       track_id,
       owner_id,
-      event_type,
-      platform,
+      visitor_id,
+      user_id,
+      is_registered,
       country,
       country_code,
       city,
-      referer_source,
+      device_type: parseDevice(ua),
+      os: parseOS(ua),
+      browser: parseBrowser(ua),
+      referer,
+      referer_source: referer_source || 'direct',
       utm_source,
       utm_medium,
       utm_campaign,
       utm_term,
       utm_content,
-      device_type: parseDevice(ua),
-      os: parseOS(ua),
-      browser: parseBrowser(ua),
-      is_registered,
-      user_id,
-      visitor_id,
     });
 
-    return Response.json({ ok: true });
+    return Response.json({ ok: true, session_id: session.id });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
