@@ -1,0 +1,93 @@
+{
+  "name": "ReleaseLanding",
+  "type": "object",
+  "properties": {
+    "track_id": {
+      "type": "string",
+      "description": "ID del soundtrack vinculado (\u00fanico por landing)"
+    },
+    "slug": {
+      "type": "string",
+      "description": "Slug \u00fanico para la URL p\u00fablica /release/:slug"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la landing est\u00e1 publicada y accesible p\u00fablicamente"
+    },
+    "preview_limit_seconds": {
+      "type": "number",
+      "default": 0,
+      "description": "Segundos de preview del MP3 (0 = sin l\u00edmite, reproduce completo)"
+    },
+    "background_url": {
+      "type": "string",
+      "description": "URL de fondo cinematogr\u00e1fico opcional (imagen o video)"
+    },
+    "background_type": {
+      "type": "string",
+      "enum": [
+        "image",
+        "video"
+      ],
+      "default": "image",
+      "description": "Tipo de fondo: imagen o video"
+    },
+    "accent_color": {
+      "type": "string",
+      "default": "#ff5833",
+      "description": "Color de acento de la landing"
+    },
+    "title_override": {
+      "type": "string",
+      "description": "T\u00edtulo opcional que sobreescribe el del track en la landing"
+    },
+    "artist_override": {
+      "type": "string",
+      "description": "Nombre de artista opcional que sobreescribe el del track en la landing"
+    }
+  },
+  "required": [
+    "track_id",
+    "slug"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -111,6 +111,49 @@
       "default": false,
       "description": "Si el track est\u00e1 disponible p\u00fablicamente en Explorar"
     },
+    "streaming_links": {
+      "type": "object",
+      "properties": {
+        "spotify": {
+          "type": "string"
+        },
+        "apple_music": {
+          "type": "string"
+        },
+        "youtube_music": {
+          "type": "string"
+        },
+        "youtube_video": {
+          "type": "string"
+        },
+        "amazon_music": {
+          "type": "string"
+        },
+        "deezer": {
+          "type": "string"
+        },
+        "soundcloud": {
+          "type": "string"
+        }
+      },
+      "description": "Enlaces oficiales del lanzamiento en cada plataforma de streaming. Usados por la Landing Page del release."
+    },
+    "platform_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [
+        "spotify",
+        "apple_music",
+        "youtube_music",
+        "youtube_video",
+        "amazon_music",
+        "deezer",
+        "soundcloud"
+      ],
+      "description": "Orden de visualizaci\u00f3n de las plataformas en la Landing Page (drag & drop)"
+    },
     "versions": {
       "type": "object",
       "properties": {

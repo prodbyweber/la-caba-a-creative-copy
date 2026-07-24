@@ -1,0 +1,133 @@
+{
+  "name": "ReleaseEvent",
+  "type": "object",
+  "properties": {
+    "landing_id": {
+      "type": "string",
+      "description": "ID de la landing a la que pertenece el evento"
+    },
+    "track_id": {
+      "type": "string",
+      "description": "ID del soundtrack (denormalizado para queries r\u00e1pidas)"
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "ID del usuario due\u00f1o de la landing (ancla el RLS de anal\u00edticas)"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "view",
+        "click"
+      ],
+      "default": "view",
+      "description": "Tipo de evento: visita a la landing o clic en plataforma"
+    },
+    "platform": {
+      "type": "string",
+      "description": "Plataforma pulsada en un evento click (spotify, apple_music, youtube_music, youtube_video, amazon_music, deezer, soundcloud)"
+    },
+    "country": {
+      "type": "string",
+      "description": "Pa\u00eds aproximado (geolocalizaci\u00f3n por IP)"
+    },
+    "country_code": {
+      "type": "string",
+      "description": "C\u00f3digo de pa\u00eds (ISO 2 letras)"
+    },
+    "city": {
+      "type": "string",
+      "description": "Ciudad aproximada (geolocalizaci\u00f3n por IP)"
+    },
+    "referer_source": {
+      "type": "string",
+      "description": "Origen del tr\u00e1fico: instagram, tiktok, whatsapp, facebook, threads, x, youtube, google, discord, telegram, email, direct, other"
+    },
+    "utm_source": {
+      "type": "string"
+    },
+    "utm_medium": {
+      "type": "string"
+    },
+    "utm_campaign": {
+      "type": "string"
+    },
+    "utm_term": {
+      "type": "string"
+    },
+    "utm_content": {
+      "type": "string"
+    },
+    "device_type": {
+      "type": "string",
+      "enum": [
+        "mobile",
+        "desktop",
+        "tablet",
+        "unknown"
+      ],
+      "description": "Tipo de dispositivo"
+    },
+    "os": {
+      "type": "string",
+      "description": "Sistema operativo"
+    },
+    "browser": {
+      "type": "string",
+      "description": "Navegador"
+    },
+    "is_registered": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si el visitante es un usuario registrado de la plataforma"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID del usuario registrado (si aplica)"
+    },
+    "visitor_id": {
+      "type": "string",
+      "description": "Identificador an\u00f3nimo persistente (almacenado en localStorage del visitante)"
+    }
+  },
+  "required": [
+    "landing_id",
+    "event_type"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.owner_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "data.owner_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

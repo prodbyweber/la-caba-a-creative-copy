@@ -12,6 +12,7 @@ import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
 import FilmsSection from "@/components/dashboard/FilmsSection";
 import PhotosGallery from "@/components/dashboard/PhotosGallery";
+import LandingPagesSection from "@/components/dashboard/LandingPagesSection";
 import CatalogSectionOrder, { DEFAULT_SECTION_ORDER } from "@/components/dashboard/CatalogSectionOrder";
 import OnboardingForm from "@/components/onboarding/OnboardingForm";
 
@@ -108,7 +109,10 @@ export default function Dashboard() {
   const [sectionOrder, setSectionOrder] = useState(() => {
     try {
       const saved = localStorage.getItem(storageKey);
-      return saved ? JSON.parse(saved) : DEFAULT_SECTION_ORDER;
+      const order = saved ? JSON.parse(saved) : DEFAULT_SECTION_ORDER;
+      // Migración: aseguramos que toda sección conocida esté presente
+      DEFAULT_SECTION_ORDER.forEach((k) => { if (!order.includes(k)) order.push(k); });
+      return order;
     } catch {
       return DEFAULT_SECTION_ORDER;
     }
@@ -167,6 +171,13 @@ export default function Dashboard() {
           <div key="photos">
             <SectionLabel label="Fotos" />
             <PhotosGallery userProfileId={jlyUserProfile?.id} />
+          </div>
+        );
+      case "landings":
+        return (
+          <div key="landings">
+            <SectionLabel label="Landing Pages" />
+            <LandingPagesSection jlyArtistId={jlyArtistId} />
           </div>
         );
       default:

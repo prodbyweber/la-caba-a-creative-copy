@@ -9,6 +9,7 @@ import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import NetflixTrackCard from "./NetflixTrackCard";
 import { createSoundtrack, updateSoundtrack, uploadFile } from "@/lib/mediaCreation";
 import ArtistPicker from "@/components/tracks/ArtistPicker";
+import StreamingPlatformsBlock from "@/components/tracks/StreamingPlatformsBlock";
 
 // Same architecture as Explorar: modal state in parent, rendered OUTSIDE the scroll container.
 // This guarantees reliable mounting on ALL mobile browsers (iOS Safari, Android Chrome, etc.)
@@ -294,7 +295,8 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
       setFormData({
         title: "", project_id: "", cover_url: "", audio_file_url: "",
         youtube_music_url: "", display_artist: "", composers: [], producers: [],
-        genre: "", genre_secondary: "", status: "demo", notes: "", versions: {}
+        genre: "", genre_secondary: "", status: "idea", notes: "", versions: {},
+        streaming_links: {}, platform_order: ["spotify","apple_music","youtube_music","youtube_video","amazon_music","deezer","soundcloud"]
       });
       setAudioMode("file");
     }
@@ -554,6 +556,19 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
                 </div>
               </div>
             )}
+
+            {/* Streaming Platforms */}
+            <StreamingPlatformsBlock
+              value={formData.streaming_links}
+              order={formData.platform_order}
+              onChange={({ links, order }) => setFormData(f => ({ ...f, streaming_links: links, platform_order: order }))}
+              onMetadata={(meta) => setFormData(f => ({
+                ...f,
+                cover_url: f.cover_url || meta.cover_url || f.cover_url,
+                display_artist: f.display_artist || meta.artist || f.display_artist,
+                title: f.title || meta.title || f.title,
+              }))}
+            />
 
             {/* Créditos */}
             <div className="space-y-3">

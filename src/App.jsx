@@ -46,6 +46,8 @@ import Beats from './pages/Beats';
 import BeatsAdmin from './pages/BeatsAdmin';
 import BeatDetail from './pages/BeatDetail';
 import TrackShare from './pages/TrackShare';
+import ReleaseLanding from './pages/ReleaseLanding';
+import ReleaseAnalytics from './pages/ReleaseAnalytics';
 import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
@@ -163,6 +165,10 @@ const AuthenticatedApp = () => {
       <Route path="/beats/:id" element={<BeatDetail />} />
       <Route path="/t/:slug" element={<TrackShare />} />
       <Route path="/track/:id" element={<TrackShare />} />
+      <Route path="/release/:slug" element={<ReleaseLanding />} />
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route path="/release/:slug/analytics" element={<ReleaseAnalytics />} />
+      </Route>
       <Route path="/StudioSession" element={<StudioSession />} />
       <Route path="/meeting" element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}><Route index element={<Meeting />} /></Route>
 
