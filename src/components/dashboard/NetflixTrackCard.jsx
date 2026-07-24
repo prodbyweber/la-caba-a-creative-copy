@@ -601,6 +601,16 @@ function TrackCard({ track, onEdit, isFirst }) {
 
   useEffect(() => { setLocalTrack(track); }, [track]);
 
+  // Limpiar timers y previews al desmontar la tarjeta (evita acceder a refs null)
+  useEffect(() => {
+    return () => {
+      clearTimeout(previewTimerRef.current);
+      clearTimeout(hoverDelayRef.current);
+      try { if (previewRef.current) { previewRef.current.pause(); previewRef.current.currentTime = 0; } } catch {}
+      try { if (playbackRef.current) { playbackRef.current.pause(); } } catch {}
+    };
+  }, []);
+
   const previewRef = useRef(null);
   const playbackRef = useRef(null);
   const previewTimerRef = useRef(null);
@@ -628,6 +638,7 @@ function TrackCard({ track, onEdit, isFirst }) {
     setHovered(true);
     if (hasAudio && previewRef.current && !playing && !globalAudio?.isPlaying && !ytPlaying) {
       hoverDelayRef.current = setTimeout(() => {
+        if (!previewRef.current) return;
         setShowPreviewAnimation(true);
         previewRef.current.currentTime = 0;
         previewRef.current.volume = 0.6;
