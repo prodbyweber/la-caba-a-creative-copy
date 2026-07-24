@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link2, Pencil, Trash2, ExternalLink, BarChart3, Plus, X, Check, Globe, Lock, Link, Music2 } from "lucide-react";
+import { Link2, Pencil, Trash2, ExternalLink, BarChart3, Plus, X, Check, Globe, Lock, Link as LinkIcon, Music2 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { ensureUniqueLandingSlug, DEFAULT_PLATFORM_ORDER } from "@/lib/releaseUtils";
 
