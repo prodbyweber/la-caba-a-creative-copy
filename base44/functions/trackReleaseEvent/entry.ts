@@ -49,9 +49,10 @@ Deno.serve(async (req) => {
     const ua = req.headers.get('user-agent') || '';
     const ip = getIP(req);
 
-    // Geolocalización por IP (ipapi.co, https, sin API key)
+    // Geolocalización por IP con dos proveedores (fallback) para máxima fiabilidad.
     let country = null, country_code = null, city = null;
     if (ip) {
+      // 1) ipapi.co
       try {
         const ctrl = new AbortController();
         const timer = setTimeout(() => ctrl.abort(), 2500);
@@ -59,11 +60,30 @@ Deno.serve(async (req) => {
         clearTimeout(timer);
         if (r.ok) {
           const j = await r.json();
-          country = j.country_name || null;
-          country_code = j.country_code || null;
-          city = j.city || null;
+          if (j && !j.error && (j.country_name || j.country_code)) {
+            country = j.country_name || null;
+            country_code = j.country_code || null;
+            city = j.city || null;
+          }
         }
-      } catch (_) { /* geo no bloquea el tracking */ }
+      } catch (_) { /* continúa al fallback */ }
+      // 2) Fallback: ipwho.is
+      if (!country && !country_code) {
+        try {
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 2500);
+          const r = await fetch(`https://ipwho.is/${ip}/`, { signal: ctrl.signal });
+          clearTimeout(timer);
+          if (r.ok) {
+            const j = await r.json();
+            if (j && j.success !== false && (j.country || j.country_code)) {
+              country = j.country || null;
+              country_code = j.country_code || null;
+              city = j.city || null;
+            }
+          }
+        } catch (_) { /* geo no bloquea el tracking */ }
+      }
     }
 
     // Usuario registrado (opcional — la página es pública)

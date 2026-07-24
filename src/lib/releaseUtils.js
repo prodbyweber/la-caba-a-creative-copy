@@ -31,14 +31,31 @@ export function activePlatforms(streamingLinks, order) {
     .filter((p) => !!p.url);
 }
 
-// Detección de origen de tráfico a partir del referer.
-export function detectRefererSource(referrer) {
+// Detección de origen de tráfico.
+// Prioridad: User-Agent del navegador in-app (más fiable que el referrer, que los
+// navegadores in-app de WhatsApp/Instagram/TikTok suelen vaciar) → referrer → directo.
+export function detectRefererSource(referrer, userAgent) {
+  const ua = (userAgent || (typeof navigator !== "undefined" ? navigator.userAgent : "")).toLowerCase();
+  // 1) Navegador in-app detectado por User-Agent
+  if (ua) {
+    if (ua.includes("whatsapp")) return "whatsapp";
+    if (ua.includes("instagram")) return "instagram";
+    if (ua.includes("tiktok") || ua.includes("musical_ly") || ua.includes("bytedance")) return "tiktok";
+    if (ua.includes("fbav") || ua.includes("fban") || ua.includes("facebook")) return "facebook";
+    if (ua.includes("snapchat")) return "snapchat";
+    if (ua.includes("twitter") || ua.includes("x.com")) return "x";
+    if (ua.includes("telegram")) return "telegram";
+    if (ua.includes("discord")) return "discord";
+    if (ua.includes("threads")) return "threads";
+  }
+  // 2) Referrer
   if (!referrer) return "direct";
   const r = referrer.toLowerCase();
-  if (r.includes("instagram")) return "instagram";
+  if (r.includes("instagram") || r.includes("l.instagram")) return "instagram";
   if (r.includes("tiktok")) return "tiktok";
   if (r.includes("whatsapp") || r.includes("wa.me")) return "whatsapp";
   if (r.includes("facebook") || r.includes("fb.com") || r.includes("fbcdn")) return "facebook";
+  if (r.includes("snapchat")) return "snapchat";
   if (r.includes("threads")) return "threads";
   if (r.includes("twitter") || r.includes("t.co") || r.includes("x.com")) return "x";
   if (r.includes("youtube") || r.includes("youtu.be")) return "youtube";
@@ -51,7 +68,7 @@ export function detectRefererSource(referrer) {
 
 export const REFERER_LABELS = {
   instagram: "Instagram", tiktok: "TikTok", whatsapp: "WhatsApp", facebook: "Facebook",
-  threads: "Threads", x: "X", youtube: "YouTube", google: "Google",
+  snapchat: "Snapchat", threads: "Threads", x: "X", youtube: "YouTube", google: "Google",
   discord: "Discord", telegram: "Telegram", email: "Email", direct: "Directo", other: "Otros",
 };
 export function refererLabel(src) { return REFERER_LABELS[src] || src; }
