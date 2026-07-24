@@ -152,6 +152,10 @@ export default function TrackShare() {
     [track?.streaming_links, track?.platform_order]
   );
 
+  // Detecta automáticamente el estado del soundtrack.
+  const hasRelease = platforms.length > 0; // existen enlaces de streaming oficiales
+  const isFullPlayerMode = hasAccess && !!track?.audio_file_url && !hasRelease;
+
   useTrackMeta(track);
 
   // Creación de la sesión de Analytics — una sola vez al cargar la página.
@@ -168,7 +172,8 @@ export default function TrackShare() {
     });
   }, [track?.id]);
 
-  const cappedDuration = duration > 0 ? Math.min(duration, PREVIEW_SECONDS) : PREVIEW_SECONDS;
+  // Duración efectiva para seek/progress: completa en modo catálogo, capada a 15s en modo release.
+  const seekMax = isFullPlayerMode ? duration : (duration > 0 ? Math.min(duration, PREVIEW_SECONDS) : PREVIEW_SECONDS);
 
   const handleTogglePlay = useCallback(() => {
     const el = audioRef.current;
@@ -176,20 +181,21 @@ export default function TrackShare() {
     if (isPlaying) {
       el.pause();
     } else {
-      if (el.currentTime >= PREVIEW_SECONDS) el.currentTime = 0;
+      // En modo release el preview se reinicia al llegar a los 15s; en modo catálogo suena completo.
+      if (hasRelease && el.currentTime >= PREVIEW_SECONDS) el.currentTime = 0;
       el.play().then(() => setIsPlaying(true)).catch(() => {});
     }
-  }, [isPlaying, track?.audio_file_url, hasAccess]);
+  }, [isPlaying, track?.audio_file_url, hasAccess, hasRelease]);
 
   const updateSeekFromClientX = useCallback((clientX) => {
     const el = audioRef.current;
-    if (!el || !cappedDuration || !progressRef.current) return;
+    if (!el || !seekMax || !progressRef.current) return;
     const rect = progressRef.current.getBoundingClientRect();
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    const t = (x / rect.width) * cappedDuration;
+    const t = (x / rect.width) * seekMax;
     el.currentTime = t;
     setCurrentTime(t);
-  }, [cappedDuration]);
+  }, [seekMax]);
 
   useEffect(() => {
     if (!dragging) return;
@@ -356,78 +362,125 @@ export default function TrackShare() {
           </motion.div>
         )}
 
-        {/* Vertical link buttons — main focus */}
-        {platforms.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.48 }}
-            className="mt-7 w-full space-y-3"
-          >
-            <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/30">Stream la señal</p>
-            {platforms.map((p, i) => (
-              <motion.button
-                key={p.key}
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, delay: 0.5 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                onClick={() => handlePlatformClick(p)}
-                className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-sm font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-                style={{ background: p.meta.color, boxShadow: `0 12px 30px ${p.meta.color}40` }}
-              >
-                <span className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>
-                  <PlatformIcon platform={p.key} className="w-5 h-5" />
-                </span>
-                <span className="flex-1 text-left">{p.meta.verb} {p.meta.label}</span>
-                <ExternalLink className="w-4 h-4 text-white/70 flex-shrink-0" />
-              </motion.button>
-            ))}
-          </motion.div>
+        {/* Audio element — único, compartido por ambos modos */}
+        {hasAccess && track.audio_file_url && (
+          <audio
+            ref={audioRef}
+            src={track.audio_file_url}
+            preload="metadata"
+            onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
+            onTimeUpdate={(e) => {
+              const t = e.currentTarget.currentTime;
+              if (hasRelease && t >= PREVIEW_SECONDS) {
+                e.currentTarget.pause();
+                e.currentTarget.currentTime = 0;
+                setCurrentTime(0);
+                setIsPlaying(false);
+              } else {
+                setCurrentTime(t);
+              }
+            }}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onEnded={() => { setIsPlaying(false); setCurrentTime(0); }}
+          />
         )}
 
-        {/* Slim preview player — sutil */}
-        {hasAccess && track.audio_file_url && (
+        {/* MODO RELEASE: botones oficiales + preview de ~15s */}
+        {hasRelease && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.48 }}
+              className="mt-7 w-full space-y-3"
+            >
+              <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/30">Stream la señal</p>
+              {platforms.map((p, i) => (
+                <motion.button
+                  key={p.key}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.45, delay: 0.5 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                  onClick={() => handlePlatformClick(p)}
+                  className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-sm font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  style={{ background: p.meta.color, boxShadow: `0 12px 30px ${p.meta.color}40` }}
+                >
+                  <span className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>
+                    <PlatformIcon platform={p.key} className="w-5 h-5" />
+                  </span>
+                  <span className="flex-1 text-left">{p.meta.verb} {p.meta.label}</span>
+                  <ExternalLink className="w-4 h-4 text-white/70 flex-shrink-0" />
+                </motion.button>
+              ))}
+            </motion.div>
+
+            {/* Slim preview player */}
+            {hasAccess && track.audio_file_url && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.45 }}
+                className="mt-4 w-full flex items-center gap-2.5 px-3 py-2 rounded-full"
+                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+              >
+                <button
+                  onClick={handleTogglePlay}
+                  className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
+                  style={{ background: "rgba(250,204,21,0.16)" }}
+                >
+                  {isPlaying ? <Pause className="w-3 h-3 text-[#facc15]" fill="#facc15" /> : <Play className="w-3 h-3 text-[#facc15] ml-0.5" fill="#facc15" />}
+                </button>
+                <div
+                  ref={progressRef}
+                  className="flex-1 h-6 flex items-center cursor-pointer"
+                  onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
+                  onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
+                >
+                  <WaveformBars progress={seekMax ? currentTime / seekMax : 0} isPlaying={isPlaying} bars={28} color="#facc15" />
+                </div>
+                <span className="flex-shrink-0 text-[9px] font-medium text-white/35 tabular-nums">
+                  {formatTime(currentTime)}
+                </span>
+              </motion.div>
+            )}
+          </>
+        )}
+
+        {/* MODO CATÁLOGO (sin release): reproductor completo y protagonista */}
+        {isFullPlayerMode && (
           <motion.div
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.45 }}
-            className="mt-4 w-full flex items-center gap-2.5 px-3 py-2 rounded-full"
-            style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+            initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-7 w-full"
           >
-            <audio
-              ref={audioRef}
-              src={track.audio_file_url}
-              preload="metadata"
-              onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
-              onTimeUpdate={(e) => {
-                const t = e.currentTarget.currentTime;
-                if (t >= PREVIEW_SECONDS) {
-                  e.currentTarget.pause();
-                  e.currentTarget.currentTime = 0;
-                  setCurrentTime(0);
-                  setIsPlaying(false);
-                } else {
-                  setCurrentTime(t);
-                }
-              }}
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              onEnded={() => { setIsPlaying(false); setCurrentTime(0); }}
-            />
-            <button
-              onClick={handleTogglePlay}
-              className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
-              style={{ background: "rgba(250,204,21,0.16)" }}
-            >
-              {isPlaying ? <Pause className="w-3 h-3 text-[#facc15]" fill="#facc15" /> : <Play className="w-3 h-3 text-[#facc15] ml-0.5" fill="#facc15" />}
-            </button>
-            <div
-              ref={progressRef}
-              className="flex-1 h-6 flex items-center cursor-pointer"
-              onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
-              onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
-            >
-              <WaveformBars progress={cappedDuration ? currentTime / cappedDuration : 0} isPlaying={isPlaying} bars={28} color="#facc15" />
+            <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 mb-4">Escucha completa · Cabaña Creative</p>
+            <div className="rounded-3xl p-5 sm:p-6" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}>
+              {/* Play / Pause grande */}
+              <div className="flex items-center justify-center mb-5">
+                <motion.button
+                  whileTap={{ scale: 0.92 }}
+                  onClick={handleTogglePlay}
+                  className="flex items-center justify-center transition-transform hover:scale-105"
+                  style={{ width: 64, height: 64, borderRadius: "50%", background: "#facc15", boxShadow: "0 12px 32px rgba(250,204,21,0.35)" }}
+                >
+                  {isPlaying
+                    ? <Pause className="w-7 h-7 text-[#0a0a0b]" fill="#0a0a0b" />
+                    : <Play className="w-7 h-7 text-[#0a0a0b] ml-1" fill="#0a0a0b" />}
+                </motion.button>
+              </div>
+
+              {/* Barra de progreso visual */}
+              <div
+                ref={progressRef}
+                className="h-9 flex items-center cursor-pointer"
+                onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
+                onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
+              >
+                <WaveformBars progress={seekMax ? currentTime / seekMax : 0} isPlaying={isPlaying} bars={40} color="#facc15" />
+              </div>
+
+              {/* Tiempos */}
+              <div className="flex justify-between mt-1.5 text-[11px] font-medium text-white/45 tabular-nums">
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(seekMax)}</span>
+              </div>
             </div>
-            <span className="flex-shrink-0 text-[9px] font-medium text-white/35 tabular-nums">
-              {formatTime(currentTime)}
-            </span>
           </motion.div>
         )}
 
