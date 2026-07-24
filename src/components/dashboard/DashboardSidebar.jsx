@@ -4,7 +4,6 @@ import {
   LayoutDashboard, 
   Film, 
   Calendar, 
-  BarChart3,
   Settings,
   HelpCircle,
   LogOut,
@@ -21,7 +20,6 @@ import { createPageUrl } from "@/utils";
 export default function DashboardSidebar({ isOpen, onClose, artistId }) {
   const menuItems = [
     { icon: LayoutDashboard, label: "Panel", active: true, page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
-    { icon: BarChart3, label: "Análisis", page: artistId ? `Analytics?artistId=${artistId}` : "Analytics" },
     { icon: Film, label: "Clips", page: artistId ? `Clips?artistId=${artistId}` : "Clips" },
     { icon: Music2, label: "Tracks", page: artistId ? `ArtistTracks?artistId=${artistId}` : "Tracks" },
     { icon: FolderKanban, label: "Proyectos", page: artistId ? `ArtistProjects?artistId=${artistId}` : "Projects" },

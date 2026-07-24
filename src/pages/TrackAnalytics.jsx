@@ -132,19 +132,6 @@ export default function TrackAnalytics() {
               </div>
             </div>
 
-            {/* Stat chips compactos */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <div className="text-right">
-                <p className="text-[9px] font-semibold uppercase tracking-wider text-white/30 leading-none">Visitas</p>
-                <p className="text-base font-black leading-tight">{stats.views}</p>
-              </div>
-              <div className="w-px h-7 bg-white/10" />
-              <div className="text-right">
-                <p className="text-[9px] font-semibold uppercase tracking-wider text-white/30 leading-none">Clics</p>
-                <p className="text-base font-black leading-tight" style={{ color: "#facc15" }}>{stats.clicks}</p>
-              </div>
-            </div>
-
             {sharePath && (
               <a href={sharePath} target="_blank" rel="noreferrer" className="hidden sm:flex w-9 h-9 rounded-full items-center justify-center bg-white/[0.04] hover:bg-white/[0.08] transition-colors flex-shrink-0" title="Abrir página pública">
                 <ExternalLink className="w-4 h-4 text-white/50" />
@@ -227,13 +214,28 @@ export default function TrackAnalytics() {
           </Card>
 
           <Card title="Dispositivos">
-            {stats.devices.length === 0 ? (
+            {stats.devices.length === 0 && stats.osList.length === 0 && stats.browsers.length === 0 ? (
               <EmptyHint text="Sin datos de dispositivo." />
             ) : (
-              <div>
-                {stats.devices.map(([d, n]) => (
-                  <BarRow key={d} label={DEVICE_LABELS[d] || d} count={n} total={stats.views} color="#60a5fa" />
-                ))}
+              <div className="space-y-3">
+                <div>
+                  <p className="text-[10px] font-semibold text-white/25 uppercase tracking-wider mb-1">Tipo</p>
+                  {stats.devices.length === 0
+                    ? <p className="text-xs text-white/25 py-1">Sin datos.</p>
+                    : stats.devices.map(([d, n]) => <BarRow key={d} label={DEVICE_LABELS[d] || d} count={n} total={stats.views} color="#60a5fa" />)}
+                </div>
+                {stats.osList.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-semibold text-white/25 uppercase tracking-wider mb-1">Sistema</p>
+                    {stats.osList.map(([o, n]) => <BarRow key={o} label={o} count={n} total={stats.views} color="#a78bfa" />)}
+                  </div>
+                )}
+                {stats.browsers.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-semibold text-white/25 uppercase tracking-wider mb-1">Navegador</p>
+                    {stats.browsers.map(([b, n]) => <BarRow key={b} label={b} count={n} total={stats.views} color="#34d399" />)}
+                  </div>
+                )}
               </div>
             )}
           </Card>

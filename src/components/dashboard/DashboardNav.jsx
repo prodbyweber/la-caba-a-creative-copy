@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Home, BarChart3, BookOpen, Compass, Music2 } from "lucide-react";
+import { Home, BookOpen, Compass, Music2 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
@@ -25,7 +25,6 @@ export default function DashboardNav({ artistName, artistId, children }) {
     { icon: BookOpen, label: "Tu catálogo", page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
     { icon: Compass, label: "Explorar", page: "Explorar" },
     { icon: Music2, label: "Beats", page: "beats" },
-    { icon: BarChart3, label: "Analytics", page: "Analytics" },
   ];
 
   const isActivePage = (page) => {
