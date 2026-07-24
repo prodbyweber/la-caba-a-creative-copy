@@ -48,7 +48,6 @@ export default function StreamingPlatformsBlock({ value, order, onChange, onMeta
             cover_url: { type: "string" },
             apple_music: { type: "string" },
             youtube_music: { type: "string" },
-            youtube_video: { type: "string" },
           },
         },
       });
@@ -56,7 +55,6 @@ export default function StreamingPlatformsBlock({ value, order, onChange, onMeta
       const newLinks = { ...links };
       if (meta.apple_music) newLinks.apple_music = meta.apple_music;
       if (meta.youtube_music) newLinks.youtube_music = meta.youtube_music;
-      if (meta.youtube_video) newLinks.youtube_video = meta.youtube_video;
       onChange({ links: newLinks, order });
       if (onMetadata) onMetadata(meta);
     } catch (e) {

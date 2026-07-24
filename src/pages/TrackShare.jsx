@@ -8,13 +8,11 @@ import { resolveTrackBySlugOrId } from "@/lib/trackSlug";
 import {
   activePlatforms, detectRefererSource, parseUTM, getOrCreateVisitorId, trackEvent,
 } from "@/lib/releaseUtils";
-import {
-  Play, Pause, Lock, Share2, FolderOpen, ExternalLink,
-  Home, Compass, LogIn, UserPlus, LayoutDashboard, User, Music2,
-} from "lucide-react";
+import { Play, Pause, Lock, Share2, ExternalLink, Music2 } from "lucide-react";
 import WaveformBars from "@/components/audio/WaveformBars";
 
 const PREVIEW_SECONDS = 15;
+const CABANA_LOGO = "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
 
 function useTrackMeta(track) {
   useEffect(() => {
@@ -67,41 +65,32 @@ function formatDate(dateStr) {
   } catch { return ""; }
 }
 
-function TopNav({ user, profileUsername }) {
-  return (
-    <div className="flex items-center justify-between px-5 sm:px-10 py-4">
-      <Link to="/" className="flex items-center gap-2">
-        <img src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png" alt="Cabaña Creative" className="h-6 w-auto opacity-90" />
-      </Link>
-      <div className="flex items-center gap-2 sm:gap-3">
-        <Link to="/" className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-white/60 hover:text-white transition-colors px-3 py-2">
-          <Home className="w-3.5 h-3.5" /> Inicio
-        </Link>
-        <Link to="/Explorar" className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-white/60 hover:text-white transition-colors px-3 py-2">
-          <Compass className="w-3.5 h-3.5" /> Catálogo
-        </Link>
-        {user ? (
-          <>
-            <Link to="/ArtistDashboard" className="flex items-center gap-1.5 text-xs font-semibold text-white/70 hover:text-white px-3 py-2 rounded-full bg-white/5 border border-white/10 transition-colors">
-              <LayoutDashboard className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Dashboard</span>
-            </Link>
-            <Link to={profileUsername ? `/${profileUsername}` : "/ArtistDashboard"} className="flex items-center justify-center w-9 h-9 rounded-full bg-white/5 border border-white/10 text-white/70 hover:text-white transition-colors">
-              <User className="w-4 h-4" />
-            </Link>
-          </>
-        ) : (
-          <>
-            <Link to="/login" className="flex items-center gap-1.5 text-xs font-semibold text-white/60 hover:text-white transition-colors px-3 py-2">
-              <LogIn className="w-3.5 h-3.5" /> Login
-            </Link>
-            <Link to="/register" className="flex items-center gap-1.5 text-xs font-bold text-[#0e0e0e] px-4 py-2 rounded-full transition-transform hover:scale-105" style={{ background: "#d4f7c7" }}>
-              <UserPlus className="w-3.5 h-3.5" /> Registrarse
-            </Link>
-          </>
-        )}
-      </div>
-    </div>
-  );
+function PlatformIcon({ platform, className = "w-5 h-5" }) {
+  const common = { viewBox: "0 0 24 24", fill: "currentColor", className };
+  if (platform === "spotify") {
+    return (
+      <svg {...common}>
+        <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.52 17.34c-.23.37-.7.49-1.07.27-2.93-1.79-6.62-2.2-10.97-1.21-.42.1-.84-.16-.94-.58-.1-.42.16-.84.58-.94 4.75-1.08 8.83-.62 12.1 1.39.37.22.49.69.3 1.07zm1.47-3.27c-.29.47-.9.62-1.37.33-3.36-2.07-8.49-2.67-12.46-1.46-.53.16-1.1-.14-1.26-.67-.16-.53.14-1.1.67-1.26 4.54-1.38 10.18-.71 14.09 1.69.47.29.62.9.33 1.37zm.13-3.4C15.1 8.2 8.9 7.94 5.04 9.09c-.64.2-1.32-.16-1.52-.8-.2-.64.16-1.32.8-1.52 4.43-1.34 11.32-1.03 15.79 1.71.59.35.78 1.11.43 1.7-.35.59-1.11.78-1.7.43z"/>
+      </svg>
+    );
+  }
+  if (platform === "apple_music") {
+    return (
+      <svg {...common}>
+        <path d="M17.05 12.04c-.03-2.4 1.96-3.55 2.05-3.61-1.12-1.64-2.86-1.86-3.47-1.89-1.48-.15-2.89.87-3.64.87-.75 0-1.9-.85-3.13-.83-1.61.02-3.1.94-3.93 2.38-1.68 2.91-.43 7.21 1.21 9.57.8 1.16 1.76 2.46 3.02 2.41 1.21-.05 1.67-.78 3.13-.78s1.87.78 3.14.76c1.3-.02 2.12-1.18 2.91-2.35.92-1.35 1.3-2.66 1.32-2.73-.03-.01-2.53-.97-2.56-3.84zM14.8 5.18c.66-.8 1.11-1.92.99-3.03-.96.04-2.12.64-2.81 1.44-.62.72-1.16 1.86-1.01 2.95 1.07.08 2.17-.54 2.83-1.36z"/>
+      </svg>
+    );
+  }
+  if (platform === "youtube_music") {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" className={className}>
+        <circle cx="12" cy="12" r="9.2" fill="currentColor" opacity="0.18" />
+        <circle cx="12" cy="12" r="9.2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M10.4 8.4l6 3.6-6 3.6z" fill="currentColor" />
+      </svg>
+    );
+  }
+  return null;
 }
 
 export default function TrackShare() {
@@ -152,6 +141,7 @@ export default function TrackShare() {
 
   const resolvedArtistName = artist?.stageName || ownerProfile?.artist_name || ownerProfile?.display_name || ownerProfile?.full_name || "";
   const artistName = track?.display_artist || resolvedArtistName;
+  const artistAvatar = artist?.avatar_url || ownerProfile?.avatar_url || ownerProfile?.profile_photo_url || "";
 
   const isOwnerOrAdmin = !!user && (user.role === "admin" || track?.created_by_id === user.id);
   const hasAccess = track?.is_public === true || isOwnerOrAdmin;
@@ -163,7 +153,7 @@ export default function TrackShare() {
 
   useTrackMeta(track);
 
-  // Registro de visita (view) — una sola vez, en silencio, sin bloquear la carga.
+  // Registro de visita (view) — una sola vez, en silencio.
   useEffect(() => {
     if (!track?.id || trackedViewRef.current) return;
     trackedViewRef.current = true;
@@ -177,7 +167,6 @@ export default function TrackShare() {
     });
   }, [track?.id]);
 
-  // Audio local con límite de preview de 15s.
   const cappedDuration = duration > 0 ? Math.min(duration, PREVIEW_SECONDS) : PREVIEW_SECONDS;
 
   const handleTogglePlay = useCallback(() => {
@@ -193,8 +182,7 @@ export default function TrackShare() {
 
   const updateSeekFromClientX = useCallback((clientX) => {
     const el = audioRef.current;
-    if (!el || !cappedDuration) return;
-    if (!progressRef.current) return;
+    if (!el || !cappedDuration || !progressRef.current) return;
     const rect = progressRef.current.getBoundingClientRect();
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
     const t = (x / rect.width) * cappedDuration;
@@ -267,234 +255,251 @@ export default function TrackShare() {
     );
   }
 
+  const coverFallback = !track.cover_url && track.youtube_music_url
+    ? `https://img.youtube.com/vi/${(track.youtube_music_url.match(/v=([^&]+)/) || [])[1] || ""}/hqdefault.jpg`
+    : null;
+  const coverSrc = track.cover_url || coverFallback;
+
   return (
-    <div className="min-h-screen pb-24" style={{ background: "#0a0a0b", fontFamily: "'Inter', -apple-system, sans-serif" }}>
-      {/* Cinematic ambient backdrop from the cover */}
+    <div className="min-h-screen relative overflow-hidden" style={{ background: "#0a0a0b", fontFamily: "'Inter', -apple-system, sans-serif" }}>
+      {/* Ambient backdrop from the cover */}
       <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
-        {track.cover_url && (
-          <img src={track.cover_url} alt="" className="w-full h-full object-cover opacity-25" style={{ filter: "blur(60px) saturate(1.4)" }} />
+        {coverSrc && (
+          <img src={coverSrc} alt="" className="w-full h-full object-cover" style={{ filter: "blur(60px) saturate(1.6)", opacity: 0.45, transform: "scale(1.15)" }} />
         )}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,11,0.4) 0%, rgba(10,10,11,0.92) 55%, #0a0a0b 100%)" }} />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(10,10,11,0.5) 0%, rgba(10,10,11,0.82) 45%, #0a0a0b 100%)" }} />
       </div>
 
-      <div className="relative z-10">
-        <TopNav user={user} profileUsername={profileUsername} />
+      {/* Minimal top bar */}
+      <div className="relative z-20 flex items-center justify-between px-5 py-4">
+        <Link to="/" className="flex items-center gap-2">
+          <img src={CABANA_LOGO} alt="Cabaña Creative" className="h-5 w-auto opacity-80" />
+        </Link>
+        {user ? (
+          <Link to={profileUsername ? `/${profileUsername}` : "/Explorar"} className="text-[11px] font-bold uppercase tracking-widest text-white/40 hover:text-white transition-colors">
+            {profileUsername ? "Mi perfil" : "Catálogo"}
+          </Link>
+        ) : (
+          <Link to="/login" className="text-[11px] font-bold uppercase tracking-widest text-white/40 hover:text-white transition-colors">
+            Entrar
+          </Link>
+        )}
+      </div>
 
-        <div className="px-5 sm:px-10 max-w-3xl mx-auto pt-6 sm:pt-12">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col sm:flex-row gap-6 sm:gap-8 items-center sm:items-start"
-          >
-            {/* Cover */}
-            <div
-              className="w-52 h-52 sm:w-64 sm:h-64 rounded-2xl overflow-hidden flex-shrink-0 relative"
-              style={{ background: "#161616", boxShadow: "0 30px 70px rgba(0,0,0,0.55)" }}
-            >
-              {track.cover_url ? (
-                <img src={track.cover_url} alt={track.title} className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(250,204,21,0.10) 0%, #1a1a0e 50%, #0a0a0b 100%)" }}>
-                  <Music2 className="w-16 h-16 text-white/10" />
-                </div>
-              )}
-              {!hasAccess && (
-                <div className="absolute inset-0 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(2px)" }}>
-                  <Lock className="w-9 h-9 text-white/70" />
-                </div>
-              )}
+      <div className="relative z-10 px-5 max-w-md mx-auto pb-16 flex flex-col items-center">
+        {/* Cover — hero */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.92, y: 16 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="w-44 h-44 sm:w-48 sm:h-48 rounded-2xl overflow-hidden relative"
+          style={{ background: "#161616", boxShadow: "0 35px 80px rgba(0,0,0,0.6)" }}
+        >
+          {coverSrc ? (
+            <img src={coverSrc} alt={track.title} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(250,204,21,0.10) 0%, #1a1a0e 50%, #0a0a0b 100%)" }}>
+              <Music2 className="w-14 h-14 text-white/10" />
             </div>
+          )}
+          {!hasAccess && (
+            <div className="absolute inset-0 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(2px)" }}>
+              <Lock className="w-8 h-8 text-white/70" />
+            </div>
+          )}
+        </motion.div>
 
-            {/* Info */}
-            <div className="flex-1 text-center sm:text-left min-w-0 w-full">
-              {artistName && (
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-1" style={{ color: "#facc15" }}>
-                  {artistName}
-                </p>
-              )}
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-2" style={{ color: "rgba(240,237,232,0.4)" }}>
-                Cabaña Creative
-              </p>
-              <h1 className="text-3xl sm:text-5xl font-black text-white mb-2" style={{ letterSpacing: "-0.03em", lineHeight: 1.02 }}>
-                {track.title}
-              </h1>
+        {/* Artist minimalist logo + name */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-5 flex items-center gap-2"
+        >
+          {artistAvatar ? (
+            <img src={artistAvatar} alt={artistName} className="w-6 h-6 rounded-full object-cover" style={{ border: "1px solid rgba(255,255,255,0.18)" }} />
+          ) : artistName ? (
+            <span className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-[#0a0a0b]" style={{ background: "#facc15" }}>
+              {artistName.charAt(0).toUpperCase()}
+            </span>
+          ) : null}
+          {artistName && (
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: "#facc15" }}>
+              {artistName}
+            </span>
+          )}
+        </motion.div>
 
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mb-6">
-                <span
-                  className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
-                  style={{
-                    background: track.is_public ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.06)",
-                    color: track.is_public ? "#34d399" : "rgba(255,255,255,0.5)",
-                    border: `1px solid ${track.is_public ? "rgba(52,211,153,0.25)" : "rgba(255,255,255,0.1)"}`,
-                  }}
-                >
-                  {track.is_public ? "Público" : "Privado"}
-                </span>
-                {track.genre && <span className="text-xs text-white/45 font-medium">{track.genre}</span>}
-                {track.created_date && <span className="text-xs text-white/30 font-medium">{formatDate(track.created_date)}</span>}
-              </div>
+        {/* Title */}
+        <motion.h1
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.28 }}
+          className="mt-2 text-2xl sm:text-3xl font-black text-white text-center"
+          style={{ letterSpacing: "-0.03em", lineHeight: 1.05 }}
+        >
+          {track.title}
+        </motion.h1>
 
-              {/* Actions */}
-              <div className="flex items-center justify-center sm:justify-start gap-3 flex-wrap">
-                <button
-                  onClick={handleTogglePlay}
-                  disabled={!hasAccess || !track.audio_file_url}
-                  className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed"
-                  style={{ background: "linear-gradient(135deg, #facc15, #eab308)" }}
-                >
-                  {isPlaying ? <Pause className="w-6 h-6 text-[#0a0a0b]" fill="#0a0a0b" /> : <Play className="w-6 h-6 text-[#0a0a0b] ml-0.5" fill="#0a0a0b" />}
-                </button>
+        {/* Metadata */}
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.36 }}
+          className="mt-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] font-medium"
+        >
+          {track.genre && <span className="text-white/45">{track.genre}</span>}
+          {track.genre && track.created_date && <span className="text-white/15">·</span>}
+          {track.created_date && <span className="text-white/30">{formatDate(track.created_date)}</span>}
+          {track.created_date && <span className="text-white/15">·</span>}
+          <span
+            className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider"
+            style={{
+              background: track.is_public ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.06)",
+              color: track.is_public ? "#34d399" : "rgba(255,255,255,0.5)",
+            }}
+          >
+            {track.is_public ? "Público" : "Privado"}
+          </span>
+        </motion.div>
 
-                <div className="relative">
-                  <button
-                    onClick={handleShare}
-                    className="flex items-center gap-2 px-5 h-14 rounded-full text-sm font-bold transition-colors"
-                    style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "white" }}
-                  >
-                    <Share2 className="w-4 h-4" /> Compartir
-                  </button>
-                  <AnimatePresence>
-                    {shareFeedback && (
-                      <motion.span
-                        initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                        className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-[10px] font-bold text-white whitespace-nowrap"
-                        style={{ background: "rgba(0,0,0,0.85)", border: "1px solid rgba(255,255,255,0.15)" }}
-                      >
-                        {shareFeedback}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </div>
+        {/* Compact 15s preview player */}
+        {hasAccess && track.audio_file_url && (
+          <motion.div
+            initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-5 w-full rounded-2xl px-3.5 py-3 flex items-center gap-3"
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}
+          >
+            <audio
+              ref={audioRef}
+              src={track.audio_file_url}
+              preload="metadata"
+              onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
+              onTimeUpdate={(e) => {
+                const t = e.currentTarget.currentTime;
+                if (t >= PREVIEW_SECONDS) {
+                  e.currentTarget.pause();
+                  e.currentTarget.currentTime = 0;
+                  setCurrentTime(0);
+                  setIsPlaying(false);
+                } else {
+                  setCurrentTime(t);
+                }
+              }}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onEnded={() => { setIsPlaying(false); setCurrentTime(0); }}
+            />
+            <button
+              onClick={handleTogglePlay}
+              className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
+              style={{ background: "linear-gradient(135deg, #facc15, #eab308)" }}
+            >
+              {isPlaying ? <Pause className="w-4 h-4 text-[#0a0a0b]" fill="#0a0a0b" /> : <Play className="w-4 h-4 text-[#0a0a0b] ml-0.5" fill="#0a0a0b" />}
+            </button>
+            <div
+              ref={progressRef}
+              className="flex-1 h-9 flex items-center cursor-pointer"
+              onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
+              onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
+            >
+              <WaveformBars progress={cappedDuration ? currentTime / cappedDuration : 0} isPlaying={isPlaying} bars={40} color="#facc15" />
+            </div>
+            <span className="flex-shrink-0 text-[10px] font-semibold text-white/40 tabular-nums">
+              {formatTime(currentTime)}/{formatTime(cappedDuration)}
+            </span>
+          </motion.div>
+        )}
 
-                {isOwnerOrAdmin && track.versions?.drive_folder && (
-                  <a
-                    href={track.versions.drive_folder}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-2 px-5 h-14 rounded-full text-sm font-bold transition-colors"
-                    style={{ background: "rgba(250,204,21,0.12)", border: "1px solid rgba(250,204,21,0.3)", color: "#fde047" }}
-                  >
-                    <FolderOpen className="w-4 h-4" /> Drive
-                  </a>
-                )}
-              </div>
+        {/* Private state */}
+        {!hasAccess && (
+          <motion.div
+            initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-5 w-full rounded-2xl px-5 py-5 flex flex-col items-center text-center gap-3"
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}
+          >
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "rgba(250,204,21,0.15)" }}>
+              <Lock className="w-4 h-4 text-[#facc15]" />
+            </div>
+            <p className="text-xs text-white/60 max-w-xs">Este track es privado. Inicia sesión si tienes permisos.</p>
+            <div className="flex items-center gap-2">
+              <Link to="/login" className="px-4 py-2 rounded-full text-xs font-bold transition-colors" style={{ background: "linear-gradient(135deg, #facc15, #eab308)", color: "#0a0a0b" }}>
+                Iniciar sesión
+              </Link>
+              <Link to="/register" className="px-4 py-2 rounded-full text-xs font-semibold text-white/70 hover:text-white bg-white/5 border border-white/10 transition-colors">
+                Crear cuenta
+              </Link>
             </div>
           </motion.div>
+        )}
 
-          {/* Player — preview 15s */}
-          {hasAccess && track.audio_file_url && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-              className="mt-10 rounded-2xl p-5 sm:p-7 relative"
-              style={{ background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}
-            >
-              <audio
-                ref={audioRef}
-                src={track.audio_file_url}
-                preload="metadata"
-                onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
-                onTimeUpdate={(e) => {
-                  const t = e.currentTarget.currentTime;
-                  if (t >= PREVIEW_SECONDS) {
-                    e.currentTarget.pause();
-                    e.currentTarget.currentTime = 0;
-                    setCurrentTime(0);
-                    setIsPlaying(false);
-                  } else {
-                    setCurrentTime(t);
-                  }
-                }}
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
-                onEnded={() => { setIsPlaying(false); setCurrentTime(0); }}
-              />
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Preview · {PREVIEW_SECONDS}s</span>
-                  <span className="text-[10px] font-semibold text-white/30">Escucha el lanzamiento completo en las plataformas</span>
-                </div>
-                <div
-                  ref={progressRef}
-                  className="relative h-16 flex items-center cursor-pointer group"
-                  onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
-                  onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
-                >
-                  <WaveformBars progress={cappedDuration ? currentTime / cappedDuration : 0} isPlaying={isPlaying} bars={64} color="#facc15" />
-                </div>
-                <div className="flex items-center justify-between text-xs font-medium text-white/40">
-                  <span>{formatTime(currentTime)}</span>
-                  <span>{formatTime(cappedDuration)}</span>
-                </div>
-              </div>
-            </motion.div>
-          )}
+        {/* Vertical link buttons — main focus */}
+        {platforms.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.48 }}
+            className="mt-7 w-full space-y-3"
+          >
+            <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/30">Escucha el lanzamiento</p>
+            {platforms.map((p, i) => (
+              <motion.button
+                key={p.key}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: 0.5 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                onClick={() => handlePlatformClick(p)}
+                className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-sm font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{ background: p.meta.color, boxShadow: `0 12px 30px ${p.meta.color}40` }}
+              >
+                <span className="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-full" style={{ background: "rgba(255,255,255,0.16)" }}>
+                  <PlatformIcon platform={p.key} className="w-5 h-5" />
+                </span>
+                <span className="flex-1 text-left">{p.meta.verb} {p.meta.label}</span>
+                <ExternalLink className="w-4 h-4 text-white/70 flex-shrink-0" />
+              </motion.button>
+            ))}
+          </motion.div>
+        )}
 
-          {!hasAccess && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.15 }}
-              className="mt-10 rounded-2xl p-7 relative"
-              style={{ background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}
-            >
-              <div className="flex flex-col items-center text-center gap-3 py-4">
-                <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "rgba(250,204,21,0.15)" }}>
-                  <Lock className="w-5 h-5 text-[#facc15]" />
-                </div>
-                <p className="text-sm text-white/60 max-w-sm">
-                  Este track es privado. Inicia sesión o crea una cuenta para acceder si tienes permisos.
-                </p>
-                <div className="flex items-center gap-3 pt-1">
-                  <Link to="/login" className="px-5 py-2.5 rounded-full text-sm font-bold transition-colors" style={{ background: "linear-gradient(135deg, #facc15, #eab308)", color: "#0a0a0b" }}>
-                    Iniciar sesión
-                  </Link>
-                  <Link to="/register" className="px-5 py-2.5 rounded-full text-sm font-semibold text-white/70 hover:text-white bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                    Crear cuenta
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
-          )}
+        {/* Share */}
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.6 }}
+          className="mt-6 relative"
+        >
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-2 px-5 h-11 rounded-full text-xs font-bold text-white transition-colors"
+            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
+          >
+            <Share2 className="w-3.5 h-3.5" /> Compartir
+          </button>
+          <AnimatePresence>
+            {shareFeedback && (
+              <motion.span
+                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-[10px] font-bold text-white whitespace-nowrap"
+                style={{ background: "rgba(0,0,0,0.85)", border: "1px solid rgba(255,255,255,0.15)" }}
+              >
+                {shareFeedback}
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
-          {/* Platform buttons */}
-          {platforms.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.25 }}
-              className="mt-6 space-y-3"
-            >
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 text-center sm:text-left">Escucha el lanzamiento</p>
-              {platforms.map((p) => (
-                <button
-                  key={p.key}
-                  onClick={() => handlePlatformClick(p)}
-                  className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-2xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.99]"
-                  style={{
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    color: "white",
-                  }}
-                >
-                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: p.meta.color }} />
-                  <span>{p.meta.verb} {p.meta.label}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-white/40" />
-                </button>
-              ))}
-            </motion.div>
-          )}
+        {isOwnerOrAdmin && track.versions?.drive_folder && (
+          <a
+            href={track.versions.drive_folder}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 text-[11px] font-semibold text-white/40 hover:text-white/70 transition-colors"
+          >
+            Carpeta de Drive →
+          </a>
+        )}
 
-          {/* Footer branding */}
-          <div className="mt-12 text-center">
-            <Link to="/" className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.3em] text-white/30 hover:text-white/60 transition-colors">
-              <img src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png" alt="Cabaña Creative" className="h-4 w-auto opacity-60" />
-              Cabaña Creative
-            </Link>
-          </div>
-        </div>
+        {/* Footer — Cabaña Creative branding */}
+        <motion.div
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.8 }}
+          className="mt-12 flex flex-col items-center gap-1.5"
+        >
+          <Link to="/" className="flex items-center gap-2">
+            <img src={CABANA_LOGO} alt="Cabaña Creative" className="h-4 w-auto opacity-50" />
+          </Link>
+          <span className="text-[9px] font-bold uppercase tracking-[0.35em] text-white/20">Cabaña Creative</span>
+        </motion.div>
       </div>
     </div>
   );

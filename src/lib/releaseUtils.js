@@ -1,11 +1,10 @@
 import { base44 } from "@/api/base44Client";
 
-// Catálogo de plataformas soportadas (4 plataformas oficiales del release).
+// Catálogo de plataformas soportadas (3 plataformas oficiales del release).
 export const PLATFORMS = [
   { key: "spotify", label: "Spotify", color: "#1DB954", verb: "Escuchar en" },
   { key: "apple_music", label: "Apple Music", color: "#FA243C", verb: "Escuchar en" },
   { key: "youtube_music", label: "YouTube Music", color: "#FF0000", verb: "Escuchar en" },
-  { key: "youtube_video", label: "YouTube", color: "#FF0000", verb: "Ver en" },
 ];
 
 export const DEFAULT_PLATFORM_ORDER = PLATFORMS.map((p) => p.key);
@@ -16,11 +15,11 @@ export function platformMeta(key) {
 export function platformLabel(key) { return platformMeta(key).label; }
 export function platformColor(key) { return platformMeta(key).color; }
 
-// Orden efectivo de las 4 plataformas: respeta el orden del usuario (solo las 4 válidas).
+// Orden efectivo de las 3 plataformas: respeta el orden del usuario (solo las 3 válidas).
 export function effectivePlatformOrder(order) {
-  const four = DEFAULT_PLATFORM_ORDER;
-  const o = (Array.isArray(order) ? order : []).filter((k) => four.includes(k));
-  const rest = four.filter((k) => !o.includes(k));
+  const valid = DEFAULT_PLATFORM_ORDER;
+  const o = (Array.isArray(order) ? order : []).filter((k) => valid.includes(k));
+  const rest = valid.filter((k) => !o.includes(k));
   return [...o, ...rest];
 }
 

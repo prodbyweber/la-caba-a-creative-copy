@@ -1,14 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link as RouterLink } from "react-router-dom";
-import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock, Trash2, FolderOpen, Upload, Check, Link, Share2, Download, BarChart3 } from "lucide-react";
+import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock, Trash2, FolderOpen, Upload, Check, Link, Share2, Download } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { shareTrackLink } from "@/lib/trackShare";
 import { ensureUniqueSlug } from "@/lib/trackSlug";
 import ArtistPicker from "@/components/tracks/ArtistPicker";
+import StreamingPlatformsBlock from "@/components/tracks/StreamingPlatformsBlock";
 
 const statusConfig = {
   idea:       { label: "Idea",          color: "#6b7280" },
@@ -335,16 +335,6 @@ function TrackEditModal({ track, onClose, onSaved }) {
                 <button type="button" onClick={addProducer} className="px-3 py-2 bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/25 rounded-lg text-purple-400 text-sm font-medium transition-colors">+</button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs text-white/30 mb-1.5">Ing. Mezcla</label>
-                <input type="text" value={formData.mix_engineer || ""} onChange={(e) => setFormData(f => ({ ...f, mix_engineer: e.target.value }))} placeholder="Mix engineer" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-purple-500/40 text-sm transition-colors" />
-              </div>
-              <div>
-                <label className="block text-xs text-white/30 mb-1.5">Ing. Master</label>
-                <input type="text" value={formData.master_engineer || ""} onChange={(e) => setFormData(f => ({ ...f, master_engineer: e.target.value }))} placeholder="Mastering engineer" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-purple-500/40 text-sm transition-colors" />
-              </div>
-            </div>
           </div>
 
           {/* Dolby Atmos */}
@@ -383,6 +373,18 @@ function TrackEditModal({ track, onClose, onSaved }) {
               placeholder="Notas adicionales..."
               rows={3}
               className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:border-purple-500/40 text-sm transition-colors resize-none"
+            />
+          </div>
+
+          {/* Release — links a plataformas (Landing Page) */}
+          <div>
+            <h4 className="text-xs font-bold text-white/40 uppercase tracking-wider flex items-center gap-2 mb-2.5">
+              <span className="w-1 h-3.5 bg-emerald-500 rounded-full" /> Links del lanzamiento
+            </h4>
+            <StreamingPlatformsBlock
+              value={formData.streaming_links}
+              order={formData.platform_order}
+              onChange={({ links, order }) => setFormData(f => ({ ...f, streaming_links: links, platform_order: order }))}
             />
           </div>
 
@@ -841,14 +843,6 @@ function TrackCard({ track, onEdit, isFirst }) {
                         {localTrack.mix_engineer && `Mix: ${localTrack.mix_engineer}`}
                       </p>
                     )}
-                    <RouterLink
-                      to={(localTrack.slug ? `/t/${localTrack.slug}` : `/track/${localTrack.id}`) + "/analytics"}
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex items-center justify-center gap-1.5 w-full py-1.5 rounded-md text-[9px] font-bold transition-colors"
-                      style={{ background: "rgba(250,204,21,0.12)", border: "1px solid rgba(250,204,21,0.25)", color: "#facc15" }}
-                    >
-                      <BarChart3 className="w-3 h-3" /> Analytics
-                    </RouterLink>
                   </div>
                 </motion.div>
               )}
