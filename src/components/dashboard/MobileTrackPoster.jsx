@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect, createContext, useContext, useCallback } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Globe, Lock, Share2, FolderOpen, Download } from "lucide-react";
+import { Play, Pause, Music2, X, Edit, ExternalLink, ChevronDown, Globe, Lock, Share2, FolderOpen, Download, BarChart3 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -210,6 +211,14 @@ export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, o
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold flex-1 justify-center hover:bg-white/15 transition-colors">
               <Edit className="w-4 h-4" /> Editar
             </button>
+            <Link
+              to={(track.slug ? `/t/${track.slug}` : `/track/${track.id}`) + "/analytics"}
+              onClick={onClose}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold flex-1 justify-center transition-colors"
+              style={{ background: "rgba(250,204,21,0.12)", border: "1px solid rgba(250,204,21,0.3)", color: "#facc15" }}
+            >
+              <BarChart3 className="w-4 h-4" /> Analytics
+            </Link>
             <button onClick={handleShare}
               className="relative flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold flex-1 justify-center hover:bg-white/15 transition-colors">
               <Share2 className="w-4 h-4" /> Compartir

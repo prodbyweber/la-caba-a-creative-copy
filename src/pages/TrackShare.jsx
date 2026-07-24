@@ -1,19 +1,22 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
-import { useGlobalAudio } from "@/context/GlobalAudioContext";
-import { formatDuration } from "@/lib/musicConstants";
 import { getTrackShareUrl, shareTrackLink } from "@/lib/trackShare";
 import { resolveTrackBySlugOrId } from "@/lib/trackSlug";
 import {
-  Play, Pause, Lock, Share2, FolderOpen,
+  activePlatforms, detectRefererSource, parseUTM, getOrCreateVisitorId, trackEvent,
+} from "@/lib/releaseUtils";
+import {
+  Play, Pause, Lock, Share2, FolderOpen, ExternalLink,
   Home, Compass, LogIn, UserPlus, LayoutDashboard, User, Music2,
 } from "lucide-react";
 import WaveformBars from "@/components/audio/WaveformBars";
 
-function useTrackMeta(track, hasAccess) {
+const PREVIEW_SECONDS = 15;
+
+function useTrackMeta(track) {
   useEffect(() => {
     if (!track) return;
     const prevTitle = document.title;
@@ -54,7 +57,7 @@ function useTrackMeta(track, hasAccess) {
       document.title = prevTitle;
       created.forEach((el) => el.remove());
     };
-  }, [track, hasAccess]);
+  }, [track]);
 }
 
 function formatDate(dateStr) {
@@ -104,12 +107,17 @@ function TopNav({ user, profileUsername }) {
 export default function TrackShare() {
   const { slug, id } = useParams();
   const routeKey = slug || id;
-  const { playingTrack, isPlaying, currentTime, duration, playTrack, pauseTrack, resumeTrack, seekTrack } = useGlobalAudio();
   const [user, setUser] = useState(null);
   const [profileUsername, setProfileUsername] = useState(null);
   const [shareFeedback, setShareFeedback] = useState("");
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  const audioRef = useRef(null);
   const progressRef = useRef(null);
   const [dragging, setDragging] = useState(false);
+  const trackedViewRef = useRef(false);
 
   useEffect(() => {
     base44.auth.isAuthenticated().then(async (authed) => {
@@ -147,36 +155,52 @@ export default function TrackShare() {
 
   const isOwnerOrAdmin = !!user && (user.role === "admin" || track?.created_by_id === user.id);
   const hasAccess = track?.is_public === true || isOwnerOrAdmin;
-  const active = playingTrack?.id === track?.id;
 
-  useTrackMeta(track, hasAccess);
+  const platforms = useMemo(
+    () => activePlatforms(track?.streaming_links, track?.platform_order),
+    [track?.streaming_links, track?.platform_order]
+  );
+
+  useTrackMeta(track);
+
+  // Registro de visita (view) — una sola vez, en silencio, sin bloquear la carga.
+  useEffect(() => {
+    if (!track?.id || trackedViewRef.current) return;
+    trackedViewRef.current = true;
+    const utm = parseUTM();
+    trackEvent({
+      track_id: track.id,
+      event_type: "view",
+      visitor_id: getOrCreateVisitorId(),
+      referer_source: detectRefererSource(document.referrer),
+      ...utm,
+    });
+  }, [track?.id]);
+
+  // Audio local con límite de preview de 15s.
+  const cappedDuration = duration > 0 ? Math.min(duration, PREVIEW_SECONDS) : PREVIEW_SECONDS;
 
   const handleTogglePlay = useCallback(() => {
-    if (!track?.audio_file_url || !hasAccess) return;
-    if (active) {
-      isPlaying ? pauseTrack() : resumeTrack();
+    const el = audioRef.current;
+    if (!el || !track?.audio_file_url || !hasAccess) return;
+    if (isPlaying) {
+      el.pause();
     } else {
-      playTrack({ ...track, producer: track.producers?.join(", ") || track.composers?.join(", ") });
+      if (el.currentTime >= PREVIEW_SECONDS) el.currentTime = 0;
+      el.play().then(() => setIsPlaying(true)).catch(() => {});
     }
-  }, [track, hasAccess, active, isPlaying, pauseTrack, resumeTrack, playTrack]);
-
-  const handleShare = async () => {
-    const result = await shareTrackLink(track);
-    if (result.copied) {
-      setShareFeedback("Enlace copiado");
-      setTimeout(() => setShareFeedback(""), 2200);
-    } else if (result.copied === false) {
-      setShareFeedback("No se pudo copiar");
-      setTimeout(() => setShareFeedback(""), 2200);
-    }
-  };
+  }, [isPlaying, track?.audio_file_url, hasAccess]);
 
   const updateSeekFromClientX = useCallback((clientX) => {
-    if (!progressRef.current || !duration) return;
+    const el = audioRef.current;
+    if (!el || !cappedDuration) return;
+    if (!progressRef.current) return;
     const rect = progressRef.current.getBoundingClientRect();
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
-    seekTrack((x / rect.width) * duration);
-  }, [duration, seekTrack]);
+    const t = (x / rect.width) * cappedDuration;
+    el.currentTime = t;
+    setCurrentTime(t);
+  }, [cappedDuration]);
 
   useEffect(() => {
     if (!dragging) return;
@@ -193,6 +217,30 @@ export default function TrackShare() {
       window.removeEventListener("touchend", up);
     };
   }, [dragging, updateSeekFromClientX]);
+
+  const handlePlatformClick = useCallback((p) => {
+    const utm = parseUTM();
+    trackEvent({
+      track_id: track.id,
+      event_type: "click",
+      platform: p.key,
+      visitor_id: getOrCreateVisitorId(),
+      referer_source: detectRefererSource(document.referrer),
+      ...utm,
+    });
+    window.open(p.url, "_blank", "noopener,noreferrer");
+  }, [track?.id]);
+
+  const handleShare = async () => {
+    const result = await shareTrackLink(track);
+    if (result.copied) {
+      setShareFeedback("Enlace copiado");
+      setTimeout(() => setShareFeedback(""), 2200);
+    } else if (result.copied === false) {
+      setShareFeedback("No se pudo copiar");
+      setTimeout(() => setShareFeedback(""), 2200);
+    }
+  };
 
   const formatTime = (s) => {
     if (!s || isNaN(s)) return "0:00";
@@ -284,9 +332,6 @@ export default function TrackShare() {
                   {track.is_public ? "Público" : "Privado"}
                 </span>
                 {track.genre && <span className="text-xs text-white/45 font-medium">{track.genre}</span>}
-                {track.bpm && <span className="text-xs text-white/45 font-medium">{track.bpm} BPM</span>}
-                {track.key && <span className="text-xs text-white/45 font-medium">{track.key}</span>}
-                {track.duration > 0 && <span className="text-xs text-white/45 font-medium">{formatDuration(track.duration)}</span>}
                 {track.created_date && <span className="text-xs text-white/30 font-medium">{formatDate(track.created_date)}</span>}
               </div>
 
@@ -298,7 +343,7 @@ export default function TrackShare() {
                   className="w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-transform hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed"
                   style={{ background: "linear-gradient(135deg, #facc15, #eab308)" }}
                 >
-                  {active && isPlaying ? <Pause className="w-6 h-6 text-[#0a0a0b]" fill="#0a0a0b" /> : <Play className="w-6 h-6 text-[#0a0a0b] ml-0.5" fill="#0a0a0b" />}
+                  {isPlaying ? <Pause className="w-6 h-6 text-[#0a0a0b]" fill="#0a0a0b" /> : <Play className="w-6 h-6 text-[#0a0a0b] ml-0.5" fill="#0a0a0b" />}
                 </button>
 
                 <div className="relative">
@@ -337,34 +382,64 @@ export default function TrackShare() {
             </div>
           </motion.div>
 
-          {/* Player */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            className="mt-10 rounded-2xl p-5 sm:p-7 relative"
-            style={{ background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}
-          >
-            {hasAccess ? (
+          {/* Player — preview 15s */}
+          {hasAccess && track.audio_file_url && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="mt-10 rounded-2xl p-5 sm:p-7 relative"
+              style={{ background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}
+            >
+              <audio
+                ref={audioRef}
+                src={track.audio_file_url}
+                preload="metadata"
+                onLoadedMetadata={(e) => setDuration(e.currentTarget.duration || 0)}
+                onTimeUpdate={(e) => {
+                  const t = e.currentTarget.currentTime;
+                  if (t >= PREVIEW_SECONDS) {
+                    e.currentTarget.pause();
+                    e.currentTarget.currentTime = 0;
+                    setCurrentTime(0);
+                    setIsPlaying(false);
+                  } else {
+                    setCurrentTime(t);
+                  }
+                }}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onEnded={() => { setIsPlaying(false); setCurrentTime(0); }}
+              />
               <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">Preview · {PREVIEW_SECONDS}s</span>
+                  <span className="text-[10px] font-semibold text-white/30">Escucha el lanzamiento completo en las plataformas</span>
+                </div>
                 <div
                   ref={progressRef}
                   className="relative h-16 flex items-center cursor-pointer group"
                   onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
                   onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
                 >
-                  <WaveformBars progress={active && duration ? currentTime / duration : 0} isPlaying={active && isPlaying} bars={64} color="#facc15" />
+                  <WaveformBars progress={cappedDuration ? currentTime / cappedDuration : 0} isPlaying={isPlaying} bars={64} color="#facc15" />
                 </div>
                 <div className="flex items-center justify-between text-xs font-medium text-white/40">
-                  <span>{formatTime(active ? currentTime : 0)}</span>
-                  <span>{formatTime(active ? duration : track.duration)}</span>
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(cappedDuration)}</span>
                 </div>
-
-                {!track.audio_file_url && (
-                  <p className="text-center text-xs text-white/30 pt-1">Este track no tiene audio disponible.</p>
-                )}
               </div>
-            ) : (
+            </motion.div>
+          )}
+
+          {!hasAccess && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="mt-10 rounded-2xl p-7 relative"
+              style={{ background: "rgba(255,255,255,0.035)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}
+            >
               <div className="flex flex-col items-center text-center gap-3 py-4">
                 <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "rgba(250,204,21,0.15)" }}>
                   <Lock className="w-5 h-5 text-[#facc15]" />
@@ -381,8 +456,44 @@ export default function TrackShare() {
                   </Link>
                 </div>
               </div>
-            )}
-          </motion.div>
+            </motion.div>
+          )}
+
+          {/* Platform buttons */}
+          {platforms.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.25 }}
+              className="mt-6 space-y-3"
+            >
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 text-center sm:text-left">Escucha el lanzamiento</p>
+              {platforms.map((p) => (
+                <button
+                  key={p.key}
+                  onClick={() => handlePlatformClick(p)}
+                  className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-2xl text-sm font-bold transition-all hover:scale-[1.02] active:scale-[0.99]"
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    color: "white",
+                  }}
+                >
+                  <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: p.meta.color }} />
+                  <span>{p.meta.verb} {p.meta.label}</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-white/40" />
+                </button>
+              ))}
+            </motion.div>
+          )}
+
+          {/* Footer branding */}
+          <div className="mt-12 text-center">
+            <Link to="/" className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.3em] text-white/30 hover:text-white/60 transition-colors">
+              <img src="https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png" alt="Cabaña Creative" className="h-4 w-auto opacity-60" />
+              Cabaña Creative
+            </Link>
+          </div>
         </div>
       </div>
     </div>

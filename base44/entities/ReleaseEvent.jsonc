@@ -2,17 +2,13 @@
   "name": "ReleaseEvent",
   "type": "object",
   "properties": {
-    "landing_id": {
-      "type": "string",
-      "description": "ID de la landing a la que pertenece el evento"
-    },
     "track_id": {
       "type": "string",
-      "description": "ID del soundtrack (denormalizado para queries r\u00e1pidas)"
+      "description": "ID del soundtrack al que pertenece el evento"
     },
     "owner_id": {
       "type": "string",
-      "description": "ID del usuario due\u00f1o de la landing (ancla el RLS de anal\u00edticas)"
+      "description": "ID del usuario due\u00f1o del soundtrack (ancla el RLS de anal\u00edticas)"
     },
     "event_type": {
       "type": "string",
@@ -21,11 +17,11 @@
         "click"
       ],
       "default": "view",
-      "description": "Tipo de evento: visita a la landing o clic en plataforma"
+      "description": "Tipo de evento: visita a la p\u00e1gina o clic en plataforma"
     },
     "platform": {
       "type": "string",
-      "description": "Plataforma pulsada en un evento click (spotify, apple_music, youtube_music, youtube_video, amazon_music, deezer, soundcloud)"
+      "description": "Plataforma pulsada en un evento click (spotify, apple_music, youtube_music, youtube_video)"
     },
     "country": {
       "type": "string",
@@ -91,7 +87,7 @@
     }
   },
   "required": [
-    "landing_id",
+    "track_id",
     "event_type"
   ],
   "rls": {

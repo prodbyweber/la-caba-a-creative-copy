@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { X, Check, ChevronUp, ChevronDown } from "lucide-react";
 
-export const DEFAULT_SECTION_ORDER = ["tracks", "savedbeats", "video", "shorts", "projects", "landings"];
+export const DEFAULT_SECTION_ORDER = ["tracks", "savedbeats", "video", "shorts", "projects"];
 
 const SECTION_META = {
   savedbeats: { label: "Ritmos Guardados" },
@@ -10,7 +10,6 @@ const SECTION_META = {
   video:      { label: "Films" },
   shorts:     { label: "Shorts" },
   projects:   { label: "Proyectos" },
-  landings:   { label: "Landing Pages" },
 };
 
 export default function CatalogSectionOrder({ order, onChange, onClose, isMobile }) {

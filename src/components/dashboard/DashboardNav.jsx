@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
-import { Home, BarChart3, BookOpen, Compass, Menu, X, Music2 } from "lucide-react";
+import { Home, BarChart3, BookOpen, Compass, Music2 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
@@ -23,21 +21,11 @@ export default function DashboardNav({ artistName, artistId, children }) {
     checkAdmin();
   }, []);
 
-  // Fetch LandingConfig para saber si Analytics está habilitado
-  const { data: landingConfig } = useQuery({
-    queryKey: ['landingConfig'],
-    queryFn: async () => {
-      const configs = await base44.entities.LandingConfig.list();
-      return configs[0];
-    }
-  });
-
-  const analyticsEnabled = landingConfig?.sections_enabled?.analytics !== false;
-  
   const menuItems = [
     { icon: BookOpen, label: "Tu catálogo", page: artistId ? `ArtistDashboard?artistId=${artistId}` : "Dashboard" },
     { icon: Compass, label: "Explorar", page: "Explorar" },
     { icon: Music2, label: "Beats", page: "beats" },
+    { icon: BarChart3, label: "Analytics", page: "Analytics" },
   ];
 
   const isActivePage = (page) => {

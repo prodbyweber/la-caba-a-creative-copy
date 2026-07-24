@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock, Trash2, FolderOpen, Upload, Check, Link, Share2, Download } from "lucide-react";
+import { Link as RouterLink } from "react-router-dom";
+import { Play, Pause, Edit, Music2, ExternalLink, ChevronDown, X, Globe, Lock, Trash2, FolderOpen, Upload, Check, Link, Share2, Download, BarChart3 } from "lucide-react";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
@@ -829,6 +830,14 @@ function TrackCard({ track, onEdit, isFirst }) {
                         {localTrack.mix_engineer && `Mix: ${localTrack.mix_engineer}`}
                       </p>
                     )}
+                    <RouterLink
+                      to={(localTrack.slug ? `/t/${localTrack.slug}` : `/track/${localTrack.id}`) + "/analytics"}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center justify-center gap-1.5 w-full py-1.5 rounded-md text-[9px] font-bold transition-colors"
+                      style={{ background: "rgba(250,204,21,0.12)", border: "1px solid rgba(250,204,21,0.25)", color: "#facc15" }}
+                    >
+                      <BarChart3 className="w-3 h-3" /> Analytics
+                    </RouterLink>
                   </div>
                 </motion.div>
               )}

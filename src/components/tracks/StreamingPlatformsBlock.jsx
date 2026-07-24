@@ -37,7 +37,7 @@ export default function StreamingPlatformsBlock({ value, order, onChange, onMeta
     setFetching(true);
     try {
       const res = await base44.integrations.Core.InvokeLLM({
-        prompt: `A partir de este enlace de Spotify: ${spotify}\nDevuelve los metadatos del lanzamiento: título exacto, artista, URL de la portada (imagen cuadrada), y si los encuentras los enlaces oficiales en Apple Music, YouTube Music y YouTube (video). Solo devuelve JSON.`,
+        prompt: `A partir de este enlace de Spotify: ${spotify}\nDevuelve los metadatos del lanzamiento: título exacto, artista, URL de la portada (imagen cuadrada), y si los encuentras los enlaces oficiales en Apple Music, YouTube Music y YouTube (video). Solo devuelve JSON, sin texto adicional.`,
         add_context_from_internet: true,
         model: "gemini_3_flash",
         response_json_schema: {
@@ -72,7 +72,7 @@ export default function StreamingPlatformsBlock({ value, order, onChange, onMeta
     <div>
       <div className="flex items-center justify-between mb-1.5">
         <label className="block text-[10px] font-semibold text-white/30 uppercase tracking-widest mb-0">
-          Streaming Platforms
+          Release
         </label>
         <button
           type="button"

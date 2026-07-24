@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useMemo } from "react";
+import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, BarChart3 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { computeStats } from "@/lib/analyticsStats";
+import { resolveTrackBySlugOrId } from "@/lib/trackSlug";
+import { computeStats, dailySeries } from "@/lib/analyticsStats";
 import { refererLabel } from "@/lib/releaseUtils";
 
 function Stat({ label, value, hint }) {
@@ -24,63 +25,48 @@ function BarRow({ label, count, total, color = "#facc15" }) {
       <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
         <div className="h-full rounded-full" style={{ width: `${pct}%`, background: color }} />
       </div>
-      <span className="w-20 text-right text-xs text-white/50 flex-shrink-0">{count} · {pct}%</span>
+      <span className="w-24 text-right text-xs text-white/50 flex-shrink-0">{count} · {pct}%</span>
     </div>
   );
 }
 
-export default function Analytics() {
-  const [selectedTrackId, setSelectedTrackId] = useState("all");
-
-  const { data: user } = useQuery({
-    queryKey: ["me"],
-    queryFn: () => base44.auth.me(),
-  });
-
-  // Tracks del usuario
-  const { data: tracks = [] } = useQuery({
-    queryKey: ["analytics-tracks", user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-      const all = await base44.entities.Track.list("-created_date", 200);
-      return all.filter((t) => t.created_by_id === user.id);
-    },
-    enabled: !!user,
-  });
-
-  // Todos los eventos del usuario (RLS restringe a owner_id === user.id)
-  const { data: events = [], isLoading } = useQuery({
-    queryKey: ["analytics-events", user?.id],
-    queryFn: () => base44.entities.ReleaseEvent.list("-created_date", 1000),
-    enabled: !!user,
-  });
-
-  const trackMap = useMemo(() => {
-    const m = {};
-    tracks.forEach((t) => { m[t.id] = t; });
-    return m;
-  }, [tracks]);
-
-  const filteredEvents = useMemo(
-    () => selectedTrackId === "all" ? events : events.filter((e) => e.track_id === selectedTrackId),
-    [events, selectedTrackId]
+function Chart({ data }) {
+  const max = Math.max(1, ...data.map((d) => d.count));
+  return (
+    <div className="flex items-end gap-1 h-28 mt-2">
+      {data.map((d) => (
+        <div key={d.date} className="flex-1 flex flex-col items-center justify-end" title={`${d.date}: ${d.count}`}>
+          <div
+            className="w-full rounded-t-sm transition-all"
+            style={{ height: `${(d.count / max) * 100}%`, background: d.count ? "#facc15" : "rgba(255,255,255,0.08)", minHeight: 2 }}
+          />
+        </div>
+      ))}
+    </div>
   );
+}
 
-  const stats = useMemo(() => computeStats(filteredEvents), [filteredEvents]);
+export default function TrackAnalytics() {
+  const { slug, id } = useParams();
+  const routeKey = slug || id;
 
-  // Ranking de soundtracks por visitas
-  const topTracks = useMemo(() => {
-    const counts = {};
-    events.forEach((e) => { if (e.event_type === "view" && e.track_id) counts[e.track_id] = (counts[e.track_id] || 0) + 1; });
-    return Object.entries(counts)
-      .map(([tid, n]) => ({ track: trackMap[tid], views: n, clicks: events.filter((e) => e.track_id === tid && e.event_type === "click").length }))
-      .filter((x) => x.track)
-      .sort((a, b) => b.views - a.views)
-      .slice(0, 8);
-  }, [events, trackMap]);
+  const { data: track } = useQuery({
+    queryKey: ["track-analytics", routeKey],
+    queryFn: () => resolveTrackBySlugOrId(routeKey),
+    enabled: !!routeKey,
+    retry: false,
+  });
 
-  const mainCountry = stats.countries[0]?.[0] || "—";
-  const mainSource = stats.sources[0]?.[0] || "—";
+  const { data: events = [], isLoading } = useQuery({
+    queryKey: ["track-events", track?.id],
+    queryFn: () => base44.entities.ReleaseEvent.filter({ track_id: track.id }),
+    enabled: !!track?.id,
+  });
+
+  const stats = useMemo(() => computeStats(events, track?.platform_order), [events, track?.platform_order]);
+  const series = useMemo(() => dailySeries(events.filter((e) => e.event_type === "view"), 14), [events]);
+
+  const title = track?.title || "Soundtrack";
 
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
@@ -91,79 +77,37 @@ export default function Analytics() {
           </Link>
           <div className="flex items-center gap-2">
             <BarChart3 className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm font-semibold">Analytics</span>
+            <span className="text-sm font-semibold truncate max-w-[180px]">{title}</span>
           </div>
-          <div className="w-10" />
+          {track?.slug && (
+            <a href={`/t/${track.slug}`} target="_blank" rel="noreferrer" className="text-xs text-white/40 hover:text-white">
+              Abrir página ↗
+            </a>
+          )}
         </div>
       </div>
 
       <div className="max-w-3xl mx-auto px-5 py-6 space-y-8">
-        {/* Resumen global */}
+        {/* Resumen */}
         <section>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-white/25 mb-3">Resumen del catálogo</p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <Stat label="Visitas totales" value={stats.views} />
-            <Stat label="Únicos" value={stats.uniqueVisitors} />
-            <Stat label="Clics totales" value={stats.clicks} />
-            <Stat label="CTR medio" value={`${stats.ctr}%`} />
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3">
-            <Stat label="País principal" value={mainCountry} />
-            <Stat label="Fuente principal" value={refererLabel(mainSource)} />
-            <Stat label="Soundtracks" value={tracks.length} hint="con release" />
-          </div>
-        </section>
-
-        {/* Top soundtracks */}
-        <section>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-white/25 mb-3">Top Soundtracks</p>
-          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] divide-y divide-white/[0.04]">
-            {topTracks.length === 0 ? (
-              <p className="text-sm text-white/30 py-6 text-center">Aún no hay datos de visitas.</p>
-            ) : topTracks.map(({ track, views, clicks }, i) => (
-              <Link
-                key={track.id}
-                to={track.slug ? `/t/${track.slug}/analytics` : `/track/${track.id}/analytics`}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03] transition-colors"
-              >
-                <span className="text-xs font-bold text-white/30 w-5">{i + 1}</span>
-                <div className="w-9 h-9 rounded-md overflow-hidden flex-shrink-0 bg-white/5">
-                  {track.cover_url && <img src={track.cover_url} alt="" className="w-full h-full object-cover" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white/80 truncate">{track.title}</p>
-                  <p className="text-[10px] text-white/30">{track.display_artist || ""}</p>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <p className="text-xs font-semibold text-white/70">{views} visitas</p>
-                  <p className="text-[10px] text-white/30">{clicks} clics</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* Filtro por soundtrack */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-white/25">Detalle por soundtrack</p>
-            <select
-              value={selectedTrackId}
-              onChange={(e) => setSelectedTrackId(e.target.value)}
-              className="bg-white/[0.04] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white/80 focus:outline-none focus:border-white/20"
-            >
-              <option value="all">Todos</option>
-              {tracks.map((t) => (
-                <option key={t.id} value={t.id}>{t.title}</option>
-              ))}
-            </select>
-          </div>
-
+          <p className="text-[10px] font-bold uppercase tracking-widest text-white/25 mb-3">Resumen</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Stat label="Visitas" value={stats.views} />
             <Stat label="Únicos" value={stats.uniqueVisitors} />
             <Stat label="Clics" value={stats.clicks} />
-            <Stat label="CTR" value={`${stats.ctr}%`} />
+            <Stat label="CTR" value={`${stats.ctr}%`} hint="clics / visitas" />
+          </div>
+        </section>
+
+        {/* Evolución */}
+        <section>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-white/25 mb-3">Visitas · últimos 14 días</p>
+          <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
+            <Chart data={series} />
+            <div className="flex justify-between text-[9px] text-white/25 mt-2">
+              <span>{series[0]?.date?.slice(5)}</span>
+              <span>{series[series.length - 1]?.date?.slice(5)}</span>
+            </div>
           </div>
         </section>
 
@@ -175,7 +119,18 @@ export default function Analytics() {
               <p className="text-sm text-white/30 py-4 text-center">Aún no hay clics registrados.</p>
             ) : (
               stats.platforms.map(({ key, meta, count }) => (
-                <BarRow key={key} label={meta.label} count={count} total={stats.platformTotal} color={meta.color} />
+                <div key={key} className="py-2 border-b border-white/[0.04] last:border-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="flex items-center gap-2 text-sm text-white/70">
+                      <span className="w-2 h-2 rounded-full" style={{ background: meta.color }} />
+                      {meta.label}
+                    </span>
+                    <span className="text-xs text-white/50">{count} · {stats.platformTotal ? Math.round((count / stats.platformTotal) * 100) : 0}%</span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+                    <div className="h-full rounded-full" style={{ width: `${stats.platformTotal ? (count / stats.platformTotal) * 100 : 0}%`, background: meta.color }} />
+                  </div>
+                </div>
               ))
             )}
           </div>
@@ -200,15 +155,21 @@ export default function Analytics() {
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-white/25 mb-3">Países</p>
             <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
-              {stats.countries.length === 0 ? <p className="text-sm text-white/30 py-4 text-center">Sin datos.</p> :
-                stats.countries.map(([c, n]) => <BarRow key={c} label={c} count={n} total={stats.views} color="#a78bfa" />)}
+              {stats.countries.length === 0 ? (
+                <p className="text-sm text-white/30 py-4 text-center">Sin datos.</p>
+              ) : (
+                stats.countries.map(([c, n]) => <BarRow key={c} label={c} count={n} total={stats.views} color="#a78bfa" />)
+              )}
             </div>
           </div>
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-white/25 mb-3">Ciudades</p>
             <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
-              {stats.cities.length === 0 ? <p className="text-sm text-white/30 py-4 text-center">Sin datos.</p> :
-                stats.cities.map(([c, n]) => <BarRow key={c} label={c} count={n} total={stats.views} color="#34d399" />)}
+              {stats.cities.length === 0 ? (
+                <p className="text-sm text-white/30 py-4 text-center">Sin datos.</p>
+              ) : (
+                stats.cities.map(([c, n]) => <BarRow key={c} label={c} count={n} total={stats.views} color="#34d399" />)
+              )}
             </div>
           </div>
         </section>

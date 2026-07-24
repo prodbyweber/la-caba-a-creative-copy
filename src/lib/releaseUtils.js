@@ -1,30 +1,35 @@
 import { base44 } from "@/api/base44Client";
-import { slugify } from "@/lib/trackSlug";
 
-// Catálogo de plataformas soportadas, en orden por defecto.
+// Catálogo de plataformas soportadas (4 plataformas oficiales del release).
 export const PLATFORMS = [
-  { key: "spotify", label: "Spotify", color: "#1DB954" },
-  { key: "apple_music", label: "Apple Music", color: "#FA243C" },
-  { key: "youtube_music", label: "YouTube Music", color: "#FF0000" },
-  { key: "youtube_video", label: "YouTube", color: "#FF0000" },
-  { key: "amazon_music", label: "Amazon Music", color: "#25D1DA" },
-  { key: "deezer", label: "Deezer", color: "#A238FF" },
-  { key: "soundcloud", label: "SoundCloud", color: "#FF5500" },
+  { key: "spotify", label: "Spotify", color: "#1DB954", verb: "Escuchar en" },
+  { key: "apple_music", label: "Apple Music", color: "#FA243C", verb: "Escuchar en" },
+  { key: "youtube_music", label: "YouTube Music", color: "#FF0000", verb: "Escuchar en" },
+  { key: "youtube_video", label: "YouTube", color: "#FF0000", verb: "Ver en" },
 ];
 
 export const DEFAULT_PLATFORM_ORDER = PLATFORMS.map((p) => p.key);
 
 export function platformMeta(key) {
-  return PLATFORMS.find((p) => p.key === key) || { key, label: key, color: "#ffffff" };
+  return PLATFORMS.find((p) => p.key === key) || { key, label: key, color: "#ffffff", verb: "Abrir" };
 }
 export function platformLabel(key) { return platformMeta(key).label; }
 export function platformColor(key) { return platformMeta(key).color; }
 
-// Devuelve el orden efectivo: plataformas definidas primero (en su orden), luego el resto del default.
+// Orden efectivo de las 4 plataformas: respeta el orden del usuario (solo las 4 válidas).
 export function effectivePlatformOrder(order) {
-  const o = Array.isArray(order) ? order : [];
-  const rest = DEFAULT_PLATFORM_ORDER.filter((k) => !o.includes(k));
+  const four = DEFAULT_PLATFORM_ORDER;
+  const o = (Array.isArray(order) ? order : []).filter((k) => four.includes(k));
+  const rest = four.filter((k) => !o.includes(k));
   return [...o, ...rest];
+}
+
+// Plataformas con enlace configurado, en el orden efectivo.
+export function activePlatforms(streamingLinks, order) {
+  const links = streamingLinks || {};
+  return effectivePlatformOrder(order)
+    .map((k) => ({ key: k, meta: platformMeta(k), url: links[k] }))
+    .filter((p) => !!p.url);
 }
 
 // Detección de origen de tráfico a partir del referer.
@@ -83,15 +88,4 @@ export async function trackEvent(payload) {
   try {
     await base44.functions.invoke("trackReleaseEvent", payload);
   } catch (_) { /* silent */ }
-}
-
-// Slug único para una landing a partir del título del track.
-export async function ensureUniqueLandingSlug(baseTitle, excludeId) {
-  const base = slugify(baseTitle) || "release";
-  const batch = await base44.entities.ReleaseLanding.list("-updated_date", 500);
-  const existing = new Set((batch || []).filter((l) => l.id !== excludeId && l.slug).map((l) => l.slug));
-  if (!existing.has(base)) return base;
-  let i = 2;
-  while (existing.has(`${base}-${i}`)) i++;
-  return `${base}-${i}`;
 }

@@ -296,7 +296,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
         title: "", project_id: "", cover_url: "", audio_file_url: "",
         youtube_music_url: "", display_artist: "", composers: [], producers: [],
         genre: "", genre_secondary: "", status: "idea", notes: "", versions: {},
-        streaming_links: {}, platform_order: ["spotify","apple_music","youtube_music","youtube_video","amazon_music","deezer","soundcloud"]
+        streaming_links: {}, platform_order: ["spotify","apple_music","youtube_music","youtube_video"]
       });
       setAudioMode("file");
     }

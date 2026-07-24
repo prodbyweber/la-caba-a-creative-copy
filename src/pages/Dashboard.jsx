@@ -12,7 +12,6 @@ import ProjectsSection from "@/components/dashboard/ProjectsSection";
 import TracksSection from "@/components/dashboard/TracksSection";
 import FilmsSection from "@/components/dashboard/FilmsSection";
 import PhotosGallery from "@/components/dashboard/PhotosGallery";
-import LandingPagesSection from "@/components/dashboard/LandingPagesSection";
 import CatalogSectionOrder, { DEFAULT_SECTION_ORDER } from "@/components/dashboard/CatalogSectionOrder";
 import OnboardingForm from "@/components/onboarding/OnboardingForm";
 
@@ -171,13 +170,6 @@ export default function Dashboard() {
           <div key="photos">
             <SectionLabel label="Fotos" />
             <PhotosGallery userProfileId={jlyUserProfile?.id} />
-          </div>
-        );
-      case "landings":
-        return (
-          <div key="landings">
-            <SectionLabel label="Landing Pages" />
-            <LandingPagesSection jlyArtistId={jlyArtistId} />
           </div>
         );
       default:

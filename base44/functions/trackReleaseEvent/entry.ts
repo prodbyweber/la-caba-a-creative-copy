@@ -7,10 +7,9 @@ function parseDevice(ua) {
   return 'desktop';
 }
 function parseOS(ua) {
-  if (/windows nt 10/i.test(ua)) return 'Windows';
-  if (/windows nt/i.test(ua)) return 'Windows';
   if (/iphone|ipad|ipod/i.test(ua)) return 'iOS';
   if (/android/i.test(ua)) return 'Android';
+  if (/windows nt/i.test(ua)) return 'Windows';
   if (/mac os x/i.test(ua)) return 'macOS';
   if (/linux/i.test(ua)) return 'Linux';
   return 'Unknown';
@@ -33,7 +32,7 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
     const {
-      landing_id,
+      track_id,
       event_type = 'view',
       platform = null,
       visitor_id = null,
@@ -45,7 +44,7 @@ Deno.serve(async (req) => {
       referer_source = null,
     } = body;
 
-    if (!landing_id) return Response.json({ error: 'landing_id required' }, { status: 400 });
+    if (!track_id) return Response.json({ error: 'track_id required' }, { status: 400 });
 
     const ua = req.headers.get('user-agent') || '';
     const ip = getIP(req);
@@ -67,25 +66,23 @@ Deno.serve(async (req) => {
       } catch (_) { /* geo no bloquea el tracking */ }
     }
 
-    // Usuario registrado (opcional — la landing es pública)
+    // Usuario registrado (opcional — la página es pública)
     let is_registered = false, user_id = null;
     try {
       const u = await base44.auth.me();
       if (u && u.id) { is_registered = true; user_id = u.id; }
     } catch (_) { /* anónimo */ }
 
-    // Resolver dueño de la landing para anclar el RLS de analíticas
-    let owner_id = null, track_id = null;
+    // Resolver dueño del soundtrack para anclar el RLS de analíticas
+    let owner_id = null;
     try {
-      const landing = await base44.asServiceRole.entities.ReleaseLanding.get(landing_id);
-      if (landing) {
-        owner_id = landing.created_by_id || null;
-        track_id = landing.track_id || null;
+      const track = await base44.asServiceRole.entities.Track.get(track_id);
+      if (track) {
+        owner_id = track.created_by_id || null;
       }
-    } catch (_) { /* landing no encontrada — aún registramos el evento */ }
+    } catch (_) { /* track no encontrado — aún registramos el evento */ }
 
     await base44.asServiceRole.entities.ReleaseEvent.create({
-      landing_id,
       track_id,
       owner_id,
       event_type,
