@@ -9,7 +9,7 @@ import {
   activePlatforms, detectRefererSource, parseUTM, getOrCreateVisitorId,
   createReleaseSession, trackReleaseClick,
 } from "@/lib/releaseUtils";
-import { Play, Pause, Lock, Share2, ExternalLink, Music2, BarChart3 } from "lucide-react";
+import { Play, Pause, Lock, Share2, ExternalLink, Music2 } from "lucide-react";
 import WaveformBars from "@/components/audio/WaveformBars";
 
 const PREVIEW_SECONDS = 15;
@@ -154,7 +154,6 @@ export default function TrackShare() {
 
   // Detecta automáticamente el estado del soundtrack.
   const hasRelease = platforms.length > 0; // existen enlaces de streaming oficiales
-  const isFullPlayerMode = hasAccess && !!track?.audio_file_url && !hasRelease;
 
   useTrackMeta(track);
 
@@ -173,7 +172,7 @@ export default function TrackShare() {
   }, [track?.id]);
 
   // Duración efectiva para seek/progress: completa en modo catálogo, capada a 15s en modo release.
-  const seekMax = isFullPlayerMode ? duration : (duration > 0 ? Math.min(duration, PREVIEW_SECONDS) : PREVIEW_SECONDS);
+  const seekMax = hasRelease ? (duration > 0 ? Math.min(duration, PREVIEW_SECONDS) : PREVIEW_SECONDS) : duration;
 
   const handleTogglePlay = useCallback(() => {
     const el = audioRef.current;
@@ -276,7 +275,7 @@ export default function TrackShare() {
       {/* Minimal top bar */}
       <div className="relative z-20 flex items-center justify-between px-5 py-4">
         <Link to="/" className="flex items-center gap-2">
-          <img src={CABANA_LOGO} alt="Cabaña Creative" className="h-5 w-auto opacity-80" />
+          <img src={CABANA_LOGO} alt="Cabaña Creative" className="h-9 sm:h-10 w-auto opacity-90" />
         </Link>
         {user ? (
           <Link to={profileUsername ? `/${profileUsername}` : "/Explorar"} className="text-[11px] font-bold uppercase tracking-widest text-white/40 hover:text-white transition-colors">
@@ -413,110 +412,79 @@ export default function TrackShare() {
               ))}
             </motion.div>
 
-            {/* Slim preview player */}
-            {hasAccess && track.audio_file_url && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.45 }}
-                className="mt-4 w-full flex items-center gap-2.5 px-3 py-2 rounded-full"
-                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
-              >
-                <button
-                  onClick={handleTogglePlay}
-                  className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
-                  style={{ background: "rgba(255,88,51,0.16)" }}
-                >
-                  {isPlaying ? <Pause className="w-3 h-3 text-[#ff5833]" fill="#ff5833" /> : <Play className="w-3 h-3 text-[#ff5833] ml-0.5" fill="#ff5833" />}
-                </button>
-                <div
-                  ref={progressRef}
-                  className="flex-1 h-6 flex items-center cursor-pointer"
-                  onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
-                  onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
-                >
-                  <WaveformBars progress={seekMax ? currentTime / seekMax : 0} isPlaying={isPlaying} bars={28} color="#ff5833" />
-                </div>
-                <span className="flex-shrink-0 text-[9px] font-medium text-white/35 tabular-nums">
-                  {formatTime(currentTime)}
-                </span>
-              </motion.div>
-            )}
           </>
         )}
 
-        {/* MODO CATÁLOGO (sin release): reproductor completo y protagonista */}
-        {isFullPlayerMode && (
+        {/* Reproductor cinematográfico compacto — release (preview 15s) y catálogo (completo) */}
+        {hasAccess && track.audio_file_url && (
           <motion.div
             initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}
-            className="mt-7 w-full"
+            className="mt-6 w-full"
           >
-            <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 mb-4">Escucha completa · Cabaña Creative</p>
-            <div className="rounded-3xl p-5 sm:p-6" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}>
-              {/* Play / Pause grande */}
-              <div className="flex items-center justify-center mb-5">
-                <motion.button
-                  whileTap={{ scale: 0.92 }}
+            <div
+              className="rounded-2xl p-3 flex items-center gap-3"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)", boxShadow: "0 24px 60px rgba(0,0,0,0.45)" }}
+            >
+              {/* Portada con reproducción superpuesta */}
+              <div className="relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden" style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.5)" }}>
+                {coverSrc ? (
+                  <img src={coverSrc} alt={track.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(255,88,51,0.18) 0%, #1a1a0e 50%, #0a0a0b 100%)" }}>
+                    <Music2 className="w-5 h-5 text-white/20" />
+                  </div>
+                )}
+                <button
                   onClick={handleTogglePlay}
-                  className="flex items-center justify-center transition-transform hover:scale-105"
-                  style={{ width: 64, height: 64, borderRadius: "50%", background: "#ff5833", boxShadow: "0 12px 32px rgba(255,88,51,0.35)" }}
+                  className="absolute inset-0 flex items-center justify-center transition-colors"
+                  style={{ background: "rgba(0,0,0,0.32)" }}
                 >
                   {isPlaying
-                    ? <Pause className="w-7 h-7 text-[#0a0a0b]" fill="#0a0a0b" />
-                    : <Play className="w-7 h-7 text-[#0a0a0b] ml-1" fill="#0a0a0b" />}
-                </motion.button>
+                    ? <Pause className="w-5 h-5 text-white" fill="white" />
+                    : <Play className="w-5 h-5 text-white ml-0.5" fill="white" />}
+                </button>
               </div>
 
-              {/* Barra de progreso visual */}
-              <div
-                ref={progressRef}
-                className="h-9 flex items-center cursor-pointer"
-                onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
-                onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
-              >
-                <WaveformBars progress={seekMax ? currentTime / seekMax : 0} isPlaying={isPlaying} bars={40} color="#ff5833" />
-              </div>
-
-              {/* Tiempos */}
-              <div className="flex justify-between mt-1.5 text-[11px] font-medium text-white/45 tabular-nums">
-                <span>{formatTime(currentTime)}</span>
-                <span>{formatTime(seekMax)}</span>
+              {/* Onda + tiempos */}
+              <div className="flex-1 min-w-0">
+                <div
+                  ref={progressRef}
+                  className="h-9 flex items-center cursor-pointer"
+                  onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
+                  onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
+                >
+                  <WaveformBars progress={seekMax ? currentTime / seekMax : 0} isPlaying={isPlaying} bars={36} color="#ff5833" />
+                </div>
+                <div className="flex justify-between mt-1 text-[10px] font-medium text-white/40 tabular-nums">
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(seekMax)}</span>
+                </div>
               </div>
             </div>
           </motion.div>
         )}
 
-        {/* Share */}
-        <motion.div
+        {/* Share — icono minimalista */}
+        <motion.button
+          onClick={handleShare}
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.6 }}
-          className="mt-6 relative"
+          whileTap={{ scale: 0.9 }}
+          title="Compartir"
+          className="mt-6 relative w-9 h-9 rounded-full flex items-center justify-center text-white/55 hover:text-white hover:bg-white/10 transition-colors"
         >
-          <button
-            onClick={handleShare}
-            className="flex items-center gap-2 px-5 h-11 rounded-full text-xs font-bold text-white transition-colors"
-            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
-          >
-            <Share2 className="w-3.5 h-3.5" /> Compartir
-          </button>
+          <Share2 className="w-4 h-4" />
           <AnimatePresence>
             {shareFeedback && (
               <motion.span
                 initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                className="absolute -top-9 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-[10px] font-bold text-white whitespace-nowrap"
+                className="absolute -top-8 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-md text-[10px] font-bold text-white whitespace-nowrap"
                 style={{ background: "rgba(0,0,0,0.85)", border: "1px solid rgba(255,255,255,0.15)" }}
               >
                 {shareFeedback}
               </motion.span>
             )}
           </AnimatePresence>
-        </motion.div>
-
-        {isOwnerOrAdmin && (
-          <Link
-            to={(track.slug ? `/t/${track.slug}` : `/track/${track.id}`) + "/analytics"}
-            className="mt-4 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/30 hover:text-[#ff5833] transition-colors"
-          >
-            <BarChart3 className="w-3 h-3" /> Analítica en vivo
-          </Link>
-        )}
+        </motion.button>
 
         {/* Footer — Cabaña Creative branding */}
         <motion.div
