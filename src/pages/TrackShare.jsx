@@ -301,7 +301,7 @@ export default function TrackShare() {
           {coverSrc ? (
             <img src={coverSrc} alt={track.title} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(250,204,21,0.10) 0%, #1a1a0e 50%, #0a0a0b 100%)" }}>
+            <div className="w-full h-full flex items-center justify-center" style={{ background: "linear-gradient(135deg, rgba(255,88,51,0.10) 0%, #1a1a0e 50%, #0a0a0b 100%)" }}>
               <Music2 className="w-14 h-14 text-white/10" />
             </div>
           )}
@@ -320,12 +320,12 @@ export default function TrackShare() {
           {artistAvatar ? (
             <img src={artistAvatar} alt={artistName} className="w-6 h-6 rounded-full object-cover" style={{ border: "1px solid rgba(255,255,255,0.18)" }} />
           ) : artistName ? (
-            <span className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-[#0a0a0b]" style={{ background: "#facc15" }}>
+            <span className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-[#0a0a0b]" style={{ background: "#ff5833" }}>
               {artistName.charAt(0).toUpperCase()}
             </span>
           ) : null}
           {artistName && (
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: "#facc15" }}>
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: "#ff5833" }}>
               {artistName}
             </span>
           )}
@@ -347,12 +347,12 @@ export default function TrackShare() {
             className="mt-5 w-full rounded-2xl px-5 py-5 flex flex-col items-center text-center gap-3"
             style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" }}
           >
-            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "rgba(250,204,21,0.15)" }}>
-              <Lock className="w-4 h-4 text-[#facc15]" />
+            <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "rgba(255,88,51,0.15)" }}>
+              <Lock className="w-4 h-4 text-[#ff5833]" />
             </div>
             <p className="text-xs text-white/60 max-w-xs">Este track es privado. Inicia sesión si tienes permisos.</p>
             <div className="flex items-center gap-2">
-              <Link to="/login" className="px-4 py-2 rounded-full text-xs font-bold transition-colors" style={{ background: "linear-gradient(135deg, #facc15, #eab308)", color: "#0a0a0b" }}>
+              <Link to="/login" className="px-4 py-2 rounded-full text-xs font-bold transition-colors" style={{ background: "linear-gradient(135deg, #ff5833, #eab308)", color: "#0a0a0b" }}>
                 Iniciar sesión
               </Link>
               <Link to="/register" className="px-4 py-2 rounded-full text-xs font-semibold text-white/70 hover:text-white bg-white/5 border border-white/10 transition-colors">
@@ -423,9 +423,9 @@ export default function TrackShare() {
                 <button
                   onClick={handleTogglePlay}
                   className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
-                  style={{ background: "rgba(250,204,21,0.16)" }}
+                  style={{ background: "rgba(255,88,51,0.16)" }}
                 >
-                  {isPlaying ? <Pause className="w-3 h-3 text-[#facc15]" fill="#facc15" /> : <Play className="w-3 h-3 text-[#facc15] ml-0.5" fill="#facc15" />}
+                  {isPlaying ? <Pause className="w-3 h-3 text-[#ff5833]" fill="#ff5833" /> : <Play className="w-3 h-3 text-[#ff5833] ml-0.5" fill="#ff5833" />}
                 </button>
                 <div
                   ref={progressRef}
@@ -433,7 +433,7 @@ export default function TrackShare() {
                   onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
                   onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
                 >
-                  <WaveformBars progress={seekMax ? currentTime / seekMax : 0} isPlaying={isPlaying} bars={28} color="#facc15" />
+                  <WaveformBars progress={seekMax ? currentTime / seekMax : 0} isPlaying={isPlaying} bars={28} color="#ff5833" />
                 </div>
                 <span className="flex-shrink-0 text-[9px] font-medium text-white/35 tabular-nums">
                   {formatTime(currentTime)}
@@ -457,7 +457,7 @@ export default function TrackShare() {
                   whileTap={{ scale: 0.92 }}
                   onClick={handleTogglePlay}
                   className="flex items-center justify-center transition-transform hover:scale-105"
-                  style={{ width: 64, height: 64, borderRadius: "50%", background: "#facc15", boxShadow: "0 12px 32px rgba(250,204,21,0.35)" }}
+                  style={{ width: 64, height: 64, borderRadius: "50%", background: "#ff5833", boxShadow: "0 12px 32px rgba(255,88,51,0.35)" }}
                 >
                   {isPlaying
                     ? <Pause className="w-7 h-7 text-[#0a0a0b]" fill="#0a0a0b" />
@@ -472,7 +472,7 @@ export default function TrackShare() {
                 onMouseDown={(e) => { setDragging(true); updateSeekFromClientX(e.clientX); }}
                 onTouchStart={(e) => { setDragging(true); updateSeekFromClientX(e.touches[0].clientX); }}
               >
-                <WaveformBars progress={seekMax ? currentTime / seekMax : 0} isPlaying={isPlaying} bars={40} color="#facc15" />
+                <WaveformBars progress={seekMax ? currentTime / seekMax : 0} isPlaying={isPlaying} bars={40} color="#ff5833" />
               </div>
 
               {/* Tiempos */}
@@ -512,7 +512,7 @@ export default function TrackShare() {
         {isOwnerOrAdmin && (
           <Link
             to={(track.slug ? `/t/${track.slug}` : `/track/${track.id}`) + "/analytics"}
-            className="mt-4 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/30 hover:text-[#facc15] transition-colors"
+            className="mt-4 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-white/30 hover:text-[#ff5833] transition-colors"
           >
             <BarChart3 className="w-3 h-3" /> Analítica en vivo
           </Link>
