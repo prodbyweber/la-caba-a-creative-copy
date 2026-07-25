@@ -10,6 +10,7 @@ import { shareTrackLink } from "@/lib/trackShare";
 import { ensureUniqueSlug } from "@/lib/trackSlug";
 import ArtistPicker from "@/components/tracks/ArtistPicker";
 import StreamingPlatformsBlock from "@/components/tracks/StreamingPlatformsBlock";
+import { sendTrackNotifyEmail } from "@/lib/trackNotify";
 
 const statusConfig = {
   idea:       { label: "Idea",          color: "#6b7280" },
@@ -78,6 +79,18 @@ function TrackEditModal({ track, onClose, onSaved }) {
   });
   const myArtistName = myProfile?.artist_name || myProfile?.display_name || myProfile?.full_name || "";
 
+  // Solo el administrador puede enviar notificación al artista.
+  const { data: currentUser } = useQuery({
+    queryKey: ["current-user"],
+    queryFn: () => base44.auth.me(),
+    staleTime: 120000,
+  });
+  const isAdmin = currentUser?.role === "admin";
+  const isAdminRef = useRef(false);
+  isAdminRef.current = isAdmin;
+  const notifyReplaceRef = useRef(false);
+  notifyReplaceRef.current = notifyReplace;
+
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -100,8 +113,12 @@ function TrackEditModal({ track, onClose, onSaved }) {
     },
     onSuccess: async (updated) => {
       queryClient.invalidateQueries({ queryKey: ['tracks'] });
-      // El envío de correos lo dispara un EVENTO DE ENTIDAD en el backend
-      // (automación sobre Track) según el flag notify_mp3_update.
+      // Envío inmediato y único de la notificación al artista propietario.
+      // Frontend = única fuente (el flag se persiste en false → el evento de entidad no reenvía).
+      if (isAdminRef.current && notifyReplaceRef.current) {
+        const res = await sendTrackNotifyEmail(updated, "update");
+        alert(res.ok ? `Notificación enviada a ${res.sent_to}` : "No se pudo enviar la notificación al artista");
+      }
       onSaved({ ...formData, ...updated });
     },
   });
@@ -172,7 +189,7 @@ function TrackEditModal({ track, onClose, onSaved }) {
           </button>
         </div>
 
-        <form onSubmit={(e) => { e.preventDefault(); if (!formData.title?.trim()) { alert('El título es requerido'); return; } saveMutation.mutate({ ...formData, notify_mp3_update: notifyReplace }); }} className="p-5 space-y-5">
+        <form onSubmit={(e) => { e.preventDefault(); if (!formData.title?.trim()) { alert('El título es requerido'); return; } saveMutation.mutate({ ...formData, notify_mp3_update: false }); }} className="p-5 space-y-5">
 
           {/* Cover */}
           <div>
@@ -232,14 +249,14 @@ function TrackEditModal({ track, onClose, onSaved }) {
                     {formData.audio_file_url && <p className="text-xs text-emerald-400 mt-1">✓ MP3 cargado</p>}
                   </div>
                 </div>
-                {formData.audio_file_url && formData.audio_file_url !== (track?.audio_file_url || "") && (
+                {isAdmin && formData.audio_file_url && (
                   <label className="flex items-center gap-2 mt-3 cursor-pointer">
                     <div className="relative">
                       <input type="checkbox" checked={notifyReplace} onChange={(e) => setNotifyReplace(e.target.checked)} className="sr-only peer" />
                       <div className="w-9 h-5 bg-white/10 rounded-full peer-checked:bg-emerald-500 transition-colors" />
                       <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
                     </div>
-                    <span className="text-[11px] text-white/50">Notificar al artista por correo</span>
+                    <span className="text-[11px] text-white/50">Enviar notificación al artista por correo</span>
                   </label>
                 )}
               </div>

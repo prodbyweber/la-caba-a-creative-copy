@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import ReactDOM from "react-dom";
 import MobileTrackPoster, { MobileAudioProvider, MobileTrackDetail } from "./MobileTrackPoster";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,6 +10,7 @@ import NetflixTrackCard from "./NetflixTrackCard";
 import { createSoundtrack, updateSoundtrack, uploadFile } from "@/lib/mediaCreation";
 import ArtistPicker from "@/components/tracks/ArtistPicker";
 import StreamingPlatformsBlock from "@/components/tracks/StreamingPlatformsBlock";
+import { sendTrackNotifyEmail } from "@/lib/trackNotify";
 
 // Same architecture as Explorar: modal state in parent, rendered OUTSIDE the scroll container.
 // This guarantees reliable mounting on ALL mobile browsers (iOS Safari, Android Chrome, etc.)
@@ -277,6 +278,17 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
     staleTime: 60000,
   });
   const myArtistName = myProfile?.artist_name || myProfile?.display_name || myProfile?.full_name || "";
+  // Solo el administrador puede enviar notificación al artista.
+  const { data: currentUser } = useQuery({
+    queryKey: ["current-user"],
+    queryFn: () => base44.auth.me(),
+    staleTime: 120000,
+  });
+  const isAdmin = currentUser?.role === "admin";
+  const isAdminRef = useRef(false);
+  isAdminRef.current = isAdmin;
+  const notifyReplaceRef = useRef(false);
+  notifyReplaceRef.current = notifyReplace;
   const [showGenrePanel, setShowGenrePanel] = useState(false);
   const [genreTarget, setGenreTarget] = useState("primary");
   const [uploadingCover, setUploadingCover] = useState(false);
@@ -314,9 +326,13 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
       queryClient.invalidateQueries({ queryKey: ['tracks'] });
       queryClient.invalidateQueries({ queryKey: ['artist-films'] });
       queryClient.invalidateQueries({ queryKey: ['artist-shorts'] });
-      // El envío de correos lo dispara ahora un EVENTO DE ENTIDAD en el backend
-      // (automación sobre Track) al confirmarse create/update. No depende de la UI.
-      // La casilla "Notificar al artista por correo" se persiste como flag notify_mp3_update.
+      // Envío inmediato y único de la notificación al artista propietario.
+      // Frontend = única fuente (el flag se persiste en false → el evento de entidad no reenvía).
+      if (isAdminRef.current && notifyReplaceRef.current) {
+        const action = track ? "update" : "create";
+        const res = await sendTrackNotifyEmail(saved, action);
+        alert(res.ok ? `Notificación enviada a ${res.sent_to}` : "No se pudo enviar la notificación al artista");
+      }
       onClose();
     },
     onError: (error) => {
@@ -394,7 +410,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
           </div>
 
           {/* Scrollable body */}
-          <form onSubmit={(e) => { e.preventDefault(); if (!formData.title.trim()) { alert('El título es requerido'); return; } saveMutation.mutate({ ...formData, notify_mp3_update: notifyReplace }); }}
+          <form onSubmit={(e) => { e.preventDefault(); if (!formData.title.trim()) { alert('El título es requerido'); return; } saveMutation.mutate({ ...formData, notify_mp3_update: false }); }}
             className="overflow-y-auto flex-1 px-5 py-5 space-y-5">
 
             {/* Cover + Título — row */}
@@ -477,14 +493,14 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
                   </div>
                   <input type="file" accept=".mp3,audio/mpeg" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
                 </label>
-                {formData.audio_file_url && (!track || formData.audio_file_url !== (track.audio_file_url || "")) && (
+                {isAdmin && formData.audio_file_url && (
                   <label className="flex items-center gap-2 mt-2 cursor-pointer">
                     <div className="relative">
                       <input type="checkbox" checked={notifyReplace} onChange={(e) => setNotifyReplace(e.target.checked)} className="sr-only peer" />
                       <div className="w-9 h-5 bg-white/10 rounded-full peer-checked:bg-emerald-500 transition-colors" />
                       <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
                     </div>
-                    <span className="text-[11px] text-white/50">Notificar al artista por correo</span>
+                    <span className="text-[11px] text-white/50">Enviar notificación al artista por correo</span>
                   </label>
                 )}
                 </>

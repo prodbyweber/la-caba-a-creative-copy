@@ -15,14 +15,14 @@ import WaveformBars from "@/components/audio/WaveformBars";
 const PREVIEW_SECONDS = 15;
 const CABANA_LOGO = "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
 
-function useTrackMeta(track) {
+function useTrackMeta(track, artistName) {
   useEffect(() => {
     if (!track) return;
     const prevTitle = document.title;
     document.title = `${track.title} · Cabaña Creative`;
 
-    const artistLabel = track.display_artist || "";
-    const desc = `${track.title}${artistLabel ? " — " + artistLabel : ""} · Escucha en Cabaña Creative.`;
+    const artistLabel = artistName || track.display_artist || "";
+    const desc = artistLabel ? `${artistLabel} • Cabaña Creative` : "Cabaña Creative";
     const url = getTrackShareUrl(track);
     const image = track.cover_url || "";
 
@@ -33,6 +33,7 @@ function useTrackMeta(track) {
       ["property", "og:type", "music.song"],
       ["property", "og:url", url],
       ["property", "og:image", image],
+      ["property", "og:site_name", "Cabaña Creative"],
       ["name", "twitter:card", "summary_large_image"],
       ["name", "twitter:title", track.title],
       ["name", "twitter:description", desc],
@@ -52,11 +53,35 @@ function useTrackMeta(track) {
       el.setAttribute("content", content);
     });
 
+    // og:image:width / og:image:height — lee dimensiones reales de la portada.
+    let cancelled = false;
+    const dimEls = [];
+    if (image) {
+      const setDim = (w, h) => {
+        [["og:image:width", w], ["og:image:height", h]].forEach(([k, v]) => {
+          if (!v) return;
+          let el = document.querySelector(`meta[property="${k}"]`);
+          if (!el) {
+            el = document.createElement("meta");
+            el.setAttribute("property", k);
+            document.head.appendChild(el);
+            dimEls.push(el);
+          }
+          el.setAttribute("content", String(v));
+        });
+      };
+      const img = new Image();
+      img.onload = () => { if (!cancelled) setDim(img.naturalWidth, img.naturalHeight); };
+      img.src = image;
+    }
+
     return () => {
+      cancelled = true;
       document.title = prevTitle;
       created.forEach((el) => el.remove());
+      dimEls.forEach((el) => el.remove());
     };
-  }, [track]);
+  }, [track, artistName]);
 }
 
 function formatDate(dateStr) {
@@ -155,7 +180,7 @@ export default function TrackShare() {
   // Detecta automáticamente el estado del soundtrack.
   const hasRelease = platforms.length > 0; // existen enlaces de streaming oficiales
 
-  useTrackMeta(track);
+  useTrackMeta(track, artistName);
 
   // Creación de la sesión de Analytics — una sola vez al cargar la página.
   // Toda la info del visitante (fuente, geo, dispositivo...) se fija aquí y no se recalcula.
