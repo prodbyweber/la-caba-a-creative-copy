@@ -776,7 +776,8 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
 
                 {/* ── TAB: SESIONES ── */}
                 {tab === "sessions" && artist?.id && (
-                  <div className="px-5 py-5">
+                  <div className="px-5 py-5 space-y-5">
+                    <StudioHoursBlock artist={artist} isAdmin={false} />
                     <UpcomingSessionsCard artistId={artist.id} />
                   </div>
                 )}

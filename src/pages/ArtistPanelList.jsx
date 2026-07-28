@@ -7,6 +7,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import CreatorEditModal from "@/components/admin/CreatorEditModal";
 import CreatorRowMenu from "@/components/admin/CreatorRowMenu";
 import CreatorDeleteConfirm from "@/components/admin/CreatorDeleteConfirm";
+import StudioHoursModal from "@/components/admin/StudioHoursModal";
 import { User, Search, ChevronRight } from "lucide-react";
 
 export default function ArtistPanelList() {
@@ -16,6 +17,7 @@ export default function ArtistPanelList() {
   const [search, setSearch] = useState("");
   const [editingCreator, setEditingCreator] = useState(null);
   const [deletingCreator, setDeletingCreator] = useState(null);
+  const [hoursCreator, setHoursCreator] = useState(null);
 
   React.useEffect(() => {
     base44.auth.me().then(u => {
@@ -223,6 +225,7 @@ export default function ArtistPanelList() {
                       <CreatorRowMenu
                         onEdit={() => setEditingCreator(c)}
                         onDelete={() => setDeletingCreator(c)}
+                        onHours={c.artist?.id ? () => setHoursCreator(c) : undefined}
                       />
                     )}
                     <ChevronRight className="w-3.5 h-3.5 text-white/15 flex-shrink-0 group-hover:text-white/40 transition-colors" />
@@ -247,6 +250,14 @@ export default function ArtistPanelList() {
         <CreatorDeleteConfirm
           creator={deletingCreator}
           onClose={() => setDeletingCreator(null)}
+        />
+      )}
+
+      {/* Panel de horas de estudio (agregar/quitar) */}
+      {hoursCreator?.artist && (
+        <StudioHoursModal
+          artist={hoursCreator.artist}
+          onClose={() => setHoursCreator(null)}
         />
       )}
     </AdminLayout>
