@@ -50,7 +50,6 @@ import TrackAnalytics from './pages/TrackAnalytics';
 import Analytics from './pages/Analytics';
 import { GlobalAudioProvider } from '@/context/GlobalAudioContext';
 import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
-import DesktopAudioPlayer from '@/components/audio/DesktopAudioPlayer';
 import BeatMiniPlayer from '@/components/audio/BeatMiniPlayer';
 import ExpandedPlayer from '@/components/audio/ExpandedPlayer';
 import OnboardingForm from '@/components/onboarding/OnboardingForm';
@@ -215,7 +214,6 @@ function App() {
             <NavigationTracker />
             <AuthenticatedApp />
             <GlobalAudioPlayer />
-            <DesktopAudioPlayer />
             <BeatMiniPlayer />
             <ExpandedPlayer />
           </Router>

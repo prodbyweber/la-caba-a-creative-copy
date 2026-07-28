@@ -417,7 +417,6 @@ export default function TrackShare() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.48 }}
               className="mt-7 w-full space-y-3"
             >
-              <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-white/30">Stream la señal</p>
               {platforms.map((p, i) => (
                 <motion.button
                   key={p.key}
