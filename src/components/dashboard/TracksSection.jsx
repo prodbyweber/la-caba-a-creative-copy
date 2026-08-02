@@ -285,6 +285,7 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
     staleTime: 120000,
   });
   const isAdmin = currentUser?.role === "admin";
+  const [notifyReplace, setNotifyReplace] = useState(false);
   const isAdminRef = useRef(false);
   isAdminRef.current = isAdmin;
   const notifyReplaceRef = useRef(false);
@@ -296,7 +297,6 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
   const [audioMode, setAudioMode] = useState("file");
   const [newComposer, setNewComposer] = useState("");
   const [newProducer, setNewProducer] = useState("");
-  const [notifyReplace, setNotifyReplace] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
