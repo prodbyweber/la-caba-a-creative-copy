@@ -8,6 +8,7 @@
  *  - returns the created entity
  */
 import { base44 } from "@/api/base44Client";
+import { ensureUniqueSlug } from "@/lib/trackSlug";
 
 // ─── Internal logger ──────────────────────────────────────────────────────────
 function log(tag, msg, data) {
@@ -64,6 +65,11 @@ export async function createSoundtrack(data, artistId) {
 
   if (artistId) payload.artist_id = artistId;
 
+  // Slug limpio y legible generado desde el título (URL /t/noches-sin-dormir).
+  if (!payload.slug && payload.title) {
+    payload.slug = await ensureUniqueSlug(payload.title);
+  }
+
   log("soundtrack", "Payload ready", payload);
 
   const created = await base44.entities.Track.create(payload);
@@ -87,6 +93,16 @@ export async function updateSoundtrack(trackId, data) {
   const validStatuses = ["idea", "production", "mixing", "mastering", "completed"];
   if (payload.status && !validStatuses.includes(payload.status)) {
     payload.status = "idea";
+  }
+
+  // Backfill: si el track no tiene slug, generar uno legible desde el título.
+  if (payload.title && !payload.slug) {
+    try {
+      const existing = await base44.entities.Track.get(trackId);
+      if (!existing?.slug) {
+        payload.slug = await ensureUniqueSlug(payload.title, trackId);
+      }
+    } catch { /* ignore */ }
   }
 
   const updated = await base44.entities.Track.update(trackId, payload);
