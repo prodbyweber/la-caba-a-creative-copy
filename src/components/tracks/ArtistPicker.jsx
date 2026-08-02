@@ -82,7 +82,7 @@ export default function ArtistPicker({ value, onChange, defaultName }) {
             type="text"
             value={value || ""}
             onChange={(e) => onChange(e.target.value)}
-            placeholder="Nombre artístico del artista"
+            placeholder="Nombre artístico"
             className={inp + " pr-9"}
           />
           {value && (

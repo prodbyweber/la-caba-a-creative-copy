@@ -221,7 +221,7 @@ export default function ArtistDashboard() {
         return (
           <div key="tracks">
             <SectionLabel label="Soundtracks" />
-            <TracksSection jlyArtistId={effectiveArtist?.id || artistId} userEmail={catalogOwnerEmail} />
+            <TracksSection jlyArtistId={effectiveArtist?.id || artistId} userEmail={catalogOwnerEmail} ownerArtistName={displayName} />
           </div>
         );
       case "video":

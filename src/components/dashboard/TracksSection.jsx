@@ -61,7 +61,7 @@ function MobileDetailWrapper({ track, tracks, onClose, onEdit, onDelete }) {
   );
 }
 
-export default function TracksSection({ jlyArtistId, userEmail }) {
+export default function TracksSection({ jlyArtistId, userEmail, ownerArtistName }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTrack, setEditingTrack] = useState(null);
   const [selectedTrack, setSelectedTrack] = useState(null); // lifted modal state, mirrors Explorar
@@ -243,6 +243,7 @@ export default function TracksSection({ jlyArtistId, userEmail }) {
           track={editingTrack}
           projects={projects}
           jlyArtistId={jlyArtistId}
+          defaultArtistName={ownerArtistName}
           onClose={() => {
             setShowCreateModal(false);
             setEditingTrack(null);
@@ -254,7 +255,7 @@ export default function TracksSection({ jlyArtistId, userEmail }) {
   );
 }
 
-function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
+function TrackModal({ isOpen, track, projects, jlyArtistId, defaultArtistName, onClose }) {
   useEffect(() => {
     if (!isOpen) return;
     const prev = document.body.style.overflow;
@@ -459,55 +460,36 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, onClose }) {
               <ArtistPicker
                 value={formData.display_artist || ""}
                 onChange={(name) => setFormData((f) => ({ ...f, display_artist: name }))}
-                defaultName={myArtistName}
+                defaultName={defaultArtistName}
               />
             </div>
 
             {/* Audio */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className={lbl} style={{ marginBottom: 0 }}>Audio</label>
-                <div className="flex items-center gap-0.5 rounded-lg p-0.5" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  {[{ id: "file", icon: <Upload className="w-3 h-3" />, text: "MP3" }, { id: "link", icon: <Link className="w-3 h-3" />, text: "YouTube" }].map(opt => (
-                    <button key={opt.id} type="button" onClick={() => setAudioMode(opt.id)}
-                      className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${audioMode === opt.id ? "bg-white/10 text-white" : "text-white/30 hover:text-white/60"}`}>
-                      {opt.icon} {opt.text}
-                    </button>
-                  ))}
+              <label className={lbl}>Audio</label>
+              <label className="cursor-pointer flex items-center gap-3 px-4 py-3 rounded-xl transition-colors"
+                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: formData.audio_file_url ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.06)" }}>
+                  {formData.audio_file_url ? <Check className="w-4 h-4 text-emerald-400" /> : <Music2 className="w-4 h-4 text-white/30" />}
                 </div>
-              </div>
-
-              {audioMode === "file" ? (
-                <>
-                <label className="cursor-pointer flex items-center gap-3 px-4 py-3 rounded-xl transition-colors"
-                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ background: formData.audio_file_url ? "rgba(52,211,153,0.12)" : "rgba(255,255,255,0.06)" }}>
-                    {formData.audio_file_url ? <Check className="w-4 h-4 text-emerald-400" /> : <Music2 className="w-4 h-4 text-white/30" />}
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-white/70">
+                    {uploadingAudio ? "Subiendo..." : formData.audio_file_url ? "MP3 cargado ✓" : "Subir MP3"}
+                  </p>
+                  <p className="text-[10px] text-white/25">Solo MP3 · Máx 14MB</p>
+                </div>
+                <input type="file" accept=".mp3,audio/mpeg" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
+              </label>
+              {isAdmin && formData.audio_file_url && (
+                <label className="flex items-center gap-2 mt-2 cursor-pointer">
+                  <div className="relative">
+                    <input type="checkbox" checked={notifyReplace} onChange={(e) => setNotifyReplace(e.target.checked)} className="sr-only peer" />
+                    <div className="w-9 h-5 bg-white/10 rounded-full peer-checked:bg-emerald-500 transition-colors" />
+                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-white/70">
-                      {uploadingAudio ? "Subiendo..." : formData.audio_file_url ? "MP3 cargado ✓" : "Subir MP3"}
-                    </p>
-                    <p className="text-[10px] text-white/25">Solo MP3 · Máx 14MB</p>
-                  </div>
-                  <input type="file" accept=".mp3,audio/mpeg" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
+                  <span className="text-[11px] text-white/50">Enviar notificación al artista por correo</span>
                 </label>
-                {isAdmin && formData.audio_file_url && (
-                  <label className="flex items-center gap-2 mt-2 cursor-pointer">
-                    <div className="relative">
-                      <input type="checkbox" checked={notifyReplace} onChange={(e) => setNotifyReplace(e.target.checked)} className="sr-only peer" />
-                      <div className="w-9 h-5 bg-white/10 rounded-full peer-checked:bg-emerald-500 transition-colors" />
-                      <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
-                    </div>
-                    <span className="text-[11px] text-white/50">Enviar notificación al artista por correo</span>
-                  </label>
-                )}
-                </>
-              ) : (
-                <input type="url" value={formData.youtube_music_url || ""}
-                  onChange={(e) => setFormData(f => ({ ...f, youtube_music_url: e.target.value }))}
-                  placeholder="https://music.youtube.com/watch?v=..." className={inp} />
               )}
             </div>
 
