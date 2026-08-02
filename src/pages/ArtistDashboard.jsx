@@ -12,7 +12,6 @@ import TracksSection from "@/components/dashboard/TracksSection";
 import BrandCampaignsSection from "@/components/dashboard/BrandCampaignsSection";
 import PhotosGallery from "@/components/dashboard/PhotosGallery";
 import CatalogSectionOrder, { DEFAULT_SECTION_ORDER } from "@/components/dashboard/CatalogSectionOrder";
-import SavedBeatsSection from "@/components/dashboard/SavedBeatsSection";
 import ArtistBeatsSection from "@/components/dashboard/ArtistBeatsSection";
 
 export default function ArtistDashboard() {
@@ -240,7 +239,7 @@ export default function ArtistDashboard() {
     "Mi catálogo";
 
   // Solo estas secciones son visibles en el catálogo del creador
-  const VISIBLE_CATALOG_KEYS = ["tracks", "projects", "savedbeats", "beats"];
+  const VISIBLE_CATALOG_KEYS = ["tracks", "projects", "beats"];
   const effectiveOrder = [
     ...sectionOrder.filter(k => VISIBLE_CATALOG_KEYS.includes(k)),
     ...VISIBLE_CATALOG_KEYS.filter(k => !sectionOrder.includes(k)),
@@ -270,13 +269,6 @@ export default function ArtistDashboard() {
         );
       case "photos":
         return null; // Movido al panel de cuenta
-      case "savedbeats":
-        return (
-          <div key="savedbeats">
-            <SectionLabel label="Ritmos Guardados" />
-            <SavedBeatsSection />
-          </div>
-        );
       case "beats":
         if (!showAudioSection) return null;
         return (
@@ -287,6 +279,9 @@ export default function ArtistDashboard() {
               isAdmin={isAdmin}
               artist={effectiveArtist}
               assignedById={currentUser?.id}
+              artistUserId={profileUserId}
+              userProfile={userProfile}
+              profileUserId={profileUserId}
             />
           </div>
         );

@@ -245,6 +245,13 @@
         "type": "string"
       },
       "description": "Orden personalizado de las secciones del cat\u00e1logo del artista (persistente entre dispositivos)"
+    },
+    "beats_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Orden personalizado de los beats dentro de la secci\u00f3n BEATS del cat\u00e1logo (claves: priv:<id>, rec:<beatId>, sav:<beatId>). Persistente entre dispositivos."
     }
   },
   "required": [
