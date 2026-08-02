@@ -348,7 +348,7 @@ export default function TrackShare() {
           initial={{ opacity: 0, scale: 0.92, y: 16 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="w-44 h-44 sm:w-48 sm:h-48 rounded-2xl overflow-hidden relative"
+          className="w-52 h-52 sm:w-56 sm:h-56 rounded-3xl overflow-hidden relative"
           style={{ background: "#161616", boxShadow: "0 35px 80px rgba(0,0,0,0.6)" }}
         >
           {coverSrc ? (
@@ -365,33 +365,55 @@ export default function TrackShare() {
           )}
         </motion.div>
 
-        {/* Artist minimalist logo + name */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
-          className="mt-5 flex items-center gap-2"
-        >
-          {artistAvatar ? (
-            <img src={artistAvatar} alt={artistName} className="w-6 h-6 rounded-full object-cover" style={{ border: "1px solid rgba(255,255,255,0.18)" }} />
-          ) : artistName ? (
-            <span className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-[#0a0a0b]" style={{ background: "#ff5833" }}>
-              {artistName.charAt(0).toUpperCase()}
-            </span>
-          ) : null}
-          {artistName && (
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: "#ff5833" }}>
-              {artistName}
-            </span>
-          )}
-        </motion.div>
-
-        {/* Title */}
+        {/* Title — primary */}
         <motion.h1
-          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.28 }}
-          className="mt-2 text-2xl sm:text-3xl font-black text-white text-center"
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-6 text-3xl sm:text-4xl font-black text-white text-center"
           style={{ letterSpacing: "-0.03em", lineHeight: 1.05 }}
         >
           {track.title}
         </motion.h1>
+
+        {/* Artist — secondary */}
+        {artistName && (
+          <motion.p
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.28 }}
+            className="mt-2 text-base sm:text-lg font-medium text-white/75 text-center"
+          >
+            {artistName}
+          </motion.p>
+        )}
+
+        {/* Metadata — clean vertical list, only fields that exist */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.36 }}
+          className="mt-8 w-full space-y-4 text-center"
+        >
+          {track.producers?.length > 0 && (
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/30">Produced by</p>
+              <p className="text-sm font-medium text-white/85 mt-1">{track.producers.join(", ")}</p>
+            </div>
+          )}
+          {track.composers?.length > 0 && (
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/30">Composer</p>
+              <p className="text-sm font-medium text-white/85 mt-1">{track.composers.join(", ")}</p>
+            </div>
+          )}
+          {track.genre && (
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/30">Genre</p>
+              <p className="text-sm font-medium text-white/85 mt-1">{track.genre}</p>
+            </div>
+          )}
+          {track.duration > 0 && (
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-white/30">Duration</p>
+              <p className="text-sm font-medium text-white/85 mt-1">{formatTime(track.duration)}</p>
+            </div>
+          )}
+        </motion.div>
 
         {/* Private state */}
         {!hasAccess && (
@@ -539,15 +561,12 @@ export default function TrackShare() {
           </AnimatePresence>
         </motion.button>
 
-        {/* Footer — Cabaña Creative branding */}
+        {/* Domain — subtle publisher footer */}
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.8 }}
-          className="mt-12 flex flex-col items-center gap-1.5"
+          className="mt-12"
         >
-          <Link to="/" className="flex items-center gap-2">
-            <img src={CABANA_LOGO} alt="Cabaña Creative" className="h-4 w-auto opacity-50" />
-          </Link>
-          <span className="text-[9px] font-bold uppercase tracking-[0.35em] text-white/20">Cabaña Creative</span>
+          <span className="text-[11px] font-medium tracking-wide text-white/25">cabanacreative.es</span>
         </motion.div>
       </div>
     </div>
