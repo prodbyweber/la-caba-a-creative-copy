@@ -21,6 +21,7 @@ export default function ArtistDashboard() {
   const [showOrderMenu, setShowOrderMenu] = useState(false);
   const [settingUpArtist, setSettingUpArtist] = useState(false);
   const [autoProvisionDone, setAutoProvisionDone] = useState(false);
+  const [autoProvisionExternalDone, setAutoProvisionExternalDone] = useState(false);
   const [provisioning, setProvisioning] = useState(false);
   const queryClient = useQueryClient();
 
@@ -109,6 +110,37 @@ export default function ArtistDashboard() {
     },
     enabled: !!profileUserId,
   });
+
+  // Auto-provisioning de Artist para vista externa (admin abriendo el catálogo de otro usuario).
+  // Garantiza que el artista tenga entidad Artist → los soundtracks se vinculen a su catálogo
+  // y las notificaciones se envíen al email del dueño (Track → Artist.user_id → User.email),
+  // nunca al admin creador. Restaura la visualización y creación para cuentas sin Artist.
+  useEffect(() => {
+    if (!currentUser || !hasExternalParam || !userIdParam) return;
+    if (currentUser.role !== 'admin') return;
+    if (artistByUserId !== null) return; // undefined = cargando, null = no existe aún
+    if (autoProvisionExternalDone) return;
+    if (!userProfile) return;
+    setAutoProvisionExternalDone(true);
+    setProvisioning(true);
+    (async () => {
+      try {
+        const name = userProfile?.artist_name || userProfile?.display_name || userProfile?.full_name || 'Artista';
+        await base44.entities.Artist.create({
+          stageName: name,
+          user_id: userIdParam,
+          email: userProfile?.user_email || '',
+          status: 'Active',
+          avatar_url: userProfile?.avatar_url || userProfile?.profile_photo_url || '',
+        });
+        queryClient.invalidateQueries({ queryKey: ['artist-by-user', userIdParam] });
+      } catch (e) {
+        console.error('[ArtistDashboard] External artist provision failed', e?.message);
+      } finally {
+        setProvisioning(false);
+      }
+    })();
+  }, [currentUser, hasExternalParam, userIdParam, artistByUserId, userProfile, autoProvisionExternalDone]);
 
   // Email del dueño del catálogo (después de resolver userProfile)
   const catalogOwnerEmail = userIdParam

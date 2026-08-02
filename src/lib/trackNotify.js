@@ -8,29 +8,21 @@ import { base44 } from "@/api/base44Client";
  *
  *  - Inmediato: un solo `await` tras el guardado.
  *  - Una sola vez: una sola llamada a SendEmail.
- *  - Destinatario: email registrado del propietario del soundtrack
- *      Track → Artist.user_id (o Track.created_by_id) → User.email
- *    Nunca al admin salvo que sea el propietario.
+ *  - Destinatario: email registrado del propietario del catálogo
+ *      Track → Artist.user_id → User.email
+ *    Nunca un correo fijo, nunca al admin creador.
  */
 
 async function resolveOwnerEmail(track) {
   try {
-    let userId = null;
-    if (track?.artist_id) {
-      try {
-        const artist = await base44.entities.Artist.get(track.artist_id);
-        userId = artist?.user_id || null;
-      } catch (e) {
-        console.warn("[trackNotify] Artist lookup failed", track.artist_id, e?.message);
-      }
-    }
-    if (!userId && track?.created_by_id) userId = track.created_by_id;
-    if (!userId) return { email: null, reason: "no-owner-id" };
-
-    const user = await base44.entities.User.get(userId);
+    // Cadena: Soundtrack → Artista propietario → Cuenta del artista → Email registrado.
+    // Nunca un correo fijo ni fallback al admin creador: si la cadena no resuelve,
+    // se omite el envío (cada artista recibe únicamente sus propias notificaciones).
+    if (!track?.artist_id) return { email: null, reason: "no-artist" };
+    const artist = await base44.entities.Artist.get(track.artist_id);
+    if (!artist?.user_id) return { email: null, reason: "artist-no-user" };
+    const user = await base44.entities.User.get(artist.user_id);
     if (!user?.email) return { email: null, reason: "no-email" };
-    // No notificar al admin (salvo que sea el propietario, que ya lo es aquí).
-    // Si el propietario resulta ser admin, igual enviamos: es el dueño del soundtrack.
     return { email: user.email };
   } catch (e) {
     console.error("[trackNotify] resolveOwnerEmail error", e?.message);
