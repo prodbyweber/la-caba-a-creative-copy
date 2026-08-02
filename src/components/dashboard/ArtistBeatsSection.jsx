@@ -10,11 +10,10 @@ import {
   Link2,
   Pencil,
   Trash2,
-  X,
+  Unlink,
   Sparkles,
   Lock,
   Bookmark,
-  GripVertical,
 } from "lucide-react";
 import { collectArtistGenres, rankBeatsByGenre } from "@/lib/artistBeats";
 import ArtistBeatFormModal from "./ArtistBeatFormModal";
@@ -260,25 +259,20 @@ export default function ArtistBeatsSection({
 
   const LABELS = {
     privado: { text: "Privado", Icon: Lock, color: "#ff5833" },
-    recomendado: { text: "Recomendado", Icon: Sparkles, color: "#a78bfa" },
+    recomendado: { text: "Recomendado", Icon: Sparkles, color: "#ff5833" },
     guardado: { text: "Guardado", Icon: Bookmark, color: "#7c4dff" },
   };
-
-  const cardStyle = { background: "#161616", border: "1px solid rgba(255,255,255,0.05)" };
 
   return (
     <div>
       {/* Header con acciones de admin */}
       <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <h3
-            className="text-sm font-bold text-white"
-            style={{ fontFamily: "'Helvetica Neue', sans-serif" }}
-          >
-            Beats
-          </h3>
-          <span className="text-[10px] text-white/30">{ordered.length}</span>
-        </div>
+        <h3
+          className="text-sm font-bold text-white"
+          style={{ fontFamily: "'Helvetica Neue', sans-serif" }}
+        >
+          Beats
+        </h3>
         {isAdmin && (
           <div className="flex items-center gap-2">
             <button
@@ -344,64 +338,120 @@ export default function ArtistBeatsSection({
                 onDragEnter={() => setDragOver(idx)}
                 onDragEnd={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
-                className="group relative rounded-xl overflow-hidden transition-all"
+                className="group relative rounded-xl overflow-hidden cursor-pointer transition-all duration-300"
                 style={{
-                  ...cardStyle,
-                  opacity: isDraggingThis ? 0.5 : 1,
+                  background: "#0d0d0e",
                   border: isDragTarget
-                    ? "1px solid rgba(255,88,51,0.4)"
-                    : "1px solid rgba(255,255,255,0.05)",
+                    ? "1px solid rgba(255,88,51,0.45)"
+                    : "1px solid rgba(255,255,255,0.06)",
+                  opacity: isDraggingThis ? 0.5 : 1,
+                  boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
                 }}
+                onClick={() => item.beat.preview_mp3_url && playItem(item)}
               >
-                <div
-                  className="relative aspect-square overflow-hidden cursor-pointer"
-                  style={{ background: "#1a1a1c" }}
-                  onClick={() => item.beat.preview_mp3_url && playItem(item)}
-                >
+                <div className="relative aspect-square overflow-hidden">
                   {item.beat.cover_url ? (
                     <img
                       src={item.beat.cover_url}
                       alt=""
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
+                    <div
+                      className="w-full h-full flex items-center justify-center"
+                      style={{ background: "linear-gradient(135deg, #1a1a1c 0%, #0d0d0e 100%)" }}
+                    >
                       <Music2 className="w-8 h-8 text-white/15" />
                     </div>
                   )}
 
-                  {/* Etiqueta discreta de origen */}
+                  {/* Gradiente cinematográfico */}
                   <div
-                    className="absolute top-2 left-2 flex items-center gap-1 px-1.5 py-0.5 rounded-full"
-                    style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
+                    className="absolute inset-0 pointer-events-none"
+                    style={{ background: "linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.88) 100%)" }}
+                  />
+
+                  {/* Etiqueta de origen (reducida) */}
+                  <div
+                    className="absolute top-2 left-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full"
+                    style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)" }}
                   >
-                    <Icon className="w-2.5 h-2.5" style={{ color }} />
+                    <Icon className="w-2 h-2" style={{ color }} />
                     <span
-                      className="text-[8px] font-bold uppercase tracking-wider"
+                      className="text-[7px] font-bold uppercase tracking-wider"
                       style={{ color }}
                     >
                       {text}
                     </span>
                   </div>
 
-                  {/* Drag handle (admin) */}
-                  {isAdmin && (
-                    <div className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                      style={{ background: "rgba(0,0,0,0.5)" }}
-                    >
-                      <GripVertical className="w-3 h-3 text-white/40" />
+                  {/* Acciones admin/artist (hover, sin X) */}
+                  {isAdmin && item.type === "privado" && (
+                    <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingBeat(item.privateBeat);
+                          setShowForm(true);
+                        }}
+                        className="w-6 h-6 rounded-full flex items-center justify-center"
+                        style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)" }}
+                      >
+                        <Pencil className="w-2.5 h-2.5 text-white/70" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm(`¿Eliminar el beat "${item.beat.title}"?`))
+                            deleteBeat.mutate(item.privateBeat.id);
+                        }}
+                        className="w-6 h-6 rounded-full flex items-center justify-center"
+                        style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)" }}
+                      >
+                        <Trash2 className="w-2.5 h-2.5 text-white/70 hover:text-red-400" />
+                      </button>
+                    </div>
+                  )}
+                  {isAdmin && item.type === "recomendado" && item.assignment && (
+                    <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm("¿Quitar este beat de las recomendaciones?"))
+                            unassign.mutate(item.assignment.id);
+                        }}
+                        className="w-6 h-6 rounded-full flex items-center justify-center"
+                        style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)" }}
+                      >
+                        <Unlink className="w-2.5 h-2.5 text-white/70 hover:text-red-400" />
+                      </button>
+                    </div>
+                  )}
+                  {!isAdmin && item.type === "guardado" && item.save && (
+                    <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm("¿Quitar este beat de tus guardados?"))
+                            unsave.mutate(item.save.id);
+                        }}
+                        className="w-6 h-6 rounded-full flex items-center justify-center"
+                        style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)" }}
+                      >
+                        <Bookmark className="w-2.5 h-2.5 text-white/80" fill="white" />
+                      </button>
                     </div>
                   )}
 
+                  {/* Play cinematográfico */}
                   {item.beat.preview_mp3_url && (
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center"
+                        className="w-11 h-11 rounded-full flex items-center justify-center"
                         style={{
-                          background:
-                            item.type === "privado"
-                              ? "linear-gradient(135deg, #ff5833, #e0451f)"
-                              : "linear-gradient(135deg, #7c4dff, #a78bfa)",
+                          background: "rgba(255,255,255,0.16)",
+                          backdropFilter: "blur(14px)",
+                          border: "1px solid rgba(255,255,255,0.28)",
                         }}
                       >
                         {active && isPlaying ? (
@@ -412,69 +462,26 @@ export default function ArtistBeatsSection({
                       </div>
                     </div>
                   )}
-                </div>
 
-                <div className="p-3">
-                  <h3 className="text-xs font-bold text-white truncate">
-                    {item.beat.title}
-                  </h3>
-                  <p className="text-[10px] text-white/40 truncate">
-                    {item.type === "privado"
-                      ? item.beat.bpm
-                        ? `${item.beat.bpm} BPM`
-                        : "—"
-                      : item.beat.producer || "—"}
-                  </p>
-
-                  {/* Acciones por tipo */}
-                  {isAdmin && item.type === "privado" && (
-                    <div className="flex items-center gap-1 mt-2">
-                      <button
-                        onClick={() => {
-                          setEditingBeat(item.privateBeat);
-                          setShowForm(true);
-                        }}
-                        className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
-                      >
-                        <Pencil className="w-3 h-3 text-white/40" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          if (confirm(`¿Eliminar el beat "${item.beat.title}"?`))
-                            deleteBeat.mutate(item.privateBeat.id);
-                        }}
-                        className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-red-500/10 transition-colors"
-                      >
-                        <Trash2 className="w-3 h-3 text-white/40 hover:text-red-400" />
-                      </button>
-                    </div>
-                  )}
-                  {isAdmin && item.type === "recomendado" && item.assignment && (
-                    <div className="flex items-center gap-1 mt-2">
-                      <button
-                        onClick={() => {
-                          if (confirm("¿Quitar este beat de las recomendaciones?"))
-                            unassign.mutate(item.assignment.id);
-                        }}
-                        className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-red-500/10 transition-colors"
-                      >
-                        <X className="w-3 h-3 text-white/40 hover:text-red-400" />
-                      </button>
-                    </div>
-                  )}
-                  {!isAdmin && item.type === "guardado" && item.save && (
-                    <div className="flex items-center gap-1 mt-2">
-                      <button
-                        onClick={() => {
-                          if (confirm("¿Quitar este beat de tus guardados?"))
-                            unsave.mutate(item.save.id);
-                        }}
-                        className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
-                      >
-                        <Bookmark className="w-3 h-3 text-[#a78bfa] fill-[#a78bfa]" />
-                      </button>
-                    </div>
-                  )}
+                  {/* Título + subtítulo superpuestos */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
+                    <h3
+                      className="text-xs font-bold text-white truncate"
+                      style={{ textShadow: "0 1px 6px rgba(0,0,0,0.9)" }}
+                    >
+                      {item.beat.title}
+                    </h3>
+                    <p
+                      className="text-[10px] text-white/65 truncate"
+                      style={{ textShadow: "0 1px 6px rgba(0,0,0,0.9)" }}
+                    >
+                      {item.type === "privado"
+                        ? item.beat.bpm
+                          ? `${item.beat.bpm} BPM`
+                          : "Exclusive"
+                        : item.beat.producer || "—"}
+                    </p>
+                  </div>
                 </div>
               </div>
             );
