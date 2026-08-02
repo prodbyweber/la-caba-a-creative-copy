@@ -14,6 +14,8 @@ import {
   Sparkles,
   Lock,
   Bookmark,
+  SkipBack,
+  SkipForward,
 } from "lucide-react";
 import { collectArtistGenres, rankBeatsByGenre } from "@/lib/artistBeats";
 import ArtistBeatFormModal from "./ArtistBeatFormModal";
@@ -36,7 +38,7 @@ export default function ArtistBeatsSection({
   profileUserId,
 }) {
   const qc = useQueryClient();
-  const { playingTrack, isPlaying, playQueue, pauseTrack, resumeTrack } =
+  const { playingTrack, isPlaying, playQueue, pauseTrack, resumeTrack, playNext, playPrevious } =
     useGlobalAudio();
   const [showForm, setShowForm] = useState(false);
   const [editingBeat, setEditingBeat] = useState(null);
@@ -58,13 +60,14 @@ export default function ArtistBeatsSection({
     enabled: !!artistId,
   });
 
-  const { data: publicBeats = [] } = useQuery({
-    queryKey: ["beats-public"],
-    queryFn: async () => {
-      const beats = await base44.entities.Beat.filter({ status: "Publicado" });
-      return beats.filter((b) => !b.archived);
-    },
+  const { data: allBeats = [] } = useQuery({
+    queryKey: ["beats-all"],
+    queryFn: async () => base44.entities.Beat.list("-updated_date", 200),
   });
+  const publicBeats = useMemo(
+    () => allBeats.filter((b) => b.status === "Publicado" && !b.archived),
+    [allBeats]
+  );
 
   const { data: savedSaves = [] } = useQuery({
     queryKey: ["artist-saved-beats", artistUserId],
@@ -97,6 +100,12 @@ export default function ArtistBeatsSection({
     publicBeats.forEach((b) => m.set(b.id, b));
     return m;
   }, [publicBeats]);
+
+  const allBeatMap = useMemo(() => {
+    const m = new Map();
+    allBeats.forEach((b) => m.set(b.id, b));
+    return m;
+  }, [allBeats]);
 
   // ── Construcción de la colección unificada ──
   const allItems = useMemo(() => {
@@ -139,7 +148,7 @@ export default function ArtistBeatsSection({
     const savedBeatIds = new Set();
     savedSaves.forEach((s) => {
       if (recommendedBeatIds.has(s.beat_id)) return;
-      const beat = beatMap.get(s.beat_id);
+      const beat = allBeatMap.get(s.beat_id);
       if (beat) {
         savedBeatIds.add(beat.id);
         items.push({
@@ -170,7 +179,7 @@ export default function ArtistBeatsSection({
       });
 
     return items;
-  }, [privateBeats, assignments, savedSaves, publicBeats, beatMap, artistGenres, artist]);
+  }, [privateBeats, assignments, savedSaves, publicBeats, beatMap, allBeatMap, artistGenres, artist]);
 
   // ── Aplicar orden persistido ──
   const persistedOrder = userProfile?.beats_order || [];
@@ -193,6 +202,8 @@ export default function ArtistBeatsSection({
     });
     return out;
   }, [allItems, effectiveOrder]);
+
+  const activeItem = ordered.find((it) => it.beat.beat_id === playingTrack?.beat_id) || null;
 
   // ── Mutaciones ──
   const deleteBeat = useMutation({
@@ -298,6 +309,55 @@ export default function ArtistBeatsSection({
           </div>
         )}
       </div>
+
+      {/* Barra de reproducción inline — previsualizar / avanzar / retroceder */}
+      {activeItem && (
+        <div
+          className="flex items-center gap-3 mb-4 px-3 py-2.5 rounded-xl"
+          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0" style={{ background: "#1a1a1c" }}>
+            {activeItem.beat.cover_url && (
+              <img src={activeItem.beat.cover_url} alt="" className="w-full h-full object-cover" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-white truncate">{activeItem.beat.title}</p>
+            <p className="text-[10px] text-white/40 truncate">
+              {activeItem.type === "privado"
+                ? activeItem.beat.bpm
+                  ? `${activeItem.beat.bpm} BPM`
+                  : "Exclusive"
+                : activeItem.beat.producer || "—"}
+            </p>
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={playPrevious}
+              className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+            >
+              <SkipBack className="w-4 h-4 text-white/70" fill="currentColor" />
+            </button>
+            <button
+              onClick={() => (isPlaying ? pauseTrack() : resumeTrack())}
+              className="w-9 h-9 rounded-full flex items-center justify-center"
+              style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
+            >
+              {isPlaying ? (
+                <Pause className="w-4 h-4 text-white" fill="white" />
+              ) : (
+                <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+              )}
+            </button>
+            <button
+              onClick={playNext}
+              className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
+            >
+              <SkipForward className="w-4 h-4 text-white/70" fill="currentColor" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Colección unificada */}
       {ordered.length === 0 ? (
