@@ -1,0 +1,61 @@
+{
+  "name": "ArtistBeat",
+  "type": "object",
+  "properties": {
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista propietario del beat privado"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo del beat"
+    },
+    "audio_url": {
+      "type": "string",
+      "description": "URL del archivo de audio MP3"
+    },
+    "cover_url": {
+      "type": "string",
+      "description": "URL de la portada"
+    },
+    "genre": {
+      "type": "string",
+      "description": "G\u00e9nero principal"
+    },
+    "genres": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "G\u00e9neros del beat (sistema centralizado)"
+    },
+    "bpm": {
+      "type": "number",
+      "description": "Beats por minuto"
+    },
+    "key": {
+      "type": "string",
+      "description": "Tonalidad"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n opcional"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Etiquetas"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n dentro del cat\u00e1logo del artista"
+    }
+  },
+  "required": [
+    "artist_id",
+    "title"
+  ]
+}

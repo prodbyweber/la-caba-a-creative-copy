@@ -1,0 +1,36 @@
+{
+  "name": "ArtistBeatAssignment",
+  "type": "object",
+  "properties": {
+    "artist_id": {
+      "type": "string",
+      "description": "ID del artista al que se le recomienda el beat"
+    },
+    "beat_id": {
+      "type": "string",
+      "description": "ID del beat p\u00fablico del cat\u00e1logo general asignado como recomendado"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "manual",
+        "auto"
+      ],
+      "default": "manual",
+      "description": "Origen de la asignaci\u00f3n: manual (admin) o auto (algoritmo)"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden del beat recomendado dentro del cat\u00e1logo del artista"
+    },
+    "assigned_by_id": {
+      "type": "string",
+      "description": "ID del administrador que asign\u00f3 el beat"
+    }
+  },
+  "required": [
+    "artist_id",
+    "beat_id"
+  ]
+}
