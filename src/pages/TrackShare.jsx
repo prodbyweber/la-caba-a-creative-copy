@@ -19,12 +19,19 @@ function useTrackMeta(track, artistName) {
   useEffect(() => {
     if (!track) return;
     const prevTitle = document.title;
-    document.title = `${track.title} · Cabaña Creative`;
 
     const artistLabel = artistName || track.display_artist || "";
     const desc = artistLabel ? `${artistLabel} • Cabaña Creative` : "Cabaña Creative";
     const url = getTrackShareUrl(track);
-    const image = track.cover_url || "";
+    const rawImage = track.cover_url || CABANA_LOGO;
+    // Cache-bust: invalida previews OG cuando cambia la portada (updated_date).
+    const cachev = track.updated_date || track.id || Date.now();
+    const image = rawImage + (rawImage.includes("?") ? "&" : "?") + "v=" + cachev;
+
+    // Título del navegador: Track Title — Artist | Cabaña Creative
+    document.title = artistLabel
+      ? `${track.title} — ${artistLabel} | Cabaña Creative`
+      : `${track.title} | Cabaña Creative`;
 
     const tags = [
       ["name", "description", desc],
@@ -53,10 +60,10 @@ function useTrackMeta(track, artistName) {
       el.setAttribute("content", content);
     });
 
-    // og:image:width / og:image:height — lee dimensiones reales de la portada.
+    // og:image:width / og:image:height — dimensiones reales de la portada.
     let cancelled = false;
     const dimEls = [];
-    if (image) {
+    if (rawImage) {
       const setDim = (w, h) => {
         [["og:image:width", w], ["og:image:height", h]].forEach(([k, v]) => {
           if (!v) return;
@@ -72,8 +79,30 @@ function useTrackMeta(track, artistName) {
       };
       const img = new Image();
       img.onload = () => { if (!cancelled) setDim(img.naturalWidth, img.naturalHeight); };
-      img.src = image;
+      img.src = rawImage;
     }
+
+    // schema.org MusicRecording — structured data para SEO.
+    const ld = {
+      "@context": "https://schema.org",
+      "@type": "MusicRecording",
+      name: track.title,
+      image: rawImage,
+      url,
+      publisher: { "@type": "Organization", name: "Cabaña Creative" },
+    };
+    if (artistLabel) ld.byArtist = { "@type": "MusicGroup", name: artistLabel };
+    if (track.duration) ld.duration = `PT${Math.round(track.duration)}S`;
+    if (track.genre) ld.genre = track.genre;
+
+    let ldEl = document.querySelector('script[type="application/ld+json"][data-cabana-track]');
+    if (ldEl) ldEl.remove();
+    ldEl = document.createElement("script");
+    ldEl.type = "application/ld+json";
+    ldEl.setAttribute("data-cabana-track", "true");
+    ldEl.textContent = JSON.stringify(ld);
+    document.head.appendChild(ldEl);
+    created.push(ldEl);
 
     return () => {
       cancelled = true;
