@@ -352,11 +352,19 @@ function TrackModal({ isOpen, track, projects, jlyArtistId, defaultArtistName, o
 
   const handleAudioUpload = async (e) => {
     const file = e.target.files?.[0]; if (!file) return;
-    if (file.size > 14 * 1024 * 1024) { alert('El archivo supera los 14MB'); return; }
+    if (file.size > 14 * 1024 * 1024) { alert('El archivo supera los 14MB'); e.target.value = ""; return; }
     setUploadingAudio(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    setFormData(f => ({ ...f, audio_file_url: file_url }));
-    setUploadingAudio(false);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      if (!file_url) throw new Error("No se recibió la URL del archivo");
+      setFormData(f => ({ ...f, audio_file_url: file_url }));
+    } catch (err) {
+      console.error('[TracksSection] Audio upload failed:', err);
+      alert('No se pudo subir el MP3: ' + (err?.message || 'Error desconocido'));
+    } finally {
+      setUploadingAudio(false);
+      e.target.value = "";
+    }
   };
 
   const addTag = (field, val, setter) => {
