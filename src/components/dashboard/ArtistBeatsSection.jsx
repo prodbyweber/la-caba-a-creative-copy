@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import {
-  Music2, Play, Pause, Plus, Pencil, Trash2, Unlink, Lock, Bookmark, Sparkles, Download,
+  Music2, Play, Pause, Plus, Pencil, Trash2, Unlink, Lock, Bookmark, Sparkles, Download, ChevronDown,
 } from "lucide-react";
 import { collectArtistGenres } from "@/lib/artistBeats";
 import ArtistBeatFormModal from "./ArtistBeatFormModal";
@@ -331,9 +331,19 @@ export default function ArtistBeatsSection({
                     </span>
                   </div>
 
+                  {/* Botón cinematográfico — abre el detalle (estilo soundtrack) */}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setDetailItem(item); }}
+                    className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                    style={{ background: "rgba(10,10,10,0.8)", border: "1px solid rgba(255,255,255,0.3)", backdropFilter: "blur(8px)" }}
+                    title="Ver detalle"
+                  >
+                    <ChevronDown className="w-3.5 h-3.5 text-white" />
+                  </button>
+
                   {/* Acciones admin/artist (hover) */}
                   {isAdmin && item.type === "privado" && (
-                    <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute top-2 right-10 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -358,7 +368,7 @@ export default function ArtistBeatsSection({
                     </div>
                   )}
                   {isAdmin && item.type === "recomendado" && item.assignment && (
-                    <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute top-2 right-10 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -373,7 +383,7 @@ export default function ArtistBeatsSection({
                     </div>
                   )}
                   {!isAdmin && !isReadOnly && item.type === "guardado" && item.save && (
-                    <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute top-2 right-10 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -390,12 +400,10 @@ export default function ArtistBeatsSection({
 
                   {/* Play cinematográfico */}
                   {hasAudio && (
-                    <div
-                      className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      onClick={(e) => { e.stopPropagation(); playItem(item); }}
-                    >
-                      <div
-                        className="w-11 h-11 rounded-full flex items-center justify-center"
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); playItem(item); }}
+                        className="w-11 h-11 rounded-full flex items-center justify-center pointer-events-auto"
                         style={{
                           background: "rgba(255,255,255,0.16)",
                           backdropFilter: "blur(14px)",
@@ -407,7 +415,7 @@ export default function ArtistBeatsSection({
                         ) : (
                           <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
                         )}
-                      </div>
+                      </button>
                     </div>
                   )}
 
