@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 
 // Lightweight animated waveform bars (decorative, synced to progress)
-export default function WaveformBars({ progress = 0, isPlaying = false, bars = 48, color = "#7c4dff" }) {
+export default function WaveformBars({ progress = 0, isPlaying = false, bars = 48, color = "#7c4dff", fullWidth = false }) {
   const seeds = useMemo(
     () => Array.from({ length: bars }, (_, i) => {
       // pseudo-random but deterministic per index
@@ -14,7 +14,7 @@ export default function WaveformBars({ progress = 0, isPlaying = false, bars = 4
   const activeIndex = Math.floor(progress * bars);
 
   return (
-    <div className="flex items-end gap-[2px] w-full h-full" style={{ justifyContent: "center" }}>
+    <div className="flex items-end w-full h-full" style={{ justifyContent: fullWidth ? "space-between" : "center", gap: fullWidth ? "0px" : "2px" }}>
       {seeds.map((h, i) => {
         const isActive = i <= activeIndex;
         const isCurrent = i === activeIndex;

@@ -83,8 +83,8 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
           background: "rgba(12, 12, 14, 0.97)",
         }}
       >
-        {/* Progress waveform (mismo formato que Reproduciendo) */}
-        <div className="relative h-2 sm:h-3 flex items-center px-3 sm:px-5 group">
+        {/* Progress waveform — full width edge to edge */}
+        <div className="relative h-2 sm:h-3 flex items-center group">
           <div
             ref={progressRef}
             className="w-full h-full cursor-pointer relative flex items-center"
@@ -92,7 +92,7 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
             onTouchStart={(e) => setIsDragging(true)}
             onClick={(e) => performSeek(e.clientX)}
           >
-            <WaveformBars progress={progress} isPlaying={isPlaying} bars={56} color="#ff5833" />
+            <WaveformBars progress={progress} isPlaying={isPlaying} bars={isMobile ? 56 : 120} color="#ff5833" fullWidth />
           </div>
         </div>
 
