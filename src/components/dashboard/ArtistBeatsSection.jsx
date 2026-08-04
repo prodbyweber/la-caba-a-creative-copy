@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import {
-  Music2, Play, Pause, Plus, Pencil, Trash2, Unlink, Lock, Bookmark, Sparkles, Download, ChevronDown,
+  Music2, Play, Pause, Plus, Pencil, Trash2, Unlink, Lock, Bookmark, Sparkles, Download, ChevronDown, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { collectArtistGenres } from "@/lib/artistBeats";
 import ArtistBeatFormModal from "./ArtistBeatFormModal";
@@ -37,6 +37,12 @@ export default function ArtistBeatsSection({
   const [dragging, setDragging] = useState(null);
   const [dragOver, setDragOver] = useState(null);
   const [downloadingKey, setDownloadingKey] = useState(null);
+  const scrollRef = useRef(null);
+  const scrollByDir = (dir) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth * 0.85, behavior: "smooth" });
+  };
 
   const { data: privateBeats = [] } = useQuery({
     queryKey: ["artist-beats", artistId],
@@ -271,7 +277,30 @@ export default function ArtistBeatsSection({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div
+          ref={scrollRef}
+          className="relative flex overflow-x-auto sm:grid sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:overflow-visible snap-x snap-mandatory sm:snap-none pb-2 sm:pb-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {ordered.length > 2 && (
+            <>
+              <button
+                onClick={() => scrollByDir(-1)}
+                className="sm:hidden absolute left-0 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full flex items-center justify-center"
+                style={{ background: "rgba(10,10,10,0.85)", border: "1px solid rgba(255,255,255,0.25)", backdropFilter: "blur(10px)" }}
+                title="Anterior"
+              >
+                <ChevronLeft className="w-4 h-4 text-white" />
+              </button>
+              <button
+                onClick={() => scrollByDir(1)}
+                className="sm:hidden absolute right-0 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full flex items-center justify-center"
+                style={{ background: "rgba(10,10,10,0.85)", border: "1px solid rgba(255,255,255,0.25)", backdropFilter: "blur(10px)" }}
+                title="Siguiente"
+              >
+                <ChevronRight className="w-4 h-4 text-white" />
+              </button>
+            </>
+          )}
           {ordered.map((item, idx) => {
             const { text, Icon, color } = LABELS[item.type];
             const active = playingTrack?.beat_id === item.beat.beat_id;
@@ -286,7 +315,7 @@ export default function ArtistBeatsSection({
                 onDragEnter={() => setDragOver(idx)}
                 onDragEnd={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
-                className="group relative rounded-xl p-2 transition-all duration-300"
+                className="group relative rounded-xl p-2 transition-all duration-300 w-[calc(50%-6px)] flex-none snap-start sm:w-auto sm:flex-initial"
                 style={{
                   background: "#0d0d0e",
                   border: isDragTarget
