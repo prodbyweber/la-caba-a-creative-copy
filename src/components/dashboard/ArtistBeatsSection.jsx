@@ -3,11 +3,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import {
-  Music2, Play, Pause, Plus, Pencil, Trash2, Unlink, Lock, Bookmark, Sparkles,
+  Music2, Play, Pause, Plus, Pencil, Trash2, Unlink, Lock, Bookmark, Sparkles, Download,
 } from "lucide-react";
 import { collectArtistGenres } from "@/lib/artistBeats";
 import ArtistBeatFormModal from "./ArtistBeatFormModal";
 import AddBeatModal from "./AddBeatModal";
+import BeatDetailModal from "./BeatDetailModal";
 
 // Sección BEATS — colección unificada de los beats del artista dentro de su catálogo.
 //   • Privado    → subidos exclusivamente para el artista (ArtistBeat)
@@ -31,9 +32,11 @@ export default function ArtistBeatsSection({
   const { playingTrack, isPlaying, playQueue, pauseTrack, resumeTrack } = useGlobalAudio();
   const [showAdd, setShowAdd] = useState(false);
   const [editingBeat, setEditingBeat] = useState(null);
+  const [detailItem, setDetailItem] = useState(null);
   const [displayOrder, setDisplayOrder] = useState(null);
   const [dragging, setDragging] = useState(null);
   const [dragOver, setDragOver] = useState(null);
+  const [downloadingKey, setDownloadingKey] = useState(null);
 
   const { data: privateBeats = [] } = useQuery({
     queryKey: ["artist-beats", artistId],
@@ -297,7 +300,7 @@ export default function ArtistBeatsSection({
                 <div
                   className="relative aspect-square rounded-lg overflow-hidden cursor-pointer"
                   style={{ background: "linear-gradient(135deg, #1a1a1c 0%, #0d0d0e 100%)" }}
-                  onClick={() => hasAudio && playItem(item)}
+                  onClick={() => setDetailItem(item)}
                 >
                   {item.beat.cover_url ? (
                     <img
@@ -387,7 +390,10 @@ export default function ArtistBeatsSection({
 
                   {/* Play cinematográfico */}
                   {hasAudio && (
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div
+                      className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      onClick={(e) => { e.stopPropagation(); playItem(item); }}
+                    >
                       <div
                         className="w-11 h-11 rounded-full flex items-center justify-center"
                         style={{
@@ -405,9 +411,42 @@ export default function ArtistBeatsSection({
                     </div>
                   )}
 
+                  {/* Descarga rápida (hover) */}
+                  {hasAudio && !isReadOnly && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const dlUrl = item.beat.free_mp3_url || item.beat.preview_mp3_url || item.beat.audio_url;
+                        if (!dlUrl || downloadingKey === item.key) return;
+                        setDownloadingKey(item.key);
+                        fetch(dlUrl)
+                          .then((r) => r.blob())
+                          .then((blob) => {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = `${item.beat.title || "beat"}.mp3`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            window.URL.revokeObjectURL(url);
+                          })
+                          .catch(() => window.open(dlUrl, "_blank"))
+                          .finally(() => setDownloadingKey(null));
+                      }}
+                      className="absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.15)" }}
+                      title="Descargar"
+                    >
+                      {downloadingKey === item.key
+                        ? <div className="w-2.5 h-2.5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                        : <Download className="w-3 h-3 text-white/80" />}
+                    </button>
+                  )}
+
                   {/* Equalizer si está sonando */}
                   {active && isPlaying && (
-                    <div className="absolute bottom-2 right-2 flex items-end gap-[2px] h-3">
+                    <div className="absolute bottom-2 left-2 flex items-end gap-[2px] h-3">
                       {[0, 1, 2].map((i) => (
                         <span
                           key={i}
@@ -462,6 +501,34 @@ export default function ArtistBeatsSection({
           artistId={artistId}
           beat={editingBeat}
           onClose={() => setEditingBeat(null)}
+        />
+      )}
+      {detailItem && (
+        <BeatDetailModal
+          item={detailItem}
+          queue={ordered.map((it) => it.beat)}
+          isAdmin={isAdmin}
+          isReadOnly={isReadOnly}
+          onClose={() => setDetailItem(null)}
+          onEdit={() => { setEditingBeat(detailItem.privateBeat); setDetailItem(null); }}
+          onDelete={() => {
+            if (confirm(`¿Eliminar el beat "${detailItem.beat.title}"?`)) {
+              deleteBeat.mutate(detailItem.privateBeat.id);
+              setDetailItem(null);
+            }
+          }}
+          onUnassign={() => {
+            if (confirm("¿Quitar este beat de las recomendaciones?")) {
+              unassign.mutate(detailItem.assignment.id);
+              setDetailItem(null);
+            }
+          }}
+          onUnsave={() => {
+            if (confirm("¿Quitar este beat de tus guardados?")) {
+              unsave.mutate(detailItem.save.id);
+              setDetailItem(null);
+            }
+          }}
         />
       )}
     </div>
