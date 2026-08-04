@@ -3,31 +3,20 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import {
-  Music2,
-  Play,
-  Pause,
-  Plus,
-  Link2,
-  Pencil,
-  Trash2,
-  Unlink,
-  Sparkles,
-  Lock,
-  Bookmark,
-  SkipBack,
-  SkipForward,
+  Music2, Play, Pause, Plus, Pencil, Trash2, Unlink, Lock, Bookmark, Sparkles,
 } from "lucide-react";
-import { collectArtistGenres, rankBeatsByGenre } from "@/lib/artistBeats";
+import { collectArtistGenres } from "@/lib/artistBeats";
 import ArtistBeatFormModal from "./ArtistBeatFormModal";
-import AssignPublicBeatModal from "./AssignPublicBeatModal";
+import AddBeatModal from "./AddBeatModal";
 
-// Sección BEATS — colección unificada de los tres tipos de beats del artista:
-//   • Privado   → subidos exclusivamente para el artista (ArtistBeat)
-//   • Recomendado → beats públicos asignados manualmente o sugeridos por géneros
-//   • Guardado  → beats públicos que el artista guardó del marketplace (BeatSave)
-// Todo convive en una única colección, diferenciado solo por una etiqueta discreta.
+// Sección BEATS — colección unificada de los beats del artista dentro de su catálogo.
+//   • Privado    → subidos exclusivamente para el artista (ArtistBeat)
+//   • Recomendado → beats públicos asignados manualmente por el admin
+//   • Guardado   → beats públicos que el artista guardó del marketplace (BeatSave)
+// Sin recomendaciones automáticas: solo lo que el admin asigna o sube.
 // El administrador puede subir, asignar, quitar y reordenar (drag & drop persistente).
 // El artista solo escucha y puede quitar sus propios guardados.
+// La reproducción usa el reproductor global (GlobalAudioPlayer).
 export default function ArtistBeatsSection({
   artistId,
   isAdmin,
@@ -38,12 +27,10 @@ export default function ArtistBeatsSection({
   profileUserId,
 }) {
   const qc = useQueryClient();
-  const { playingTrack, isPlaying, playQueue, pauseTrack, resumeTrack, playNext, playPrevious } =
-    useGlobalAudio();
-  const [showForm, setShowForm] = useState(false);
+  const { playingTrack, isPlaying, playQueue, pauseTrack, resumeTrack } = useGlobalAudio();
+  const [showAdd, setShowAdd] = useState(false);
   const [editingBeat, setEditingBeat] = useState(null);
-  const [showAssign, setShowAssign] = useState(false);
-  const [displayOrder, setDisplayOrder] = useState(null); // override local tras drag
+  const [displayOrder, setDisplayOrder] = useState(null);
   const [dragging, setDragging] = useState(null);
   const [dragOver, setDragOver] = useState(null);
 
@@ -55,8 +42,7 @@ export default function ArtistBeatsSection({
 
   const { data: assignments = [] } = useQuery({
     queryKey: ["artist-beat-assignments", artistId],
-    queryFn: () =>
-      base44.entities.ArtistBeatAssignment.filter({ artist_id: artistId }),
+    queryFn: () => base44.entities.ArtistBeatAssignment.filter({ artist_id: artistId }),
     enabled: !!artistId,
   });
 
@@ -107,7 +93,7 @@ export default function ArtistBeatsSection({
     return m;
   }, [allBeats]);
 
-  // ── Construcción de la colección unificada ──
+  // ── Construcción de la colección unificada (sin recomendaciones automáticas) ──
   const allItems = useMemo(() => {
     const items = [];
 
@@ -145,12 +131,10 @@ export default function ArtistBeatsSection({
     });
 
     // Guardados (excluyendo los ya recomendados para no duplicar)
-    const savedBeatIds = new Set();
     savedSaves.forEach((s) => {
       if (recommendedBeatIds.has(s.beat_id)) return;
       const beat = allBeatMap.get(s.beat_id);
       if (beat) {
-        savedBeatIds.add(beat.id);
         items.push({
           key: `sav:${beat.id}`,
           type: "guardado",
@@ -160,26 +144,8 @@ export default function ArtistBeatsSection({
       }
     });
 
-    // Recomendados automáticos por géneros (excluyendo asignados y guardados)
-    rankBeatsByGenre(publicBeats, artistGenres)
-      .filter(
-        ({ beat, score }) =>
-          score > 0 &&
-          !recommendedBeatIds.has(beat.id) &&
-          !savedBeatIds.has(beat.id)
-      )
-      .slice(0, 8)
-      .forEach(({ beat }) => {
-        items.push({
-          key: `rec:${beat.id}`,
-          type: "recomendado",
-          beat: { ...beat, beat_id: beat.id },
-          auto: true,
-        });
-      });
-
     return items;
-  }, [privateBeats, assignments, savedSaves, publicBeats, beatMap, allBeatMap, artistGenres, artist]);
+  }, [privateBeats, assignments, savedSaves, publicBeats, beatMap, allBeatMap, artist]);
 
   // ── Aplicar orden persistido ──
   const persistedOrder = userProfile?.beats_order || [];
@@ -203,8 +169,6 @@ export default function ArtistBeatsSection({
     return out;
   }, [allItems, effectiveOrder]);
 
-  const activeItem = ordered.find((it) => it.beat.beat_id === playingTrack?.beat_id) || null;
-
   // ── Mutaciones ──
   const deleteBeat = useMutation({
     mutationFn: (id) => base44.entities.ArtistBeat.delete(id),
@@ -213,25 +177,21 @@ export default function ArtistBeatsSection({
 
   const unassign = useMutation({
     mutationFn: (id) => base44.entities.ArtistBeatAssignment.delete(id),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["artist-beat-assignments", artistId] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["artist-beat-assignments", artistId] }),
   });
 
   const unsave = useMutation({
     mutationFn: async (saveId) => {
       await base44.entities.BeatSave.delete(saveId);
     },
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["artist-saved-beats", artistUserId] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["artist-saved-beats", artistUserId] }),
   });
 
   const persistOrder = async (newKeys) => {
     setDisplayOrder(newKeys);
     if (userProfile?.id) {
       try {
-        await base44.entities.UserProfile.update(userProfile.id, {
-          beats_order: newKeys,
-        });
+        await base44.entities.UserProfile.update(userProfile.id, { beats_order: newKeys });
         qc.invalidateQueries({ queryKey: ["userProfile", profileUserId] });
       } catch (e) {
         console.error("[ArtistBeatsSection] persist order failed", e?.message);
@@ -240,11 +200,7 @@ export default function ArtistBeatsSection({
   };
 
   const handleDrop = () => {
-    if (
-      dragging == null ||
-      dragOver == null ||
-      dragging === dragOver
-    ) {
+    if (dragging == null || dragOver == null || dragging === dragOver) {
       setDragging(null);
       setDragOver(null);
       return;
@@ -276,86 +232,16 @@ export default function ArtistBeatsSection({
 
   return (
     <div>
-      {/* Header con acciones de admin */}
-      <div className="flex items-center justify-between mb-3">
-        <h3
-          className="text-sm font-bold text-white"
-          style={{ fontFamily: "'Helvetica Neue', sans-serif" }}
-        >
-          Beats
-        </h3>
-        {isAdmin && (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                setEditingBeat(null);
-                setShowForm(true);
-              }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-white transition-colors"
-              style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
-            >
-              <Plus className="w-3 h-3" /> Añadir beat
-            </button>
-            <button
-              onClick={() => setShowAssign(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-white transition-colors"
-              style={{
-                background: "rgba(124,77,255,0.15)",
-                border: "1px solid rgba(124,77,255,0.3)",
-              }}
-            >
-              <Link2 className="w-3 h-3" /> Asignar beat
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Barra de reproducción inline — previsualizar / avanzar / retroceder */}
-      {activeItem && (
-        <div
-          className="flex items-center gap-3 mb-4 px-3 py-2.5 rounded-xl"
-          style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
-        >
-          <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0" style={{ background: "#1a1a1c" }}>
-            {activeItem.beat.cover_url && (
-              <img src={activeItem.beat.cover_url} alt="" className="w-full h-full object-cover" />
-            )}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-white truncate">{activeItem.beat.title}</p>
-            <p className="text-[10px] text-white/40 truncate">
-              {activeItem.type === "privado"
-                ? activeItem.beat.bpm
-                  ? `${activeItem.beat.bpm} BPM`
-                  : "Exclusive"
-                : activeItem.beat.producer || "—"}
-            </p>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={playPrevious}
-              className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
-            >
-              <SkipBack className="w-4 h-4 text-white/70" fill="currentColor" />
-            </button>
-            <button
-              onClick={() => (isPlaying ? pauseTrack() : resumeTrack())}
-              className="w-9 h-9 rounded-full flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
-            >
-              {isPlaying ? (
-                <Pause className="w-4 h-4 text-white" fill="white" />
-              ) : (
-                <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
-              )}
-            </button>
-            <button
-              onClick={playNext}
-              className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors"
-            >
-              <SkipForward className="w-4 h-4 text-white/70" fill="currentColor" />
-            </button>
-          </div>
+      {/* Acciones de admin (sin título duplicado — el label de sección lo aporta el dashboard) */}
+      {isAdmin && (
+        <div className="flex justify-end mb-3">
+          <button
+            onClick={() => setShowAdd(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-bold text-white transition-colors"
+            style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
+          >
+            <Plus className="w-3 h-3" /> Añadir beat
+          </button>
         </div>
       )}
 
@@ -363,16 +249,13 @@ export default function ArtistBeatsSection({
       {ordered.length === 0 ? (
         <div
           className="rounded-2xl p-8 text-center"
-          style={{
-            background: "#111113",
-            border: "1px solid rgba(255,255,255,0.05)",
-          }}
+          style={{ background: "#111113", border: "1px solid rgba(255,255,255,0.05)" }}
         >
           <div
             className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
-            style={{ background: "rgba(124,77,255,0.08)" }}
+            style={{ background: "rgba(255,88,51,0.08)" }}
           >
-            <Music2 className="w-6 h-6 text-[#a78bfa]" />
+            <Music2 className="w-6 h-6 text-[#ff8866]" />
           </div>
           <p className="text-sm font-semibold text-white/50 mb-1">
             {isAdmin ? "Sin beats en este catálogo" : "Aún no tienes beats"}
@@ -390,6 +273,7 @@ export default function ArtistBeatsSection({
             const active = playingTrack?.beat_id === item.beat.beat_id;
             const isDragTarget = dragOver === idx;
             const isDraggingThis = dragging === idx;
+            const hasAudio = !!item.beat.preview_mp3_url;
             return (
               <div
                 key={item.key}
@@ -398,7 +282,7 @@ export default function ArtistBeatsSection({
                 onDragEnter={() => setDragOver(idx)}
                 onDragEnd={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
-                className="group relative rounded-xl overflow-hidden cursor-pointer transition-all duration-300"
+                className="group relative rounded-xl p-2 transition-all duration-300"
                 style={{
                   background: "#0d0d0e",
                   border: isDragTarget
@@ -407,9 +291,13 @@ export default function ArtistBeatsSection({
                   opacity: isDraggingThis ? 0.5 : 1,
                   boxShadow: "0 10px 30px rgba(0,0,0,0.45)",
                 }}
-                onClick={() => item.beat.preview_mp3_url && playItem(item)}
               >
-                <div className="relative aspect-square overflow-hidden">
+                {/* Cover */}
+                <div
+                  className="relative aspect-square rounded-lg overflow-hidden cursor-pointer"
+                  style={{ background: "linear-gradient(135deg, #1a1a1c 0%, #0d0d0e 100%)" }}
+                  onClick={() => hasAudio && playItem(item)}
+                >
                   {item.beat.cover_url ? (
                     <img
                       src={item.beat.cover_url}
@@ -417,10 +305,7 @@ export default function ArtistBeatsSection({
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center"
-                      style={{ background: "linear-gradient(135deg, #1a1a1c 0%, #0d0d0e 100%)" }}
-                    >
+                    <div className="w-full h-full flex items-center justify-center">
                       <Music2 className="w-8 h-8 text-white/15" />
                     </div>
                   )}
@@ -428,31 +313,27 @@ export default function ArtistBeatsSection({
                   {/* Gradiente cinematográfico */}
                   <div
                     className="absolute inset-0 pointer-events-none"
-                    style={{ background: "linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.88) 100%)" }}
+                    style={{ background: "linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.55) 100%)" }}
                   />
 
-                  {/* Etiqueta de origen (reducida) */}
+                  {/* Etiqueta de origen (discreta) */}
                   <div
                     className="absolute top-2 left-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full"
                     style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)" }}
                   >
                     <Icon className="w-2 h-2" style={{ color }} />
-                    <span
-                      className="text-[7px] font-bold uppercase tracking-wider"
-                      style={{ color }}
-                    >
+                    <span className="text-[7px] font-bold uppercase tracking-wider" style={{ color }}>
                       {text}
                     </span>
                   </div>
 
-                  {/* Acciones admin/artist (hover, sin X) */}
+                  {/* Acciones admin/artist (hover) */}
                   {isAdmin && item.type === "privado" && (
                     <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setEditingBeat(item.privateBeat);
-                          setShowForm(true);
                         }}
                         className="w-6 h-6 rounded-full flex items-center justify-center"
                         style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)" }}
@@ -504,7 +385,7 @@ export default function ArtistBeatsSection({
                   )}
 
                   {/* Play cinematográfico */}
-                  {item.beat.preview_mp3_url && (
+                  {hasAudio && (
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <div
                         className="w-11 h-11 rounded-full flex items-center justify-center"
@@ -523,25 +404,41 @@ export default function ArtistBeatsSection({
                     </div>
                   )}
 
-                  {/* Título + subtítulo superpuestos */}
-                  <div className="absolute bottom-0 left-0 right-0 p-3 pointer-events-none">
-                    <h3
-                      className="text-xs font-bold text-white truncate"
-                      style={{ textShadow: "0 1px 6px rgba(0,0,0,0.9)" }}
-                    >
-                      {item.beat.title}
-                    </h3>
-                    <p
-                      className="text-[10px] text-white/65 truncate"
-                      style={{ textShadow: "0 1px 6px rgba(0,0,0,0.9)" }}
-                    >
-                      {item.type === "privado"
-                        ? item.beat.bpm
-                          ? `${item.beat.bpm} BPM`
-                          : "Exclusive"
-                        : item.beat.producer || "—"}
-                    </p>
-                  </div>
+                  {/* Equalizer si está sonando */}
+                  {active && isPlaying && (
+                    <div className="absolute bottom-2 right-2 flex items-end gap-[2px] h-3">
+                      {[0, 1, 2].map((i) => (
+                        <span
+                          key={i}
+                          className="w-[2.5px] rounded-full"
+                          style={{
+                            background: "#ff5833",
+                            animation: `beateq 0.9s ${i * 0.18}s ease-in-out infinite alternate`,
+                            height: "100%",
+                            transformOrigin: "bottom",
+                          }}
+                        />
+                      ))}
+                      <style>{`@keyframes beateq { 0% { transform: scaleY(0.25); } 100% { transform: scaleY(1); } }`}</style>
+                    </div>
+                  )}
+                </div>
+
+                {/* Título + subtítulo (debajo de la portada, estilo proyectos) */}
+                <div className="px-0.5 pt-2 pb-0.5 space-y-0.5">
+                  <h3
+                    className="text-xs font-semibold truncate"
+                    style={{ color: active ? "#ff5833" : "#fff" }}
+                  >
+                    {item.beat.title}
+                  </h3>
+                  <p className="text-[10px] text-white/40 truncate">
+                    {item.type === "privado"
+                      ? item.beat.bpm
+                        ? `${item.beat.bpm} BPM`
+                        : "Exclusive"
+                      : item.beat.producer || "—"}
+                  </p>
                 </div>
               </div>
             );
@@ -550,25 +447,20 @@ export default function ArtistBeatsSection({
       )}
 
       {/* Modales */}
-      {showForm && (
+      {showAdd && (
+        <AddBeatModal
+          artistId={artistId}
+          artistGenres={artistGenres}
+          excludeBeatIds={new Set(assignments.map((a) => a.beat_id))}
+          assignedById={assignedById}
+          onClose={() => setShowAdd(false)}
+        />
+      )}
+      {editingBeat && (
         <ArtistBeatFormModal
           artistId={artistId}
           beat={editingBeat}
-          onClose={() => {
-            setShowForm(false);
-            setEditingBeat(null);
-          }}
-        />
-      )}
-      {showAssign && (
-        <AssignPublicBeatModal
-          artistId={artistId}
-          artistGenres={artistGenres}
-          excludeBeatIds={
-            new Set(assignments.map((a) => a.beat_id))
-          }
-          assignedById={assignedById}
-          onClose={() => setShowAssign(false)}
+          onClose={() => setEditingBeat(null)}
         />
       )}
     </div>
