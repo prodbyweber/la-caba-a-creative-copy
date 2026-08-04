@@ -621,7 +621,6 @@ function TrackDetailModal({ track, onClose, onEdit, onDelete, onTogglePublic }) 
 // ── Track Card ────────────────────────────────────────────────────────────────
 function TrackCard({ track, onEdit, isFirst }) {
   const [hovered, setHovered] = useState(false);
-  const [playing, setPlaying] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
@@ -638,17 +637,17 @@ function TrackCard({ track, onEdit, isFirst }) {
       clearTimeout(previewTimerRef.current);
       clearTimeout(hoverDelayRef.current);
       try { if (previewRef.current) { previewRef.current.pause(); previewRef.current.currentTime = 0; } } catch {}
-      try { if (playbackRef.current) { playbackRef.current.pause(); } } catch {}
     };
   }, []);
 
   const previewRef = useRef(null);
-  const playbackRef = useRef(null);
   const previewTimerRef = useRef(null);
   const hoverDelayRef = useRef(null);
 
   const globalAudio = useGlobalAudio();
   const queryClient = useQueryClient();
+  // El estado de reproducción se deriva del reproductor global → la barra inferior aparece.
+  const playing = globalAudio?.playingTrack?.id === localTrack.id && globalAudio?.isPlaying;
 
   const status = statusConfig[localTrack.status] || statusConfig.idea;
   const hasAudio = !!localTrack.audio_file_url;
@@ -694,11 +693,13 @@ function TrackCard({ track, onEdit, isFirst }) {
 
   const togglePlay = (e) => {
     if (e) e.stopPropagation();
-    if (!playbackRef.current) return;
+    if (!hasAudio) return;
     clearTimeout(hoverDelayRef.current);
     stopPreview();
-    if (playing) { playbackRef.current.pause(); setPlaying(false); }
-    else { playbackRef.current.currentTime = 0; playbackRef.current.volume = 1; playbackRef.current.play().then(() => setPlaying(true)).catch(() => {}); }
+    const isThis = globalAudio?.playingTrack?.id === localTrack.id;
+    if (isThis && globalAudio?.isPlaying) globalAudio.pauseTrack();
+    else if (isThis) globalAudio.resumeTrack();
+    else globalAudio.playTrack(localTrack);
   };
 
   const handleTogglePublic = async () => {
@@ -775,7 +776,6 @@ function TrackCard({ track, onEdit, isFirst }) {
             {hasAudio && (
               <>
                 <audio ref={previewRef} src={localTrack.audio_file_url} preload="metadata" />
-                <audio ref={playbackRef} src={localTrack.audio_file_url} preload="metadata" onEnded={() => setPlaying(false)} />
               </>
             )}
 
