@@ -431,7 +431,7 @@ function TrackEditModal({ track, onClose, onSaved }) {
 }
 
 // ── Detail Modal ──────────────────────────────────────────────────────────────
-function TrackDetailModal({ track, onClose, onEdit, onDelete, onTogglePublic }) {
+function TrackDetailModal({ track, onClose, onEdit, onDelete, onTogglePublic, readOnly }) {
   const status = statusConfig[track.status] || statusConfig.idea;
   const folders = FOLDER_DEFS.filter(f => track.versions?.[f.key]);
   const isPublic = track.is_public === true;
@@ -528,9 +528,11 @@ function TrackDetailModal({ track, onClose, onEdit, onDelete, onTogglePublic }) 
                 {showYtPlayer ? "Cerrar video" : "YouTube Music"}
               </button>
             )}
+            {!readOnly && (
             <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all" style={{ background: "rgba(255,255,255,0.06)" }}>
               <Edit className="w-3.5 h-3.5 text-white/60" /> <span className="text-white/60 hover:text-white">Editar</span>
             </button>
+            )}
             <button onClick={handleShare} className="relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all" style={{ background: "rgba(255,255,255,0.06)" }}>
               <Share2 className="w-3.5 h-3.5 text-white/60" /> <span className="text-white/60 hover:text-white">Compartir</span>
               <AnimatePresence>
@@ -548,13 +550,17 @@ function TrackDetailModal({ track, onClose, onEdit, onDelete, onTogglePublic }) 
             <RouterLink to={track.slug ? `/t/${track.slug}/analytics` : `/track/${track.id}/analytics`} onClick={onClose} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all" style={{ background: "rgba(250,204,21,0.12)" }}>
               <BarChart3 className="w-3.5 h-3.5 text-[#facc15]" /> <span className="text-[#facc15]">Analytics</span>
             </RouterLink>
+            {!readOnly && (
             <button onClick={onTogglePublic} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all ${isPublic ? "bg-emerald-500/15 text-emerald-400" : "text-white/30"}`} style={!isPublic ? { background: "rgba(255,255,255,0.05)" } : {}}>
               {isPublic ? <Globe className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
               {isPublic ? "Público" : "Privado"}
             </button>
+            )}
+            {!readOnly && (
             <button onClick={onDelete} className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all">
               <Trash2 className="w-3.5 h-3.5" /> Eliminar
             </button>
+            )}
           </div>
 
           {/* YouTube embed */}
@@ -619,7 +625,7 @@ function TrackDetailModal({ track, onClose, onEdit, onDelete, onTogglePublic }) 
 }
 
 // ── Track Card ────────────────────────────────────────────────────────────────
-function TrackCard({ track, onEdit, isFirst }) {
+function TrackCard({ track, onEdit, isFirst, readOnly }) {
   const [hovered, setHovered] = useState(false);
   const [previewing, setPreviewing] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
@@ -821,11 +827,11 @@ function TrackCard({ track, onEdit, isFirst }) {
                   {localTrack.genre && <p className="text-white/40 text-[9px] truncate mt-1">{localTrack.genre}</p>}
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
-                  {hasAudio && (
-                    <button onClick={handleDownload} className="w-6 h-6 rounded-full flex items-center justify-center transition-transform hover:scale-110" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.18)" }} title="Descargar MP3">
-                      {downloading ? <div className="w-2.5 h-2.5 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <Download className="w-3 h-3 text-white" />}
-                    </button>
-                  )}
+                {hasAudio && !readOnly && (
+                  <button onClick={handleDownload} className="w-6 h-6 rounded-full flex items-center justify-center transition-transform hover:scale-110" style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.18)" }} title="Descargar MP3">
+                    {downloading ? <div className="w-2.5 h-2.5 border-2 border-white/40 border-t-white rounded-full animate-spin" /> : <Download className="w-3 h-3 text-white" />}
+                  </button>
+                )}
                   {(hasAudio || hasYoutube) && (
                     <button onClick={(e) => {
                       e.stopPropagation();
@@ -889,6 +895,7 @@ function TrackCard({ track, onEdit, isFirst }) {
             onEdit={() => { setShowDetail(false); setShowEdit(true); }}
             onDelete={handleDelete}
             onTogglePublic={handleTogglePublic}
+            readOnly={readOnly}
           />
         )}
       </AnimatePresence>
@@ -910,6 +917,6 @@ function TrackCard({ track, onEdit, isFirst }) {
   );
 }
 
-export default function NetflixTrackCard({ track, index, onEdit }) {
-  return <TrackCard track={track} index={index} onEdit={onEdit} isFirst={index === 0} />;
+export default function NetflixTrackCard({ track, index, onEdit, readOnly }) {
+  return <TrackCard track={track} index={index} onEdit={onEdit} isFirst={index === 0} readOnly={readOnly} />;
 }

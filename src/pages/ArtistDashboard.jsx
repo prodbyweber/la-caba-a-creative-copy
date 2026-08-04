@@ -29,6 +29,9 @@ export default function ArtistDashboard() {
   const artistIdParam = urlParams.get("artistId") || urlParams.get("id");
   const userIdParam = urlParams.get("userId");
   const hasExternalParam = !!artistIdParam || !!userIdParam;
+  // Manager: ve el dashboard del artista asignado en modo solo-lectura (escuchar y ver).
+  const isManager = urlParams.get("manager") === "1";
+  const isReadOnly = isManager;
 
   useEffect(() => {
     base44.auth.me().then(u => setCurrentUser(u)).catch(() => {});
@@ -152,6 +155,16 @@ export default function ArtistDashboard() {
     if (userProfile?.account_type && !viewMode) setViewMode(userProfile.account_type);
   }, [userProfile?.account_type]);
 
+  // Sincronizar el correo vinculado a la cuenta en el perfil (fuente de verdad = cuenta).
+  React.useEffect(() => {
+    if (hasExternalParam || isManager) return;
+    if (!currentUser?.email || !userProfile?.id) return;
+    if (userProfile.user_email === currentUser.email) return;
+    base44.entities.UserProfile.update(userProfile.id, { user_email: currentUser.email })
+      .then(() => queryClient.invalidateQueries({ queryKey: ["userProfile", profileUserId] }))
+      .catch(() => {});
+  }, [currentUser?.email, userProfile?.id, userProfile?.user_email, hasExternalParam, isManager]);
+
   const showAudioSection = accountType === "artist";
   const showProjectsSection = true;
   const showCampaignsSection = accountType === "brand";
@@ -253,7 +266,7 @@ export default function ArtistDashboard() {
         return (
           <div key="tracks">
             <SectionLabel label="Soundtracks" />
-            <TracksSection jlyArtistId={effectiveArtist?.id || artistId} userEmail={catalogOwnerEmail} ownerArtistName={displayName} />
+            <TracksSection jlyArtistId={effectiveArtist?.id || artistId} userEmail={catalogOwnerEmail} ownerArtistName={displayName} isReadOnly={isReadOnly} />
           </div>
         );
       case "video":
@@ -264,7 +277,7 @@ export default function ArtistDashboard() {
         return (
           <div key="projects">
             <SectionLabel label="Proyectos" />
-            <ProjectsSection jlyArtistId={effectiveArtist?.id} userEmail={catalogOwnerEmail} />
+            <ProjectsSection jlyArtistId={effectiveArtist?.id} userEmail={catalogOwnerEmail} isReadOnly={isReadOnly} />
           </div>
         );
       case "photos":
@@ -277,6 +290,7 @@ export default function ArtistDashboard() {
             <ArtistBeatsSection
               artistId={effectiveArtist?.id || artistId}
               isAdmin={isAdmin}
+              isReadOnly={isReadOnly}
               artist={effectiveArtist}
               assignedById={currentUser?.id}
               artistUserId={profileUserId}
@@ -293,10 +307,12 @@ export default function ArtistDashboard() {
   return (
     <div className="min-h-screen bg-[#0a0a0b] text-white">
       <DashboardNav artistName={displayName} artistId={effectiveArtist?.id}>
-        <ArtistAvatarButton
-          artist={effectiveArtist || { stageName: displayName, avatar_url: userProfile?.profile_photo_url || userProfile?.avatar_url || "" }}
-          onClick={() => setShowProfileDrawer(true)}
-        />
+        {!isManager && (
+          <ArtistAvatarButton
+            artist={effectiveArtist || { stageName: displayName, avatar_url: userProfile?.profile_photo_url || userProfile?.avatar_url || "" }}
+            onClick={() => setShowProfileDrawer(true)}
+          />
+        )}
       </DashboardNav>
 
       <MobileBottomNav artistId={effectiveArtist?.id} isAdmin={false} />
@@ -317,11 +333,12 @@ export default function ArtistDashboard() {
                       fontSize: isMobileView ? "1.5rem" : "2rem",
                     }}
                   >
-                    Tu catálogo
+                    {isManager ? `Catálogo de ${displayName}` : "Tu catálogo"}
                   </h1>
                 </div>
 
-                {/* Reorder button */}
+                {/* Reorder button — oculto para manager (solo-lectura) */}
+                {!isReadOnly && (
                 <div className="relative flex-shrink-0">
                   <button
                     onClick={() => setShowOrderMenu(v => !v)}
@@ -350,6 +367,7 @@ export default function ArtistDashboard() {
                     )}
                   </AnimatePresence>
                 </div>
+                )}
               </div>
 
               {/* Sections stacked in user order */}
@@ -368,7 +386,7 @@ export default function ArtistDashboard() {
         </div>
       </main>
 
-      {(effectiveArtist || userProfile || profileUserId) && (
+      {(effectiveArtist || userProfile || profileUserId) && !isManager && (
         <ArtistProfileDrawer
           artist={effectiveArtist}
           userProfile={userProfile}

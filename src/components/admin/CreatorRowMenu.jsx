@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MoreVertical, Pencil, Trash2, Clock } from "lucide-react";
+import { MoreVertical, Pencil, Trash2, Clock, UserCog } from "lucide-react";
 
 // Menú de tres puntos visible en cada fila de creador.
 // Se renderiza en un portal (position: fixed) para evitar que
 // contenedores padres con overflow-hidden recorten el dropdown,
 // incluso en la última fila de la lista.
-export default function CreatorRowMenu({ onEdit, onDelete, onHours }) {
+export default function CreatorRowMenu({ onEdit, onDelete, onHours, onManager }) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef(null);
   const menuRef = useRef(null);
@@ -106,6 +106,20 @@ export default function CreatorRowMenu({ onEdit, onDelete, onHours }) {
                 onMouseLeave={e => e.currentTarget.style.background = "transparent"}
               >
                 <Clock size={13} /> Horas de estudio
+              </button>
+            )}
+            {onManager && (
+              <button
+                onClick={e => { e.stopPropagation(); setOpen(false); onManager?.(); }}
+                style={{
+                  width: "100%", padding: "9px 10px", display: "flex", alignItems: "center", gap: "8px",
+                  background: "transparent", border: "none", borderRadius: "7px",
+                  color: "rgba(255,255,255,0.75)", fontSize: "12px", fontWeight: 600, cursor: "pointer", textAlign: "left",
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = "rgba(255,88,51,0.1)"}
+                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+              >
+                <UserCog size={13} /> Asignar como manager
               </button>
             )}
             <button

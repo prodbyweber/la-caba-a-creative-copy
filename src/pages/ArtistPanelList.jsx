@@ -8,6 +8,7 @@ import CreatorEditModal from "@/components/admin/CreatorEditModal";
 import CreatorRowMenu from "@/components/admin/CreatorRowMenu";
 import CreatorDeleteConfirm from "@/components/admin/CreatorDeleteConfirm";
 import StudioHoursModal from "@/components/admin/StudioHoursModal";
+import ManagerAssignModal from "@/components/admin/ManagerAssignModal";
 import { User, Search, ChevronRight } from "lucide-react";
 
 export default function ArtistPanelList() {
@@ -18,6 +19,7 @@ export default function ArtistPanelList() {
   const [editingCreator, setEditingCreator] = useState(null);
   const [deletingCreator, setDeletingCreator] = useState(null);
   const [hoursCreator, setHoursCreator] = useState(null);
+  const [managerCreator, setManagerCreator] = useState(null);
 
   React.useEffect(() => {
     base44.auth.me().then(u => {
@@ -226,6 +228,7 @@ export default function ArtistPanelList() {
                         onEdit={() => setEditingCreator(c)}
                         onDelete={() => setDeletingCreator(c)}
                         onHours={c.artist?.id ? () => setHoursCreator(c) : undefined}
+                        onManager={c.userId ? () => setManagerCreator(c) : undefined}
                       />
                     )}
                     <ChevronRight className="w-3.5 h-3.5 text-white/15 flex-shrink-0 group-hover:text-white/40 transition-colors" />
@@ -258,6 +261,14 @@ export default function ArtistPanelList() {
         <StudioHoursModal
           artist={hoursCreator.artist}
           onClose={() => setHoursCreator(null)}
+        />
+      )}
+
+      {/* Asignación de rol manager (ver dashboard de un artista, solo-lectura) */}
+      {managerCreator && (
+        <ManagerAssignModal
+          user={managerCreator}
+          onClose={() => setManagerCreator(null)}
         />
       )}
     </AdminLayout>

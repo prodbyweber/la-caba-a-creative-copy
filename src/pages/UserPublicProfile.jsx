@@ -88,7 +88,7 @@ export default function UserPublicProfile() {
   const displayName = userProfile.artist_name || userProfile.display_name || userProfile.full_name || username;
   const avatarUrl = userProfile.avatar_url || userProfile.profile_photo_url || artist?.avatar_url || "";
   const initials = displayName.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
-  const photos = (userProfile.media_items || []).filter(m => m.type === "image");
+  const linkedEmail = userProfile.contact_email || userProfile.user_email || "";
 
   return (
     <div className="min-h-screen bg-[#080808] text-white overflow-hidden">
@@ -130,6 +130,7 @@ export default function UserPublicProfile() {
               {displayName}
             </h1>
             <p className="text-white/30 text-sm mb-1">@{userProfile.username}</p>
+            {linkedEmail && <p className="text-white/25 text-xs mb-1">{linkedEmail}</p>}
             {artist?.genre && <p className="text-white/40 text-sm mb-3">{artist.genre}</p>}
             {(userProfile.role_tags || []).length > 0 && (
               <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 mb-4">
@@ -207,26 +208,7 @@ export default function UserPublicProfile() {
           </motion.div>
         )}
 
-        {/* Photos */}
-        {photos.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mb-16">
-            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/20 mb-3">Galería</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-              {photos.map((photo, idx) => (
-                <motion.div
-                  key={photo.id || idx}
-                  onClick={() => setViewingImage(photo.url)}
-                  className="group relative rounded-xl overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform duration-300 bg-white/5 flex items-center justify-center"
-                  style={{ minHeight: 140 }}
-                >
-                  <img src={photo.url} alt={photo.title} className="w-full h-full object-contain" style={{ maxHeight: 280 }} />
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {explorarItems.length === 0 && photos.length === 0 && (
+        {explorarItems.length === 0 && (
           <div className="text-center py-20">
             <p className="text-white/20 text-sm">Perfil en construcción</p>
           </div>

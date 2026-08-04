@@ -20,6 +20,7 @@ import AddBeatModal from "./AddBeatModal";
 export default function ArtistBeatsSection({
   artistId,
   isAdmin,
+  isReadOnly,
   artist,
   assignedById,
   artistUserId,
@@ -233,7 +234,7 @@ export default function ArtistBeatsSection({
   return (
     <div>
       {/* Acciones de admin (sin título duplicado — el label de sección lo aporta el dashboard) */}
-      {isAdmin && (
+      {isAdmin && !isReadOnly && (
         <div className="flex justify-end mb-3">
           <button
             onClick={() => setShowAdd(true)}
@@ -277,7 +278,7 @@ export default function ArtistBeatsSection({
             return (
               <div
                 key={item.key}
-                draggable={isAdmin}
+                draggable={isAdmin && !isReadOnly}
                 onDragStart={() => setDragging(idx)}
                 onDragEnter={() => setDragOver(idx)}
                 onDragEnd={handleDrop}
@@ -368,7 +369,7 @@ export default function ArtistBeatsSection({
                       </button>
                     </div>
                   )}
-                  {!isAdmin && item.type === "guardado" && item.save && (
+                  {!isAdmin && !isReadOnly && item.type === "guardado" && item.save && (
                     <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={(e) => {

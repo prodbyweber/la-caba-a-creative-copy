@@ -178,7 +178,7 @@ function ProjectModal({ onClose, jlyArtistId, project = null, existingTracks = [
 }
 
 // ── ProjectsSection ────────────────────────────────────────────────────────
-export default function ProjectsSection({ jlyArtistId, userEmail }) {
+export default function ProjectsSection({ jlyArtistId, userEmail, isReadOnly }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const qc = useQueryClient();
@@ -261,11 +261,13 @@ export default function ProjectsSection({ jlyArtistId, userEmail }) {
           <div className="flex items-center gap-2">
             {projects.length > 0 && <span className="text-[10px] text-white/25 px-1.5 py-0.5 bg-white/5 rounded-full">{projects.length}</span>}
           </div>
+          {!isReadOnly && (
           <button onClick={() => { setEditingProject(null); setShowCreateModal(true); }}
             className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/60 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-all">
             <Plus className="w-3 h-3" />
             <span className="hidden lg:inline">Nuevo álbum</span>
           </button>
+          )}
         </div>
 
         <div className="sm:p-4 lg:p-5">
@@ -274,10 +276,12 @@ export default function ProjectsSection({ jlyArtistId, userEmail }) {
               <FolderOpen className="w-16 h-16 text-gray-600 mx-auto mb-4" />
               <p className="text-gray-500 mb-2 text-sm">Sin proyectos aún</p>
               <p className="text-white/20 text-xs mb-4">Los proyectos se crean automáticamente al subir un film, o crea un álbum manualmente.</p>
+              {!isReadOnly && (
               <button onClick={() => setShowCreateModal(true)}
                 className="px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium transition-colors">
                 Crear álbum
               </button>
+              )}
             </div>
           ) : (
             <>
@@ -294,6 +298,7 @@ export default function ProjectsSection({ jlyArtistId, userEmail }) {
                             {cover ? <img src={cover} alt={project.title} className="w-full h-full object-cover" />
                               : <div className="w-full h-full flex items-center justify-center"><Music2 className="w-7 h-7 text-white/20" /></div>}
 
+                            {!isReadOnly && (
                             <div className="absolute bottom-1 left-1 flex items-center gap-1">
                               <button onClick={e => handleTogglePublic(e, project)}
                                 className={`w-5 h-5 rounded-md flex items-center justify-center ${project.is_public ? "bg-emerald-500/30" : "bg-black/60"}`}>
@@ -308,6 +313,7 @@ export default function ProjectsSection({ jlyArtistId, userEmail }) {
                                 <Trash2 className="w-2.5 h-2.5 text-white/50" />
                               </button>
                             </div>
+                            )}
                           </div>
                           <p className="text-[11px] font-semibold text-white truncate leading-tight">{project.title}</p>
                           <p className="text-[10px] text-white/35 truncate">{getProjectYear(project)}{project.type ? ` · ${TYPE_LABELS[project.type] || project.type}` : ""}</p>
@@ -335,6 +341,7 @@ export default function ProjectsSection({ jlyArtistId, userEmail }) {
                                 : <div className="w-full h-full flex items-center justify-center"><Music2 className="w-8 h-8 text-white/20" /></div>}
                             </Link>
 
+                            {!isReadOnly && (
                             <div className="absolute bottom-1.5 left-1.5 flex items-center gap-1 opacity-0 group-hover/proj:opacity-100 transition-opacity">
                               <button onClick={e => handleTogglePublic(e, project)}
                                 className={`w-6 h-6 rounded-md flex items-center justify-center ${project.is_public ? "bg-emerald-500/30 hover:bg-emerald-500/40" : "bg-black/70 hover:bg-black/90"}`}>
@@ -349,6 +356,7 @@ export default function ProjectsSection({ jlyArtistId, userEmail }) {
                                 <Trash2 className="w-3 h-3 text-white/50" />
                               </button>
                             </div>
+                            )}
                           </div>
                           <Link to={createPageUrl(`ProjectDetail?id=${project.id}`)}>
                             <div className="space-y-0.5 px-0.5">

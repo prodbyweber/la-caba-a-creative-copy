@@ -252,6 +252,10 @@
         "type": "string"
       },
       "description": "Orden personalizado de los beats dentro de la secci\u00f3n BEATS del cat\u00e1logo (claves: priv:<id>, rec:<beatId>, sav:<beatId>). Persistente entre dispositivos."
+    },
+    "manager_of_artist_id": {
+      "type": "string",
+      "description": "ID del artista cuyo cat\u00e1logo gestiona este usuario (rol manager). Si est\u00e1 seteado, el usuario es manager y ve solo el dashboard de ese artista en modo solo-lectura (escuchar y ver)."
     }
   },
   "required": [

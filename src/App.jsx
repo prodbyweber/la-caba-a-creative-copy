@@ -116,6 +116,15 @@ const AuthenticatedApp = () => {
           if (user?.role === 'admin') {
             window.location.replace('/AdminDashboard');
           } else {
+            // ¿Es manager? → va al dashboard del artista asignado (solo-lectura).
+            try {
+              const profiles = await base44.entities.UserProfile.filter({ user_id: user.id });
+              const profile = profiles[0];
+              if (profile?.manager_of_artist_id) {
+                window.location.replace(`/ArtistDashboard?artistId=${profile.manager_of_artist_id}&manager=1`);
+                return;
+              }
+            } catch {}
             window.location.replace('/Explorar');
           }
         }

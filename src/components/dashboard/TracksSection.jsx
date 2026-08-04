@@ -61,7 +61,7 @@ function MobileDetailWrapper({ track, tracks, onClose, onEdit, onDelete }) {
   );
 }
 
-export default function TracksSection({ jlyArtistId, userEmail, ownerArtistName }) {
+export default function TracksSection({ jlyArtistId, userEmail, ownerArtistName, isReadOnly }) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTrack, setEditingTrack] = useState(null);
   const [selectedTrack, setSelectedTrack] = useState(null); // lifted modal state, mirrors Explorar
@@ -161,6 +161,7 @@ export default function TracksSection({ jlyArtistId, userEmail, ownerArtistName 
           style={{ borderRadius: "1rem 1rem 0 0" }}>
           <div className="flex items-center gap-2">
           </div>
+          {!isReadOnly && (
           <button
             onClick={() => setShowCreateModal(true)}
             className="px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] text-white/60 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-all"
@@ -168,6 +169,7 @@ export default function TracksSection({ jlyArtistId, userEmail, ownerArtistName 
             <Plus className="w-3 h-3" />
             <span className="hidden lg:inline">Nuevo soundtrack</span>
           </button>
+          )}
         </div>
 
         {/* MOBILE: poster-style Netflix carousel edge-to-edge */}
@@ -228,7 +230,7 @@ export default function TracksSection({ jlyArtistId, userEmail, ownerArtistName 
           ) : (
             <div className="flex gap-3" style={{ width: "max-content" }}>
               {tracks.map((track, index) => (
-                <NetflixTrackCard key={track.id} track={track} index={index} onEdit={setEditingTrack} />
+                <NetflixTrackCard key={track.id} track={track} index={index} onEdit={setEditingTrack} readOnly={isReadOnly} />
               ))}
             </div>
           )}
