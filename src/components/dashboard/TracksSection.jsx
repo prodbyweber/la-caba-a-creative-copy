@@ -14,7 +14,7 @@ import { sendTrackNotifyEmail } from "@/lib/trackNotify";
 
 // Same architecture as Explorar: modal state in parent, rendered OUTSIDE the scroll container.
 // This guarantees reliable mounting on ALL mobile browsers (iOS Safari, Android Chrome, etc.)
-function MobileDetailWrapper({ track, tracks, onClose, onEdit, onDelete }) {
+function MobileDetailWrapper({ track, tracks, onClose, onEdit, onDelete, readOnly }) {
   const globalAudio = useGlobalAudio();
   const queryClient = useQueryClient();
   const [localTrack, setLocalTrack] = useState(track);
@@ -57,6 +57,7 @@ function MobileDetailWrapper({ track, tracks, onClose, onEdit, onDelete }) {
       playing={isPlaying}
       onTogglePlay={handleTogglePlay}
       onTogglePublic={handleTogglePublic}
+      readOnly={readOnly}
     />
   );
 }
@@ -194,7 +195,7 @@ export default function TracksSection({ jlyArtistId, userEmail, ownerArtistName,
               <div style={{ overflowX: "auto", overflowY: "visible", scrollbarWidth: "none", msOverflowStyle: "none" }}>
                 <div className="flex gap-2.5 py-1" style={{ width: "max-content" }}>
                   {tracks.map((track, i) => (
-                    <MobileTrackPoster key={track.id} track={track} tracks={tracks} index={i} onEdit={setEditingTrack} onDelete={(id) => deleteMutation.mutate(id)} onOpenDetail={setSelectedTrack} />
+                    <MobileTrackPoster key={track.id} track={track} tracks={tracks} index={i} onEdit={isReadOnly ? undefined : setEditingTrack} onDelete={isReadOnly ? undefined : (id) => deleteMutation.mutate(id)} onOpenDetail={setSelectedTrack} readOnly={isReadOnly} />
                   ))}
                   <div className="flex-shrink-0 w-1" />
                 </div>
@@ -212,6 +213,7 @@ export default function TracksSection({ jlyArtistId, userEmail, ownerArtistName,
             onClose={() => setSelectedTrack(null)}
             onEdit={(t) => { setEditingTrack(t); setSelectedTrack(null); }}
             onDelete={(id) => { deleteMutation.mutate(id); setSelectedTrack(null); }}
+            readOnly={isReadOnly}
           />,
           document.body
         )}

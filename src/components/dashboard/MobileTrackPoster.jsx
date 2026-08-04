@@ -76,7 +76,7 @@ function getYoutubeId(url) {
 }
 
 // ─── Bottom-sheet detail (with shared play state) ─────────────────────────────
-export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, onTogglePlay, onTogglePublic }) {
+export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, onTogglePlay, onTogglePublic, readOnly }) {
   const status = statusConfig[track.status] || statusConfig.idea;
   const folders = FOLDER_DEFS.filter(f => track.versions?.[f.key]);
   const isPublic = track.is_public === true;
@@ -207,10 +207,12 @@ export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, o
                 {showYtPlayer ? "Cerrar" : "YT Music"}
               </button>
             )}
-            <button onClick={() => { onEdit(track); onClose(); }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold flex-1 justify-center hover:bg-white/15 transition-colors">
-              <Edit className="w-4 h-4" /> Editar
-            </button>
+            {!readOnly && onEdit && (
+              <button onClick={() => { onEdit(track); onClose(); }}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold flex-1 justify-center hover:bg-white/15 transition-colors">
+                <Edit className="w-4 h-4" /> Editar
+              </button>
+            )}
             <button onClick={handleShare}
               className="relative flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white text-sm font-bold flex-1 justify-center hover:bg-white/15 transition-colors">
               <Share2 className="w-4 h-4" /> Compartir
@@ -226,7 +228,7 @@ export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, o
                 )}
               </AnimatePresence>
             </button>
-            {onDelete && (
+            {!readOnly && onDelete && (
               <button
                 onClick={() => { if (window.confirm('¿Eliminar este soundtrack?')) { onDelete(track.id); onClose(); } }}
                 className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors"
@@ -236,13 +238,15 @@ export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, o
               </button>
             )}
             {/* Toggle público/privado */}
-            <button
-              onClick={onTogglePublic}
-              title={isPublic ? "Público — toca para privado" : "Privado — toca para público"}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors flex-shrink-0 ${isPublic ? "bg-emerald-500/20 border border-emerald-500/30" : "bg-white/[0.06] border border-white/10"}`}
-            >
-              {isPublic ? <Globe className="w-4 h-4 text-emerald-400" /> : <Lock className="w-4 h-4 text-white/30" />}
-            </button>
+            {!readOnly && (
+              <button
+                onClick={onTogglePublic}
+                title={isPublic ? "Público — toca para privado" : "Privado — toca para público"}
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors flex-shrink-0 ${isPublic ? "bg-emerald-500/20 border border-emerald-500/30" : "bg-white/[0.06] border border-white/10"}`}
+              >
+                {isPublic ? <Globe className="w-4 h-4 text-emerald-400" /> : <Lock className="w-4 h-4 text-white/30" />}
+              </button>
+            )}
           </div>
 
           {/* Acceso rápido a Analytics */}
@@ -332,7 +336,7 @@ export function MobileTrackDetail({ track, onClose, onEdit, onDelete, playing, o
 
 // ─── Poster card ──────────────────────────────────────────────────────────────
 // onOpenDetail(track) — lifts selection state to parent (mirrors Explorar pattern)
-export default function MobileTrackPoster({ track, tracks, index, onEdit, onDelete, onOpenDetail }) {
+export default function MobileTrackPoster({ track, tracks, index, onEdit, onDelete, onOpenDetail, readOnly }) {
   const globalAudio = useGlobalAudio();
   const isPlaying = globalAudio?.playingTrack?.id === track.id;
   const [downloading, setDownloading] = useState(false);
@@ -471,7 +475,7 @@ export default function MobileTrackPoster({ track, tracks, index, onEdit, onDele
         </div>
 
         {/* Download MP3 — minimalist, top-left */}
-        {hasAudio && (
+        {hasAudio && !readOnly && (
           <button
             type="button"
             onClick={handleDownload}
