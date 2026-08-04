@@ -6,7 +6,6 @@ import { base44 } from "@/api/base44Client";
 import StudioHoursBlock from "@/components/dashboard/StudioHoursBlock";
 import UpcomingSessionsCard from "@/components/dashboard/UpcomingSessionsCard";
 import CountryCitySelector from "@/components/common/CountrycitySelector";
-import PhotosGallery from "@/components/dashboard/PhotosGallery";
 
 const COUNTRY_CODES = [
   { code: "+1", flag: "🇺🇸" }, { code: "+34", flag: "🇪🇸" }, { code: "+52", flag: "🇲🇽" },
@@ -514,20 +513,30 @@ export default function ArtistProfileDrawer({ artist, userProfile, targetUserId,
                     {!isEditing ? (
                       <div className="space-y-4">
 
-                        {/* Photos Gallery — primero */}
-                        {userProfile?.id && (
-                          <div className="py-3">
-                            <div className="flex items-center gap-2 mb-3">
-                              <div className="w-6 h-6 rounded-lg bg-white/[0.06] flex items-center justify-center flex-shrink-0">
-                                <Image className="w-3 h-3 text-white/40" />
-                              </div>
-                              <p className="text-xs font-semibold text-white/60">Fotos</p>
+                        {/* Resumen de datos del perfil (actualizados) */}
+                        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] divide-y divide-white/[0.04]">
+                          {[
+                            { label: "Nombre completo", value: `${userProfile?.first_name || ""} ${userProfile?.last_name || ""}`.trim() || userProfile?.full_name || "" },
+                            { label: "Nombre artístico", value: userProfile?.artist_name || artist?.stageName || "" },
+                            { label: "Username", value: userProfile?.username ? `@${userProfile.username}` : "" },
+                            { label: "Correo", value: userProfile?.contact_email || userProfile?.user_email || "" },
+                            { label: "Teléfono", value: (userProfile?.phone || artist?.phone) ? `${userProfile?.phone_country_code ? userProfile.phone_country_code + " " : ""}${userProfile?.phone || artist?.phone}` : "" },
+                            { label: "Nacionalidad", value: userProfile?.nationality || artist?.nationality || "" },
+                            { label: "Residencia", value: [userProfile?.address, userProfile?.country_of_residence || artist?.country_of_residence].filter(Boolean).join(", ") || "" },
+                            { label: "Género", value: userProfile?.gender === "male" ? "Masculino" : userProfile?.gender === "female" ? "Femenino" : userProfile?.gender === "prefer_not_to_say" ? "Prefiero no decirlo" : "" },
+                            { label: "Tipo de creador", value: userProfile?.creator_type || "" },
+                          ].filter(r => r.value).map((row, i) => (
+                            <div key={i} className="flex items-start justify-between gap-3 px-4 py-3">
+                              <p className="text-[10px] font-semibold text-white/30 uppercase tracking-wider pt-0.5 flex-shrink-0">{row.label}</p>
+                              <p className="text-xs text-white/70 text-right break-words">{row.value}</p>
                             </div>
-                            <PhotosGallery userProfileId={userProfile.id} compact={true} />
-                          </div>
-                        )}
-
-
+                          ))}
+                          {(!userProfile?.first_name && !userProfile?.artist_name && !userProfile?.contact_email && !userProfile?.phone) && (
+                            <div className="px-4 py-6 text-center">
+                              <p className="text-xs text-white/25">Completa tu perfil con el botón Editar</p>
+                            </div>
+                          )}
+                        </div>
 
                         {/* Cerrar sesión */}
                         <div className="border-t border-white/[0.04] pt-3">
