@@ -99,8 +99,10 @@ function TrackEditModal({ track, onClose, onSaved }) {
 
   const saveMutation = useMutation({
     mutationFn: async (data) => {
+      // Filtrar campos internos y valores vacíos antes de enviar.
+      const { id, created_date, updated_date, created_by_id, ...rest } = data;
       const clean = Object.fromEntries(
-        Object.entries(data).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
+        Object.entries(rest).filter(([_, v]) => v !== "" && v !== null && v !== undefined)
       );
       // Generar slug limpio si cambió el título o no existe slug aún.
       const titleChanged = (data.title || "").trim() !== (track.title || "").trim();

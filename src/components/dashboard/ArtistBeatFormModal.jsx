@@ -30,13 +30,19 @@ export default function ArtistBeatFormModal({ artistId, beat, onClose }) {
 
   const saveMutation = useMutation({
     mutationFn: async (data) => {
-      const payload = { ...data, artist_id: artistId };
+      // Filtrar campos internos que no deben enviarse en el update/create.
+      const { id, created_date, updated_date, created_by_id, ...rest } = data;
+      const payload = { ...rest, artist_id: artistId };
       if (beat?.id) return base44.entities.ArtistBeat.update(beat.id, payload);
       return base44.entities.ArtistBeat.create(payload);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["artist-beats", artistId] });
       onClose();
+    },
+    onError: (err) => {
+      console.error("[ArtistBeatFormModal] save failed:", err);
+      alert("No se pudo guardar el beat: " + (err?.message || "Error desconocido"));
     },
   });
 
@@ -45,7 +51,11 @@ export default function ArtistBeatFormModal({ artistId, beat, onClose }) {
     setUploading(field);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      if (!file_url) throw new Error("No se recibió la URL del archivo");
       setForm((f) => ({ ...f, [field]: file_url }));
+    } catch (err) {
+      console.error("[ArtistBeatFormModal] upload failed:", err);
+      alert("No se pudo subir el archivo: " + (err?.message || "Error desconocido"));
     } finally {
       setUploading(null);
     }
@@ -60,11 +70,19 @@ export default function ArtistBeatFormModal({ artistId, beat, onClose }) {
       setMp3Error("El archivo debe ser un MP3 (.mp3).");
       return;
     }
+    if (file.size > 70 * 1024 * 1024) {
+      setMp3Error("El archivo supera los 70MB.");
+      return;
+    }
     setMp3Error(null);
     setUploading("mp3");
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      if (!file_url) throw new Error("No se recibió la URL del archivo");
       setForm((f) => ({ ...f, audio_url: file_url }));
+    } catch (err) {
+      console.error("[ArtistBeatFormModal] MP3 upload failed:", err);
+      setMp3Error("No se pudo subir el MP3: " + (err?.message || "Error desconocido"));
     } finally {
       setUploading(null);
     }
