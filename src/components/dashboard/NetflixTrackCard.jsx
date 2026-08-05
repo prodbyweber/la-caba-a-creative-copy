@@ -37,6 +37,17 @@ function getYoutubeId(url) {
   return m ? m[1] : null;
 }
 
+// Extrae el nombre del archivo desde una URL de storage (fallback para tracks legacy).
+function fileNameFromUrl(url) {
+  if (!url) return "MP3";
+  try {
+    const decoded = decodeURIComponent(url.split("?")[0].split("/").pop());
+    return decoded || "MP3";
+  } catch {
+    return "MP3";
+  }
+}
+
 function AudioWave() {
   const bars = [3, 6, 9, 5, 8, 4, 7, 3, 6, 8, 5];
   return (
@@ -129,9 +140,17 @@ function TrackEditModal({ track, onClose, onSaved }) {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingCover(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    setFormData(f => ({ ...f, cover_url: file_url }));
-    setUploadingCover(false);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      if (!file_url) throw new Error("No se recibió la URL del archivo");
+      setFormData(f => ({ ...f, cover_url: file_url }));
+    } catch (err) {
+      console.error('[NetflixTrackCard] Cover upload failed:', err);
+      alert('No se pudo subir la portada: ' + (err?.message || 'Error desconocido'));
+    } finally {
+      setUploadingCover(false);
+      if (e?.target) e.target.value = "";
+    }
   };
 
   const handleAudioUpload = async (e) => {
@@ -139,17 +158,24 @@ function TrackEditModal({ track, onClose, onSaved }) {
     if (!file) return;
     if (file.size > 70 * 1024 * 1024) { alert('El archivo supera los 70MB'); e.target.value = ""; return; }
     setUploadingAudio(true);
+    let success = false;
     try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const uploadP = base44.integrations.Core.UploadFile({ file });
+      const timeoutP = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Tiempo de espera agotado")), 120000)
+      );
+      const { file_url } = await Promise.race([uploadP, timeoutP]);
       if (!file_url) throw new Error("No se recibió la URL del archivo");
-      setFormData(f => ({ ...f, audio_file_url: file_url }));
+      setFormData(f => ({ ...f, audio_file_url: file_url, audio_file_name: file.name }));
+      success = true;
     } catch (err) {
       console.error('[NetflixTrackCard] Audio upload failed:', err);
       alert('No se pudo subir el MP3: ' + (err?.message || 'Error desconocido'));
     } finally {
       setUploadingAudio(false);
-      e.target.value = "";
+      if (e?.target) e.target.value = "";
     }
+    return success;
   };
 
   const addComposer = () => {
@@ -256,7 +282,11 @@ function TrackEditModal({ track, onClose, onSaved }) {
                       {uploadingAudio ? 'Subiendo...' : formData.audio_file_url ? 'Cambiar MP3' : 'Subir MP3'}
                       <input type="file" accept=".mp3,audio/mpeg" onChange={handleAudioUpload} className="hidden" disabled={uploadingAudio} />
                     </label>
-                    {formData.audio_file_url && <p className="text-xs text-emerald-400 mt-1">✓ MP3 cargado</p>}
+                    {formData.audio_file_url && (
+                      <p className="text-xs text-emerald-400 mt-1 truncate max-w-[240px]" title={formData.audio_file_name || fileNameFromUrl(formData.audio_file_url)}>
+                        ✓ {formData.audio_file_name || fileNameFromUrl(formData.audio_file_url)}
+                      </p>
+                    )}
                   </div>
                 </div>
                 {isAdmin && formData.audio_file_url && (

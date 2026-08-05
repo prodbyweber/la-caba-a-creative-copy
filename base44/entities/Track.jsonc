@@ -34,6 +34,10 @@
       "type": "string",
       "description": "URL del archivo de audio MP3/WAV"
     },
+    "audio_file_name": {
+      "type": "string",
+      "description": "Nombre original del \u00faltimo archivo de audio subido (tal cual se subi\u00f3)"
+    },
     "youtube_music_url": {
       "type": "string",
       "description": "URL de YouTube Music o YouTube"
