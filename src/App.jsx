@@ -53,6 +53,7 @@ import GlobalAudioPlayer from '@/components/audio/GlobalAudioPlayer';
 import BeatMiniPlayer from '@/components/audio/BeatMiniPlayer';
 import ExpandedPlayer from '@/components/audio/ExpandedPlayer';
 import OnboardingForm from '@/components/onboarding/OnboardingForm';
+import Access from './pages/Access';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -169,6 +170,7 @@ const AuthenticatedApp = () => {
 
       {/* Public: Explorar is accessible without login */}
       <Route path="/Explorar" element={<Explorar />} />
+      <Route path="/access" element={<Access />} />
       <Route path="/beats" element={<Beats />} />
       <Route path="/beats/:id" element={<BeatDetail />} />
       <Route path="/t/:slug" element={<TrackShare />} />
