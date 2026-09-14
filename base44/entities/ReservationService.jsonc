@@ -1,0 +1,69 @@
+{
+  "name": "ReservationService",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre del servicio o producto reservable"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "digital",
+        "estudio",
+        "mix_master"
+      ],
+      "description": "Categor\u00eda: digital (sample packs, workshops, beats), estudio (horas de estudio), mix_master (mix & mastering)"
+    },
+    "subcategory": {
+      "type": "string",
+      "description": "Subcategor\u00eda visible (ej: Horas de estudio, Estudio + Beatmaking)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n del servicio (qu\u00e9 incluye)"
+    },
+    "duration_hours": {
+      "type": "number",
+      "description": "Duraci\u00f3n en horas (para servicios de estudio)"
+    },
+    "price": {
+      "type": "number",
+      "description": "Precio del servicio en euros"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si el servicio est\u00e1 disponible para reservar"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "online",
+        "manual",
+        "contact"
+      ],
+      "default": "manual",
+      "description": "M\u00e9todo de reserva: online (payment link), manual (solicitar reserva), contact (gesti\u00f3n manual)"
+    },
+    "payment_link": {
+      "type": "string",
+      "description": "URL de pago configurada por el admin para el m\u00e9todo online"
+    },
+    "is_beat_picker": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si el servicio requiere seleccionar un beat del cat\u00e1logo (precio variable seg\u00fan el beat)"
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n dentro de su categor\u00eda"
+    }
+  },
+  "required": [
+    "name",
+    "category",
+    "price"
+  ]
+}

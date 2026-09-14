@@ -1,0 +1,156 @@
+{
+  "name": "Reservation",
+  "type": "object",
+  "properties": {
+    "customer_name": {
+      "type": "string",
+      "description": "Nombre del cliente"
+    },
+    "customer_last_name": {
+      "type": "string",
+      "description": "Apellidos del cliente"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email de contacto del cliente"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Tel\u00e9fono del cliente"
+    },
+    "artist_project": {
+      "type": "string",
+      "description": "Nombre art\u00edstico / proyecto"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Notas adicionales del cliente"
+    },
+    "service_id": {
+      "type": "string",
+      "description": "ID del servicio reservado (ReservationService o Beat)"
+    },
+    "service_kind": {
+      "type": "string",
+      "enum": [
+        "service",
+        "beat"
+      ],
+      "default": "service",
+      "description": "Si el servicio reservado es un servicio del cat\u00e1logo o un beat"
+    },
+    "service_name": {
+      "type": "string",
+      "description": "Nombre del servicio (snapshot)"
+    },
+    "service_price": {
+      "type": "number",
+      "description": "Precio del servicio (snapshot)"
+    },
+    "extras": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "beat_id": {
+            "type": "string"
+          },
+          "hours": {
+            "type": "number"
+          },
+          "price": {
+            "type": "number"
+          }
+        }
+      },
+      "description": "Extras a\u00f1adidos a la reserva (snapshot)"
+    },
+    "beat_id": {
+      "type": "string",
+      "description": "ID del beat seleccionado (si el servicio o un extra es un beat)"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha de la reserva"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Hora de inicio (HH:MM)"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Hora de fin (HH:MM)"
+    },
+    "duration_hours": {
+      "type": "number",
+      "description": "Duraci\u00f3n total en horas"
+    },
+    "subtotal": {
+      "type": "number",
+      "description": "Subtotal de la reserva"
+    },
+    "total": {
+      "type": "number",
+      "description": "Total de la reserva"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "online",
+        "manual",
+        "contact"
+      ],
+      "default": "manual",
+      "description": "M\u00e9todo de pago/reserva"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid",
+        "refunded"
+      ],
+      "default": "pending",
+      "description": "Estado del pago"
+    },
+    "reservation_status": {
+      "type": "string",
+      "enum": [
+        "pendiente",
+        "confirmada",
+        "pagada",
+        "completada",
+        "cancelada"
+      ],
+      "default": "pendiente",
+      "description": "Estado de la reserva"
+    },
+    "payment_link": {
+      "type": "string",
+      "description": "Payment link utilizado (snapshot)"
+    },
+    "internal_notes": {
+      "type": "string",
+      "description": "Notas internas editables solo por el admin"
+    },
+    "created_by_admin": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si la reserva fue creada manualmente desde el admin"
+    }
+  },
+  "required": [
+    "customer_name",
+    "email",
+    "service_id",
+    "date",
+    "start_time"
+  ]
+}

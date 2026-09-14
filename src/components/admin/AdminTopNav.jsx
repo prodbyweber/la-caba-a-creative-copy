@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Users, Calendar, Monitor, Inbox, User, LogOut,
-  ChevronRight, Film, Music2,
+  ChevronRight, Film, Music2, CalendarCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -16,6 +16,7 @@ export const ADMIN_NAV_ITEMS = [
   { icon: Monitor, label: "Design Editor", page: "DesignEditor" },
   { icon: Film, label: "Weber", page: "WeberAdmin" },
   { icon: Music2, label: "Beats", page: "BeatsAdmin" },
+  { icon: CalendarCheck, label: "Reservas", page: "ReservasAdmin" },
 ];
 
 // Barra superior de navegación del administrador (desktop horizontal + perfil).

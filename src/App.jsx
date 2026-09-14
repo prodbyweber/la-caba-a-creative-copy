@@ -54,6 +54,8 @@ import BeatMiniPlayer from '@/components/audio/BeatMiniPlayer';
 import ExpandedPlayer from '@/components/audio/ExpandedPlayer';
 import OnboardingForm from '@/components/onboarding/OnboardingForm';
 import Access from './pages/Access';
+import Reservas from './pages/Reservas';
+import ReservasAdmin from './pages/ReservasAdmin';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -171,6 +173,7 @@ const AuthenticatedApp = () => {
       {/* Public: Explorar is accessible without login */}
       <Route path="/Explorar" element={<Explorar />} />
       <Route path="/access" element={<Access />} />
+      <Route path="/reservas" element={<Reservas />} />
       <Route path="/beats" element={<Beats />} />
       <Route path="/beats/:id" element={<BeatDetail />} />
       <Route path="/t/:slug" element={<TrackShare />} />
@@ -195,6 +198,7 @@ const AuthenticatedApp = () => {
       <Route path="/WeberAdmin" element={<ProtectedAdminRoute element={<WeberAdmin />} />} />
       <Route path="/StudioSessionEditor" element={<ProtectedAdminRoute element={<StudioSessionEditor />} />} />
       <Route path="/BeatsAdmin" element={<ProtectedAdminRoute element={<BeatsAdmin />} />} />
+      <Route path="/ReservasAdmin" element={<ProtectedAdminRoute element={<ReservasAdmin />} />} />
 
       {/* Legacy pages config loop */}
       {Object.entries(Pages).map(([path, Page]) => (

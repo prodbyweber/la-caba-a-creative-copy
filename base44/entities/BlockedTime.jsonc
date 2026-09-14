@@ -1,0 +1,33 @@
+{
+  "name": "BlockedTime",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Fecha del bloqueo"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Hora de inicio del bloqueo (HH:MM)"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Hora de fin del bloqueo (HH:MM)"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Motivo del bloqueo"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si el bloqueo est\u00e1 activo"
+    }
+  },
+  "required": [
+    "date",
+    "start_time",
+    "end_time"
+  ]
+}

@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, Calendar, Inbox, Monitor, Film, Music2 } from "lucide-react";
+import { LayoutDashboard, Users, Calendar, Inbox, Monitor, Film, Music2, CalendarCheck } from "lucide-react";
 import { createPageUrl } from "@/utils";
 
 const items = [
@@ -12,6 +12,7 @@ const items = [
   { icon: Monitor,         label: "Design",     page: "DesignEditor" },
   { icon: Film,            label: "Weber",      page: "WeberAdmin" },
   { icon: Music2,          label: "Beats",       page: "BeatsAdmin" },
+  { icon: CalendarCheck,   label: "Reservas",    page: "ReservasAdmin" },
 ];
 
 export default function AdminBottomNav() {
