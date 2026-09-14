@@ -36,13 +36,13 @@ export default function BeatPicker({ open, onClose, onSelect, title = "Seleccion
       {open && (
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-0 md:p-4"
         >
           <div className="absolute inset-0 bg-black/85 backdrop-blur-sm" onClick={onClose} />
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }}
+            initial={{ opacity: 0, scale: 0.96, y: 40 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 40 }}
             onClick={e => e.stopPropagation()}
-            className="relative w-full max-w-2xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
+            className="relative w-full md:max-w-2xl rounded-t-2xl md:rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
             style={{ background: "#141414", maxHeight: "85vh", display: "flex", flexDirection: "column" }}
           >
             <div className="p-5 border-b border-white/[0.07] flex items-center justify-between">

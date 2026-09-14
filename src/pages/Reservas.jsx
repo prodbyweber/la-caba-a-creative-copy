@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { STEPS, calcTotals, normalizeBeatService, formatPrice, generateReservationCode, sendReservationEmail } from "@/lib/reservations";
 import WizardSidebar from "@/components/reservas/WizardSidebar";
+import MobileReservas from "@/components/reservas/mobile/MobileReservas";
 import BeatPicker from "@/components/reservas/BeatPicker";
 import StepService from "@/components/reservas/StepService";
 import StepExtras from "@/components/reservas/StepExtras";
@@ -113,6 +115,41 @@ export default function Reservas() {
 
   const handleComplete = () => setStep(5);
 
+  const isMobile = useIsMobile();
+
+  // Layout mobile específico — no afecta al desktop
+  if (isMobile) {
+    return (
+      <MobileReservas
+        step={step}
+        service={service}
+        setService={setService}
+        extras={extras}
+        setExtras={setExtras}
+        date={date}
+        setDate={setDate}
+        startTime={startTime}
+        setStartTime={setStartTime}
+        endTime={endTime}
+        setEndTime={setEndTime}
+        info={info}
+        setInfo={setInfo}
+        reservation={reservation}
+        beatMode={beatMode}
+        setBeatMode={setBeatMode}
+        canProceed={canProceed}
+        next={next}
+        back={back}
+        handlePickBeat={handlePickBeat}
+        handleCreate={handleCreate}
+        handleCardSubmitted={handleCardSubmitted}
+        handleComplete={handleComplete}
+        durationHours={durationHours}
+      />
+    );
+  }
+
+  // ── Layout desktop (sin cambios) ──
   return (
     <div className="flex flex-col" style={{ minHeight: "100dvh", background: "#0a0a0b" }}>
       {/* Top bar (mobile logo) */}
