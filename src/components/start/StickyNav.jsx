@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { key: "artists",  label: "Creadores",     hideOnExplorar: true },
   { key: "brands",   label: "Marcas",        hideOnExplorar: true },
   { key: "explorar", label: "Explorar",      hideOnExplorar: false },
-  { key: "choose",   label: "Comenzar",      hideOnExplorar: false },
+  { key: "choose",   label: "Reservar",      hideOnExplorar: false },
 ];
 
 const scrollTo = (id) => {
@@ -84,7 +84,7 @@ export default function StickyNav({ showMoreInfo = false }) {
                 style={{ overflow: "hidden" }}
               >
                 <button
-                  onClick={() => scrollTo(item.key)}
+                  onClick={() => item.key === "choose" ? navigate("/reservas") : scrollTo(item.key)}
                   style={{
                     fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                     fontWeight: 900,

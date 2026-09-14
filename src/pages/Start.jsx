@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import StartNav from "@/components/start/StartNav";
 import StartHero from "@/components/start/StartHero";
 import CatalogoCarousel from "@/components/start/CatalogoCarousel";
@@ -12,6 +13,7 @@ import ApplicationModal from "@/components/start/ApplicationModal";
 export default function Start() {
   const [modalOpen, setModalOpen] = useState(false);
   const [showStickyCta, setShowStickyCta] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => { window.scrollTo(0, 0); }, []);
 
@@ -68,7 +70,7 @@ export default function Start() {
       {/* 4. Sección del Proceso — acordeones desplegables */}
       <HowItWorksAccordion />
 
-      {/* 5. Cierre de embudo — "Comenzar" con Calendly integrado */}
+      {/* 5. Cierre de embudo — "Reservar" */}
       <div id="contacto">
         <StartChoosePath />
       </div>
@@ -100,7 +102,7 @@ export default function Start() {
             }}
           >
             <button
-              onClick={() => { document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}
+              onClick={() => navigate("/reservas")}
               style={{
                 fontFamily: "'Helvetica Neue', sans-serif",
                 fontWeight: 700,
@@ -120,7 +122,7 @@ export default function Start() {
               onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; }}
             >
-              Sesión de descubrimiento gratis →
+              Reservar →
             </button>
           </motion.div>
         )}

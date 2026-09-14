@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { STEPS } from "@/lib/reservations";
 import MobileStepService from "./MobileStepService";
 import MobileStepExtras from "./MobileStepExtras";
@@ -31,7 +32,7 @@ export default function MobileReservas({
         className="sticky top-0 z-30 flex items-center justify-between px-5 py-3 border-b border-white/[0.06]"
         style={{ background: "#0d0d0e", paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
       >
-        <img src={LOGO} alt="Cabaña Creative" className="h-6 w-auto opacity-90" />
+        <Link to="/"><img src={LOGO} alt="Cabaña Creative" className="h-6 w-auto opacity-90" /></Link>
         <div className="text-right">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
             {String(step + 1).padStart(2, "0")} / {String(STEPS.length).padStart(2, "0")}

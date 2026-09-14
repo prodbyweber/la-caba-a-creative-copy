@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Link } from "react-router-dom";
 import { STEPS, calcTotals, normalizeBeatService, formatPrice, generateReservationCode, sendReservationEmail } from "@/lib/reservations";
 import WizardSidebar from "@/components/reservas/WizardSidebar";
 import MobileReservas from "@/components/reservas/mobile/MobileReservas";
@@ -154,7 +155,7 @@ export default function Reservas() {
     <div className="flex flex-col" style={{ minHeight: "100dvh", background: "#0a0a0b" }}>
       {/* Top bar (mobile logo) */}
       <div className="md:hidden flex items-center justify-between px-5 py-3 border-b border-white/[0.06]" style={{ background: "#0d0d0e" }}>
-        <img src={LOGO} alt="Cabaña Creative" className="h-7 w-auto opacity-90" />
+        <Link to="/"><img src={LOGO} alt="Cabaña Creative" className="h-7 w-auto opacity-90" /></Link>
         <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#ff5833]">Reservas</span>
       </div>
 
@@ -164,7 +165,7 @@ export default function Reservas() {
         <main className="flex-1 flex flex-col overflow-hidden">
           {/* Desktop top bar */}
           <div className="hidden md:flex items-center justify-between px-8 py-4 border-b border-white/[0.06]">
-            <img src={LOGO} alt="Cabaña Creative" className="h-8 w-auto opacity-90" />
+            <Link to="/"><img src={LOGO} alt="Cabaña Creative" className="h-8 w-auto opacity-90" /></Link>
             <span className="text-xs text-white/40">{STEPS[step].label} · Paso {step + 1} de {STEPS.length}</span>
           </div>
 

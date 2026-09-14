@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { key: "explorar", label: "Explorar" },
   { key: "artists",  label: "Creadores" },
   { key: "about",    label: "Quiénes Somos" },
-  { key: "choose",   label: "Comenzar" },
+  { key: "choose",   label: "Reservar" },
 ];
 
 const scrollTo = (id) => {
@@ -84,7 +84,7 @@ export default function LandingStickyNav() {
                 style={{ overflow: "hidden" }}
               >
                 <button
-                  onClick={() => scrollTo(item.key)}
+                  onClick={() => item.key === "choose" ? navigate("/reservas") : scrollTo(item.key)}
                   style={{
                     fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                     fontWeight: 900,
