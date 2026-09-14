@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient } from "@tanstack/react-query";
-import { STEPS, calcTotals, normalizeBeatService } from "@/lib/reservations";
+import { STEPS, calcTotals, normalizeBeatService, formatPrice } from "@/lib/reservations";
 import WizardSidebar from "@/components/reservas/WizardSidebar";
 import BeatPicker from "@/components/reservas/BeatPicker";
 import StepService from "@/components/reservas/StepService";
@@ -149,8 +149,37 @@ export default function Reservas() {
                   )}
                 </motion.div>
               </AnimatePresence>
-            </div>
-          </div>
+
+              {/* Resumen de selección (pasos Servicio y Extras) */}
+              {(step === 0 || step === 1) && service && (
+               <div className="mt-8 pt-6 border-t border-white/[0.06]">
+                 <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/30 mb-3">Resumen de selección</p>
+                 <div className="space-y-2">
+                   <div className="flex items-center justify-between text-sm">
+                     <span className="text-white/50">Servicio</span>
+                     <span className="text-white font-medium">{service.name}</span>
+                   </div>
+                   {step === 1 && extras.filter(e => e.type === "beat").map(e => (
+                     <div key={e.beat_id} className="flex items-center justify-between text-sm">
+                       <span className="text-white/50">Beat · {e.name}</span>
+                       <span className="text-white/70">{formatPrice(e.price)}</span>
+                     </div>
+                   ))}
+                   {step === 1 && extras.filter(e => e.type === "simple").map(e => (
+                     <div key={e.extra_id} className="flex items-center justify-between text-sm">
+                       <span className="text-white/50">{e.name}</span>
+                       <span className="text-white/70">{formatPrice(e.price)}</span>
+                     </div>
+                   ))}
+                   <div className="flex items-center justify-between pt-2 border-t border-white/[0.05]">
+                     <span className="text-white font-semibold">Total</span>
+                     <span className="text-xl font-black text-[#ff5833]">{formatPrice(calcTotals(service, extras).total)}</span>
+                   </div>
+                 </div>
+               </div>
+              )}
+              </div>
+              </div>
 
           {/* Bottom nav (hidden on confirmation) */}
           {step < 5 && (

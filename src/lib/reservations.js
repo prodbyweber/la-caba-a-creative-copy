@@ -10,8 +10,33 @@ export const STEPS = [
   { key: "confirmation", label: "Confirmación", short: "Hecho" },
 ];
 
-// Horario de apertura del estudio
-export const WORKING_HOURS = { start: "10:00", end: "22:00" };
+// Horario operativo por defecto del estudio (fallback si no hay config en admin).
+export const WORKING_HOURS = { start: "15:00", end: "23:00" };
+
+// Horario operativo del estudio por día de la semana (configurable desde Admin).
+let _operatingHoursCache = null;
+export async function getOperatingHours() {
+  if (_operatingHoursCache) return _operatingHoursCache;
+  try {
+    const rows = await base44.entities.StudioOperatingHours.list("day_of_week");
+    const map = {};
+    rows.forEach(r => { map[r.day_of_week] = { start: r.start_time, end: r.end_time, is_open: r.is_open !== false }; });
+    _operatingHoursCache = map;
+    return map;
+  } catch {
+    return null;
+  }
+}
+export function clearOperatingHoursCache() { _operatingHoursCache = null; }
+
+// Devuelve el horario operativo de una fecha concreta (con fallback al por defecto).
+export async function getHoursForDate(date) {
+  const dayOfWeek = new Date(date + "T00:00:00").getDay();
+  const hours = (await getOperatingHours()) || {};
+  const day = hours[dayOfWeek];
+  if (!day) return { is_open: true, start: WORKING_HOURS.start, end: WORKING_HOURS.end };
+  return { is_open: !!day.is_open, start: day.start || WORKING_HOURS.start, end: day.end || WORKING_HOURS.end };
+}
 
 export const CATEGORY_LABELS = {
   estudio: "Reservas de estudio",
@@ -61,28 +86,31 @@ export function overlaps(s1, e1, s2, e2) {
 
 // Comprueba disponibilidad de un slot contra reservas existentes y horarios bloqueados
 export async function checkAvailability(date, startTime, durationHours, excludeId = null) {
-  const end = minutesToTime(timeToMinutes(startTime) + Math.round(durationHours * 60));
-  // Dentro del horario de apertura
-  if (timeToMinutes(startTime) < timeToMinutes(WORKING_HOURS.start) || timeToMinutes(end) > timeToMinutes(WORKING_HOURS.end)) {
-    return { available: false, end, reason: "Fuera del horario de apertura (10:00–22:00)" };
+  const { is_open, start, end } = await getHoursForDate(date);
+  const endSlot = minutesToTime(timeToMinutes(startTime) + Math.round(durationHours * 60));
+  if (!is_open) return { available: false, end: endSlot, reason: "Día no disponible" };
+  if (timeToMinutes(startTime) < timeToMinutes(start) || timeToMinutes(endSlot) > timeToMinutes(end)) {
+    return { available: false, end: endSlot, reason: `Fuera del horario operativo (${start}–${end})` };
   }
   const [reservations, blocked] = await Promise.all([
     base44.entities.Reservation.filter({ date }),
     base44.entities.BlockedTime.filter({ date, active: true }),
   ]);
   const active = reservations.filter(r => r.reservation_status !== "cancelada" && r.id !== excludeId);
-  const conflict = active.find(r => overlaps(startTime, end, r.start_time, r.end_time));
-  if (conflict) return { available: false, end, reason: "Horario ya reservado", conflict };
-  const bConflict = blocked.find(b => overlaps(startTime, end, b.start_time, b.end_time));
-  if (bConflict) return { available: false, end, reason: "Horario bloqueado", conflict: bConflict };
-  return { available: true, end };
+  const conflict = active.find(r => overlaps(startTime, endSlot, r.start_time, r.end_time));
+  if (conflict) return { available: false, end: endSlot, reason: "Horario ya reservado", conflict };
+  const bConflict = blocked.find(b => overlaps(startTime, endSlot, b.start_time, b.end_time));
+  if (bConflict) return { available: false, end: endSlot, reason: "Horario bloqueado", conflict: bConflict };
+  return { available: true, end: endSlot };
 }
 
-// Genera slots disponibles para una fecha y duración
+// Genera slots disponibles para una fecha y duración (inicios a la hora en punto).
 export async function getAvailableSlots(date, durationHours, excludeId = null) {
-  const stepMin = 30;
-  const startMin = timeToMinutes(WORKING_HOURS.start);
-  const endMin = timeToMinutes(WORKING_HOURS.end);
+  const { is_open, start, end } = await getHoursForDate(date);
+  if (!is_open) return [];
+  const stepMin = 60; // inicios a la hora en punto
+  const startMin = timeToMinutes(start);
+  const endMin = timeToMinutes(end);
   const durMin = Math.round(durationHours * 60);
   const [reservations, blocked] = await Promise.all([
     base44.entities.Reservation.filter({ date }),

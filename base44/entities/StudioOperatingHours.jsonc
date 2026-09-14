@@ -1,0 +1,28 @@
+{
+  "name": "StudioOperatingHours",
+  "type": "object",
+  "properties": {
+    "day_of_week": {
+      "type": "number",
+      "description": "D\u00eda de la semana (0 = domingo, 1 = lunes, ... 6 = s\u00e1bado). Un registro por d\u00eda."
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Hora de apertura del estudio (HH:MM)"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Hora de cierre del estudio (HH:MM)"
+    },
+    "is_open": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si el estudio abre ese d\u00eda"
+    }
+  },
+  "required": [
+    "day_of_week",
+    "start_time",
+    "end_time"
+  ]
+}

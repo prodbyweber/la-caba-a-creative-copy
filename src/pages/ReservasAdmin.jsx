@@ -9,6 +9,7 @@ import ReservationFormModal from "@/components/admin/ReservationFormModal";
 import ServiceFormModal from "@/components/admin/ServiceFormModal";
 import ExtraFormModal from "@/components/admin/ExtraFormModal";
 import BlockedTimeModal from "@/components/admin/BlockedTimeModal";
+import StudioHoursPanel from "@/components/admin/StudioHoursPanel";
 
 const LOGO = "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
 const TABS = [
@@ -181,6 +182,7 @@ export default function ReservasAdmin() {
         {/* ── HORARIOS ── */}
         {tab === "horarios" && (
           <div>
+            <StudioHoursPanel />
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-white">Horarios bloqueados</h2>
               <button onClick={() => setFormModal({ type: "block" })} className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-[#ff5833] hover:bg-[#ff6b4a] text-white text-xs font-bold"><Plus className="w-3.5 h-3.5" /> Bloquear horario</button>
