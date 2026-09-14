@@ -4,7 +4,6 @@ import useActiveSection from "@/components/start/useActiveSection";
 
 const NAV_ITEMS = [
   { key: "hero",     label: "Inicio" },
-  { key: "explorar", label: "Explorar" },
   { key: "artists",  label: "Creadores" },
   { key: "about",    label: "Quiénes Somos" },
   { key: "choose",   label: "Reservar" },

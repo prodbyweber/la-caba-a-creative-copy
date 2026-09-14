@@ -217,7 +217,7 @@ export default function LandingHero({ bottomOffset } = {}) {
         }} />
       )}
 
-      {/* Bottom-right: slogan */}
+      {/* Center-bottom: slogan blending with background */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -225,32 +225,23 @@ export default function LandingHero({ bottomOffset } = {}) {
         style={{
           position: "absolute",
           bottom: effectiveBottomOffset,
-          right: "clamp(24px, 6vw, 56px)",
+          left: "50%",
+          transform: "translateX(-50%)",
           zIndex: 20,
-          textAlign: "right",
+          textAlign: "center",
           pointerEvents: "none",
           willChange: "transform",
         }}
       >
         <p style={{
           fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          fontSize: "9px",
-          fontWeight: 700,
-          letterSpacing: "0.3em",
-          textTransform: "uppercase",
-          color: "rgba(240,237,232,0.4)",
-          marginBottom: "6px",
-        }}>
-          Música · Films · Creadores
-        </p>
-        <p style={{
-          fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
           fontSize: "clamp(1rem, 2.5vw, 1.4rem)",
           fontWeight: 300,
-          color: "rgba(240,237,232,0.85)",
+          color: "rgba(240,237,232,0.5)",
           letterSpacing: "-0.01em",
           lineHeight: 1.3,
           maxWidth: "320px",
+          mixBlendMode: "overlay",
         }}>
           más que lo que se escucha.
         </p>
