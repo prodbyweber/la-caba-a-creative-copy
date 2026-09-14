@@ -58,13 +58,13 @@ export default function Landing() {
       <LandingNav />
 
       {/* Sticky scroll nav de Landing */}
-      <LandingStickyNav />
+      <LandingStickyNav hasBottomNav={isAuthed} />
 
       <div>
         <LandingHero bottomOffset="clamp(90px, 12vw, 140px)" />
+        <StartWhatWeDo />
         <StartExplorar showButton={true} allowMobileScroll={true} />
         <StartCreadores hideServices />
-        <StartWhatWeDo />
         <StartChoosePath />
         <LandingContact />
         <StartFooter />

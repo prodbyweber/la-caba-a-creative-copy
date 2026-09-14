@@ -19,7 +19,7 @@ const scrollTo = (id) => {
   }
 };
 
-export default function LandingStickyNav() {
+export default function LandingStickyNav({ hasBottomNav = false }) {
   const active = useActiveSection();
   const isChooseSection = active === "choose";
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ export default function LandingStickyNav() {
     <nav
       style={{
         position: "fixed",
-        bottom: `${typeof window !== "undefined" && window.innerWidth >= 768 ? "clamp(30px, 3vw, 60px)" : "max(calc(65px + env(safe-area-inset-bottom, 0px) + 12px), clamp(28px, 5vw, 48px))"}`,
+        bottom: `${typeof window !== "undefined" && window.innerWidth >= 768 ? "clamp(30px, 3vw, 60px)" : hasBottomNav ? "max(calc(65px + env(safe-area-inset-bottom, 0px) + 12px), clamp(28px, 5vw, 48px))" : "max(calc(env(safe-area-inset-bottom, 0px) + 20px), clamp(20px, 6vw, 36px))"}`,
         left: isChooseSection ? "auto" : "clamp(20px, 5vw, 48px)",
         right: isChooseSection ? "clamp(20px, 5vw, 48px)" : "auto",
         zIndex: 100,
