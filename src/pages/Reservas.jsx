@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient } from "@tanstack/react-query";
-import { STEPS, calcTotals, normalizeBeatService, formatPrice } from "@/lib/reservations";
+import { STEPS, calcTotals, normalizeBeatService, formatPrice, generateReservationCode, sendReservationEmail } from "@/lib/reservations";
 import WizardSidebar from "@/components/reservas/WizardSidebar";
 import BeatPicker from "@/components/reservas/BeatPicker";
 import StepService from "@/components/reservas/StepService";
@@ -64,8 +64,10 @@ export default function Reservas() {
     setBeatMode(null);
   };
 
-  const handleCreate = async ({ totals, payment_method }) => {
+  const handleCreate = async ({ totals, payment_method, payment_status, reservation_status, hold_expires_at, payment_link }) => {
+    const code = await generateReservationCode();
     const payload = {
+      reservation_code: code,
       customer_name: info.customer_name,
       customer_last_name: info.customer_last_name,
       email: info.email,
@@ -85,15 +87,31 @@ export default function Reservas() {
       subtotal: totals.subtotal,
       total: totals.total,
       payment_method,
-      payment_status: "pending",
-      reservation_status: "pendiente",
-      payment_link: payment_method === "online" ? (service.payment_link || "") : "",
+      payment_status: payment_status || "pending",
+      reservation_status: reservation_status || "pendiente",
+      hold_expires_at: hold_expires_at || null,
+      payment_link: payment_link || "",
     };
     const created = await base44.entities.Reservation.create(payload);
     setReservation(created);
     queryClient.invalidateQueries({ queryKey: ["reservations"] });
+    // Email al cliente + CC al estudio (contenido adaptado al método)
+    sendReservationEmail({ ...created, reservation_code: code }).catch(() => {});
+    return { ...created, reservation_code: code };
+  };
+
+  // Tarjeta: el usuario confirma "YA HE REALIZADO EL PAGO" → payment_submitted + pending_verification
+  const handleCardSubmitted = async (res) => {
+    const updated = await base44.entities.Reservation.update(res.id, {
+      payment_status: "payment_submitted",
+      reservation_status: "pending_verification",
+    });
+    setReservation({ ...res, ...updated });
+    queryClient.invalidateQueries({ queryKey: ["reservations"] });
     setStep(5);
   };
+
+  const handleComplete = () => setStep(5);
 
   return (
     <div className="flex flex-col" style={{ minHeight: "100dvh", background: "#0a0a0b" }}>
@@ -138,7 +156,8 @@ export default function Reservas() {
                   {step === 4 && (
                     <StepPayment
                       service={service} extras={extras} date={date} startTime={startTime} endTime={endTime}
-                      durationHours={durationHours} info={info} onCreate={handleCreate}
+                      durationHours={durationHours} info={info}
+                      onCreate={handleCreate} onComplete={handleComplete} onCardSubmitted={handleCardSubmitted}
                     />
                   )}
                   {step === 5 && (
@@ -181,8 +200,8 @@ export default function Reservas() {
               </div>
               </div>
 
-          {/* Bottom nav (hidden on confirmation) */}
-          {step < 5 && (
+          {/* Bottom nav (hidden on confirmation and payment — payment has its own action) */}
+          {step < 4 && (
             <div className="border-t border-white/[0.06] px-5 sm:px-8 py-4 flex items-center justify-between" style={{ background: "#0d0d0e" }}>
               <button
                 onClick={back}
@@ -198,6 +217,16 @@ export default function Reservas() {
                 style={{ background: "#ff5833", color: "#fff" }}
               >
                 Siguiente <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+          {step === 4 && (
+            <div className="border-t border-white/[0.06] px-5 sm:px-8 py-4 flex items-center justify-start" style={{ background: "#0d0d0e" }}>
+              <button
+                onClick={back}
+                className="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-medium text-white/60 hover:text-white transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" /> Atrás
               </button>
             </div>
           )}

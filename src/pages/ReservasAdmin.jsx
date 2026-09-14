@@ -3,13 +3,14 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Plus, Pencil, Trash2, Calendar, Music2, Clock, ArrowLeft, Search } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { STATUS_LABELS, STATUS_COLORS, CATEGORY_LABELS, formatPrice } from "@/lib/reservations";
+import { STATUS_LABELS, STATUS_COLORS, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_STATUS_COLORS, CATEGORY_LABELS, formatPrice } from "@/lib/reservations";
 import ReservationDetailModal from "@/components/admin/ReservationDetailModal";
 import ReservationFormModal from "@/components/admin/ReservationFormModal";
 import ServiceFormModal from "@/components/admin/ServiceFormModal";
 import ExtraFormModal from "@/components/admin/ExtraFormModal";
 import BlockedTimeModal from "@/components/admin/BlockedTimeModal";
 import StudioHoursPanel from "@/components/admin/StudioHoursPanel";
+import PaymentConfigPanel from "@/components/admin/PaymentConfigPanel";
 
 const LOGO = "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
 const TABS = [
@@ -17,6 +18,7 @@ const TABS = [
   { key: "servicios", label: "Servicios" },
   { key: "extras", label: "Extras" },
   { key: "horarios", label: "Horarios" },
+  { key: "config", label: "Configuración" },
 ];
 
 export default function ReservasAdmin() {
@@ -116,14 +118,22 @@ export default function ReservasAdmin() {
                   <button key={r.id} onClick={() => setDetail(r)} className="w-full text-left flex items-center gap-3 p-3.5 rounded-xl bg-white/[0.025] hover:bg-white/[0.05] border border-white/[0.06] transition-colors">
                     <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0"><Calendar className="w-4 h-4 text-white/40" /></div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-semibold text-sm truncate">{r.customer_name} · {r.service_name}</p>
-                      <p className="text-white/40 text-xs">{r.date} {r.start_time ? `· ${r.start_time}` : ""} · {r.email}</p>
+                      <p className="text-white font-semibold text-sm truncate">
+                        {r.reservation_code ? <span className="text-[#ff5833] mr-1.5">#{r.reservation_code}</span> : null}
+                        {r.customer_name} · {r.service_name}
+                      </p>
+                      <p className="text-white/40 text-xs">{r.date} {r.start_time ? `· ${r.start_time}` : ""} · {r.email} · {PAYMENT_METHOD_LABELS[r.payment_method] || r.payment_method}</p>
                     </div>
-                    <div className="text-right flex-shrink-0">
+                    <div className="text-right flex-shrink-0 flex flex-col items-end gap-1">
                       <p className="text-white font-bold text-sm">{formatPrice(r.total)}</p>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ background: (STATUS_COLORS[r.reservation_status] || "#999") + "22", color: STATUS_COLORS[r.reservation_status] || "#999" }}>
-                        {STATUS_LABELS[r.reservation_status] || r.reservation_status}
-                      </span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: (PAYMENT_STATUS_COLORS[r.payment_status] || "#999") + "22", color: PAYMENT_STATUS_COLORS[r.payment_status] || "#999" }}>
+                          {PAYMENT_STATUS_LABELS[r.payment_status] || r.payment_status}
+                        </span>
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: (STATUS_COLORS[r.reservation_status] || "#999") + "22", color: STATUS_COLORS[r.reservation_status] || "#999" }}>
+                          {STATUS_LABELS[r.reservation_status] || r.reservation_status}
+                        </span>
+                      </div>
                     </div>
                   </button>
                 ))}
@@ -203,6 +213,9 @@ export default function ReservasAdmin() {
             </div>
           </div>
         )}
+
+        {/* ── CONFIGURACIÓN DE PAGOS ── */}
+        {tab === "config" && <PaymentConfigPanel />}
       </div>
 
       {/* Modales */}

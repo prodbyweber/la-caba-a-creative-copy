@@ -46,21 +46,48 @@ export const CATEGORY_LABELS = {
 
 export const STATUS_LABELS = {
   pendiente: "Pendiente",
+  temporary_hold: "Retención temporal",
+  pending_verification: "Verificación pendiente",
   confirmada: "Confirmada",
   pagada: "Pagada",
   completada: "Completada",
   cancelada: "Cancelada",
+  expired: "Expirada",
 };
 
 export const STATUS_COLORS = {
   pendiente: "#facc15",
-  confirmada: "#60a5fa",
+  temporary_hold: "#fb923c",
+  pending_verification: "#60a5fa",
+  confirmada: "#34d399",
   pagada: "#34d399",
   completada: "#a78bfa",
   cancelada: "#f87171",
+  expired: "#6b7280",
+};
+
+export const PAYMENT_STATUS_LABELS = {
+  pending: "Pendiente",
+  payment_submitted: "Pago enviado",
+  paid: "Pagado",
+  failed: "Fallido",
+  expired: "Expirado",
+  refunded: "Reembolsado",
+};
+
+export const PAYMENT_STATUS_COLORS = {
+  pending: "#facc15",
+  payment_submitted: "#60a5fa",
+  paid: "#34d399",
+  failed: "#f87171",
+  expired: "#6b7280",
+  refunded: "#a78bfa",
 };
 
 export const PAYMENT_METHOD_LABELS = {
+  transfer: "Transferencia bancaria",
+  cash: "Pago en efectivo",
+  card: "Pago con tarjeta",
   online: "Pago online",
   manual: "Reserva manual",
   contact: "Contacto / pago manual",
@@ -171,29 +198,158 @@ export function normalizeBeatService(beat) {
   };
 }
 
-// Envía el email de confirmación al cliente + copia a hola@cabanacreative.es
-export async function sendReservationEmail(reservation) {
-  const subject = "Reserva confirmada — Cabaña Creative";
+export function formatPrice(n) {
+  return `${Number(n || 0).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€`;
+}
+
+// ── Configuración de pagos (admin) ──
+let _paymentConfigCache = null;
+export async function getPaymentConfig() {
+  if (_paymentConfigCache) return _paymentConfigCache;
+  try {
+    const rows = await base44.entities.PaymentConfig.list();
+    _paymentConfigCache = rows[0] || null;
+    return _paymentConfigCache;
+  } catch {
+    return null;
+  }
+}
+export function clearPaymentConfigCache() { _paymentConfigCache = null; }
+
+// ── Generación de código de reserva (CAB-YYYYMMDD-NNN) ──
+export async function generateReservationCode() {
+  const now = new Date();
+  const ymd = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+  const prefix = `CAB-${ymd}-`;
+  try {
+    const existing = await base44.entities.Reservation.list("-created_date", 200);
+    const todays = existing.filter(r => (r.reservation_code || "").startsWith(prefix));
+    const next = String(todays.length + 1).padStart(3, "0");
+    return `${prefix}${next}`;
+  } catch {
+    return `${prefix}001`;
+  }
+}
+
+// Formatea una fecha ISO (YYYY-MM-DD) a formato largo en español.
+export function formatLongDate(iso) {
+  if (!iso) return "—";
+  try {
+    const [y, m, d] = iso.split("-").map(Number);
+    const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+    return `${d} ${months[m - 1]} ${y}`;
+  } catch {
+    return iso;
+  }
+}
+
+// ── Email de confirmación adaptado al método de pago ──
+// TO: cliente · CC: hola@cabanacreative.es
+export async function sendReservationEmail(reservation, paymentConfig = null) {
+  const cfg = paymentConfig || (await getPaymentConfig());
   const extrasText = (reservation.extras || []).map(e => `${e.name}${e.hours ? ` (${e.hours}h)` : ""}`).join(", ") || "—";
-  const body = `Hola ${reservation.customer_name},
+  const code = reservation.reservation_code || "—";
+  const method = reservation.payment_method;
+  const methodLabel = PAYMENT_METHOD_LABELS[method] || method;
 
-Tu reserva en Cabaña Creative ha sido confirmada.
-
-DETALLES DE TU RESERVA
+  const detailsBlock = `DETALLES DE TU RESERVA
 
 Servicio: ${reservation.service_name}
-Fecha: ${reservation.date}
+Fecha: ${formatLongDate(reservation.date)}
 Hora: ${reservation.start_time || "—"}
 Duración: ${reservation.duration_hours ? reservation.duration_hours + " horas" : "—"}
 Extras: ${extrasText}
-Total: ${reservation.total}€
-${reservation.notes ? `\nNotas: ${reservation.notes}\n` : ""}
-Te esperamos en Cabaña Creative.
+Total: ${formatPrice(reservation.total)}`;
+
+  let subject, body;
+
+  if (method === "transfer") {
+    subject = `Reserva recibida — Cabaña Creative #${code}`;
+    const bankBlock = `DATOS BANCARIOS PARA LA TRANSFERENCIA
+
+Titular: ${cfg?.account_holder || "—"}
+Banco: ${cfg?.bank_name || "—"}
+IBAN: ${cfg?.iban || "—"}
+BIC/SWIFT: ${cfg?.bic_swift || "—"}
+Concepto: ${cfg?.concept_instructions || reservation.customer_name + " / " + code}
+${cfg?.transfer_extra_instructions ? `\n${cfg.transfer_extra_instructions}\n` : ""}`;
+    body = `Hola ${reservation.customer_name},
+
+Hemos recibido correctamente tu solicitud de reserva en Cabaña Creative.
+
+${detailsBlock}
+
+Para completar la reserva, realiza una transferencia bancaria utilizando los siguientes datos:
+
+${bankBlock}
+
+Hemos reservado temporalmente este horario para ti durante 1 hora mientras realizas la transferencia.
+
+Dispones de 1 hora para completar el pago y enviarnos la transferencia. Una vez recibido y corroborado el pago, confirmaremos definitivamente tu reserva.
+
+Si transcurrido este plazo no hemos podido verificar el pago, el horario podrá volver a quedar disponible.
+
+Si ya has realizado la transferencia, no necesitas realizar ninguna otra acción.
+
+Cabaña Creative
+Más de lo que se escucha.
+
+hola@cabanacreative.es`;
+  } else if (method === "cash") {
+    subject = `Solicitud de reserva recibida — Cabaña Creative #${code}`;
+    body = `Hola ${reservation.customer_name},
+
+Hemos recibido correctamente tu solicitud de reserva en Cabaña Creative.
+
+${detailsBlock}
+
+Tu solicitud ha sido recibida correctamente.
+
+Hemos reservado temporalmente el horario seleccionado durante 1 hora mientras coordinamos el pago.
+
+Una vez confirmado el método de pago, recibirás la confirmación definitiva de tu reserva.
+
+Si necesitas cualquier aclaración, puedes contactar con Cabaña Creative en hola@cabanacreative.es.
+
+Cabaña Creative
+Más de lo que se escucha.
+
+hola@cabanacreative.es`;
+  } else if (method === "card") {
+    subject = `Pago pendiente — Cabaña Creative #${code}`;
+    body = `Hola ${reservation.customer_name},
+
+Hemos recibido tu solicitud de reserva en Cabaña Creative.
+
+${detailsBlock}
+
+Has indicado que realizarás el pago mediante tarjeta.
+
+Completa el pago en la plataforma de pago segura que te hemos abierto y vuelve a la página de reservas para indicarnos que has finalizado.
+
+Enlace de pago: ${reservation.payment_link || cfg?.card_payment_link || "—"}
+
+Una vez verificado el pago, te enviaremos la confirmación definitiva de tu reserva.
+
+Cabaña Creative
+Más de lo que se escucha.
+
+hola@cabanacreative.es`;
+  } else {
+    subject = `Reserva confirmada — Cabaña Creative #${code}`;
+    body = `Hola ${reservation.customer_name},
+
+Tu reserva en Cabaña Creative ha sido confirmada.
+
+${detailsBlock}
+
+${reservation.notes ? `Notas: ${reservation.notes}\n\n` : ""}Te esperamos en Cabaña Creative.
 
 Más de lo que se escucha.
 
 Cabaña Creative
 hola@cabanacreative.es`;
+  }
 
   const results = { toClient: false, toStudio: false };
   try {
@@ -209,8 +365,4 @@ hola@cabanacreative.es`;
     console.error("Email estudio fallido:", e);
   }
   return results;
-}
-
-export function formatPrice(n) {
-  return `${Number(n || 0).toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}€`;
 }

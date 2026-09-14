@@ -2,6 +2,10 @@
   "name": "Reservation",
   "type": "object",
   "properties": {
+    "reservation_code": {
+      "type": "string",
+      "description": "Identificador \u00fanico de la reserva (ej: CAB-20260914-001)"
+    },
     "customer_name": {
       "type": "string",
       "description": "Nombre del cliente"
@@ -103,18 +107,24 @@
     "payment_method": {
       "type": "string",
       "enum": [
+        "transfer",
+        "cash",
+        "card",
         "online",
         "manual",
         "contact"
       ],
-      "default": "manual",
+      "default": "transfer",
       "description": "M\u00e9todo de pago/reserva"
     },
     "payment_status": {
       "type": "string",
       "enum": [
         "pending",
+        "payment_submitted",
         "paid",
+        "failed",
+        "expired",
         "refunded"
       ],
       "default": "pending",
@@ -124,10 +134,12 @@
       "type": "string",
       "enum": [
         "pendiente",
+        "temporary_hold",
+        "pending_verification",
         "confirmada",
-        "pagada",
         "completada",
-        "cancelada"
+        "cancelada",
+        "expired"
       ],
       "default": "pendiente",
       "description": "Estado de la reserva"
@@ -135,6 +147,11 @@
     "payment_link": {
       "type": "string",
       "description": "Payment link utilizado (snapshot)"
+    },
+    "hold_expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha/hora de expiraci\u00f3n de la retenci\u00f3n temporal del horario (ISO)"
     },
     "internal_notes": {
       "type": "string",

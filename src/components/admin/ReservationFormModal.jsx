@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Save, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { STATUS_LABELS, PAYMENT_METHOD_LABELS, calcTotals, formatPrice } from "@/lib/reservations";
+import { STATUS_LABELS, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS, calcTotals, formatPrice } from "@/lib/reservations";
 
 // Creación / edición manual de reserva desde el admin.
 export default function ReservationFormModal({ reservation, onClose }) {
@@ -13,7 +13,7 @@ export default function ReservationFormModal({ reservation, onClose }) {
   const [form, setForm] = useState({
     customer_name: "", customer_last_name: "", email: "", phone: "", artist_project: "", notes: "",
     service_id: "", date: "", start_time: "", duration_hours: 2, extras: [], total: 0,
-    reservation_status: "pendiente", payment_method: "manual", internal_notes: "",
+    reservation_status: "pendiente", payment_status: "pending", payment_method: "transfer", internal_notes: "",
   });
 
   const { data: services = [] } = useQuery({
@@ -29,7 +29,8 @@ export default function ReservationFormModal({ reservation, onClose }) {
         notes: reservation.notes || "", service_id: reservation.service_id, date: reservation.date || "",
         start_time: reservation.start_time || "", duration_hours: reservation.duration_hours || 0,
         extras: reservation.extras || [], total: reservation.total || 0,
-        reservation_status: reservation.reservation_status, payment_method: reservation.payment_method || "manual",
+        reservation_status: reservation.reservation_status, payment_status: reservation.payment_status || "pending",
+        payment_method: reservation.payment_method || "transfer",
         internal_notes: reservation.internal_notes || "",
       });
     }
@@ -58,7 +59,7 @@ export default function ReservationFormModal({ reservation, onClose }) {
         end_time: form.start_time && form.duration_hours ? endTimeCalc(form.start_time, form.duration_hours) : null,
         duration_hours: Number(form.duration_hours) || 0,
         subtotal: computedTotal, total: Number(form.total) || computedTotal,
-        payment_method: form.payment_method, payment_status: "pending",
+        payment_method: form.payment_method, payment_status: form.payment_status,
         reservation_status: form.reservation_status, internal_notes: form.internal_notes,
         created_by_admin: !isEdit,
       };
@@ -122,7 +123,12 @@ export default function ReservationFormModal({ reservation, onClose }) {
                   {Object.entries(STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </Field>
-              <Field label="Método de pago">
+              <Field label="Estado del pago">
+                <select value={form.payment_status} onChange={set("payment_status")} className="inp">
+                  {Object.entries(PAYMENT_STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                </select>
+              </Field>
+              <Field label="Método de pago" full>
                 <select value={form.payment_method} onChange={set("payment_method")} className="inp">
                   {Object.entries(PAYMENT_METHOD_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>

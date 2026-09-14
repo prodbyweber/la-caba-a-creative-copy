@@ -3,12 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Mail, Check, Ban, Save, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useQueryClient } from "@tanstack/react-query";
-import { STATUS_LABELS, STATUS_COLORS, PAYMENT_METHOD_LABELS, formatPrice, sendReservationEmail } from "@/lib/reservations";
+import { STATUS_LABELS, STATUS_COLORS, PAYMENT_METHOD_LABELS, PAYMENT_STATUS_LABELS, PAYMENT_STATUS_COLORS, formatPrice, sendReservationEmail } from "@/lib/reservations";
 
 // Detalle de reserva: ver datos, cambiar estado, notas internas, confirmar/cancelar, reenviar email.
 export default function ReservationDetailModal({ reservation, onClose }) {
   const queryClient = useQueryClient();
   const [status, setStatus] = useState(reservation.reservation_status);
+  const [payStatus, setPayStatus] = useState(reservation.payment_status);
   const [internalNotes, setInternalNotes] = useState(reservation.internal_notes || "");
   const [saving, setSaving] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
@@ -22,7 +23,7 @@ export default function ReservationDetailModal({ reservation, onClose }) {
     } finally { setSaving(false); }
   };
 
-  const handleSave = () => update({ reservation_status: status, internal_notes: internalNotes });
+  const handleSave = () => update({ reservation_status: status, payment_status: payStatus, internal_notes: internalNotes });
 
   const handleConfirm = async () => {
     setSaving(true);
@@ -70,7 +71,7 @@ export default function ReservationDetailModal({ reservation, onClose }) {
           style={{ background: "#141414", maxHeight: "88vh", overflowY: "auto" }}>
           <div className="p-5 border-b border-white/[0.07] flex items-center justify-between sticky top-0 z-10" style={{ background: "#141414" }}>
             <div>
-              <h3 className="text-base font-bold text-white">Reserva</h3>
+              <h3 className="text-base font-bold text-white">Reserva {reservation.reservation_code ? <span className="text-[#ff5833]">#{reservation.reservation_code}</span> : ""}</h3>
               <p className="text-xs text-white/40">{reservation.customer_name} · {reservation.date}</p>
             </div>
             <button onClick={onClose} className="w-8 h-8 rounded-lg hover:bg-white/5 flex items-center justify-center"><X className="w-4 h-4 text-white/50" /></button>
@@ -78,9 +79,12 @@ export default function ReservationDetailModal({ reservation, onClose }) {
 
           <div className="p-5 space-y-5">
             {/* Estado badge */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="px-2.5 py-1 rounded text-xs font-bold" style={{ background: (STATUS_COLORS[status] || "#999") + "22", color: STATUS_COLORS[status] || "#999" }}>
                 {STATUS_LABELS[status] || status}
+              </span>
+              <span className="px-2.5 py-1 rounded text-xs font-bold" style={{ background: (PAYMENT_STATUS_COLORS[payStatus] || "#999") + "22", color: PAYMENT_STATUS_COLORS[payStatus] || "#999" }}>
+                {PAYMENT_STATUS_LABELS[payStatus] || payStatus}
               </span>
               <span className="text-xs text-white/40">· {PAYMENT_METHOD_LABELS[reservation.payment_method]}</span>
             </div>
@@ -110,7 +114,7 @@ export default function ReservationDetailModal({ reservation, onClose }) {
               <Row label="Subtotal" value={formatPrice(reservation.subtotal)} />
               <Row label="Total" value={formatPrice(reservation.total)} />
               <Row label="Método" value={PAYMENT_METHOD_LABELS[reservation.payment_method]} />
-              <Row label="Estado pago" value={reservation.payment_status} />
+              <Row label="Estado pago" value={PAYMENT_STATUS_LABELS[reservation.payment_status] || reservation.payment_status} />
               {reservation.payment_link && <Row label="Payment link" value={<a href={reservation.payment_link} target="_blank" rel="noreferrer" className="text-[#ff5833] underline text-xs">Abrir</a>} />}
             </div>
 
@@ -121,6 +125,13 @@ export default function ReservationDetailModal({ reservation, onClose }) {
                 <select value={status} onChange={e => setStatus(e.target.value)}
                   className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#ff5833]/50">
                   {Object.entries(STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Estado del pago</label>
+                <select value={payStatus} onChange={e => setPayStatus(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#ff5833]/50">
+                  {Object.entries(PAYMENT_STATUS_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
               </div>
               <div>
