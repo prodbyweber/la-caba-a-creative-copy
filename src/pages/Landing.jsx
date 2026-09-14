@@ -28,9 +28,10 @@ const FreeSection = ({ children }) => (
 
 export default function Landing() {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthed, setIsAuthed] = useState(false);
 
   useEffect(() => {
-    base44.auth.me().then(u => { if (u?.role === 'admin') setIsAdmin(true); }).catch(() => {});
+    base44.auth.me().then(u => { setIsAuthed(true); if (u?.role === 'admin') setIsAdmin(true); }).catch(() => {});
     const timer = setTimeout(() => {
       const splash = document.getElementById("cabana-splash");
       if (splash) {
@@ -69,7 +70,7 @@ export default function Landing() {
         <StartFooter />
       </div>
 
-      <MobileBottomNav artistId={null} isAdmin={isAdmin} />
+      {isAuthed && <MobileBottomNav artistId={null} isAdmin={isAdmin} />}
     </div>
   );
 }

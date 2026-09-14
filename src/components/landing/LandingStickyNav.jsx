@@ -4,8 +4,8 @@ import useActiveSection from "@/components/start/useActiveSection";
 
 const NAV_ITEMS = [
   { key: "hero",     label: "Inicio" },
-  { key: "artists",  label: "Creadores" },
   { key: "about",    label: "Quiénes Somos" },
+  { key: "artists",  label: "Creadores" },
   { key: "choose",   label: "Reservar" },
 ];
 
@@ -53,7 +53,7 @@ export default function LandingStickyNav() {
               style={{
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 900,
-                fontSize: isActive ? "clamp(1.4rem, 4vw, 2.4rem)" : "clamp(1rem, 2.8vw, 1.6rem)",
+                fontSize: isActive ? "clamp(1.6rem, 5vw, 2.4rem)" : "clamp(1.15rem, 3.2vw, 1.6rem)",
                 letterSpacing: "-0.025em",
                 color: isChoose
                   ? "#ff5833"
