@@ -214,7 +214,7 @@ export default function StartHero() {
           style={{ marginBottom: "clamp(24px, 4vw, 40px)" }}
         >
           <button
-            onClick={() => navigate("/reservas")}
+            onClick={() => document.getElementById("choose")?.scrollIntoView({ behavior: "smooth" })}
             style={{
               fontFamily: "'Helvetica Neue', sans-serif",
               fontWeight: 900,
@@ -231,7 +231,7 @@ export default function StartHero() {
             onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; e.currentTarget.style.transform = "translateY(-1px)"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; e.currentTarget.style.transform = "translateY(0)"; }}
           >
-            Reservar →
+            Agendar sesión de descubrimiento →
           </button>
         </motion.div>
 

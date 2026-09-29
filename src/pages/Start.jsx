@@ -102,7 +102,7 @@ export default function Start() {
             }}
           >
             <button
-              onClick={() => navigate("/reservas")}
+              onClick={() => document.getElementById("choose")?.scrollIntoView({ behavior: "smooth" })}
               style={{
                 fontFamily: "'Helvetica Neue', sans-serif",
                 fontWeight: 700,
@@ -122,7 +122,7 @@ export default function Start() {
               onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; }}
             >
-              Reservar →
+              Agendar sesión de descubrimiento →
             </button>
           </motion.div>
         )}

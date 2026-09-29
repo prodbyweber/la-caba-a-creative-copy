@@ -622,7 +622,7 @@ export default function StartChoosePath() {
             marginBottom: "clamp(8px, 2vw, 16px)",
           }}
         >
-          Reservar
+          Agendar sesión de descubrimiento
         </motion.h2>
 
         <motion.p
@@ -642,32 +642,13 @@ export default function StartChoosePath() {
           Una reunión para conocer tu visión creativa, analizar tu proyecto y explorar cómo podemos ayudarte a desarrollar tu sonido, identidad visual y dirección artística a través de Cabaña Creative.
         </motion.p>
 
-        {/* Botón Reservar — lleva a /reservas */}
+        {/* Calendly embed para agendar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
-          <Link
-            to="/reservas"
-            style={{
-              display: "inline-block",
-              fontFamily: "'Helvetica Neue', sans-serif",
-              fontWeight: 900,
-              fontSize: "clamp(0.85rem, 1.4vw, 0.95rem)",
-              letterSpacing: "0.01em",
-              background: "#ff5833",
-              color: "#fff",
-              border: "none",
-              borderRadius: "8px",
-              padding: "clamp(13px, 1.8vw, 17px) clamp(22px, 3vw, 36px)",
-              cursor: "pointer",
-              textDecoration: "none",
-              transition: "background 0.2s ease, transform 0.2s ease",
-            }}
-          >
-            Reservar sesión →
-          </Link>
+          <CalendlyEmbed />
         </motion.div>
       </div>
     </section>
