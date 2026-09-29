@@ -9,6 +9,7 @@ import HowItWorksAccordion from "@/components/start/HowItWorksAccordion";
 import StartChoosePath from "@/components/start/StartChoosePath";
 import StartFooter from "@/components/start/StartFooter";
 import ApplicationModal from "@/components/start/ApplicationModal";
+import CalendlyModal from "@/components/start/CalendlyModal";
 
 export default function Start() {
   const [modalOpen, setModalOpen] = useState(false);
@@ -102,7 +103,7 @@ export default function Start() {
             }}
           >
             <button
-              onClick={() => document.getElementById("choose")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => window.dispatchEvent(new Event("open-calendly-modal"))}
               style={{
                 fontFamily: "'Helvetica Neue', sans-serif",
                 fontWeight: 700,
@@ -130,6 +131,9 @@ export default function Start() {
 
       {/* Application Modal — controlled from here */}
       <ApplicationModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+
+      {/* Calendly Modal — pop-up cinematográfico */}
+      <CalendlyModal />
     </div>
   );
 }

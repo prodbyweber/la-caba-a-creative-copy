@@ -214,7 +214,7 @@ export default function StartHero() {
           style={{ marginBottom: "clamp(24px, 4vw, 40px)" }}
         >
           <button
-            onClick={() => document.getElementById("choose")?.scrollIntoView({ behavior: "smooth" })}
+            onClick={() => window.dispatchEvent(new Event("open-calendly-modal"))}
             style={{
               fontFamily: "'Helvetica Neue', sans-serif",
               fontWeight: 900,
