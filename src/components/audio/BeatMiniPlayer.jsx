@@ -34,19 +34,23 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
   useEffect(() => {
     if (!isDragging) return;
     const move = (e) => {
+      if (e.cancelable) e.preventDefault();
       const x = e.touches ? e.touches[0].clientX : e.clientX;
+      if (x == null) return;
       performSeek(x);
     };
     const end = () => setIsDragging(false);
-    document.addEventListener("mousemove", move, { passive: true });
-    document.addEventListener("touchmove", move, { passive: true });
+    document.addEventListener("mousemove", move, { passive: false });
+    document.addEventListener("touchmove", move, { passive: false });
     document.addEventListener("mouseup", end);
     document.addEventListener("touchend", end);
+    document.addEventListener("touchcancel", end);
     return () => {
       document.removeEventListener("mousemove", move);
       document.removeEventListener("touchmove", move);
       document.removeEventListener("mouseup", end);
       document.removeEventListener("touchend", end);
+      document.removeEventListener("touchcancel", end);
     };
   }, [isDragging, performSeek]);
 
@@ -88,8 +92,11 @@ export default function BeatMiniPlayer({ onLike, onDownload, onDrive, liked }) {
           <div
             ref={progressRef}
             className="w-full h-full cursor-pointer relative flex items-center"
+            style={{ touchAction: "none" }}
             onMouseDown={(e) => { e.preventDefault(); setIsDragging(true); }}
             onTouchStart={(e) => setIsDragging(true)}
+            onTouchEnd={() => setIsDragging(false)}
+            onTouchCancel={() => setIsDragging(false)}
             onClick={(e) => performSeek(e.clientX)}
           >
             <WaveformBars progress={progress} isPlaying={isPlaying} bars={isMobile ? 56 : 120} color="#ff5833" fullWidth />

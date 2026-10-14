@@ -59,6 +59,7 @@ export default function GlobalAudioPlayer() {
     };
 
     const handleGlobalTouchMove = (e) => {
+      if (e.cancelable) e.preventDefault();
       if (e.touches[0]) {
         performSeek(e.touches[0].clientX);
       }
@@ -123,8 +124,11 @@ export default function GlobalAudioPlayer() {
             <div
               ref={progressRef}
               className="w-full h-1 sm:h-1 bg-white/5 cursor-pointer group hover:bg-white/8 transition-all relative rounded-full"
+              style={{ touchAction: "none" }}
               onMouseDown={handleSeekDown}
               onTouchStart={handleSeekDown}
+              onTouchEnd={handleSeekUp}
+              onTouchCancel={handleSeekUp}
               onClick={handleClick}
             >
               <div

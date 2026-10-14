@@ -21,6 +21,16 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
   const [resolvedArtist, setResolvedArtist] = useState("");
   const progressRef = useRef(null);
   const startY = useRef(null);
+  const movedRef = useRef(false);
+
+  // Bloquear el scroll del fondo mientras el reproductor expandido está abierto:
+  // la vista queda fija y solo se cierra al minimizarla.
+  useEffect(() => {
+    if (!expanded) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [expanded]);
 
   // Resolver el nombre artístico desde la entidad Artist vinculada cuando el track no trae uno real.
   useEffect(() => {
@@ -51,35 +61,45 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
   useEffect(() => {
     if (!isDragging) return;
     const move = (e) => {
+      if (e.cancelable) e.preventDefault();
+      if (e.touches && !e.touches[0]) return;
       const x = e.touches ? e.touches[0].clientX : e.clientX;
+      if (x == null) return;
+      movedRef.current = true;
       performSeek(x);
     };
     const end = () => setIsDragging(false);
-    document.addEventListener("mousemove", move, { passive: true });
-    document.addEventListener("touchmove", move, { passive: true });
+    document.addEventListener("mousemove", move, { passive: false });
+    document.addEventListener("touchmove", move, { passive: false });
     document.addEventListener("mouseup", end);
     document.addEventListener("touchend", end);
+    document.addEventListener("touchcancel", end);
     return () => {
       document.removeEventListener("mousemove", move);
       document.removeEventListener("touchmove", move);
       document.removeEventListener("mouseup", end);
       document.removeEventListener("touchend", end);
+      document.removeEventListener("touchcancel", end);
     };
   }, [isDragging, performSeek]);
 
-  // Swipe down to minimize
+  // Swipe down to minimize — solo con un gesto claramente vertical,
+  // nunca al deslizar la barra de reproducción.
+  const swipeStartX = useRef(null);
   const handleTouchStart = (e) => {
     startY.current = e.touches[0].clientY;
+    swipeStartX.current = e.touches[0].clientX;
   };
   const handleTouchMove = (e) => {
     if (startY.current == null) return;
     const dy = e.touches[0].clientY - startY.current;
-    if (dy > 100) {
+    const dx = Math.abs(e.touches[0].clientX - (swipeStartX.current ?? e.touches[0].clientX));
+    if (dy > 100 && dy > dx * 1.5) {
       setExpanded(false);
       startY.current = null;
     }
   };
-  const handleTouchEnd = () => { startY.current = null; };
+  const handleTouchEnd = () => { startY.current = null; swipeStartX.current = null; };
 
   // Swipe left/right for prev/next (mobile)
   const startX = useRef(null);
@@ -144,7 +164,7 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[200] flex flex-col"
+          className="fixed inset-0 z-[200] flex flex-col overflow-hidden overscroll-none"
           style={{ background: "rgba(8, 8, 10, 0.98)", backdropFilter: "blur(20px)" }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
@@ -300,10 +320,23 @@ export default function ExpandedPlayer({ onLike, onSave, onDownload, onDrive, on
             <div className="w-full mb-4">
               <div
                 ref={progressRef}
-                className="relative h-12 flex items-center cursor-pointer group"
-                onMouseDown={(e) => { e.preventDefault(); setIsDragging(true); }}
-                onTouchStart={(e) => setIsDragging(true)}
-                onClick={(e) => performSeek(e.clientX)}
+                className="relative h-12 flex items-center cursor-pointer group select-none"
+                style={{ touchAction: "none" }}
+                onMouseDown={(e) => { e.preventDefault(); movedRef.current = false; setIsDragging(true); }}
+                onTouchStart={(e) => {
+                  // Aislar el gesto de la onda: no debe minimizar ni cambiar de pista.
+                  e.stopPropagation();
+                  movedRef.current = false;
+                  setIsDragging(true);
+                }}
+                onTouchMove={(e) => e.stopPropagation()}
+                onTouchEnd={(e) => { e.stopPropagation(); setIsDragging(false); }}
+                onTouchCancel={(e) => { e.stopPropagation(); setIsDragging(false); }}
+                onClick={(e) => {
+                  // Evitar un segundo salto cuando el toque ya fue un arrastre.
+                  if (movedRef.current) { movedRef.current = false; return; }
+                  performSeek(e.clientX);
+                }}
               >
                 <WaveformBars progress={progress} isPlaying={isPlaying} bars={56} color="#ff5833" />
               </div>
