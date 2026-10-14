@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useGlobalAudio } from "@/context/GlobalAudioContext";
 import { GENRES, KEYS } from "@/lib/musicConstants";
 import { rankBeatsByGenre } from "@/lib/artistBeats";
+import { sendBeatNotifyEmail } from "@/lib/beatNotify";
 
 // Modal unificado para añadir beats al catálogo del artista.
 //   • Pestaña "Subir privado"  → crea un ArtistBeat (privado, con metadata).
@@ -106,6 +107,25 @@ function TabButton({ active, onClick, icon, label }) {
   );
 }
 
+// Interruptor para notificar al artista por correo (mismo patrón que Soundtracks).
+function NotifyToggle({ checked, onChange }) {
+  return (
+    <label className="flex items-center gap-2 cursor-pointer">
+      <div className="relative">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+          className="sr-only peer"
+        />
+        <div className="w-9 h-5 bg-white/10 rounded-full peer-checked:bg-emerald-500 transition-colors" />
+        <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
+      </div>
+      <span className="text-[11px] text-white/50">Enviar notificación al artista por correo</span>
+    </label>
+  );
+}
+
 // ── Pestaña privada: subir un beat exclusivo con metadata ────────────────────
 function PrivateTab({ artistId, onClose }) {
   const qc = useQueryClient();
@@ -122,12 +142,19 @@ function PrivateTab({ artistId, onClose }) {
   });
   const [uploading, setUploading] = useState(null);
   const [mp3Error, setMp3Error] = useState(null);
+  const [notify, setNotify] = useState(false);
 
   const saveMutation = useMutation({
-    mutationFn: async (data) =>
-      base44.entities.ArtistBeat.create({ ...data, artist_id: artistId }),
-    onSuccess: () => {
+    mutationFn: async ({ data, notify }) => {
+      const created = await base44.entities.ArtistBeat.create({ ...data, artist_id: artistId });
+      return { created, notify };
+    },
+    onSuccess: async ({ created, notify }) => {
       qc.invalidateQueries({ queryKey: ["artist-beats", artistId] });
+      if (notify) {
+        const res = await sendBeatNotifyEmail(artistId, [created?.title || form.title]);
+        alert(res.ok ? `Notificación enviada a ${res.sent_to}` : "No se pudo enviar la notificación al artista");
+      }
       onClose();
     },
   });
@@ -322,6 +349,14 @@ function PrivateTab({ artistId, onClose }) {
         administradores y el artista. No aparecerá en el marketplace.
       </div>
 
+      {/* Notificación al artista */}
+      <div
+        className="rounded-xl px-4 py-3"
+        style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}
+      >
+        <NotifyToggle checked={notify} onChange={setNotify} />
+      </div>
+
       <div className="flex gap-3 pt-1">
         <button
           onClick={onClose}
@@ -330,7 +365,7 @@ function PrivateTab({ artistId, onClose }) {
           Cancelar
         </button>
         <button
-          onClick={() => saveMutation.mutate(form)}
+          onClick={() => saveMutation.mutate({ data: form, notify })}
           disabled={saveMutation.isPending || !form.title}
           className="flex-1 py-3 rounded-xl text-white text-sm font-bold transition-colors disabled:opacity-40"
           style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
@@ -348,6 +383,7 @@ function PublicTab({ artistId, artistGenres, excludeBeatIds, assignedById, onClo
   const { playQueue, playingTrack, isPlaying, pauseTrack, resumeTrack } = useGlobalAudio();
   const [selected, setSelected] = useState(new Set());
   const [search, setSearch] = useState("");
+  const [notify, setNotify] = useState(false);
 
   const { data: publicBeats = [], isLoading } = useQuery({
     queryKey: ["beats-public"],
@@ -373,7 +409,7 @@ function PublicTab({ artistId, artistGenres, excludeBeatIds, assignedById, onClo
   }, [ranked, search]);
 
   const assignMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async ({ notify }) => {
       const ids = Array.from(selected);
       const existing = await base44.entities.ArtistBeatAssignment.filter({ artist_id: artistId });
       const existingIds = new Set(existing.map((a) => a.beat_id));
@@ -388,9 +424,17 @@ function PublicTab({ artistId, artistGenres, excludeBeatIds, assignedById, onClo
           assigned_by_id: assignedById,
         }));
       if (toCreate.length) await base44.entities.ArtistBeatAssignment.bulkCreate(toCreate);
+      return { notify, createdIds: toCreate.map((a) => a.beat_id) };
     },
-    onSuccess: () => {
+    onSuccess: async ({ notify, createdIds }) => {
       qc.invalidateQueries({ queryKey: ["artist-beat-assignments", artistId] });
+      if (notify && createdIds.length) {
+        const titles = createdIds
+          .map((id) => publicBeats.find((b) => b.id === id)?.title)
+          .filter(Boolean);
+        const res = await sendBeatNotifyEmail(artistId, titles);
+        alert(res.ok ? `Notificación enviada a ${res.sent_to}` : "No se pudo enviar la notificación al artista");
+      }
       onClose();
     },
   });
@@ -489,6 +533,14 @@ function PublicTab({ artistId, artistGenres, excludeBeatIds, assignedById, onClo
         </div>
       )}
 
+      {/* Notificación al artista */}
+      <div
+        className="rounded-xl px-4 py-3"
+        style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}
+      >
+        <NotifyToggle checked={notify} onChange={setNotify} />
+      </div>
+
       <div className="flex gap-3 pt-1">
         <button
           onClick={onClose}
@@ -497,7 +549,7 @@ function PublicTab({ artistId, artistGenres, excludeBeatIds, assignedById, onClo
           Cancelar
         </button>
         <button
-          onClick={() => assignMutation.mutate()}
+          onClick={() => assignMutation.mutate({ notify })}
           disabled={assignMutation.isPending || selected.size === 0}
           className="flex-1 py-3 rounded-xl text-white text-sm font-bold transition-colors disabled:opacity-40"
           style={{ background: "linear-gradient(135deg, #ff5833, #e0451f)" }}
