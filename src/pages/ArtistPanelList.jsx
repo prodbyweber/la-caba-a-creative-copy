@@ -9,7 +9,8 @@ import CreatorRowMenu from "@/components/admin/CreatorRowMenu";
 import CreatorDeleteConfirm from "@/components/admin/CreatorDeleteConfirm";
 import StudioHoursModal from "@/components/admin/StudioHoursModal";
 import ManagerAssignModal from "@/components/admin/ManagerAssignModal";
-import { User, Search, ChevronRight } from "lucide-react";
+import { User, Search, ChevronRight, Download } from "lucide-react";
+import { downloadArtistsCsv } from "@/lib/exportArtists";
 
 export default function ArtistPanelList() {
   const navigate = useNavigate();
@@ -131,14 +132,29 @@ export default function ArtistPanelList() {
       <div className="min-h-screen bg-[#080809] text-white">
 
         {/* Header */}
-        <div className="px-5 sm:px-10 pt-8 pb-5">
-          <h1
-            className="text-2xl font-black text-white tracking-tight mb-0.5"
-            style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.035em" }}
+        <div className="px-5 sm:px-10 pt-8 pb-5 flex items-start justify-between gap-4">
+          <div>
+            <h1
+              className="text-2xl font-black text-white tracking-tight mb-0.5"
+              style={{ fontFamily: "'Helvetica Neue', sans-serif", letterSpacing: "-0.035em" }}
+            >
+              Creadores
+            </h1>
+            <p className="text-[11px] text-white/25">{allCreators.length} perfiles registrados</p>
+          </div>
+
+          {/* Exportar ficha completa de creadores */}
+          <button
+            onClick={() => downloadArtistsCsv(allCreators)}
+            disabled={isLoading || allCreators.length === 0}
+            title="Descargar la ficha completa de todos los creadores"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[11px] font-semibold text-white/70 hover:bg-white/[0.08] hover:text-white transition-colors flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+            style={{ fontFamily: "'Helvetica Neue', sans-serif" }}
           >
-            Creadores
-          </h1>
-          <p className="text-[11px] text-white/25">{allCreators.length} perfiles registrados</p>
+            <Download className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Descargar Excel</span>
+            <span className="sm:hidden">Excel</span>
+          </button>
         </div>
 
         {/* Search */}
