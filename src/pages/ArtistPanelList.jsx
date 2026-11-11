@@ -11,6 +11,7 @@ import StudioHoursModal from "@/components/admin/StudioHoursModal";
 import ManagerAssignModal from "@/components/admin/ManagerAssignModal";
 import { User, Search, ChevronRight, Download } from "lucide-react";
 import { downloadArtistsCsv } from "@/lib/exportArtists";
+import SheetSyncButton from "@/components/admin/SheetSyncButton";
 
 export default function ArtistPanelList() {
   const navigate = useNavigate();
@@ -143,18 +144,22 @@ export default function ArtistPanelList() {
             <p className="text-[11px] text-white/25">{allCreators.length} perfiles registrados</p>
           </div>
 
-          {/* Exportar ficha completa de creadores */}
-          <button
-            onClick={() => downloadArtistsCsv(allCreators)}
-            disabled={isLoading || allCreators.length === 0}
-            title="Descargar la ficha completa de todos los creadores"
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[11px] font-semibold text-white/70 hover:bg-white/[0.08] hover:text-white transition-colors flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
-            style={{ fontFamily: "'Helvetica Neue', sans-serif" }}
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Descargar Excel</span>
-            <span className="sm:hidden">Excel</span>
-          </button>
+          {/* Exportar / sincronizar con Google Sheets */}
+          <div className="flex items-start gap-1.5 flex-shrink-0">
+            <SheetSyncButton disabled={isLoading || allCreators.length === 0} />
+
+            <button
+              onClick={() => downloadArtistsCsv(allCreators)}
+              disabled={isLoading || allCreators.length === 0}
+              title="Descargar la ficha completa de todos los creadores"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.04] border border-white/[0.08] text-[11px] font-semibold text-white/70 hover:bg-white/[0.08] hover:text-white transition-colors flex-shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
+              style={{ fontFamily: "'Helvetica Neue', sans-serif" }}
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Descargar Excel</span>
+              <span className="sm:hidden">Excel</span>
+            </button>
+          </div>
         </div>
 
         {/* Search */}

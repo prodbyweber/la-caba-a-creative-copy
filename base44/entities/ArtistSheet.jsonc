@@ -1,0 +1,48 @@
+{
+  "name": "ArtistSheet",
+  "type": "object",
+  "properties": {
+    "spreadsheet_id": {
+      "type": "string",
+      "description": "ID de la hoja de Google sincronizada"
+    },
+    "spreadsheet_url": {
+      "type": "string",
+      "description": "URL para abrir la hoja de Google"
+    },
+    "last_synced_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "\u00daltima sincronizaci\u00f3n con Google Sheets"
+    },
+    "row_count": {
+      "type": "number",
+      "description": "Creadores escritos en la \u00faltima sincronizaci\u00f3n"
+    }
+  },
+  "required": [
+    "spreadsheet_id"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
