@@ -1,0 +1,73 @@
+{
+  "name": "LandingSection",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Identificador de la secci\u00f3n: hero, brands, features, journey, videos, creators, beats, about, closing"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n en la p\u00e1gina"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la secci\u00f3n se muestra en la p\u00e1gina"
+    },
+    "eyebrow": {
+      "type": "string",
+      "description": "Texto peque\u00f1o sobre el titular"
+    },
+    "title": {
+      "type": "string",
+      "description": "Titular de la secci\u00f3n"
+    },
+    "subtitle": {
+      "type": "string",
+      "description": "Texto de apoyo"
+    },
+    "body": {
+      "type": "string",
+      "description": "Texto largo o nota interna de la secci\u00f3n"
+    },
+    "cta_label": {
+      "type": "string",
+      "description": "Texto del bot\u00f3n principal"
+    },
+    "cta_link": {
+      "type": "string",
+      "description": "Enlace o acci\u00f3n del bot\u00f3n principal. Usa modal:access para abrir el formulario de acceso"
+    },
+    "cta2_label": {
+      "type": "string",
+      "description": "Texto del bot\u00f3n secundario"
+    },
+    "cta2_link": {
+      "type": "string",
+      "description": "Enlace o acci\u00f3n del bot\u00f3n secundario"
+    }
+  },
+  "required": [
+    "key"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

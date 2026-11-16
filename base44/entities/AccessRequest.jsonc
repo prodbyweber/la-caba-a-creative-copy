@@ -1,0 +1,82 @@
+{
+  "name": "AccessRequest",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "access",
+        "message"
+      ],
+      "enumColors": [
+        "blue",
+        "purple"
+      ],
+      "default": "access",
+      "description": "Solicitud de acceso o mensaje del formulario de cierre"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nombre de la persona"
+    },
+    "email": {
+      "type": "string",
+      "description": "Email de contacto"
+    },
+    "artist_name": {
+      "type": "string",
+      "description": "Nombre art\u00edstico"
+    },
+    "music_link": {
+      "type": "string",
+      "description": "Enlace a su m\u00fasica"
+    },
+    "message": {
+      "type": "string",
+      "description": "Mensaje o descripci\u00f3n del proyecto"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "nueva",
+        "revisada",
+        "aprobada",
+        "rechazada"
+      ],
+      "enumColors": [
+        "blue",
+        "yellow",
+        "green",
+        "red"
+      ],
+      "default": "nueva",
+      "description": "Estado de la solicitud"
+    },
+    "admin_notes": {
+      "type": "string",
+      "description": "Notas internas"
+    }
+  },
+  "required": [
+    "name",
+    "email"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "name": "LandingVersion",
+  "type": "object",
+  "properties": {
+    "label": {
+      "type": "string",
+      "description": "Etiqueta de la versi\u00f3n"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published"
+      ],
+      "enumColors": [
+        "yellow",
+        "green"
+      ],
+      "default": "published",
+      "description": "Borrador de trabajo o versi\u00f3n publicada"
+    },
+    "content": {
+      "type": "string",
+      "description": "Contenido completo de la landing en JSON"
+    }
+  },
+  "required": [
+    "content"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

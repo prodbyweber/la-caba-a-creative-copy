@@ -1,0 +1,90 @@
+{
+  "name": "FeaturedFeature",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Titular de beneficio de la tarjeta"
+    },
+    "support_line": {
+      "type": "string",
+      "description": "L\u00ednea de apoyo"
+    },
+    "badge": {
+      "type": "string",
+      "enum": [
+        "available",
+        "soon"
+      ],
+      "enumColors": [
+        "green",
+        "gray"
+      ],
+      "default": "available",
+      "description": "Disponible o Pr\u00f3ximamente"
+    },
+    "visual": {
+      "type": "string",
+      "enum": [
+        "catalog",
+        "player",
+        "artwork",
+        "beats",
+        "roadmap",
+        "workshop"
+      ],
+      "default": "catalog",
+      "description": "Mini interfaz animada que se muestra en la tarjeta"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Imagen opcional de fondo de la tarjeta"
+    },
+    "size": {
+      "type": "string",
+      "enum": [
+        "sm",
+        "md",
+        "lg"
+      ],
+      "enumColors": [
+        "gray",
+        "blue",
+        "purple"
+      ],
+      "default": "md",
+      "description": "Tama\u00f1o de la tarjeta en la cuadr\u00edcula bento"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la tarjeta se muestra"
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

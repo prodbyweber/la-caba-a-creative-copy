@@ -1,0 +1,135 @@
+{
+  "name": "SiteSettings",
+  "type": "object",
+  "properties": {
+    "seo_title": {
+      "type": "string",
+      "description": "T\u00edtulo SEO de la p\u00e1gina"
+    },
+    "seo_description": {
+      "type": "string",
+      "description": "Meta description"
+    },
+    "og_image_url": {
+      "type": "string",
+      "description": "Imagen al compartir la p\u00e1gina"
+    },
+    "brand_strip_title": {
+      "type": "string",
+      "description": "T\u00edtulo peque\u00f1o del carrusel de marcas"
+    },
+    "login_label": {
+      "type": "string",
+      "description": "Texto del bot\u00f3n de acceso"
+    },
+    "login_url": {
+      "type": "string",
+      "description": "Enlace del bot\u00f3n de acceso"
+    },
+    "request_label": {
+      "type": "string",
+      "description": "Texto del bot\u00f3n de solicitud de acceso"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Email de contacto"
+    },
+    "city": {
+      "type": "string",
+      "description": "Ciudad"
+    },
+    "booking_label": {
+      "type": "string",
+      "description": "Texto del enlace de sesi\u00f3n de descubrimiento"
+    },
+    "booking_url": {
+      "type": "string",
+      "description": "Enlace de reserva de sesi\u00f3n de descubrimiento"
+    },
+    "social_instagram": {
+      "type": "string",
+      "description": "Instagram (vac\u00edo para ocultar)"
+    },
+    "social_tiktok": {
+      "type": "string",
+      "description": "TikTok (vac\u00edo para ocultar)"
+    },
+    "social_youtube": {
+      "type": "string",
+      "description": "YouTube (vac\u00edo para ocultar)"
+    },
+    "hero_media_url": {
+      "type": "string",
+      "description": "V\u00eddeo de fondo del hero (escritorio)"
+    },
+    "hero_media_mobile_url": {
+      "type": "string",
+      "description": "V\u00eddeo de fondo del hero (m\u00f3vil)"
+    },
+    "hero_poster_url": {
+      "type": "string",
+      "description": "Imagen fija del hero mientras carga el v\u00eddeo"
+    },
+    "journey_media_url": {
+      "type": "string",
+      "description": "V\u00eddeo de fondo del recorrido por scroll"
+    },
+    "access_card_image_url": {
+      "type": "string",
+      "description": "Imagen de la tarjeta de acceso en el cierre"
+    },
+    "weber_name": {
+      "type": "string",
+      "description": "Nombre de Weber"
+    },
+    "weber_photo_url": {
+      "type": "string",
+      "description": "Foto de Weber"
+    },
+    "weber_bg_url": {
+      "type": "string",
+      "description": "Imagen de fondo de la secci\u00f3n de Weber"
+    },
+    "weber_line": {
+      "type": "string",
+      "description": "Una l\u00ednea de presentaci\u00f3n de Weber"
+    },
+    "journey_step1_title": {
+      "type": "string"
+    },
+    "journey_step1_text": {
+      "type": "string"
+    },
+    "journey_step2_title": {
+      "type": "string"
+    },
+    "journey_step2_text": {
+      "type": "string"
+    },
+    "journey_step3_title": {
+      "type": "string"
+    },
+    "journey_step3_text": {
+      "type": "string"
+    }
+  },
+  "required": [],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "name": "FeaturedCreator",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre del creador"
+    },
+    "genre": {
+      "type": "string",
+      "description": "G\u00e9nero musical"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "Foto del creador"
+    },
+    "cover_url": {
+      "type": "string",
+      "description": "Portada de la canci\u00f3n"
+    },
+    "track_title": {
+      "type": "string",
+      "description": "T\u00edtulo de la canci\u00f3n"
+    },
+    "audio_url": {
+      "type": "string",
+      "description": "URL del audio p\u00fablico de la canci\u00f3n"
+    },
+    "year": {
+      "type": "string",
+      "description": "A\u00f1o de la canci\u00f3n"
+    },
+    "credits": {
+      "type": "string",
+      "description": "Cr\u00e9ditos de la canci\u00f3n"
+    },
+    "is_public": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si el creador se muestra p\u00fablicamente"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

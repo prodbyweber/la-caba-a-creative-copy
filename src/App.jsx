@@ -56,6 +56,7 @@ import OnboardingForm from '@/components/onboarding/OnboardingForm';
 import Access from './pages/Access';
 import Reservas from './pages/Reservas';
 import ReservasAdmin from './pages/ReservasAdmin';
+import LandingAdmin from './pages/admin/LandingAdmin';
 
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
@@ -199,6 +200,7 @@ const AuthenticatedApp = () => {
       <Route path="/StudioSessionEditor" element={<ProtectedAdminRoute element={<StudioSessionEditor />} />} />
       <Route path="/BeatsAdmin" element={<ProtectedAdminRoute element={<BeatsAdmin />} />} />
       <Route path="/ReservasAdmin" element={<ProtectedAdminRoute element={<ReservasAdmin />} />} />
+      <Route path="/admin/landing" element={<ProtectedAdminRoute element={<LandingAdmin />} />} />
 
       {/* Legacy pages config loop */}
       {Object.entries(Pages).map(([path, Page]) => (
