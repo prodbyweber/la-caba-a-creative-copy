@@ -6,7 +6,8 @@ import {
   Video,
   Music4,
   Users,
-  Route,
+  Globe,
+  Layers,
   ListOrdered,
   Wand2,
   SlidersHorizontal,
@@ -21,7 +22,8 @@ import RequestsPanel from "@/components/admin/home/RequestsPanel";
 const TABS = [
   { id: "secciones", label: "Secciones", icon: Layout },
   { id: "hero", label: "Hero y SEO", icon: Video },
-  { id: "roadmap", label: "Roadmap", icon: Route },
+  { id: "propuesta", label: "Propuesta", icon: Layers },
+  { id: "paises", label: "Países", icon: Globe },
   { id: "generos", label: "Géneros", icon: Music4 },
   { id: "comunidad", label: "Comunidad", icon: Users },
   { id: "proceso", label: "Cómo funciona", icon: ListOrdered },
@@ -65,15 +67,15 @@ const GENRE_FIELDS = [
   { key: "is_visible", label: "Visible", type: "toggle" },
 ];
 
-const ROADMAP_FIELDS = [
-  { key: "num", label: "Número (00, 01...)" },
-  { key: "title", label: "Título", wide: true },
-  { key: "text", label: "Texto del paso", type: "textarea", wide: true },
-  { key: "subline", label: "Segunda línea (solo portada)", wide: true },
-  { key: "keywords", label: "Palabras en bucle", type: "list", wide: true },
-  { key: "cta_label", label: "Botón del último paso" },
-  { key: "cta_link", label: "Destino del botón", hint: "#comenzar" },
-  { key: "is_intro", label: "Es la portada naranja", type: "toggle" },
+const PROPOSAL_FIELDS = [
+  { key: "label", label: "Etiqueta (Qué es, Qué haces tú...)" },
+  { key: "text", label: "Texto", type: "textarea", wide: true },
+  { key: "is_visible", label: "Visible", type: "toggle" },
+];
+
+const FLAG_FIELDS = [
+  { key: "code", label: "Código ISO (ES, MX, NG...)" },
+  { key: "name", label: "País" },
   { key: "is_visible", label: "Visible", type: "toggle" },
 ];
 
@@ -180,13 +182,23 @@ export default function HomeAdmin() {
 
         {tab === "hero" && <HeroPanel />}
 
-        {tab === "roadmap" && (
+        {tab === "propuesta" && (
           <CrudPanel
-            entityName="RoadmapStep"
-            fields={ROADMAP_FIELDS}
-            defaults={{ is_visible: true, keywords: [] }}
-            itemTitle={(item) => `${item.num || "--"} — ${item.title || "sin título"}`}
-            hint="Un paso por pantalla. El paso marcado como portada es la pantalla naranja con el logo."
+            entityName="ProposalBlock"
+            fields={PROPOSAL_FIELDS}
+            defaults={{ is_visible: true }}
+            itemTitle={(item) => item.label || "sin etiqueta"}
+            hint="Los tres bloques de «La propuesta», justo después del hero."
+          />
+        )}
+
+        {tab === "paises" && (
+          <CrudPanel
+            entityName="CountryFlag"
+            fields={FLAG_FIELDS}
+            defaults={{ is_visible: true }}
+            itemTitle={(item) => `${item.code} — ${item.name || ""}`}
+            hint="Banderas que caen en la sección Países (máximo 16). El número y los textos se editan en Secciones."
           />
         )}
 

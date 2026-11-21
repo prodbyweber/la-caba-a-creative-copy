@@ -3,8 +3,10 @@ import "@/components/landing/v3/landing3.css";
 import "@/components/landing/v3/landing3-extra.css";
 import { useHomeContent } from "@/hooks/useHomeContent";
 import Nav3 from "@/components/landing/v3/Nav3";
-import Hero3 from "@/components/landing/v3/Hero3";
-import RoadmapSection from "@/components/landing/v3/RoadmapSection";
+import Hero5 from "@/components/landing/v3/Hero5";
+import ProposalSection from "@/components/landing/v3/ProposalSection";
+import CountriesSection from "@/components/landing/v3/CountriesSection";
+import BrandsSection from "@/components/landing/v3/BrandsSection";
 import GenresStack from "@/components/landing/v3/GenresStack";
 import CommunitySection from "@/components/landing/v3/CommunitySection";
 import ProcessSection from "@/components/landing/v3/ProcessSection";
@@ -18,7 +20,9 @@ import { scrollToSection } from "@/components/landing/v3/scrollToSection";
 
 const ANCHORS = {
   hero: "top",
-  roadmap: "roadmap",
+  propuesta: "propuesta",
+  paises: "paises",
+  marcas: "marcas",
   generos: "generos",
   comunidad: "comunidad",
   proceso: "proceso",
@@ -32,7 +36,9 @@ const ANCHORS = {
 
 const DOT_LABELS = {
   hero: "Inicio",
-  roadmap: "Empieza",
+  propuesta: "Propuesta",
+  paises: "Países",
+  marcas: "Marcas",
   generos: "Géneros",
   comunidad: "Comunidad",
   proceso: "Cómo funciona",
@@ -153,9 +159,13 @@ export default function Landing() {
   const renderSection = (section) => {
     switch (section.key) {
       case "hero":
-        return <Hero3 key={section.key} section={section} settings={content.settings} />;
-      case "roadmap":
-        return <RoadmapSection key={section.key} section={section} steps={content.roadmap} />;
+        return <Hero5 key={section.key} section={section} settings={content.settings} />;
+      case "propuesta":
+        return <ProposalSection key={section.key} section={section} blocks={content.proposal} />;
+      case "paises":
+        return <CountriesSection key={section.key} section={section} flags={content.flags} />;
+      case "marcas":
+        return <BrandsSection key={section.key} />;
       case "generos":
         return <GenresStack key={section.key} section={section} items={content.genres} />;
       case "comunidad":

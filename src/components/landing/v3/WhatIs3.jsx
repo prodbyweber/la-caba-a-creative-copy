@@ -1,6 +1,5 @@
 import React from "react";
 import { MINI } from "./constants";
-import BrandLogos3 from "./BrandLogos3";
 
 export default function WhatIs3() {
   return (
@@ -25,8 +24,6 @@ export default function WhatIs3() {
             </div>
           ))}
         </div>
-
-        <BrandLogos3 />
       </div>
     </section>
   );
