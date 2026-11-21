@@ -5,17 +5,18 @@ export const LOGO =
 
 export const SECTIONS = [
   { id: "top", label: "Inicio" },
-  { id: "estudio", label: "Estudio" },
+  { id: "audiencia", label: "Para quién" },
   { id: "generos", label: "Géneros" },
   { id: "comunidad", label: "Comunidad" },
   { id: "proceso", label: "Cómo funciona" },
   { id: "comenzar", label: "Empezar" },
+  { id: "antes_despues", label: "Antes / Después" },
   { id: "final", label: "Contacto" },
 ];
 
 export const MINI = [
   { title: "Crear", text: "Producción y composición" },
-  { title: "Descubrir", text: "Tu sonido y tu catálogo" },
+  { title: "Descubrir", text: "Tu sonido y tu identidad" },
   { title: "Lanzar", text: "Estrategia y salida al mercado" },
 ];
 
@@ -48,8 +49,8 @@ export const STEPS = [
   },
   {
     num: "03",
-    title: "Define tu estrategia",
-    text: "Plan claro para cada lanzamiento: cuándo, cómo y dónde sale tu música.",
+    title: "Dale identidad",
+    text: "Imagen, audiovisual y marca: el universo visual que acompaña a tu música.",
   },
   {
     num: "04",

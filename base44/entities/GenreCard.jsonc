@@ -4,19 +4,19 @@
   "properties": {
     "key": {
       "type": "string",
-      "description": "Identificador interno (latin_urban, afrobeats, pop...)"
+      "description": "Identificador interno (latin, urban, pop...)"
     },
     "name": {
       "type": "string",
-      "description": "Nombre del g\u00e9nero en grande"
+      "description": "Nombre del g\u00e9nero en grande (LATIN, URBAN...)"
     },
     "label": {
       "type": "string",
-      "description": "Etiqueta peque\u00f1a en may\u00fasculas"
+      "description": "Etiqueta peque\u00f1a en may\u00fasculas (ej: ARTISTAS \u00b7 CAT\u00c1LOGO)"
     },
     "description": {
       "type": "string",
-      "description": "Descripci\u00f3n corta bajo el mini t\u00edtulo SONIDO"
+      "description": "Descripci\u00f3n corta de 1-2 l\u00edneas bajo el mini t\u00edtulo SONIDO"
     },
     "video_url": {
       "type": "string",
@@ -28,19 +28,27 @@
     },
     "tint": {
       "type": "string",
-      "description": "Color de tinte de la tarjeta en hex"
+      "description": "Color de tinte de la tarjeta en hex (ej: #ff5833)"
     },
     "accent": {
       "type": "string",
-      "description": "Color de acento en hex"
+      "description": "Color de acento para la cifra en hex"
     },
-    "global_data": {
-      "type": "string",
-      "description": "Dato global del g\u00e9nero (tendencia mundial). Si est\u00e1 vac\u00edo no se muestra."
+    "plays": {
+      "type": "number",
+      "description": "Reproducciones (cifra grande animada)"
     },
-    "global_source": {
-      "type": "string",
-      "description": "Fuente del dato global"
+    "songs": {
+      "type": "number",
+      "description": "Mini dato: canciones"
+    },
+    "likes": {
+      "type": "number",
+      "description": "Mini dato: likes"
+    },
+    "reach": {
+      "type": "number",
+      "description": "Mini dato: alcance"
     },
     "order": {
       "type": "number",

@@ -4,66 +4,42 @@ import {
   ArrowLeft,
   Layout,
   Video,
-  Film,
   Music4,
-  Layers,
   Users,
   ListOrdered,
   Wand2,
   SlidersHorizontal,
   BarChart3,
-  Image as ImageIcon,
+  Inbox,
   ExternalLink,
 } from "lucide-react";
 import CrudPanel from "@/components/admin/home/CrudPanel";
 import HeroPanel from "@/components/admin/home/HeroPanel";
-import BrandsPanel from "@/components/admin/home/BrandsPanel";
+import RequestsPanel from "@/components/admin/home/RequestsPanel";
 
 const TABS = [
   { id: "secciones", label: "Secciones", icon: Layout },
   { id: "hero", label: "Hero y SEO", icon: Video },
-  { id: "videos", label: "Vídeos hero", icon: Film },
-  { id: "estudio", label: "Estudio", icon: Video },
+  { id: "audiencia", label: "Para quién", icon: Users },
   { id: "generos", label: "Géneros", icon: Music4 },
-  { id: "fusion", label: "Fusion", icon: Layers },
   { id: "comunidad", label: "Comunidad", icon: Users },
   { id: "proceso", label: "Cómo funciona", icon: ListOrdered },
-  { id: "comenzar", label: "Configurador", icon: Wand2 },
+  { id: "comenzar", label: "Cómo comenzar", icon: Wand2 },
   { id: "antes", label: "Antes / Después", icon: SlidersHorizontal },
   { id: "cifras", label: "Cifras", icon: BarChart3 },
-  { id: "marcas", label: "Marcas", icon: ImageIcon },
+  { id: "solicitudes", label: "Solicitudes", icon: Inbox },
 ];
 
 const SECTION_FIELDS = [
   { key: "key", label: "Clave (no cambiar)" },
   { key: "eyebrow", label: "Etiqueta superior" },
-  {
-    key: "title",
-    label: "Título",
-    type: "textarea",
-    wide: true,
-    hint: "Usa un salto de línea para separar frases.",
-  },
+  { key: "title", label: "Título", wide: true },
   { key: "subtitle", label: "Subtítulo", type: "textarea", wide: true },
   { key: "body", label: "Texto de apoyo", type: "textarea", wide: true },
   { key: "cta_label", label: "Botón principal" },
   { key: "cta_link", label: "Destino del botón", hint: "#seccion o /ruta" },
   { key: "cta2_label", label: "Botón secundario" },
   { key: "cta2_link", label: "Destino secundario" },
-  { key: "is_visible", label: "Visible", type: "toggle" },
-];
-
-const HERO_VIDEO_FIELDS = [
-  { key: "title", label: "Nombre del clip" },
-  { key: "video_url", label: "Vídeo", type: "media", wide: true, hint: "MP4 H.264, sin audio, 720p." },
-  { key: "poster_url", label: "Póster", type: "media", wide: true },
-  { key: "is_visible", label: "En rotación", type: "toggle" },
-];
-
-const STUDIO_FIELDS = [
-  { key: "title", label: "Título" },
-  { key: "video_url", label: "Vídeo de la sesión", type: "media", wide: true },
-  { key: "image_url", label: "Imagen o póster", type: "media", wide: true },
   { key: "is_visible", label: "Visible", type: "toggle" },
 ];
 
@@ -76,15 +52,17 @@ const GENRE_FIELDS = [
   { key: "video_url", label: "Vídeo de fondo", type: "media", wide: true },
   { key: "tint", label: "Tinte", type: "color" },
   { key: "accent", label: "Color de acento", type: "color" },
-  { key: "global_data", label: "Dato global", type: "textarea", wide: true, hint: "Déjalo vacío para no mostrar nada." },
-  { key: "global_source", label: "Fuente del dato", wide: true },
+  { key: "plays", label: "Reproducciones", type: "number" },
+  { key: "songs", label: "Canciones", type: "number" },
+  { key: "likes", label: "Likes", type: "number" },
+  { key: "reach", label: "Alcance", type: "number" },
   { key: "is_visible", label: "Visible", type: "toggle" },
 ];
 
-const FUSION_FIELDS = [
-  { key: "name", label: "Nombre" },
-  { key: "description", label: "Descripción corta", type: "textarea", wide: true },
-  { key: "accent", label: "Color de acento", type: "color" },
+const AUDIENCE_FIELDS = [
+  { key: "title", label: "Título (Artistas, Labels, Managers)" },
+  { key: "text", label: "Frase corta", type: "textarea", wide: true },
+  { key: "image_url", label: "Imagen", type: "media", wide: true },
   { key: "is_visible", label: "Visible", type: "toggle" },
 ];
 
@@ -98,19 +76,15 @@ const CREATOR_FIELDS = [
 
 const PROCESS_FIELDS = [
   { key: "num", label: "Número" },
-  {
-    key: "icon",
-    label: "Icono (sparkles, disc, target, rocket, music, mic, trending, layers)",
-    wide: true,
-  },
   { key: "title", label: "Título", wide: true },
-  { key: "text", label: "Dos líneas de explicación", type: "textarea", wide: true },
+  { key: "text", label: "Texto", type: "textarea", wide: true },
   { key: "image_url", label: "Imagen", type: "media", wide: true },
+  { key: "video_url", label: "Vídeo", type: "media", wide: true },
   { key: "is_visible", label: "Visible", type: "toggle" },
 ];
 
 const BUILDER_FIELDS = [
-  { key: "key", label: "Clave (genero, necesitas, etapa, ubicacion, demo, mood)" },
+  { key: "key", label: "Clave (genero, necesitas, etapa, ubicacion, demo)" },
   { key: "title", label: "Título de la tarjeta" },
   { key: "color", label: "Color", type: "color" },
   { key: "options", label: "Opciones (píldoras)", type: "list", wide: true },
@@ -189,28 +163,18 @@ export default function HomeAdmin() {
             fields={SECTION_FIELDS}
             defaults={{ key: "", is_visible: true }}
             itemTitle={(item) => `${item.key} — ${item.title || "sin título"}`}
-            hint="Activa, oculta o reordena las pantallas de la home. El orden de las tarjetas se cambia con las flechas."
+            hint="Activa, oculta o reordena las pantallas de la home. El hero, el cierre y la franja de marcas llevan sus propios botones."
           />
         )}
 
         {tab === "hero" && <HeroPanel />}
 
-        {tab === "videos" && (
+        {tab === "audiencia" && (
           <CrudPanel
-            entityName="HeroVideo"
-            fields={HERO_VIDEO_FIELDS}
+            entityName="AudienceCard"
+            fields={AUDIENCE_FIELDS}
             defaults={{ is_visible: true }}
-            itemTitle={(item) => item.title || item.video_url}
-            hint="Rotan automáticamente cada 7 segundos con fundido y zoom lento. Usa MP4 H.264 sin audio."
-          />
-        )}
-
-        {tab === "estudio" && (
-          <CrudPanel
-            entityName="StudioCard"
-            fields={STUDIO_FIELDS}
-            defaults={{ is_visible: true }}
-            hint="Tarjetas verticales de sesiones en el estudio."
+            hint="Tarjetas de «Para quién es», justo después del hero."
           />
         )}
 
@@ -218,17 +182,8 @@ export default function HomeAdmin() {
           <CrudPanel
             entityName="GenreCard"
             fields={GENRE_FIELDS}
-            defaults={{ is_visible: true, tint: "#ff5833", accent: "#ff5833" }}
-            hint="Tarjetas apiladas. No hay cifras inventadas: si dejas el dato global vacío, no se muestra."
-          />
-        )}
-
-        {tab === "fusion" && (
-          <CrudPanel
-            entityName="FusionGenre"
-            fields={FUSION_FIELDS}
-            defaults={{ is_visible: true, accent: "#ff5833" }}
-            hint="Subgéneros de la lista compacta de Fusion."
+            defaults={{ is_visible: true, tint: "#ff5833", accent: "#ff5833", plays: 0 }}
+            hint="Tarjetas verticales apiladas. Las cifras son de ejemplo: edítalas aquí."
           />
         )}
 
@@ -245,8 +200,8 @@ export default function HomeAdmin() {
           <CrudPanel
             entityName="ProcessStep"
             fields={PROCESS_FIELDS}
-            defaults={{ is_visible: true, icon: "sparkles" }}
-            hint="Cuatro tarjetas horizontales con número, icono, título y dos líneas."
+            defaults={{ is_visible: true }}
+            hint="Un paso por pantalla completa."
           />
         )}
 
@@ -256,7 +211,7 @@ export default function HomeAdmin() {
             fields={BUILDER_FIELDS}
             defaults={{ is_visible: true, multi: true, options: [] }}
             itemTitle={(item) => `${item.title} (${item.key})`}
-            hint="Claves especiales: genero, necesitas, etapa, ubicacion, demo, mood. El color de cada tarjeta se edita aquí."
+            hint="Claves especiales: genero, necesitas, etapa, ubicacion, demo. El color de cada tarjeta se edita aquí."
           />
         )}
 
@@ -275,11 +230,11 @@ export default function HomeAdmin() {
             entityName="HomeStat"
             fields={STAT_FIELDS}
             defaults={{ is_visible: true, value: 0 }}
-            hint="Contadores animados de Cifras y Comunidad."
+            hint="Contadores animados de la sección Comunidad."
           />
         )}
 
-        {tab === "marcas" && <BrandsPanel />}
+        {tab === "solicitudes" && <RequestsPanel />}
       </div>
     </div>
   );

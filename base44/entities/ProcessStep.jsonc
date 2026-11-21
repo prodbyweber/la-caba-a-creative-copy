@@ -6,38 +6,13 @@
       "type": "string",
       "description": "N\u00famero grande del paso (01, 02...)"
     },
-    "icon": {
-      "type": "string",
-      "enum": [
-        "sparkles",
-        "disc",
-        "target",
-        "rocket",
-        "music",
-        "mic",
-        "trending",
-        "layers"
-      ],
-      "enumColors": [
-        "purple",
-        "blue",
-        "green",
-        "orange",
-        "pink",
-        "gray",
-        "yellow",
-        "blue"
-      ],
-      "default": "sparkles",
-      "description": "Icono del paso"
-    },
     "title": {
       "type": "string",
       "description": "T\u00edtulo del paso"
     },
     "text": {
       "type": "string",
-      "description": "Dos l\u00edneas de explicaci\u00f3n"
+      "description": "Texto corto del paso"
     },
     "video_url": {
       "type": "string",

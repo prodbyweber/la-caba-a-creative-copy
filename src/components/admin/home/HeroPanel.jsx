@@ -48,15 +48,27 @@ export default function HeroPanel() {
   return (
     <div className="grid gap-4 max-w-2xl">
       <p className="text-[11px] text-white/30">
-        Póster del hero (se ve mientras cargan los vídeos y si el móvil bloquea la reproducción), SEO y
-        datos de contacto. Los vídeos en rotación se gestionan en la pestaña «Vídeos hero».
+        Vídeo y póster del hero, datos de contacto y SEO. Para que el vídeo funcione en móvil, usa MP4
+        H.264 (sin audio, 720p).
       </p>
 
+      <ImageField
+        label="Vídeo del hero (escritorio)"
+        value={record.hero_media_url}
+        onChange={set("hero_media_url")}
+        hint="MP4 H.264 recomendado."
+      />
+      <ImageField
+        label="Vídeo del hero (móvil)"
+        value={record.hero_media_mobile_url}
+        onChange={set("hero_media_mobile_url")}
+        hint="Versión vertical o recortada."
+      />
       <ImageField
         label="Póster del hero"
         value={record.hero_poster_url}
         onChange={set("hero_poster_url")}
-        hint="Imagen fija de respaldo."
+        hint="Se muestra si el vídeo no puede reproducirse."
       />
 
       <TextField label="Título SEO" value={record.seo_title} onChange={set("seo_title")} />
