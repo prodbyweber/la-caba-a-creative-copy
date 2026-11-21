@@ -1,0 +1,85 @@
+{
+  "name": "GenreCard",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Identificador interno (latin, urban, pop...)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nombre del g\u00e9nero en grande (LATIN, URBAN...)"
+    },
+    "label": {
+      "type": "string",
+      "description": "Etiqueta peque\u00f1a en may\u00fasculas (ej: ARTISTAS \u00b7 CAT\u00c1LOGO)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n corta de 1-2 l\u00edneas bajo el mini t\u00edtulo SONIDO"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "V\u00eddeo de fondo en loop (solo decorativo)"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Imagen de fondo o p\u00f3ster del v\u00eddeo"
+    },
+    "tint": {
+      "type": "string",
+      "description": "Color de tinte de la tarjeta en hex (ej: #ff5833)"
+    },
+    "accent": {
+      "type": "string",
+      "description": "Color de acento para la cifra en hex"
+    },
+    "plays": {
+      "type": "number",
+      "description": "Reproducciones (cifra grande animada)"
+    },
+    "songs": {
+      "type": "number",
+      "description": "Mini dato: canciones"
+    },
+    "likes": {
+      "type": "number",
+      "description": "Mini dato: likes"
+    },
+    "reach": {
+      "type": "number",
+      "description": "Mini dato: alcance"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la tarjeta se muestra"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "name": "BuilderCard",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "genero | necesitas | etapa | ubicacion | demo"
+    },
+    "title": {
+      "type": "string",
+      "description": "T\u00edtulo de la tarjeta del configurador"
+    },
+    "color": {
+      "type": "string",
+      "description": "Color de fondo de la tarjeta en hex"
+    },
+    "options": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Opciones (p\u00edldoras) de la tarjeta"
+    },
+    "multi": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si admite selecci\u00f3n m\u00faltiple"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de la tarjeta"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la tarjeta se muestra"
+    }
+  },
+  "required": [
+    "key",
+    "title"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

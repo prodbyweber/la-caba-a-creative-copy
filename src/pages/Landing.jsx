@@ -1,16 +1,47 @@
 import React, { useEffect, useRef, useState } from "react";
 import "@/components/landing/v3/landing3.css";
-import { useLandingContent } from "@/hooks/useLandingContent";
+import { useHomeContent } from "@/hooks/useHomeContent";
 import Nav3 from "@/components/landing/v3/Nav3";
 import Hero3 from "@/components/landing/v3/Hero3";
+import AudienceSection from "@/components/landing/v3/AudienceSection";
+import GenresStack from "@/components/landing/v3/GenresStack";
+import CommunitySection from "@/components/landing/v3/CommunitySection";
+import ProcessSection from "@/components/landing/v3/ProcessSection";
+import BeforeAfterSection from "@/components/landing/v3/BeforeAfterSection";
+import BuilderSection from "@/components/landing/v3/builder/BuilderSection";
 import WhatIs3 from "@/components/landing/v3/WhatIs3";
 import Stats3 from "@/components/landing/v3/Stats3";
-import Genres3 from "@/components/landing/v3/Genres3";
-import Steps3 from "@/components/landing/v3/Steps3";
 import Trending3 from "@/components/landing/v3/Trending3";
 import Final3 from "@/components/landing/v3/Final3";
-import { SECTIONS } from "@/components/landing/v3/constants";
 import { scrollToSection } from "@/components/landing/v3/scrollToSection";
+
+const ANCHORS = {
+  hero: "top",
+  audiencia: "audiencia",
+  generos: "generos",
+  comunidad: "comunidad",
+  proceso: "proceso",
+  comenzar: "comenzar",
+  antes_despues: "antes_despues",
+  casa: "casa",
+  cifras: "cifras",
+  tendencia: "tendencia",
+  final: "final",
+};
+
+const DOT_LABELS = {
+  hero: "Inicio",
+  audiencia: "Para quién",
+  generos: "Géneros",
+  comunidad: "Comunidad",
+  proceso: "Cómo funciona",
+  comenzar: "Empezar",
+  antes_despues: "Antes / Después",
+  casa: "Qué es",
+  cifras: "Cifras",
+  tendencia: "Explorar",
+  final: "Contacto",
+};
 
 function setMeta(attr, key, content) {
   if (!content) return;
@@ -24,13 +55,21 @@ function setMeta(attr, key, content) {
 }
 
 export default function Landing() {
-  const { model, loading, isPreview } = useLandingContent();
+  const { content, loading } = useHomeContent();
   const rootRef = useRef(null);
   const [active, setActive] = useState("top");
 
   useEffect(() => {
-    if (!model) return;
-    const s = model.settings;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!content) return;
+    const s = content.settings;
     document.title = s.seo_title || "Cabaña Creative";
     setMeta("name", "description", s.seo_description);
     setMeta("property", "og:title", s.seo_title);
@@ -39,18 +78,19 @@ export default function Landing() {
     setMeta("property", "og:type", "website");
     setMeta("name", "twitter:card", "summary_large_image");
     setMeta("name", "twitter:image", s.og_image_url);
-  }, [model]);
+  }, [content]);
 
-  // Revelado por pantalla + sección activa para el indicador de progreso.
+  const sections = (content?.sections || []).filter((s) => s.is_visible !== false && ANCHORS[s.key]);
+
   useEffect(() => {
-    if (!model || !rootRef.current) return;
+    if (!content || !rootRef.current) return;
     const root = rootRef.current;
     root.scrollTop = 0;
 
-    const sections = Array.from(root.querySelectorAll(".ccl-snap"));
+    const nodes = Array.from(root.querySelectorAll(".ccl-snap, .ccl-stack__intro"));
 
     if (!("IntersectionObserver" in window)) {
-      sections.forEach((s) => s.classList.add("is-in"));
+      nodes.forEach((n) => n.classList.add("is-in"));
       return;
     }
 
@@ -75,18 +115,21 @@ export default function Landing() {
       { root, rootMargin: "-48% 0px -48% 0px", threshold: 0 }
     );
 
+    nodes.forEach((node) => {
+      if (node.classList.contains("ccl-snap")) reveal.observe(node);
+    });
     sections.forEach((section) => {
-      reveal.observe(section);
-      spy.observe(section);
+      const el = document.getElementById(ANCHORS[section.key]);
+      if (el) spy.observe(el);
     });
 
     return () => {
       reveal.disconnect();
       spy.disconnect();
     };
-  }, [model]);
+  }, [content, sections.length]);
 
-  if (loading || !model) {
+  if (loading || !content) {
     return (
       <div className="ccl" style={{ display: "grid", placeItems: "center" }}>
         <div style={{ display: "grid", gap: 12, justifyItems: "center" }}>
@@ -106,35 +149,61 @@ export default function Landing() {
     );
   }
 
+  const renderSection = (section) => {
+    switch (section.key) {
+      case "hero":
+        return <Hero3 key={section.key} section={section} settings={content.settings} />;
+      case "audiencia":
+        return <AudienceSection key={section.key} section={section} items={content.audience} />;
+      case "generos":
+        return <GenresStack key={section.key} section={section} items={content.genres} />;
+      case "comunidad":
+        return (
+          <CommunitySection
+            key={section.key}
+            section={section}
+            creators={content.creators}
+            stats={content.stats}
+          />
+        );
+      case "proceso":
+        return <ProcessSection key={section.key} section={section} steps={content.process} />;
+      case "comenzar":
+        return <BuilderSection key={section.key} section={section} cards={content.builder} />;
+      case "antes_despues":
+        return <BeforeAfterSection key={section.key} section={section} items={content.demos} />;
+      case "casa":
+        return <WhatIs3 key={section.key} />;
+      case "cifras":
+        return <Stats3 key={section.key} />;
+      case "tendencia":
+        return <Trending3 key={section.key} videos={content.videos || []} />;
+      case "final":
+        return <Final3 key={section.key} section={section} settings={content.settings} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="ccl" ref={rootRef}>
       <Nav3 />
 
-      <main>
-        <Hero3 settings={model.settings} />
-        <WhatIs3 />
-        <Stats3 />
-        <Genres3 settings={model.settings} creators={model.creators} />
-        <Steps3 />
-        <Trending3 videos={model.videos} />
-        <Final3 settings={model.settings} />
-      </main>
+      <main>{sections.map(renderSection)}</main>
 
       <div className="ccl-dots">
-        {SECTIONS.map((section) => (
+        {sections.map((section) => (
           <button
-            key={section.id}
+            key={section.key}
             type="button"
-            className={`ccl-dot ${active === section.id ? "is-active" : ""}`}
-            aria-label={`Ir a ${section.label}`}
-            onClick={() => scrollToSection(section.id)}
+            className={`ccl-dot ${active === ANCHORS[section.key] ? "is-active" : ""}`}
+            aria-label={`Ir a ${DOT_LABELS[section.key] || section.key}`}
+            onClick={() => scrollToSection(ANCHORS[section.key])}
           />
         ))}
       </div>
 
       <div className="ccl-grain" aria-hidden="true" />
-
-      {isPreview && <div className="ccl-preview-badge">Vista previa del borrador</div>}
     </div>
   );
 }

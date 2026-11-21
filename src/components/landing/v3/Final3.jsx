@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { submitAccessRequest } from "@/lib/landingForms";
 import { SESSION_CTA } from "./constants";
+import CtaLink from "./CtaLink";
 import Footer3 from "./Footer3";
 
-export default function Final3({ settings }) {
+export default function Final3({ settings, section }) {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
   const [done, setDone] = useState(false);
@@ -35,13 +36,15 @@ export default function Final3({ settings }) {
     <section className="ccl-snap ccl-final" id="final">
       <div className="ccl-final__screen">
         <div className="ccl-wrap ccl-final__inner">
-          <span className="ccl-eyebrow">Empezar</span>
-          <h2 className="ccl-display ccl-h1 ccl-final__title">Tu catálogo empieza en la cabaña.</h2>
+          <span className="ccl-eyebrow">{section?.eyebrow || "Empezar"}</span>
+          <h2 className="ccl-display ccl-h1 ccl-final__title">
+            {section?.title || "Tu catálogo empieza en la cabaña."}
+          </h2>
 
           <div className="ccl-final__ctas">
-            <Link to={SESSION_CTA} className="ccl-btn ccl-btn--primary">
-              Agendar sesión de descubrimiento <ArrowRight size={14} />
-            </Link>
+            <CtaLink to={section?.cta_link || SESSION_CTA} className="ccl-btn ccl-btn--primary">
+              {section?.cta_label || "Agendar sesión de descubrimiento"} <ArrowRight size={14} />
+            </CtaLink>
           </div>
         </div>
       </div>

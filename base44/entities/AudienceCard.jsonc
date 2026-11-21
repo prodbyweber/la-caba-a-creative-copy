@@ -1,0 +1,49 @@
+{
+  "name": "AudienceCard",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Artistas, Labels, Managers..."
+    },
+    "text": {
+      "type": "string",
+      "description": "Frase corta de lo que gana ese perfil"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Imagen de fondo de la tarjeta"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la tarjeta se muestra"
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

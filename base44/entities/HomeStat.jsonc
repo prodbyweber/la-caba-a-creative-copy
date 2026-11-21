@@ -1,0 +1,53 @@
+{
+  "name": "HomeStat",
+  "type": "object",
+  "properties": {
+    "value": {
+      "type": "number",
+      "description": "Cifra a animar"
+    },
+    "prefix": {
+      "type": "string",
+      "description": "Prefijo (ej: +)"
+    },
+    "suffix": {
+      "type": "string",
+      "description": "Sufijo opcional (ej: M)"
+    },
+    "label": {
+      "type": "string",
+      "description": "Etiqueta bajo la cifra"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la cifra se muestra"
+    }
+  },
+  "required": [
+    "label"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

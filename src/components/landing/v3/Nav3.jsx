@@ -21,11 +21,11 @@ export default function Nav3() {
 
         <nav className="ccl-nav__links" aria-label="Navegación principal">
           <a
-            href="#tendencia"
+            href="#generos"
             className="ccl-nav__link"
             onClick={(e) => {
               e.preventDefault();
-              scrollToSection("tendencia");
+              scrollToSection("generos");
             }}
           >
             Explorar

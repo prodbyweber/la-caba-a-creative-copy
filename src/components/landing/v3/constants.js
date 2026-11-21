@@ -5,12 +5,13 @@ export const LOGO =
 
 export const SECTIONS = [
   { id: "top", label: "Inicio" },
-  { id: "casa", label: "Qué es" },
-  { id: "cifras", label: "Cifras" },
+  { id: "audiencia", label: "Para quién" },
   { id: "generos", label: "Géneros" },
-  { id: "metodo", label: "Cómo funciona" },
-  { id: "tendencia", label: "Explorar" },
-  { id: "final", label: "Empezar" },
+  { id: "comunidad", label: "Comunidad" },
+  { id: "proceso", label: "Cómo funciona" },
+  { id: "comenzar", label: "Empezar" },
+  { id: "antes_despues", label: "Antes / Después" },
+  { id: "final", label: "Contacto" },
 ];
 
 export const MINI = [
@@ -23,7 +24,6 @@ export const STATS = [
   { value: 100, prefix: "+", label: "artistas desarrollados" },
   { value: 1000000, prefix: "+", label: "reproducciones" },
   { value: 7, prefix: "", label: "géneros musicales" },
-  { value: null, prefix: "", text: "Madrid", label: "base con alcance global" },
 ];
 
 export const GENRES = [

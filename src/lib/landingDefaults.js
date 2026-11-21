@@ -19,14 +19,14 @@ const M = {
 export const DEFAULT_SETTINGS = {
   seo_title: "Cabaña Creative — El centro de control para artistas que producen",
   seo_description:
-    "Cabaña Creative es la plataforma para artistas productores: catálogo, demos, beats y hoja de ruta de lanzamiento. Estudio de producción musical en Madrid.",
+    "Cabaña Creative es la plataforma para artistas productores: catálogo, demos, beats y hoja de ruta de lanzamiento. Producción musical, imagen y estrategia.",
   og_image_url: M.still,
   brand_strip_title: "Han confiado en nosotros",
   login_label: "Acceder",
   login_url: "/login",
   request_label: "Solicitar acceso",
   contact_email: "hola@cabanacreative.es",
-  city: "Madrid",
+  city: "",
   booking_label: "¿Quieres trabajar con Cabaña? Agenda una sesión de descubrimiento",
   booking_url: "/reservas",
   social_instagram: "",

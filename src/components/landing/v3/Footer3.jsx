@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Instagram, Youtube, Music2, Mail, MapPin } from "lucide-react";
+import { Instagram, Youtube, Music2, Mail } from "lucide-react";
 import { LOGO, SECTIONS } from "./constants";
 import { scrollToSection } from "./scrollToSection";
 
@@ -46,12 +46,6 @@ export default function Footer3({ settings }) {
                   {settings.contact_email}
                 </a>
               )}
-              {settings?.city && (
-                <span>
-                  <MapPin size={11} style={{ display: "inline", marginRight: 6 }} />
-                  {settings.city}
-                </span>
-              )}
               {socials.length > 0 && (
                 <span className="ccl-foot__socials">
                   {socials.map(({ href, label, icon: Icon }) => (
@@ -76,7 +70,7 @@ export default function Footer3({ settings }) {
 
         <div className="ccl-foot__bottom">
           <span>© 2026 Cabaña Creative</span>
-          <span>Producción musical · Madrid</span>
+          <span>Producción musical y desarrollo creativo</span>
         </div>
       </div>
     </footer>
