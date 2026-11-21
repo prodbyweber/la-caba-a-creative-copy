@@ -1,21 +1,28 @@
 import React, { useState } from "react";
 import { ArrowRight, Check, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { validatePhone } from "@/lib/phone";
 import PillCard from "./PillCard";
 import CountryPicker from "./CountryPicker";
 import DemoCard from "./DemoCard";
+import MoodCard from "./MoodCard";
+import PhoneField from "./PhoneField";
 
 export default function BuilderSection({ section, cards = [] }) {
   const [picks, setPicks] = useState({});
   const [country, setCountry] = useState("");
+  const [countryCode, setCountryCode] = useState("ES");
+  const [phone, setPhone] = useState("");
   const [link, setLink] = useState("");
   const [file, setFile] = useState(null);
-  const [directions, setDirections] = useState([]);
-  const [form, setForm] = useState({ name: "", email: "", whatsapp: "" });
+  const [references, setReferences] = useState("");
+  const [instructions, setInstructions] = useState("");
+  const [form, setForm] = useState({ name: "", email: "" });
   const [demo, setDemo] = useState(true);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   const stopDemo = () => setDemo(false);
   const list = cards.filter((c) => c.is_visible !== false);
@@ -36,23 +43,44 @@ export default function BuilderSection({ section, cards = [] }) {
     });
   };
 
-  const toggleDirection = (option) => {
-    setDirections((prev) => (prev.includes(option) ? prev.filter((o) => o !== option) : [...prev, option]));
+  const reset = () => {
+    setPicks({});
+    setCountry("");
+    setCountryCode("ES");
+    setPhone("");
+    setLink("");
+    setFile(null);
+    setReferences("");
+    setInstructions("");
+    setForm({ name: "", email: "" });
+    setDemo(true);
+    setSent(false);
+    setError("");
+    setPhoneError("");
   };
 
   const submit = async (e) => {
     e.preventDefault();
     setError("");
+    setPhoneError("");
+
     if (!form.name.trim() || !form.email.trim()) {
       setError("Necesitamos tu nombre y tu email.");
       return;
     }
+
+    const phoneCheck = validatePhone(phone, countryCode);
+    if (!phoneCheck.valid) {
+      setPhoneError(phoneCheck.error);
+      return;
+    }
+
     setSending(true);
     try {
       const res = await base44.functions.invoke("submitProjectRequest", {
         name: form.name,
         email: form.email,
-        whatsapp: form.whatsapp,
+        phone: phoneCheck.e164,
         genres: picks.genero || [],
         needs: picks.necesitas || [],
         stage: (picks.etapa || [])[0] || "",
@@ -60,7 +88,9 @@ export default function BuilderSection({ section, cards = [] }) {
         demo_link: link,
         demo_file_uri: file?.uri || "",
         demo_file_name: file?.name || "",
-        creative_directions: directions,
+        moods: picks.mood || [],
+        references,
+        instructions,
       });
       if (res.data?.error) throw new Error(res.data.error);
       setSent(true);
@@ -102,20 +132,7 @@ export default function BuilderSection({ section, cards = [] }) {
                 ))}
               </div>
             )}
-            <button
-              type="button"
-              className="ccl-btn ccl-btn--ghost"
-              onClick={() => {
-                setSent(false);
-                setPicks({});
-                setCountry("");
-                setLink("");
-                setFile(null);
-                setDirections([]);
-                setForm({ name: "", email: "", whatsapp: "" });
-                setDemo(true);
-              }}
-            >
+            <button type="button" className="ccl-btn ccl-btn--ghost" onClick={reset}>
               Enviar otra solicitud
             </button>
           </div>
@@ -145,8 +162,22 @@ export default function BuilderSection({ section, cards = [] }) {
                       onLink={setLink}
                       file={file}
                       onFile={setFile}
-                      directions={directions}
-                      onToggleDirection={toggleDirection}
+                      onInteract={stopDemo}
+                    />
+                  );
+                }
+                if (card.key === "mood") {
+                  return (
+                    <MoodCard
+                      key={card.id || card.key}
+                      card={card}
+                      index={i}
+                      moods={picks.mood || []}
+                      onToggle={(option) => toggle(card, option)}
+                      references={references}
+                      onReferences={setReferences}
+                      instructions={instructions}
+                      onInstructions={setInstructions}
                       onInteract={stopDemo}
                     />
                   );
@@ -193,14 +224,18 @@ export default function BuilderSection({ section, cards = [] }) {
                 />
               </div>
               <div className="ccl-field">
-                <label htmlFor="ccl-b-wa">WhatsApp (opcional)</label>
-                <input
-                  id="ccl-b-wa"
-                  className="ccl-input"
-                  value={form.whatsapp}
-                  onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}
-                  placeholder="+34 600 000 000"
+                <label>WhatsApp</label>
+                <PhoneField
+                  countryCode={countryCode}
+                  onCountryChange={setCountryCode}
+                  value={phone}
+                  onChange={(value) => {
+                    setPhone(value);
+                    setPhoneError("");
+                  }}
+                  error={phoneError}
                 />
+                {phoneError && <span className="ccl-form__error">{phoneError}</span>}
               </div>
 
               {error && <p className="ccl-form__error">{error}</p>}
