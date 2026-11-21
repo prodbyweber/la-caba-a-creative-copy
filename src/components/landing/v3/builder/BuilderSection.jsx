@@ -4,6 +4,7 @@ import { base44 } from "@/api/base44Client";
 import PillCard from "./PillCard";
 import CountryPicker from "./CountryPicker";
 import DemoCard from "./DemoCard";
+import WhatsAppInput from "./WhatsAppInput";
 
 export default function BuilderSection({ section, cards = [] }) {
   const [picks, setPicks] = useState({});
@@ -47,6 +48,10 @@ export default function BuilderSection({ section, cards = [] }) {
       setError("Necesitamos tu nombre y tu email.");
       return;
     }
+    if (form.whatsapp.replace(/\D/g, "").length < 8) {
+      setError("Necesitamos tu WhatsApp para poder escribirte.");
+      return;
+    }
     setSending(true);
     try {
       const res = await base44.functions.invoke("submitProjectRequest", {
@@ -55,6 +60,7 @@ export default function BuilderSection({ section, cards = [] }) {
         whatsapp: form.whatsapp,
         genres: picks.genero || [],
         needs: picks.necesitas || [],
+        mood: (picks.mood || [])[0] || "",
         stage: (picks.etapa || [])[0] || "",
         country,
         demo_link: link,
@@ -72,9 +78,10 @@ export default function BuilderSection({ section, cards = [] }) {
   };
 
   const summary = [
-    ...(picks.genero || []),
-    ...(picks.necesitas || []),
     ...(picks.etapa || []),
+    ...(picks.genero || []),
+    ...(picks.mood || []),
+    ...(picks.necesitas || []),
     country,
   ].filter(Boolean);
 
@@ -193,13 +200,13 @@ export default function BuilderSection({ section, cards = [] }) {
                 />
               </div>
               <div className="ccl-field">
-                <label htmlFor="ccl-b-wa">WhatsApp (opcional)</label>
-                <input
-                  id="ccl-b-wa"
-                  className="ccl-input"
+                <label>WhatsApp</label>
+                <WhatsAppInput
                   value={form.whatsapp}
-                  onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}
-                  placeholder="+34 600 000 000"
+                  onChange={(next) => {
+                    setForm((f) => ({ ...f, whatsapp: next }));
+                    stopDemo();
+                  }}
                 />
               </div>
 

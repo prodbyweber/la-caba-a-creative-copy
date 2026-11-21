@@ -14,7 +14,7 @@ export function formatCompact(value) {
 }
 
 /** Cifra que cuenta hasta su valor cuando entra en pantalla. */
-export default function Counter({ value = 0, prefix = "", suffix = "", className = "" }) {
+export default function Counter({ value = 0, prefix = "", suffix = "", className = "", format }) {
   const ref = useRef(null);
   const [n, setN] = useState(0);
 
@@ -54,7 +54,7 @@ export default function Counter({ value = 0, prefix = "", suffix = "", className
   return (
     <span ref={ref} className={className}>
       {prefix}
-      {formatCompact(n)}
+      {format ? format(n) : formatCompact(n)}
       {suffix}
     </span>
   );

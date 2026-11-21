@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { ArrowRight } from "lucide-react";
 import { isVideoFile } from "@/lib/landingMedia";
 import AmbientVideo from "./AmbientVideo";
-import CtaLink from "./CtaLink";
 
 export default function Hero3({ section, settings }) {
   const [isMobile, setIsMobile] = useState(false);
@@ -43,19 +41,6 @@ export default function Hero3({ section, settings }) {
 
         {section?.subtitle && <p className="ccl-lead">{section.subtitle}</p>}
         {section?.body && <p className="ccl-hero__note">{section.body}</p>}
-
-        <div className="ccl-hero__ctas">
-          {section?.cta_label && (
-            <CtaLink to={section.cta_link} className="ccl-btn ccl-btn--primary">
-              {section.cta_label} <ArrowRight size={14} />
-            </CtaLink>
-          )}
-          {section?.cta2_label && (
-            <CtaLink to={section.cta2_link} className="ccl-btn ccl-btn--ghost">
-              {section.cta2_label}
-            </CtaLink>
-          )}
-        </div>
       </div>
     </section>
   );

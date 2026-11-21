@@ -90,6 +90,11 @@ export default function RequestsPanel() {
                   {item.stage}
                 </span>
               )}
+              {item.mood && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-white/60">
+                  mood: {item.mood}
+                </span>
+              )}
               {item.country && (
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-white/60">
                   {item.country}

@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import "@/components/landing/v3/landing3.css";
+import "@/components/landing/v3/landing3-extra.css";
 import { useHomeContent } from "@/hooks/useHomeContent";
 import Nav3 from "@/components/landing/v3/Nav3";
 import Hero3 from "@/components/landing/v3/Hero3";
-import AudienceSection from "@/components/landing/v3/AudienceSection";
+import RoadmapSection from "@/components/landing/v3/RoadmapSection";
 import GenresStack from "@/components/landing/v3/GenresStack";
 import CommunitySection from "@/components/landing/v3/CommunitySection";
 import ProcessSection from "@/components/landing/v3/ProcessSection";
@@ -17,7 +18,7 @@ import { scrollToSection } from "@/components/landing/v3/scrollToSection";
 
 const ANCHORS = {
   hero: "top",
-  audiencia: "audiencia",
+  roadmap: "roadmap",
   generos: "generos",
   comunidad: "comunidad",
   proceso: "proceso",
@@ -31,7 +32,7 @@ const ANCHORS = {
 
 const DOT_LABELS = {
   hero: "Inicio",
-  audiencia: "Para quién",
+  roadmap: "Empieza",
   generos: "Géneros",
   comunidad: "Comunidad",
   proceso: "Cómo funciona",
@@ -153,8 +154,8 @@ export default function Landing() {
     switch (section.key) {
       case "hero":
         return <Hero3 key={section.key} section={section} settings={content.settings} />;
-      case "audiencia":
-        return <AudienceSection key={section.key} section={section} items={content.audience} />;
+      case "roadmap":
+        return <RoadmapSection key={section.key} section={section} steps={content.roadmap} />;
       case "generos":
         return <GenresStack key={section.key} section={section} items={content.genres} />;
       case "comunidad":

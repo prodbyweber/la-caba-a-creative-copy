@@ -6,6 +6,7 @@ import {
   Video,
   Music4,
   Users,
+  Route,
   ListOrdered,
   Wand2,
   SlidersHorizontal,
@@ -20,7 +21,7 @@ import RequestsPanel from "@/components/admin/home/RequestsPanel";
 const TABS = [
   { id: "secciones", label: "Secciones", icon: Layout },
   { id: "hero", label: "Hero y SEO", icon: Video },
-  { id: "audiencia", label: "Para quién", icon: Users },
+  { id: "roadmap", label: "Roadmap", icon: Route },
   { id: "generos", label: "Géneros", icon: Music4 },
   { id: "comunidad", label: "Comunidad", icon: Users },
   { id: "proceso", label: "Cómo funciona", icon: ListOrdered },
@@ -46,23 +47,33 @@ const SECTION_FIELDS = [
 const GENRE_FIELDS = [
   { key: "name", label: "Nombre" },
   { key: "key", label: "Clave interna" },
-  { key: "label", label: "Etiqueta pequeña", wide: true },
-  { key: "description", label: "Descripción SONIDO", type: "textarea", wide: true },
+  { key: "subgenres", label: "Subgéneros (separados por ·)", type: "textarea", wide: true },
+  { key: "figure_value", label: "Cifra (número)", type: "number" },
+  { key: "figure_prefix", label: "Prefijo (+, US$)" },
+  { key: "figure_suffix", label: "Sufijo (B, %)" },
+  { key: "figure_text", label: "Cifra en texto", hint: "Solo si no es un número, ej: 1 de cada 4" },
+  { key: "figure_label", label: "Qué mide la cifra", wide: true },
+  { key: "figure_note", label: "Periodo o comparación", wide: true },
+  { key: "facts", label: "Mini datos", type: "list", wide: true, hint: "Un dato por línea (máximo 3)." },
+  { key: "source", label: "Fuente" },
+  { key: "source_year", label: "Año de la fuente" },
   { key: "image_url", label: "Imagen de fondo", type: "media", wide: true },
   { key: "video_url", label: "Vídeo de fondo", type: "media", wide: true },
   { key: "tint", label: "Tinte", type: "color" },
   { key: "accent", label: "Color de acento", type: "color" },
-  { key: "plays", label: "Reproducciones", type: "number" },
-  { key: "songs", label: "Canciones", type: "number" },
-  { key: "likes", label: "Likes", type: "number" },
-  { key: "reach", label: "Alcance", type: "number" },
+  { key: "is_fusion", label: "Va en la fila Fusion", type: "toggle" },
   { key: "is_visible", label: "Visible", type: "toggle" },
 ];
 
-const AUDIENCE_FIELDS = [
-  { key: "title", label: "Título (Artistas, Labels, Managers)" },
-  { key: "text", label: "Frase corta", type: "textarea", wide: true },
-  { key: "image_url", label: "Imagen", type: "media", wide: true },
+const ROADMAP_FIELDS = [
+  { key: "num", label: "Número (00, 01...)" },
+  { key: "title", label: "Título", wide: true },
+  { key: "text", label: "Texto del paso", type: "textarea", wide: true },
+  { key: "subline", label: "Segunda línea (solo portada)", wide: true },
+  { key: "keywords", label: "Palabras en bucle", type: "list", wide: true },
+  { key: "cta_label", label: "Botón del último paso" },
+  { key: "cta_link", label: "Destino del botón", hint: "#comenzar" },
+  { key: "is_intro", label: "Es la portada naranja", type: "toggle" },
   { key: "is_visible", label: "Visible", type: "toggle" },
 ];
 
@@ -169,12 +180,13 @@ export default function HomeAdmin() {
 
         {tab === "hero" && <HeroPanel />}
 
-        {tab === "audiencia" && (
+        {tab === "roadmap" && (
           <CrudPanel
-            entityName="AudienceCard"
-            fields={AUDIENCE_FIELDS}
-            defaults={{ is_visible: true }}
-            hint="Tarjetas de «Para quién es», justo después del hero."
+            entityName="RoadmapStep"
+            fields={ROADMAP_FIELDS}
+            defaults={{ is_visible: true, keywords: [] }}
+            itemTitle={(item) => `${item.num || "--"} — ${item.title || "sin título"}`}
+            hint="Un paso por pantalla. El paso marcado como portada es la pantalla naranja con el logo."
           />
         )}
 
@@ -182,8 +194,8 @@ export default function HomeAdmin() {
           <CrudPanel
             entityName="GenreCard"
             fields={GENRE_FIELDS}
-            defaults={{ is_visible: true, tint: "#ff5833", accent: "#ff5833", plays: 0 }}
-            hint="Tarjetas verticales apiladas. Las cifras son de ejemplo: edítalas aquí."
+            defaults={{ is_visible: true, tint: "#ff5833", accent: "#ff5833", facts: [] }}
+            hint="Tarjetas verticales apiladas con su cifra y su fuente. Las marcadas como Fusion van a la fila compacta."
           />
         )}
 

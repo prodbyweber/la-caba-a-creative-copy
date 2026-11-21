@@ -5,42 +5,40 @@ export const LOGO =
 
 export const SECTIONS = [
   { id: "top", label: "Inicio" },
-  { id: "audiencia", label: "Para quién" },
+  { id: "roadmap", label: "Roadmap" },
   { id: "generos", label: "Géneros" },
   { id: "comunidad", label: "Comunidad" },
   { id: "proceso", label: "Cómo funciona" },
   { id: "comenzar", label: "Empezar" },
   { id: "antes_despues", label: "Antes / Después" },
-  { id: "final", label: "Contacto" },
+  { id: "final", label: "Lanzar" },
 ];
 
 export const MINI = [
-  { title: "Crear", text: "Producción y composición" },
-  { title: "Descubrir", text: "Tu sonido y tu identidad" },
-  { title: "Lanzar", text: "Estrategia y salida al mercado" },
+  { title: "Catálogo", text: "Tus canciones, con orden" },
+  { title: "Producción", text: "Composición, mezcla y master" },
+  { title: "Lanzamiento", text: "Los recursos para salir al mundo" },
 ];
 
 export const STATS = [
   { value: 100, prefix: "+", label: "artistas desarrollados" },
   { value: 1000000, prefix: "+", label: "reproducciones" },
-  { value: 7, prefix: "", label: "géneros musicales" },
+  { value: 30, prefix: "+", label: "países" },
 ];
 
 export const GENRES = [
-  { name: "Latin", sub: "Raíz latina, sonido actual" },
-  { name: "Urban", sub: "Reggaetón, R&B y calle" },
-  { name: "Pop", sub: "Melodía y alcance global" },
-  { name: "Afrobeats", sub: "Ritmo y movimiento" },
-  { name: "Trap", sub: "808, atmósfera y flow" },
-  { name: "House", sub: "Pista y energía" },
-  { name: "Fusion", sub: "Afro House · Electropop · y mezclas sin etiqueta" },
+  { name: "Latin Urban", sub: "Reggaetón · Bachata · Latin Pop" },
+  { name: "Afrobeats", sub: "Afropop · Amapiano · Latin Afro" },
+  { name: "Hip Hop", sub: "Trap · Drill · Boom Bap" },
+  { name: "House", sub: "Afro House · Tech House" },
+  { name: "Fusion", sub: "Jersey Club · Electropop · Funk Brasil · Acústico" },
 ];
 
 export const STEPS = [
   {
     num: "01",
     title: "Descubre tu sonido",
-    text: "Referencias, visión y dirección sonora: definimos de dónde viene tu música y hacia dónde va.",
+    text: "Referencias y dirección sonora: de dónde viene tu música y hacia dónde va.",
   },
   {
     num: "02",
@@ -49,13 +47,13 @@ export const STEPS = [
   },
   {
     num: "03",
-    title: "Dale identidad",
-    text: "Imagen, audiovisual y marca: el universo visual que acompaña a tu música.",
+    title: "Prepara tu lanzamiento",
+    text: "Recibes los recursos para planificarlo.",
   },
   {
     num: "04",
-    title: "Lánzalo al mercado",
-    text: "Planificación, contenido y estrategia para que el proyecto salga y se escuche.",
+    title: "Lanza tu catálogo",
+    text: "Tu proyecto sale al mundo con todo listo para escucharse.",
   },
 ];
 

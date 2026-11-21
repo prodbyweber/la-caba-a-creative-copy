@@ -12,7 +12,7 @@
     },
     "whatsapp": {
       "type": "string",
-      "description": "WhatsApp (opcional)"
+      "description": "WhatsApp con prefijo de pa\u00eds"
     },
     "genres": {
       "type": "array",
@@ -20,6 +20,10 @@
         "type": "string"
       },
       "description": "G\u00e9neros seleccionados"
+    },
+    "mood": {
+      "type": "string",
+      "description": "Mood elegido para la canci\u00f3n"
     },
     "needs": {
       "type": "array",
@@ -30,7 +34,7 @@
     },
     "stage": {
       "type": "string",
-      "description": "Etapa del proyecto"
+      "description": "Punto de partida (una canci\u00f3n o un cat\u00e1logo)"
     },
     "country": {
       "type": "string",
@@ -53,7 +57,7 @@
       "items": {
         "type": "string"
       },
-      "description": "Direcci\u00f3n creativa elegida"
+      "description": "Preferencias de sonido elegidas"
     },
     "message": {
       "type": "string",

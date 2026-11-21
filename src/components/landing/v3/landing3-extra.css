@@ -1,0 +1,432 @@
+/* ============================================================
+   Bloques nuevos: roadmap, cifras de género, fusion, configurador
+   ============================================================ */
+
+/* ---------- roadmap / onboarding ---------- */
+.ccl-roadmap {
+  position: relative;
+}
+
+.ccl-road__intro {
+  background: #ff5833;
+  color: #080808;
+}
+.ccl-road__intro .ccl-snap__inner {
+  padding-top: 104px;
+  padding-bottom: 104px;
+}
+.ccl-road__intro-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+}
+.ccl-road__eyebrow {
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.ccl-road__kicker {
+  font-size: clamp(0.8rem, 3.4vw, 0.95rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  opacity: 0.5;
+}
+.ccl-road__logo {
+  width: min(64vw, 280px);
+  height: auto;
+  animation: cclRoadLogo 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes cclRoadLogo {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.ccl-road__claim {
+  font-size: clamp(1.9rem, 8.4vw, 3.2rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.ccl-road__sub {
+  font-size: clamp(0.85rem, 3.6vw, 1rem);
+  font-weight: 600;
+  opacity: 0.72;
+}
+.ccl-road__keys {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+.ccl-road__keys span {
+  opacity: 0.34;
+  transition: opacity 0.5s ease;
+}
+.ccl-road__keys span.is-on {
+  opacity: 1;
+}
+.ccl-road__keys .ccl-road__dotsep {
+  opacity: 0.5;
+}
+
+.ccl-road {
+  background: var(--bg);
+  color: var(--cream);
+}
+.ccl-road__rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 22px;
+  width: 1px;
+  z-index: 1;
+}
+.ccl-road__line,
+.ccl-road__fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+}
+.ccl-road__line {
+  background: rgba(241, 239, 232, 0.14);
+}
+.ccl-road__fill {
+  height: 50%;
+  bottom: auto;
+  background: #ff5833;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ccl-road.is-in .ccl-road__fill {
+  transform: scaleY(1);
+}
+.ccl-road__dot {
+  position: absolute;
+  top: calc(50% - 4px);
+  left: -4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(241, 239, 232, 0.32);
+  transition: background 0.5s ease, box-shadow 0.5s ease;
+}
+.ccl-road.is-in .ccl-road__dot {
+  background: #ff5833;
+  box-shadow: 0 0 0 5px rgba(255, 88, 51, 0.16);
+}
+.ccl-road__body {
+  padding-left: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+.ccl-road__num {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.32em;
+  color: #ff5833;
+}
+.ccl-road__title {
+  font-size: clamp(1.9rem, 9vw, 3.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  max-width: 18ch;
+}
+.ccl-road__text {
+  font-size: clamp(0.92rem, 3.8vw, 1.08rem);
+  line-height: 1.6;
+  color: var(--dim);
+  max-width: 42ch;
+}
+.ccl-road__body .ccl-btn {
+  margin-top: 10px;
+  min-height: 48px;
+}
+.ccl-road__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 3;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(241, 239, 232, 0.42);
+  animation: cclRoadNudge 2.6s ease-in-out infinite;
+}
+.ccl-road__intro .ccl-road__hint {
+  color: rgba(8, 8, 8, 0.55);
+}
+@keyframes cclRoadNudge {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, 6px);
+  }
+}
+
+@media (min-width: 768px) {
+  .ccl-road__rail {
+    left: max(44px, calc(50% - 546px));
+  }
+  .ccl-road__body {
+    padding-left: 64px;
+  }
+}
+
+/* ---------- cifras de género ---------- */
+.ccl-gcard__sub {
+  margin-top: 10px;
+  font-size: clamp(0.76rem, 3.2vw, 0.92rem);
+  line-height: 1.45;
+  color: rgba(241, 239, 232, 0.62);
+  max-width: 34ch;
+}
+.ccl-gfig {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ccl-gfig__tag {
+  align-self: flex-start;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(241, 239, 232, 0.92);
+  color: #080808;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.ccl-gfig__value {
+  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-size: clamp(2.3rem, 11.5vw, 4rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.ccl-gfig__label {
+  font-size: clamp(0.8rem, 3.3vw, 0.98rem);
+  line-height: 1.35;
+  color: var(--cream);
+  max-width: 26ch;
+}
+.ccl-gfig__note {
+  font-size: 10px;
+  color: rgba(241, 239, 232, 0.45);
+}
+.ccl-gfacts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.ccl-gfacts li {
+  position: relative;
+  padding-left: 13px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: rgba(241, 239, 232, 0.72);
+  max-width: 38ch;
+}
+.ccl-gfacts li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+.ccl-gsrc {
+  display: block;
+  margin-top: 14px;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(241, 239, 232, 0.34);
+}
+
+/* ---------- fusion (scroll libre) ---------- */
+.ccl-fusion {
+  position: relative;
+  padding: 34px 0 54px;
+  background: var(--bg);
+}
+.ccl-fusion__rail {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin: 16px -22px 0;
+  padding: 0 22px 6px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.ccl-fusion__rail::-webkit-scrollbar {
+  display: none;
+}
+.ccl-fusion__card {
+  flex: 0 0 auto;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(241, 239, 232, 0.16);
+  background: rgba(241, 239, 232, 0.04);
+  color: var(--cream);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+@media (min-width: 768px) {
+  .ccl-fusion__rail {
+    margin: 18px 0 0;
+    padding: 0;
+    flex-wrap: wrap;
+  }
+}
+
+/* ---------- píldoras: + más ---------- */
+.ccl-pills__more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+  max-height: 132px;
+  overflow-y: auto;
+  padding-right: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+.ccl-pill--more {
+  margin-top: 10px;
+  background: transparent;
+  border-style: dashed;
+  color: inherit;
+}
+.ccl-bcard--dark .ccl-pill--more {
+  background: transparent;
+  color: #f1efe8;
+  border-color: rgba(241, 239, 232, 0.4);
+}
+
+/* ---------- banderas SVG ---------- */
+.ccl-flag {
+  width: 17px;
+  height: 12px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* ---------- whatsapp ---------- */
+.ccl-wa {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.ccl-wa__pick {
+  position: relative;
+  flex-shrink: 0;
+}
+.ccl-wa__btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 46px;
+  padding: 0 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(241, 239, 232, 0.18);
+  background: rgba(241, 239, 232, 0.05);
+  color: var(--cream);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+.ccl-wa__list {
+  position: absolute;
+  z-index: 20;
+  bottom: calc(100% + 6px);
+  left: 0;
+  width: 230px;
+  max-height: 210px;
+  overflow-y: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(241, 239, 232, 0.14);
+  background: #141414;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+.ccl-wa__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 11px;
+  background: transparent;
+  border: 0;
+  color: var(--cream);
+  font-size: 11.5px;
+  text-align: left;
+}
+.ccl-wa__item:hover {
+  background: rgba(255, 88, 51, 0.12);
+}
+.ccl-wa__dial {
+  margin-left: auto;
+  font-size: 10px;
+  opacity: 0.45;
+}
+.ccl-wa__input {
+  flex: 1;
+  min-width: 0;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(241, 239, 232, 0.18);
+  background: rgba(8, 8, 8, 0.35);
+  color: var(--cream);
+  font-size: 13px;
+  font-family: inherit;
+}
+.ccl-wa__input::placeholder {
+  color: rgba(241, 239, 232, 0.3);
+}
+.ccl-wa__input:focus {
+  outline: none;
+  border-color: rgba(255, 88, 51, 0.6);
+}
+.ccl-wa__error {
+  margin-top: 6px;
+  font-size: 10.5px;
+  color: #ff9c85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ccl-road__logo,
+  .ccl-road__hint {
+    animation: none;
+  }
+}

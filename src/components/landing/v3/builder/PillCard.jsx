@@ -9,10 +9,13 @@ export function inkFor(hex) {
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62 ? "#080808" : "#f1efe8";
 }
 
+const VISIBLE = 6;
+
 /** Tarjeta del configurador con píldoras y demo automática. */
 export default function PillCard({ card, index = 0, selected = [], onToggle, demo = true }) {
   const options = card.options || [];
   const [demoIndex, setDemoIndex] = useState(-1);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     if (!demo || options.length === 0) {
@@ -34,6 +37,26 @@ export default function PillCard({ card, index = 0, selected = [], onToggle, dem
     };
   }, [demo, index, options.length]);
 
+  const many = options.length > VISIBLE;
+  const head = options.slice(0, VISIBLE);
+  const rest = options.slice(VISIBLE);
+
+  const pill = (option) => {
+    const isOn = selected.includes(option);
+    const isDemo = demo && !isOn && demoIndex === options.indexOf(option);
+    return (
+      <button
+        key={option}
+        type="button"
+        className={`ccl-pill ${isOn ? "is-on" : ""} ${isDemo ? "is-demo" : ""}`}
+        onClick={() => onToggle(option)}
+        aria-pressed={isOn}
+      >
+        {option}
+      </button>
+    );
+  };
+
   return (
     <div
       className={`ccl-bcard ${inkFor(card.color) === "#f1efe8" ? "ccl-bcard--dark" : ""}`}
@@ -45,23 +68,20 @@ export default function PillCard({ card, index = 0, selected = [], onToggle, dem
         {card.multi && <span className="ccl-bcard__hint">varias opciones</span>}
       </div>
 
-      <div className="ccl-bcard__pills">
-        {options.map((option, i) => {
-          const isOn = selected.includes(option);
-          const isDemo = demo && !isOn && demoIndex === i;
-          return (
-            <button
-              key={option}
-              type="button"
-              className={`ccl-pill ${isOn ? "is-on" : ""} ${isDemo ? "is-demo" : ""}`}
-              onClick={() => onToggle(option)}
-              aria-pressed={isOn}
-            >
-              {option}
-            </button>
-          );
-        })}
-      </div>
+      <div className="ccl-bcard__pills">{head.map(pill)}</div>
+
+      {many && expanded && <div className="ccl-pills__more">{rest.map(pill)}</div>}
+
+      {many && (
+        <button
+          type="button"
+          className="ccl-pill ccl-pill--more"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+        >
+          {expanded ? "Ver menos" : `+ más (${rest.length})`}
+        </button>
+      )}
     </div>
   );
 }

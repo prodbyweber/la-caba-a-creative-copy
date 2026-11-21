@@ -14,7 +14,7 @@ export default function WhatIs3() {
 
         <p className="ccl-lead">
           Cabaña es el lugar donde un artista pasa de canciones sueltas a un catálogo sólido:
-          producción, identidad visual, estrategia y lanzamiento, en un solo ecosistema.
+          producción musical, mezcla, master y los recursos para lanzarlo.
         </p>
 
         <div className="ccl-mini">

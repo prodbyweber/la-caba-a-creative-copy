@@ -11,12 +11,12 @@ export function useHomeContent() {
 
     const load = async () => {
       try {
-        const [sections, settings, genres, audience, process, builder, demos, stats, creators, videos] =
+        const [sections, settings, genres, roadmap, process, builder, demos, stats, creators, videos] =
           await Promise.all([
             base44.entities.LandingSection.list("-created_date", 100),
             base44.entities.SiteSettings.list("-created_date", 5),
             base44.entities.GenreCard.list("-created_date", 100),
-            base44.entities.AudienceCard.list("-created_date", 100),
+            base44.entities.RoadmapStep.list("-created_date", 100),
             base44.entities.ProcessStep.list("-created_date", 100),
             base44.entities.BuilderCard.list("-created_date", 100),
             base44.entities.DemoCase.list("-created_date", 100),
@@ -31,7 +31,7 @@ export function useHomeContent() {
             sections,
             settings: settings?.[0] || null,
             genres,
-            audience,
+            roadmap,
             process,
             builder,
             demos,

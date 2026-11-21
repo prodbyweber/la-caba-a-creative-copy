@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Search, ChevronDown } from "lucide-react";
-import { COUNTRIES, MAIN_COUNTRIES } from "@/lib/countries";
+import { COUNTRIES, MAIN_COUNTRIES, flagUrl } from "@/lib/countries";
 import { inkFor } from "./PillCard";
 
 export default function CountryPicker({ card, index = 0, value = "", onChange, onInteract }) {
@@ -39,7 +39,7 @@ export default function CountryPicker({ card, index = 0, value = "", onChange, o
             onClick={() => pick(country)}
             aria-pressed={value === country.name}
           >
-            <span className="ccl-pill__flag">{country.flag}</span> {country.name}
+            <img className="ccl-flag" src={flagUrl(country.code)} alt="" /> {country.name}
           </button>
         ))}
         <button
@@ -80,7 +80,7 @@ export default function CountryPicker({ card, index = 0, value = "", onChange, o
                 className={`ccl-country__item ${value === country.name ? "is-on" : ""}`}
                 onClick={() => pick(country)}
               >
-                <span>{country.flag}</span> {country.name}
+                <img className="ccl-flag" src={flagUrl(country.code)} alt="" /> {country.name}
               </button>
             ))}
             {results.length === 0 && <span className="ccl-country__empty">Sin resultados</span>}

@@ -4,51 +4,75 @@
   "properties": {
     "key": {
       "type": "string",
-      "description": "Identificador interno (latin, urban, pop...)"
+      "description": "Identificador interno (latin_urban, afrobeats...)"
     },
     "name": {
       "type": "string",
-      "description": "Nombre del g\u00e9nero en grande (LATIN, URBAN...)"
+      "description": "Nombre del g\u00e9nero en grande (LATIN URBAN...)"
     },
-    "label": {
+    "subgenres": {
       "type": "string",
-      "description": "Etiqueta peque\u00f1a en may\u00fasculas (ej: ARTISTAS \u00b7 CAT\u00c1LOGO)"
-    },
-    "description": {
-      "type": "string",
-      "description": "Descripci\u00f3n corta de 1-2 l\u00edneas bajo el mini t\u00edtulo SONIDO"
-    },
-    "video_url": {
-      "type": "string",
-      "description": "V\u00eddeo de fondo en loop (solo decorativo)"
+      "description": "Subg\u00e9neros separados por \u00b7"
     },
     "image_url": {
       "type": "string",
       "description": "Imagen de fondo o p\u00f3ster del v\u00eddeo"
     },
+    "video_url": {
+      "type": "string",
+      "description": "V\u00eddeo de fondo en loop (solo decorativo)"
+    },
     "tint": {
       "type": "string",
-      "description": "Color de tinte de la tarjeta en hex (ej: #ff5833)"
+      "description": "Color de tinte de la tarjeta en hex"
     },
     "accent": {
       "type": "string",
       "description": "Color de acento para la cifra en hex"
     },
-    "plays": {
+    "figure_value": {
       "type": "number",
-      "description": "Reproducciones (cifra grande animada)"
+      "description": "Cifra a animar (363.2, 5022, 15.1)"
     },
-    "songs": {
-      "type": "number",
-      "description": "Mini dato: canciones"
+    "figure_prefix": {
+      "type": "string",
+      "description": "Prefijo de la cifra (ej: +, US$)"
     },
-    "likes": {
-      "type": "number",
-      "description": "Mini dato: likes"
+    "figure_suffix": {
+      "type": "string",
+      "description": "Sufijo de la cifra (ej: B, %)"
     },
-    "reach": {
-      "type": "number",
-      "description": "Mini dato: alcance"
+    "figure_text": {
+      "type": "string",
+      "description": "Sustituye a la cifra cuando no es num\u00e9rica (ej: 1 de cada 4)"
+    },
+    "figure_label": {
+      "type": "string",
+      "description": "Qu\u00e9 mide la cifra"
+    },
+    "figure_note": {
+      "type": "string",
+      "description": "Periodo o comparaci\u00f3n de la cifra"
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Mini datos (m\u00e1ximo 3). Los vac\u00edos se ocultan."
+    },
+    "source": {
+      "type": "string",
+      "description": "Fuente del dato (ej: Luminate Midyear Report)"
+    },
+    "source_year": {
+      "type": "string",
+      "description": "A\u00f1o de la fuente (ej: 2026)"
+    },
+    "is_fusion": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si es una tarjeta peque\u00f1a de la fila Fusion"
     },
     "order": {
       "type": "number",

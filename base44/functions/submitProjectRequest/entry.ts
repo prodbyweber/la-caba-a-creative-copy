@@ -26,6 +26,7 @@ export default async function (req) {
     const genres = cleanList(body.genres);
     const needs = cleanList(body.needs);
     const stage = clean(body.stage, 80);
+    const mood = clean(body.mood, 60);
     const country = clean(body.country, 80);
     const demoLink = clean(body.demo_link, 500);
     const demoFileUri = clean(body.demo_file_uri, 500);
@@ -41,6 +42,7 @@ export default async function (req) {
       whatsapp,
       genres,
       needs,
+      mood,
       stage,
       country,
       demo_link: demoLink,
@@ -57,7 +59,8 @@ export default async function (req) {
       whatsapp ? `WhatsApp: ${whatsapp}` : null,
       genres.length ? `Géneros: ${genres.join(", ")}` : null,
       needs.length ? `Necesita: ${needs.join(", ")}` : null,
-      stage ? `Etapa: ${stage}` : null,
+      stage ? `Punto de partida: ${stage}` : null,
+      mood ? `Mood: ${mood}` : null,
       country ? `Ubicación: ${country}` : null,
       demoLink ? `Demo: ${demoLink}` : null,
       demoFileName ? `Audio adjunto: ${demoFileName}` : null,

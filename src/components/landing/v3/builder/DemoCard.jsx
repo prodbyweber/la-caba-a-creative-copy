@@ -80,7 +80,7 @@ export default function DemoCard({
         {error && <span className="ccl-demo__error">{error}</span>}
       </div>
 
-      <span className="ccl-bcard__mini">Dirección creativa</span>
+      <span className="ccl-bcard__mini">Cómo quieres tu sonido</span>
       <div className="ccl-dirs">
         {(card.options || []).map((option, i) => {
           const Icon = ICONS[i % ICONS.length];
