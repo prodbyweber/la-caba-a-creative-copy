@@ -1,109 +1,66 @@
-// Recursos y copy fijos de la landing v3.
-// El logotipo original se usa siempre como imagen, nunca como texto.
+// Recursos y copy de la home v4. El logotipo original siempre como imagen.
 
 export const LOGO =
   "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
 
-export const NAV_ITEMS = [
+export const SECTIONS = [
   { id: "top", label: "Inicio" },
-  { id: "servicios", label: "Servicios" },
-  { id: "catalogo", label: "Catálogo" },
-  { id: "artistas", label: "Artistas" },
-  { id: "creadores", label: "Creadores" },
-  { id: "contacto", label: "Contacto" },
+  { id: "casa", label: "Qué es" },
+  { id: "cifras", label: "Cifras" },
+  { id: "generos", label: "Géneros" },
+  { id: "metodo", label: "Cómo funciona" },
+  { id: "tendencia", label: "Explorar" },
+  { id: "final", label: "Empezar" },
+];
+
+export const MINI = [
+  { title: "Crear", text: "Producción y composición" },
+  { title: "Descubrir", text: "Tu sonido y tu identidad" },
+  { title: "Lanzar", text: "Estrategia y salida al mercado" },
+];
+
+export const STATS = [
+  { value: 100, prefix: "+", label: "artistas desarrollados" },
+  { value: 1000000, prefix: "+", label: "reproducciones" },
+  { value: 7, prefix: "", label: "géneros musicales" },
+  { value: null, prefix: "", text: "Madrid", label: "base con alcance global" },
 ];
 
 export const GENRES = [
-  "Latin Urban",
-  "Trap",
-  "Afrobeats",
-  "Pop",
-  "House",
-  "Fusiones",
-  "& Más",
-];
-
-export const DISCIPLINES = [
-  "Producción musical",
-  "Desarrollo artístico",
-  "Dirección creativa",
-  "Estrategia",
-  "Catálogo",
-  "Madrid · Venezuela",
-];
-
-export const AREAS = [
-  {
-    num: "01",
-    title: "Producción musical",
-    text: "Desarrollo de sonidos, instrumentales, composición, grabación y producción de canciones.",
-    tone: "orange",
-  },
-  {
-    num: "02",
-    title: "Desarrollo artístico",
-    text: "Construcción de identidad, dirección sonora, selección de repertorio y desarrollo de catálogo.",
-    tone: "dark",
-  },
-  {
-    num: "03",
-    title: "Dirección creativa",
-    text: "Desarrollo de conceptos, universos visuales, contenido y dirección de proyectos.",
-    tone: "dark",
-  },
-  {
-    num: "04",
-    title: "Estrategia",
-    text: "Planificación de lanzamientos, posicionamiento, contenido y crecimiento de proyectos.",
-    tone: "cream",
-  },
+  { name: "Latin", sub: "Raíz latina, sonido actual" },
+  { name: "Urban", sub: "Reggaetón, R&B y calle" },
+  { name: "Pop", sub: "Melodía y alcance global" },
+  { name: "Afrobeats", sub: "Ritmo y movimiento" },
+  { name: "Trap", sub: "808, atmósfera y flow" },
+  { name: "House", sub: "Pista y energía" },
+  { name: "Fusion", sub: "Afro House · Electropop · y mezclas sin etiqueta" },
 ];
 
 export const STEPS = [
   {
     num: "01",
-    title: "Identidad",
-    text: "Entendemos al artista, sus referencias, su visión y su dirección sonora.",
+    title: "Descubre tu sonido",
+    text: "Referencias, visión y dirección sonora: definimos de dónde viene tu música y hacia dónde va.",
   },
   {
     num: "02",
-    title: "Producción",
-    text: "Desarrollamos el sonido, producimos canciones y trabajamos el repertorio.",
+    title: "Produce y construye tu catálogo",
+    text: "Composición, instrumentales y producción. Las canciones sueltas se convierten en un catálogo coherente.",
   },
   {
     num: "03",
-    title: "Catálogo",
-    text: "Construimos un catálogo coherente que represente la identidad del proyecto.",
+    title: "Dale identidad",
+    text: "Imagen, audiovisual y marca: el universo visual que acompaña a tu música.",
   },
   {
     num: "04",
-    title: "Estrategia",
-    text: "Definimos dirección creativa, contenido y planificación de lanzamientos.",
-  },
-  {
-    num: "05",
-    title: "Desarrollo",
-    text: "Conectamos el proyecto con nuevas oportunidades, colaboradores y audiencias.",
+    title: "Lánzalo al mercado",
+    text: "Planificación, contenido y estrategia para que el proyecto salga y se escuche.",
   },
 ];
 
-export const PROCESS = [
-  "Análisis del proyecto",
-  "Dirección sonora",
-  "Producción musical",
-  "Construcción del catálogo",
-  "Desarrollo estratégico",
-];
+export const TRENDING = ["Feelingmancia", "La Señal", "La Última Vez", "Lipstick", "U N I"];
 
-export const ROLES = [
-  "Artistas",
-  "Productores musicales",
-  "Compositores",
-  "Creadores audiovisuales",
-  "Directores creativos",
-  "Industria musical",
-];
-
-export const PROJECT_CTA = "/ExploracionForm";
-export const CATALOG_CTA = "/Explorar";
-export const CONNECT_CTA = "/access";
+export const EXPLORE_CTA = "/Explorar";
+export const SESSION_CTA = "/solicitud";
+export const REGISTER_CTA = "/access";

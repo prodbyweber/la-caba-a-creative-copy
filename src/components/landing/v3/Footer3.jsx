@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Instagram, Youtube, Music2, Mail, MapPin } from "lucide-react";
-import { LOGO, NAV_ITEMS } from "./constants";
+import { LOGO, SECTIONS } from "./constants";
+import { scrollToSection } from "./scrollToSection";
 
 export default function Footer3({ settings }) {
   const socials = [
@@ -21,8 +22,15 @@ export default function Footer3({ settings }) {
           <div>
             <div className="ccl-foot__title">Navegación</div>
             <div className="ccl-foot__links">
-              {NAV_ITEMS.map((item) => (
-                <a key={item.id} href={`#${item.id}`}>
+              {SECTIONS.map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToSection(item.id);
+                  }}
+                >
                   {item.label}
                 </a>
               ))}

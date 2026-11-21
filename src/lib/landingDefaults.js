@@ -94,7 +94,7 @@ export const DEFAULT_SECTIONS = [
     is_visible: true,
     eyebrow: "Qué es Cabaña Creative",
     title: "No hacemos canciones. Construimos proyectos.",
-    subtitle: "Compañía de producción musical y desarrollo creativo. Venezuela 2020 · Madrid.",
+    subtitle: "Compañía de producción musical y desarrollo creativo. Base en Madrid.",
     cta_label: "",
     cta_link: "",
     cta2_label: "",
