@@ -54,7 +54,7 @@ export default function Layout({ children, currentPageName }) {
         body {
           background: #0a0a0b;
           color: white;
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-family: 'Neue Haas Grotesk Display Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
         
         ::selection {

@@ -14,6 +14,8 @@
   --ink: #080808;
   --ink-line: rgba(8, 8, 8, 0.12);
   --ink-dim: rgba(8, 8, 8, 0.62);
+  --font-sans: "Neue Haas Grotesk Display Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-display: "Neue Haas Grotesk Display Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   position: relative;
   height: 100svh;
@@ -26,7 +28,7 @@
   overscroll-behavior-y: contain;
   background: var(--bg);
   color: var(--cream);
-  font-family: "Arial Nova", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -83,8 +85,8 @@
 
 /* ---------- tipografía ---------- */
 .ccl-display {
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
-  font-weight: 900;
+  font-family: var(--font-display);
+  font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 0.98;
   text-transform: none;
@@ -229,7 +231,7 @@
 }
 .ccl-mini__card b {
   display: block;
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 12.5px;
   letter-spacing: -0.01em;
 }
@@ -294,7 +296,7 @@
   padding: 18px 16px;
 }
 .ccl-stat__value {
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.65rem, 8.4vw, 2.6rem);
   line-height: 1;
   letter-spacing: -0.04em;
@@ -358,7 +360,7 @@
 }
 .ccl-genre__body { position: relative; z-index: 2; }
 .ccl-genre__name {
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.25rem, 6vw, 1.7rem);
   letter-spacing: -0.02em;
   color: var(--cream);
@@ -398,7 +400,7 @@
   justify-content: space-between;
 }
 .ccl-step__num {
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 2.1rem;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -406,7 +408,7 @@
   -webkit-text-stroke: 1px rgba(241, 239, 232, 0.45);
 }
 .ccl-step__title {
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 1.12rem;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -463,7 +465,7 @@
 }
 .ccl-trend__title {
   margin-top: 10px;
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 12.5px;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -744,7 +746,6 @@
   margin-top: 8px;
   font-size: clamp(2.2rem, 11.5vw, 6rem);
   line-height: 0.94;
-  text-transform: uppercase;
 }
 .ccl-gcard__mini {
   display: block;
@@ -769,7 +770,7 @@
   margin-top: 16px;
 }
 .ccl-gcard__plays {
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.6rem, 8vw, 2.6rem);
   line-height: 1;
   letter-spacing: -0.03em;
@@ -795,7 +796,7 @@
 }
 .ccl-gcard__fact-value {
   display: block;
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 15px;
   letter-spacing: -0.01em;
 }
@@ -828,7 +829,7 @@
 }
 .ccl-proc__num {
   display: block;
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(3rem, 18vw, 7rem);
   line-height: 0.9;
   letter-spacing: -0.04em;
@@ -878,7 +879,7 @@
 }
 .ccl-aud__title {
   margin-top: 8px;
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.3rem, 6vw, 1.8rem);
   letter-spacing: -0.02em;
 }
@@ -922,7 +923,7 @@
   padding: 10px;
 }
 .ccl-comm__name {
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 12px;
   letter-spacing: -0.01em;
 }
@@ -954,7 +955,7 @@
 }
 .ccl-comm__stat-value {
   display: block;
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(1.05rem, 5.2vw, 1.6rem);
   letter-spacing: -0.02em;
   color: var(--orange);
@@ -1001,7 +1002,7 @@
   opacity: 0.55;
 }
 .ccl-bcard__title {
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 1.05rem;
   letter-spacing: -0.01em;
 }
@@ -1285,7 +1286,7 @@
 }
 .ccl-ba__body { padding: 12px 14px 16px; }
 .ccl-ba__artist {
-  font-family: "Arial Black", "Arial Bold", Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 13px;
   letter-spacing: -0.01em;
 }
