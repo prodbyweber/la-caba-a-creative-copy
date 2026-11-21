@@ -1,0 +1,45 @@
+{
+  "name": "CountryFlag",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "C\u00f3digo ISO del pa\u00eds en dos letras (ES, MX, NG...)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Nombre del pa\u00eds"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la bandera cae en la secci\u00f3n"
+    }
+  },
+  "required": [
+    "code"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
