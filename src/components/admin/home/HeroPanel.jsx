@@ -70,6 +70,17 @@ export default function HeroPanel() {
         onChange={set("hero_poster_url")}
         hint="Se muestra si el vídeo no puede reproducirse."
       />
+      <TextField
+        label="Sombreado sobre el vídeo del hero (0-100)"
+        value={record.hero_shade ?? 38}
+        onChange={set("hero_shade")}
+      />
+      <ImageField
+        label="Segundo vídeo del hero (rota con el primero)"
+        value={record.journey_media_url}
+        onChange={set("journey_media_url")}
+        hint="MP4 H.264. Cada 8 segundos cambia el vídeo."
+      />
 
       <TextField label="Título SEO" value={record.seo_title} onChange={set("seo_title")} />
       <TextField
@@ -83,6 +94,38 @@ export default function HeroPanel() {
       <TextField label="Instagram" value={record.social_instagram} onChange={set("social_instagram")} />
       <TextField label="TikTok" value={record.social_tiktok} onChange={set("social_tiktok")} />
       <TextField label="YouTube" value={record.social_youtube} onChange={set("social_youtube")} />
+
+      <p className="mt-2 text-[11px] font-bold uppercase tracking-widest text-[#ff5833]">
+        Santiago Weber
+      </p>
+      <TextField
+        label="Etiqueta bajo el nombre"
+        value={record.weber_role}
+        onChange={set("weber_role")}
+      />
+      <TextField
+        label="Mini biografía"
+        value={record.weber_bio}
+        onChange={set("weber_bio")}
+        textarea
+        rows={4}
+      />
+      <ImageField
+        label="Vídeo personal (se reproduce al tocar play)"
+        value={record.weber_video_url}
+        onChange={set("weber_video_url")}
+        hint="Con sonido y controles. MP4 H.264."
+      />
+      <ImageField
+        label="Póster del vídeo personal"
+        value={record.weber_poster_url}
+        onChange={set("weber_poster_url")}
+      />
+      <ImageField
+        label="Foto de Santiago"
+        value={record.weber_photo_url}
+        onChange={set("weber_photo_url")}
+      />
 
       <div className="flex items-center gap-2">
         <button

@@ -4,49 +4,50 @@ import "@/components/landing/v3/landing3-extra.css";
 import { useHomeContent } from "@/hooks/useHomeContent";
 import Nav3 from "@/components/landing/v3/Nav3";
 import Hero5 from "@/components/landing/v3/Hero5";
-import ProposalSection from "@/components/landing/v3/ProposalSection";
-import CountriesSection from "@/components/landing/v3/CountriesSection";
-import BrandsSection from "@/components/landing/v3/BrandsSection";
-import GenresStack from "@/components/landing/v3/GenresStack";
-import CommunitySection from "@/components/landing/v3/CommunitySection";
-import ProcessSection from "@/components/landing/v3/ProcessSection";
-import BeforeAfterSection from "@/components/landing/v3/BeforeAfterSection";
-import BuilderSection from "@/components/landing/v3/builder/BuilderSection";
-import WhatIs3 from "@/components/landing/v3/WhatIs3";
 import Stats3 from "@/components/landing/v3/Stats3";
-import Trending3 from "@/components/landing/v3/Trending3";
+import SantiagoSection from "@/components/landing/v3/SantiagoSection";
+import BrandsSection from "@/components/landing/v3/BrandsSection";
+import ProposalSection from "@/components/landing/v3/ProposalSection";
+import ProcessSection from "@/components/landing/v3/ProcessSection";
+import BuilderSection from "@/components/landing/v3/builder/BuilderSection";
+import GenresStack from "@/components/landing/v3/GenresStack";
+import WhatIs3 from "@/components/landing/v3/WhatIs3";
+import CountriesSection from "@/components/landing/v3/CountriesSection";
+import FollowUpSection from "@/components/landing/v3/FollowUpSection";
+import FaqSection from "@/components/landing/v3/FaqSection";
 import Final3 from "@/components/landing/v3/Final3";
+import FloatingCta from "@/components/landing/v3/FloatingCta";
 import { scrollToSection } from "@/components/landing/v3/scrollToSection";
 
 const ANCHORS = {
   hero: "top",
-  propuesta: "propuesta",
-  paises: "paises",
+  cifras: "cifras",
+  santiago: "santiago",
   marcas: "marcas",
-  generos: "generos",
-  comunidad: "comunidad",
+  propuesta: "propuesta",
   proceso: "proceso",
   comenzar: "comenzar",
-  antes_despues: "antes_despues",
+  generos: "generos",
   casa: "casa",
-  cifras: "cifras",
-  tendencia: "tendencia",
+  paises: "paises",
+  seguimiento: "seguimiento",
+  faq: "faq",
   final: "final",
 };
 
 const DOT_LABELS = {
   hero: "Inicio",
-  propuesta: "Propuesta",
-  paises: "Países",
-  marcas: "Marcas",
-  generos: "Géneros",
-  comunidad: "Comunidad",
-  proceso: "Cómo funciona",
-  comenzar: "Empezar",
-  antes_despues: "Antes / Después",
-  casa: "Qué es",
   cifras: "Cifras",
-  tendencia: "Explorar",
+  santiago: "Santiago",
+  marcas: "Marcas",
+  propuesta: "Propuesta",
+  proceso: "Cómo funciona",
+  comenzar: "Tu brief",
+  generos: "Géneros",
+  casa: "Estudio",
+  paises: "Países",
+  seguimiento: "Seguimiento",
+  faq: "FAQ",
   final: "Contacto",
 };
 
@@ -77,7 +78,7 @@ export default function Landing() {
   useEffect(() => {
     if (!content) return;
     const s = content.settings;
-    document.title = s.seo_title || "Cabaña Creative";
+    document.title = s.seo_title || "Cabaña Creative | Producción musical y catálogo para artistas";
     setMeta("name", "description", s.seo_description);
     setMeta("property", "og:title", s.seo_title);
     setMeta("property", "og:description", s.seo_description);
@@ -160,35 +161,35 @@ export default function Landing() {
     switch (section.key) {
       case "hero":
         return <Hero5 key={section.key} section={section} settings={content.settings} />;
-      case "propuesta":
-        return <ProposalSection key={section.key} section={section} blocks={content.proposal} />;
-      case "paises":
-        return <CountriesSection key={section.key} section={section} flags={content.flags} />;
-      case "marcas":
-        return <BrandsSection key={section.key} />;
-      case "generos":
-        return <GenresStack key={section.key} section={section} items={content.genres} />;
-      case "comunidad":
+      case "cifras":
+        return <Stats3 key={section.key} section={section} stats={content.stats} />;
+      case "santiago":
         return (
-          <CommunitySection
+          <SantiagoSection
             key={section.key}
             section={section}
+            settings={content.settings}
             creators={content.creators}
-            stats={content.stats}
           />
         );
+      case "marcas":
+        return <BrandsSection key={section.key} />;
+      case "propuesta":
+        return <ProposalSection key={section.key} section={section} blocks={content.proposal} />;
       case "proceso":
         return <ProcessSection key={section.key} section={section} steps={content.process} />;
       case "comenzar":
         return <BuilderSection key={section.key} section={section} cards={content.builder} />;
-      case "antes_despues":
-        return <BeforeAfterSection key={section.key} section={section} items={content.demos} />;
+      case "generos":
+        return <GenresStack key={section.key} section={section} items={content.genres} />;
       case "casa":
         return <WhatIs3 key={section.key} />;
-      case "cifras":
-        return <Stats3 key={section.key} />;
-      case "tendencia":
-        return <Trending3 key={section.key} videos={content.videos || []} />;
+      case "paises":
+        return <CountriesSection key={section.key} section={section} flags={content.flags} />;
+      case "seguimiento":
+        return <FollowUpSection key={section.key} section={section} stages={content.tracking} />;
+      case "faq":
+        return <FaqSection key={section.key} section={section} items={content.faq} />;
       case "final":
         return <Final3 key={section.key} section={section} settings={content.settings} />;
       default:
@@ -213,6 +214,8 @@ export default function Landing() {
           />
         ))}
       </div>
+
+      <FloatingCta />
 
       <div className="ccl-grain" aria-hidden="true" />
     </div>

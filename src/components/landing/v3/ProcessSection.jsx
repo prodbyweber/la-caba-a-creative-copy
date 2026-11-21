@@ -1,40 +1,53 @@
-import React from "react";
-import { isVideoFile } from "@/lib/landingMedia";
-import AmbientVideo from "./AmbientVideo";
+import React, { useEffect, useRef, useState } from "react";
+import CtaLink from "./CtaLink";
+import ProcessCard from "./process/ProcessCard";
 
+/** Cómo funciona: fondo naranja, tarjetas grandes de color y paneles CSS animados. */
 export default function ProcessSection({ section, steps = [] }) {
   const list = steps.filter((s) => s.is_visible !== false);
+  const ref = useRef(null);
+  const [live, setLive] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setLive(true);
+      return undefined;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setLive(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <div className="ccl-stack" id="proceso">
-      <div className="ccl-wrap ccl-stack__intro">
-        {section?.eyebrow && <span className="ccl-eyebrow">{section.eyebrow}</span>}
-        <h2 className="ccl-display ccl-h2" style={{ marginTop: 12 }}>
-          {section?.title}
-        </h2>
-        {section?.subtitle && <p className="ccl-small">{section.subtitle}</p>}
-      </div>
+    <section className="ccl-how" id="proceso" ref={ref}>
+      <div className="ccl-wrap">
+        {section?.eyebrow && <span className="ccl-eyebrow ccl-how__eyebrow">{section.eyebrow}</span>}
+        <h2 className="ccl-display ccl-how__title">{section?.title || "Cómo funciona"}</h2>
+        {section?.subtitle && <p className="ccl-how__sub">{section.subtitle}</p>}
 
-      {list.map((step, i) => (
-        <article className="ccl-stack__item" key={step.id || step.title}>
-          <div className="ccl-proc">
-            <div className="ccl-media">
-              {isVideoFile(step.video_url) ? (
-                <AmbientVideo src={step.video_url} poster={step.image_url} />
-              ) : step.image_url ? (
-                <img className="ccl-media__el" src={step.image_url} alt="" loading="lazy" />
-              ) : null}
-              <span className="ccl-media__veil" />
-            </div>
+        <div className="ccl-how__grid">
+          {list.map((step, i) => (
+            <ProcessCard key={step.id || step.title} step={step} index={i} live={live} />
+          ))}
+        </div>
 
-            <div className="ccl-wrap ccl-proc__body">
-              <span className="ccl-proc__num">{step.num || `0${i + 1}`}</span>
-              <h3 className="ccl-display ccl-proc__title">{step.title}</h3>
-              <p className="ccl-proc__text">{step.text}</p>
-            </div>
+        {section?.cta_label && (
+          <div className="ccl-how__cta">
+            <CtaLink to={section.cta_link || "#comenzar"} className="ccl-btn ccl-btn--ink">
+              {section.cta_label}
+            </CtaLink>
           </div>
-        </article>
-      ))}
-    </div>
+        )}
+      </div>
+    </section>
   );
 }

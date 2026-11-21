@@ -11,20 +11,35 @@ export function useHomeContent() {
 
     const load = async () => {
       try {
-        const [sections, settings, genres, proposal, flags, process, builder, demos, stats, creators, videos] =
-          await Promise.all([
-            base44.entities.LandingSection.list("-created_date", 100),
-            base44.entities.SiteSettings.list("-created_date", 5),
-            base44.entities.GenreCard.list("-created_date", 100),
-            base44.entities.ProposalBlock.list("-created_date", 100),
-            base44.entities.CountryFlag.list("-created_date", 100),
-            base44.entities.ProcessStep.list("-created_date", 100),
-            base44.entities.BuilderCard.list("-created_date", 100),
-            base44.entities.DemoCase.list("-created_date", 100),
-            base44.entities.HomeStat.list("-created_date", 100),
-            base44.entities.FeaturedCreator.list("-created_date", 100),
-            base44.entities.FeaturedVideo.list("-created_date", 100),
-          ]);
+        const [
+          sections,
+          settings,
+          genres,
+          proposal,
+          flags,
+          process,
+          builder,
+          demos,
+          stats,
+          creators,
+          videos,
+          faq,
+          tracking,
+        ] = await Promise.all([
+          base44.entities.LandingSection.list("-created_date", 100),
+          base44.entities.SiteSettings.list("-created_date", 5),
+          base44.entities.GenreCard.list("-created_date", 100),
+          base44.entities.ProposalBlock.list("-created_date", 100),
+          base44.entities.CountryFlag.list("-created_date", 100),
+          base44.entities.ProcessStep.list("-created_date", 100),
+          base44.entities.BuilderCard.list("-created_date", 100),
+          base44.entities.DemoCase.list("-created_date", 100),
+          base44.entities.HomeStat.list("-created_date", 100),
+          base44.entities.FeaturedCreator.list("-created_date", 100),
+          base44.entities.FeaturedVideo.list("-created_date", 100),
+          base44.entities.FaqItem.list("-created_date", 100),
+          base44.entities.TrackingStage.list("-created_date", 100),
+        ]);
 
         if (!alive) return;
         setContent(
@@ -40,6 +55,8 @@ export function useHomeContent() {
             stats,
             creators,
             videos,
+            faq,
+            tracking,
           })
         );
       } catch (e) {

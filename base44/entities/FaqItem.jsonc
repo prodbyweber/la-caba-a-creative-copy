@@ -1,0 +1,46 @@
+{
+  "name": "FaqItem",
+  "type": "object",
+  "properties": {
+    "question": {
+      "type": "string",
+      "description": "Pregunta"
+    },
+    "answer": {
+      "type": "string",
+      "description": "Respuesta"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la pregunta se muestra"
+    }
+  },
+  "required": [
+    "question",
+    "answer"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

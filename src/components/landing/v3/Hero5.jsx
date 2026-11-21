@@ -25,6 +25,12 @@ export default function Hero5({ section, settings }) {
 
   const src = sources[index] || "";
   const poster = settings?.hero_poster_url || "";
+  const shade = Math.max(0, Math.min(100, Number(settings?.hero_shade ?? 38))) / 100;
+  const shadeStyle = {
+    "--shade": shade,
+    "--shade-2": shade * 0.62,
+    "--shade-3": shade * 0.22,
+  };
 
   const title = (section?.title || "Todo empieza con un catálogo.").trim();
   const words = title.split(" ");
@@ -40,7 +46,7 @@ export default function Hero5({ section, settings }) {
         ) : poster ? (
           <img className="ccl-media__el" src={poster} alt="" aria-hidden="true" />
         ) : null}
-        <span className="ccl-hero5__shade" aria-hidden="true" />
+        <span className="ccl-hero5__shade" style={shadeStyle} aria-hidden="true" />
       </div>
 
       <div className="ccl-wrap ccl-snap__inner ccl-hero5__inner">

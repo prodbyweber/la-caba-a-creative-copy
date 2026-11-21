@@ -70,9 +70,14 @@
       "type": "string",
       "description": "Imagen fija del hero mientras carga el v\u00eddeo"
     },
+    "hero_shade": {
+      "type": "number",
+      "default": 38,
+      "description": "Intensidad del sombreado sobre el v\u00eddeo del hero (0-100)"
+    },
     "journey_media_url": {
       "type": "string",
-      "description": "V\u00eddeo de fondo del recorrido por scroll"
+      "description": "Segundo v\u00eddeo que rota en el hero"
     },
     "access_card_image_url": {
       "type": "string",
@@ -82,9 +87,25 @@
       "type": "string",
       "description": "Nombre de Weber"
     },
+    "weber_role": {
+      "type": "string",
+      "description": "Etiqueta bajo el nombre (Founder, productor y artista)"
+    },
+    "weber_bio": {
+      "type": "string",
+      "description": "Mini biograf\u00eda creativa y personal"
+    },
     "weber_photo_url": {
       "type": "string",
-      "description": "Foto de Weber"
+      "description": "Foto de perfil de Weber"
+    },
+    "weber_video_url": {
+      "type": "string",
+      "description": "V\u00eddeo personal (se reproduce al tocarlo, con sonido)"
+    },
+    "weber_poster_url": {
+      "type": "string",
+      "description": "P\u00f3ster del v\u00eddeo personal"
     },
     "weber_bg_url": {
       "type": "string",

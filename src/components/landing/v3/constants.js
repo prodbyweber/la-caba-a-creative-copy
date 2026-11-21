@@ -4,14 +4,10 @@ export const LOGO =
   "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/6b7c4002a_Titulo.png";
 
 export const SECTIONS = [
-  { id: "top", label: "Inicio" },
-  { id: "roadmap", label: "Roadmap" },
-  { id: "generos", label: "Géneros" },
-  { id: "comunidad", label: "Comunidad" },
   { id: "proceso", label: "Cómo funciona" },
-  { id: "comenzar", label: "Empezar" },
-  { id: "antes_despues", label: "Antes / Después" },
-  { id: "final", label: "Lanzar" },
+  { id: "comenzar", label: "Tu brief" },
+  { id: "faq", label: "Preguntas frecuentes" },
+  { id: "generos", label: "Géneros" },
 ];
 
 export const MINI = [

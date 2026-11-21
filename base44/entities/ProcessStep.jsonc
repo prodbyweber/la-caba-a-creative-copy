@@ -14,13 +14,41 @@
       "type": "string",
       "description": "Texto corto del paso"
     },
+    "bullets": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Dos vi\u00f1etas explicativas (qu\u00e9 haces t\u00fa / qu\u00e9 hacemos nosotros)"
+    },
+    "color": {
+      "type": "string",
+      "description": "Color de fondo de la tarjeta en hex"
+    },
+    "panel": {
+      "type": "string",
+      "enum": [
+        "genres",
+        "mood",
+        "mix",
+        "checklist"
+      ],
+      "enumColors": [
+        "orange",
+        "purple",
+        "blue",
+        "green"
+      ],
+      "default": "genres",
+      "description": "Mini panel animado de la tarjeta"
+    },
     "video_url": {
       "type": "string",
-      "description": "V\u00eddeo de fondo en loop (decorativo)"
+      "description": "No se usa en la home actual (se conserva por compatibilidad)"
     },
     "image_url": {
       "type": "string",
-      "description": "Imagen de fondo o p\u00f3ster"
+      "description": "No se usa en la home actual (se conserva por compatibilidad)"
     },
     "order": {
       "type": "number",

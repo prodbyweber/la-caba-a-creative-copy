@@ -17,9 +17,9 @@ const M = {
 };
 
 export const DEFAULT_SETTINGS = {
-  seo_title: "Cabaña Creative — El centro de control para artistas que producen",
+  seo_title: "Cabaña Creative | Producción musical y catálogo para artistas",
   seo_description:
-    "Cabaña Creative es la plataforma para artistas productores: catálogo, demos, beats y hoja de ruta de lanzamiento. Producción musical, imagen y estrategia.",
+    "Construye tu catálogo musical con producción, mezcla y master, y beatmaking personalizado. Envía tu proyecto.",
   og_image_url: M.still,
   brand_strip_title: "Han confiado en nosotros",
   login_label: "Acceder",
@@ -35,9 +35,15 @@ export const DEFAULT_SETTINGS = {
   hero_media_url: M.heroVideo,
   hero_media_mobile_url: M.heroVideoMobile,
   hero_poster_url: M.still,
+  hero_shade: 38,
   journey_media_url: M.journeyVideo,
   access_card_image_url: M.accessCard,
-  weber_name: "Weber",
+  weber_name: "Santiago Weber",
+  weber_role: "Santiago Weber · Founder, productor y artista",
+  weber_bio:
+    "Soy Santiago Weber, productor y artista, fundador de Cabaña Creative. He producido para Universal Music, Warner Music Spain y Magnus Media. Aquí desarrollo cada proyecto contigo, canción a canción.",
+  weber_video_url: "",
+  weber_poster_url: M.weberBg,
   weber_photo_url: "",
   weber_bg_url: M.weberBg,
   weber_line:

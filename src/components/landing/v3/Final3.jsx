@@ -18,6 +18,11 @@ export default function Final3({ settings, section }) {
             <CtaLink to={section?.cta_link || SESSION_CTA} className="ccl-btn ccl-btn--primary">
               {section?.cta_label || "Enviar mi proyecto"} <ArrowRight size={14} />
             </CtaLink>
+            {section?.cta2_label && (
+              <CtaLink to={section?.cta2_link || SESSION_CTA} className="ccl-btn ccl-btn--ghost">
+                {section.cta2_label}
+              </CtaLink>
+            )}
           </div>
         </div>
       </div>

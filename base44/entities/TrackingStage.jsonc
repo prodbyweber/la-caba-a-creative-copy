@@ -1,0 +1,46 @@
+{
+  "name": "TrackingStage",
+  "type": "object",
+  "properties": {
+    "label": {
+      "type": "string",
+      "description": "Nombre de la etapa (Brief recibido, Producci\u00f3n...)"
+    },
+    "progress": {
+      "type": "number",
+      "default": 0,
+      "description": "Porcentaje de la barra (0-100)"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la etapa se muestra"
+    }
+  },
+  "required": [
+    "label"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

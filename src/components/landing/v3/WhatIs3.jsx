@@ -5,15 +5,15 @@ export default function WhatIs3() {
   return (
     <section className="ccl-snap ccl-snap--dark" id="casa">
       <div className="ccl-wrap ccl-snap__inner">
-        <span className="ccl-eyebrow">Qué es Cabaña</span>
+        <span className="ccl-eyebrow">El estudio</span>
 
         <h2 className="ccl-display ccl-h2" style={{ marginTop: 12 }}>
-          Tu música, con estructura.
+          Aquí se hace la música.
         </h2>
 
         <p className="ccl-lead">
-          Cabaña es el lugar donde un artista pasa de canciones sueltas a un catálogo sólido:
-          producción musical, mezcla, master y los recursos para lanzarlo.
+          Producción, mezcla y master en la misma cabaña. Un artista pasa de canciones sueltas a un
+          catálogo sólido, canción a canción.
         </p>
 
         <div className="ccl-mini">
