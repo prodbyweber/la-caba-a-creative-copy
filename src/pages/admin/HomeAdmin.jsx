@@ -14,8 +14,6 @@ import {
   BarChart3,
   Inbox,
   ExternalLink,
-  MessageCircleQuestion,
-  Activity,
 } from "lucide-react";
 import CrudPanel from "@/components/admin/home/CrudPanel";
 import HeroPanel from "@/components/admin/home/HeroPanel";
@@ -23,17 +21,15 @@ import RequestsPanel from "@/components/admin/home/RequestsPanel";
 
 const TABS = [
   { id: "secciones", label: "Secciones", icon: Layout },
-  { id: "hero", label: "Hero y Santiago", icon: Video },
+  { id: "hero", label: "Hero y SEO", icon: Video },
   { id: "propuesta", label: "Propuesta", icon: Layers },
   { id: "paises", label: "Países", icon: Globe },
   { id: "generos", label: "Géneros", icon: Music4 },
   { id: "comunidad", label: "Comunidad", icon: Users },
   { id: "proceso", label: "Cómo funciona", icon: ListOrdered },
-  { id: "comenzar", label: "Tu brief", icon: Wand2 },
+  { id: "comenzar", label: "Cómo comenzar", icon: Wand2 },
   { id: "antes", label: "Antes / Después", icon: SlidersHorizontal },
   { id: "cifras", label: "Cifras", icon: BarChart3 },
-  { id: "faq", label: "Preguntas", icon: MessageCircleQuestion },
-  { id: "seguimiento", label: "Seguimiento", icon: Activity },
   { id: "solicitudes", label: "Solicitudes", icon: Inbox },
 ];
 
@@ -123,18 +119,6 @@ const STAT_FIELDS = [
   { key: "prefix", label: "Prefijo" },
   { key: "suffix", label: "Sufijo" },
   { key: "label", label: "Etiqueta" },
-  { key: "is_visible", label: "Visible", type: "toggle" },
-];
-
-const FAQ_FIELDS = [
-  { key: "question", label: "Pregunta", wide: true },
-  { key: "answer", label: "Respuesta", type: "textarea", wide: true },
-  { key: "is_visible", label: "Visible", type: "toggle" },
-];
-
-const TRACKING_FIELDS = [
-  { key: "label", label: "Etapa (Brief recibido, Producción...)" },
-  { key: "progress", label: "Barra (0-100)", type: "number" },
   { key: "is_visible", label: "Visible", type: "toggle" },
 ];
 
@@ -271,26 +255,6 @@ export default function HomeAdmin() {
             fields={STAT_FIELDS}
             defaults={{ is_visible: true, value: 0 }}
             hint="Contadores animados de la sección Comunidad."
-          />
-        )}
-
-        {tab === "faq" && (
-          <CrudPanel
-            entityName="FaqItem"
-            fields={FAQ_FIELDS}
-            defaults={{ is_visible: true }}
-            itemTitle={(item) => item.question || "sin pregunta"}
-            hint="Acordeón de preguntas frecuentes, antes del cierre."
-          />
-        )}
-
-        {tab === "seguimiento" && (
-          <CrudPanel
-            entityName="TrackingStage"
-            fields={TRACKING_FIELDS}
-            defaults={{ is_visible: true, progress: 50 }}
-            itemTitle={(item) => `${item.label} — ${item.progress ?? 0}%`}
-            hint="Ejemplo ilustrativo del avance de un proyecto. No son datos reales."
           />
         )}
 

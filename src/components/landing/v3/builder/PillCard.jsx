@@ -9,7 +9,7 @@ export function inkFor(hex) {
   return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.62 ? "#080808" : "#f1efe8";
 }
 
-const VISIBLE = 8;
+const VISIBLE = 6;
 
 /** Tarjeta del configurador con píldoras y demo automática. */
 export default function PillCard({ card, index = 0, selected = [], onToggle, demo = true }) {

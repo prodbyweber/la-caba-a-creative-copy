@@ -64,7 +64,6 @@ export default function GenresStack({ section, items = [] }) {
             {section?.title}
           </h2>
           {section?.subtitle && <p className="ccl-small">{section.subtitle}</p>}
-          {section?.body && <p className="ccl-gsrc ccl-gsrc--note">{section.body}</p>}
         </div>
 
         {main.map((item) => (
