@@ -34,7 +34,7 @@ export const DEFAULT_HOME_SECTIONS = [
     order: 1,
     is_visible: true,
     eyebrow: "",
-    title: "Todo empieza con un catálogo.",
+    title: "Todo empieza con tu catálogo",
     subtitle:
       "Descubre nuevos sonidos, conecta con creadores y desarrolla tu próximo proyecto musical.",
     body: "",

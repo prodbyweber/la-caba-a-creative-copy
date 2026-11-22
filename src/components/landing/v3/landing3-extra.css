@@ -85,18 +85,42 @@
 .ccl-hero5__inner {
   position: relative;
   z-index: 3;
-  padding-top: 96px;
-  padding-bottom: 56px;
+  padding-top: 126px;
+  padding-bottom: 64px;
+}
+.ccl-hero5__brand {
+  font-size: clamp(3.2rem, 17.5vw, 9rem);
+  line-height: 0.84;
+  letter-spacing: -0.05em;
 }
 .ccl-hero5__title {
-  font-size: clamp(2.35rem, 11.8vw, 5rem);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
-  max-width: 16ch;
+  margin-top: 16px;
+  font-size: clamp(1.2rem, 5.9vw, 2.15rem);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  max-width: 20ch;
 }
-.ccl-hero5__title em {
-  font-style: normal;
+.ccl-hero5__rot {
   color: var(--orange);
+}
+.ccl-rot__word {
+  display: inline-block;
+  animation: cclRotIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes cclRotIn {
+  from {
+    transform: translateY(0.45em);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ccl-rot__word {
+    animation: none;
+  }
 }
 .ccl-hero5__sub {
   margin-top: 18px;
@@ -110,12 +134,15 @@
     top: 100px;
   }
   .ccl-hero5__inner {
-    padding-top: 150px;
-    padding-bottom: 88px;
+    padding-top: 202px;
+    padding-bottom: 96px;
+  }
+  .ccl-hero5__brand {
+    font-size: clamp(5rem, 11vw, 10rem);
   }
   .ccl-hero5__title {
-    max-width: 17ch;
-    font-size: clamp(3rem, 6vw, 5.2rem);
+    max-width: 24ch;
+    font-size: clamp(1.6rem, 2.6vw, 2.4rem);
   }
 }
 
