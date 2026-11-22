@@ -98,7 +98,8 @@
 .ccl-hero5__inner {
   position: relative;
   z-index: 3;
-  padding-top: clamp(196px, 34svh, 250px);
+  /* el texto de arriba ocupa ~34px: se descuentan para no mover el título */
+  padding-top: clamp(160px, 29svh, 214px);
   padding-bottom: 56px;
 }
 
@@ -185,20 +186,42 @@
   color: var(--orange);
 }
 
-/* subtítulo: solo en el cuadro final, con 0,3 s de retraso al entrar */
-.ccl-hero5__sub {
-  margin-top: 20px;
-  max-width: 34ch;
-  font-size: clamp(0.9rem, 3.7vw, 1.05rem);
-  line-height: 1.55;
-  min-height: 1.6em;
+/* textos de apoyo: frase normal, peso fino y blanco suave */
+.ccl-hero5__eyebrow,
+.ccl-hero5__note {
+  font-family: inherit;
+  font-weight: 400;
+  font-size: clamp(13px, 3.5vw, 16px);
+  line-height: 1.45;
+  letter-spacing: 0;
+  text-transform: none;
   color: rgba(241, 239, 232, 0.85);
+  text-shadow: 0 2px 18px rgba(8, 8, 8, 0.5);
+}
+.ccl-hero5__eyebrow {
+  margin: 0 0 14px;
+}
+.ccl-hero5__notes {
+  display: grid;
+  margin-top: 20px;
+  max-width: 40ch;
+}
+.ccl-hero5__notes > * {
+  grid-area: 1 / 1;
+}
+.ccl-hero5__note {
+  margin: 0;
+  transition: opacity 0.35s ease;
+}
+.ccl-hero5__note.is-off {
+  opacity: 0;
+}
+.ccl-hero5__note--final {
   opacity: 0;
   transform: translateY(6px);
   transition: opacity 0.35s ease, transform 0.35s ease;
-  text-shadow: 0 2px 22px rgba(8, 8, 8, 0.5);
 }
-.ccl-hero5__sub.is-on {
+.ccl-hero5__note--final.is-on {
   opacity: 1;
   transform: none;
   transition-delay: 0.3s;
@@ -207,7 +230,8 @@
   .ccl-hero5__seq,
   .ccl-hero5__track,
   .ccl-hero5__final,
-  .ccl-hero5__sub {
+  .ccl-hero5__note,
+  .ccl-hero5__note--final {
     transition: none;
   }
 }
@@ -216,7 +240,7 @@
     top: 100px;
   }
   .ccl-hero5__inner {
-    padding-top: 218px;
+    padding-top: 182px;
     padding-bottom: 96px;
   }
   .ccl-hero5__line {

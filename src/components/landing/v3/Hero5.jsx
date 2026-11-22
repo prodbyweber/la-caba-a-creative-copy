@@ -70,6 +70,8 @@ export default function Hero5({ settings }) {
           finalWord={finalWord}
           finalHold={settings?.hero_final_hold_ms}
           subtitle={subtitle}
+          eyebrow={settings?.hero_eyebrow}
+          lead={settings?.hero_lead}
         />
       </div>
     </section>

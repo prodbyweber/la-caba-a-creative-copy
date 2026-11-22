@@ -44,6 +44,9 @@ export const DEFAULT_SETTINGS = {
   hero_final_word: "Cabaña",
   hero_final_hold_ms: 3500,
   hero_subtitle: "Más que lo que se escucha.",
+  hero_eyebrow: "Para artistas y creadores",
+  hero_lead:
+    "Empieza con una canción, construye tu catálogo, conecta con creadores y lánzalo al mundo.",
   journey_media_url: M.journeyVideo,
   access_card_image_url: M.accessCard,
   weber_name: "Weber",

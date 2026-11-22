@@ -22,6 +22,8 @@ export default function HeroRotator({
   finalWord = "Cabaña",
   finalHold = DEFAULT_FINAL_HOLD,
   subtitle = "",
+  eyebrow = "",
+  lead = "",
 }) {
   const list = useMemo(() => normalizeFrames(frames), [frames]);
   const [reduce, setReduce] = useState(false);
@@ -65,11 +67,19 @@ export default function HeroRotator({
   if (reduce) {
     const last = list[total - 1];
     return (
-      <div className="ccl-hero5__stage">
-        <p className="ccl-display ccl-hero5__line">
-          {last.top} <span className="ccl-hero5__rot">{last.prefix} {last.word}</span>
-        </p>
-      </div>
+      <>
+        {eyebrow ? <p className="ccl-hero5__eyebrow">{eyebrow}</p> : null}
+        <div className="ccl-hero5__stage">
+          <p className="ccl-display ccl-hero5__line">
+            {last.top} <span className="ccl-hero5__rot">{last.prefix} {last.word}</span>
+          </p>
+        </div>
+        {lead ? (
+          <div className="ccl-hero5__notes">
+            <p className="ccl-hero5__note">{lead}</p>
+          </div>
+        ) : null}
+      </>
     );
   }
 
@@ -78,6 +88,8 @@ export default function HeroRotator({
 
   return (
     <>
+      {eyebrow ? <p className="ccl-hero5__eyebrow">{eyebrow}</p> : null}
+
       <div className="ccl-hero5__stage">
         <div className={`ccl-hero5__seq${isFinal ? " is-off" : ""}`} aria-hidden="true">
           <span className="ccl-display ccl-hero5__line">{current.top}</span>
@@ -104,8 +116,17 @@ export default function HeroRotator({
         </div>
       </div>
 
-      {subtitle ? (
-        <p className={`ccl-hero5__sub${isFinal ? " is-on" : ""}`}>{subtitle}</p>
+      {lead || subtitle ? (
+        <div className="ccl-hero5__notes">
+          {lead ? (
+            <p className={`ccl-hero5__note${isFinal ? " is-off" : ""}`}>{lead}</p>
+          ) : null}
+          {subtitle ? (
+            <p className={`ccl-hero5__note ccl-hero5__note--final${isFinal ? " is-on" : ""}`}>
+              {subtitle}
+            </p>
+          ) : null}
+        </div>
       ) : null}
     </>
   );

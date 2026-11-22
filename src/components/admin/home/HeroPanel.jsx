@@ -98,7 +98,21 @@ export default function HeroPanel() {
           value={record.hero_subtitle}
           onChange={set("hero_subtitle")}
         />
+        <TextField
+          label="Texto de arriba (fijo)"
+          value={record.hero_eyebrow}
+          onChange={set("hero_eyebrow")}
+        />
       </div>
+
+      <TextField
+        label="Texto descriptivo (cuadros 1, 2 y 3)"
+        value={record.hero_lead}
+        onChange={set("hero_lead")}
+        textarea
+        rows={2}
+        hint="Se ve debajo del título y se sustituye por el subtítulo en el cuadro final."
+      />
 
       <TextField label="Título SEO" value={record.seo_title} onChange={set("seo_title")} />
       <TextField

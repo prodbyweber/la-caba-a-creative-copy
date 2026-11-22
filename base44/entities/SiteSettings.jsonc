@@ -115,6 +115,14 @@
       "type": "string",
       "description": "Subt\u00edtulo que solo aparece en el cuadro final"
     },
+    "hero_eyebrow": {
+      "type": "string",
+      "description": "Texto fijo encima del t\u00edtulo animado del hero"
+    },
+    "hero_lead": {
+      "type": "string",
+      "description": "Texto descriptivo bajo el t\u00edtulo animado, visible en los cuadros 1, 2 y 3"
+    },
     "journey_media_url": {
       "type": "string",
       "description": "V\u00eddeo de fondo del recorrido por scroll"
