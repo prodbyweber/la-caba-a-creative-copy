@@ -4,7 +4,7 @@ export const GENRES = [
   "Afrobeats", "Afro House", "Amapiano", "Dancehall", "Reggae", "Hip-Hop",
   "Boom Bap", "Rap", "R&B", "Soul", "Neo Soul", "Jazz", "Lo-Fi", "House",
   "Deep House", "Tech House", "Electrónica", "Pop", "Pop Latino", "Rock",
-  "Alternativo", "Indie", "Acústico", "Flamenco", "Flamenco Urbano", "Dembow",
+  "Alternativo", "Indie", "Acústico", "Flamenco", "Flamenco Urbano",
   "Merengue", "Bachata", "Salsa", "Regional Mexicano", "Corridos",
   "Corridos Tumbados", "Funk Brasileño", "Phonk", "Drum & Bass", "Future Bass",
   "Synthwave", "Ambient", "Experimental", "Cinemático", "Gospel", "Funk", "Disco",

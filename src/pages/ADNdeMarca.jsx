@@ -18,7 +18,7 @@ const vibes = ["Alta energía", "Media energía", "Baja energía", "Variable/Din
 
 const genres = [
   "Trap", "Reggaeton", "R&B", "Pop", "Hip Hop", "Drill", "Afrobeat",
-  "Dembow", "House", "Techno", "Indie", "Rock", "Punk", "Metal",
+  "House", "Techno", "Indie", "Rock", "Punk", "Metal",
   "Jazz", "Soul", "Funk", "Electronic", "Ambient", "Lo-fi", "Reggae",
   "Dancehall", "UK Garage", "Grime", "Baile Funk", "Cumbia", "Salsa"
 ];

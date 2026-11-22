@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 // Géneros musicales
 const MUSIC_GENRES = [
   "Afrobeats", "Afropop", "Afro-Caribbean", "Reggaeton", "Trap", "Trap Cristiano",
-  "Hip-Hop", "R&B", "Neo Soul", "Funk", "Dancehall", "Dembow",
+  "Hip-Hop", "R&B", "Neo Soul", "Funk", "Dancehall",
   "Salsa", "Cumbia", "Merengue", "Bachata", "Vallenato", "Champeta",
   "Electronic", "House", "Techno", "Amapiano", "Afrohouse",
   "Latin Pop", "Pop", "Urban Pop", "Indie Pop",

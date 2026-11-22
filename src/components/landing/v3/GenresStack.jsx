@@ -54,7 +54,6 @@ function Figure({ item }) {
 export default function GenresStack({ section, items = [] }) {
   const list = items.filter((i) => i.is_visible !== false);
   const main = list.filter((i) => !i.is_fusion);
-  const fusion = list.filter((i) => i.is_fusion);
 
   return (
     <>
@@ -93,7 +92,7 @@ export default function GenresStack({ section, items = [] }) {
         ))}
       </div>
 
-      <FusionCards items={fusion} />
+      <FusionCards items={list} />
     </>
   );
 }
