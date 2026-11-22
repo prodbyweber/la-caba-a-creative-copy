@@ -4,7 +4,7 @@ import AmbientVideo from "./AmbientVideo";
 
 const ROTATE_MS = 8000;
 
-/** Hero startup: texto arriba a la izquierda y vídeo decorativo debajo, sin solapes. */
+/** Hero cinemático: vídeo de fondo con sombreado y el texto por encima. */
 export default function Hero5({ section, settings }) {
   const sources = useMemo(() => {
     const list = [
@@ -32,13 +32,6 @@ export default function Hero5({ section, settings }) {
 
   return (
     <section className="ccl-snap ccl-hero5" id="top">
-      <div className="ccl-wrap ccl-snap__inner ccl-hero5__inner">
-        <h1 className="ccl-display ccl-hero5__title">
-          {words.join(" ")} {last && <em>{last}</em>}
-        </h1>
-        {section?.subtitle && <p className="ccl-hero5__sub">{section.subtitle}</p>}
-      </div>
-
       <div className="ccl-hero5__media">
         {src ? (
           <div className="ccl-hero5__frame" key={src}>
@@ -48,7 +41,14 @@ export default function Hero5({ section, settings }) {
           <img className="ccl-media__el" src={poster} alt="" aria-hidden="true" />
         ) : null}
         <span className="ccl-hero5__shade" aria-hidden="true" />
-        <span className="ccl-hero5__arch" aria-hidden="true" />
+        <span className="ccl-hero5__vignette" aria-hidden="true" />
+      </div>
+
+      <div className="ccl-wrap ccl-snap__inner ccl-hero5__inner">
+        <h1 className="ccl-display ccl-hero5__title">
+          {words.join(" ")} {last && <em>{last}</em>}
+        </h1>
+        {section?.subtitle && <p className="ccl-hero5__sub">{section.subtitle}</p>}
       </div>
     </section>
   );

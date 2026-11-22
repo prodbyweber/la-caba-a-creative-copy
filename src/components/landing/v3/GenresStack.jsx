@@ -2,6 +2,7 @@ import React from "react";
 import { isVideoFile } from "@/lib/landingMedia";
 import AmbientVideo from "./AmbientVideo";
 import Counter from "./Counter";
+import FusionCards from "./FusionCards";
 
 const figureFormat = (n) => Number(n).toLocaleString("en-US", { maximumFractionDigits: 1 });
 
@@ -92,20 +93,7 @@ export default function GenresStack({ section, items = [] }) {
         ))}
       </div>
 
-      {fusion.length > 0 && (
-        <div className="ccl-fusion">
-          <div className="ccl-wrap">
-            <span className="ccl-eyebrow">Fusion</span>
-            <div className="ccl-fusion__rail">
-              {fusion.map((item) => (
-                <span className="ccl-fusion__card" key={item.id || item.key || item.name}>
-                  {item.name}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      <FusionCards items={fusion} />
     </>
   );
 }

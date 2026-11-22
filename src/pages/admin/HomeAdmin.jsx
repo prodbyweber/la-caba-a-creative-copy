@@ -7,7 +7,6 @@ import {
   Music4,
   Users,
   Globe,
-  Layers,
   ListOrdered,
   Wand2,
   SlidersHorizontal,
@@ -22,7 +21,6 @@ import RequestsPanel from "@/components/admin/home/RequestsPanel";
 const TABS = [
   { id: "secciones", label: "Secciones", icon: Layout },
   { id: "hero", label: "Hero y SEO", icon: Video },
-  { id: "propuesta", label: "Propuesta", icon: Layers },
   { id: "paises", label: "Países", icon: Globe },
   { id: "generos", label: "Géneros", icon: Music4 },
   { id: "comunidad", label: "Comunidad", icon: Users },
@@ -63,13 +61,7 @@ const GENRE_FIELDS = [
   { key: "video_url", label: "Vídeo de fondo", type: "media", wide: true },
   { key: "tint", label: "Tinte", type: "color" },
   { key: "accent", label: "Color de acento", type: "color" },
-  { key: "is_fusion", label: "Va en la fila Fusion", type: "toggle" },
-  { key: "is_visible", label: "Visible", type: "toggle" },
-];
-
-const PROPOSAL_FIELDS = [
-  { key: "label", label: "Etiqueta (Qué es, Qué haces tú...)" },
-  { key: "text", label: "Texto", type: "textarea", wide: true },
+  { key: "is_fusion", label: "Es una fusión", type: "toggle" },
   { key: "is_visible", label: "Visible", type: "toggle" },
 ];
 
@@ -182,16 +174,6 @@ export default function HomeAdmin() {
 
         {tab === "hero" && <HeroPanel />}
 
-        {tab === "propuesta" && (
-          <CrudPanel
-            entityName="ProposalBlock"
-            fields={PROPOSAL_FIELDS}
-            defaults={{ is_visible: true }}
-            itemTitle={(item) => item.label || "sin etiqueta"}
-            hint="Los tres bloques de «La propuesta», justo después del hero."
-          />
-        )}
-
         {tab === "paises" && (
           <CrudPanel
             entityName="CountryFlag"
@@ -207,7 +189,7 @@ export default function HomeAdmin() {
             entityName="GenreCard"
             fields={GENRE_FIELDS}
             defaults={{ is_visible: true, tint: "#ff5833", accent: "#ff5833", facts: [] }}
-            hint="Tarjetas verticales apiladas con su cifra y su fuente. Las marcadas como Fusion van a la fila compacta."
+            hint="Tarjetas verticales apiladas con su cifra y su fuente. Las marcadas como fusión se muestran como tarjetas cinemáticas al final."
           />
         )}
 

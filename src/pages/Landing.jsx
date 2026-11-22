@@ -4,7 +4,6 @@ import "@/components/landing/v3/landing3-extra.css";
 import { useHomeContent } from "@/hooks/useHomeContent";
 import Nav3 from "@/components/landing/v3/Nav3";
 import Hero5 from "@/components/landing/v3/Hero5";
-import ProposalSection from "@/components/landing/v3/ProposalSection";
 import CountriesSection from "@/components/landing/v3/CountriesSection";
 import BrandsSection from "@/components/landing/v3/BrandsSection";
 import GenresStack from "@/components/landing/v3/GenresStack";
@@ -20,7 +19,6 @@ import { scrollToSection } from "@/components/landing/v3/scrollToSection";
 
 const ANCHORS = {
   hero: "top",
-  propuesta: "propuesta",
   paises: "paises",
   marcas: "marcas",
   generos: "generos",
@@ -36,7 +34,6 @@ const ANCHORS = {
 
 const DOT_LABELS = {
   hero: "Inicio",
-  propuesta: "Propuesta",
   paises: "Países",
   marcas: "Marcas",
   generos: "Géneros",
@@ -160,8 +157,6 @@ export default function Landing() {
     switch (section.key) {
       case "hero":
         return <Hero5 key={section.key} section={section} settings={content.settings} />;
-      case "propuesta":
-        return <ProposalSection key={section.key} section={section} blocks={content.proposal} />;
       case "paises":
         return <CountriesSection key={section.key} section={section} flags={content.flags} />;
       case "marcas":

@@ -11,7 +11,6 @@ export default function BuilderSection({ section, cards = [] }) {
   const [country, setCountry] = useState("");
   const [link, setLink] = useState("");
   const [file, setFile] = useState(null);
-  const [directions, setDirections] = useState([]);
   const [form, setForm] = useState({ name: "", email: "", whatsapp: "" });
   const [demo, setDemo] = useState(true);
   const [sending, setSending] = useState(false);
@@ -35,10 +34,6 @@ export default function BuilderSection({ section, cards = [] }) {
           : [option];
       return { ...prev, [card.key]: next };
     });
-  };
-
-  const toggleDirection = (option) => {
-    setDirections((prev) => (prev.includes(option) ? prev.filter((o) => o !== option) : [...prev, option]));
   };
 
   const submit = async (e) => {
@@ -66,7 +61,6 @@ export default function BuilderSection({ section, cards = [] }) {
         demo_link: link,
         demo_file_uri: file?.uri || "",
         demo_file_name: file?.name || "",
-        creative_directions: directions,
       });
       if (res.data?.error) throw new Error(res.data.error);
       setSent(true);
@@ -118,7 +112,6 @@ export default function BuilderSection({ section, cards = [] }) {
                 setCountry("");
                 setLink("");
                 setFile(null);
-                setDirections([]);
                 setForm({ name: "", email: "", whatsapp: "" });
                 setDemo(true);
               }}
@@ -152,8 +145,6 @@ export default function BuilderSection({ section, cards = [] }) {
                       onLink={setLink}
                       file={file}
                       onFile={setFile}
-                      directions={directions}
-                      onToggleDirection={toggleDirection}
                       onInteract={stopDemo}
                     />
                   );

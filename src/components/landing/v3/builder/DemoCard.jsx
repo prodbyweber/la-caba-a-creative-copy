@@ -1,9 +1,8 @@
 import React, { useRef, useState } from "react";
-import { Check, Loader2, Music2, Mic2, Sliders, Sparkles, Upload } from "lucide-react";
+import { Check, Loader2, Upload } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { inkFor } from "./PillCard";
 
-const ICONS = [Sparkles, Music2, Sliders, Mic2];
 const LINK_RE = /^(https?:\/\/)?([\w-]+\.)+[a-z]{2,}([\/?#]\S*)?$/i;
 
 export default function DemoCard({
@@ -13,8 +12,6 @@ export default function DemoCard({
   onLink,
   file,
   onFile,
-  directions = [],
-  onToggleDirection,
   onInteract,
 }) {
   const inputRef = useRef(null);
@@ -78,29 +75,6 @@ export default function DemoCard({
           onChange={(e) => upload(e.target.files?.[0])}
         />
         {error && <span className="ccl-demo__error">{error}</span>}
-      </div>
-
-      <span className="ccl-bcard__mini">Cómo quieres tu sonido</span>
-      <div className="ccl-dirs">
-        {(card.options || []).map((option, i) => {
-          const Icon = ICONS[i % ICONS.length];
-          const on = directions.includes(option);
-          return (
-            <button
-              key={option}
-              type="button"
-              className={`ccl-dir ${on ? "is-on" : ""}`}
-              onClick={() => {
-                onToggleDirection(option);
-                onInteract?.();
-              }}
-              aria-pressed={on}
-            >
-              <Icon size={14} />
-              {option}
-            </button>
-          );
-        })}
       </div>
     </div>
   );
