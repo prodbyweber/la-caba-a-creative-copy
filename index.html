@@ -19,13 +19,74 @@
       name="twitter:description"
       content="Cabaña Creative es la plataforma para artistas y creadores: producción musical, mezcla y master, beatmaking personalizado y desarrollo de catálogo."
     />
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18190555269"></script>
+    <!-- Píxeles de anuncios (Google Ads y Meta). Se cargan solo en la web
+         publicada: dentro del editor/preview (iframe, sin cookies de terceros)
+         fallan y el navegador los reporta como "Script error." -->
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'AW-18190555269');
+      (function () {
+        window.dataLayer = window.dataLayer || [];
+
+        var framed = true;
+        try {
+          framed = window.top !== window.self;
+        } catch (e) {
+          framed = true;
+        }
+
+        if (framed) {
+          window.gtag = function () {};
+          window.fbq = function () {};
+          return;
+        }
+
+        window.gtag = function () {
+          window.dataLayer.push(arguments);
+        };
+
+        var load = function (src) {
+          try {
+            var s = document.createElement("script");
+            s.async = true;
+            s.src = src;
+            document.head.appendChild(s);
+          } catch (e) {
+            /* nunca romper la app por un píxel */
+          }
+        };
+
+        var boot = function () {
+          try {
+            gtag("js", new Date());
+            gtag("config", "AW-18190555269");
+            load("https://www.googletagmanager.com/gtag/js?id=AW-18190555269");
+
+            !(function (f, b, e, v, n, t, s) {
+              if (f.fbq) return;
+              n = f.fbq = function () {
+                n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+              };
+              if (!f._fbq) f._fbq = n;
+              n.push = n;
+              n.loaded = true;
+              n.version = "2.0";
+              n.queue = [];
+              t = b.createElement(e);
+              t.async = true;
+              t.src = v;
+              s = b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t, s);
+            })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+
+            fbq("init", "1701297601087526");
+            fbq("track", "PageView");
+          } catch (e) {
+            /* nunca romper la app por un píxel */
+          }
+        };
+
+        if (document.readyState === "complete") boot();
+        else window.addEventListener("load", boot);
+      })();
     </script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -86,19 +147,7 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- Meta Pixel Code -->
-    <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1701297601087526');
-    fbq('track', 'PageView');
-    </script>
+    <!-- Meta Pixel: la carga está en <head>, solo en la web publicada. -->
     <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1701297601087526&ev=PageView&noscript=1" /></noscript>
     <!-- End Meta Pixel Code -->
 
