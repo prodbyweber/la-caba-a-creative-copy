@@ -70,6 +70,51 @@
       "type": "string",
       "description": "Imagen fija del hero mientras carga el v\u00eddeo"
     },
+    "hero_frames": {
+      "type": "array",
+      "description": "Cuadros del texto animado del hero: l\u00ednea fija, palabra fija, palabra que cambia y duraci\u00f3n",
+      "items": {
+        "type": "object",
+        "properties": {
+          "top": {
+            "type": "string",
+            "description": "Primera l\u00ednea fija del cuadro"
+          },
+          "prefix": {
+            "type": "string",
+            "description": "Palabra fija antes de la que cambia (ej: tu)"
+          },
+          "word": {
+            "type": "string",
+            "description": "Palabra que cambia, en naranja (ej: idea.)"
+          },
+          "hold_ms": {
+            "type": "number",
+            "description": "Tiempo en pantalla en milisegundos"
+          },
+          "order": {
+            "type": "number",
+            "description": "Orden del cuadro"
+          }
+        }
+      }
+    },
+    "hero_final_top": {
+      "type": "string",
+      "description": "Cuadro final: l\u00ednea de arriba (ej: La)"
+    },
+    "hero_final_word": {
+      "type": "string",
+      "description": "Cuadro final: palabra grande en naranja (ej: Caba\u00f1a)"
+    },
+    "hero_final_hold_ms": {
+      "type": "number",
+      "description": "Cuadro final: tiempo en pantalla en milisegundos"
+    },
+    "hero_subtitle": {
+      "type": "string",
+      "description": "Subt\u00edtulo que solo aparece en el cuadro final"
+    },
     "journey_media_url": {
       "type": "string",
       "description": "V\u00eddeo de fondo del recorrido por scroll"

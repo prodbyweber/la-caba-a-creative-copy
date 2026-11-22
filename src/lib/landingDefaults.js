@@ -19,7 +19,7 @@ const M = {
 export const DEFAULT_SETTINGS = {
   seo_title: "Cabaña Creative — El centro de control para artistas que producen",
   seo_description:
-    "Cabaña Creative es la plataforma para artistas productores: catálogo, demos, beats y hoja de ruta de lanzamiento. Producción musical, imagen y estrategia.",
+    "Cabaña Creative es la plataforma para artistas y creadores: producción musical, mezcla y master, beatmaking personalizado y desarrollo de catálogo.",
   og_image_url: M.still,
   brand_strip_title: "Han confiado en nosotros",
   login_label: "Acceder",
@@ -35,6 +35,15 @@ export const DEFAULT_SETTINGS = {
   hero_media_url: M.heroVideo,
   hero_media_mobile_url: M.heroVideoMobile,
   hero_poster_url: M.still,
+  hero_frames: [
+    { top: "Todo comienza con", prefix: "tu", word: "idea.", hold_ms: 2000, order: 1 },
+    { top: "Todo comienza con", prefix: "tu", word: "canción.", hold_ms: 2000, order: 2 },
+    { top: "Todo comienza con", prefix: "tu", word: "catálogo.", hold_ms: 2000, order: 3 },
+  ],
+  hero_final_top: "La",
+  hero_final_word: "Cabaña",
+  hero_final_hold_ms: 3500,
+  hero_subtitle: "Más que lo que se escucha.",
   journey_media_url: M.journeyVideo,
   access_card_image_url: M.accessCard,
   weber_name: "Weber",

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 const CARD_COLORS = ["#ff5833", "#f1efe8", "#c9431f", "#141414"];
 const CARD_INKS = ["#0a0a0b", "#0a0a0b", "#f1efe8", "#f1efe8"];
-const STEP_MS = 2800;
+const STEP_MS = 2200;
 
 /** Cómo funciona: una pantalla fija, las cuatro tarjetas y el paso activo pasando solo. */
 export default function ProcessSection({ section, steps = [] }) {
@@ -40,7 +40,7 @@ export default function ProcessSection({ section, steps = [] }) {
       <div className="ccl-wrap ccl-snap__inner ccl-how__inner">
         <span className="ccl-eyebrow">Proceso</span>
         <h2 className="ccl-display ccl-how__title">{section?.title || "Cómo funciona"}</h2>
-        <p className="ccl-how__lead">{section?.subtitle || "Cuatro pasos. Sin vueltas."}</p>
+        <p className="ccl-how__lead">{section?.subtitle || "Sin vueltas."}</p>
 
         <div className="ccl-how__grid">
           {list.map((step, i) => (

@@ -23,6 +23,19 @@
   font-weight: 700;
 }
 
+/* ---------- texto solo para lectores de pantalla ---------- */
+.ccl-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ---------- hero v5 (cinemático) ---------- */
 .ccl-hero5 {
   position: relative;
@@ -59,15 +72,15 @@
   z-index: 1;
   background: linear-gradient(
       180deg,
-      rgba(8, 8, 8, 0.96) 0%,
-      rgba(8, 8, 8, 0.88) 24%,
-      rgba(8, 8, 8, 0.48) 45%,
-      rgba(8, 8, 8, 0) 68%
+      rgba(8, 8, 8, 0.86) 0%,
+      rgba(8, 8, 8, 0.62) 26%,
+      rgba(8, 8, 8, 0.26) 48%,
+      rgba(8, 8, 8, 0) 70%
     ),
     linear-gradient(
       180deg,
       rgba(8, 8, 8, 0) 80%,
-      rgba(8, 8, 8, 0.5) 94%,
+      rgba(8, 8, 8, 0.4) 94%,
       #080808 100%
     );
 }
@@ -85,64 +98,135 @@
 .ccl-hero5__inner {
   position: relative;
   z-index: 3;
-  padding-top: 126px;
-  padding-bottom: 64px;
+  padding-top: clamp(196px, 34svh, 250px);
+  padding-bottom: 56px;
 }
-.ccl-hero5__brand {
-  font-size: clamp(3.2rem, 17.5vw, 9rem);
-  line-height: 0.84;
-  letter-spacing: -0.05em;
+
+/* escenario: los dos bloques comparten celda, así el alto no salta */
+.ccl-hero5__stage {
+  display: grid;
+  text-shadow: 0 2px 26px rgba(8, 8, 8, 0.45);
 }
-.ccl-hero5__title {
-  margin-top: 16px;
-  font-size: clamp(1.2rem, 5.9vw, 2.15rem);
-  line-height: 1.08;
-  letter-spacing: -0.025em;
-  max-width: 20ch;
+.ccl-hero5__stage > * {
+  grid-area: 1 / 1;
+}
+
+/* cuadros 1..n: primera línea fija y palabra que sube */
+.ccl-hero5__seq {
+  transition: opacity 0.45s ease;
+}
+.ccl-hero5__seq.is-off {
+  opacity: 0;
+}
+.ccl-hero5__line {
+  display: block;
+  font-size: clamp(2rem, 9.4vw, 4.4rem);
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+}
+.ccl-hero5__line--word {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.22em;
+  margin-top: 2px;
+}
+.ccl-hero5__prefix {
+  display: block;
+  line-height: 1.15em;
+}
+.ccl-hero5__window {
+  display: block;
+  overflow: hidden;
+  height: 1.15em;
+}
+.ccl-hero5__track {
+  display: block;
+  transition: transform 0.55s cubic-bezier(0.65, 0, 0.35, 1);
+  will-change: transform;
+}
+.ccl-hero5__track.is-snap {
+  transition: none;
+}
+.ccl-hero5__word {
+  display: block;
+  height: 1.15em;
+  line-height: 1.15em;
+  color: var(--orange);
+  white-space: nowrap;
+}
+
+/* cuadro final: La / Cabaña */
+.ccl-hero5__final {
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ccl-hero5__final.is-on {
+  opacity: 1;
+  transform: none;
+}
+.ccl-hero5__final-top {
+  display: block;
+  font-size: clamp(1.35rem, 6.2vw, 2.4rem);
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+}
+.ccl-hero5__final-word {
+  display: block;
+  margin-top: 2px;
+  font-size: clamp(3rem, 25vw, 9.5rem);
+  line-height: 0.88;
+  letter-spacing: -0.045em;
+  color: var(--orange);
+  white-space: nowrap;
 }
 .ccl-hero5__rot {
   color: var(--orange);
 }
-.ccl-rot__word {
-  display: inline-block;
-  animation: cclRotIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-@keyframes cclRotIn {
-  from {
-    transform: translateY(0.45em);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ccl-rot__word {
-    animation: none;
-  }
-}
+
+/* subtítulo: solo en el cuadro final, con 0,3 s de retraso al entrar */
 .ccl-hero5__sub {
-  margin-top: 18px;
+  margin-top: 20px;
   max-width: 34ch;
   font-size: clamp(0.9rem, 3.7vw, 1.05rem);
   line-height: 1.55;
+  min-height: 1.6em;
   color: rgba(241, 239, 232, 0.85);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  text-shadow: 0 2px 22px rgba(8, 8, 8, 0.5);
+}
+.ccl-hero5__sub.is-on {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.3s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ccl-hero5__seq,
+  .ccl-hero5__track,
+  .ccl-hero5__final,
+  .ccl-hero5__sub {
+    transition: none;
+  }
 }
 @media (min-width: 900px) {
   .ccl-hero5__media {
     top: 100px;
   }
   .ccl-hero5__inner {
-    padding-top: 202px;
+    padding-top: 218px;
     padding-bottom: 96px;
   }
-  .ccl-hero5__brand {
-    font-size: clamp(5rem, 11vw, 10rem);
+  .ccl-hero5__line {
+    font-size: clamp(2.6rem, 4.6vw, 4.6rem);
   }
-  .ccl-hero5__title {
-    max-width: 24ch;
-    font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  .ccl-hero5__final-top {
+    font-size: clamp(1.6rem, 2.4vw, 2.6rem);
+  }
+  .ccl-hero5__final-word {
+    font-size: clamp(5rem, 12.5vw, 11rem);
   }
 }
 
@@ -183,10 +267,10 @@
   border-radius: 20px;
   text-align: left;
   cursor: pointer;
-  opacity: 0.4;
+  opacity: 0.55;
   transform: scale(0.97);
-  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.5s ease;
+  transition: opacity 0.38s ease, transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.38s ease;
   -webkit-tap-highlight-color: transparent;
 }
 .ccl-step2.is-on {
@@ -195,7 +279,7 @@
   box-shadow: 0 26px 60px -40px rgba(0, 0, 0, 0.95);
 }
 .ccl-step2.is-on .ccl-step2__copy {
-  animation: cclStepIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: cclStepIn 0.4s ease-out both;
 }
 @keyframes cclStepIn {
   from {
@@ -241,7 +325,7 @@
   display: block;
   height: 100%;
   background: var(--orange);
-  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 @media (min-width: 900px) {
   .ccl-how__grid {

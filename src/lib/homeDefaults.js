@@ -88,7 +88,7 @@ export const DEFAULT_HOME_SECTIONS = [
     is_visible: true,
     eyebrow: "",
     title: "Cómo funciona",
-    subtitle: "Cuatro pasos. Sin vueltas.",
+    subtitle: "Sin vueltas.",
     body: "",
     cta_label: "",
     cta_link: "",

@@ -81,6 +81,7 @@ export default function Landing() {
     setMeta("property", "og:image", s.og_image_url);
     setMeta("property", "og:type", "website");
     setMeta("name", "twitter:card", "summary_large_image");
+    setMeta("name", "twitter:description", s.seo_description);
     setMeta("name", "twitter:image", s.og_image_url);
   }, [content]);
 

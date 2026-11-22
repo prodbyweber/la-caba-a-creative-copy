@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { Loader2, Save, Check } from "lucide-react";
 import { TextField, ImageField } from "@/components/admin/landing/Field";
+import HeroFramesEditor from "@/components/admin/home/HeroFramesEditor";
 import { DEFAULT_SETTINGS } from "@/lib/landingDefaults";
 
 export default function HeroPanel() {
@@ -70,6 +71,34 @@ export default function HeroPanel() {
         onChange={set("hero_poster_url")}
         hint="Se muestra si el vídeo no puede reproducirse."
       />
+
+      <HeroFramesEditor
+        frames={record.hero_frames}
+        onChange={(value) => setRecord((r) => ({ ...r, hero_frames: value }))}
+      />
+
+      <div className="grid sm:grid-cols-2 gap-3">
+        <TextField
+          label="Cuadro final: línea de arriba"
+          value={record.hero_final_top}
+          onChange={set("hero_final_top")}
+        />
+        <TextField
+          label="Cuadro final: palabra grande"
+          value={record.hero_final_word}
+          onChange={set("hero_final_word")}
+        />
+        <TextField
+          label="Cuadro final: duración (ms)"
+          value={record.hero_final_hold_ms}
+          onChange={(v) => setRecord((r) => ({ ...r, hero_final_hold_ms: Number(v) || 0 }))}
+        />
+        <TextField
+          label="Subtítulo del cuadro final"
+          value={record.hero_subtitle}
+          onChange={set("hero_subtitle")}
+        />
+      </div>
 
       <TextField label="Título SEO" value={record.seo_title} onChange={set("seo_title")} />
       <TextField

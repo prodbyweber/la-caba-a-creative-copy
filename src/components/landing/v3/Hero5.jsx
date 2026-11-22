@@ -1,20 +1,24 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { isVideoFile } from "@/lib/landingMedia";
 import AmbientVideo from "./AmbientVideo";
-import RotatingWord from "./RotatingWord";
+import HeroRotator, { normalizeFrames } from "./HeroRotator";
 
 const ROTATE_MS = 8000;
-const EXTRA_WORDS = ["sonido", "historia"];
+const IS_MP4 = /\.mp4(\?|$)/i;
 
-/** Hero cinemático: vídeo de fondo con sombreado y el texto por encima. */
-export default function Hero5({ section, settings }) {
+/** Hero cinemático: vídeo de fondo con sombreado y el texto animado por encima. */
+export default function Hero5({ settings }) {
   const sources = useMemo(() => {
     const list = [
       settings?.hero_media_url,
       settings?.journey_media_url,
       ...(Array.isArray(settings?.hero_videos) ? settings.hero_videos : []),
     ].filter((url) => isVideoFile(url));
-    return [...new Set(list)];
+
+    const unique = [...new Set(list)];
+    // MP4 H.264 primero: los .MOV no se reproducen en todos los navegadores.
+    const mp4 = unique.filter((url) => IS_MP4.test(url));
+    return mp4.length ? [...mp4, ...unique.filter((url) => !IS_MP4.test(url))] : unique;
   }, [settings]);
 
   const [index, setIndex] = useState(0);
@@ -28,11 +32,21 @@ export default function Hero5({ section, settings }) {
   const src = sources[index] || "";
   const poster = settings?.hero_poster_url || "";
 
-  const rawTitle = (section?.title || "Todo empieza con tu catálogo").trim().replace(/[.!?]+$/, "");
-  const words = rawTitle.split(/\s+/).filter(Boolean);
-  const last = words.length > 1 ? words[words.length - 1] : "";
-  const prefix = last ? words.slice(0, -1).join(" ") : rawTitle;
-  const rotating = last ? [last, ...EXTRA_WORDS] : EXTRA_WORDS;
+  const frames = useMemo(() => normalizeFrames(settings?.hero_frames), [settings]);
+  const finalTop = settings?.hero_final_top || "La";
+  const finalWord = settings?.hero_final_word || "Cabaña";
+  const subtitle = settings?.hero_subtitle || "";
+  const lastFrame = frames[frames.length - 1];
+
+  const headline = lastFrame
+    ? `${lastFrame.top} ${lastFrame.prefix} ${lastFrame.word}`.replace(/\s+/g, " ").trim()
+    : "";
+  const subtitleSentence = subtitle
+    ? `${subtitle.charAt(0).toLowerCase()}${subtitle.slice(1)}`
+    : "";
+  const hiddenTitle = `${headline} ${finalTop} ${finalWord}: ${subtitleSentence}`
+    .replace(/\s+/g, " ")
+    .trim();
 
   return (
     <section className="ccl-snap ccl-hero5" id="top">
@@ -49,11 +63,14 @@ export default function Hero5({ section, settings }) {
       </div>
 
       <div className="ccl-wrap ccl-snap__inner ccl-hero5__inner">
-        <p className="ccl-display ccl-hero5__brand">La Cabaña</p>
-        <h1 className="ccl-display ccl-hero5__title">
-          {prefix} <RotatingWord words={rotating} className="ccl-hero5__rot" />
-        </h1>
-        {section?.subtitle && <p className="ccl-hero5__sub">{section.subtitle}</p>}
+        <h1 className="ccl-sr-only">{hiddenTitle}</h1>
+        <HeroRotator
+          frames={frames}
+          finalTop={finalTop}
+          finalWord={finalWord}
+          finalHold={settings?.hero_final_hold_ms}
+          subtitle={subtitle}
+        />
       </div>
     </section>
   );
