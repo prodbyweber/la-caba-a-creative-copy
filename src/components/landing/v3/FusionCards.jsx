@@ -1,57 +1,52 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { makeCombo } from "@/lib/fusionCombos";
 
 const SLOTS = 3;
 const SWAP_MS = 4200;
 
-const shuffle = (arr) => {
-  const copy = [...arr];
-  for (let i = copy.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
+const buildSlots = (images, count = SLOTS) => {
+  const used = new Set();
+  const next = [];
+  for (let i = 0; i < count; i += 1) {
+    const combo = makeCombo({ exclude: used, images });
+    if (!combo) break;
+    used.add(combo.key);
+    next.push(combo);
   }
-  return copy;
+  return next;
 };
 
-const figureOf = (item) => {
-  if (item.figure_text) return item.figure_text;
-  if (!Number(item.figure_value)) return "";
-  const value = Number(item.figure_value).toLocaleString("en-US", { maximumFractionDigits: 1 });
-  return `${item.figure_prefix || ""}${value}${item.figure_suffix || ""}`;
-};
-
-/** Tarjetas cinemáticas que van rotando géneros al azar del catálogo. */
+/** Tarjetas cinemáticas con combinaciones de dos géneros y su mood. */
 export default function FusionCards({ items = [] }) {
-  const pool = useMemo(() => items, [items]);
-  const poolRef = useRef(pool);
-  poolRef.current = pool;
+  const images = useMemo(
+    () => items.filter((item) => item.image_url).map((item) => item.image_url),
+    [items]
+  );
+  const imagesRef = useRef(images);
+  imagesRef.current = images;
 
-  const [slots, setSlots] = useState([]);
+  const [slots, setSlots] = useState(() => buildSlots(images));
 
   useEffect(() => {
-    setSlots(shuffle(poolRef.current).slice(0, SLOTS));
-  }, [pool.length]);
-
-  useEffect(() => {
-    if (poolRef.current.length <= SLOTS) return undefined;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
 
     let cursor = 0;
     const timer = setInterval(() => {
       setSlots((prev) => {
-        const visible = new Set(prev.map((p) => p.key));
-        const rest = poolRef.current.filter((p) => !visible.has(p.key));
-        if (!rest.length) return prev;
+        const used = new Set(prev.map((slot) => slot.key));
+        const combo = makeCombo({ exclude: used, images: imagesRef.current });
+        if (!combo) return prev;
         const next = [...prev];
-        next[cursor % next.length] = rest[Math.floor(Math.random() * rest.length)];
+        next[cursor % next.length] = combo;
         cursor += 1;
         return next;
       });
     }, SWAP_MS);
 
     return () => clearInterval(timer);
-  }, [pool.length]);
+  }, []);
 
-  if (slots.length === 0) return null;
+  if (!slots.length) return null;
 
   return (
     <div className="ccl-fusion">
@@ -75,17 +70,12 @@ export default function FusionCards({ items = [] }) {
               )}
               <span className="ccl-fcard__tint" aria-hidden="true" />
               <span className="ccl-fcard__veil" aria-hidden="true" />
-              <span className="ccl-fcard__idx">{String(i + 1).padStart(2, "0")}</span>
 
               <div className="ccl-fcard__body" key={item.key}>
                 <h3 className="ccl-fcard__name">{item.name}</h3>
-                {item.subgenres && <p className="ccl-fcard__sub">{item.subgenres}</p>}
-                {(figureOf(item) || item.figure_label) && (
-                  <div className="ccl-fcard__fig">
-                    {figureOf(item) && <span className="ccl-fcard__value">{figureOf(item)}</span>}
-                    {item.figure_label && <span className="ccl-fcard__label">{item.figure_label}</span>}
-                  </div>
-                )}
+                <div className="ccl-fcard__fig">
+                  <span className="ccl-fcard__value">{item.mood}</span>
+                </div>
               </div>
             </article>
           ))}

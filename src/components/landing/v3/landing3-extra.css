@@ -515,16 +515,6 @@
     rgba(8, 8, 8, 0.93) 100%
   );
 }
-.ccl-fcard__idx {
-  position: absolute;
-  top: 16px;
-  right: 18px;
-  z-index: 3;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.24em;
-  color: rgba(241, 239, 232, 0.55);
-}
 .ccl-fcard__body {
   position: relative;
   z-index: 3;
@@ -538,12 +528,6 @@
   letter-spacing: -0.03em;
   color: var(--cream);
 }
-.ccl-fcard__sub {
-  margin-top: 8px;
-  font-size: 10.5px;
-  line-height: 1.4;
-  color: rgba(241, 239, 232, 0.6);
-}
 .ccl-fcard__fig {
   display: flex;
   align-items: baseline;
@@ -555,17 +539,11 @@
 .ccl-fcard__value {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(1.45rem, 6.6vw, 2rem);
-  line-height: 1;
-  letter-spacing: -0.03em;
+  font-size: clamp(1.05rem, 4.6vw, 1.55rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   color: var(--accent, #ff5833);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.ccl-fcard__label {
-  font-size: 10px;
-  line-height: 1.35;
-  color: rgba(241, 239, 232, 0.66);
+  text-wrap: balance;
 }
 .ccl-fcard__body {
   animation: cclFcardIn 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;

@@ -426,7 +426,6 @@ export const DEFAULT_BUILDER = [
     options: [
       "Latin Urban",
       "Reggaetón",
-      "Bachata",
       "Latin Pop",
       "Afrobeats",
       "Latin Afro",
@@ -472,7 +471,6 @@ export const DEFAULT_BUILDER = [
       "Producción musical",
       "Mezcla y master",
       "Desarrollo de catálogo",
-      "Recursos de lanzamiento",
     ],
     order: 4,
     is_visible: true,
