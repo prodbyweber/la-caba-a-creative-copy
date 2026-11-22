@@ -14,12 +14,6 @@ export const SECTIONS = [
   { id: "final", label: "Lanzar" },
 ];
 
-export const MINI = [
-  { title: "Catálogo", text: "Tus canciones, con orden" },
-  { title: "Producción", text: "Composición, mezcla y master" },
-  { title: "Lanzamiento", text: "Los recursos para salir al mundo" },
-];
-
 export const STATS = [
   { value: 100, prefix: "+", label: "artistas desarrollados" },
   { value: 1000000, prefix: "+", label: "reproducciones" },

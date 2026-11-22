@@ -11,7 +11,7 @@ export default function Final3({ settings, section }) {
         <div className="ccl-wrap ccl-final__inner">
           <span className="ccl-eyebrow">{section?.eyebrow || "Empezar"}</span>
           <h2 className="ccl-display ccl-h1 ccl-final__title">
-            {section?.title || "Lanza tu catálogo."}
+            {section?.title || "Crea tu catálogo."}
           </h2>
 
           <div className="ccl-final__ctas">

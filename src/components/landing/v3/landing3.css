@@ -215,37 +215,8 @@
 .ccl-hero__title em { font-style: normal; color: var(--orange); }
 .ccl-hero__ctas { display: grid; gap: 10px; margin-top: 24px; }
 
-/* ---------- qué es ---------- */
-.ccl-mini {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-top: 26px;
-}
-.ccl-mini__card {
-  border-radius: 20px;
-  border: 1px solid var(--line);
-  background: rgba(241, 239, 232, 0.05);
-  padding: 14px 10px;
-  text-align: center;
-}
-.ccl-mini__card b {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 12.5px;
-  letter-spacing: -0.01em;
-}
-.ccl-mini__card span {
-  display: block;
-  margin-top: 6px;
-  font-size: 9.5px;
-  line-height: 1.35;
-  color: var(--dim-2);
-}
-.ccl-mini__card:nth-child(2) { border-color: rgba(255, 88, 51, 0.4); }
-
 /* logos de marcas (en color) */
-.ccl-brands { margin-top: 26px; }
+.ccl-brands { margin-top: 0; }
 .ccl-brands__label {
   font-size: 8.5px;
   font-weight: 800;
@@ -601,9 +572,6 @@
 @media (min-width: 640px) {
   .ccl-hero__ctas { grid-template-columns: auto auto; justify-content: start; }
   .ccl-final__ctas { grid-template-columns: auto auto; justify-content: start; }
-  .ccl-mini { gap: 12px; }
-  .ccl-mini__card { padding: 18px 12px; }
-  .ccl-mini__card b { font-size: 14px; }
   .ccl-genre { flex: 0 0 44%; }
   .ccl-step { flex: 0 0 46%; }
   .ccl-trend { flex: 0 0 34%; }
@@ -621,8 +589,6 @@
   .ccl-h1 { font-size: clamp(3rem, 5.6vw, 4.9rem); }
   .ccl-lead { font-size: 1.05rem; }
   .ccl-snap__inner { padding-top: 120px; padding-bottom: 72px; }
-  .ccl-mini { grid-template-columns: repeat(3, 200px); justify-content: start; gap: 14px; }
-  .ccl-brands { margin-top: 30px; }
   .ccl-brands__cell { height: 54px; width: 150px; }
   .ccl-stats { grid-template-columns: repeat(4, 1fr); gap: 14px; }
   .ccl-stat { padding: 24px 20px; }

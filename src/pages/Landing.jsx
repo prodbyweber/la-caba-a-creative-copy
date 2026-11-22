@@ -160,7 +160,7 @@ export default function Landing() {
       case "paises":
         return <CountriesSection key={section.key} section={section} flags={content.flags} />;
       case "marcas":
-        return <BrandsSection key={section.key} />;
+        return <BrandsSection key={section.key} creators={content.creators} />;
       case "generos":
         return <GenresStack key={section.key} section={section} items={content.genres} />;
       case "comunidad":

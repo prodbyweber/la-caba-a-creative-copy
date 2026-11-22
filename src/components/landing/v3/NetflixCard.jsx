@@ -26,7 +26,6 @@ export default function NetflixCard() {
             loading="lazy"
           />
           <span className="ccl-nf__veil" aria-hidden="true" />
-          <span className="ccl-nf__badge">Cabaña Original</span>
           <span className="ccl-nf__body">
             <span className="ccl-nf__title">Así se trabaja en La Cabaña</span>
             <span className="ccl-nf__meta">Producción · Mezcla · Master</span>

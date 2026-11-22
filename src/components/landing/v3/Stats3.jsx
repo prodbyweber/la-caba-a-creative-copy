@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { STATS } from "./constants";
 
+const ZERO = () => STATS.map((s) => (s.value === null ? null : 0));
+
 function formatValue(value, prefix) {
   if (value === null || value === undefined) return "";
   if (value >= 1000000) {
@@ -16,16 +18,15 @@ function formatValue(value, prefix) {
 
 export default function Stats3() {
   const ref = useRef(null);
-  const [values, setValues] = useState(() => STATS.map((s) => (s.value === null ? null : 0)));
+  const [values, setValues] = useState(ZERO);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el) return undefined;
 
-    const finish = () => setValues(STATS.map((s) => s.value));
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
     let frame = 0;
+
     const animate = () => {
       const duration = 1400;
       const start = performance.now();
@@ -40,12 +41,18 @@ export default function Stats3() {
 
     const io = new IntersectionObserver(
       (entries) => {
-        if (!entries[0].isIntersecting) return;
-        if (reduce) finish();
-        else animate();
-        io.disconnect();
+        const entry = entries[0];
+        if (entry.isIntersecting && entry.intersectionRatio > 0.45) {
+          if (frame) cancelAnimationFrame(frame);
+          if (reduce) setValues(STATS.map((s) => s.value));
+          else animate();
+        } else if (!entry.isIntersecting) {
+          if (frame) cancelAnimationFrame(frame);
+          frame = 0;
+          setValues(ZERO());
+        }
       },
-      { threshold: 0.3 }
+      { threshold: [0, 0.45, 0.8] }
     );
 
     io.observe(el);
