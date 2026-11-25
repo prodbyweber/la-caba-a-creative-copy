@@ -1,8 +1,9 @@
 import React from "react";
 import MethodologyStage from "@/components/fullaccess/MethodologyStage";
+import DemoMasterRow from "@/components/fullaccess/DemoMasterRow";
 import { METHOD_STAGES, METHOD_RESULT } from "@/lib/methodologyStages";
 
-export default function Methodology({ studioVideoUrl }) {
+export default function Methodology({ studioVideoUrl, demos = [], demoEyebrow }) {
   return (
     <section className="fa-method" id="metodologia">
       <div className="fa-wrap">
@@ -24,6 +25,8 @@ export default function Methodology({ studioVideoUrl }) {
           <p className="fa-result__note">{METHOD_RESULT.note}</p>
         </div>
       </div>
+
+      <DemoMasterRow eyebrow={demoEyebrow} projects={demos} />
     </section>
   );
 }

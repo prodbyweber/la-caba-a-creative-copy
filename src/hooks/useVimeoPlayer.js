@@ -19,17 +19,19 @@ function loadSdk() {
 }
 
 /**
- * Reproductor del VSL: sin saltos, sin controles nativos, con sonido activado
- * y desbloqueo solo por visionado real.
+ * Reproductor del VSL: sin saltos, sin controles nativos, con sonido activado,
+ * audio conmutable y desbloqueo solo por visionado real.
  */
 export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended }) {
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
   const maxRef = useRef(0);
   const unlockedRef = useRef(unlocked);
+  const mutedRef = useRef(false);
 
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(unlocked ? 1 : 0);
 
   useEffect(() => {
@@ -88,6 +90,14 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
         player.on("play", () => setPlaying(true));
         player.on("pause", () => setPlaying(false));
 
+        // El icono de audio sigue siempre el estado real del reproductor.
+        player.on("volumechange", (data) => {
+          const value = Number(data?.volume);
+          const next = data?.muted === true || value === 0;
+          mutedRef.current = next;
+          setMuted(next);
+        });
+
         player
           .ready()
           .then(() => {
@@ -121,13 +131,26 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
   const toggle = useCallback(() => {
     const player = playerRef.current;
     if (!player) return;
-    if (playing) player.pause().catch(() => {});
-    else {
+    if (playing) {
+      player.pause().catch(() => {});
+      return;
+    }
+    if (mutedRef.current) {
       player.setMuted(false).catch(() => {});
       player.setVolume(1).catch(() => {});
-      player.play().catch(() => setPlaying(false));
     }
+    player.play().catch(() => setPlaying(false));
   }, [playing]);
 
-  return { iframeRef, started, playing, progress, activate, toggle };
+  const toggleMute = useCallback(() => {
+    const player = playerRef.current;
+    if (!player) return;
+    const next = !mutedRef.current;
+    mutedRef.current = next;
+    setMuted(next);
+    player.setMuted(next).catch(() => {});
+    player.setVolume(next ? 0 : 1).catch(() => {});
+  }, []);
+
+  return { iframeRef, started, playing, muted, progress, activate, toggle, toggleMute };
 }

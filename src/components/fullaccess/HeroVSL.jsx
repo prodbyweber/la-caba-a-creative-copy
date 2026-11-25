@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Maximize2, Minimize2, Play } from "lucide-react";
+import { Maximize2, Minimize2, Play, Volume2, VolumeX } from "lucide-react";
 import UnlockModule from "@/components/fullaccess/UnlockModule";
 import useVimeoPlayer from "@/hooks/useVimeoPlayer";
 import useVimeoThumb from "@/hooks/useVimeoThumb";
@@ -35,19 +35,18 @@ const reducedMotion = () =>
 export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, suspended }) {
   const coverRef = useRef(null);
   const previewRef = useRef(null);
-  const [fullscreen, setFullscreen] = useState(false);
+  const [nativeFs, setNativeFs] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [previewFailed, setPreviewFailed] = useState(false);
 
   const { poster, ratio } = useVimeoThumb(
     settings.vimeo_url,
     settings.vimeo_poster_url || settings.hero_image_url
   );
-  const { iframeRef, started, playing, progress, activate, toggle } = useVimeoPlayer({
-    settings,
-    unlocked,
-    onUnlock,
-    suspended,
-  });
+  const { iframeRef, started, playing, muted, progress, activate, toggle, toggleMute } =
+    useVimeoPlayer({ settings, unlocked, onUnlock, suspended });
+
+  const isFullscreen = nativeFs || expanded;
 
   const previewUrl = settings.preview_video_url || "";
   const showPreview = Boolean(previewUrl) && !previewFailed && !reducedMotion();
@@ -76,7 +75,7 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
   useEffect(() => {
     const sync = () => {
       const active = document.fullscreenElement || document.webkitFullscreenElement;
-      setFullscreen(!!active && coverRef.current?.contains(active));
+      setNativeFs(!!active && coverRef.current?.contains(active));
     };
     document.addEventListener("fullscreenchange", sync);
     document.addEventListener("webkitfullscreenchange", sync);
@@ -86,9 +85,25 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
     };
   }, []);
 
+  // Modo ampliado propio: bloquea el scroll y se cierra con Esc.
+  useEffect(() => {
+    if (!expanded) return undefined;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (event) => {
+      if (event.key === "Escape") setExpanded(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [expanded]);
+
   const toggleFullscreen = useCallback(async () => {
     const el = coverRef.current;
     const active = document.fullscreenElement || document.webkitFullscreenElement;
+
     if (active) {
       try {
         if (document.exitFullscreen) await document.exitFullscreen();
@@ -98,21 +113,34 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
       }
       return;
     }
-    if (el?.requestFullscreen) {
-      try {
+
+    if (expanded) {
+      setExpanded(false);
+      return;
+    }
+
+    // Pantalla completa nativa cuando el navegador la permite.
+    try {
+      if (el?.requestFullscreen) {
         await el.requestFullscreen();
         return;
-      } catch {
-        /* ignore */
       }
+      if (el?.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen();
+        return;
+      }
+    } catch {
+      /* seguimos con el modo ampliado */
     }
-    if (el?.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  }, []);
+
+    // iOS y navegadores sin API de pantalla completa.
+    setExpanded(true);
+  }, [expanded]);
 
   return (
     <section className="fa-hero">
       <div
-        className={`fa-cover${started ? " is-playing" : ""}`}
+        className={`fa-cover${started ? " is-playing" : ""}${expanded ? " is-expanded" : ""}`}
         ref={coverRef}
         style={{ "--vsl-ratio": ratio }}
         onContextMenu={(event) => event.preventDefault()}
@@ -143,10 +171,19 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
               <button
                 type="button"
                 className="fa-glass fa-glass--sm"
-                onClick={toggleFullscreen}
-                aria-label={fullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+                onClick={toggleMute}
+                aria-label={muted ? "Activar el sonido" : "Silenciar"}
+                aria-pressed={muted}
               >
-                {fullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </button>
+              <button
+                type="button"
+                className="fa-glass fa-glass--sm"
+                onClick={toggleFullscreen}
+                aria-label={isFullscreen ? "Salir de pantalla ampliada" : "Pantalla ampliada"}
+              >
+                {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
               </button>
             </div>
           </div>

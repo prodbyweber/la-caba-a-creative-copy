@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ARTIST_SLIDES } from "@/lib/startArtistSlides";
-import DemoMasterRow from "@/components/fullaccess/DemoMasterRow";
 
 const AUTO_MS = 5200;
 
-export default function ArtistsCarousel({ artists, settings = {}, demos = [] }) {
+export default function ArtistsCarousel({ artists, settings = {} }) {
   const [index, setIndex] = useState(0);
   const [held, setHeld] = useState(false);
   const touchRef = useRef(null);
@@ -101,8 +100,6 @@ export default function ArtistsCarousel({ artists, settings = {}, demos = [] }) 
           />
         ))}
       </div>
-
-      <DemoMasterRow eyebrow={settings.demo_eyebrow} projects={demos} />
     </section>
   );
 }

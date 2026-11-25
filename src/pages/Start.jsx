@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { ArrowRight } from "lucide-react";
 import "@/components/fullaccess/fa.css";
 import "@/components/fullaccess/fa-landing.css";
 import "@/components/fullaccess/fa-v4.css";
@@ -51,11 +52,22 @@ export default function Start() {
 
       <StatsSection />
       <BrandsStrip />
-      <ArtistsCarousel artists={artists} settings={settings} demos={demos} />
+      <ArtistsCarousel artists={artists} settings={settings} />
       <SelectedProjects projects={projects} />
-      <Methodology studioVideoUrl={settings.studio_video_url} />
+      <Methodology
+        studioVideoUrl={settings.studio_video_url}
+        demos={demos}
+        demoEyebrow={settings.demo_eyebrow}
+      />
 
       <footer className="fa-wrap">
+        <div className="fa-endcta">
+          <button type="button" className="fa-cta" onClick={openBrief}>
+            Envía tu proyecto
+            <ArrowRight size={17} />
+          </button>
+        </div>
+
         <div className="fa-foot">
           <span>Cabaña Creative · Madrid</span>
           <span>Full Access · Programa de desarrollo artístico</span>

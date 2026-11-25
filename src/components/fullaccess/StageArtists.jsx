@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { ARTIST_SLIDES } from "@/lib/startArtistSlides";
+import { STAGE3_SLIDES } from "@/lib/stage3Slides";
 
 const prefersReduced = () =>
   typeof window !== "undefined" &&
@@ -14,7 +14,7 @@ export default function StageArtists() {
   const goTo = (next) => {
     const rail = railRef.current;
     if (!rail) return;
-    const target = rail.children[Math.max(0, Math.min(ARTIST_SLIDES.length - 1, next))];
+    const target = rail.children[Math.max(0, Math.min(STAGE3_SLIDES.length - 1, next))];
     if (!target) return;
     rail.scrollTo({
       left: target.offsetLeft - rail.offsetLeft,
@@ -42,9 +42,9 @@ export default function StageArtists() {
   return (
     <div className="fa-shot">
       <div className="fa-shot__rail" ref={railRef} onScroll={onScroll}>
-        {ARTIST_SLIDES.map((slide) => (
+        {STAGE3_SLIDES.map((slide) => (
           <figure className="fa-shot__item" key={slide.src}>
-            <img src={slide.src} alt={slide.alt} loading="lazy" />
+            <img src={slide.src} alt={slide.name} loading="lazy" />
           </figure>
         ))}
       </div>
@@ -67,13 +67,13 @@ export default function StageArtists() {
       </button>
 
       <div className="fa-shot__dots">
-        {ARTIST_SLIDES.map((slide, i) => (
+        {STAGE3_SLIDES.map((slide, i) => (
           <button
             type="button"
             key={slide.src}
             className={`fa-shot__dot${i === index ? " is-on" : ""}`}
             onClick={() => goTo(i)}
-            aria-label={slide.alt}
+            aria-label={slide.name}
           />
         ))}
       </div>
