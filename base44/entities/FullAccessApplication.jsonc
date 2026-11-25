@@ -27,17 +27,6 @@
       "type": "string",
       "description": "G\u00e9neros musicales"
     },
-    "moods": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Moods o estados de \u00e1nimo elegidos"
-    },
-    "location": {
-      "type": "string",
-      "description": "Pa\u00eds desde el que escribe"
-    },
     "references": {
       "type": "string",
       "description": "Referencias y artistas que inspiran su sonido"

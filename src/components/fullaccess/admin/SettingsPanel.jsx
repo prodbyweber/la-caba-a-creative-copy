@@ -4,17 +4,18 @@ import { base44 } from "@/api/base44Client";
 import { FA_DEFAULTS } from "@/lib/fullAccessDefaults";
 
 const FIELDS = [
-  { key: "hero_image_url", label: "Fotografía del hero", wide: true },
-  { key: "hero_loop_video_url", label: "Vídeo de portada en loop", wide: true },
+  { key: "hero_image_url", label: "Fotografía del hero" },
+  { key: "hero_eyebrow", label: "Antetítulo" },
   { key: "hero_kicker", label: "Descriptor del programa" },
   { key: "hero_title", label: "Titular principal", wide: true },
-  { key: "hero_subtitle", label: "Credenciales del hero", wide: true },
-  { key: "hero_cta_label", label: "Texto del botón" },
+  { key: "hero_subtitle", label: "Subtítulo", wide: true },
   { key: "vimeo_url", label: "URL del VSL (Vimeo)", wide: true },
   { key: "vimeo_poster_url", label: "Portada del vídeo", wide: true },
-  { key: "gate_seconds", label: "Segundo de la captura (1:44 = 104)", type: "number" },
+  { key: "gate_seconds", label: "Segundo de la captura", type: "number" },
   { key: "gate_title", label: "Título de la captura" },
   { key: "gate_text", label: "Texto de la captura", wide: true },
+  { key: "stats_title", label: "Título de trayectoria" },
+  { key: "stats_intro", label: "Descripción de trayectoria", wide: true },
   { key: "collabs_title", label: "Título de colaboraciones" },
   { key: "demo_title", label: "Título demo/master" },
   { key: "demo_subtitle", label: "Subtítulo demo/master", wide: true },

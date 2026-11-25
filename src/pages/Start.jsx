@@ -61,7 +61,7 @@ export default function Start() {
       </div>
 
       <StatsSection settings={settings} stats={stats} />
-      <CollabsStrip lead={settings.hero_kicker} logos={collabLogos} />
+      <CollabsStrip title={settings.collabs_title} logos={collabLogos} />
       <DemoToMaster settings={settings} demos={demos} />
       <SelectedProjects settings={settings} projects={projects} />
       <Methodology settings={settings} stages={stages} />

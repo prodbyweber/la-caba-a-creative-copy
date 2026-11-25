@@ -1,12 +1,13 @@
 import React from "react";
 
-export default function CollabsStrip({ lead, logos }) {
+export default function CollabsStrip({ title, logos }) {
   if (!logos?.length) return null;
 
   return (
-    <section className="fa-collabs-sec">
+    <section className="fa-sec--tight fa-collabs-sec">
       <div className="fa-wrap">
-        <span className="fa-eyebrow">{lead || "Programa de desarrollo artístico"}</span>
+        <span className="fa-eyebrow">Marcas</span>
+        <h2 className="fa-display fa-collabs__title">{title}</h2>
       </div>
 
       <div className="fa-collabs">

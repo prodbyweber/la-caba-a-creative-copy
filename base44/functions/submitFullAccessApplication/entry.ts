@@ -9,8 +9,6 @@ const ALLOWED = [
   "spotify",
   "youtube",
   "genres",
-  "moods",
-  "location",
   "references",
   "identity",
   "stage",

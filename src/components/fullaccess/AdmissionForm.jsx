@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Loader2, Paperclip } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { FA_GENRES, FA_MOODS, FA_STAGE_OPTIONS, FA_NEEDS } from "@/lib/fullAccessDefaults";
-import { COUNTRIES, MAIN_COUNTRIES, flagUrl } from "@/lib/countries";
+import { FA_GENRES } from "@/lib/fullAccessDefaults";
 
+const STAGE_OPTIONS = ["Solo ideas", "Tengo demos", "Preparando un lanzamiento", "Ya he publicado"];
 const YES_NO = ["Sí", "No", "Algunas"];
 
 const EMPTY = {
@@ -29,7 +29,6 @@ const EMPTY = {
   expectations: "",
   links: "",
   context: "",
-  location: "",
 };
 
 export default function AdmissionForm({ lead, settings, onSubmitted }) {
@@ -52,12 +51,6 @@ export default function AdmissionForm({ lead, settings, onSubmitted }) {
     set("genres", next.join(", "));
   };
   const genres = data.genres ? data.genres.split(", ") : [];
-  const moods = data.moods || [];
-
-  const toggleMood = (mood) => {
-    const next = moods.includes(mood) ? moods.filter((item) => item !== mood) : [...moods, mood];
-    set("moods", next);
-  };
 
   const uploadFiles = async (event) => {
     const picked = Array.from(event.target.files || []);
@@ -169,35 +162,6 @@ export default function AdmissionForm({ lead, settings, onSubmitted }) {
               placeholder="Enlace"
             />
           </label>
-          <div style={{ gridColumn: "1 / -1" }}>
-            <span className="fa-label">¿Dónde te ubicas?</span>
-            <div className="fa-chips">
-              {MAIN_COUNTRIES.map((country) => (
-                <button
-                  type="button"
-                  key={country.code}
-                  className={`fa-chip fa-chip--flag${data.location === country.name ? " is-on" : ""}`}
-                  onClick={() => set("location", country.name)}
-                >
-                  <img className="fa-flag" src={flagUrl(country.code)} alt="" />
-                  {country.name}
-                </button>
-              ))}
-            </div>
-            <select
-              className="fa-input fa-select"
-              value={MAIN_COUNTRIES.some((c) => c.name === data.location) ? "" : data.location}
-              onChange={(e) => set("location", e.target.value)}
-              aria-label="Otro país"
-            >
-              <option value="">Otro país…</option>
-              {COUNTRIES.filter((country) => !country.main).map((country) => (
-                <option key={country.code} value={country.name}>
-                  {country.name}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
       ),
     },
@@ -218,21 +182,6 @@ export default function AdmissionForm({ lead, settings, onSubmitted }) {
                   onClick={() => toggleGenre(genre)}
                 >
                   {genre}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <span className="fa-label">Mood · elige los que encajen</span>
-            <div className="fa-chips">
-              {FA_MOODS.map((mood) => (
-                <button
-                  type="button"
-                  key={mood}
-                  className={`fa-chip${moods.includes(mood) ? " is-on" : ""}`}
-                  onClick={() => toggleMood(mood)}
-                >
-                  {mood}
                 </button>
               ))}
             </div>
@@ -260,14 +209,14 @@ export default function AdmissionForm({ lead, settings, onSubmitted }) {
     },
     {
       label: "Your project",
-      title: "¿En qué punto está tu proyecto?",
+      title: "¿En qué punto estás?",
       hint: "Nos ayuda a saber desde dónde partimos.",
       body: (
         <div className="fa-form__grid">
           <div>
-            <span className="fa-label">Punto de partida</span>
+            <span className="fa-label">Punto actual</span>
             <div className="fa-chips">
-              {FA_STAGE_OPTIONS.map((option) => (
+              {STAGE_OPTIONS.map((option) => (
                 <button
                   type="button"
                   key={option}
@@ -288,21 +237,6 @@ export default function AdmissionForm({ lead, settings, onSubmitted }) {
                   key={option}
                   className={`fa-chip${data.has_demos === option ? " is-on" : ""}`}
                   onClick={() => set("has_demos", option)}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <span className="fa-label">¿Qué necesitas?</span>
-            <div className="fa-chips">
-              {FA_NEEDS.map((option) => (
-                <button
-                  type="button"
-                  key={option}
-                  className={`fa-chip${data.wants === option ? " is-on" : ""}`}
-                  onClick={() => set("wants", option)}
                 >
                   {option}
                 </button>
@@ -333,6 +267,14 @@ export default function AdmissionForm({ lead, settings, onSubmitted }) {
               className="fa-textarea"
               value={data.missing}
               onChange={(e) => set("missing", e.target.value)}
+            />
+          </label>
+          <label className="fa-field">
+            <span className="fa-label">Qué quieres desarrollar</span>
+            <textarea
+              className="fa-textarea"
+              value={data.wants}
+              onChange={(e) => set("wants", e.target.value)}
             />
           </label>
         </div>

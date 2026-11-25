@@ -3,15 +3,13 @@ export const FA_DEFAULTS = {
     "https://base44.app/api/apps/6966ddf48947f217e81ea27c/files/mp/public/6966ddf48947f217e81ea27c/de2d3f461_Still2026-05-24133616_241.jpg",
   hero_eyebrow: "Cabaña Full Access",
   hero_kicker: "Programa de desarrollo artístico",
-  hero_title:
-    "De canciones sueltas a un catálogo con identidad y estrategia en cada lanzamiento.",
-  hero_subtitle: "Music producer · Founder · Director creativo",
-  hero_loop_video_url: "",
-  hero_cta_label: "Empecemos",
+  hero_title: "Desarrolla tu catálogo. Construye una identidad musical y lánzala al mundo.",
+  hero_subtitle:
+    "Un proceso de desarrollo artístico para encontrar tu sonido, construir un catálogo con personalidad y preparar tu música para llegar al mercado.",
   vimeo_url: "https://player.vimeo.com/video/1250103284?h=1204b00d26",
   vimeo_poster_url:
     "https://base44.app/api/apps/6966ddf48947f217e81ea27c/files/mp/public/6966ddf48947f217e81ea27c/de2d3f461_Still2026-05-24133616_241.jpg",
-  gate_seconds: 104,
+  gate_seconds: 65,
   gate_title: "Antes de continuar, queremos conocerte.",
   gate_text:
     "Déjanos tu nombre y tu correo para guardar tu progreso y abrirte la sesión de admisión.",
@@ -21,7 +19,7 @@ export const FA_DEFAULTS = {
   collabs_title: "Marcas con las que he colaborado",
   demo_title: "Del demo al master",
   demo_subtitle: "Escucha cómo una idea se convierte en una producción terminada.",
-  projects_title: "Selected projects",
+  projects_title: "Trabajos seleccionados",
   projects_subtitle:
     "Una selección de proyectos en los que he participado desde la producción musical y la composición.",
   method_title: "Las tres etapas de Cabaña Full Access",
@@ -41,8 +39,9 @@ export const FA_DEFAULTS = {
 
 export const FA_STATS_FALLBACK = [
   { value: 100, prefix: "+", suffix: "", label: "Artistas desarrollados", note: "" },
-  { value: 1, prefix: "+", suffix: "M", label: "Reproducciones", note: "" },
-  { value: 30, prefix: "+", suffix: "", label: "Países", note: "" },
+  { value: 7, prefix: "+", suffix: "", label: "Años de experiencia", note: "" },
+  { value: 1, prefix: "+", suffix: "M", label: "Reproducciones acumuladas", note: "" },
+  { value: 30, prefix: "+", suffix: "", label: "Países alcanzados", note: "" },
 ];
 
 export const FA_PROJECTS_FALLBACK = [
@@ -76,15 +75,16 @@ export const FA_STAGES = [
   {
     num: "01",
     key: "explorar",
-    title: "Explorar.",
-    text: "Encontramos tu sonido mezclando géneros, ritmos y referencias hasta dar con una combinación que sea solo tuya.",
+    title: "Encuentra tu sonido.",
+    text: "Exploramos ritmos, géneros y referencias para encontrar combinaciones que puedan darle personalidad a tu proyecto.",
     items: [
-      "Géneros y fusiones",
+      "Exploración de géneros",
       "Ritmos e instrumentales",
       "Beat Store de Cabaña",
       "Referencias",
       "Sonidos y texturas",
-      "Dirección sonora",
+      "Influencias",
+      "Dirección sonora inicial",
     ],
     result:
       "Una dirección sonora inicial y una selección de ideas con potencial para desarrollar.",
@@ -92,36 +92,44 @@ export const FA_STAGES = [
   {
     num: "02",
     key: "descubrir",
-    title: "Descubrimiento.",
-    text: "Convertimos las ideas en canciones en sesiones presenciales en el estudio o en remoto, contigo en la cabina.",
+    title: "Dale forma a tu sonido y conviértelo en canciones.",
+    text: "Desarrollamos tus ideas mediante sesiones presenciales uno a uno, producción musical, composición y trabajo vocal.",
     items: [
-      "Sesiones presenciales",
-      "Sesiones online",
+      "Flow Camp",
       "Beatmaking",
+      "Producción musical",
+      "Melodías y armonías",
       "Composición",
-      "Trabajo vocal",
+      "Estructuras",
+      "Producción vocal",
       "Grabación",
+      "Selección de tomas",
+      "Arreglos",
+      "Diseño sonoro",
+      "Dirección creativa",
     ],
     result: "Canciones desarrolladas con una dirección artística y sonora coherente.",
   },
   {
     num: "03",
     key: "lanzar",
-    title: "Estrategia y lanzamiento.",
-    text: "Ordenamos tu catálogo y construimos el plan de cada lanzamiento para que la música no salga al azar.",
+    title: "Prepara tu música para llegar al mundo.",
+    text: "Organizamos tu catálogo y construimos una dirección para tus próximos lanzamientos.",
     items: [
-      "Catálogo",
+      "Organización del catálogo",
       "Selección de canciones",
-      "Concepto",
+      "Coherencia del proyecto",
+      "Planificación de lanzamientos",
+      "Conceptos creativos",
+      "Referencias visuales",
+      "Estrategia de contenido",
       "Calendario",
-      "Contenido",
-      "Distribución",
+      "Materiales para distribución",
+      "Hoja de ruta",
     ],
     result: "Un catálogo organizado y una dirección clara para presentar tu música al mercado.",
   },
 ];
-
-export const FA_LAUNCH_STEPS = ["Catálogo", "Concepto", "Calendario", "Lanzamiento"];
 
 export const FA_GENRES = [
   "Reggaetón",
@@ -133,46 +141,5 @@ export const FA_GENRES = [
   "House",
   "Dancehall",
   "Flamenco",
-  "Hip Hop",
-  "Drill",
-  "Amapiano",
-  "Dembow",
-  "Baile Funk",
-  "Afro House",
-  "Electrónica",
-  "Salsa",
-  "Bachata",
-  "Cumbia",
-  "Regional Mexicano",
-  "Indie",
-  "Rock",
-  "Soul",
-  "Jazz",
   "Otro",
 ];
-
-export const FA_MOODS = [
-  "Oscuro",
-  "Festivo",
-  "Melancólico",
-  "Íntimo",
-  "Energético",
-  "Nostálgico",
-  "Sensual",
-  "Épico",
-  "Relajado",
-  "Romántico",
-  "Nocturno",
-  "Veraniego",
-  "Experimental",
-  "Agresivo",
-];
-
-export const FA_STAGE_OPTIONS = [
-  "Solo tengo ideas",
-  "Tengo demos sin terminar",
-  "Tengo canciones listas para lanzar",
-  "Ya publico y quiero ordenar mi catálogo",
-];
-
-export const FA_NEEDS = ["Desarrollo de catálogo", "Producir una canción"];

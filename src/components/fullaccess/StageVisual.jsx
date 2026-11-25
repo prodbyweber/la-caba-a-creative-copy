@@ -1,13 +1,14 @@
 import React from "react";
-import GenrePairs from "@/components/fullaccess/GenrePairs";
-import { FA_LAUNCH_STEPS } from "@/lib/fullAccessDefaults";
+import GenreExplorer from "@/components/fullaccess/GenreExplorer";
+
+const TIMELINE = ["Catálogo", "Concepto", "Calendario", "Lanzamiento"];
 
 export default function StageVisual({ stage }) {
   const video = stage.video_url;
   const image = stage.image_url;
 
   if (stage.key === "explorar" || stage.num === "01") {
-    return <GenrePairs />;
+    return <GenreExplorer />;
   }
 
   if (stage.key === "lanzar" || stage.num === "03") {
@@ -15,9 +16,11 @@ export default function StageVisual({ stage }) {
       <div className="fa-launch">
         {video ? (
           <video className="fa-loop" src={video} poster={image || undefined} autoPlay muted loop playsInline />
+        ) : image ? (
+          <img className="fa-loop" src={image} alt="" loading="lazy" />
         ) : null}
         <div className="fa-launch__line">
-          {FA_LAUNCH_STEPS.map((step, index) => (
+          {TIMELINE.map((step, index) => (
             <span className="fa-launch__step" key={step}>
               <b>{String(index + 1).padStart(2, "0")}</b>
               {step}
