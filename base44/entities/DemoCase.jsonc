@@ -22,6 +22,10 @@
       "type": "string",
       "description": "Audio del master final"
     },
+    "description": {
+      "type": "string",
+      "description": "Breve descripci\u00f3n del trabajo realizado"
+    },
     "order": {
       "type": "number",
       "default": 0,

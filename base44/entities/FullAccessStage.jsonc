@@ -1,0 +1,56 @@
+{
+  "name": "FullAccessStage",
+  "type": "object",
+  "properties": {
+    "num": {
+      "type": "string",
+      "description": "N\u00famero de la etapa (01, 02, 03)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Titular de la etapa"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Puntos de trabajo"
+    },
+    "result": {
+      "type": "string",
+      "description": "Resultado de la etapa"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden de aparici\u00f3n"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la etapa se muestra"
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

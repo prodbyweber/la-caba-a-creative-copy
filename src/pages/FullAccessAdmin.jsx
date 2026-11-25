@@ -1,0 +1,141 @@
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import SettingsPanel from "@/components/fullaccess/admin/SettingsPanel";
+import ListPanel from "@/components/fullaccess/admin/ListPanel";
+import ApplicationsPanel from "@/components/fullaccess/admin/ApplicationsPanel";
+
+const TABS = [
+  { key: "contenido", label: "Contenido" },
+  { key: "stats", label: "Estadísticas" },
+  { key: "proyectos", label: "Proyectos" },
+  { key: "etapas", label: "Metodología" },
+  { key: "demos", label: "Demo / Master" },
+  { key: "solicitudes", label: "Solicitudes" },
+];
+
+export default function FullAccessAdmin() {
+  const [tab, setTab] = useState("contenido");
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0b] text-white">
+      <div className="mx-auto max-w-5xl px-5 py-8">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#ff5833]">
+              Cabaña Full Access
+            </p>
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight">Panel de la landing</h1>
+          </div>
+          <div className="flex gap-2">
+            <Link
+              to="/start"
+              className="rounded-md border border-white/10 px-3 py-2 text-xs text-zinc-300 hover:text-white"
+            >
+              Ver landing
+            </Link>
+            <Link
+              to="/AdminDashboard"
+              className="rounded-md border border-white/10 px-3 py-2 text-xs text-zinc-300 hover:text-white"
+            >
+              Panel general
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-2 border-b border-white/10 pb-3">
+          {TABS.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => setTab(item.key)}
+              className={`rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition ${
+                tab === item.key ? "bg-white text-black" : "text-zinc-400 hover:text-white"
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-7">
+          {tab === "contenido" && <SettingsPanel />}
+
+          {tab === "stats" && (
+            <ListPanel
+              title="Estadísticas"
+              description="Deja la cifra vacía para mostrarla como pendiente de verificar."
+              entity="FullAccessStat"
+              defaults={{ value: 0, label: "Nueva cifra", order: 0, is_visible: true }}
+              fields={[
+                { key: "value", label: "Cifra", type: "number" },
+                { key: "prefix", label: "Prefijo" },
+                { key: "suffix", label: "Sufijo" },
+                { key: "label", label: "Etiqueta" },
+                { key: "note", label: "Nota", wide: true },
+                { key: "order", label: "Orden", type: "number" },
+                { key: "is_visible", label: "Visible", type: "bool" },
+              ]}
+            />
+          )}
+
+          {tab === "proyectos" && (
+            <ListPanel
+              title="Selected projects"
+              description="Artista, canción, crédito y enlace del videoclip. La portada es opcional."
+              entity="FullAccessProject"
+              defaults={{ artist: "", song: "", credit: "", order: 0, is_visible: true }}
+              fields={[
+                { key: "artist", label: "Artista" },
+                { key: "song", label: "Canción" },
+                { key: "credit", label: "Crédito" },
+                { key: "year", label: "Año" },
+                { key: "youtube_url", label: "Enlace del vídeo", wide: true },
+                { key: "cover_url", label: "Portada (opcional)", wide: true },
+                { key: "order", label: "Orden", type: "number" },
+                { key: "is_visible", label: "Visible", type: "bool" },
+              ]}
+            />
+          )}
+
+          {tab === "etapas" && (
+            <ListPanel
+              title="Metodología"
+              description="Cada etapa con su número, titular, puntos y resultado."
+              entity="FullAccessStage"
+              defaults={{ num: "", title: "", items: [], order: 0, is_visible: true }}
+              fields={[
+                { key: "num", label: "Número" },
+                { key: "title", label: "Titular", wide: true },
+                { key: "items", label: "Puntos (separados por coma)", type: "list", wide: true },
+                { key: "result", label: "Resultado", type: "textarea", wide: true },
+                { key: "order", label: "Orden", type: "number" },
+                { key: "is_visible", label: "Visible", type: "bool" },
+              ]}
+            />
+          )}
+
+          {tab === "demos" && (
+            <ListPanel
+              title="From demo to master"
+              description="Sube el audio demo y el master final de cada ejemplo."
+              entity="DemoCase"
+              defaults={{ artist: "", order: 0, is_visible: true }}
+              fields={[
+                { key: "artist", label: "Artista / proyecto" },
+                { key: "genre", label: "Género" },
+                { key: "demo_audio_url", label: "Audio DEMO", wide: true },
+                { key: "master_audio_url", label: "Audio MASTER", wide: true },
+                { key: "cover_url", label: "Portada", wide: true },
+                { key: "description", label: "Descripción del trabajo", type: "textarea", wide: true },
+                { key: "order", label: "Orden", type: "number" },
+                { key: "is_visible", label: "Visible", type: "bool" },
+              ]}
+            />
+          )}
+
+          {tab === "solicitudes" && <ApplicationsPanel />}
+        </div>
+      </div>
+    </div>
+  );
+}

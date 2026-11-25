@@ -1,0 +1,138 @@
+{
+  "name": "FullAccessSettings",
+  "type": "object",
+  "properties": {
+    "hero_image_url": {
+      "type": "string",
+      "description": "Fotograf\u00eda protagonista del hero"
+    },
+    "hero_eyebrow": {
+      "type": "string",
+      "description": "Texto peque\u00f1o sobre el titular"
+    },
+    "hero_title": {
+      "type": "string",
+      "description": "Titular principal"
+    },
+    "hero_subtitle": {
+      "type": "string",
+      "description": "Subt\u00edtulo descriptivo"
+    },
+    "vimeo_url": {
+      "type": "string",
+      "description": "URL del VSL de Vimeo"
+    },
+    "gate_seconds": {
+      "type": "number",
+      "default": 65,
+      "description": "Segundo del VSL en el que se pide nombre y email"
+    },
+    "gate_title": {
+      "type": "string",
+      "description": "T\u00edtulo de la captura inicial"
+    },
+    "gate_text": {
+      "type": "string",
+      "description": "Texto de la captura inicial"
+    },
+    "stats_title": {
+      "type": "string",
+      "description": "T\u00edtulo de la secci\u00f3n de trayectoria"
+    },
+    "stats_intro": {
+      "type": "string",
+      "description": "Descripci\u00f3n de la trayectoria"
+    },
+    "collabs_title": {
+      "type": "string",
+      "description": "T\u00edtulo de la franja de colaboraciones"
+    },
+    "collab_logos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Logotipos de marcas colaboradoras"
+    },
+    "demo_title": {
+      "type": "string",
+      "description": "T\u00edtulo de la secci\u00f3n demo vs master"
+    },
+    "demo_subtitle": {
+      "type": "string",
+      "description": "Subt\u00edtulo de la secci\u00f3n demo vs master"
+    },
+    "projects_title": {
+      "type": "string",
+      "description": "T\u00edtulo de proyectos seleccionados"
+    },
+    "projects_subtitle": {
+      "type": "string",
+      "description": "Subt\u00edtulo de proyectos seleccionados"
+    },
+    "method_title": {
+      "type": "string",
+      "description": "T\u00edtulo de la metodolog\u00eda"
+    },
+    "method_subtitle": {
+      "type": "string",
+      "description": "Subt\u00edtulo de la metodolog\u00eda"
+    },
+    "form_intro": {
+      "type": "string",
+      "description": "Texto de entrada del formulario"
+    },
+    "booking_duration": {
+      "type": "number",
+      "default": 30,
+      "description": "Duraci\u00f3n de la sesi\u00f3n en minutos"
+    },
+    "booking_days_ahead": {
+      "type": "number",
+      "default": 21,
+      "description": "D\u00edas de disponibilidad mostrados"
+    },
+    "booking_start_hour": {
+      "type": "number",
+      "default": 10,
+      "description": "Hora de inicio de las sesiones (Europe/Madrid)"
+    },
+    "booking_end_hour": {
+      "type": "number",
+      "default": 19,
+      "description": "Hora de fin de las sesiones (Europe/Madrid)"
+    },
+    "booking_timezone": {
+      "type": "string",
+      "default": "Europe/Madrid",
+      "description": "Zona horaria del calendario"
+    },
+    "confirm_title": {
+      "type": "string",
+      "description": "T\u00edtulo de la confirmaci\u00f3n"
+    },
+    "confirm_text": {
+      "type": "string",
+      "description": "Texto de la confirmaci\u00f3n"
+    }
+  },
+  "required": [],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

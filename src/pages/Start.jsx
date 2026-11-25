@@ -1,139 +1,129 @@
-import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
-import StartNav from "@/components/start/StartNav";
-import StartHero from "@/components/start/StartHero";
-import CatalogoCarousel from "@/components/start/CatalogoCarousel";
-import ProblemSolution from "@/components/start/ProblemSolution";
-import HowItWorksAccordion from "@/components/start/HowItWorksAccordion";
-import StartChoosePath from "@/components/start/StartChoosePath";
-import StartFooter from "@/components/start/StartFooter";
-import ApplicationModal from "@/components/start/ApplicationModal";
-import CalendlyModal from "@/components/start/CalendlyModal";
+import React, { useCallback, useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import "@/components/fullaccess/fa.css";
+import useFullAccessContent from "@/hooks/useFullAccessContent";
+import { readStoredLead, UNLOCK_KEY } from "@/lib/fullAccess";
+import FullAccessNav from "@/components/fullaccess/FullAccessNav";
+import HeroVSL from "@/components/fullaccess/HeroVSL";
+import StatsSection from "@/components/fullaccess/StatsSection";
+import CollabsStrip from "@/components/fullaccess/CollabsStrip";
+import DemoToMaster from "@/components/fullaccess/DemoToMaster";
+import SelectedProjects from "@/components/fullaccess/SelectedProjects";
+import Methodology from "@/components/fullaccess/Methodology";
+import AdmissionForm from "@/components/fullaccess/AdmissionForm";
+import BookingSection from "@/components/fullaccess/BookingSection";
+
+const scrollTo = (id) => {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+};
 
 export default function Start() {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [showStickyCta, setShowStickyCta] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => { window.scrollTo(0, 0); }, []);
+  const { settings, stats, projects, demos, stages, collabLogos } = useFullAccessContent();
+  const [lead, setLead] = useState(() => readStoredLead());
+  const [unlocked, setUnlocked] = useState(() => {
+    try {
+      return localStorage.getItem(UNLOCK_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const [application, setApplication] = useState(null);
 
   useEffect(() => {
-    const handler = () => setModalOpen(true);
-    window.addEventListener("open-application-modal", handler);
-    return () => window.removeEventListener("open-application-modal", handler);
+    window.scrollTo(0, 0);
   }, []);
 
-  // Sticky mobile CTA: show after hero, hide at "comenzar" section
-  useEffect(() => {
-    const heroEl = document.getElementById("hero");
-    const contactoEl = document.getElementById("contacto");
-    let lastScrollY = window.scrollY;
-
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const heroBottom = heroEl ? heroEl.offsetTop + heroEl.offsetHeight : 0;
-      const contactoTop = contactoEl ? contactoEl.offsetTop : Infinity;
-
-      if (currentScrollY > heroBottom && currentScrollY < contactoTop - window.innerHeight / 2) {
-        setShowStickyCta(true);
-      } else {
-        setShowStickyCta(false);
-      }
-      lastScrollY = currentScrollY;
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+  const handleUnlock = useCallback(() => {
+    setUnlocked(true);
+    setTimeout(() => scrollTo("admision"), 600);
   }, []);
+
+  const goToForm = () => {
+    if (!unlocked) return scrollTo("video");
+    scrollTo("admision");
+  };
 
   return (
-    <div style={{
-      background: "#080808",
-      color: "#f0ede8",
-      fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-      overflowX: "hidden",
-      minHeight: "100dvh",
-      maxWidth: "1920px",
-      margin: "0 auto",
-    }}>
-      <StartNav />
+    <div className="fa">
+      <FullAccessNav onApply={goToForm} />
 
-      {/* 1. Hero — con YouTube embed, CTA y carrusel de marcas */}
-      <StartHero />
-
-      {/* 2. Sección de Agitación del Problema */}
-      <ProblemSolution />
-
-      {/* 3. Catálogo Prod. by Weber — debajo de El Problema */}
-      <CatalogoCarousel />
-
-      {/* 4. Sección del Proceso — acordeones desplegables */}
-      <HowItWorksAccordion />
-
-      {/* 5. Cierre de embudo — "Reservar" */}
-      <div id="contacto">
-        <StartChoosePath />
+      <div id="video">
+        <HeroVSL
+          settings={settings}
+          lead={lead}
+          onLead={setLead}
+          unlocked={unlocked}
+          onUnlock={handleUnlock}
+          onRequestForm={goToForm}
+        />
       </div>
 
-      <StartFooter />
+      <StatsSection settings={settings} stats={stats} />
+      <CollabsStrip title={settings.collabs_title} logos={collabLogos} />
+      <DemoToMaster settings={settings} demos={demos} />
+      <SelectedProjects settings={settings} projects={projects} />
+      <Methodology settings={settings} stages={stages} />
 
-      {/* Sticky Mobile CTA */}
-      <style>{`
-        .sticky-mobile-cta { display: flex; }
-        @media (min-width: 768px) { .sticky-mobile-cta { display: none !important; } }
-      `}</style>
-      <AnimatePresence>
-        {showStickyCta && (
-          <motion.div
-            className="sticky-mobile-cta"
-            initial={{ y: 80, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 80, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            style={{
-              position: "fixed",
-              bottom: 0,
-              left: 0,
-              right: 0,
-              zIndex: 50,
-              justifyContent: "center",
-              padding: "12px 16px calc(12px + env(safe-area-inset-bottom, 0px))",
-              background: "linear-gradient(to top, rgba(8,8,8,0.98) 0%, rgba(8,8,8,0.92) 60%, transparent 100%)",
-            }}
-          >
-            <button
-              onClick={() => window.dispatchEvent(new Event("open-calendly-modal"))}
-              style={{
-                fontFamily: "'Helvetica Neue', sans-serif",
-                fontWeight: 700,
-                fontSize: "0.9rem",
-                background: "#ff5833",
-                color: "#fff",
-                border: "none",
-                borderRadius: "10px",
-                padding: "14px 28px",
-                cursor: "pointer",
-                width: "100%",
-                maxWidth: "360px",
-                textAlign: "center",
-                boxShadow: "0 4px 24px rgba(255,88,51,0.35)",
-                transition: "background 0.2s ease",
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#e04a28"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#ff5833"; }}
-            >
-              Agendar sesión de descubrimiento →
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <section className="fa-sec fa-sec--line" id="admision">
+        <div className="fa-wrap">
+          {!unlocked ? (
+            <div className="fa-confirm">
+              <span className="fa-eyebrow">Admisión</span>
+              <h2 className="fa-display fa-h2" style={{ marginTop: 14, maxWidth: "20ch" }}>
+                El formulario se abre al terminar el vídeo.
+              </h2>
+              <p className="fa-lead" style={{ marginTop: 14, maxWidth: "48ch" }}>
+                Queremos que conozcas el programa completo antes de presentar tu proyecto.
+              </p>
+              <button type="button" className="fa-btn" style={{ marginTop: 22 }} onClick={() => scrollTo("video")}>
+                Volver al vídeo
+              </button>
+            </div>
+          ) : application ? (
+            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <span className="fa-eyebrow">Solicitud recibida</span>
+              <h2 className="fa-display fa-h2" style={{ marginTop: 14 }}>
+                Your project has been submitted.
+              </h2>
+              <p className="fa-lead" style={{ marginTop: 14, maxWidth: "46ch" }}>
+                Tu proyecto ya está en nuestras manos. El siguiente paso es conocernos.
+              </p>
+            </motion.div>
+          ) : (
+            <>
+              <div className="fa-sec-head">
+                <span className="fa-eyebrow">Admisión</span>
+                <h2 className="fa-display fa-h2">Presenta tu proyecto</h2>
+                <p className="fa-lead">{settings.form_intro}</p>
+              </div>
+              <AdmissionForm lead={lead} settings={settings} onSubmitted={setApplication} />
+            </>
+          )}
+        </div>
+      </section>
 
-      {/* Application Modal — controlled from here */}
-      <ApplicationModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      {application ? (
+        <section className="fa-sec fa-sec--tight" id="sesion">
+          <div className="fa-wrap">
+            <div className="fa-sec-head">
+              <span className="fa-eyebrow">Sesión de admisión</span>
+              <h2 className="fa-display fa-h2">Reserva tu videollamada</h2>
+              <p className="fa-lead">
+                {settings.booking_duration} minutos con Santiago Weber para conocer tu proyecto.
+              </p>
+            </div>
+            <BookingSection application={application} settings={settings} />
+          </div>
+        </section>
+      ) : null}
 
-      {/* Calendly Modal — pop-up cinematográfico */}
-      <CalendlyModal />
+      <footer className="fa-wrap">
+        <div className="fa-foot">
+          <span>Cabaña Creative · Madrid</span>
+          <span>Full Access · Programa de desarrollo artístico</span>
+        </div>
+      </footer>
     </div>
   );
 }

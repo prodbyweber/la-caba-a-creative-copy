@@ -1,0 +1,188 @@
+{
+  "name": "FullAccessApplication",
+  "type": "object",
+  "properties": {
+    "artist_name": {
+      "type": "string",
+      "description": "Nombre art\u00edstico"
+    },
+    "contact_name": {
+      "type": "string",
+      "description": "Nombre de contacto"
+    },
+    "email": {
+      "type": "string",
+      "description": "Correo electr\u00f3nico"
+    },
+    "instagram": {
+      "type": "string"
+    },
+    "spotify": {
+      "type": "string"
+    },
+    "youtube": {
+      "type": "string"
+    },
+    "genres": {
+      "type": "string",
+      "description": "G\u00e9neros musicales"
+    },
+    "references": {
+      "type": "string",
+      "description": "Referencias y artistas que inspiran su sonido"
+    },
+    "identity": {
+      "type": "string",
+      "description": "Identidad musical y diferencial"
+    },
+    "stage": {
+      "type": "string",
+      "description": "Punto del proyecto"
+    },
+    "released": {
+      "type": "string",
+      "description": "Canciones publicadas"
+    },
+    "has_demos": {
+      "type": "string",
+      "description": "Si tiene demos"
+    },
+    "preparing_release": {
+      "type": "string",
+      "description": "Si prepara un lanzamiento"
+    },
+    "missing": {
+      "type": "string",
+      "description": "Qu\u00e9 siente que le falta"
+    },
+    "wants": {
+      "type": "string",
+      "description": "Qu\u00e9 quiere desarrollar"
+    },
+    "goals_90": {
+      "type": "string",
+      "description": "Objetivos a 90 d\u00edas"
+    },
+    "catalog_vision": {
+      "type": "string",
+      "description": "Tipo de cat\u00e1logo que quiere construir"
+    },
+    "recognition": {
+      "type": "string",
+      "description": "Qu\u00e9 quiere que se reconozca de su m\u00fasica"
+    },
+    "expectations": {
+      "type": "string",
+      "description": "Qu\u00e9 espera de la colaboraci\u00f3n"
+    },
+    "links": {
+      "type": "string",
+      "description": "Enlaces a canciones y demos"
+    },
+    "context": {
+      "type": "string",
+      "description": "Contexto adicional"
+    },
+    "file_uris": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Archivos adjuntos (privados)"
+    },
+    "file_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "vsl_progress": {
+      "type": "number",
+      "description": "Porcentaje del VSL visto"
+    },
+    "source": {
+      "type": "string",
+      "description": "Origen de captaci\u00f3n"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "nueva",
+        "revisada",
+        "sesion_agendada",
+        "cerrada",
+        "rechazada"
+      ],
+      "enumColors": [
+        "blue",
+        "yellow",
+        "green",
+        "gray",
+        "red"
+      ],
+      "default": "nueva",
+      "description": "Estado de admisi\u00f3n"
+    },
+    "hubspot_contact_id": {
+      "type": "string"
+    },
+    "hubspot_sync_status": {
+      "type": "string",
+      "enum": [
+        "pendiente",
+        "sincronizado",
+        "error"
+      ],
+      "enumColors": [
+        "yellow",
+        "green",
+        "red"
+      ],
+      "default": "pendiente"
+    },
+    "hubspot_sync_error": {
+      "type": "string"
+    },
+    "meeting_start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "meeting_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "meeting_timezone": {
+      "type": "string"
+    },
+    "meeting_link": {
+      "type": "string"
+    },
+    "calendar_event_id": {
+      "type": "string"
+    },
+    "admin_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "email"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
