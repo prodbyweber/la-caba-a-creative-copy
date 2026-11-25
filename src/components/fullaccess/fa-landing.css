@@ -384,7 +384,7 @@
 }
 .fa-credits__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .fa-credit {
   padding: clamp(16px, 4vw, 26px) clamp(8px, 2.6vw, 18px);
