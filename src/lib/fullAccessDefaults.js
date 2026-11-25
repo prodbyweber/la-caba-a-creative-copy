@@ -3,9 +3,9 @@ export const FA_DEFAULTS = {
     "https://base44.app/api/apps/6966ddf48947f217e81ea27c/files/mp/public/6966ddf48947f217e81ea27c/de2d3f461_Still2026-05-24133616_241.jpg",
   hero_eyebrow: "Cabaña Full Access",
   hero_kicker: "Programa de desarrollo artístico",
-  hero_title: "Desarrolla tu catálogo. Construye una identidad musical y lánzala al mundo.",
-  hero_subtitle:
-    "Un proceso de desarrollo artístico para encontrar tu sonido, construir un catálogo con personalidad y preparar tu música para llegar al mercado.",
+  hero_title:
+    "De canciones sueltas a un catálogo con identidad y estrategia en cada lanzamiento.",
+  hero_subtitle: "Programa de desarrollo artístico",
   vimeo_url: "https://player.vimeo.com/video/1250103284?h=1204b00d26",
   vimeo_poster_url:
     "https://base44.app/api/apps/6966ddf48947f217e81ea27c/files/mp/public/6966ddf48947f217e81ea27c/de2d3f461_Still2026-05-24133616_241.jpg",

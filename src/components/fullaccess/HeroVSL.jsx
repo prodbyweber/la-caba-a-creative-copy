@@ -1,47 +1,202 @@
-import React from "react";
-import { motion } from "framer-motion";
-import VimeoVSL from "@/components/fullaccess/VimeoVSL";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Maximize2, Minimize2, Play, Volume2, VolumeX } from "lucide-react";
+import UnlockModule from "@/components/fullaccess/UnlockModule";
+import useVimeoPlayer from "@/hooks/useVimeoPlayer";
 import useVimeoThumb from "@/hooks/useVimeoThumb";
+import { vimeoEmbedUrl } from "@/lib/fullAccess";
 
-export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm }) {
+const EMBED = {
+  autoplay: "1",
+  controls: "0",
+  title: "0",
+  byline: "0",
+  portrait: "0",
+  speed: "0",
+  pip: "0",
+  keyboard: "0",
+  dnt: "1",
+  playsinline: "1",
+  like: "0",
+  share: "0",
+  watch_later: "0",
+  badge: "0",
+  logo: "0",
+  outro: "0",
+  cards: "0",
+  cc: "0",
+  chapters: "0",
+  transparent: "0",
+};
+
+const reducedMotion = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, suspended }) {
+  const coverRef = useRef(null);
+  const previewRef = useRef(null);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [previewFailed, setPreviewFailed] = useState(false);
+
   const { poster, ratio } = useVimeoThumb(
     settings.vimeo_url,
     settings.vimeo_poster_url || settings.hero_image_url
   );
+  const { iframeRef, started, playing, muted, progress, activate, toggle, toggleMute } =
+    useVimeoPlayer({ settings, unlocked, onUnlock, suspended });
+
+  const previewUrl = settings.preview_video_url || "";
+  const showPreview = Boolean(previewUrl) && !previewFailed && !reducedMotion();
+
+  useEffect(() => {
+    const el = previewRef.current;
+    if (!el) return undefined;
+    if (started || !showPreview) {
+      el.pause();
+      return undefined;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) el.play().catch(() => {});
+        else el.pause();
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      el.pause();
+    };
+  }, [started, showPreview]);
+
+  useEffect(() => {
+    const sync = () => {
+      const active = document.fullscreenElement || document.webkitFullscreenElement;
+      setFullscreen(!!active && coverRef.current?.contains(active));
+    };
+    document.addEventListener("fullscreenchange", sync);
+    document.addEventListener("webkitfullscreenchange", sync);
+    return () => {
+      document.removeEventListener("fullscreenchange", sync);
+      document.removeEventListener("webkitfullscreenchange", sync);
+    };
+  }, []);
+
+  const toggleFullscreen = useCallback(async () => {
+    const el = coverRef.current;
+    const active = document.fullscreenElement || document.webkitFullscreenElement;
+    if (active) {
+      try {
+        if (document.exitFullscreen) await document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      } catch {
+        /* ignore */
+      }
+      return;
+    }
+    if (el?.requestFullscreen) {
+      try {
+        await el.requestFullscreen();
+        return;
+      } catch {
+        /* ignore */
+      }
+    }
+    if (el?.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  }, []);
 
   return (
     <section className="fa-hero">
-      <div className="fa-hero__bg" aria-hidden="true">
-        {poster ? <img src={poster} alt="" /> : null}
+      <div
+        className={`fa-cover${started ? " is-playing" : ""}`}
+        ref={coverRef}
+        style={{ "--vsl-ratio": ratio }}
+        onContextMenu={(event) => event.preventDefault()}
+      >
+        {started ? (
+          <div className="fa-cover__frame">
+            <iframe
+              ref={iframeRef}
+              src={vimeoEmbedUrl(settings.vimeo_url, EMBED)}
+              title="Cabaña Full Access"
+              allow="autoplay; fullscreen; encrypted-media"
+              referrerPolicy="strict-origin-when-cross-origin"
+              tabIndex={-1}
+            />
+            <button
+              type="button"
+              className="fa-cover__tap"
+              onClick={toggle}
+              aria-label={playing ? "Pausar el vídeo" : "Reproducir el vídeo"}
+            >
+              {!playing && (
+                <span className="fa-glass fa-cover__center">
+                  <Play size={26} fill="currentColor" strokeWidth={0} />
+                </span>
+              )}
+            </button>
+            <div className="fa-cover__tools">
+              <button
+                type="button"
+                className="fa-glass fa-glass--sm"
+                onClick={toggleMute}
+                aria-label={muted ? "Activar el sonido" : "Silenciar"}
+              >
+                {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </button>
+              <button
+                type="button"
+                className="fa-glass fa-glass--sm"
+                onClick={toggleFullscreen}
+                aria-label={fullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+              >
+                {fullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+              </button>
+            </div>
+          </div>
+        ) : null}
+
+        <div className={`fa-cover__media${started ? " is-hidden" : ""}`} aria-hidden={started}>
+          {showPreview ? (
+            <video
+              ref={previewRef}
+              src={previewUrl}
+              poster={poster || undefined}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              onError={() => setPreviewFailed(true)}
+            />
+          ) : poster ? (
+            <img src={poster} alt="" />
+          ) : null}
+          <span className="fa-cover__vignette" aria-hidden="true" />
+        </div>
+
+        <div className={`fa-cover__content${started ? " is-hidden" : ""}`}>
+          <div className="fa-wrap">
+            <div className="fa-cover__text">
+              <h1 className="fa-display fa-cover__title">{settings.hero_title}</h1>
+              <p className="fa-cover__line">{settings.hero_subtitle}</p>
+            </div>
+          </div>
+        </div>
+
+        {!started ? (
+          <button
+            type="button"
+            className="fa-glass fa-cover__play"
+            onClick={activate}
+            aria-label="Reproducir el vídeo"
+          >
+            <Play size={28} fill="currentColor" strokeWidth={0} />
+          </button>
+        ) : null}
       </div>
 
-      <div className="fa-wrap fa-hero__inner">
-        <motion.div
-          className="fa-hero__head"
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <h1 className="fa-display fa-hero__title">{settings.hero_title}</h1>
-          <p className="fa-hero__lead">{settings.hero_subtitle}</p>
-        </motion.div>
-
-        <motion.div
-          className="fa-hero__video"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <VimeoVSL
-            settings={settings}
-            poster={poster}
-            ratio={ratio}
-            unlocked={unlocked}
-            onUnlock={onUnlock}
-            onOpenForm={onOpenForm}
-          />
-        </motion.div>
-      </div>
+      <UnlockModule progress={progress} unlocked={unlocked} onOpenForm={onOpenForm} />
     </section>
   );
 }
