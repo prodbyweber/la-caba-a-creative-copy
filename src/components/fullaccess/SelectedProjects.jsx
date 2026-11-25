@@ -26,16 +26,15 @@ export default function SelectedProjects({ settings, projects }) {
           {projects.map((project, index) => (
             <motion.button
               type="button"
-              className={`fa-proj${index % 2 === 1 ? " is-flip" : ""}`}
+              className="fa-proj"
               key={`${project.artist}-${project.song}`}
               onClick={() => setOpen(project)}
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 22 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.6, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="fa-proj__media">
-                <span className="fa-proj__index">{String(index + 1).padStart(2, "0")}</span>
                 {cover(project) ? (
                   <img
                     src={cover(project)}
@@ -47,17 +46,19 @@ export default function SelectedProjects({ settings, projects }) {
                     }}
                   />
                 ) : null}
-                <span className="fa-proj__play">
-                  <Play size={26} />
-                </span>
               </div>
-              <div>
+              <span className="fa-proj__veil" aria-hidden="true" />
+              <span className="fa-proj__index">{String(index + 1).padStart(2, "0")}</span>
+              <span className="fa-proj__play">
+                <Play size={14} fill="currentColor" strokeWidth={0} />
+              </span>
+              <div className="fa-proj__body">
                 <h3 className="fa-display fa-proj__artist">{project.artist}</h3>
                 <p className="fa-proj__song">
                   {project.song}
                   {project.year ? ` · ${project.year}` : ""}
                 </p>
-                <span className="fa-proj__credit">{project.credit}</span>
+                {project.credit ? <span className="fa-proj__credit">{project.credit}</span> : null}
               </div>
             </motion.button>
           ))}

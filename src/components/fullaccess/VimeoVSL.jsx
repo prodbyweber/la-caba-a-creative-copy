@@ -32,7 +32,7 @@ function loadVimeoSdk() {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default function VimeoVSL({ settings, lead, onLead, onUnlock, unlocked }) {
+export default function VimeoVSL({ settings, lead, onLead, onUnlock, unlocked, startSignal = 0 }) {
   const shellRef = useRef(null);
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
@@ -195,6 +195,10 @@ export default function VimeoVSL({ settings, lead, onLead, onUnlock, unlocked })
       setPlaying(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (startSignal > 0) startPlayback();
+  }, [startSignal, startPlayback]);
 
   const seek = (event) => {
     const player = playerRef.current;

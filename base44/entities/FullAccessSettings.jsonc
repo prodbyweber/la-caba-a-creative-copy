@@ -6,9 +6,17 @@
       "type": "string",
       "description": "Fotograf\u00eda protagonista del hero"
     },
+    "hero_loop_video_url": {
+      "type": "string",
+      "description": "V\u00eddeo de previsualizaci\u00f3n en loop de la portada (si est\u00e1 vac\u00edo se usa la portada del v\u00eddeo)"
+    },
     "hero_eyebrow": {
       "type": "string",
       "description": "Texto peque\u00f1o sobre el titular"
+    },
+    "hero_kicker": {
+      "type": "string",
+      "description": "Descriptor del programa"
     },
     "hero_title": {
       "type": "string",
@@ -16,15 +24,23 @@
     },
     "hero_subtitle": {
       "type": "string",
-      "description": "Subt\u00edtulo descriptivo"
+      "description": "Credenciales bajo el titular"
+    },
+    "hero_cta_label": {
+      "type": "string",
+      "description": "Texto del bot\u00f3n principal"
     },
     "vimeo_url": {
       "type": "string",
       "description": "URL del VSL de Vimeo"
     },
+    "vimeo_poster_url": {
+      "type": "string",
+      "description": "Portada del v\u00eddeo"
+    },
     "gate_seconds": {
       "type": "number",
-      "default": 65,
+      "default": 104,
       "description": "Segundo del VSL en el que se pide nombre y email"
     },
     "gate_title": {
