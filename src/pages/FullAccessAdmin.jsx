@@ -2,14 +2,16 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import SettingsPanel from "@/components/fullaccess/admin/SettingsPanel";
 import ListPanel from "@/components/fullaccess/admin/ListPanel";
+import SortablePanel from "@/components/fullaccess/admin/SortablePanel";
 import ApplicationsPanel from "@/components/fullaccess/admin/ApplicationsPanel";
 
 const TABS = [
   { key: "contenido", label: "Contenido" },
   { key: "stats", label: "Estadísticas" },
+  { key: "artistas", label: "Artistas" },
+  { key: "demos", label: "Demo / Master" },
   { key: "proyectos", label: "Proyectos" },
   { key: "etapas", label: "Metodología" },
-  { key: "demos", label: "Demo / Master" },
   { key: "solicitudes", label: "Solicitudes" },
 ];
 
@@ -118,23 +120,58 @@ export default function FullAccessAdmin() {
             />
           )}
 
+          {tab === "artistas" && (
+            <SortablePanel
+              title="Artistas"
+              description="Nombre, imagen y orden de las tarjetas del carrusel. Arrastra para reordenar."
+              entity="StartArtist"
+              defaults={{ name: "", image_url: "", order: 0, is_visible: true }}
+              fields={[
+                { key: "name", label: "Artista" },
+                { key: "is_visible", label: "Visible", type: "bool" },
+                {
+                  key: "image_url",
+                  label: "Imagen",
+                  type: "media",
+                  accept: "image/*",
+                  wide: true,
+                },
+              ]}
+            />
+          )}
+
           {tab === "demos" && (
-            <ListPanel
-              title="From demo to master"
-              description="Sube el audio demo y el master final de cada ejemplo."
+            <SortablePanel
+              title="Demo & Master"
+              description="Solo se publican los proyectos con audio demo y master. Arrastra para reordenar."
               entity="DemoCase"
               defaults={{ artist: "", order: 0, is_visible: true }}
               fields={[
-                { key: "artist", label: "Artista / proyecto" },
+                { key: "artist", label: "Artista" },
                 { key: "song", label: "Canción" },
-                { key: "track_id", label: "ID del track del catálogo (opcional)" },
-                { key: "genre", label: "Género" },
-                { key: "demo_audio_url", label: "Audio DEMO", wide: true },
-                { key: "master_audio_url", label: "Audio MASTER", wide: true },
-                { key: "cover_url", label: "Portada", wide: true },
-                { key: "description", label: "Descripción del trabajo", type: "textarea", wide: true },
-                { key: "order", label: "Orden", type: "number" },
                 { key: "is_visible", label: "Visible", type: "bool" },
+                { key: "description", label: "Descripción breve", type: "textarea", wide: true },
+                {
+                  key: "cover_url",
+                  label: "Imagen del artista",
+                  type: "media",
+                  accept: "image/*",
+                  wide: true,
+                },
+                {
+                  key: "demo_audio_url",
+                  label: "Audio DEMO",
+                  type: "media",
+                  accept: "audio/*",
+                  wide: true,
+                },
+                {
+                  key: "master_audio_url",
+                  label: "Audio MASTER",
+                  type: "media",
+                  accept: "audio/*",
+                  wide: true,
+                },
               ]}
             />
           )}

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Maximize2, Minimize2, Play, Volume2, VolumeX } from "lucide-react";
+import { Maximize2, Minimize2, Play } from "lucide-react";
 import UnlockModule from "@/components/fullaccess/UnlockModule";
 import useVimeoPlayer from "@/hooks/useVimeoPlayer";
 import useVimeoThumb from "@/hooks/useVimeoThumb";
@@ -42,8 +42,12 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
     settings.vimeo_url,
     settings.vimeo_poster_url || settings.hero_image_url
   );
-  const { iframeRef, started, playing, muted, progress, activate, toggle, toggleMute } =
-    useVimeoPlayer({ settings, unlocked, onUnlock, suspended });
+  const { iframeRef, started, playing, progress, activate, toggle } = useVimeoPlayer({
+    settings,
+    unlocked,
+    onUnlock,
+    suspended,
+  });
 
   const previewUrl = settings.preview_video_url || "";
   const showPreview = Boolean(previewUrl) && !previewFailed && !reducedMotion();
@@ -136,14 +140,6 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
               )}
             </button>
             <div className="fa-cover__tools">
-              <button
-                type="button"
-                className="fa-glass fa-glass--sm"
-                onClick={toggleMute}
-                aria-label={muted ? "Activar el sonido" : "Silenciar"}
-              >
-                {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-              </button>
               <button
                 type="button"
                 className="fa-glass fa-glass--sm"

@@ -56,8 +56,13 @@ export function formatSlot(iso, opts = {}) {
 }
 
 export const LEAD_KEY = "fa_lead";
-export const UNLOCK_KEY = "fa_unlocked";
 export const PROGRESS_KEY = "fa_vsl_progress";
+
+/** Clave de desbloqueo ligada al ID del vídeo: otro vídeo vuelve a bloquear el CTA. */
+export function unlockKey(vimeoUrl = "") {
+  const match = String(vimeoUrl).match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  return match ? `fa_unlocked_${match[1]}` : "fa_unlocked";
+}
 
 export function readStoredLead() {
   try {

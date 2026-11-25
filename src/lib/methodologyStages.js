@@ -2,150 +2,112 @@
 export const METHOD_STAGES = [
   {
     num: "01",
-    title: "EXPLORAR. ENCUENTRA TU SONIDO",
-    objective:
-      "identificar qué hace diferente al artista y encontrar una dirección sonora que represente su personalidad.",
-    intro: [
-      "Antes de empezar a producir canciones, necesitamos entender quién es el artista, qué quiere comunicar y qué sonidos conectan con su visión.",
-      "En esta etapa exploramos diferentes géneros, referencias, ritmos, texturas y posibilidades musicales hasta empezar a definir un universo sonoro propio.",
-    ],
+    key: "EXPLORAR",
+    title: "ENCUENTRA TU SONIDO",
+    text: "Exploramos diferentes posibilidades musicales para descubrir sonidos, géneros y fusiones que conecten con tu personalidad artística y nos permitan definir una dirección sonora propia.",
     items: [
       {
-        title: "Exploración de géneros y sonidos",
-        text: "descubrimos estilos, fusiones y nuevas posibilidades musicales que encajen con la personalidad del artista.",
+        title: "Beatmaking",
+        text: "experimentación y creación de instrumentales.",
       },
       {
-        title: "Análisis de referencias",
-        text: "estudiamos canciones, artistas y producciones que sirven como punto de partida para definir una dirección.",
+        title: "Géneros y fusiones",
+        text: "exploración de nuevos sonidos y combinaciones musicales.",
       },
       {
-        title: "Exploración de beats e instrumentales",
-        text: "acceso al Cabaña Beat Store para escuchar, seleccionar y experimentar con diferentes instrumentales.",
+        title: "Instrumentales exclusivas",
+        text: "acceso al catálogo privado de instrumentales de Cabaña.",
       },
       {
-        title: "Experimentación sonora",
-        text: "probamos combinaciones de ritmos, melodías, armonías, texturas y ambientes.",
+        title: "Referencias musicales",
+        text: "búsqueda de sonidos, artistas y producciones que conecten con tu visión.",
       },
       {
-        title: "Dirección sonora inicial",
-        text: "definimos qué elementos pueden convertirse en parte de la identidad musical del artista.",
+        title: "Dirección sonora",
+        text: "definición de una línea musical para desarrollar tu proyecto.",
       },
     ],
-    resultQuestion:
-      "El artista termina esta etapa con una dirección sonora más clara: sabe qué sonidos quiere explorar, qué referencias representan su visión y qué elementos pueden diferenciar su música.",
-    result:
-      "una dirección sonora definida y una selección de referencias e ideas musicales sobre las que empezar a construir su catálogo.",
-    media: "genres",
+    media: "fusion",
   },
   {
     num: "02",
-    title: "DESCUBRIR. CONVIERTE TU SONIDO EN CANCIONES",
-    objective:
-      "transformar la dirección sonora en canciones terminadas, desarrollando la personalidad y el potencial de cada composición.",
-    intro: [
-      "Esta es la etapa donde la exploración se convierte en música. Trabajamos directamente con el artista en el estudio para desarrollar ideas, crear producciones y construir canciones que tengan una identidad reconocible.",
-      "No se trata simplemente de grabar voces sobre una instrumental. Se trata de trabajar cada canción desde su concepto hasta su producción.",
-    ],
+    key: "DESCUBRIR",
+    title: "CREA TU MÚSICA EN EL ESTUDIO",
+    text: "Sesiones presenciales uno a uno junto a Santiago Weber, donde desarrollamos tu proyecto a través de un plan de producción musical personalizado y una experiencia creativa estilo campamento.",
     items: [
       {
-        title: "Sesiones creativas uno a uno",
-        text: "trabajo presencial en el estudio junto a Santiago Weber para desarrollar las ideas del artista.",
+        title: "Sesiones presenciales",
+        text: "creación y desarrollo musical junto a Santiago Weber en el estudio.",
       },
       {
-        title: "Beatmaking y producción musical",
-        text: "creación y adaptación de instrumentales, ritmos, melodías y arreglos.",
+        title: "FLOW CAMP",
+        text: "jornadas intensivas de producción y experimentación.",
       },
       {
-        title: "Composición y songwriting",
-        text: "desarrollo de conceptos, estructuras, melodías y letras para convertir ideas en canciones.",
+        title: "Beatmaking",
+        text: "creación de instrumentales desde cero.",
+      },
+      {
+        title: "Songwriting",
+        text: "composición de melodías, letras y estructuras.",
+      },
+      {
+        title: "Producción musical",
+        text: "desarrollo de canciones, arreglos y sonido.",
       },
       {
         title: "Producción vocal",
-        text: "interpretación, grabación, selección de tomas, arreglos vocales y detalles que aporten personalidad.",
+        text: "grabación, interpretación y arreglos vocales.",
       },
       {
         title: "Diseño sonoro",
-        text: "incorporación de texturas, efectos, transiciones y elementos que construyan el universo de cada canción.",
-      },
-      {
-        title: "Grabación y desarrollo de canciones",
-        text: "acompañamiento creativo durante el proceso de producción para llevar las ideas a una versión sólida.",
+        text: "texturas, efectos y detalles que aportan personalidad a cada producción.",
       },
     ],
-    flowCamp:
-      "Dentro de esta etapa se pueden realizar sesiones intensivas de creación y producción, bajo el concepto FLOW CAMP. Son espacios de trabajo concentrado donde el artista puede desarrollar varias ideas, experimentar y avanzar en su catálogo junto al productor.",
-    resultQuestion:
-      "El artista transforma sus ideas en canciones desarrolladas, con una dirección musical coherente y una personalidad sonora más definida.",
-    result:
-      "canciones producidas y un catálogo en desarrollo que refleja la identidad artística que se comenzó a construir en la primera etapa.",
     media: "studio",
   },
   {
     num: "03",
-    title: "LANZAR. PREPARA TU MÚSICA PARA EL MUNDO",
-    objective:
-      "transformar el catálogo desarrollado en un proyecto artístico organizado y preparado para presentarse al público.",
-    intro: [
-      "Tener buenas canciones es solo una parte del proceso. También necesitamos saber qué canciones representan mejor al artista, cómo se van a presentar y qué dirección seguirá el proyecto cuando llegue el momento de lanzarlas.",
-      "En esta etapa trabajamos la selección del catálogo y construimos una dirección creativa y estratégica para los próximos lanzamientos.",
-    ],
+    key: "LANZAR",
+    title: "PREPARA TU MÚSICA PARA EL MUNDO",
+    text: "Organizamos tu catálogo y construimos una dirección artística y creativa para presentar tu proyecto al público. Convertimos las canciones desarrolladas en un plan de lanzamiento con una visión clara.",
     items: [
       {
-        title: "Selección y organización del catálogo",
-        text: "escuchamos y evaluamos las canciones desarrolladas para identificar cuáles tienen mayor potencial y prioridad.",
+        title: "Selección de canciones",
+        text: "identificamos los temas que mejor representan tu proyecto.",
       },
       {
         title: "Dirección artística",
-        text: "definimos cómo debe presentarse el proyecto y qué narrativa conecta las canciones con la identidad del artista.",
+        text: "definimos la narrativa y personalidad de tu catálogo.",
       },
       {
-        title: "Conceptualización de lanzamientos",
-        text: "desarrollamos conceptos creativos para cada lanzamiento, buscando coherencia entre música, mensaje e imagen.",
+        title: "Conceptualización",
+        text: "desarrollamos ideas creativas para tus próximos lanzamientos.",
       },
       {
-        title: "Dirección visual y referencias",
-        text: "construimos una línea visual mediante referencias estéticas, moodboards y conceptos para portadas, fotografías y videoclips.",
+        title: "Dirección visual",
+        text: "referencias estéticas, moodboards y conceptos visuales.",
       },
       {
         title: "Estrategia de contenido",
-        text: "definimos qué tipo de contenido puede acompañar cada lanzamiento y cómo comunicar la música en redes.",
+        text: "planificación de piezas y comunicación para redes.",
       },
       {
-        title: "Planificación del calendario",
-        text: "organizamos las prioridades, fechas y pasos necesarios para preparar cada lanzamiento.",
+        title: "Calendario de lanzamientos",
+        text: "organización de fechas y próximos pasos.",
       },
       {
-        title: "Preparación para distribución",
-        text: "revisamos los materiales y elementos necesarios para que las canciones estén listas para su publicación.",
+        title: "Preparación de distribución",
+        text: "revisión de los materiales necesarios para publicar tu música.",
       },
     ],
-    numbered: true,
-    resultQuestion:
-      "El artista deja de tener únicamente una colección de canciones y empieza a tener un proyecto organizado, con una identidad clara, prioridades definidas y una hoja de ruta para presentar su música al público.",
-    result:
-      "un catálogo seleccionado y organizado, una dirección creativa definida y un plan de acción para los próximos lanzamientos.",
-    note: "Importante: los presupuestos de publicidad, inversión en medios, producción audiovisual externa, distribución de pago y otros costes de terceros deben presupuestarse por separado. La planificación y dirección estratégica no implican que esos gastos estén incluidos.",
     media: "artists",
   },
 ];
 
-export const METHOD_CONNECTION = [
-  {
-    title: "EXPLORAR.",
-    sub: "Identidad y dirección sonora.",
-    text: "Descubrimos qué sonido representa al artista y qué camino creativo vamos a desarrollar.",
-  },
-  {
-    title: "DESCUBRIR.",
-    sub: "Creación y desarrollo musical.",
-    text: "Convertimos esa dirección en canciones mediante producción, composición y trabajo en estudio.",
-  },
-  {
-    title: "LANZAR.",
-    sub: "Catálogo y estrategia.",
-    text: "Organizamos las canciones y definimos cómo preparar y presentar el proyecto al mundo.",
-  },
-];
-
-export const METHOD_RESULT =
-  "El resultado: un artista con una identidad sonora más definida, un catálogo desarrollado y una dirección clara para llevar su música al mercado.";
+export const METHOD_RESULT = {
+  text: "Un catálogo organizado, una dirección creativa definida y una hoja de ruta para llevar tu música al mercado.",
+  philosophy:
+    "La filosofía de CABAÑA FULL ACCESS: primero encontramos lo que te hace diferente, después lo convertimos en música y finalmente construimos la dirección necesaria para llevarlo al mundo.",
+  note: "La inversión en publicidad, los presupuestos de campañas y los costes de producción audiovisual o servicios externos no están incluidos automáticamente en esta metodología.",
+};

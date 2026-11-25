@@ -1,0 +1,395 @@
+/* ============================================================
+   /start — ajustes v4 (se carga después de fa-landing.css)
+   ============================================================ */
+
+/* ---------- logo de la esquina ---------- */
+.fa-nav__brand {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+.fa-nav__brand img {
+  display: block;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
+}
+@media (min-width: 900px) {
+  .fa-nav__brand img {
+    width: 52px;
+    height: 52px;
+  }
+}
+
+/* ---------- CTA: bloqueado por defecto, un latido al abrir ---------- */
+.fa-cta:disabled,
+.fa-cta[aria-disabled="true"] {
+  opacity: 0.42;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.fa-cta.is-open {
+  animation: none;
+}
+.fa-cta.is-pulse {
+  animation: faCtaPulse 1.1s ease 0.1s 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fa-cta.is-pulse {
+    animation: none;
+  }
+}
+
+/* ---------- bloques de /landing incrustados ---------- */
+.fa .ccl-embed {
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+  overscroll-behavior: auto;
+  background: transparent;
+}
+
+/* ---------- marcas ---------- */
+.fa-brands {
+  padding: clamp(24px, 4vw, 44px) 0 clamp(28px, 4vw, 48px);
+  border-top: 1px solid var(--fa-line);
+}
+.fa-brands__label {
+  display: block;
+  text-align: center;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--fa-faint);
+}
+.fa-brands__viewport {
+  overflow: hidden;
+  margin-top: 14px;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+}
+.fa-brands__track {
+  display: flex;
+  width: max-content;
+  animation: faBrands 26s linear infinite;
+}
+.fa-brands__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  height: 44px;
+  width: 128px;
+  padding: 0 14px;
+}
+.fa-brands__cell img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: none;
+  opacity: 1;
+}
+@keyframes faBrands {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (min-width: 900px) {
+  .fa-brands__cell {
+    height: 56px;
+    width: 170px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fa-brands__viewport {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .fa-brands__track {
+    animation: none;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 10px;
+  }
+  .fa-brands__cell {
+    width: auto;
+    padding: 0 10px;
+  }
+  .fa-brands__cell[aria-hidden="true"] {
+    display: none;
+  }
+}
+
+/* ---------- etapa 1: tarjetas Fusion de /landing ---------- */
+.fa-fusion {
+  margin-top: 18px;
+}
+.fa-fusion .ccl-wrap {
+  padding: 0;
+  max-width: none;
+}
+.fa-fusion .ccl-fusion {
+  padding: 0;
+}
+.fa-fusion .ccl-fusion__grid {
+  margin-top: 10px;
+}
+
+/* ---------- etapa 3: una imagen horizontal por panel ---------- */
+.fa-shot {
+  position: relative;
+}
+.fa-shot__rail {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.fa-shot__rail::-webkit-scrollbar {
+  display: none;
+}
+.fa-shot__item {
+  flex: 0 0 100%;
+  margin: 0;
+  padding: 10px;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  border-radius: 18px;
+  background: #0d0d0e;
+  box-shadow: 0 34px 80px -56px rgba(0, 0, 0, 0.98);
+}
+.fa-shot__item img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 10px;
+}
+.fa-shot__dots {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 14px;
+}
+.fa-shot__dot {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(241, 239, 232, 0.22);
+  cursor: pointer;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.fa-shot__dot.is-on {
+  width: 20px;
+  background: var(--fa-orange);
+}
+.fa-shot__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  display: none;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  border: 1px solid var(--fa-line);
+  background: rgba(8, 8, 8, 0.68);
+  color: var(--fa-cream);
+  cursor: pointer;
+}
+.fa-shot__arrow:hover {
+  background: var(--fa-orange);
+  border-color: transparent;
+  color: #080808;
+}
+.fa-shot__arrow--prev {
+  left: 8px;
+}
+.fa-shot__arrow--next {
+  right: 8px;
+}
+@media (min-width: 900px) {
+  .fa-shot__arrow {
+    display: grid;
+  }
+}
+
+/* ---------- metodología: lista de elementos ---------- */
+.fa-mstage__label {
+  margin-top: 22px;
+}
+.fa-mstage__items {
+  margin-top: 14px;
+}
+
+/* ---------- resultado global ---------- */
+.fa-result {
+  margin-top: clamp(26px, 4vw, 46px);
+  padding-top: clamp(22px, 3vw, 34px);
+  border-top: 1px solid var(--fa-line);
+}
+.fa-result__text {
+  margin-top: 12px;
+  font-size: clamp(1rem, 3.6vw, 1.18rem);
+  line-height: 1.5;
+  color: var(--fa-cream);
+  max-width: 62ch;
+}
+.fa-result__philosophy {
+  margin-top: 16px;
+  font-size: clamp(0.92rem, 3.3vw, 1rem);
+  line-height: 1.6;
+  color: rgba(241, 239, 232, 0.72);
+  max-width: 64ch;
+}
+.fa-result__note {
+  margin-top: 18px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--fa-faint);
+  max-width: 62ch;
+}
+
+/* ---------- demo & master ---------- */
+.fa-dm {
+  margin-top: clamp(30px, 5vw, 56px);
+}
+.fa-dm__rail {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 4px clamp(20px, 5vw, 56px) 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.fa-dm__rail::-webkit-scrollbar {
+  display: none;
+}
+.fa-dmcard {
+  flex: 0 0 84%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  border: 1px solid var(--fa-line);
+  border-radius: 20px;
+  background: #0b0b0c;
+  overflow: hidden;
+}
+.fa-dmcard__media {
+  aspect-ratio: 16 / 10;
+  background: #101010;
+  overflow: hidden;
+}
+.fa-dmcard__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.fa-dmcard__body {
+  padding: 14px 16px 16px;
+}
+.fa-dmcard__artist {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.fa-dmcard__song {
+  margin-top: 3px;
+  font-size: 0.88rem;
+  color: var(--fa-dim);
+}
+.fa-dmcard__desc {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--fa-faint);
+}
+.fa-dmcard__switch {
+  display: inline-flex;
+  gap: 4px;
+  margin-top: 14px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.fa-dmcard__opt {
+  min-height: 30px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(241, 239, 232, 0.7);
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.fa-dmcard__opt.is-on {
+  background: var(--fa-cream);
+  color: #080808;
+}
+.fa-dmcard__transport {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+.fa-dmcard__bar {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 16px;
+  cursor: pointer;
+  touch-action: none;
+}
+.fa-dmcard__bar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(241, 239, 232, 0.16);
+}
+.fa-dmcard__bar span {
+  position: relative;
+  display: block;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--fa-orange);
+}
+.fa-dm__empty {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fa-faint);
+}
+@media (min-width: 900px) {
+  .fa-dmcard {
+    flex: 0 0 calc(50% - 6px);
+  }
+}

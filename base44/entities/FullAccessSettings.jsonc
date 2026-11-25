@@ -56,6 +56,18 @@
       "type": "string",
       "description": "Descripci\u00f3n de la trayectoria"
     },
+    "artists_eyebrow": {
+      "type": "string",
+      "description": "Antet\u00edtulo de la secci\u00f3n de artistas"
+    },
+    "artists_title": {
+      "type": "string",
+      "description": "Titular de la secci\u00f3n de artistas"
+    },
+    "demo_eyebrow": {
+      "type": "string",
+      "description": "Antet\u00edtulo del bloque Demo & Master"
+    },
     "collabs_title": {
       "type": "string",
       "description": "T\u00edtulo de la franja de colaboraciones"

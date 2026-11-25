@@ -6,6 +6,7 @@ const prefersReduced = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/** Etapa 3: una imagen horizontal completa por panel, sin recortes. */
 export default function StageArtists() {
   const railRef = useRef(null);
   const [index, setIndex] = useState(0);
@@ -39,10 +40,10 @@ export default function StageArtists() {
   };
 
   return (
-    <div className="fa-railwrap">
-      <div className="fa-rail" ref={railRef} onScroll={onScroll}>
+    <div className="fa-shot">
+      <div className="fa-shot__rail" ref={railRef} onScroll={onScroll}>
         {ARTIST_SLIDES.map((slide) => (
-          <figure className="fa-rail__item" key={slide.src}>
+          <figure className="fa-shot__item" key={slide.src}>
             <img src={slide.src} alt={slide.alt} loading="lazy" />
           </figure>
         ))}
@@ -50,7 +51,7 @@ export default function StageArtists() {
 
       <button
         type="button"
-        className="fa-rail__arrow fa-rail__arrow--prev"
+        className="fa-shot__arrow fa-shot__arrow--prev"
         onClick={() => goTo(index - 1)}
         aria-label="Anterior"
       >
@@ -58,19 +59,19 @@ export default function StageArtists() {
       </button>
       <button
         type="button"
-        className="fa-rail__arrow fa-rail__arrow--next"
+        className="fa-shot__arrow fa-shot__arrow--next"
         onClick={() => goTo(index + 1)}
         aria-label="Siguiente"
       >
         <ChevronRight size={18} />
       </button>
 
-      <div className="fa-rail__dots">
+      <div className="fa-shot__dots">
         {ARTIST_SLIDES.map((slide, i) => (
           <button
             type="button"
             key={slide.src}
-            className={`fa-rail__dot${i === index ? " is-on" : ""}`}
+            className={`fa-shot__dot${i === index ? " is-on" : ""}`}
             onClick={() => goTo(i)}
             aria-label={slide.alt}
           />

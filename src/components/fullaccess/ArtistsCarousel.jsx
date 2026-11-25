@@ -1,14 +1,21 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ARTIST_SLIDES } from "@/lib/startArtistSlides";
+import DemoMasterRow from "@/components/fullaccess/DemoMasterRow";
 
 const AUTO_MS = 5200;
 
-export default function ArtistsCarousel() {
+export default function ArtistsCarousel({ artists, settings = {}, demos = [] }) {
   const [index, setIndex] = useState(0);
   const [held, setHeld] = useState(false);
   const touchRef = useRef(null);
-  const total = ARTIST_SLIDES.length;
+
+  const slides =
+    artists && artists.length
+      ? artists.filter((item) => item.is_visible !== false)
+      : ARTIST_SLIDES.map((slide) => ({ name: slide.alt, image_url: slide.src }));
+
+  const total = slides.length;
 
   const go = useCallback(
     (next) => setIndex(((next % total) + total) % total),
@@ -16,7 +23,7 @@ export default function ArtistsCarousel() {
   );
 
   useEffect(() => {
-    if (held) return undefined;
+    if (!total || held) return undefined;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
     const timer = setInterval(() => setIndex((prev) => (prev + 1) % total), AUTO_MS);
     return () => clearInterval(timer);
@@ -41,8 +48,10 @@ export default function ArtistsCarousel() {
     <section className="fa-artists">
       <div className="fa-wrap">
         <div className="fa-artists__head">
-          <span className="fa-eyebrow">Respaldo</span>
-          <h2 className="fa-display fa-artists__title">Artistas que confiaron en nosotros.</h2>
+          <span className="fa-eyebrow">{settings.artists_eyebrow || "Respaldo"}</span>
+          <h2 className="fa-display fa-artists__title">
+            {settings.artists_title || "Artistas que confiaron en nosotros."}
+          </h2>
         </div>
       </div>
 
@@ -53,14 +62,11 @@ export default function ArtistsCarousel() {
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        <div
-          className="fa-artists__track"
-          style={{ transform: `translateX(-${index * 100}%)` }}
-        >
-          {ARTIST_SLIDES.map((slide, i) => (
-            <div className="fa-artists__slide" key={slide.src}>
+        <div className="fa-artists__track" style={{ transform: `translateX(-${index * 100}%)` }}>
+          {slides.map((slide, i) => (
+            <div className="fa-artists__slide" key={`${slide.image_url}-${i}`}>
               <figure className={`fa-artists__card${i === index ? " is-on" : ""}`}>
-                <img src={slide.src} alt={slide.alt} loading="lazy" />
+                <img src={slide.image_url} alt={slide.name} loading="lazy" />
               </figure>
             </div>
           ))}
@@ -85,16 +91,18 @@ export default function ArtistsCarousel() {
       </div>
 
       <div className="fa-artists__dots">
-        {ARTIST_SLIDES.map((slide, i) => (
+        {slides.map((slide, i) => (
           <button
             type="button"
-            key={slide.src}
+            key={`${slide.image_url}-dot-${i}`}
             className={`fa-artists__dot${i === index ? " is-on" : ""}`}
             onClick={() => go(i)}
-            aria-label={slide.alt}
+            aria-label={slide.name}
           />
         ))}
       </div>
+
+      <DemoMasterRow eyebrow={settings.demo_eyebrow} projects={demos} />
     </section>
   );
 }

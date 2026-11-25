@@ -19,6 +19,9 @@ export const FA_DEFAULTS = {
   stats_title: "Santiago Weber",
   stats_intro:
     "Music Producer · Songwriter · Creative Director · Founder of Cabaña Creative.",
+  artists_eyebrow: "Respaldo",
+  artists_title: "Artistas que confiaron en nosotros.",
+  demo_eyebrow: "Demo & Master",
   collabs_title: "Marcas con las que he colaborado",
   demo_title: "Del demo al master",
   demo_subtitle: "Escucha cómo una idea se convierte en una producción terminada.",

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { UNLOCK_KEY } from "@/lib/fullAccess";
+import { unlockKey } from "@/lib/fullAccess";
 
 const DEFAULT_UNLOCK = 249;
 const JUMP_TOLERANCE = 1.5;
@@ -18,7 +18,10 @@ function loadSdk() {
   return window.__faVimeoPromise;
 }
 
-/** Reproductor del VSL: sin saltos, sin controles nativos, con desbloqueo por visionado. */
+/**
+ * Reproductor del VSL: sin saltos, sin controles nativos, con sonido activado
+ * y desbloqueo solo por visionado real.
+ */
 export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended }) {
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
@@ -27,7 +30,6 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
 
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(unlocked ? 1 : 0);
 
   useEffect(() => {
@@ -35,25 +37,17 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
     if (unlocked) setProgress(1);
   }, [unlocked]);
 
-  const unlockPoint = useCallback(
-    (duration) => {
-      const target = Number(settings.unlock_seconds) || DEFAULT_UNLOCK;
-      return duration && target > duration ? duration * 0.97 : target;
-    },
-    [settings.unlock_seconds]
-  );
-
   const markUnlocked = useCallback(() => {
     if (unlockedRef.current) return;
     unlockedRef.current = true;
     try {
-      localStorage.setItem(UNLOCK_KEY, "1");
+      localStorage.setItem(unlockKey(settings.vimeo_url), "1");
     } catch {
       /* almacenamiento no disponible */
     }
     setProgress(1);
     onUnlock();
-  }, [onUnlock]);
+  }, [onUnlock, settings.vimeo_url]);
 
   const activate = useCallback(() => setStarted(true), []);
 
@@ -71,14 +65,24 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
         player.on("timeupdate", (data) => {
           const now = data.seconds || 0;
           const duration = data.duration || 0;
+          // Un salto hacia delante nunca desbloquea: se devuelve al último punto visto.
           if (now > maxRef.current + JUMP_TOLERANCE) {
             player.setCurrentTime(maxRef.current).catch(() => {});
             return;
           }
           if (now > maxRef.current) maxRef.current = now;
-          const target = unlockPoint(duration);
-          if (target > 0) setProgress(Math.min(1, now / target));
-          if (now >= target) markUnlocked();
+
+          const target = Number(settings.unlock_seconds) || DEFAULT_UNLOCK;
+          const fullLength = duration > 0 && target >= duration - 1;
+          const point = fullLength ? duration : target;
+          if (point > 0) setProgress(Math.min(1, now / point));
+          if (!fullLength && now >= target) markUnlocked();
+        });
+
+        player.on("ended", () => {
+          setPlaying(false);
+          setProgress(1);
+          markUnlocked();
         });
 
         player.on("play", () => setPlaying(true));
@@ -88,11 +92,15 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
           .ready()
           .then(() => {
             player.setPlaybackRate(1).catch(() => {});
+            player.setMuted(false).catch(() => {});
+            player.setVolume(1).catch(() => {});
             return player.play();
           })
           .catch(() => {});
       })
-      .catch(() => markUnlocked());
+      .catch(() => {
+        /* sin SDK no hay vídeo ni desbloqueo: el CTA sigue bloqueado */
+      });
 
     return () => {
       cancelled = true;
@@ -102,7 +110,7 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
         /* ignore */
       }
     };
-  }, [started, markUnlocked, unlockPoint]);
+  }, [started, markUnlocked, settings.unlock_seconds]);
 
   useEffect(() => {
     if (!suspended) return;
@@ -114,16 +122,12 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
     const player = playerRef.current;
     if (!player) return;
     if (playing) player.pause().catch(() => {});
-    else player.play().catch(() => {});
+    else {
+      player.setMuted(false).catch(() => {});
+      player.setVolume(1).catch(() => {});
+      player.play().catch(() => setPlaying(false));
+    }
   }, [playing]);
 
-  const toggleMute = useCallback(() => {
-    const player = playerRef.current;
-    if (!player) return;
-    const next = !muted;
-    player.setVolume(next ? 0 : 1).catch(() => {});
-    setMuted(next);
-  }, [muted]);
-
-  return { iframeRef, started, playing, muted, progress, activate, toggle, toggleMute };
+  return { iframeRef, started, playing, progress, activate, toggle };
 }

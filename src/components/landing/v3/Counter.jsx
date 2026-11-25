@@ -14,7 +14,14 @@ export function formatCompact(value) {
 }
 
 /** Cifra que cuenta hasta su valor cuando entra en pantalla. */
-export default function Counter({ value = 0, prefix = "", suffix = "", className = "", format }) {
+export default function Counter({
+  value = 0,
+  prefix = "",
+  suffix = "",
+  className = "",
+  format,
+  duration = 1500,
+}) {
   const ref = useRef(null);
   const [n, setN] = useState(0);
 
@@ -33,7 +40,6 @@ export default function Counter({ value = 0, prefix = "", suffix = "", className
           return;
         }
         const start = performance.now();
-        const duration = 1500;
         const tick = (now) => {
           const p = Math.min((now - start) / duration, 1);
           setN((Number(value) || 0) * (1 - Math.pow(1 - p, 3)));
@@ -49,7 +55,7 @@ export default function Counter({ value = 0, prefix = "", suffix = "", className
       io.disconnect();
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [value]);
+  }, [value, duration]);
 
   return (
     <span ref={ref} className={className}>

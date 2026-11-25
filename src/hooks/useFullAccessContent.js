@@ -10,13 +10,14 @@ import {
 const byOrder = (a, b) => (a.order ?? 0) - (b.order ?? 0);
 
 async function loadContent() {
-  const [settingsList, stats, projects, demos, stages, configs] = await Promise.all([
+  const [settingsList, stats, projects, demos, stages, configs, artists] = await Promise.all([
     base44.entities.FullAccessSettings.list("-created_date", 1),
     base44.entities.FullAccessStat.list("order"),
     base44.entities.FullAccessProject.list("order"),
     base44.entities.DemoCase.list("order"),
     base44.entities.FullAccessStage.list("order"),
     base44.entities.LandingConfig.list(),
+    base44.entities.StartArtist.list("order"),
   ]);
 
   const saved = settingsList?.[0] || {};
@@ -33,6 +34,7 @@ async function loadContent() {
   const visibleProjects = (projects || []).filter((p) => p.is_visible !== false).sort(byOrder);
   const visibleDemos = (demos || []).filter((d) => d.is_visible !== false).sort(byOrder);
   const visibleStages = (stages || []).filter((s) => s.is_visible !== false).sort(byOrder);
+  const visibleArtists = (artists || []).filter((a) => a.is_visible !== false).sort(byOrder);
 
   return {
     settings,
@@ -40,6 +42,7 @@ async function loadContent() {
     projects: visibleProjects.length ? visibleProjects : FA_PROJECTS_FALLBACK,
     demos: visibleDemos,
     stages: visibleStages.length ? visibleStages : FA_STAGES,
+    artists: visibleArtists,
     collabLogos: settings.collab_logos?.length > 0 ? settings.collab_logos : configs?.[0]?.brand_logos || [],
   };
 }
@@ -58,6 +61,7 @@ export default function useFullAccessContent() {
     projects: data?.projects || FA_PROJECTS_FALLBACK,
     demos: data?.demos || [],
     stages: data?.stages || FA_STAGES,
+    artists: data?.artists || [],
     collabLogos: data?.collabLogos || [],
   };
 }
