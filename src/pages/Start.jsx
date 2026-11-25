@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import "@/components/fullaccess/fa.css";
+import "@/components/fullaccess/fa-landing.css";
 import useFullAccessContent from "@/hooks/useFullAccessContent";
 import { readStoredLead, UNLOCK_KEY } from "@/lib/fullAccess";
 import FullAccessNav from "@/components/fullaccess/FullAccessNav";
@@ -46,7 +47,7 @@ export default function Start() {
 
   return (
     <div className="fa">
-      <FullAccessNav onApply={goToForm} />
+      <FullAccessNav />
 
       <div id="video">
         <HeroVSL
@@ -71,20 +72,21 @@ export default function Start() {
             <div className="fa-confirm">
               <span className="fa-eyebrow">Admisión</span>
               <h2 className="fa-display fa-h2" style={{ marginTop: 14, maxWidth: "20ch" }}>
-                El formulario se abre al terminar el vídeo.
+                Tu proyecto merece una dirección propia.
               </h2>
               <p className="fa-lead" style={{ marginTop: 14, maxWidth: "48ch" }}>
-                Queremos que conozcas el programa completo antes de presentar tu proyecto.
+                El siguiente paso es conocer tu proyecto. Cuando termines de descubrir cómo
+                trabajamos, podrás presentarnos tu música y solicitar una sesión de admisión.
               </p>
               <button type="button" className="fa-btn" style={{ marginTop: 22 }} onClick={() => scrollTo("video")}>
-                Volver al vídeo
+                Seguir viendo
               </button>
             </div>
           ) : application ? (
             <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
               <span className="fa-eyebrow">Solicitud recibida</span>
               <h2 className="fa-display fa-h2" style={{ marginTop: 14 }}>
-                Your project has been submitted.
+                Hemos recibido tu proyecto.
               </h2>
               <p className="fa-lead" style={{ marginTop: 14, maxWidth: "46ch" }}>
                 Tu proyecto ya está en nuestras manos. El siguiente paso es conocernos.

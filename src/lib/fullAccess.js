@@ -5,10 +5,14 @@ export function vimeoEmbedUrl(url) {
   const hMatch = url.match(/[?&]h=([a-zA-Z0-9]+)/);
   const params = new URLSearchParams({
     autopause: "0",
+    autoplay: "0",
     dnt: "1",
     title: "0",
     byline: "0",
     portrait: "0",
+    playsinline: "1",
+    controls: "1",
+    pip: "1",
     app_id: "58479",
   });
   if (hMatch) params.set("h", hMatch[1]);

@@ -17,7 +17,7 @@ export default function SelectedProjects({ settings, projects }) {
     <section className="fa-sec fa-sec--line" id="proyectos">
       <div className="fa-wrap">
         <div className="fa-sec-head">
-          <span className="fa-eyebrow">Selected work</span>
+          <span className="fa-eyebrow">Créditos</span>
           <h2 className="fa-display fa-h2">{settings.projects_title}</h2>
           <p className="fa-lead">{settings.projects_subtitle}</p>
         </div>

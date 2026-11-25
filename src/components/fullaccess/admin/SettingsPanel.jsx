@@ -6,9 +6,11 @@ import { FA_DEFAULTS } from "@/lib/fullAccessDefaults";
 const FIELDS = [
   { key: "hero_image_url", label: "Fotografía del hero" },
   { key: "hero_eyebrow", label: "Antetítulo" },
+  { key: "hero_kicker", label: "Descriptor del programa" },
   { key: "hero_title", label: "Titular principal", wide: true },
   { key: "hero_subtitle", label: "Subtítulo", wide: true },
   { key: "vimeo_url", label: "URL del VSL (Vimeo)", wide: true },
+  { key: "vimeo_poster_url", label: "Portada del vídeo", wide: true },
   { key: "gate_seconds", label: "Segundo de la captura", type: "number" },
   { key: "gate_title", label: "Título de la captura" },
   { key: "gate_text", label: "Texto de la captura", wide: true },

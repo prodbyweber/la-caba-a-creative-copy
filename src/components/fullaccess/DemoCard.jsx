@@ -69,8 +69,10 @@ export default function DemoCard({ demo }) {
     <article className="fa-demo">
       <div className="fa-demo__top">
         <div>
-          <h3 className="fa-demo__artist">{demo.artist}</h3>
-          {demo.genre ? <p className="fa-demo__genre">{demo.genre}</p> : null}
+          <h3 className="fa-demo__artist">{demo.song || demo.artist}</h3>
+          <p className="fa-demo__genre">
+            {[demo.song ? demo.artist : null, demo.genre].filter(Boolean).join(" · ")}
+          </p>
         </div>
         <div className="fa-demo__toggle" role="group" aria-label="Versión">
           <button

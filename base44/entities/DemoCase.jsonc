@@ -6,13 +6,21 @@
       "type": "string",
       "description": "Nombre del artista"
     },
+    "song": {
+      "type": "string",
+      "description": "Nombre de la canci\u00f3n"
+    },
+    "track_id": {
+      "type": "string",
+      "description": "ID del track del cat\u00e1logo al que corresponde (opcional)"
+    },
     "genre": {
       "type": "string",
       "description": "G\u00e9nero musical"
     },
     "cover_url": {
       "type": "string",
-      "description": "Portada cinem\u00e1tica"
+      "description": "Portada cinematogr\u00e1fica"
     },
     "demo_audio_url": {
       "type": "string",

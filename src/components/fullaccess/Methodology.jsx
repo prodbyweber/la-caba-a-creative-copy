@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import StageVisual from "@/components/fullaccess/StageVisual";
 
 export default function Methodology({ settings, stages }) {
   return (
@@ -13,7 +14,7 @@ export default function Methodology({ settings, stages }) {
 
         <div className="fa-stages">
           {stages.map((stage, index) => (
-            <motion.div
+            <motion.article
               className="fa-stage"
               key={stage.id || stage.num || index}
               initial={{ opacity: 0, y: 20 }}
@@ -22,8 +23,15 @@ export default function Methodology({ settings, stages }) {
               transition={{ duration: 0.6, delay: index * 0.05 }}
             >
               <span className="fa-stage__num">{stage.num || String(index + 1).padStart(2, "0")}</span>
-              <h3 className="fa-stage__title">{stage.title}</h3>
+
+              <div className="fa-stage__head">
+                <h3 className="fa-stage__title">{stage.title}</h3>
+                {stage.text ? <p className="fa-stage__text">{stage.text}</p> : null}
+              </div>
+
               <div className="fa-stage__body">
+                <StageVisual stage={stage} />
+
                 {stage.items?.length ? (
                   <ul className="fa-stage__list">
                     {stage.items.map((item) => (
@@ -31,14 +39,15 @@ export default function Methodology({ settings, stages }) {
                     ))}
                   </ul>
                 ) : null}
+
                 {stage.result ? (
-                  <p className="fa-stage__result" style={{ marginTop: 18 }}>
+                  <p className="fa-stage__result">
                     <b>Resultado</b>
                     {stage.result}
                   </p>
                 ) : null}
               </div>
-            </motion.div>
+            </motion.article>
           ))}
         </div>
       </div>

@@ -5,39 +5,32 @@ import VimeoVSL from "@/components/fullaccess/VimeoVSL";
 
 export default function HeroVSL({ settings, lead, onLead, unlocked, onUnlock, onRequestForm }) {
   return (
-    <>
-      <section className="fa-hero">
-        {settings.hero_image_url && (
-          <img
-            className="fa-hero__img"
-            src={settings.hero_image_url}
-            alt="Santiago Weber, Cabaña Creative"
-            loading="eager"
-          />
-        )}
-        <div className="fa-hero__veil" />
+    <section className="fa-hero">
+      <div className="fa-hero__glow" aria-hidden="true" />
 
-        <div className="fa-wrap fa-hero__inner">
-          <motion.div
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="fa-hero__tag">
-              <span className="fa-eyebrow">{settings.hero_eyebrow}</span>
-              <span className="fa-hero__tag-sep" />
-              <span className="fa-micro">Programa de desarrollo artístico</span>
-            </div>
+      <div className="fa-wrap fa-hero__inner">
+        <motion.div
+          className="fa-hero__head"
+          initial={{ opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="fa-hero__tag">
+            <span className="fa-eyebrow">{settings.hero_eyebrow}</span>
+            <span className="fa-hero__tag-sep" />
+            <span className="fa-micro">{settings.hero_kicker}</span>
+          </div>
 
-            <h1 className="fa-display fa-hero__title">{settings.hero_title}</h1>
-            <p className="fa-hero__sub">{settings.hero_subtitle}</p>
-            <span className="fa-hero__scroll">Ver el vídeo ↓</span>
-          </motion.div>
-        </div>
-      </section>
+          <h1 className="fa-display fa-hero__title">{settings.hero_title}</h1>
+          <p className="fa-hero__sub">{settings.hero_subtitle}</p>
+        </motion.div>
 
-      <div className="fa-vsl-sec">
-        <div className="fa-wrap">
+        <motion.div
+          className="fa-hero__video"
+          initial={{ opacity: 0, y: 26 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+        >
           <VimeoVSL
             settings={settings}
             lead={lead}
@@ -45,25 +38,32 @@ export default function HeroVSL({ settings, lead, onLead, unlocked, onUnlock, on
             onUnlock={onUnlock}
             unlocked={unlocked}
           />
+        </motion.div>
 
-          <div className="fa-unlock">
+        {unlocked && (
+          <motion.div
+            className="fa-unlock is-open"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
             <div>
-              <span className="fa-micro">
-                {unlocked ? "Admisión abierta" : "Admisión"}
-              </span>
-              <h2 className="fa-h3" style={{ marginTop: 10, maxWidth: "26ch" }}>
-                {unlocked
-                  ? "Tu proyecto merece una dirección propia."
-                  : "El siguiente paso es conocer tu música."}
+              <span className="fa-micro">Admisión abierta</span>
+              <h2 className="fa-h3" style={{ marginTop: 10, maxWidth: "24ch" }}>
+                Tu proyecto merece una dirección propia.
               </h2>
+              <p className="fa-unlock__text">
+                Cuando termines de descubrir cómo trabajamos, podrás presentarnos tu música y
+                solicitar una sesión de admisión.
+              </p>
             </div>
             <button type="button" className="fa-btn" onClick={onRequestForm}>
-              {unlocked ? "Presentar mi proyecto" : "Ir al formulario"}
+              Presentar mi proyecto
               <ArrowRight size={15} />
             </button>
-          </div>
-        </div>
+          </motion.div>
+        )}
       </div>
-    </>
+    </section>
   );
 }

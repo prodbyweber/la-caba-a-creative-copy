@@ -6,9 +6,17 @@
       "type": "string",
       "description": "N\u00famero de la etapa (01, 02, 03)"
     },
+    "key": {
+      "type": "string",
+      "description": "Identificador interno: explorar, descubrir, lanzar"
+    },
     "title": {
       "type": "string",
       "description": "Titular de la etapa"
+    },
+    "text": {
+      "type": "string",
+      "description": "Descripci\u00f3n de la etapa"
     },
     "items": {
       "type": "array",
@@ -20,6 +28,14 @@
     "result": {
       "type": "string",
       "description": "Resultado de la etapa"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "V\u00eddeo en loop de la etapa (opcional)"
+    },
+    "image_url": {
+      "type": "string",
+      "description": "Imagen o p\u00f3ster de la etapa (opcional)"
     },
     "order": {
       "type": "number",

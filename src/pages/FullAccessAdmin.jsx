@@ -105,9 +105,13 @@ export default function FullAccessAdmin() {
               defaults={{ num: "", title: "", items: [], order: 0, is_visible: true }}
               fields={[
                 { key: "num", label: "Número" },
+                { key: "key", label: "Identificador (explorar / descubrir / lanzar)" },
                 { key: "title", label: "Titular", wide: true },
+                { key: "text", label: "Descripción", type: "textarea", wide: true },
                 { key: "items", label: "Puntos (separados por coma)", type: "list", wide: true },
                 { key: "result", label: "Resultado", type: "textarea", wide: true },
+                { key: "video_url", label: "Vídeo en loop", wide: true },
+                { key: "image_url", label: "Imagen o póster", wide: true },
                 { key: "order", label: "Orden", type: "number" },
                 { key: "is_visible", label: "Visible", type: "bool" },
               ]}
@@ -122,6 +126,8 @@ export default function FullAccessAdmin() {
               defaults={{ artist: "", order: 0, is_visible: true }}
               fields={[
                 { key: "artist", label: "Artista / proyecto" },
+                { key: "song", label: "Canción" },
+                { key: "track_id", label: "ID del track del catálogo (opcional)" },
                 { key: "genre", label: "Género" },
                 { key: "demo_audio_url", label: "Audio DEMO", wide: true },
                 { key: "master_audio_url", label: "Audio MASTER", wide: true },

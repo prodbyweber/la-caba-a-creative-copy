@@ -2,25 +2,29 @@ export const FA_DEFAULTS = {
   hero_image_url:
     "https://base44.app/api/apps/6966ddf48947f217e81ea27c/files/mp/public/6966ddf48947f217e81ea27c/de2d3f461_Still2026-05-24133616_241.jpg",
   hero_eyebrow: "Cabaña Full Access",
-  hero_title: "Desarrolla tu catálogo y prepáralo para lanzarlo al mundo.",
+  hero_kicker: "Programa de desarrollo artístico",
+  hero_title: "Desarrolla tu catálogo. Construye una identidad musical y lánzala al mundo.",
   hero_subtitle:
-    "Un programa de desarrollo artístico en el que exploramos tu sonido, desarrollamos tus canciones y construimos una dirección para tus próximos lanzamientos.",
+    "Un proceso de desarrollo artístico para encontrar tu sonido, construir un catálogo con personalidad y preparar tu música para llegar al mercado.",
   vimeo_url: "https://player.vimeo.com/video/1250103284?h=1204b00d26",
+  vimeo_poster_url:
+    "https://base44.app/api/apps/6966ddf48947f217e81ea27c/files/mp/public/6966ddf48947f217e81ea27c/de2d3f461_Still2026-05-24133616_241.jpg",
   gate_seconds: 65,
-  gate_title: "Antes de seguir, ¿cómo te llamas?",
-  gate_text: "Guarda tu progreso y recibe el acceso a la sesión de admisión.",
+  gate_title: "Antes de continuar, queremos conocerte.",
+  gate_text:
+    "Déjanos tu nombre y tu correo para guardar tu progreso y abrirte la sesión de admisión.",
   stats_title: "Santiago Weber",
   stats_intro:
     "Music Producer · Songwriter · Creative Director · Founder of Cabaña Creative.",
-  collabs_title: "Selected collaborations",
-  demo_title: "From demo to master",
-  demo_subtitle: "Del primer concepto a una producción con identidad.",
-  projects_title: "Selected projects",
+  collabs_title: "Marcas con las que he colaborado",
+  demo_title: "Del demo al master",
+  demo_subtitle: "Escucha cómo una idea se convierte en una producción terminada.",
+  projects_title: "Trabajos seleccionados",
   projects_subtitle:
-    "Una selección de proyectos en los que he participado como productor y compositor.",
-  method_title: "Three stages. One artistic direction.",
+    "Una selección de proyectos en los que he participado desde la producción musical y la composición.",
+  method_title: "Las tres etapas de Cabaña Full Access",
   method_subtitle:
-    "Un proceso para encontrar tu sonido, desarrollar tu catálogo y preparar tu música para el mercado.",
+    "Una experiencia de desarrollo artístico para explorar tu sonido, descubrir tu identidad y lanzar tu catálogo.",
   form_intro:
     "Tu proyecto merece una dirección propia. El siguiente paso es conocer tu música.",
   booking_duration: 30,
@@ -28,16 +32,16 @@ export const FA_DEFAULTS = {
   booking_start_hour: 10,
   booking_end_hour: 19,
   booking_timezone: "Europe/Madrid",
-  confirm_title: "Your session is confirmed.",
+  confirm_title: "Sesión confirmada.",
   confirm_text:
     "Nos vemos pronto. Ya tenemos tu proyecto y estamos preparados para conocerlo mejor.",
 };
 
 export const FA_STATS_FALLBACK = [
-  { value: 1, prefix: "+", suffix: "M", label: "Streams", note: "" },
-  { value: 30, prefix: "+", suffix: "", label: "Países alcanzados", note: "Pendiente de verificar" },
-  { value: null, prefix: "", suffix: "", label: "Artistas desarrollados", note: "Pendiente de verificar" },
-  { value: null, prefix: "", suffix: "", label: "Años de experiencia", note: "Pendiente de verificar" },
+  { value: 100, prefix: "+", suffix: "", label: "Artistas desarrollados", note: "" },
+  { value: 7, prefix: "+", suffix: "", label: "Años de experiencia", note: "" },
+  { value: 1, prefix: "+", suffix: "M", label: "Reproducciones acumuladas", note: "" },
+  { value: 30, prefix: "+", suffix: "", label: "Países alcanzados", note: "" },
 ];
 
 export const FA_PROJECTS_FALLBACK = [
@@ -71,7 +75,8 @@ export const FA_STAGES = [
   {
     num: "01",
     key: "explorar",
-    title: "Encuentra el sonido que puede hacer reconocible tu proyecto.",
+    title: "Encuentra tu sonido.",
+    text: "Exploramos ritmos, géneros y referencias para encontrar combinaciones que puedan darle personalidad a tu proyecto.",
     items: [
       "Exploración de géneros",
       "Ritmos e instrumentales",
@@ -88,6 +93,7 @@ export const FA_STAGES = [
     num: "02",
     key: "descubrir",
     title: "Dale forma a tu sonido y conviértelo en canciones.",
+    text: "Desarrollamos tus ideas mediante sesiones presenciales uno a uno, producción musical, composición y trabajo vocal.",
     items: [
       "Flow Camp",
       "Beatmaking",
@@ -107,7 +113,8 @@ export const FA_STAGES = [
   {
     num: "03",
     key: "lanzar",
-    title: "Prepara tu catálogo para llegar al mundo.",
+    title: "Prepara tu música para llegar al mundo.",
+    text: "Organizamos tu catálogo y construimos una dirección para tus próximos lanzamientos.",
     items: [
       "Organización del catálogo",
       "Selección de canciones",
