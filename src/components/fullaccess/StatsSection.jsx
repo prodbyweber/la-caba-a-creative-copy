@@ -13,7 +13,7 @@ export default function StatsSection({ stats }) {
     <section className="fa-credits" id="trayectoria">
       <div className="fa-wrap">
         <div className="fa-credits__grid">
-          {stats.slice(0, 3).map((stat, index) => (
+          {stats.map((stat, index) => (
             <motion.div
               className="fa-credit"
               key={`${stat.label}-${index}`}
