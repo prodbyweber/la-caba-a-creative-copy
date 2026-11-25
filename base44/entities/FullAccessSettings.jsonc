@@ -22,6 +22,19 @@
       "type": "string",
       "description": "URL del VSL de Vimeo"
     },
+    "preview_video_url": {
+      "type": "string",
+      "description": "V\u00eddeo de portada opcional (MP4/WebM) que sustituye a la miniatura"
+    },
+    "studio_video_url": {
+      "type": "string",
+      "description": "V\u00eddeo del estudio para la etapa Descubrir (MP4 o URL de Vimeo)"
+    },
+    "unlock_seconds": {
+      "type": "number",
+      "default": 249,
+      "description": "Segundo de reproducci\u00f3n continua que desbloquea el CTA"
+    },
     "gate_seconds": {
       "type": "number",
       "default": 65,

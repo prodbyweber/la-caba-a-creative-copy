@@ -24,6 +24,10 @@ async function loadContent() {
   Object.entries(saved).forEach(([key, value]) => {
     if (value !== "" && value !== null && value !== undefined) settings[key] = value;
   });
+  // Los vídeos opcionales deben poder vaciarse desde el editor.
+  ["preview_video_url", "studio_video_url"].forEach((key) => {
+    if (saved[key] !== undefined) settings[key] = saved[key] || "";
+  });
 
   const visibleStats = (stats || []).filter((s) => s.is_visible !== false).sort(byOrder);
   const visibleProjects = (projects || []).filter((p) => p.is_visible !== false).sort(byOrder);

@@ -1,20 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Lock, Maximize2, Minimize2, Play } from "lucide-react";
-import {
-  vimeoEmbedUrl,
-  formatClock,
-  storeLead,
-  UNLOCK_KEY,
-  PROGRESS_KEY,
-} from "@/lib/fullAccess";
+import { vimeoEmbedUrl, UNLOCK_KEY } from "@/lib/fullAccess";
 
-const MESSAGES = [
-  "Cada proyecto tiene una historia que contar.",
-  "Tu sonido necesita una dirección.",
-  "Descubre cómo podemos construirla.",
-  "El siguiente paso es conocer tu música.",
-];
+const DEFAULT_UNLOCK = 249;
+const JUMP_TOLERANCE = 1.5;
 
 function loadVimeoSdk() {
   if (window.Vimeo?.Player) return Promise.resolve(window.Vimeo);
@@ -30,38 +19,66 @@ function loadVimeoSdk() {
   return window.__faVimeoPromise;
 }
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const reducedMotion = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-export default function VimeoVSL({ settings, lead, onLead, onUnlock, unlocked }) {
+export default function VimeoVSL({ settings, poster, ratio, unlocked, onUnlock, onOpenForm }) {
   const shellRef = useRef(null);
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
-  const leadRef = useRef(lead);
-  const maxRatioRef = useRef(0);
-  const gateRef = useRef(false);
-  const gateSecondsRef = useRef(Number(settings.gate_seconds) || 65);
+  const previewRef = useRef(null);
+  const maxRef = useRef(0);
+  const unlockedRef = useRef(unlocked);
 
-  const [started, setStarted] = useState(false);
+  const [activated, setActivated] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [seconds, setSeconds] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [ratio, setRatio] = useState(0);
+  const [progress, setProgress] = useState(unlocked ? 1 : 0);
   const [fullscreen, setFullscreen] = useState(false);
-  const [gateOpen, setGateOpen] = useState(false);
-  const [form, setForm] = useState({ name: lead?.name || "", email: lead?.email || "" });
-  const [error, setError] = useState("");
-  const [sdkError, setSdkError] = useState(false);
+
+  const previewUrl = settings.preview_video_url || "";
 
   useEffect(() => {
-    leadRef.current = lead;
-  }, [lead]);
+    unlockedRef.current = unlocked;
+    if (unlocked) setProgress(1);
+  }, [unlocked]);
 
-  useEffect(() => {
-    gateSecondsRef.current = Number(settings.gate_seconds) || 65;
-  }, [settings.gate_seconds]);
+  const unlockPoint = useCallback((duration) => {
+    const target = Number(settings.unlock_seconds) || DEFAULT_UNLOCK;
+    return duration && target > duration ? duration * 0.97 : target;
+  }, [settings.unlock_seconds]);
 
-  /* ---------- reproductor: un único iframe, una única sesión ---------- */
+  const markUnlocked = useCallback(() => {
+    if (unlockedRef.current) return;
+    unlockedRef.current = true;
+    try {
+      localStorage.setItem(UNLOCK_KEY, "1");
+    } catch {
+      /* almacenamiento no disponible */
+    }
+    setProgress(1);
+    onUnlock();
+  }, [onUnlock]);
+
+  /* ---------- portada en movimiento (opcional) ---------- */
   useEffect(() => {
+    if (activated || !previewUrl || reducedMotion()) return undefined;
+    const el = previewRef.current;
+    if (!el) return undefined;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) el.play().catch(() => {});
+        else el.pause();
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [activated, previewUrl]);
+
+  /* ---------- reproductor: se monta solo al pulsar play ---------- */
+  useEffect(() => {
+    if (!activated) return undefined;
     let cancelled = false;
     let player;
 
@@ -72,56 +89,33 @@ export default function VimeoVSL({ settings, lead, onLead, onUnlock, unlocked })
         playerRef.current = player;
 
         player.on("timeupdate", (data) => {
-          const dur = data.duration || 0;
           const now = data.seconds || 0;
-          setSeconds(now);
-          setDuration(dur);
-          const r = dur ? now / dur : 0;
-          setRatio(r);
-          if (r > maxRatioRef.current) {
-            maxRatioRef.current = r;
-            try {
-              localStorage.setItem(PROGRESS_KEY, String(now));
-            } catch {
-              /* almacenamiento no disponible */
-            }
+          const duration = data.duration || 0;
+          if (now > maxRef.current + JUMP_TOLERANCE) {
+            player.setCurrentTime(maxRef.current).catch(() => {});
+            return;
           }
-          if (!leadRef.current && !gateRef.current && now >= gateSecondsRef.current) {
-            gateRef.current = true;
-            player.pause().catch(() => {});
-            setGateOpen(true);
-          }
+          if (now > maxRef.current) maxRef.current = now;
+          const target = unlockPoint(duration);
+          if (target > 0) setProgress(Math.min(1, now / target));
+          if (now >= target) markUnlocked();
         });
 
-        player.on("play", () => {
-          setStarted(true);
-          setPlaying(true);
-        });
+        player.on("play", () => setPlaying(true));
         player.on("pause", () => setPlaying(false));
 
-        player.on("ended", () => {
-          setPlaying(false);
-          if (maxRatioRef.current >= 0.9) {
-            try {
-              localStorage.setItem(UNLOCK_KEY, "1");
-            } catch {
-              /* almacenamiento no disponible */
-            }
-            onUnlock();
-          }
-        });
-
-        player.ready().then(() => {
-          let saved = 0;
-          try {
-            saved = Number(localStorage.getItem(PROGRESS_KEY) || 0);
-          } catch {
-            saved = 0;
-          }
-          if (saved > 10) player.setCurrentTime(saved).catch(() => {});
-        });
+        player
+          .ready()
+          .then(() => {
+            player.setPlaybackRate(1).catch(() => {});
+            return player.play();
+          })
+          .catch(() => {});
       })
-      .catch(() => setSdkError(true));
+      .catch(() => {
+        // Si el reproductor no carga, el acceso no se queda bloqueado.
+        markUnlocked();
+      });
 
     return () => {
       cancelled = true;
@@ -131,7 +125,7 @@ export default function VimeoVSL({ settings, lead, onLead, onUnlock, unlocked })
         /* ignore */
       }
     };
-  }, [onUnlock]);
+  }, [activated, markUnlocked, unlockPoint]);
 
   /* ---------- pantalla completa sin reiniciar la sesión ---------- */
   useEffect(() => {
@@ -149,9 +143,7 @@ export default function VimeoVSL({ settings, lead, onLead, onUnlock, unlocked })
 
   const toggleFullscreen = useCallback(async () => {
     const el = shellRef.current;
-    const player = playerRef.current;
     const active = document.fullscreenElement || document.webkitFullscreenElement;
-
     if (active) {
       try {
         if (document.exitFullscreen) await document.exitFullscreen();
@@ -161,193 +153,110 @@ export default function VimeoVSL({ settings, lead, onLead, onUnlock, unlocked })
       }
       return;
     }
-
     if (el?.requestFullscreen) {
       try {
         await el.requestFullscreen();
         return;
       } catch {
-        /* seguimos con el reproductor */
+        /* ignore */
       }
     } else if (el?.webkitRequestFullscreen) {
       el.webkitRequestFullscreen();
       return;
     }
-
-    // Safari móvil no permite pantalla completa de un contenedor:
-    // la pedimos al propio reproductor, que mantiene la misma sesión.
     try {
-      await player?.requestFullscreen?.();
+      await playerRef.current?.requestFullscreen?.();
     } catch {
       /* ignore */
     }
   }, []);
 
-  const startPlayback = useCallback(async () => {
+  const togglePlayback = useCallback(() => {
     const player = playerRef.current;
     if (!player) return;
-    try {
-      await player.ready();
-      await player.play();
-      setStarted(true);
-      setPlaying(true);
-    } catch {
-      setPlaying(false);
-    }
-  }, []);
+    if (playing) player.pause().catch(() => {});
+    else player.play().catch(() => {});
+  }, [playing]);
 
-  const seek = (event) => {
-    const player = playerRef.current;
-    if (!player || !duration) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    const pct = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
-    player.setCurrentTime(pct * duration).catch(() => {});
-    setRatio(pct);
-  };
-
-  const submitGate = (event) => {
-    event.preventDefault();
-    const name = form.name.trim();
-    const email = form.email.trim();
-    if (!name) return setError("Escribe tu nombre.");
-    if (!EMAIL_RE.test(email)) return setError("Revisa tu correo electrónico.");
-    setError("");
-    const next = { name, email };
-    storeLead(next);
-    onLead(next);
-    leadRef.current = next;
-    setGateOpen(false);
-    playerRef.current?.play?.().catch(() => {});
-  };
-
-  const poster = settings.vimeo_poster_url || settings.hero_image_url;
-  const messageIndex = ratio < 0.25 ? 0 : ratio < 0.55 ? 1 : ratio < 0.8 ? 2 : 3;
-  const percent = Math.round(Math.min(1, ratio) * 100);
+  const showPreview = Boolean(previewUrl) && !reducedMotion();
 
   return (
     <div className={`fa-vsl-shell${fullscreen ? " is-fs" : ""}`} ref={shellRef}>
-      <div className="fa-vsl">
-        <iframe
-          ref={iframeRef}
-          className={`fa-vsl__frame${started ? " is-on" : ""}`}
-          src={vimeoEmbedUrl(settings.vimeo_url)}
-          title="Cabaña Full Access — VSL"
-          allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
-        />
-
-        <div className={`fa-vsl__poster${started ? " is-off" : ""}`}>
-          {poster ? <img src={poster} alt="" loading="eager" /> : null}
-          <span className="fa-vsl__poster-veil" aria-hidden="true" />
-          <button
-            type="button"
-            className="fa-vsl__play"
-            onClick={startPlayback}
-            aria-label="Reproducir el vídeo"
-          >
-            <Play size={26} fill="currentColor" strokeWidth={0} />
-          </button>
-          <span className="fa-vsl__poster-note">Ver el programa completo</span>
-        </div>
-
-        <AnimatePresence>
-          {gateOpen && (
-            <motion.div
-              className="fa-gate"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.35 }}
+      <div className="fa-vsl" style={{ "--vsl-ratio": ratio }}>
+        {activated ? (
+          <>
+            <iframe
+              ref={iframeRef}
+              src={vimeoEmbedUrl(settings.vimeo_url, { autoplay: "1", controls: "0", pip: "0" })}
+              title="Cabaña Full Access"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+            <button
+              type="button"
+              className="fa-vsl__tap"
+              onClick={togglePlayback}
+              aria-label={playing ? "Pausar el vídeo" : "Reproducir el vídeo"}
             >
-              <motion.form
-                className="fa-gate__box"
-                onSubmit={submitGate}
-                initial={{ y: 16, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <span className="fa-micro">Cabaña Full Access</span>
-                <h3 className="fa-gate__title">{settings.gate_title}</h3>
-                <p className="fa-gate__text">{settings.gate_text}</p>
-                <div className="fa-gate__fields">
-                  <label className="fa-gate__field">
-                    <span>¿Cómo te llamas?</span>
-                    <input
-                      className="fa-input"
-                      value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      autoComplete="name"
-                      enterKeyHint="next"
-                    />
-                  </label>
-                  <label className="fa-gate__field">
-                    <span>Tu correo electrónico</span>
-                    <input
-                      className="fa-input"
-                      type="email"
-                      inputMode="email"
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      autoComplete="email"
-                      enterKeyHint="go"
-                    />
-                  </label>
-                  {error && <p className="fa-error">{error}</p>}
-                  <button type="submit" className="fa-btn fa-btn--block">
-                    Continuar viendo <ArrowRight size={15} />
-                  </button>
-                </div>
-              </motion.form>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {started && (
-          <button
-            type="button"
-            className="fa-vsl__fs"
-            onClick={toggleFullscreen}
-            aria-label={fullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
-          >
-            {fullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-          </button>
+              {!playing && (
+                <span className="fa-vsl__tap-icon">
+                  <Play size={22} fill="currentColor" strokeWidth={0} />
+                </span>
+              )}
+            </button>
+            <button
+              type="button"
+              className="fa-vsl__fs"
+              onClick={toggleFullscreen}
+              aria-label={fullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+            >
+              {fullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+            </button>
+          </>
+        ) : (
+          <div className="fa-vsl__media">
+            {showPreview ? (
+              <video
+                ref={previewRef}
+                src={previewUrl}
+                poster={poster || undefined}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+              />
+            ) : poster ? (
+              <img src={poster} alt="" />
+            ) : null}
+            <span className="fa-vsl__veil" aria-hidden="true" />
+            <button
+              type="button"
+              className="fa-vsl__play"
+              onClick={() => setActivated(true)}
+              aria-label="Reproducir el vídeo"
+            >
+              <Play size={24} fill="currentColor" strokeWidth={0} />
+            </button>
+          </div>
         )}
-
       </div>
 
-      <div
-        className="fa-vsl__bar"
-        onClick={seek}
-        role="presentation"
-        aria-hidden="true"
+      <div className="fa-vsl__bar" aria-hidden="true">
+        <span className="fa-vsl__bar-fill" style={{ width: `${Math.min(100, progress * 100)}%` }} />
+      </div>
+
+      <button
+        type="button"
+        className={`fa-cta${unlocked ? " is-open" : ""}`}
+        aria-disabled={!unlocked}
+        disabled={!unlocked}
+        onClick={unlocked ? onOpenForm : undefined}
       >
-        <span className="fa-vsl__bar-fill" style={{ width: `${Math.min(100, ratio * 100)}%` }} />
-      </div>
-
-      <div className="fa-vsl__foot">
-        <span className="fa-vsl__msg">
-          {sdkError ? "El vídeo no se ha podido cargar en este navegador." : MESSAGES[messageIndex]}
-        </span>
-        <span className="fa-vsl__time">
-          {formatClock(seconds)} / {duration ? formatClock(duration) : "--:--"} · {percent}%
-        </span>
-      </div>
-
-      {sdkError && !unlocked && (
-        <button type="button" className="fa-btn fa-btn--ghost" onClick={onUnlock}>
-          Continuar al formulario
-        </button>
-      )}
-
-      {!unlocked && !sdkError && (
-        <p className="fa-vsl__lock">
-          <Lock size={12} />
-          {started
-            ? "El formulario de admisión se abre al terminar el vídeo."
-            : "Pulsa play para empezar."}
-        </p>
-      )}
+        Creemos tu catálogo
+        {unlocked ? <ArrowRight size={17} /> : <Lock size={15} />}
+      </button>
     </div>
   );
 }

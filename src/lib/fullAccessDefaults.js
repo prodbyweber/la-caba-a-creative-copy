@@ -9,6 +9,9 @@ export const FA_DEFAULTS = {
   vimeo_url: "https://player.vimeo.com/video/1250103284?h=1204b00d26",
   vimeo_poster_url:
     "https://base44.app/api/apps/6966ddf48947f217e81ea27c/files/mp/public/6966ddf48947f217e81ea27c/de2d3f461_Still2026-05-24133616_241.jpg",
+  preview_video_url: "",
+  studio_video_url: "",
+  unlock_seconds: 249,
   gate_seconds: 65,
   gate_title: "Antes de continuar, queremos conocerte.",
   gate_text:

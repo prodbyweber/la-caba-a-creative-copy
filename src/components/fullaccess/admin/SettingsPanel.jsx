@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Loader2, Save } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { FA_DEFAULTS } from "@/lib/fullAccessDefaults";
+import MediaField from "@/components/fullaccess/admin/MediaField";
 
 const FIELDS = [
   { key: "hero_image_url", label: "Fotografía del hero" },
@@ -11,6 +12,21 @@ const FIELDS = [
   { key: "hero_subtitle", label: "Subtítulo", wide: true },
   { key: "vimeo_url", label: "URL del VSL (Vimeo)", wide: true },
   { key: "vimeo_poster_url", label: "Portada del vídeo", wide: true },
+  {
+    key: "preview_video_url",
+    label: "Vídeo de portada (MP4/WebM)",
+    type: "media",
+    wide: true,
+    hint: "Opcional: sustituye a la miniatura de Vimeo",
+  },
+  {
+    key: "studio_video_url",
+    label: "Vídeo del estudio (MP4 o URL de Vimeo)",
+    type: "media",
+    wide: true,
+    hint: "Etapa Descubrir",
+  },
+  { key: "unlock_seconds", label: "Segundo de desbloqueo del CTA", type: "number" },
   { key: "gate_seconds", label: "Segundo de la captura", type: "number" },
   { key: "gate_title", label: "Título de la captura" },
   { key: "gate_text", label: "Texto de la captura", wide: true },
@@ -86,17 +102,25 @@ export default function SettingsPanel() {
             <span className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
               {field.label}
             </span>
-            <input
-              type={field.type === "number" ? "number" : "text"}
-              value={settings[field.key] ?? ""}
-              onChange={(e) =>
-                setSettings({
-                  ...settings,
-                  [field.key]: field.type === "number" ? Number(e.target.value) : e.target.value,
-                })
-              }
-              className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#ff5833]"
-            />
+            {field.type === "media" ? (
+              <MediaField
+                value={settings[field.key]}
+                onChange={(next) => setSettings({ ...settings, [field.key]: next })}
+                hint={field.hint}
+              />
+            ) : (
+              <input
+                type={field.type === "number" ? "number" : "text"}
+                value={settings[field.key] ?? ""}
+                onChange={(e) =>
+                  setSettings({
+                    ...settings,
+                    [field.key]: field.type === "number" ? Number(e.target.value) : e.target.value,
+                  })
+                }
+                className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#ff5833]"
+              />
+            )}
           </label>
         ))}
       </div>

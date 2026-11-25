@@ -1,4 +1,4 @@
-export function vimeoEmbedUrl(url) {
+export function vimeoEmbedUrl(url, overrides = {}) {
   if (!url) return "";
   const idMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
   if (!idMatch) return url;
@@ -14,9 +14,19 @@ export function vimeoEmbedUrl(url) {
     controls: "1",
     pip: "1",
     app_id: "58479",
+    ...overrides,
   });
   if (hMatch) params.set("h", hMatch[1]);
   return `https://player.vimeo.com/video/${idMatch[1]}?${params.toString()}`;
+}
+
+export function projectCover(project) {
+  if (!project) return "";
+  if (project.cover_url) return project.cover_url;
+  const match = (project.youtube_url || "").match(
+    /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/
+  );
+  return match ? `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg` : "";
 }
 
 export function formatClock(seconds) {
