@@ -22,36 +22,12 @@
   }
 }
 
-/* ---------- vídeo en pantalla ampliada (también en iOS) ---------- */
-.fa .fa-cover.is-expanded {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  width: 100vw;
-  height: 100dvh;
-  --cover-h: 100dvh;
-  background: #000;
-}
-.fa .fa-cover.is-expanded .fa-cover__tools,
-.fa .fa-cover:fullscreen .fa-cover__tools {
-  top: 16px;
-  right: 16px;
+/* ---------- herramientas del reproductor ---------- */
+/* la barra de Vimeo ocupa la parte baja: el sonido va arriba */
+.fa-cover__tools {
+  top: 14px;
+  right: 14px;
   bottom: auto;
-}
-/* en pantalla ampliada el vídeo llena la pantalla y manda la barra del reproductor */
-.fa .fa-cover.is-expanded .fa-cover__frame,
-.fa .fa-cover:fullscreen .fa-cover__frame {
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  max-height: none;
-  aspect-ratio: auto;
-  transform: none;
-}
-.fa .fa-cover.is-expanded .fa-cover__tap,
-.fa .fa-cover:fullscreen .fa-cover__tap {
-  display: none;
 }
 
 /* ---------- CTA final ---------- */
@@ -162,9 +138,9 @@
    MÓVIL: barra de progreso, cifras y marcas más compactas
    ============================================================ */
 @media (max-width: 899px) {
-  /* portada vertical, más corta para que quepan progreso, cifras y marcas */
+  /* portada vertical: deja ver progreso, cifras y marcas y oculta el bloque de artistas */
   .fa-cover {
-    --cover-h: clamp(320px, 56svh, 460px);
+    --cover-h: clamp(280px, calc(100svh - 285px), 480px);
   }
   .fa-cover__title {
     font-size: clamp(1.4rem, 6vw, 1.9rem);
@@ -213,9 +189,10 @@
 /* ---------- CTA: bloqueado por defecto, un latido al abrir ---------- */
 .fa-cta:disabled,
 .fa-cta[aria-disabled="true"] {
-  opacity: 0.42;
+  opacity: 0.38;
   cursor: not-allowed;
-  box-shadow: none;
+  filter: grayscale(0.6);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25), inset 0 12px 24px -12px rgba(0, 0, 0, 0.55);
 }
 .fa-cta.is-open {
   animation: none;

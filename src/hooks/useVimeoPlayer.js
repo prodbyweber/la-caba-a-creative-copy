@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { unlockKey } from "@/lib/fullAccess";
 
-const DEFAULT_UNLOCK = 104;
+const DEFAULT_UNLOCK = 249;
 const JUMP_TOLERANCE = 1.5;
 
 function loadSdk() {
@@ -22,7 +22,7 @@ function loadSdk() {
  * Reproductor del VSL: sin saltos, sin controles nativos, con sonido activado,
  * audio conmutable y desbloqueo solo por visionado real.
  */
-export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended, controls }) {
+export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended }) {
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
   const maxRef = useRef(0);
@@ -131,7 +131,7 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
         /* ignore */
       }
     };
-  }, [started, markUnlocked, settings.unlock_seconds, controls]);
+  }, [started, markUnlocked, settings.unlock_seconds]);
 
   useEffect(() => {
     if (!suspended) return;

@@ -1,13 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Maximize2, Minimize2, Play, Volume2, VolumeX } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Play, Volume2, VolumeX } from "lucide-react";
 import UnlockModule from "@/components/fullaccess/UnlockModule";
 import useVimeoPlayer from "@/hooks/useVimeoPlayer";
 import useVimeoThumb from "@/hooks/useVimeoThumb";
 import { vimeoEmbedUrl } from "@/lib/fullAccess";
 
+// Manda el reproductor de Vimeo: su barra incluye el botón de pantalla completa.
 const EMBED = {
   autoplay: "1",
-  controls: "0",
+  controls: "1",
   title: "0",
   byline: "0",
   portrait: "0",
@@ -28,33 +29,24 @@ const EMBED = {
   transparent: "0",
 };
 
-// En pantalla ampliada manda el reproductor, con su propia barra.
-const embedFor = (fullscreen) => ({
-  ...EMBED,
-  controls: fullscreen ? "1" : "0",
-  playsinline: fullscreen ? "0" : "1",
-  pip: fullscreen ? "1" : "0",
-});
-
 const reducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, suspended }) {
-  const coverRef = useRef(null);
   const previewRef = useRef(null);
-  const [nativeFs, setNativeFs] = useState(false);
-  const [expanded, setExpanded] = useState(false);
   const [previewFailed, setPreviewFailed] = useState(false);
-
-  const isFullscreen = nativeFs || expanded;
 
   const { poster, ratio } = useVimeoThumb(
     settings.vimeo_url,
     settings.vimeo_poster_url || settings.hero_image_url
   );
-  const { iframeRef, started, playing, muted, progress, activate, toggle, toggleMute } =
-    useVimeoPlayer({ settings, unlocked, onUnlock, suspended, controls: isFullscreen });
+  const { iframeRef, started, muted, progress, activate, toggleMute } = useVimeoPlayer({
+    settings,
+    unlocked,
+    onUnlock,
+    suspended,
+  });
 
   const previewUrl = settings.preview_video_url || "";
   const showPreview = Boolean(previewUrl) && !previewFailed && !reducedMotion();
@@ -80,102 +72,23 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
     };
   }, [started, showPreview]);
 
-  useEffect(() => {
-    const sync = () => {
-      const active = document.fullscreenElement || document.webkitFullscreenElement;
-      setNativeFs(!!active && coverRef.current?.contains(active));
-    };
-    document.addEventListener("fullscreenchange", sync);
-    document.addEventListener("webkitfullscreenchange", sync);
-    return () => {
-      document.removeEventListener("fullscreenchange", sync);
-      document.removeEventListener("webkitfullscreenchange", sync);
-    };
-  }, []);
-
-  // Modo ampliado propio: bloquea el scroll y se cierra con Esc.
-  useEffect(() => {
-    if (!expanded) return undefined;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (event) => {
-      if (event.key === "Escape") setExpanded(false);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = previous;
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [expanded]);
-
-  const toggleFullscreen = useCallback(async () => {
-    const el = coverRef.current;
-    const active = document.fullscreenElement || document.webkitFullscreenElement;
-
-    if (active) {
-      try {
-        if (document.exitFullscreen) await document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-      } catch {
-        /* ignore */
-      }
-      return;
-    }
-
-    if (expanded) {
-      setExpanded(false);
-      return;
-    }
-
-    // Pantalla completa nativa cuando el navegador la permite.
-    try {
-      if (el?.requestFullscreen) {
-        await el.requestFullscreen();
-        return;
-      }
-      if (el?.webkitRequestFullscreen) {
-        el.webkitRequestFullscreen();
-        return;
-      }
-    } catch {
-      /* seguimos con el modo ampliado */
-    }
-
-    // iOS y navegadores sin API de pantalla completa.
-    setExpanded(true);
-  }, [expanded]);
-
   return (
     <section className="fa-hero">
       <div
-        className={`fa-cover${started ? " is-playing" : ""}${expanded ? " is-expanded" : ""}`}
-        ref={coverRef}
+        className={`fa-cover${started ? " is-playing" : ""}`}
         style={{ "--vsl-ratio": ratio }}
         onContextMenu={(event) => event.preventDefault()}
       >
         {started ? (
           <div className="fa-cover__frame">
             <iframe
-              key={isFullscreen ? "expanded" : "inline"}
               ref={iframeRef}
-              src={vimeoEmbedUrl(settings.vimeo_url, embedFor(isFullscreen))}
+              src={vimeoEmbedUrl(settings.vimeo_url, EMBED)}
               title="Cabaña Full Access"
-              allow="autoplay; fullscreen; encrypted-media"
+              allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+              allowFullScreen
               referrerPolicy="strict-origin-when-cross-origin"
-              tabIndex={-1}
             />
-            <button
-              type="button"
-              className="fa-cover__tap"
-              onClick={toggle}
-              aria-label={playing ? "Pausar el vídeo" : "Reproducir el vídeo"}
-            >
-              {!playing && (
-                <span className="fa-glass fa-cover__center">
-                  <Play size={26} fill="currentColor" strokeWidth={0} />
-                </span>
-              )}
-            </button>
             <div className="fa-cover__tools">
               <button
                 type="button"
@@ -185,14 +98,6 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
                 aria-pressed={muted}
               >
                 {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-              </button>
-              <button
-                type="button"
-                className="fa-glass fa-glass--sm"
-                onClick={toggleFullscreen}
-                aria-label={isFullscreen ? "Salir de pantalla ampliada" : "Pantalla ampliada"}
-              >
-                {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
               </button>
             </div>
           </div>
