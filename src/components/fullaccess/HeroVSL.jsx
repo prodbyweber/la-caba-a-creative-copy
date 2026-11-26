@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Maximize2, Minimize2, Play } from "lucide-react";
+import { Loader2, Maximize2, Minimize2, Play } from "lucide-react";
 import UnlockModule from "@/components/fullaccess/UnlockModule";
 import useVimeoPlayer from "@/hooks/useVimeoPlayer";
 import useVimeoThumb from "@/hooks/useVimeoThumb";
 import { vimeoEmbedUrl } from "@/lib/fullAccess";
 
-// Sin barra de Vimeo: durante la reproducción solo se ve el botón de pantalla completa.
+// El reproductor se prepara en silencio detrás de la portada: sin autoplay y sin controles.
 const EMBED = {
-  autoplay: "1",
+  autoplay: "0",
   controls: "0",
   title: "0",
   byline: "0",
@@ -17,6 +17,7 @@ const EMBED = {
   keyboard: "0",
   dnt: "1",
   playsinline: "1",
+  muted: "0",
   like: "0",
   share: "0",
   watch_later: "0",
@@ -36,8 +37,9 @@ const reducedMotion = () =>
 export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, suspended }) {
   const previewRef = useRef(null);
   const [previewFailed, setPreviewFailed] = useState(false);
+  const [viewport, setViewport] = useState(0);
 
-  const { poster, ratio } = useVimeoThumb(
+  const { poster, ratio, ratioValue } = useVimeoThumb(
     settings.vimeo_url,
     settings.vimeo_poster_url || settings.hero_image_url
   );
@@ -45,8 +47,8 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
     wrapperRef,
     iframeRef,
     started,
-    leaving,
     playing,
+    loading,
     progress,
     immersive,
     isFullscreen,
@@ -55,8 +57,21 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
     toggleFullscreen,
   } = useVimeoPlayer({ settings, unlocked, onUnlock, suspended });
 
+  // Altura real del vídeo: ancho de la ventana dividido por su relación de aspecto.
+  useEffect(() => {
+    const sync = () => setViewport(document.documentElement.clientWidth);
+    sync();
+    window.addEventListener("resize", sync);
+    window.addEventListener("orientationchange", sync);
+    return () => {
+      window.removeEventListener("resize", sync);
+      window.removeEventListener("orientationchange", sync);
+    };
+  }, []);
+
   const previewUrl = settings.preview_video_url || "";
   const showPreview = Boolean(previewUrl) && !previewFailed && !reducedMotion();
+  const videoHeight = viewport && ratioValue ? `${Math.round(viewport / ratioValue)}px` : "56.25vw";
 
   useEffect(() => {
     const el = previewRef.current;
@@ -83,63 +98,59 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
     <section className="fa-hero">
       <div
         className={`fa-cover${started ? " is-playing" : ""}`}
-        style={{ "--vsl-ratio": ratio }}
+        style={{ "--vsl-ratio": ratio, "--video-h": videoHeight }}
         onContextMenu={(event) => event.preventDefault()}
       >
-        {started || leaving ? (
-          <div
-            ref={wrapperRef}
-            className={`fa-cover__frame${immersive ? " is-immersive" : ""}${
-              leaving ? " is-leaving" : ""
-            }`}
-          >
-            <div className="fa-cover__crop">
-              <iframe
-                ref={iframeRef}
-                src={vimeoEmbedUrl(settings.vimeo_url, EMBED)}
-                title="Cabaña Full Access"
-                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                allowFullScreen
-                referrerPolicy="strict-origin-when-cross-origin"
-              />
-            </div>
-
-            {/* Escudo transparente: cualquier clic o toque pausa o reanuda. */}
-            <button
-              type="button"
-              className="fa-cover__tap"
-              onClick={togglePlay}
-              aria-label={playing ? "Pausar el vídeo" : "Reproducir el vídeo"}
-            />
-
-            {!playing && !leaving ? (
-              <button
-                type="button"
-                className="fa-glass fa-cover__play"
-                onClick={togglePlay}
-                aria-label="Reproducir el vídeo"
-              >
-                <Play size={26} fill="currentColor" strokeWidth={0} />
-              </button>
-            ) : null}
-
-            <div className="fa-cover__tools">
-              <button
-                type="button"
-                className="fa-glass fa-glass--sm"
-                onClick={toggleFullscreen}
-                aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
-              >
-                {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-              </button>
-            </div>
-          </div>
-        ) : null}
-
         <div
-          className={`fa-cover__media${started && !leaving ? " is-hidden" : ""}`}
-          aria-hidden={started && !leaving}
+          ref={wrapperRef}
+          className={`fa-cover__frame${immersive ? " is-immersive" : ""}`}
         >
+          <iframe
+            ref={iframeRef}
+            className="fa-cover__vsl"
+            src={vimeoEmbedUrl(settings.vimeo_url, EMBED)}
+            title="Cabaña Full Access"
+            allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
+          />
+
+          {started ? (
+            <>
+              {/* Escudo transparente: cualquier clic o toque pausa o reanuda. */}
+              <button
+                type="button"
+                className="fa-cover__tap"
+                onClick={togglePlay}
+                aria-label={playing ? "Pausar el vídeo" : "Reproducir el vídeo"}
+              />
+
+              {!playing ? (
+                <button
+                  type="button"
+                  className="fa-glass fa-cover__play"
+                  onClick={togglePlay}
+                  aria-label="Reproducir el vídeo"
+                >
+                  <Play size={26} fill="currentColor" strokeWidth={0} />
+                </button>
+              ) : null}
+
+              <div className="fa-cover__tools">
+                <button
+                  type="button"
+                  className="fa-glass fa-glass--sm"
+                  onClick={toggleFullscreen}
+                  aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+                >
+                  {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                </button>
+              </div>
+            </>
+          ) : null}
+        </div>
+
+        <div className={`fa-cover__media${started ? " is-hidden" : ""}`} aria-hidden={started}>
           {showPreview ? (
             <video
               ref={previewRef}
@@ -158,7 +169,7 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
           <span className="fa-cover__vignette" aria-hidden="true" />
         </div>
 
-        <div className={`fa-cover__content${started && !leaving ? " is-hidden" : ""}`}>
+        <div className={`fa-cover__content${started ? " is-hidden" : ""}`}>
           <div className="fa-wrap">
             <div className="fa-cover__text">
               <h1 className="fa-display fa-cover__title">{settings.hero_title}</h1>
@@ -174,7 +185,11 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
             onClick={activate}
             aria-label="Reproducir el vídeo"
           >
-            <Play size={28} fill="currentColor" strokeWidth={0} />
+            {loading ? (
+              <Loader2 className="fa-spin" size={26} />
+            ) : (
+              <Play size={28} fill="currentColor" strokeWidth={0} />
+            )}
           </button>
         ) : null}
       </div>

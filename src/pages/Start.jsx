@@ -9,7 +9,6 @@ import HeroVSL from "@/components/fullaccess/HeroVSL";
 import StatsSection from "@/components/fullaccess/StatsSection";
 import BrandsStrip from "@/components/fullaccess/BrandsStrip";
 import ArtistsCarousel from "@/components/fullaccess/ArtistsCarousel";
-import DemoMasterRow from "@/components/fullaccess/DemoMasterRow";
 import SelectedProjects from "@/components/fullaccess/SelectedProjects";
 import Methodology from "@/components/fullaccess/Methodology";
 import ProjectBriefModal from "@/components/fullaccess/ProjectBriefModal";
@@ -46,9 +45,8 @@ export default function Start() {
       <StatsSection />
       <BrandsStrip />
       <ArtistsCarousel artists={artists} settings={settings} />
-      <DemoMasterRow eyebrow={settings.demo_eyebrow} projects={demos} />
       <SelectedProjects projects={projects} />
-      <Methodology settings={settings} />
+      <Methodology settings={settings} demos={demos} />
 
       <footer className="fa-wrap">
         <div className="fa-endcta">

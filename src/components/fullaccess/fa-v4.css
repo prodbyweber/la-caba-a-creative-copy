@@ -563,33 +563,35 @@
 /* ============================================================
    VSL: portada → reproducción → pausa → fin
    ============================================================ */
+/* el marco ocupa exactamente la portada: sin recortes, desplazamientos ni barras */
+.fa-cover {
+  transition: height 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.fa-cover.is-playing {
+  --cover-h: var(--video-h, 56.25vw);
+}
 .fa-cover__frame {
-  overflow: hidden;
-}
-.fa-cover__frame.is-leaving {
-  animation: faFrameOut 700ms ease forwards;
-  pointer-events: none;
-}
-@keyframes faFrameOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-.fa-cover__crop {
   position: absolute;
   inset: 0;
-  overflow: hidden;
-}
-.fa-cover__crop iframe {
-  position: absolute;
-  left: 0;
-  top: 0;
   width: 100%;
-  height: calc(100% + 64px);
-  border: 0;
+  height: 100%;
+  max-height: none;
+  aspect-ratio: auto;
+  transform: none;
+  overflow: hidden;
+  background: #000;
+}
+.fa-cover__vsl {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.fa-cover.is-playing .fa-cover__vsl {
+  opacity: 1;
+}
+.fa-cover__media,
+.fa-cover__content {
+  transition: opacity 0.25s ease;
 }
 .fa-cover__tap {
   z-index: 2;
@@ -610,6 +612,15 @@
   to {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
+  }
+}
+/* anillo de carga dentro del mismo botón de play */
+.fa-spin {
+  animation: faSpin 900ms linear infinite;
+}
+@keyframes faSpin {
+  to {
+    transform: rotate(360deg);
   }
 }
 .fa-cover__frame .fa-cover__tools {
@@ -645,16 +656,15 @@
   transform: none;
   background: #000;
 }
-.fa-cover__frame:fullscreen .fa-cover__crop,
-.fa-cover__frame:-webkit-full-screen .fa-cover__crop,
-.fa-cover__frame.is-immersive .fa-cover__crop {
+.fa-cover__frame:fullscreen .fa-cover__vsl,
+.fa-cover__frame:-webkit-full-screen .fa-cover__vsl,
+.fa-cover__frame.is-immersive .fa-cover__vsl {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(100vw, calc(100dvh * 16 / 9));
-  height: min(calc(100vw * 9 / 16), 100dvh);
-  overflow: hidden;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  pointer-events: auto;
 }
 .fa-cover__frame.is-immersive {
   position: fixed;

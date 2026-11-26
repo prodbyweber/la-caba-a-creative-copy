@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 
 /**
- * Recupera la miniatura del VSL desde Vimeo oEmbed y su relación de aspecto.
- * Si falla, se queda con la portada estática que recibe como respaldo.
+ * Recupera la miniatura del VSL desde Vimeo oEmbed, su relación de aspecto
+ * y su valor numérico (ancho / alto) para calcular la altura real del vídeo.
  */
 export default function useVimeoThumb(vimeoUrl, fallback) {
   const [poster, setPoster] = useState(fallback || "");
   const [ratio, setRatio] = useState("16 / 9");
+  const [ratioValue, setRatioValue] = useState(16 / 9);
 
   useEffect(() => {
     if (!vimeoUrl) return undefined;
@@ -21,7 +22,10 @@ export default function useVimeoThumb(vimeoUrl, fallback) {
       .then((data) => {
         if (!alive || !data) return;
         if (data.thumbnail_url) setPoster(data.thumbnail_url);
-        if (data.width && data.height) setRatio(`${data.width} / ${data.height}`);
+        if (data.width && data.height) {
+          setRatio(`${data.width} / ${data.height}`);
+          setRatioValue(data.width / data.height);
+        }
       })
       .catch(() => {});
 
@@ -30,5 +34,5 @@ export default function useVimeoThumb(vimeoUrl, fallback) {
     };
   }, [vimeoUrl]);
 
-  return { poster, ratio };
+  return { poster, ratio, ratioValue };
 }

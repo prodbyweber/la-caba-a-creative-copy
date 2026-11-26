@@ -3,8 +3,6 @@ import { unlockKey } from "@/lib/fullAccess";
 
 const DEFAULT_UNLOCK = 249;
 const JUMP_TOLERANCE = 1.5;
-// Tiempo del fundido de vuelta a la portada al terminar el vídeo.
-const LEAVE_MS = 700;
 
 function loadSdk() {
   if (window.Vimeo?.Player) return Promise.resolve(window.Vimeo);
@@ -34,26 +32,33 @@ const runPromise = (result) => {
 };
 
 /**
- * Reproductor del VSL: sin controles visibles, se pausa tocando el vídeo,
- * pantalla completa real (API / Vimeo / inmersiva) y desbloqueo por visionado.
+ * Reproductor del VSL: se prepara en segundo plano detrás de la portada y solo
+ * se muestra cuando Vimeo confirma "playing". Un único botón de play (el de la
+ * portada), pausa al tocar el vídeo, pantalla completa real y desbloqueo por visionado.
  */
 export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended }) {
   const wrapperRef = useRef(null);
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
+  const readyRef = useRef(false);
+  const pendingRef = useRef(false);
   const maxRef = useRef(0);
   const unlockedRef = useRef(unlocked);
   const firstPlayRef = useRef(true);
   const scrollRef = useRef(0);
   const immersiveRef = useRef(false);
   const endedRef = useRef(() => {});
+  const settingsRef = useRef(settings);
+  const markRef = useRef(() => {});
 
   const [started, setStarted] = useState(false);
-  const [leaving, setLeaving] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(unlocked ? 1 : 0);
   const [nativeFs, setNativeFs] = useState(false);
   const [immersive, setImmersive] = useState(false);
+
+  settingsRef.current = settings;
 
   useEffect(() => {
     unlockedRef.current = unlocked;
@@ -76,7 +81,9 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
     onUnlock();
   }, [onUnlock, settings.vimeo_url]);
 
-  const activate = useCallback(() => setStarted(true), []);
+  useEffect(() => {
+    markRef.current = markUnlocked;
+  }, [markUnlocked]);
 
   /* ---------------- pantalla completa ---------------- */
   const exitFullscreen = useCallback(async () => {
@@ -193,6 +200,7 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
   const handleEnded = useCallback(async () => {
     const player = playerRef.current;
     setPlaying(false);
+    setLoading(false);
     markUnlocked();
     setProgress(1);
     await exitFullscreen();
@@ -204,91 +212,118 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
     }
     maxRef.current = 0;
     firstPlayRef.current = true;
-    setLeaving(true);
-    window.setTimeout(() => {
-      setLeaving(false);
-      setStarted(false);
-    }, LEAVE_MS);
+    setStarted(false);
   }, [exitFullscreen, markUnlocked]);
 
   useEffect(() => {
     endedRef.current = handleEnded;
   }, [handleEnded]);
 
-  /* ---------------- reproductor ---------------- */
+  /* ---------------- reproductor preparado en segundo plano ---------------- */
   useEffect(() => {
-    if (!started) return undefined;
     let cancelled = false;
     let player;
 
-    loadSdk()
-      .then((Vimeo) => {
-        if (cancelled || !iframeRef.current) return;
-        player = new Vimeo.Player(iframeRef.current);
-        playerRef.current = player;
+    const boot = () => {
+      loadSdk()
+        .then((Vimeo) => {
+          if (cancelled || !iframeRef.current) return;
+          player = new Vimeo.Player(iframeRef.current);
+          playerRef.current = player;
 
-        player.on("timeupdate", (data) => {
-          const now = data.seconds || 0;
-          const duration = data.duration || 0;
-          // Un salto hacia delante nunca desbloquea: se devuelve al último punto visto.
-          if (now > maxRef.current + JUMP_TOLERANCE) {
-            player.setCurrentTime(maxRef.current).catch(() => {});
-            return;
-          }
-          if (now > maxRef.current) maxRef.current = now;
+          player.on("timeupdate", (data) => {
+            const now = data.seconds || 0;
+            const duration = data.duration || 0;
+            // Un salto hacia delante nunca desbloquea: se devuelve al último punto visto.
+            if (now > maxRef.current + JUMP_TOLERANCE) {
+              player.setCurrentTime(maxRef.current).catch(() => {});
+              return;
+            }
+            if (now > maxRef.current) maxRef.current = now;
 
-          const target = Number(settings.unlock_seconds) || DEFAULT_UNLOCK;
-          const fullLength = duration > 0 && target >= duration - 1;
-          const point = fullLength ? duration : target;
-          if (point > 0) setProgress(Math.min(1, now / point));
-          if (!fullLength && now >= target) markUnlocked();
-        });
+            const target = Number(settingsRef.current.unlock_seconds) || DEFAULT_UNLOCK;
+            const fullLength = duration > 0 && target >= duration - 1;
+            const point = fullLength ? duration : target;
+            if (point > 0) setProgress(Math.min(1, now / point));
+            if (!fullLength && now >= target) markRef.current();
+          });
 
-        player.on("ended", () => endedRef.current());
+          // Solo cuando el vídeo empieza de verdad se descubre el reproductor.
+          player.on("playing", () => {
+            setLoading(false);
+            setPlaying(true);
+            setStarted(true);
+            if (firstPlayRef.current) {
+              firstPlayRef.current = false;
+              player.setMuted(false).catch(() => {});
+              player.setVolume(1).catch(() => {});
+            }
+          });
 
-        // El vídeo arranca siempre con el audio activo.
-        player.on("play", () => {
-          setPlaying(true);
-          if (firstPlayRef.current) {
-            firstPlayRef.current = false;
-            player.setMuted(false).catch(() => {});
-            player.setVolume(1).catch(() => {});
-          }
-        });
-        player.on("pause", () => setPlaying(false));
+          player.on("pause", () => setPlaying(false));
+          player.on("ended", () => endedRef.current());
 
-        player
-          .ready()
-          .then(() => {
-            player.setPlaybackRate(1).catch(() => {});
-            player.setMuted(false).catch(() => {});
-            player.setVolume(1).catch(() => {});
-            // Al cambiar de vista (ampliada / reducida) se retoma donde iba.
-            if (maxRef.current > 0) player.setCurrentTime(maxRef.current).catch(() => {});
-            return player.play();
-          })
-          .then(() => setPlaying(true))
-          .catch(() => setPlaying(false));
-      })
-      .catch(() => {
-        /* sin SDK no hay vídeo ni desbloqueo: el CTA sigue bloqueado */
-      });
+          player
+            .ready()
+            .then(() => {
+              readyRef.current = true;
+              player.setPlaybackRate(1).catch(() => {});
+              player.setMuted(false).catch(() => {});
+              player.setVolume(1).catch(() => {});
+              if (pendingRef.current) {
+                pendingRef.current = false;
+                player.play().catch(() => setLoading(false));
+              }
+            })
+            .catch(() => setLoading(false));
+        })
+        .catch(() => setLoading(false));
+    };
+
+    const handle =
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback(boot, { timeout: 1200 })
+        : window.setTimeout(boot, 200);
 
     return () => {
       cancelled = true;
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(handle);
+      else window.clearTimeout(handle);
       try {
         player?.destroy?.();
       } catch {
         /* ignore */
       }
+      playerRef.current = null;
+      readyRef.current = false;
     };
-  }, [started, markUnlocked, settings.unlock_seconds]);
+  }, []);
 
   useEffect(() => {
     if (!suspended) return;
     const player = playerRef.current;
     if (player) player.pause().catch(() => {});
   }, [suspended]);
+
+  /* ---------------- controles ---------------- */
+  // Único play: arranca en el mismo gesto del visitante.
+  const activate = useCallback(() => {
+    const player = playerRef.current;
+    setLoading(true);
+    if (!player || !readyRef.current) {
+      pendingRef.current = true;
+      return;
+    }
+    player.setMuted(false).catch(() => {});
+    player.setVolume(1).catch(() => {});
+    const result = player.play();
+    if (result && typeof result.catch === "function") {
+      result.catch(() => {
+        pendingRef.current = false;
+        setLoading(false);
+      });
+    }
+  }, []);
 
   const togglePlay = useCallback(() => {
     const player = playerRef.current;
@@ -299,15 +334,15 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
     }
     player.setMuted(false).catch(() => {});
     player.setVolume(1).catch(() => {});
-    player.play().catch(() => setPlaying(false));
+    runPromise(player.play());
   }, [playing]);
 
   return {
     wrapperRef,
     iframeRef,
     started,
-    leaving,
     playing,
+    loading,
     progress,
     immersive,
     isFullscreen: nativeFs || immersive,
