@@ -1,34 +1,37 @@
 import React from "react";
 import StageGenres from "@/components/fullaccess/StageGenres";
+import StageStudio from "@/components/fullaccess/StageStudio";
 import StageVideo from "@/components/fullaccess/StageVideo";
-import StageArtists from "@/components/fullaccess/StageArtists";
 
-export default function MethodologyStage({ stage }) {
+/** Un bloque compacto por etapa: etiqueta, titular, frase y tres puntos clave. */
+export default function MethodologyStage({ stage, studioUrl }) {
   return (
     <article className="fa-mstage">
       <span className="fa-mstage__num">
         {stage.num} · {stage.key}
       </span>
       <h3 className="fa-display fa-mstage__title">{stage.title}</h3>
+      <p className="fa-mstage__p">{stage.text}</p>
 
-      <ul className="fa-mstage__items">
-        {stage.items.map((item) => (
-          <li className="fa-mstage__item" key={item}>
-            <span className="fa-mstage__item-body">{item}</span>
-          </li>
-        ))}
-      </ul>
+      {stage.items?.length ? (
+        <div className="fa-mstage__chips">
+          {stage.items.map((item) => (
+            <span className="fa-chip" key={item}>
+              {item}
+            </span>
+          ))}
+        </div>
+      ) : null}
 
-      <div className="fa-mstage__media">
-        {stage.media === "fusion" ? <StageGenres /> : null}
-        {stage.media === "youtube" ? <StageVideo youtubeId={stage.youtubeId} /> : null}
-        {stage.media === "artists" ? <StageArtists /> : null}
-      </div>
+      {stage.media === "genres" ? (
+        <div className="fa-mstage__media">
+          <StageGenres />
+        </div>
+      ) : null}
 
-      {stage.result ? (
-        <div className="fa-mstage__result">
-          <b>Resultado</b>
-          <span>{stage.result}</span>
+      {stage.media === "studio" ? (
+        <div className="fa-mstage__media">
+          {studioUrl ? <StageStudio url={studioUrl} /> : <StageVideo youtubeId={stage.youtubeId} />}
         </div>
       ) : null}
     </article>

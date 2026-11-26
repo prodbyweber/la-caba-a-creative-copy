@@ -7,45 +7,44 @@ import { DEFAULT_GENRES } from "@/lib/homeDefaults";
 
 const SWAP_MS = 5200;
 
-/** Dos combinaciones por pareja: ningún género se repite entre las dos tarjetas. */
-const PAIRS = [
-  [
-    {
-      name: "Reggaetón + R&B",
-      mood: "Sensual, nocturno, con pulso de pista",
-      tint: "#ff5833",
-      accent: "#ffb4a2",
-    },
-    {
-      name: "Trap + House",
-      mood: "Graves secos sobre groove de club",
-      tint: "#ff3d6e",
-      accent: "#ff8aa5",
-    },
-  ],
-  [
-    {
-      name: "House + Afrobeats",
-      mood: "Pulso orgánico, solar y bailable",
-      tint: "#22c1d6",
-      accent: "#7ae6f3",
-    },
-    {
-      name: "Pop + Latin Urban",
-      mood: "Melodía directa, festiva y radial",
-      tint: "#e0b354",
-      accent: "#ffdca8",
-    },
-  ],
+/** Tarjetas de género de /start: una sola palabra de mood por tarjeta. */
+const START_GENRES = [
+  {
+    key: "latin_urban",
+    name: "Reggaetón + R&B",
+    mood: "Sensual",
+    tint: "#ff5833",
+    accent: "#ffb4a2",
+  },
+  { key: "hip_hop", name: "Trap + House", mood: "Oscuro", tint: "#ff3d6e", accent: "#ff8aa5" },
+  {
+    key: "afrobeats",
+    name: "House + Afrobeats",
+    mood: "Festivo",
+    tint: "#22c1d6",
+    accent: "#7ae6f3",
+  },
+  {
+    key: "pop",
+    name: "Pop + Latin Urban",
+    mood: "Magnético",
+    tint: "#e0b354",
+    accent: "#ffdca8",
+  },
 ];
 
-/** Etapa 1: dos tarjetas de género con el diseño cinemático actual. */
+const byOrder = (a, b) => (a.order ?? 0) - (b.order ?? 0);
+
+/** Etapa 1: tarjetas de género con el diseño cinemático actual y su mood en una palabra. */
 export default function StageGenres() {
   const { data } = useQuery({
     queryKey: ["landing-genres"],
     queryFn: () => base44.entities.GenreCard.list("-created_date", 100),
     staleTime: 60000,
   });
+
+  const records = (data || []).filter((item) => item.is_visible !== false).sort(byOrder);
+  const cards = records.length ? records : START_GENRES;
 
   const images = (data?.length ? data : DEFAULT_GENRES)
     .filter((item) => item.image_url)
@@ -59,7 +58,10 @@ export default function StageGenres() {
     return () => clearInterval(timer);
   }, []);
 
-  const pair = PAIRS[round % PAIRS.length];
+  const steps = Math.max(1, Math.ceil(cards.length / 2));
+  const start = (round % steps) * 2;
+  const pair = cards.slice(start, start + 2);
+  if (pair.length < 2 && cards.length > 1) pair.push(cards[0]);
 
   return (
     <div className="fa-genrepair ccl ccl-embed">
@@ -67,13 +69,13 @@ export default function StageGenres() {
         {pair.map((combo, i) => (
           <article
             className="ccl-fcard"
-            key={combo.name}
-            style={{ "--tint": combo.tint, "--accent": combo.accent }}
+            key={`${combo.key || combo.name}-${i}`}
+            style={{ "--tint": combo.tint || "#ff5833", "--accent": combo.accent || "#ffb4a2" }}
           >
-            {images.length ? (
+            {combo.image_url || images.length ? (
               <img
                 className="ccl-fcard__img"
-                src={images[(round + i) % images.length]}
+                src={combo.image_url || images[(round + i) % images.length]}
                 alt=""
                 loading="lazy"
               />
@@ -82,9 +84,11 @@ export default function StageGenres() {
             <span className="ccl-fcard__veil" aria-hidden="true" />
             <div className="ccl-fcard__body">
               <h4 className="ccl-fcard__name">{combo.name}</h4>
-              <div className="ccl-fcard__fig">
-                <span className="ccl-fcard__value">{combo.mood}</span>
-              </div>
+              {combo.mood ? (
+                <div className="ccl-fcard__fig">
+                  <span className="ccl-fcard__value">{combo.mood}</span>
+                </div>
+              ) : null}
             </div>
           </article>
         ))}

@@ -1,46 +1,37 @@
-// Contenido de la metodología de Cabaña Full Access (/start).
-// Tres bloques visuales, frases cortas y sin párrafos largos.
-export const METHOD_TITLE = "Las Tres Etapas del programa";
+// Metodología de Cabaña Full Access (/start).
+// Tres bloques compactos: etiqueta, titular, una frase y tres puntos clave.
+export const METHOD_TITLE = "Las tres etapas de Cabaña Full Access";
 
 export const METHOD_STAGES = [
   {
     num: "01",
     key: "EXPLORAR",
-    title: "Encuentra tu sonido.",
-    items: [
-      "Beatmaking y exploración sonora",
-      "Géneros y fusiones",
-      "Referencias musicales",
-      "Dirección de identidad sonora",
-    ],
-    media: "fusion",
+    title: "ENCUENTRA TU SONIDO",
+    text: "Probamos géneros, fusiones y referencias hasta definir una dirección sonora propia.",
+    items: ["Beatmaking", "Instrumentales exclusivas", "Dirección sonora"],
+    media: "genres",
   },
   {
     num: "02",
     key: "DESCUBRIR",
-    title: "Desarrolla tu música en el estudio.",
-    items: [
-      "Sesiones presenciales uno a uno con Santiago Weber",
-      "Producción y songwriting",
-      "Producción vocal y arreglos",
-      "FLOW CAMP: experiencia creativa intensiva",
-    ],
-    media: "youtube",
+    title: "CREA TU MÚSICA EN EL ESTUDIO",
+    text: "Sesiones presenciales uno a uno con Santiago Weber para convertir tus ideas en canciones.",
+    items: ["Sesiones presenciales", "FLOW CAMP", "Producción y songwriting"],
+    media: "studio",
     youtubeId: "vxwLBrTLOVM",
   },
   {
     num: "03",
     key: "LANZAR",
-    title: "Prepara tu música para el mundo.",
-    items: [
-      "Organización y selección del catálogo",
-      "Dirección artística y creativa",
-      "Conceptos y referencias visuales",
-      "Estrategia de contenido",
-      "Planificación de lanzamientos",
-    ],
-    media: "artists",
-    result:
-      "Una identidad más clara, un catálogo organizado y una dirección para llevar el proyecto al mercado.",
+    title: "PREPARA TU MÚSICA PARA EL MUNDO",
+    text: "Organizamos tu catálogo y construimos la dirección y el plan para presentarlo al público.",
+    items: ["Selección de canciones", "Dirección artística y visual", "Calendario de lanzamientos"],
+    media: null,
   },
 ];
+
+export const METHOD_CLOSING =
+  "Primero encontramos lo que te hace diferente, después lo convertimos en música y finalmente construimos la dirección necesaria para llevarlo al mundo.";
+
+export const METHOD_NOTE =
+  "La inversión en publicidad, los presupuestos de campañas y los costes de producción audiovisual o servicios externos no están incluidos automáticamente en esta metodología.";

@@ -34,6 +34,12 @@ const FIELDS = [
   { key: "stats_intro", label: "Descripción de trayectoria", wide: true },
   { key: "artists_eyebrow", label: "Antetítulo de artistas" },
   { key: "artists_title", label: "Titular de artistas", wide: true },
+  {
+    key: "artists_autoplay",
+    label: "Avance automático del carrusel de artistas",
+    type: "bool",
+    hint: "Cada 5 segundos; se detiene al pasar el ratón o al tocar",
+  },
   { key: "demo_eyebrow", label: "Antetítulo Demo & Master" },
   { key: "collabs_title", label: "Título de colaboraciones" },
   { key: "demo_title", label: "Título demo/master" },
@@ -111,6 +117,15 @@ export default function SettingsPanel() {
                 onChange={(next) => setSettings({ ...settings, [field.key]: next })}
                 hint={field.hint}
               />
+            ) : field.type === "bool" ? (
+              <label className="flex items-center gap-2 rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-white">
+                <input
+                  type="checkbox"
+                  checked={settings[field.key] !== false}
+                  onChange={(e) => setSettings({ ...settings, [field.key]: e.target.checked })}
+                />
+                {settings[field.key] !== false ? "Activado" : "Desactivado"}
+              </label>
             ) : (
               <input
                 type={field.type === "number" ? "number" : "text"}

@@ -3,6 +3,8 @@ import { unlockKey } from "@/lib/fullAccess";
 
 const DEFAULT_UNLOCK = 249;
 const JUMP_TOLERANCE = 1.5;
+// Tiempo del fundido de vuelta a la portada al terminar el vídeo.
+const LEAVE_MS = 700;
 
 function loadSdk() {
   if (window.Vimeo?.Player) return Promise.resolve(window.Vimeo);
@@ -18,27 +20,49 @@ function loadSdk() {
   return window.__faVimeoPromise;
 }
 
+const isTouchDevice = () =>
+  typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+
+const fullscreenElement = () =>
+  (typeof document !== "undefined" &&
+    (document.fullscreenElement || document.webkitFullscreenElement)) ||
+  null;
+
+const runPromise = (result) => {
+  if (result && typeof result.catch === "function") return result.catch(() => {});
+  return undefined;
+};
+
 /**
- * Reproductor del VSL: sin saltos, sin controles nativos, con sonido activado,
- * audio conmutable y desbloqueo solo por visionado real.
+ * Reproductor del VSL: sin controles visibles, se pausa tocando el vídeo,
+ * pantalla completa real (API / Vimeo / inmersiva) y desbloqueo por visionado.
  */
 export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended }) {
+  const wrapperRef = useRef(null);
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
   const maxRef = useRef(0);
   const unlockedRef = useRef(unlocked);
-  const mutedRef = useRef(false);
   const firstPlayRef = useRef(true);
+  const scrollRef = useRef(0);
+  const immersiveRef = useRef(false);
+  const endedRef = useRef(() => {});
 
   const [started, setStarted] = useState(false);
+  const [leaving, setLeaving] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [muted, setMuted] = useState(false);
   const [progress, setProgress] = useState(unlocked ? 1 : 0);
+  const [nativeFs, setNativeFs] = useState(false);
+  const [immersive, setImmersive] = useState(false);
 
   useEffect(() => {
     unlockedRef.current = unlocked;
     if (unlocked) setProgress(1);
   }, [unlocked]);
+
+  useEffect(() => {
+    immersiveRef.current = immersive;
+  }, [immersive]);
 
   const markUnlocked = useCallback(() => {
     if (unlockedRef.current) return;
@@ -54,6 +78,144 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
 
   const activate = useCallback(() => setStarted(true), []);
 
+  /* ---------------- pantalla completa ---------------- */
+  const exitFullscreen = useCallback(async () => {
+    if (fullscreenElement()) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      try {
+        await exit.call(document);
+      } catch {
+        /* el navegador ya salió */
+      }
+    }
+    if (immersiveRef.current) setImmersive(false);
+    try {
+      await runPromise(playerRef.current?.exitFullscreen?.());
+    } catch {
+      /* no estaba en pantalla completa de Vimeo */
+    }
+    const y = scrollRef.current;
+    if (y) window.requestAnimationFrame(() => window.scrollTo(0, y));
+  }, []);
+
+  const enterFullscreen = useCallback(async () => {
+    if (fullscreenElement() || immersiveRef.current) return;
+    scrollRef.current = window.scrollY;
+
+    // a) API del navegador sobre el marco limpio del reproductor.
+    const el = wrapperRef.current;
+    const request = el?.requestFullscreen || el?.webkitRequestFullscreen;
+    if (request) {
+      try {
+        await request.call(el);
+        return;
+      } catch {
+        /* sigue con el plan B */
+      }
+    }
+
+    // b) iPhone Safari: pantalla completa nativa del propio Vimeo.
+    const player = playerRef.current;
+    if (player?.requestFullscreen) {
+      try {
+        await player.requestFullscreen();
+        return;
+      } catch {
+        /* sigue con el plan C */
+      }
+    }
+
+    // c) Modo inmersivo: ocupa la pantalla con estilos propios.
+    setImmersive(true);
+  }, []);
+
+  const toggleFullscreen = useCallback(() => {
+    if (fullscreenElement() || immersiveRef.current) exitFullscreen();
+    else enterFullscreen();
+  }, [enterFullscreen, exitFullscreen]);
+
+  useEffect(() => {
+    const onChange = () => setNativeFs(Boolean(fullscreenElement()));
+    document.addEventListener("fullscreenchange", onChange);
+    document.addEventListener("webkitfullscreenchange", onChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", onChange);
+      document.removeEventListener("webkitfullscreenchange", onChange);
+    };
+  }, []);
+
+  // Con la pantalla completa activa se bloquea el scroll y se intenta girar a horizontal.
+  useEffect(() => {
+    if (!immersive) return undefined;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [immersive]);
+
+  useEffect(() => {
+    if (!nativeFs && !immersive) return undefined;
+    try {
+      runPromise(screen.orientation?.lock?.("landscape"));
+    } catch {
+      /* el navegador no permite bloquear la orientación */
+    }
+    return () => {
+      try {
+        screen.orientation?.unlock?.();
+      } catch {
+        /* sin bloqueo previo */
+      }
+    };
+  }, [nativeFs, immersive]);
+
+  // Al girar el móvil a horizontal se entra en pantalla completa; en vertical se vuelve.
+  useEffect(() => {
+    if (!started || !isTouchDevice()) return undefined;
+    const query = window.matchMedia("(orientation: landscape)");
+    const onChange = () => {
+      if (query.matches) {
+        if (!fullscreenElement() && !immersiveRef.current) enterFullscreen();
+      } else if (immersiveRef.current) {
+        setImmersive(false);
+      }
+    };
+    query.addEventListener("change", onChange);
+    window.addEventListener("orientationchange", onChange);
+    return () => {
+      query.removeEventListener("change", onChange);
+      window.removeEventListener("orientationchange", onChange);
+    };
+  }, [started, enterFullscreen]);
+
+  /* ---------------- fin del vídeo ---------------- */
+  const handleEnded = useCallback(async () => {
+    const player = playerRef.current;
+    setPlaying(false);
+    markUnlocked();
+    setProgress(1);
+    await exitFullscreen();
+    try {
+      await player?.pause?.();
+      await player?.setCurrentTime?.(0);
+    } catch {
+      /* el reproductor ya se ha liberado */
+    }
+    maxRef.current = 0;
+    firstPlayRef.current = true;
+    setLeaving(true);
+    window.setTimeout(() => {
+      setLeaving(false);
+      setStarted(false);
+    }, LEAVE_MS);
+  }, [exitFullscreen, markUnlocked]);
+
+  useEffect(() => {
+    endedRef.current = handleEnded;
+  }, [handleEnded]);
+
+  /* ---------------- reproductor ---------------- */
   useEffect(() => {
     if (!started) return undefined;
     let cancelled = false;
@@ -82,11 +244,7 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
           if (!fullLength && now >= target) markUnlocked();
         });
 
-        player.on("ended", () => {
-          setPlaying(false);
-          setProgress(1);
-          markUnlocked();
-        });
+        player.on("ended", () => endedRef.current());
 
         // El vídeo arranca siempre con el audio activo.
         player.on("play", () => {
@@ -99,14 +257,6 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
         });
         player.on("pause", () => setPlaying(false));
 
-        // El icono de audio sigue siempre el estado real del reproductor.
-        player.on("volumechange", (data) => {
-          const value = Number(data?.volume);
-          const next = data?.muted === true || value === 0;
-          mutedRef.current = next;
-          setMuted(next);
-        });
-
         player
           .ready()
           .then(() => {
@@ -117,7 +267,8 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
             if (maxRef.current > 0) player.setCurrentTime(maxRef.current).catch(() => {});
             return player.play();
           })
-          .catch(() => {});
+          .then(() => setPlaying(true))
+          .catch(() => setPlaying(false));
       })
       .catch(() => {
         /* sin SDK no hay vídeo ni desbloqueo: el CTA sigue bloqueado */
@@ -139,51 +290,29 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
     if (player) player.pause().catch(() => {});
   }, [suspended]);
 
-  const toggle = useCallback(() => {
+  const togglePlay = useCallback(() => {
     const player = playerRef.current;
     if (!player) return;
     if (playing) {
       player.pause().catch(() => {});
       return;
     }
-    if (mutedRef.current) {
-      player.setMuted(false).catch(() => {});
-      player.setVolume(1).catch(() => {});
-    }
+    player.setMuted(false).catch(() => {});
+    player.setVolume(1).catch(() => {});
     player.play().catch(() => setPlaying(false));
   }, [playing]);
 
-  // Pantalla completa del propio reproductor de Vimeo.
-  const requestFullscreen = useCallback(() => {
-    const player = playerRef.current;
-    if (!player) return;
-    try {
-      const result = player.requestFullscreen?.();
-      if (result && typeof result.catch === "function") result.catch(() => {});
-    } catch {
-      /* el reproductor ya no está disponible */
-    }
-  }, []);
-
-  const toggleMute = useCallback(() => {
-    const player = playerRef.current;
-    if (!player) return;
-    const next = !mutedRef.current;
-    mutedRef.current = next;
-    setMuted(next);
-    player.setMuted(next).catch(() => {});
-    player.setVolume(next ? 0 : 1).catch(() => {});
-  }, []);
-
   return {
+    wrapperRef,
     iframeRef,
     started,
+    leaving,
     playing,
-    muted,
     progress,
+    immersive,
+    isFullscreen: nativeFs || immersive,
     activate,
-    toggle,
-    toggleMute,
-    requestFullscreen,
+    togglePlay,
+    toggleFullscreen,
   };
 }

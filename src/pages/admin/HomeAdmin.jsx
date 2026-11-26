@@ -48,6 +48,11 @@ const GENRE_FIELDS = [
   { key: "name", label: "Nombre" },
   { key: "key", label: "Clave interna" },
   { key: "subgenres", label: "Subgéneros (separados por ·)", type: "textarea", wide: true },
+  {
+    key: "mood",
+    label: "Mood para /start",
+    hint: "Una sola palabra: Nocturno, Sensual, Magnético...",
+  },
   { key: "figure_value", label: "Cifra (número)", type: "number" },
   { key: "figure_prefix", label: "Prefijo (+, US$)" },
   { key: "figure_suffix", label: "Sufijo (B, %)" },

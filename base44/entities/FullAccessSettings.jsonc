@@ -30,6 +30,11 @@
       "type": "string",
       "description": "V\u00eddeo del estudio para la etapa Descubrir (MP4 o URL de Vimeo)"
     },
+    "artists_autoplay": {
+      "type": "boolean",
+      "default": true,
+      "description": "Avance autom\u00e1tico del carrusel de artistas"
+    },
     "unlock_seconds": {
       "type": "number",
       "default": 249,

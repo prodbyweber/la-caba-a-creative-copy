@@ -14,6 +14,10 @@
       "type": "string",
       "description": "Subg\u00e9neros separados por \u00b7"
     },
+    "mood": {
+      "type": "string",
+      "description": "Estado de \u00e1nimo en una sola palabra para /start (Nocturno, Sensual, Magn\u00e9tico...)"
+    },
     "image_url": {
       "type": "string",
       "description": "Imagen de fondo o p\u00f3ster del v\u00eddeo"
