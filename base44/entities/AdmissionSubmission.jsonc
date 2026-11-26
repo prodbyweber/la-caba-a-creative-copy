@@ -12,11 +12,11 @@
     },
     "first_name": {
       "type": "string",
-      "description": "Nombre"
+      "description": "Nombre completo tal y como lo escribe el artista"
     },
     "last_name": {
       "type": "string",
-      "description": "Apellido"
+      "description": "Apellido (hist\u00f3rico, el formulario actual no lo pide)"
     },
     "email": {
       "type": "string",
@@ -33,6 +33,10 @@
     "city": {
       "type": "string",
       "description": "Ciudad"
+    },
+    "modality": {
+      "type": "string",
+      "description": "Modalidad preferida de grabaci\u00f3n (presencial, online, h\u00edbrido o abierto a valorarlo)"
     },
     "instagram": {
       "type": "string",

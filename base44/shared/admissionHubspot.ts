@@ -1,8 +1,8 @@
 /**
  * Sincronización de solicitudes de admisión con HubSpot.
  * HubSpot es el CRM principal: aquí solo se crea o actualiza el contacto con
- * las propiedades que ya existen en el grupo "Cabaña Creative admisión".
- * Nunca se crean propiedades nuevas.
+ * las propiedades que existen en el grupo "Cabaña Creative Admisión".
+ * Nunca se crean propiedades nuevas desde el código.
  */
 
 const HUBSPOT = "https://api.hubapi.com";
@@ -26,7 +26,11 @@ const PROPERTY_MAP: Array<[string, string]> = [
   ["main_blocker", "principal_bloqueo"],
   ["phone", "telefono"],
   ["release_type", "tipo_de_lanzamiento"],
+  ["modality", "modalidad_preferida_grabacion"],
 ];
+
+/** Propiedades cuyo valor es una URL: HubSpot rechaza el contacto si no lleva protocolo. */
+const URL_FIELDS = new Set(["enlace_a_tu_musicaperfil_spotify_youtube_o_drive"]);
 
 const norm = (value: unknown) =>
   String(value ?? "")
@@ -36,6 +40,13 @@ const norm = (value: unknown) =>
     .replace(/\s+/g, " ")
     .trim()
     .replace(/[.;]+$/, "");
+
+const withProtocol = (value: string) => {
+  const text = value.trim();
+  if (/^https?:\/\//i.test(text)) return text;
+  if (/^[\w-]+(\.[\w-]+)+/.test(text)) return `https://${text.replace(/^\/+/, "")}`;
+  return text;
+};
 
 async function hs(path: string, token: string, options: RequestInit = {}) {
   const res = await fetch(`${HUBSPOT}${path}`, {
@@ -55,7 +66,7 @@ async function hs(path: string, token: string, options: RequestInit = {}) {
     data = { raw };
   }
   if (!res.ok) {
-    const error: any = new Error(`HubSpot ${res.status}: ${data?.message || raw.slice(0, 200)}`);
+    const error: any = new Error(`HubSpot ${res.status}: ${data?.message || raw.slice(0, 300)}`);
     error.status = res.status;
     throw error;
   }
@@ -74,11 +85,17 @@ function optionValue(prop: any, label: string) {
 
 function buildProperties(submission: any, byName: Map<string, any>) {
   const warnings: string[] = [];
-  const props: Record<string, string> = { email: submission.email };
+  const props: Record<string, string> = {};
 
-  if (submission.first_name) props.firstname = submission.first_name;
-  if (submission.last_name) props.lastname = submission.last_name;
-  if (submission.phone) props.phone = submission.phone;
+  if (submission.email) props.email = String(submission.email).trim();
+  // El nombre llega completo en un solo campo: se conserva tal cual en firstname.
+  if (submission.first_name) props.firstname = String(submission.first_name).trim().slice(0, 250);
+  if (submission.last_name) props.lastname = String(submission.last_name).trim().slice(0, 250);
+  if (submission.phone) props.phone = String(submission.phone).trim().slice(0, 60);
+
+  // Propiedades estándar de ubicación (son de texto libre en esta cuenta).
+  if (submission.country) props.country = String(submission.country).trim().slice(0, 120);
+  if (submission.city) props.city = String(submission.city).trim().slice(0, 120);
 
   PROPERTY_MAP.forEach(([field, name]) => {
     const raw = submission[field];
@@ -133,7 +150,8 @@ function buildProperties(submission: any, byName: Map<string, any>) {
       return;
     }
 
-    props[name] = values.join(", ").slice(0, 65000);
+    const text = values.join(", ").slice(0, 65000);
+    props[name] = URL_FIELDS.has(name) ? withProtocol(text) : text;
   });
 
   return { props, warnings };
@@ -152,12 +170,50 @@ async function findContact(token: string, email: string) {
 }
 
 /**
+ * Escribe el contacto. Si HubSpot rechaza alguna propiedad concreta (400),
+ * se reintenta una vez sin las propiedades inválidas para no perder el resto
+ * de la información, y se deja constancia en los avisos.
+ */
+async function writeContact(
+  token: string,
+  contactId: string | null,
+  props: Record<string, string>,
+  warnings: string[]
+) {
+  const attempt = (payload: Record<string, string>) =>
+    contactId
+      ? hs(`/crm/v3/objects/contacts/${contactId}`, token, {
+          method: "PATCH",
+          body: JSON.stringify({ properties: payload }),
+        })
+      : hs("/crm/v3/objects/contacts", token, {
+          method: "POST",
+          body: JSON.stringify({ properties: payload }),
+        });
+
+  try {
+    return await attempt(props);
+  } catch (error: any) {
+    if (error?.status !== 400) throw error;
+    const invalid = [...String(error.message || "").matchAll(/"name"\s*:\s*"([^"]+)"/g)].map(
+      (match) => match[1]
+    );
+    const cleaned: Record<string, string> = { ...props };
+    invalid.forEach((name) => delete cleaned[name]);
+    if (!invalid.length || !Object.keys(cleaned).length) throw error;
+    warnings.push(`HubSpot rechazó: ${[...new Set(invalid)].join(", ")}`);
+    return await attempt(cleaned);
+  }
+}
+
+/**
  * Crea o actualiza el contacto usando el email estándar como identificador.
  * Solo escribe los campos que llegan con valor: nunca sobrescribe con vacíos.
  */
 export async function syncAdmissionToHubspot(base44: any, submission: any) {
   const { accessToken } = await base44.asServiceRole.connectors.getConnection("hubspot");
   if (!accessToken) throw new Error("HubSpot no está conectado.");
+  if (!submission?.email) throw new Error("La solicitud no tiene correo electrónico.");
 
   const meta = await hs("/crm/v3/properties/contacts", accessToken);
   const byName = new Map<string, any>(
@@ -168,26 +224,13 @@ export async function syncAdmissionToHubspot(base44: any, submission: any) {
   const existing = await findContact(accessToken, submission.email);
 
   let contact: any;
-  if (existing) {
-    contact = await hs(`/crm/v3/objects/contacts/${existing.id}`, accessToken, {
-      method: "PATCH",
-      body: JSON.stringify({ properties: props }),
-    });
-  } else {
-    try {
-      contact = await hs("/crm/v3/objects/contacts", accessToken, {
-        method: "POST",
-        body: JSON.stringify({ properties: props }),
-      });
-    } catch (error: any) {
-      if (error?.status !== 409) throw error;
-      const retry = await findContact(accessToken, submission.email);
-      if (!retry) throw error;
-      contact = await hs(`/crm/v3/objects/contacts/${retry.id}`, accessToken, {
-        method: "PATCH",
-        body: JSON.stringify({ properties: props }),
-      });
-    }
+  try {
+    contact = await writeContact(accessToken, existing?.id || null, props, warnings);
+  } catch (error: any) {
+    if (error?.status !== 409) throw error;
+    const retry = await findContact(accessToken, submission.email);
+    if (!retry) throw error;
+    contact = await writeContact(accessToken, retry.id, props, warnings);
   }
 
   return {

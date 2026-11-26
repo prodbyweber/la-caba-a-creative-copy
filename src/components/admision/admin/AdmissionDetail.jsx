@@ -76,6 +76,7 @@ export default function AdmissionDetail({ item, onClose, onSaved, onRetry, busy 
               <Row label="Correo" value={item.email} />
               <Row label="Teléfono" value={item.phone} />
               <Row label="País / Ciudad" value={[item.country, item.city].filter(Boolean).join(" · ")} />
+              <Row label="Modalidad" value={item.modality} />
               <Row label="Instagram" value={item.instagram} />
               <Row label="Música / perfil" value={item.music_link} />
             </div>
