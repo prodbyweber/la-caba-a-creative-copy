@@ -4,8 +4,14 @@ import { base44 } from "@/api/base44Client";
 import AdmissionDetail from "@/components/admision/admin/AdmissionDetail";
 import { AVAILABILITY, BUDGETS, PROJECT_STAGES } from "@/lib/admissionForm";
 
-const QUALIFICATIONS = ["APTO PARA AGENDAR", "EN EXPLORACIÓN", "SIN PRESUPUESTO DISPONIBLE"];
-const SYNC_STATES = ["pendiente", "sincronizado", "error"];
+const QUALIFICATIONS = [
+  "APTO PARA AGENDAR",
+  "EN EXPLORACIÓN",
+  "REVISIÓN MANUAL",
+  "NO APTO",
+  "SIN PRESUPUESTO DISPONIBLE",
+];
+const SYNC_STATES = ["pendiente", "sincronizado", "parcial", "error"];
 
 const short = (value, max = 34) =>
   value && value.length > max ? `${value.slice(0, max)}…` : value || "—";

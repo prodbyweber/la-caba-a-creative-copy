@@ -64,15 +64,24 @@ export const BUDGETS = [
 export const EXPLORING = "Estoy explorando opciones por ahora.";
 export const NO_BUDGET = "Ahora mismo no cuento con presupuesto para invertir.";
 
-export const INVESTMENT_OK = [
-  "Puedo asumir una inversión desde 2.000 €.",
-  "Me interesa, pero necesitaría valorar un pago fraccionado.",
-  "Mi presupuesto actual está entre los 700 € a 1200€",
+export const MODALITIES = [
+  "Presencial: prefiero realizar las sesiones de grabación en persona.",
+  "Online / Remoto: prefiero trabajar a distancia.",
+  "Híbrido: desarrollar el proyecto online y realizar las grabaciones de voces presencialmente.",
+  "Estoy abierto/a a valorarlo: quiero conocer las posibilidades según mi ubicación y el proyecto.",
 ];
+
+export const FRACTIONED = "Me interesa, pero necesitaría valorar un pago fraccionado.";
+export const INVESTMENT_2K = "Puedo asumir una inversión desde 2.000 €.";
+export const BUDGET_700_1200 = "Mi presupuesto actual está entre los 700 € a 1200€";
+
+export const INVESTMENT_OK = [INVESTMENT_2K];
 
 export const QUALIFICATION = {
   APTO: "APTO PARA AGENDAR",
   EXPLORANDO: "EN EXPLORACIÓN",
+  REVISION: "REVISIÓN MANUAL",
+  NO_APTO: "NO APTO",
   SIN_PRESUPUESTO: "SIN PRESUPUESTO DISPONIBLE",
 };
 
@@ -81,14 +90,18 @@ export const norm = (value: unknown) =>
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\u2010-\u2015\u2212]/g, "-")
     .replace(/\s+/g, " ")
     .trim()
-    .replace(/[.;]+$/, "");
+    .replace(/[.;,]+$/, "");
 
+/** Calificación interna, por prioridad. */
 export function qualify(availability: string, budget: string) {
   if (norm(availability) === norm(EXPLORING)) return QUALIFICATION.EXPLORANDO;
-  if (norm(budget) === norm(NO_BUDGET)) return QUALIFICATION.SIN_PRESUPUESTO;
-  if (INVESTMENT_OK.some((option) => norm(option) === norm(budget))) return QUALIFICATION.APTO;
+  if (norm(budget) === norm(FRACTIONED)) return QUALIFICATION.REVISION;
+  if (norm(budget) === norm(INVESTMENT_2K)) return QUALIFICATION.APTO;
+  if (norm(budget) === norm(BUDGET_700_1200)) return QUALIFICATION.NO_APTO;
+  if (norm(budget) === norm(NO_BUDGET)) return QUALIFICATION.NO_APTO;
   return QUALIFICATION.EXPLORANDO;
 }
 
@@ -171,4 +184,76 @@ export function validateAdmission(body: any): {
   if (!data.budget) errors.budget = "Selecciona el presupuesto.";
 
   return { data, errors };
+}
+
+/** Respuestas saneadas de un borrador: solo se acepta lo que existe en el contrato. */
+export function parseAnswers(body: any) {
+  return {
+    first_name: text(body?.first_name, 120),
+    last_name: text(body?.last_name, 120),
+    email: text(body?.email, 200).toLowerCase(),
+    phone: text(body?.phone, 40),
+    country: text(body?.country, 120),
+    city: text(body?.city, 120),
+    instagram: text(body?.instagram, 120),
+    music_link: text(body?.music_link, 500),
+    project_stage: pick(body?.project_stage, PROJECT_STAGES),
+    genres: list(body?.genres, GENRES),
+    genre_other: text(body?.genre_other, 200),
+    goals: list(body?.goals, GOALS),
+    main_blocker: text(body?.main_blocker, 4000),
+    release_type: pick(body?.release_type, RELEASE_TYPES),
+    release_date: pick(body?.release_date, RELEASE_DATES),
+    availability: pick(body?.availability, AVAILABILITY),
+    budget: pick(body?.budget, BUDGETS),
+    modality: pick(body?.modality, MODALITIES),
+  };
+}
+
+const STEP_MESSAGES: Record<string, string> = {
+  first_name: "Escribe tu nombre.",
+  last_name: "Escribe tus apellidos.",
+  email: "Revisa tu correo electrónico.",
+  phone: "Necesitamos un teléfono de contacto.",
+  project_stage: "Elige la opción que mejor te represente.",
+  country: "Indica tu país.",
+  city: "Indica tu ciudad.",
+  modality: "Elige cómo prefieres trabajar.",
+  genres: "Elige al menos un género.",
+  goals: "Elige al menos un objetivo.",
+  main_blocker: "Cuéntanos qué te está frenando.",
+  release_type: "Elige el formato de lanzamiento.",
+  release_date: "Elige una fecha objetivo.",
+  availability: "Elige tu disponibilidad.",
+  budget: "Elige la opción que mejor refleje tu situación.",
+};
+
+const STEP_FIELDS: Record<number, string[]> = {
+  1: ["first_name", "last_name", "email", "phone"],
+  2: ["project_stage"],
+  3: ["country", "city", "modality"],
+  4: ["genres"],
+  5: ["goals"],
+  6: ["main_blocker"],
+  7: ["release_type", "release_date"],
+  8: ["availability", "budget"],
+};
+
+/** Validación de la pantalla que se está guardando. */
+export function validateStep(step: number, data: any) {
+  const errors: Record<string, string> = {};
+
+  (STEP_FIELDS[step] || []).forEach((key) => {
+    const value = data?.[key];
+    const empty = Array.isArray(value) ? !value.length : !String(value ?? "").trim();
+    if (empty) errors[key] = STEP_MESSAGES[key] || "Campo obligatorio.";
+  });
+
+  if (data?.email && !EMAIL_RE.test(data.email)) errors.email = "Revisa tu correo electrónico.";
+  if (data?.phone && !/^\+\d{6,15}$/.test(data.phone)) errors.phone = "Revisa el número de teléfono.";
+  if (data?.music_link && !/^(https?:\/\/)?[\w-]+(\.[\w-]+)+/.test(data.music_link)) {
+    errors.music_link = "Revisa el enlace.";
+  }
+
+  return errors;
 }

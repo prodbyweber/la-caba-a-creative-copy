@@ -23,12 +23,13 @@ export default async function (req: Request): Promise<Response> {
     const attempts = Number(record.hubspot_attempts || 0) + 1;
 
     try {
-      const { contactId, warnings } = await syncAdmissionToHubspot(base44, record);
+      const { contactId, warnings, notes, status } = await syncAdmissionToHubspot(base44, record);
       const updated = await base44.asServiceRole.entities.AdmissionSubmission.update(record.id, {
         hubspot_contact_id: contactId,
-        hubspot_sync_status: "sincronizado",
+        hubspot_sync_status: status,
         hubspot_sync_error: "",
-        hubspot_sync_warning: (warnings || []).join(" · ").slice(0, 900),
+        hubspot_sync_warning: [...(notes || []), ...(warnings || [])].join(" · ").slice(0, 900),
+        sync_warnings: (warnings || []).join(" · ").slice(0, 900),
         hubspot_last_sync: new Date().toISOString(),
         hubspot_attempts: attempts,
         activity: [

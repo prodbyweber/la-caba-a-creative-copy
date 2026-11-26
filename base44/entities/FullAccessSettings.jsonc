@@ -147,7 +147,11 @@
     },
     "meetings_url": {
       "type": "string",
-      "description": "URL real de HubSpot Meetings para reservar la conversaci\u00f3n desde /admision"
+      "description": "URL real de HubSpot Meetings (hist\u00f3rico, ya no se usa en /admision)"
+    },
+    "booking_url": {
+      "type": "string",
+      "description": "URL de la agenda de Google Calendar que se incrusta en la \u00faltima pantalla de /admision"
     }
   },
   "required": [],

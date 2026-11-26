@@ -56,10 +56,16 @@ const FIELDS = [
   { key: "confirm_title", label: "Título de confirmación" },
   { key: "confirm_text", label: "Texto de confirmación", wide: true },
   {
+    key: "booking_url",
+    label: "Booking URL (Google Calendar)",
+    wide: true,
+    hint: "Agenda que se incrusta en la última pantalla de /admision. Si se deja vacío se usa la agenda de Cabaña Creative.",
+  },
+  {
     key: "meetings_url",
     label: "URL de HubSpot Meetings",
     wide: true,
-    hint: "Enlace real de la agenda de Cabaña Creative. Se usa en la pantalla final de /admision.",
+    hint: "Histórico: ya no se usa en /admision.",
   },
 ];
 

@@ -1,4 +1,5 @@
 import React from "react";
+import PhoneField from "@/components/admision/PhoneField";
 
 export default function ContactScreen({ data, set, errors }) {
   return (
@@ -8,19 +9,34 @@ export default function ContactScreen({ data, set, errors }) {
       </h1>
 
       <div className="adm-fields">
-        <label className="adm-field">
-          <span className="adm-field__label">Nombre</span>
-          <input
-            type="text"
-            value={data.full_name}
-            onChange={(event) => set("full_name", event.target.value)}
-            placeholder="Tu nombre y apellido"
-            autoComplete="name"
-            autoCapitalize="words"
-            autoFocus
-          />
-          {errors.full_name ? <span className="adm-field__error">{errors.full_name}</span> : null}
-        </label>
+        <div className="adm-fields__row">
+          <label className="adm-field">
+            <span className="adm-field__label">Nombre</span>
+            <input
+              type="text"
+              value={data.first_name}
+              onChange={(event) => set("first_name", event.target.value)}
+              placeholder="Tu nombre"
+              autoComplete="given-name"
+              autoCapitalize="words"
+              autoFocus
+            />
+            {errors.first_name ? <span className="adm-field__error">{errors.first_name}</span> : null}
+          </label>
+
+          <label className="adm-field">
+            <span className="adm-field__label">Apellido</span>
+            <input
+              type="text"
+              value={data.last_name}
+              onChange={(event) => set("last_name", event.target.value)}
+              placeholder="Tus apellidos"
+              autoComplete="family-name"
+              autoCapitalize="words"
+            />
+            {errors.last_name ? <span className="adm-field__error">{errors.last_name}</span> : null}
+          </label>
+        </div>
 
         <label className="adm-field">
           <span className="adm-field__label">Email</span>
@@ -35,18 +51,20 @@ export default function ContactScreen({ data, set, errors }) {
           {errors.email ? <span className="adm-field__error">{errors.email}</span> : null}
         </label>
 
-        <label className="adm-field">
-          <span className="adm-field__label">Número de teléfono</span>
-          <input
-            type="tel"
+        <div className="adm-field">
+          <label className="adm-field__label" htmlFor="adm-phone">
+            Número de teléfono
+          </label>
+          <PhoneField
+            id="adm-phone"
             value={data.phone}
-            onChange={(event) => set("phone", event.target.value)}
-            placeholder="+34 612 34 56 78"
-            autoComplete="tel"
-            inputMode="tel"
+            country={data.phone_country}
+            onNumber={(value) => set("phone", value)}
+            onCountry={(value) => set("phone_country", value)}
+            error={errors.phone}
           />
           {errors.phone ? <span className="adm-field__error">{errors.phone}</span> : null}
-        </label>
+        </div>
       </div>
     </div>
   );

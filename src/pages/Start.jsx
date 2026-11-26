@@ -26,7 +26,16 @@ export default function Start() {
 
   const handleUnlock = useCallback(() => setUnlocked(true), []);
   // El CTA mantiene su diseño y su desbloqueo: solo cambia el destino.
-  const openBrief = useCallback(() => navigate("/admision"), [navigate]);
+  // Va al mismo formulario de /admision y conserva los parámetros UTM.
+  const openBrief = useCallback(() => {
+    const current = new URLSearchParams(window.location.search);
+    const next = new URLSearchParams({ source: "vsl" });
+    ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach((key) => {
+      const value = current.get(key);
+      if (value) next.set(key, value);
+    });
+    navigate(`/admision?${next.toString()}`);
+  }, [navigate]);
 
   return (
     <div className="fa">

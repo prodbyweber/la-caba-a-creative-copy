@@ -76,6 +76,8 @@ export const INVESTMENT_OK = [
 export const QUALIFICATION = {
   APTO: "APTO PARA AGENDAR",
   EXPLORANDO: "EN EXPLORACIÓN",
+  REVISION: "REVISIÓN MANUAL",
+  NO_APTO: "NO APTO",
   SIN_PRESUPUESTO: "SIN PRESUPUESTO DISPONIBLE",
 };
 
@@ -91,8 +93,14 @@ export const norm = (value) =>
 /** Calificación interna: la disponibilidad manda sobre el presupuesto. */
 export function qualify({ availability, budget }) {
   if (norm(availability) === norm(EXPLORING)) return QUALIFICATION.EXPLORANDO;
-  if (norm(budget) === norm(NO_BUDGET)) return QUALIFICATION.SIN_PRESUPUESTO;
-  if (INVESTMENT_OK.some((option) => norm(option) === norm(budget))) return QUALIFICATION.APTO;
+  if (norm(budget) === norm("Me interesa, pero necesitaría valorar un pago fraccionado.")) {
+    return QUALIFICATION.REVISION;
+  }
+  if (norm(budget) === norm("Puedo asumir una inversión desde 2.000 €.")) return QUALIFICATION.APTO;
+  if (norm(budget) === norm("Mi presupuesto actual está entre los 700 € a 1200€")) {
+    return QUALIFICATION.NO_APTO;
+  }
+  if (norm(budget) === norm(NO_BUDGET)) return QUALIFICATION.NO_APTO;
   return QUALIFICATION.EXPLORANDO;
 }
 
@@ -223,9 +231,16 @@ export const RESULT_COPY = {
     text:
       "Tu proyecto merece el momento adecuado. Gracias por compartir tu información. Cabaña Full Access está diseñado para artistas que tienen claridad sobre sus objetivos y están preparados para comenzar a desarrollar su proyecto. Trabajamos con plazas limitadas para poder dedicar a cada artista el tiempo y la dirección que necesita. Si todavía estás explorando opciones, te invitamos a seguir desarrollando tu propuesta y volver cuando sientas que es el momento de dar este paso.",
   },
+  [QUALIFICATION.REVISION]: {
+    title: "Hemos recibido tu proyecto.",
+    text:
+      "Gracias por compartir tu propuesta con nosotros. Hemos recibido tu solicitud correctamente. Antes de reservar una conversación vamos a revisar tu caso para valorar la opción del pago fraccionado, y te escribiremos a tu correo con la respuesta.",
+  },
   [QUALIFICATION.SIN_PRESUPUESTO]: {
     title: "Gracias por contarnos tu situación.",
     text:
       "Gracias por compartir tu situación y contarnos más sobre tu proyecto. Hemos recibido tu solicitud correctamente. En Cabaña Creative valoramos el momento y las posibilidades de cada artista. Te invitamos a seguir desarrollando tu propuesta y volver a contactarnos cuando tengas disponibilidad para invertir en esta etapa.",
   },
 };
+
+RESULT_COPY[QUALIFICATION.NO_APTO] = RESULT_COPY[QUALIFICATION.SIN_PRESUPUESTO];

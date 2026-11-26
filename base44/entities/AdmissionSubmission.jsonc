@@ -12,11 +12,11 @@
     },
     "first_name": {
       "type": "string",
-      "description": "Nombre completo tal y como lo escribe el artista"
+      "description": "Nombre del artista"
     },
     "last_name": {
       "type": "string",
-      "description": "Apellido (hist\u00f3rico, el formulario actual no lo pide)"
+      "description": "Apellidos del artista"
     },
     "email": {
       "type": "string",
@@ -24,7 +24,7 @@
     },
     "phone": {
       "type": "string",
-      "description": "Tel\u00e9fono con prefijo internacional"
+      "description": "Tel\u00e9fono en formato E.164"
     },
     "country": {
       "type": "string",
@@ -36,7 +36,7 @@
     },
     "modality": {
       "type": "string",
-      "description": "Modalidad preferida de grabaci\u00f3n (presencial, online, h\u00edbrido o abierto a valorarlo)"
+      "description": "Modalidad preferida de grabaci\u00f3n"
     },
     "instagram": {
       "type": "string",
@@ -93,25 +93,36 @@
       "enum": [
         "APTO PARA AGENDAR",
         "EN EXPLORACI\u00d3N",
+        "REVISI\u00d3N MANUAL",
+        "NO APTO",
         "SIN PRESUPUESTO DISPONIBLE"
       ],
       "enumColors": [
         "green",
         "yellow",
+        "blue",
+        "red",
         "gray"
       ],
       "description": "Estado interno de calificaci\u00f3n"
+    },
+    "submitted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Momento del env\u00edo final del formulario"
     },
     "hubspot_sync_status": {
       "type": "string",
       "enum": [
         "pendiente",
         "sincronizado",
+        "parcial",
         "error"
       ],
       "enumColors": [
         "yellow",
         "green",
+        "blue",
         "red"
       ],
       "default": "pendiente",
@@ -137,11 +148,19 @@
     },
     "hubspot_sync_warning": {
       "type": "string",
-      "description": "Avisos de mapeo de propiedades (valores no reconocidos)"
+      "description": "Avisos de mapeo: propiedades inexistentes o valores sin equivalente"
+    },
+    "sync_warnings": {
+      "type": "string",
+      "description": "Valores que no se pudieron enviar a HubSpot"
     },
     "source": {
       "type": "string",
-      "description": "Fuente de captaci\u00f3n"
+      "description": "Fuente de captaci\u00f3n (vsl / direct)"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "URL desde la que se envi\u00f3 el formulario"
     },
     "utm_source": {
       "type": "string"
@@ -163,7 +182,7 @@
     },
     "payload_json": {
       "type": "string",
-      "description": "Payload original del formulario en JSON"
+      "description": "Respuestas completas en JSON"
     },
     "admin_notes": {
       "type": "string",
