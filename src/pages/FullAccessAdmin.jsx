@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import SettingsPanel from "@/components/fullaccess/admin/SettingsPanel";
 import ListPanel from "@/components/fullaccess/admin/ListPanel";
 import SortablePanel from "@/components/fullaccess/admin/SortablePanel";
+import ArtistsPanel from "@/components/fullaccess/admin/ArtistsPanel";
 import ApplicationsPanel from "@/components/fullaccess/admin/ApplicationsPanel";
 
 const TABS = [
@@ -120,25 +121,7 @@ export default function FullAccessAdmin() {
             />
           )}
 
-          {tab === "artistas" && (
-            <SortablePanel
-              title="Artistas"
-              description="Nombre, imagen y orden de las tarjetas del carrusel. Arrastra para reordenar."
-              entity="StartArtist"
-              defaults={{ name: "", image_url: "", order: 0, is_visible: true }}
-              fields={[
-                { key: "name", label: "Artista" },
-                { key: "is_visible", label: "Visible", type: "bool" },
-                {
-                  key: "image_url",
-                  label: "Imagen",
-                  type: "media",
-                  accept: "image/*",
-                  wide: true,
-                },
-              ]}
-            />
-          )}
+          {tab === "artistas" && <ArtistsPanel />}
 
           {tab === "demos" && (
             <SortablePanel

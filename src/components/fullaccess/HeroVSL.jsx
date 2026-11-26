@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Maximize2, Minimize2, Play, Volume2, VolumeX } from "lucide-react";
+import { Maximize2, Minimize2, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import UnlockModule from "@/components/fullaccess/UnlockModule";
 import useVimeoPlayer from "@/hooks/useVimeoPlayer";
 import useVimeoThumb from "@/hooks/useVimeoThumb";
@@ -28,6 +28,13 @@ const EMBED = {
   transparent: "0",
 };
 
+const clock = (seconds) => {
+  const total = Math.max(0, Math.floor(Number(seconds) || 0));
+  const minutes = Math.floor(total / 60);
+  const rest = total % 60;
+  return `${minutes}:${String(rest).padStart(2, "0")}`;
+};
+
 const reducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -35,19 +42,31 @@ const reducedMotion = () =>
 export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, suspended }) {
   const coverRef = useRef(null);
   const previewRef = useRef(null);
-  const [nativeFs, setNativeFs] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const [domFullscreen, setDomFullscreen] = useState(false);
   const [previewFailed, setPreviewFailed] = useState(false);
 
   const { poster, ratio } = useVimeoThumb(
     settings.vimeo_url,
     settings.vimeo_poster_url || settings.hero_image_url
   );
-  const { iframeRef, started, playing, muted, progress, activate, toggle, toggleMute } =
-    useVimeoPlayer({ settings, unlocked, onUnlock, suspended });
+  const {
+    iframeRef,
+    started,
+    playing,
+    muted,
+    progress,
+    currentTime,
+    duration,
+    vimeoFullscreen,
+    activate,
+    toggle,
+    toggleMute,
+    seek,
+    requestVimeoFullscreen,
+    exitVimeoFullscreen,
+  } = useVimeoPlayer({ settings, unlocked, onUnlock, suspended });
 
-  const isFullscreen = nativeFs || expanded;
-
+  const isFullscreen = domFullscreen || vimeoFullscreen;
   const previewUrl = settings.preview_video_url || "";
   const showPreview = Boolean(previewUrl) && !previewFailed && !reducedMotion();
 
@@ -75,7 +94,7 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
   useEffect(() => {
     const sync = () => {
       const active = document.fullscreenElement || document.webkitFullscreenElement;
-      setNativeFs(!!active && coverRef.current?.contains(active));
+      setDomFullscreen(Boolean(active && coverRef.current?.contains(active)));
     };
     document.addEventListener("fullscreenchange", sync);
     document.addEventListener("webkitfullscreenchange", sync);
@@ -85,26 +104,36 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
     };
   }, []);
 
-  // Modo ampliado propio: bloquea el scroll y se cierra con Esc.
-  useEffect(() => {
-    if (!expanded) return undefined;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (event) => {
-      if (event.key === "Escape") setExpanded(false);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = previous;
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [expanded]);
+  const lockLandscape = useCallback(() => {
+    try {
+      const request = screen.orientation?.lock?.("landscape");
+      if (request?.catch) request.catch(() => {});
+    } catch {
+      /* el navegador decide la orientación */
+    }
+  }, []);
 
+  const unlockOrientation = useCallback(() => {
+    try {
+      screen.orientation?.unlock?.();
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  /**
+   * Pantalla completa real, siempre desde el clic del usuario:
+   * 1) API del navegador sobre el contenedor del reproductor (Chrome, Firefox,
+   *    Safari de escritorio y Android): no recrea el iframe ni reinicia el vídeo.
+   * 2) En iPhone, donde el contenedor no admite pantalla completa, se pide al
+   *    Vimeo Player SDK su propio modo a pantalla completa.
+   */
   const toggleFullscreen = useCallback(async () => {
     const el = coverRef.current;
     const active = document.fullscreenElement || document.webkitFullscreenElement;
 
     if (active) {
+      unlockOrientation();
       try {
         if (document.exitFullscreen) await document.exitFullscreen();
         else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
@@ -114,33 +143,39 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
       return;
     }
 
-    if (expanded) {
-      setExpanded(false);
+    if (vimeoFullscreen) {
+      unlockOrientation();
+      await exitVimeoFullscreen();
       return;
     }
 
-    // Pantalla completa nativa cuando el navegador la permite.
     try {
       if (el?.requestFullscreen) {
         await el.requestFullscreen();
+        lockLandscape();
         return;
       }
       if (el?.webkitRequestFullscreen) {
         el.webkitRequestFullscreen();
+        lockLandscape();
         return;
       }
     } catch {
-      /* seguimos con el modo ampliado */
+      /* seguimos con el reproductor de Vimeo */
     }
 
-    // iOS y navegadores sin API de pantalla completa.
-    setExpanded(true);
-  }, [expanded]);
+    const ok = await requestVimeoFullscreen();
+    if (ok) lockLandscape();
+  }, [exitVimeoFullscreen, lockLandscape, requestVimeoFullscreen, unlockOrientation, vimeoFullscreen]);
+
+  const onSeek = (event) => {
+    seek(Number(event.target.value));
+  };
 
   return (
     <section className="fa-hero">
       <div
-        className={`fa-cover${started ? " is-playing" : ""}${expanded ? " is-expanded" : ""}`}
+        className={`fa-cover${started ? " is-playing" : ""}`}
         ref={coverRef}
         style={{ "--vsl-ratio": ratio }}
         onContextMenu={(event) => event.preventDefault()}
@@ -151,7 +186,10 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
               ref={iframeRef}
               src={vimeoEmbedUrl(settings.vimeo_url, EMBED)}
               title="Cabaña Full Access"
-              allow="autoplay; fullscreen; encrypted-media"
+              allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+              allowFullScreen
+              webkitallowfullscreen="true"
+              mozallowfullscreen="true"
               referrerPolicy="strict-origin-when-cross-origin"
               tabIndex={-1}
             />
@@ -167,23 +205,49 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
                 </span>
               )}
             </button>
-            <div className="fa-cover__tools">
+
+            <div className="fa-cover__bar">
               <button
                 type="button"
-                className="fa-glass fa-glass--sm"
+                className="fa-cover__btn"
+                onClick={toggle}
+                aria-label={playing ? "Pausar" : "Reproducir"}
+              >
+                {playing ? <Pause size={15} /> : <Play size={15} />}
+              </button>
+
+              <span className="fa-cover__time">{clock(currentTime)}</span>
+
+              <input
+                className="fa-cover__range"
+                type="range"
+                min={0}
+                max={Math.max(1, Math.floor(duration))}
+                step={1}
+                value={Math.min(Math.floor(currentTime), Math.max(1, Math.floor(duration)))}
+                onChange={onSeek}
+                aria-label="Posición del vídeo"
+              />
+
+              <span className="fa-cover__time fa-cover__time--total">{clock(duration)}</span>
+
+              <button
+                type="button"
+                className="fa-cover__btn"
                 onClick={toggleMute}
                 aria-label={muted ? "Activar el sonido" : "Silenciar"}
                 aria-pressed={muted}
               >
-                {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
               </button>
+
               <button
                 type="button"
-                className="fa-glass fa-glass--sm"
+                className="fa-cover__btn"
                 onClick={toggleFullscreen}
-                aria-label={isFullscreen ? "Salir de pantalla ampliada" : "Pantalla ampliada"}
+                aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
               >
-                {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
               </button>
             </div>
           </div>

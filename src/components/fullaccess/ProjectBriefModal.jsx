@@ -1,20 +1,17 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { X } from "lucide-react";
-import "@/components/landing/v3/landing3.css";
-import { useHomeContent } from "@/hooks/useHomeContent";
-import BuilderSection from "@/components/landing/v3/builder/BuilderSection";
+import "@/components/fullaccess/fa.css";
+import "@/components/fullaccess/fa-landing.css";
+import "@/components/fullaccess/fa-v4.css";
+import useFullAccessContent from "@/hooks/useFullAccessContent";
+import ProjectBriefForm from "@/components/fullaccess/brief/ProjectBriefForm";
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 export default function ProjectBriefModal({ onClose }) {
   const panelRef = useRef(null);
-  const { content } = useHomeContent();
-
-  const section = useMemo(() => {
-    const base = content?.sections?.find((item) => item.key === "comenzar") || {};
-    return { ...base, title: "Cuéntanos tu proyecto en minutos", subtitle: "" };
-  }, [content]);
+  const { settings } = useFullAccessContent();
 
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -56,11 +53,7 @@ export default function ProjectBriefModal({ onClose }) {
         </button>
 
         <div className="fa-brief__scroll">
-          {content ? (
-            <div className="ccl">
-              <BuilderSection section={section} cards={content.builder} />
-            </div>
-          ) : null}
+          <ProjectBriefForm settings={settings} onDone={onClose} />
         </div>
       </div>
     </div>

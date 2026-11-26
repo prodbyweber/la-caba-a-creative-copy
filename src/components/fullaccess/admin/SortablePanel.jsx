@@ -5,7 +5,7 @@ import { base44 } from "@/api/base44Client";
 import MediaField from "@/components/fullaccess/admin/MediaField";
 
 /** Lista editable con orden por arrastre, subida de archivos y visibilidad. */
-export default function SortablePanel({ title, description, entity, fields, defaults = {} }) {
+export default function SortablePanel({ title, description, entity, fields, defaults = {}, preview }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
@@ -116,6 +116,8 @@ export default function SortablePanel({ title, description, entity, fields, defa
           <Plus size={14} /> Añadir
         </button>
       </div>
+
+      {typeof preview === "function" && !loading ? preview(items) : null}
 
       {loading ? (
         <p className="mt-6 flex items-center gap-2 text-sm text-zinc-400">

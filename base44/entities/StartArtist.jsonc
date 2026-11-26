@@ -4,11 +4,19 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "Nombre del artista"
+      "description": "Nombre art\u00edstico"
     },
     "image_url": {
       "type": "string",
-      "description": "Imagen del artista para la tarjeta del carrusel"
+      "description": "Imagen horizontal del artista para la tarjeta del carrusel"
+    },
+    "spotify_url": {
+      "type": "string",
+      "description": "Enlace al perfil de Spotify del artista"
+    },
+    "credit": {
+      "type": "string",
+      "description": "Cr\u00e9dito o participaci\u00f3n en el proyecto (opcional)"
     },
     "order": {
       "type": "number",
