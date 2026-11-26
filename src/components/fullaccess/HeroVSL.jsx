@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Maximize2, Play } from "lucide-react";
+import { Maximize2, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import UnlockModule from "@/components/fullaccess/UnlockModule";
 import useVimeoPlayer from "@/hooks/useVimeoPlayer";
 import useVimeoThumb from "@/hooks/useVimeoThumb";
 import { vimeoEmbedUrl } from "@/lib/fullAccess";
 
-// Manda el reproductor de Vimeo: su barra incluye el botón de pantalla completa.
+// La barra de Vimeo va oculta: los controles propios son pausa, sonido y pantalla completa.
 const EMBED = {
   autoplay: "1",
   controls: "0",
@@ -41,7 +41,17 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
     settings.vimeo_url,
     settings.vimeo_poster_url || settings.hero_image_url
   );
-  const { iframeRef, started, progress, activate, requestFullscreen } = useVimeoPlayer({
+  const {
+    iframeRef,
+    started,
+    playing,
+    muted,
+    progress,
+    activate,
+    toggle,
+    toggleMute,
+    requestFullscreen,
+  } = useVimeoPlayer({
     settings,
     unlocked,
     onUnlock,
@@ -90,6 +100,28 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
               referrerPolicy="strict-origin-when-cross-origin"
             />
             <div className="fa-cover__tools">
+              <button
+                type="button"
+                className="fa-glass fa-glass--sm"
+                onClick={toggle}
+                aria-label={playing ? "Pausar el vídeo" : "Reproducir el vídeo"}
+                aria-pressed={playing}
+              >
+                {playing ? (
+                  <Pause size={16} fill="currentColor" strokeWidth={0} />
+                ) : (
+                  <Play size={16} fill="currentColor" strokeWidth={0} />
+                )}
+              </button>
+              <button
+                type="button"
+                className="fa-glass fa-glass--sm"
+                onClick={toggleMute}
+                aria-label={muted ? "Activar el sonido" : "Silenciar"}
+                aria-pressed={muted}
+              >
+                {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </button>
               <button
                 type="button"
                 className="fa-glass fa-glass--sm"

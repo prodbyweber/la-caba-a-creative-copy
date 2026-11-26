@@ -157,7 +157,12 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
   const requestFullscreen = useCallback(() => {
     const player = playerRef.current;
     if (!player) return;
-    player.requestFullscreen?.().catch(() => {});
+    try {
+      const result = player.requestFullscreen?.();
+      if (result && typeof result.catch === "function") result.catch(() => {});
+    } catch {
+      /* el reproductor ya no está disponible */
+    }
   }, []);
 
   const toggleMute = useCallback(() => {
