@@ -122,16 +122,17 @@
   width: 40px;
   height: 40px;
 }
-/* aviso de play: solo al inicio y en pausa, sin círculo */
-.fa-cover__glyph {
+.fa-cover__play {
   position: absolute;
   left: 50%;
   top: 50%;
   z-index: 3;
+  width: 72px;
+  height: 72px;
   transform: translate(-50%, -50%);
-  color: #fff;
-  pointer-events: none;
-  filter: drop-shadow(0 2px 14px rgba(0, 0, 0, 0.6));
+}
+.fa-cover__play:hover {
+  transform: translate(-50%, -50%) scale(1.04);
 }
 
 /* reproductor: 16:9 real, nunca recortado */
@@ -155,12 +156,10 @@
 .fa-cover__tap {
   position: absolute;
   inset: 0;
-  z-index: 3;
   padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
 }
 .fa-cover__center {
   position: absolute;
@@ -859,6 +858,7 @@
   .fa-cover.is-playing {
     --cover-h: clamp(540px, 82vh, 880px);
   }
+  .fa-cover__play,
   .fa-cover__center {
     width: 88px;
     height: 88px;
