@@ -145,12 +145,6 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
         style={{ "--vsl-ratio": ratio }}
         onContextMenu={(event) => event.preventDefault()}
       >
-        {poster ? (
-          <div className="fa-cover__backdrop" aria-hidden="true">
-            <img src={poster} alt="" />
-          </div>
-        ) : null}
-
         {started ? (
           <div className="fa-cover__frame">
             <iframe

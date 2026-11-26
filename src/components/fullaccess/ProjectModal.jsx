@@ -9,6 +9,15 @@ export default function ProjectModal({ project, onClose }) {
   return (
     <div className="fa-modal" onClick={onClose}>
       <div className="fa-modal__inner" onClick={(event) => event.stopPropagation()}>
+        <button
+          type="button"
+          className="fa-glass fa-modal__close"
+          onClick={onClose}
+          aria-label="Cerrar"
+        >
+          <X size={18} />
+        </button>
+
         <div className="fa-modal__frame">
           {id ? (
             <iframe
@@ -25,16 +34,9 @@ export default function ProjectModal({ project, onClose }) {
             </div>
           )}
         </div>
+
         <div className="fa-modal__bar">
-          <div>
-            <span className="fa-micro">{project.credit}</span>
-            <p style={{ marginTop: 6, fontSize: 15 }}>
-              {project.artist} · {project.song}
-            </p>
-          </div>
-          <button type="button" className="fa-btn fa-btn--ghost" onClick={onClose}>
-            <X size={15} /> Cerrar
-          </button>
+          <p className="fa-modal__artist">{project.artist}</p>
         </div>
       </div>
     </div>
