@@ -22,12 +22,11 @@
   }
 }
 
-/* ---------- herramientas del reproductor ---------- */
-/* la barra de Vimeo ocupa la parte baja: el sonido va arriba */
+/* ---------- único botón del reproductor: pantalla completa ---------- */
 .fa-cover__tools {
-  top: 14px;
+  top: auto;
   right: 14px;
-  bottom: auto;
+  bottom: 14px;
 }
 
 /* ---------- CTA final ---------- */

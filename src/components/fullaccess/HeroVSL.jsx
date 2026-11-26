@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Play, Volume2, VolumeX } from "lucide-react";
+import { Maximize2, Play } from "lucide-react";
 import UnlockModule from "@/components/fullaccess/UnlockModule";
 import useVimeoPlayer from "@/hooks/useVimeoPlayer";
 import useVimeoThumb from "@/hooks/useVimeoThumb";
@@ -8,7 +8,7 @@ import { vimeoEmbedUrl } from "@/lib/fullAccess";
 // Manda el reproductor de Vimeo: su barra incluye el botón de pantalla completa.
 const EMBED = {
   autoplay: "1",
-  controls: "1",
+  controls: "0",
   title: "0",
   byline: "0",
   portrait: "0",
@@ -41,7 +41,7 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
     settings.vimeo_url,
     settings.vimeo_poster_url || settings.hero_image_url
   );
-  const { iframeRef, started, muted, progress, activate, toggleMute } = useVimeoPlayer({
+  const { iframeRef, started, progress, activate, requestFullscreen } = useVimeoPlayer({
     settings,
     unlocked,
     onUnlock,
@@ -93,11 +93,10 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
               <button
                 type="button"
                 className="fa-glass fa-glass--sm"
-                onClick={toggleMute}
-                aria-label={muted ? "Activar el sonido" : "Silenciar"}
-                aria-pressed={muted}
+                onClick={requestFullscreen}
+                aria-label="Pantalla completa"
               >
-                {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                <Maximize2 size={16} />
               </button>
             </div>
           </div>

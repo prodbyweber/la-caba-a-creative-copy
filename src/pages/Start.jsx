@@ -4,7 +4,6 @@ import "@/components/fullaccess/fa.css";
 import "@/components/fullaccess/fa-landing.css";
 import "@/components/fullaccess/fa-v4.css";
 import useFullAccessContent from "@/hooks/useFullAccessContent";
-import { unlockKey } from "@/lib/fullAccess";
 import FullAccessNav from "@/components/fullaccess/FullAccessNav";
 import HeroVSL from "@/components/fullaccess/HeroVSL";
 import StatsSection from "@/components/fullaccess/StatsSection";
@@ -23,14 +22,7 @@ export default function Start() {
     window.scrollTo(0, 0);
   }, []);
 
-  // El desbloqueo se guarda por vídeo: otro VSL vuelve a bloquear el CTA.
-  useEffect(() => {
-    try {
-      setUnlocked(localStorage.getItem(unlockKey(settings.vimeo_url)) === "1");
-    } catch {
-      setUnlocked(false);
-    }
-  }, [settings.vimeo_url]);
+  // El CTA arranca siempre bloqueado: solo se abre al llegar al minuto marcado.
 
   const handleUnlock = useCallback(() => setUnlocked(true), []);
   const openBrief = useCallback(() => setBriefOpen(true), []);

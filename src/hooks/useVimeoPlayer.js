@@ -153,6 +153,13 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
     player.play().catch(() => setPlaying(false));
   }, [playing]);
 
+  // Pantalla completa del propio reproductor de Vimeo.
+  const requestFullscreen = useCallback(() => {
+    const player = playerRef.current;
+    if (!player) return;
+    player.requestFullscreen?.().catch(() => {});
+  }, []);
+
   const toggleMute = useCallback(() => {
     const player = playerRef.current;
     if (!player) return;
@@ -163,5 +170,15 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
     player.setVolume(next ? 0 : 1).catch(() => {});
   }, []);
 
-  return { iframeRef, started, playing, muted, progress, activate, toggle, toggleMute };
+  return {
+    iframeRef,
+    started,
+    playing,
+    muted,
+    progress,
+    activate,
+    toggle,
+    toggleMute,
+    requestFullscreen,
+  };
 }
