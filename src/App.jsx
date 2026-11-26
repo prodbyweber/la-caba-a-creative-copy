@@ -22,6 +22,7 @@ import CookieBanner from './components/common/CookieBanner';
 import StudioSession from './pages/StudioSession';
 import Meeting from './pages/Meeting';
 import Start from './pages/Start';
+import Admision from './pages/Admision';
 import ContactLeads from './pages/ContactLeads';
 import CatalogoAdmin from './pages/CatalogoAdmin.jsx';
 import ArtistPanelList from './pages/ArtistPanelList';
@@ -159,6 +160,7 @@ const AuthenticatedApp = () => {
 
       {/* Public pages (no auth required) */}
       <Route path="/start" element={<Start />} />
+      <Route path="/admision" element={<Admision />} />
       <Route path="/Marcas" element={<Marcas />} />
       <Route path="/gracias" element={<Gracias />} />
       <Route path="/solicitud" element={<Solicitud />} />

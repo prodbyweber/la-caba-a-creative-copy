@@ -144,6 +144,10 @@
     "confirm_text": {
       "type": "string",
       "description": "Texto de la confirmaci\u00f3n"
+    },
+    "meetings_url": {
+      "type": "string",
+      "description": "URL real de HubSpot Meetings para reservar la conversaci\u00f3n desde /admision"
     }
   },
   "required": [],

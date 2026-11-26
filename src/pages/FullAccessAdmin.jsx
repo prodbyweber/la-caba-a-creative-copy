@@ -4,8 +4,10 @@ import SettingsPanel from "@/components/fullaccess/admin/SettingsPanel";
 import ListPanel from "@/components/fullaccess/admin/ListPanel";
 import SortablePanel from "@/components/fullaccess/admin/SortablePanel";
 import ApplicationsPanel from "@/components/fullaccess/admin/ApplicationsPanel";
+import AdmissionsPanel from "@/components/admision/admin/AdmissionsPanel";
 
 const TABS = [
+  { key: "admisiones", label: "Admisiones" },
   { key: "contenido", label: "Contenido" },
   { key: "stats", label: "Estadísticas" },
   { key: "artistas", label: "Artistas" },
@@ -60,6 +62,8 @@ export default function FullAccessAdmin() {
         </div>
 
         <div className="mt-7">
+          {tab === "admisiones" && <AdmissionsPanel />}
+
           {tab === "contenido" && <SettingsPanel />}
 
           {tab === "stats" && (

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import "@/components/fullaccess/fa.css";
 import "@/components/fullaccess/fa-landing.css";
@@ -11,12 +12,11 @@ import BrandsStrip from "@/components/fullaccess/BrandsStrip";
 import ArtistsCarousel from "@/components/fullaccess/ArtistsCarousel";
 import SelectedProjects from "@/components/fullaccess/SelectedProjects";
 import Methodology from "@/components/fullaccess/Methodology";
-import ProjectBriefModal from "@/components/fullaccess/ProjectBriefModal";
 
 export default function Start() {
   const { settings, projects, demos, artists } = useFullAccessContent();
   const [unlocked, setUnlocked] = useState(false);
-  const [briefOpen, setBriefOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -25,8 +25,8 @@ export default function Start() {
   // El CTA arranca siempre bloqueado: solo se abre al llegar al minuto marcado.
 
   const handleUnlock = useCallback(() => setUnlocked(true), []);
-  const openBrief = useCallback(() => setBriefOpen(true), []);
-  const closeBrief = useCallback(() => setBriefOpen(false), []);
+  // El CTA mantiene su diseño y su desbloqueo: solo cambia el destino.
+  const openBrief = useCallback(() => navigate("/admision"), [navigate]);
 
   return (
     <div className="fa">
@@ -38,7 +38,6 @@ export default function Start() {
           unlocked={unlocked}
           onUnlock={handleUnlock}
           onOpenForm={openBrief}
-          suspended={briefOpen}
         />
       </div>
 
@@ -62,7 +61,6 @@ export default function Start() {
         </div>
       </footer>
 
-      {briefOpen ? <ProjectBriefModal onClose={closeBrief} /> : null}
     </div>
   );
 }

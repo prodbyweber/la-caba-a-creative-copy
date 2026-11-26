@@ -55,6 +55,12 @@ const FIELDS = [
   { key: "booking_end_hour", label: "Hora fin", type: "number" },
   { key: "confirm_title", label: "Título de confirmación" },
   { key: "confirm_text", label: "Texto de confirmación", wide: true },
+  {
+    key: "meetings_url",
+    label: "URL de HubSpot Meetings",
+    wide: true,
+    hint: "Enlace real de la agenda de Cabaña Creative. Se usa en la pantalla final de /admision.",
+  },
 ];
 
 export default function SettingsPanel() {

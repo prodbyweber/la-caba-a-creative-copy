@@ -1,0 +1,197 @@
+{
+  "name": "AdmissionSubmission",
+  "type": "object",
+  "properties": {
+    "submission_id": {
+      "type": "string",
+      "description": "Identificador \u00fanico de la solicitud"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "description": "Clave para evitar env\u00edos duplicados accidentales"
+    },
+    "first_name": {
+      "type": "string",
+      "description": "Nombre"
+    },
+    "last_name": {
+      "type": "string",
+      "description": "Apellido"
+    },
+    "email": {
+      "type": "string",
+      "description": "Correo electr\u00f3nico (identificador en HubSpot)"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Tel\u00e9fono con prefijo internacional"
+    },
+    "country": {
+      "type": "string",
+      "description": "Pa\u00eds"
+    },
+    "city": {
+      "type": "string",
+      "description": "Ciudad"
+    },
+    "instagram": {
+      "type": "string",
+      "description": "Instagram @"
+    },
+    "music_link": {
+      "type": "string",
+      "description": "Enlace a m\u00fasica o perfil (Spotify, YouTube, Drive)"
+    },
+    "project_stage": {
+      "type": "string",
+      "description": "Etapa del proyecto"
+    },
+    "genres": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "G\u00e9neros musicales seleccionados"
+    },
+    "genre_other": {
+      "type": "string",
+      "description": "Detalle cuando selecciona Otro"
+    },
+    "goals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Objetivos del proyecto seleccionados"
+    },
+    "main_blocker": {
+      "type": "string",
+      "description": "Principal bloqueo"
+    },
+    "release_type": {
+      "type": "string",
+      "description": "Tipo de lanzamiento"
+    },
+    "release_date": {
+      "type": "string",
+      "description": "Fecha objetivo de lanzamiento"
+    },
+    "availability": {
+      "type": "string",
+      "description": "Disponibilidad para comenzar"
+    },
+    "budget": {
+      "type": "string",
+      "description": "Presupuesto"
+    },
+    "qualification_status": {
+      "type": "string",
+      "enum": [
+        "APTO PARA AGENDAR",
+        "EN EXPLORACI\u00d3N",
+        "SIN PRESUPUESTO DISPONIBLE"
+      ],
+      "enumColors": [
+        "green",
+        "yellow",
+        "gray"
+      ],
+      "description": "Estado interno de calificaci\u00f3n"
+    },
+    "hubspot_sync_status": {
+      "type": "string",
+      "enum": [
+        "pendiente",
+        "sincronizado",
+        "error"
+      ],
+      "enumColors": [
+        "yellow",
+        "green",
+        "red"
+      ],
+      "default": "pendiente",
+      "description": "Estado de sincronizaci\u00f3n con HubSpot"
+    },
+    "hubspot_contact_id": {
+      "type": "string",
+      "description": "ID del contacto en HubSpot"
+    },
+    "hubspot_last_sync": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha de la \u00faltima sincronizaci\u00f3n"
+    },
+    "hubspot_attempts": {
+      "type": "number",
+      "default": 0,
+      "description": "N\u00famero de intentos de sincronizaci\u00f3n"
+    },
+    "hubspot_sync_error": {
+      "type": "string",
+      "description": "\u00daltimo error de sincronizaci\u00f3n"
+    },
+    "hubspot_sync_warning": {
+      "type": "string",
+      "description": "Avisos de mapeo de propiedades (valores no reconocidos)"
+    },
+    "source": {
+      "type": "string",
+      "description": "Fuente de captaci\u00f3n"
+    },
+    "utm_source": {
+      "type": "string"
+    },
+    "utm_medium": {
+      "type": "string"
+    },
+    "utm_campaign": {
+      "type": "string"
+    },
+    "utm_content": {
+      "type": "string"
+    },
+    "utm_term": {
+      "type": "string"
+    },
+    "referrer": {
+      "type": "string"
+    },
+    "payload_json": {
+      "type": "string",
+      "description": "Payload original del formulario en JSON"
+    },
+    "admin_notes": {
+      "type": "string",
+      "description": "Notas internas del equipo"
+    },
+    "activity": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Historial de actividad de la solicitud"
+    }
+  },
+  "required": [
+    "email"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
