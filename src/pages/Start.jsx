@@ -54,11 +54,7 @@ export default function Start() {
       <BrandsStrip />
       <ArtistsCarousel artists={artists} settings={settings} />
       <SelectedProjects projects={projects} />
-      <Methodology
-        studioVideoUrl={settings.studio_video_url}
-        demos={demos}
-        demoEyebrow={settings.demo_eyebrow}
-      />
+      <Methodology demos={demos} demoEyebrow={settings.demo_eyebrow} />
 
       <footer className="fa-wrap">
         <div className="fa-endcta">
