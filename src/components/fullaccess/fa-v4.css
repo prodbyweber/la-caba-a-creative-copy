@@ -42,6 +42,66 @@
   padding: clamp(30px, 6vw, 64px) 0 clamp(10px, 2vw, 18px);
 }
 
+/* ============================================================
+   MÓVIL: portada, título, vídeo, barra y marcas en una vista
+   ============================================================ */
+@media (max-width: 899px) {
+  /* menos altura = menos recorte lateral; nunca se recorta en vertical */
+  .fa-cover {
+    --cover-h: clamp(280px, calc(56.25vw + 108px), 380px);
+  }
+  .fa-cover__title {
+    font-size: clamp(1.45rem, 6.2vw, 1.9rem);
+  }
+  /* la portada no se recorta: se ve el cuadro completo, sin tocar caras */
+  .fa-cover__media img,
+  .fa-cover__media video {
+    object-fit: contain;
+  }
+  .fa-cover__line {
+    margin-top: 8px;
+    font-size: 0.82rem;
+  }
+  .fa-cover__content {
+    padding-bottom: 18px;
+  }
+  .fa-unlockmod {
+    padding-top: 12px;
+  }
+  .fa-unlockmod__hint {
+    font-size: 10px;
+    line-height: 1.35;
+  }
+  .fa-progress {
+    margin-top: 8px;
+  }
+  .fa-cta {
+    min-height: 48px;
+    margin-top: 10px;
+    font-size: 0.88rem;
+  }
+  .fa-statsrow {
+    padding: 16px 0 18px;
+  }
+  .fa-statsrow__value {
+    font-size: clamp(1.5rem, 7vw, 2.2rem);
+  }
+  .fa-statsrow__label {
+    margin-top: 5px;
+    font-size: 7px;
+  }
+  .fa-brands {
+    padding: 16px 0 18px;
+  }
+  .fa-brands__viewport {
+    margin-top: 8px;
+  }
+  .fa-brands__cell {
+    height: 34px;
+    width: 112px;
+  }
+}
+
 /* ---------- CTA: bloqueado por defecto, un latido al abrir ---------- */
 .fa-cta:disabled,
 .fa-cta[aria-disabled="true"] {
