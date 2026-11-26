@@ -28,6 +28,14 @@ const EMBED = {
   transparent: "0",
 };
 
+// En pantalla ampliada manda el reproductor, con su propia barra.
+const embedFor = (fullscreen) => ({
+  ...EMBED,
+  controls: fullscreen ? "1" : "0",
+  playsinline: fullscreen ? "0" : "1",
+  pip: fullscreen ? "1" : "0",
+});
+
 const reducedMotion = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -39,14 +47,14 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
   const [expanded, setExpanded] = useState(false);
   const [previewFailed, setPreviewFailed] = useState(false);
 
+  const isFullscreen = nativeFs || expanded;
+
   const { poster, ratio } = useVimeoThumb(
     settings.vimeo_url,
     settings.vimeo_poster_url || settings.hero_image_url
   );
   const { iframeRef, started, playing, muted, progress, activate, toggle, toggleMute } =
-    useVimeoPlayer({ settings, unlocked, onUnlock, suspended });
-
-  const isFullscreen = nativeFs || expanded;
+    useVimeoPlayer({ settings, unlocked, onUnlock, suspended, controls: isFullscreen });
 
   const previewUrl = settings.preview_video_url || "";
   const showPreview = Boolean(previewUrl) && !previewFailed && !reducedMotion();
@@ -148,8 +156,9 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
         {started ? (
           <div className="fa-cover__frame">
             <iframe
+              key={isFullscreen ? "expanded" : "inline"}
               ref={iframeRef}
-              src={vimeoEmbedUrl(settings.vimeo_url, EMBED)}
+              src={vimeoEmbedUrl(settings.vimeo_url, embedFor(isFullscreen))}
               title="Cabaña Full Access"
               allow="autoplay; fullscreen; encrypted-media"
               referrerPolicy="strict-origin-when-cross-origin"

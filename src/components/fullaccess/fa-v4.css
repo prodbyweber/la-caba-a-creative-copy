@@ -32,9 +32,26 @@
   --cover-h: 100dvh;
   background: #000;
 }
-.fa .fa-cover.is-expanded .fa-cover__tools {
-  right: 18px;
-  bottom: 18px;
+.fa .fa-cover.is-expanded .fa-cover__tools,
+.fa .fa-cover:fullscreen .fa-cover__tools {
+  top: 16px;
+  right: 16px;
+  bottom: auto;
+}
+/* en pantalla ampliada el vídeo llena la pantalla y manda la barra del reproductor */
+.fa .fa-cover.is-expanded .fa-cover__frame,
+.fa .fa-cover:fullscreen .fa-cover__frame {
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  aspect-ratio: auto;
+  transform: none;
+}
+.fa .fa-cover.is-expanded .fa-cover__tap,
+.fa .fa-cover:fullscreen .fa-cover__tap {
+  display: none;
 }
 
 /* ---------- CTA final ---------- */

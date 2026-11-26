@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { unlockKey } from "@/lib/fullAccess";
 
-const DEFAULT_UNLOCK = 249;
+const DEFAULT_UNLOCK = 104;
 const JUMP_TOLERANCE = 1.5;
 
 function loadSdk() {
@@ -22,12 +22,13 @@ function loadSdk() {
  * Reproductor del VSL: sin saltos, sin controles nativos, con sonido activado,
  * audio conmutable y desbloqueo solo por visionado real.
  */
-export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended }) {
+export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended, controls }) {
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
   const maxRef = useRef(0);
   const unlockedRef = useRef(unlocked);
   const mutedRef = useRef(false);
+  const firstPlayRef = useRef(true);
 
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -87,7 +88,15 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
           markUnlocked();
         });
 
-        player.on("play", () => setPlaying(true));
+        // El vídeo arranca siempre con el audio activo.
+        player.on("play", () => {
+          setPlaying(true);
+          if (firstPlayRef.current) {
+            firstPlayRef.current = false;
+            player.setMuted(false).catch(() => {});
+            player.setVolume(1).catch(() => {});
+          }
+        });
         player.on("pause", () => setPlaying(false));
 
         // El icono de audio sigue siempre el estado real del reproductor.
@@ -104,6 +113,8 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
             player.setPlaybackRate(1).catch(() => {});
             player.setMuted(false).catch(() => {});
             player.setVolume(1).catch(() => {});
+            // Al cambiar de vista (ampliada / reducida) se retoma donde iba.
+            if (maxRef.current > 0) player.setCurrentTime(maxRef.current).catch(() => {});
             return player.play();
           })
           .catch(() => {});
@@ -120,7 +131,7 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
         /* ignore */
       }
     };
-  }, [started, markUnlocked, settings.unlock_seconds]);
+  }, [started, markUnlocked, settings.unlock_seconds, controls]);
 
   useEffect(() => {
     if (!suspended) return;

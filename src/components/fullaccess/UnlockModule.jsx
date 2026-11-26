@@ -37,7 +37,7 @@ export default function UnlockModule({ progress, unlocked, onOpenForm }) {
         disabled={!unlocked}
         onClick={unlocked ? onOpenForm : undefined}
       >
-        ENVÍA TU PROYECTO
+        Envía tu proyecto
         {unlocked ? <ArrowRight size={17} /> : <Lock size={15} />}
       </button>
     </div>
