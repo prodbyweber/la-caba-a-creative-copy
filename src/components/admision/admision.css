@@ -314,6 +314,15 @@
   overflow-wrap: anywhere;
 }
 
+.adm-review__row {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fa-faint);
+}
+
 /* ---------- resultado ---------- */
 .adm-result {
   max-width: 720px;

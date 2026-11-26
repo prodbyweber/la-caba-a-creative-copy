@@ -96,17 +96,19 @@ function buildProperties(submission: any, byName: Map<string, any>) {
     }
 
     if (prop.type === "enumeration" || prop.type === "checkbox") {
+      // HubSpot expone los multiselección como enumeration + fieldType "checkbox".
+      const multiProp = prop.type === "checkbox" || prop.fieldType === "checkbox";
       const resolved = values.map((value) => optionValue(prop, value)).filter(Boolean);
       const unmatched = values.filter((value) => !optionValue(prop, value));
       if (unmatched.length) warnings.push(`${name}: sin opción equivalente para "${unmatched.join(", ")}"`);
       if (!resolved.length) return;
-      if (prop.type === "enumeration") {
+      if (multiProp) {
+        props[name] = resolved.join(";");
+      } else {
         if (resolved.length > 1) {
           warnings.push(`${name}: es de selección única, se envía solo "${resolved[0]}"`);
         }
         props[name] = resolved[0];
-      } else {
-        props[name] = resolved.join(";");
       }
       return;
     }

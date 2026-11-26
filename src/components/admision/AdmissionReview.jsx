@@ -72,6 +72,7 @@ export default function AdmissionReview({ data, onEdit }) {
           </div>
           {group.rows.map(([label, value]) => (
             <p key={label} className="adm-review__value">
+              <span className="adm-review__row">{label}</span>
               {value || "—"}
             </p>
           ))}
