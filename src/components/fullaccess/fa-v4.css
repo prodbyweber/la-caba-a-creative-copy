@@ -145,6 +145,17 @@
    MÓVIL: barra de progreso, cifras y marcas más compactas
    ============================================================ */
 @media (max-width: 899px) {
+  /* portada vertical, más corta para que quepan progreso, cifras y marcas */
+  .fa-cover {
+    --cover-h: clamp(320px, 56svh, 460px);
+  }
+  .fa-cover__title {
+    font-size: clamp(1.4rem, 6vw, 1.9rem);
+  }
+  .fa-cover__line {
+    margin-top: 8px;
+    font-size: 0.8rem;
+  }
   .fa-unlockmod {
     padding-top: 12px;
   }
