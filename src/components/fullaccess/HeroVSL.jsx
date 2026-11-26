@@ -88,6 +88,9 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
         className={`fa-cover${started ? " is-playing" : ""}`}
         style={{ "--vsl-ratio": ratio }}
         onContextMenu={(event) => event.preventDefault()}
+        onClick={() => {
+          if (!started) activate();
+        }}
       >
         {started ? (
           <div className="fa-cover__frame">
@@ -98,6 +101,13 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
               allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
               allowFullScreen
               referrerPolicy="strict-origin-when-cross-origin"
+            />
+            {/* tocar la pantalla reproduce o pausa el vídeo */}
+            <button
+              type="button"
+              className="fa-cover__tap"
+              onClick={toggle}
+              aria-label={playing ? "Pausar el vídeo" : "Reproducir el vídeo"}
             />
             <div className="fa-cover__tools">
               <button
@@ -162,15 +172,11 @@ export default function HeroVSL({ settings, unlocked, onUnlock, onOpenForm, susp
           </div>
         </div>
 
-        {!started ? (
-          <button
-            type="button"
-            className="fa-glass fa-cover__play"
-            onClick={activate}
-            aria-label="Reproducir el vídeo"
-          >
-            <Play size={28} fill="currentColor" strokeWidth={0} />
-          </button>
+        {/* aviso de play: solo al inicio y en pausa, sin círculo */}
+        {!playing ? (
+          <span className="fa-cover__glyph" aria-hidden="true">
+            <Play size={52} fill="currentColor" strokeWidth={0} />
+          </span>
         ) : null}
       </div>
 
