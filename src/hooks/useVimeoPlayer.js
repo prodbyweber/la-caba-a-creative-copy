@@ -2,8 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { unlockKey } from "@/lib/fullAccess";
 
 const DEFAULT_UNLOCK = 249;
-// Un salto en la línea de tiempo nunca cuenta como visionado.
-const MAX_TICK = 1.5;
+const JUMP_TOLERANCE = 1.5;
 
 function loadSdk() {
   if (window.Vimeo?.Player) return Promise.resolve(window.Vimeo);
@@ -20,24 +19,19 @@ function loadSdk() {
 }
 
 /**
- * Reproductor del VSL: una sola instancia, audio conmutable, barra real y
- * desbloqueo solo por tiempo realmente visionado (arrastrar no desbloquea).
+ * Reproductor del VSL: sin saltos, sin controles nativos, con sonido activado,
+ * audio conmutable y desbloqueo solo por visionado real.
  */
 export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended }) {
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
-  const watchedRef = useRef(0);
-  const lastTickRef = useRef(0);
+  const maxRef = useRef(0);
   const unlockedRef = useRef(unlocked);
   const mutedRef = useRef(false);
-  const playingRef = useRef(false);
 
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [vimeoFullscreen, setVimeoFullscreen] = useState(false);
   const [progress, setProgress] = useState(unlocked ? 1 : 0);
 
   useEffect(() => {
@@ -71,39 +65,30 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
         playerRef.current = player;
 
         player.on("timeupdate", (data) => {
-          const now = Number(data?.seconds) || 0;
-          const total = Number(data?.duration) || 0;
-          setCurrentTime(now);
-          if (total > 0) setDuration(total);
-
-          const delta = now - lastTickRef.current;
-          lastTickRef.current = now;
-          if (delta > 0 && delta <= MAX_TICK) watchedRef.current += delta;
+          const now = data.seconds || 0;
+          const duration = data.duration || 0;
+          // Un salto hacia delante nunca desbloquea: se devuelve al último punto visto.
+          if (now > maxRef.current + JUMP_TOLERANCE) {
+            player.setCurrentTime(maxRef.current).catch(() => {});
+            return;
+          }
+          if (now > maxRef.current) maxRef.current = now;
 
           const target = Number(settings.unlock_seconds) || DEFAULT_UNLOCK;
-          const fullLength = total > 0 && target >= total - 1;
-          const point = fullLength ? total : target;
-          if (point > 0 && !unlockedRef.current) {
-            setProgress(Math.min(1, watchedRef.current / point));
-          }
-          if (!fullLength && watchedRef.current >= target) markUnlocked();
+          const fullLength = duration > 0 && target >= duration - 1;
+          const point = fullLength ? duration : target;
+          if (point > 0) setProgress(Math.min(1, now / point));
+          if (!fullLength && now >= target) markUnlocked();
         });
 
         player.on("ended", () => {
-          playingRef.current = false;
           setPlaying(false);
           setProgress(1);
           markUnlocked();
         });
 
-        player.on("play", () => {
-          playingRef.current = true;
-          setPlaying(true);
-        });
-        player.on("pause", () => {
-          playingRef.current = false;
-          setPlaying(false);
-        });
+        player.on("play", () => setPlaying(true));
+        player.on("pause", () => setPlaying(false));
 
         // El icono de audio sigue siempre el estado real del reproductor.
         player.on("volumechange", (data) => {
@@ -111,10 +96,6 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
           const next = data?.muted === true || value === 0;
           mutedRef.current = next;
           setMuted(next);
-        });
-
-        player.on("fullscreenchange", (data) => {
-          setVimeoFullscreen(Boolean(data?.fullscreen));
         });
 
         player
@@ -138,7 +119,6 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
       } catch {
         /* ignore */
       }
-      playerRef.current = null;
     };
   }, [started, markUnlocked, settings.unlock_seconds]);
 
@@ -151,7 +131,7 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
   const toggle = useCallback(() => {
     const player = playerRef.current;
     if (!player) return;
-    if (playingRef.current) {
+    if (playing) {
       player.pause().catch(() => {});
       return;
     }
@@ -160,7 +140,7 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
       player.setVolume(1).catch(() => {});
     }
     player.play().catch(() => setPlaying(false));
-  }, []);
+  }, [playing]);
 
   const toggleMute = useCallback(() => {
     const player = playerRef.current;
@@ -172,52 +152,5 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
     player.setVolume(next ? 0 : 1).catch(() => {});
   }, []);
 
-  // Avanzar o retroceder no suma tiempo visionado.
-  const seek = useCallback((seconds) => {
-    const player = playerRef.current;
-    if (!player) return;
-    const value = Math.max(0, seconds);
-    lastTickRef.current = value;
-    setCurrentTime(value);
-    player.setCurrentTime(value).catch(() => {});
-  }, []);
-
-  const requestVimeoFullscreen = useCallback(async () => {
-    const player = playerRef.current;
-    if (!player?.requestFullscreen) return false;
-    try {
-      await player.requestFullscreen();
-      return true;
-    } catch {
-      return false;
-    }
-  }, []);
-
-  const exitVimeoFullscreen = useCallback(async () => {
-    const player = playerRef.current;
-    if (!player?.exitFullscreen) return false;
-    try {
-      await player.exitFullscreen();
-      return true;
-    } catch {
-      return false;
-    }
-  }, []);
-
-  return {
-    iframeRef,
-    started,
-    playing,
-    muted,
-    progress,
-    currentTime,
-    duration,
-    vimeoFullscreen,
-    activate,
-    toggle,
-    toggleMute,
-    seek,
-    requestVimeoFullscreen,
-    exitVimeoFullscreen,
-  };
+  return { iframeRef, started, playing, muted, progress, activate, toggle, toggleMute };
 }

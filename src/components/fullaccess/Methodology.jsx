@@ -1,9 +1,9 @@
 import React from "react";
 import MethodologyStage from "@/components/fullaccess/MethodologyStage";
 import DemoMasterRow from "@/components/fullaccess/DemoMasterRow";
-import { METHOD_STAGES } from "@/lib/methodologyStages";
+import { METHOD_STAGES, METHOD_RESULT } from "@/lib/methodologyStages";
 
-export default function Methodology({ studioVideoUrl, demos = [], demoEyebrow, artists = [] }) {
+export default function Methodology({ studioVideoUrl, demos = [], demoEyebrow }) {
   return (
     <section className="fa-method" id="metodologia">
       <div className="fa-wrap">
@@ -14,13 +14,15 @@ export default function Methodology({ studioVideoUrl, demos = [], demoEyebrow, a
 
         <div className="fa-mstages">
           {METHOD_STAGES.map((stage) => (
-            <MethodologyStage
-              key={stage.num}
-              stage={stage}
-              studioVideoUrl={studioVideoUrl}
-              artists={artists}
-            />
+            <MethodologyStage key={stage.num} stage={stage} studioVideoUrl={studioVideoUrl} />
           ))}
+        </div>
+
+        <div className="fa-result">
+          <span className="fa-eyebrow">RESULTADO</span>
+          <p className="fa-result__text">{METHOD_RESULT.text}</p>
+          <p className="fa-result__philosophy">{METHOD_RESULT.philosophy}</p>
+          <p className="fa-result__note">{METHOD_RESULT.note}</p>
         </div>
       </div>
 

@@ -9,6 +9,7 @@ import FullAccessNav from "@/components/fullaccess/FullAccessNav";
 import HeroVSL from "@/components/fullaccess/HeroVSL";
 import StatsSection from "@/components/fullaccess/StatsSection";
 import BrandsStrip from "@/components/fullaccess/BrandsStrip";
+import ArtistsCarousel from "@/components/fullaccess/ArtistsCarousel";
 import SelectedProjects from "@/components/fullaccess/SelectedProjects";
 import Methodology from "@/components/fullaccess/Methodology";
 import ProjectBriefModal from "@/components/fullaccess/ProjectBriefModal";
@@ -51,12 +52,12 @@ export default function Start() {
 
       <StatsSection />
       <BrandsStrip />
+      <ArtistsCarousel artists={artists} settings={settings} />
       <SelectedProjects projects={projects} />
       <Methodology
         studioVideoUrl={settings.studio_video_url}
         demos={demos}
         demoEyebrow={settings.demo_eyebrow}
-        artists={artists}
       />
 
       <footer className="fa-wrap">

@@ -2,65 +2,6 @@
   "name": "FullAccessApplication",
   "type": "object",
   "properties": {
-    "request_key": {
-      "type": "string",
-      "description": "Clave \u00fanica del briefing para evitar env\u00edos duplicados"
-    },
-    "first_name": {
-      "type": "string",
-      "description": "Nombre"
-    },
-    "last_name": {
-      "type": "string",
-      "description": "Apellidos"
-    },
-    "phone": {
-      "type": "string",
-      "description": "Tel\u00e9fono con prefijo internacional"
-    },
-    "moment": {
-      "type": "string",
-      "description": "Punto en el que se encuentra el proyecto"
-    },
-    "moment_detail": {
-      "type": "string",
-      "description": "Respuesta a la pregunta condicional del momento actual"
-    },
-    "goals": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "Objetivos seleccionados"
-    },
-    "priority_goal": {
-      "type": "string",
-      "description": "Objetivo prioritario"
-    },
-    "music_link": {
-      "type": "string",
-      "description": "Enlace a m\u00fasica o demos"
-    },
-    "release_format": {
-      "type": "string",
-      "description": "Formato del pr\u00f3ximo lanzamiento"
-    },
-    "release_window": {
-      "type": "string",
-      "description": "Fecha estimada del lanzamiento"
-    },
-    "start_window": {
-      "type": "string",
-      "description": "Cu\u00e1ndo quiere empezar a trabajar"
-    },
-    "modality": {
-      "type": "string",
-      "description": "Modalidad de inter\u00e9s"
-    },
-    "payment_preference": {
-      "type": "string",
-      "description": "Preferencia de pago"
-    },
     "artist_name": {
       "type": "string",
       "description": "Nombre art\u00edstico"
