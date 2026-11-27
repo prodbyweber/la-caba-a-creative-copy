@@ -152,6 +152,11 @@
     "booking_url": {
       "type": "string",
       "description": "URL de la agenda de Google Calendar que se incrusta en la \u00faltima pantalla de /admision"
+    },
+    "available_spots": {
+      "type": "number",
+      "default": 7,
+      "description": "Plazas disponibles que se muestran en la pantalla final de /admision"
     }
   },
   "required": [],

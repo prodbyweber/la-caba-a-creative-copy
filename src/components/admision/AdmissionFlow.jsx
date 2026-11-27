@@ -4,11 +4,9 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import ContactScreen from "@/components/admision/ContactScreen";
 import StageScreen from "@/components/admision/StageScreen";
-import LocationScreen from "@/components/admision/LocationScreen";
 import SoundScreen from "@/components/admision/SoundScreen";
-import GoalsScreen from "@/components/admision/GoalsScreen";
-import BlockerScreen from "@/components/admision/BlockerScreen";
 import ReleaseScreen from "@/components/admision/ReleaseScreen";
+import BudgetScreen from "@/components/admision/BudgetScreen";
 import AvailabilityScreen from "@/components/admision/AvailabilityScreen";
 import BookingScreen from "@/components/admision/BookingScreen";
 import ResultScreen from "@/components/admision/ResultScreen";
@@ -22,21 +20,19 @@ import { browserCountryCode } from "@/lib/phoneCountries";
 const SCREENS = [
   ContactScreen,
   StageScreen,
-  LocationScreen,
   SoundScreen,
-  GoalsScreen,
-  BlockerScreen,
   ReleaseScreen,
+  BudgetScreen,
   AvailabilityScreen,
 ];
 const LAST_FORM_SCREEN = SCREENS.length - 1;
-const FINAL_SCREEN = SCREENS.length;
 
 const readParams = () => new URLSearchParams(window.location.search);
 
 export default function AdmissionFlow({ settings }) {
   const reduce = useReducedMotion();
   const [screen, setScreen] = useState(0);
+  const [phase, setPhase] = useState("form");
   const [data, setData] = useState(() => createEmptyAdmission(browserCountryCode()));
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -47,7 +43,7 @@ export default function AdmissionFlow({ settings }) {
   const screenRef = useRef(null);
   const lockRef = useRef(false);
 
-  const done = screen === FINAL_SCREEN;
+  const booking = phase === "booking";
   const Screen = SCREENS[screen] || null;
   const qualified = result?.qualification_status === QUALIFIED_STATUS;
 
@@ -58,7 +54,6 @@ export default function AdmissionFlow({ settings }) {
     const root = document.documentElement;
     const apply = () => {
       root.style.setProperty("--adm-viewport", `${Math.round(viewport.height)}px`);
-      root.style.setProperty("--adm-offset", `${Math.round(viewport.offsetTop)}px`);
     };
     apply();
     viewport.addEventListener("resize", apply);
@@ -67,7 +62,6 @@ export default function AdmissionFlow({ settings }) {
       viewport.removeEventListener("resize", apply);
       viewport.removeEventListener("scroll", apply);
       root.style.removeProperty("--adm-viewport");
-      root.style.removeProperty("--adm-offset");
     };
   }, []);
 
@@ -144,7 +138,7 @@ export default function AdmissionFlow({ settings }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (saving || lockRef.current || done) return;
+    if (saving || lockRef.current || phase !== "form") return;
 
     const found = validateScreen(screen, data);
     if (Object.keys(found).length) {
@@ -159,9 +153,10 @@ export default function AdmissionFlow({ settings }) {
         await persist(screen + 1);
         goTo(screen + 1);
       } else {
+        // Doble clic: se bloquea el botón hasta confirmar el guardado.
         lockRef.current = true;
         await finish();
-        goTo(FINAL_SCREEN);
+        setPhase("result");
       }
     } catch (error) {
       lockRef.current = false;
@@ -187,8 +182,12 @@ export default function AdmissionFlow({ settings }) {
 
   return (
     <div className="adm-wrap">
-      <form className="adm-shell" onSubmit={handleSubmit} noValidate>
-        <div className="adm-card">
+      <form
+        className={`adm-shell${booking ? " adm-shell--wide" : ""}`}
+        onSubmit={handleSubmit}
+        noValidate
+      >
+        <div className={`adm-card${booking ? " adm-card--booking" : ""}`}>
           <input
             ref={honeypotRef}
             className="adm-honeypot"
@@ -200,13 +199,15 @@ export default function AdmissionFlow({ settings }) {
 
           <div className="adm-screen" ref={screenRef}>
             <AnimatePresence mode="wait" initial={false}>
-              <motion.div key={done ? "final" : screen} className="adm-screen__inner" {...motionProps}>
-                {done ? (
-                  qualified ? (
-                    <BookingScreen data={data} settings={settings} />
-                  ) : (
-                    <ResultScreen qualification={result?.qualification_status} />
-                  )
+              <motion.div key={phase === "form" ? screen : phase} className="adm-screen__inner" {...motionProps}>
+                {phase === "booking" ? (
+                  <BookingScreen settings={settings} />
+                ) : phase === "result" ? (
+                  <ResultScreen
+                    qualification={result?.qualification_status}
+                    settings={settings}
+                    onBook={() => setPhase("booking")}
+                  />
                 ) : (
                   <Screen data={data} set={set} errors={errors} settings={settings} />
                 )}
@@ -216,7 +217,7 @@ export default function AdmissionFlow({ settings }) {
 
           {saveError ? <p className="adm-error adm-error--block">{saveError}</p> : null}
 
-          {!done ? (
+          {phase === "form" ? (
             <div className="adm-nav">
               {screen > 0 ? (
                 <button

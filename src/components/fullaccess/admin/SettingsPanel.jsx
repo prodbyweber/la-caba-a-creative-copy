@@ -56,6 +56,12 @@ const FIELDS = [
   { key: "confirm_title", label: "Título de confirmación" },
   { key: "confirm_text", label: "Texto de confirmación", wide: true },
   {
+    key: "available_spots",
+    label: "Plazas disponibles",
+    type: "number",
+    hint: "Se muestra en la pantalla final de /admision. Si se deja vacío o en 0, se oculta la cifra.",
+  },
+  {
     key: "booking_url",
     label: "Booking URL (Google Calendar)",
     wide: true,

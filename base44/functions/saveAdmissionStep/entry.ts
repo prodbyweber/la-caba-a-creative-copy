@@ -22,7 +22,7 @@ export default async function (req: Request): Promise<Response> {
     }
 
     const step = Number(body?.step);
-    if (!(step >= 1 && step <= 8)) {
+    if (!(step >= 1 && step <= 6)) {
       return Response.json({ error: "Paso no válido." }, { status: 400 });
     }
 
@@ -41,14 +41,7 @@ export default async function (req: Request): Promise<Response> {
       });
       record = found?.[0] || null;
     }
-    if (!record && answers.email) {
-      const page = await base44.asServiceRole.entities.AdmissionSubmission.filter(
-        { email: answers.email },
-        { sort: "-created_date", limit: 1 }
-      );
-      record = page?.items?.[0] || null;
-    }
-
+    // Cada envío crea su propio registro: nunca se reutiliza el de otra visita.
     if (!record && step !== 1) {
       return Response.json(
         { error: "No encontramos tus datos. Vuelve al primer paso." },

@@ -16,7 +16,7 @@
     },
     "last_name": {
       "type": "string",
-      "description": "Apellidos del artista"
+      "description": "Apellido del artista"
     },
     "email": {
       "type": "string",
@@ -28,23 +28,23 @@
     },
     "country": {
       "type": "string",
-      "description": "Pa\u00eds"
+      "description": "Pa\u00eds de residencia"
     },
     "city": {
       "type": "string",
-      "description": "Ciudad"
+      "description": "Ciudad (solo registros hist\u00f3ricos)"
     },
     "modality": {
       "type": "string",
-      "description": "Modalidad preferida de grabaci\u00f3n"
+      "description": "Modalidad de grabaci\u00f3n (solo registros hist\u00f3ricos)"
     },
     "instagram": {
       "type": "string",
-      "description": "Instagram @"
+      "description": "Instagram (solo registros hist\u00f3ricos)"
     },
     "music_link": {
       "type": "string",
-      "description": "Enlace a m\u00fasica o perfil (Spotify, YouTube, Drive)"
+      "description": "Enlace a m\u00fasica o perfil (Spotify, YouTube, SoundCloud, Drive)"
     },
     "project_stage": {
       "type": "string",
@@ -59,30 +59,30 @@
     },
     "genre_other": {
       "type": "string",
-      "description": "Detalle cuando selecciona Otro"
+      "description": "Detalle cuando selecciona Otro (hist\u00f3rico)"
     },
     "goals": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "Objetivos del proyecto seleccionados"
+      "description": "Objetivos del proyecto (solo registros hist\u00f3ricos)"
     },
     "main_blocker": {
       "type": "string",
-      "description": "Principal bloqueo"
+      "description": "Principal bloqueo (solo registros hist\u00f3ricos)"
     },
     "release_type": {
       "type": "string",
-      "description": "Tipo de lanzamiento"
+      "description": "Tipo de proyecto: single, varios singles, EP, \u00e1lbum"
     },
     "release_date": {
       "type": "string",
-      "description": "Fecha objetivo de lanzamiento"
+      "description": "Fecha objetivo de lanzamiento (solo registros hist\u00f3ricos)"
     },
     "availability": {
       "type": "string",
-      "description": "Disponibilidad para comenzar"
+      "description": "Disponibilidad para comenzar (respuesta original)"
     },
     "budget": {
       "type": "string",
@@ -153,6 +153,15 @@
     "sync_warnings": {
       "type": "string",
       "description": "Valores que no se pudieron enviar a HubSpot"
+    },
+    "booking_status": {
+      "type": "string",
+      "description": "Estado de la reserva de la sesi\u00f3n de descubrimiento"
+    },
+    "booking_datetime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha de la sesi\u00f3n de descubrimiento reservada"
     },
     "source": {
       "type": "string",

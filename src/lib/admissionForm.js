@@ -54,6 +54,7 @@ export const AVAILABILITY = [
   "La próxima semana.",
   "Durante el próximo mes.",
   "En los próximos 2–3 meses.",
+  "Todavía no tengo una fecha definida.",
   "Estoy explorando opciones por ahora.",
 ];
 

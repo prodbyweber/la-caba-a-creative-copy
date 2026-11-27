@@ -1,12 +1,11 @@
 import React from "react";
 import PhoneField from "@/components/admision/PhoneField";
+import CountryField from "@/components/admision/CountryField";
 
 export default function ContactScreen({ data, set, errors }) {
   return (
     <div>
-      <h1 className="adm-title">
-        Déjanos tus datos para saber quién está detrás del proyecto y poder contactar contigo.
-      </h1>
+      <h1 className="adm-title">Datos</h1>
 
       <div className="adm-fields">
         <div className="adm-fields__row">
@@ -30,7 +29,7 @@ export default function ContactScreen({ data, set, errors }) {
               type="text"
               value={data.last_name}
               onChange={(event) => set("last_name", event.target.value)}
-              placeholder="Tus apellidos"
+              placeholder="Tu apellido"
               autoComplete="family-name"
               autoCapitalize="words"
             />
@@ -39,7 +38,7 @@ export default function ContactScreen({ data, set, errors }) {
         </div>
 
         <label className="adm-field">
-          <span className="adm-field__label">Email</span>
+          <span className="adm-field__label">Correo electrónico</span>
           <input
             type="email"
             value={data.email}
@@ -53,7 +52,7 @@ export default function ContactScreen({ data, set, errors }) {
 
         <div className="adm-field">
           <label className="adm-field__label" htmlFor="adm-phone">
-            Número de teléfono
+            Teléfono
           </label>
           <PhoneField
             id="adm-phone"
@@ -64,6 +63,16 @@ export default function ContactScreen({ data, set, errors }) {
             error={errors.phone}
           />
           {errors.phone ? <span className="adm-field__error">{errors.phone}</span> : null}
+        </div>
+
+        <div className="adm-field">
+          <span className="adm-field__label">País de residencia actual</span>
+          <CountryField
+            value={data.country}
+            onChange={(value) => set("country", value)}
+            error={errors.country}
+          />
+          {errors.country ? <span className="adm-field__error">{errors.country}</span> : null}
         </div>
       </div>
     </div>

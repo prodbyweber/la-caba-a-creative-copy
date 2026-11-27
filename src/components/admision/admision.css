@@ -704,3 +704,131 @@
     animation: none;
   }
 }
+
+/* País de residencia (selector buscable con bandera) */
+
+.adm-country {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0 0 10px;
+  border: 0;
+  border-bottom: 1px solid rgba(10, 10, 11, 0.14);
+  background: transparent;
+  color: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.adm-country:focus-visible {
+  outline: none;
+  border-bottom-color: rgba(10, 10, 11, 0.6);
+}
+
+.adm-country__name {
+  flex: 1 1 auto;
+}
+
+.adm-country__name.is-empty {
+  color: rgba(10, 10, 11, 0.4);
+}
+
+.adm-country.has-error {
+  border-bottom-color: #c0392b;
+}
+
+/* Resultado de la admisión */
+
+.adm-result__text {
+  margin: 16px 0 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: rgba(10, 10, 11, 0.78);
+}
+
+.adm-result__text--muted {
+  color: rgba(10, 10, 11, 0.6);
+}
+
+.adm-result__subtitle {
+  margin: 22px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.adm-spots {
+  margin-top: 24px;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: rgba(10, 10, 11, 0.05);
+}
+
+.adm-spots__number {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--fa-orange, #ff5833);
+}
+
+.adm-spots__label {
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(10, 10, 11, 0.6);
+}
+
+.adm-result__cta {
+  margin-top: 26px;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+/* Agenda: el calendario ocupa el resto de la tarjeta */
+
+.adm-booking-screen {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.adm-booking-screen .adm-booking {
+  margin-top: 16px;
+  flex: 1 1 auto;
+  display: flex;
+}
+
+.adm-booking-screen .adm-booking iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 640px;
+  flex: 1 1 auto;
+}
+
+.adm-shell--wide {
+  max-width: 960px;
+}
+
+@media (max-width: 767px) {
+  .adm-card--booking {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
+  }
+
+  .adm-card--booking .adm-screen {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .adm-booking-screen {
+    flex: 1 1 auto;
+  }
+
+  .adm-result__text {
+    font-size: 15px;
+  }
+}

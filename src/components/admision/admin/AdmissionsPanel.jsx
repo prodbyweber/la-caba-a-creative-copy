@@ -35,7 +35,9 @@ const badge = (value) => {
     return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300";
   if (value === "EN EXPLORACIÓN" || value === "pendiente")
     return "border-amber-400/30 bg-amber-400/10 text-amber-300";
-  if (value === "error") return "border-red-400/30 bg-red-400/10 text-red-300";
+  if (value === "parcial") return "border-sky-400/30 bg-sky-400/10 text-sky-300";
+  if (value === "error" || value === "SIN PRESUPUESTO DISPONIBLE")
+    return "border-red-400/30 bg-red-400/10 text-red-300";
   return "border-white/15 bg-white/5 text-zinc-300";
 };
 
@@ -235,9 +237,9 @@ export default function AdmissionsPanel() {
             <thead className="bg-white/5 text-[10px] uppercase tracking-[0.16em] text-zinc-500">
               <tr>
                 <th className="px-3 py-3">Artista</th>
-                <th className="px-3 py-3">Fecha</th>
                 <th className="px-3 py-3">País</th>
                 <th className="px-3 py-3">Etapa</th>
+                <th className="px-3 py-3">Tipo de lanzamiento</th>
                 <th className="px-3 py-3">Presupuesto</th>
                 <th className="px-3 py-3">Disponibilidad</th>
                 <th className="px-3 py-3">Estado</th>
@@ -257,9 +259,9 @@ export default function AdmissionsPanel() {
                     </p>
                     <p className="text-[11px] text-zinc-500">{item.email}</p>
                   </td>
-                  <td className="px-3 py-3">{dateLabel(item.created_date)}</td>
                   <td className="px-3 py-3">{item.country || "—"}</td>
                   <td className="px-3 py-3">{short(item.project_stage, 26)}</td>
+                  <td className="px-3 py-3">{short(item.release_type, 24)}</td>
                   <td className="px-3 py-3">{short(item.budget, 26)}</td>
                   <td className="px-3 py-3">{short(item.availability, 24)}</td>
                   <td className="px-3 py-3">

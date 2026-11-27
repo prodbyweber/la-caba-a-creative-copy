@@ -1,6 +1,7 @@
 /**
  * Contrato compartido del formulario de admisión: opciones, validación y
  * calificación. El servidor valida siempre por su cuenta.
+ * Seis pasos: datos · etapa · sonido y enlace · tipo de proyecto · inversión · inicio.
  */
 
 export const PROJECT_STAGES = [
@@ -23,14 +24,6 @@ export const GENRES = [
   "Otro",
 ];
 
-export const GOALS = [
-  "Encontrar una identidad sonora propia y reconocible.",
-  "Desarrollar canciones con un sonido profesional.",
-  "Construir un catálogo coherente y con personalidad.",
-  "Definir una dirección artística y diferenciar mi propuesta.",
-  "Preparar mis lanzamientos y conectar con una audiencia.",
-];
-
 export const RELEASE_TYPES = [
   "Un single.",
   "Varios singles.",
@@ -39,19 +32,12 @@ export const RELEASE_TYPES = [
   "Todavía estoy definiendo mi próximo proyecto.",
 ];
 
-export const RELEASE_DATES = [
-  "Durante el próximo mes.",
-  "En los próximos 2–3 meses.",
-  "En los próximos 3–6 meses.",
-  "Todavía no tengo fecha definida.",
-];
-
 export const AVAILABILITY = [
   "Lo antes posible.",
   "La próxima semana.",
   "Durante el próximo mes.",
   "En los próximos 2–3 meses.",
-  "Estoy explorando opciones por ahora.",
+  "Todavía no tengo una fecha definida.",
 ];
 
 export const BUDGETS = [
@@ -61,21 +47,25 @@ export const BUDGETS = [
   "Ahora mismo no cuento con presupuesto para invertir.",
 ];
 
+/** Respuesta de disponibilidad sin equivalente en HubSpot: se traduce al enviar. */
+export const NO_DATE = "Todavía no tengo una fecha definida.";
 export const EXPLORING = "Estoy explorando opciones por ahora.";
 export const NO_BUDGET = "Ahora mismo no cuento con presupuesto para invertir.";
-
-export const MODALITIES = [
-  "Presencial: prefiero realizar las sesiones de grabación en persona.",
-  "Online / Remoto: prefiero trabajar a distancia.",
-  "Híbrido: desarrollar el proyecto online y realizar las grabaciones de voces presencialmente.",
-  "Estoy abierto/a a valorarlo: quiero conocer las posibilidades según mi ubicación y el proyecto.",
-];
-
 export const FRACTIONED = "Me interesa, pero necesitaría valorar un pago fraccionado.";
 export const INVESTMENT_2K = "Puedo asumir una inversión desde 2.000 €.";
 export const BUDGET_700_1200 = "Mi presupuesto actual está entre los 700 € a 1200€";
 
-export const INVESTMENT_OK = [INVESTMENT_2K];
+/** Dominios aceptados para el enlace de música. */
+export const MUSIC_HOSTS = [
+  "open.spotify.com",
+  "spotify.link",
+  "youtube.com",
+  "youtu.be",
+  "music.youtube.com",
+  "soundcloud.com",
+  "on.soundcloud.com",
+  "drive.google.com",
+];
 
 export const QUALIFICATION = {
   APTO: "APTO PARA AGENDAR",
@@ -95,31 +85,45 @@ export const norm = (value: unknown) =>
     .trim()
     .replace(/[.;,]+$/, "");
 
-/** Calificación interna, por prioridad. */
-export function qualify(availability: string, budget: string) {
-  if (norm(availability) === norm(EXPLORING)) return QUALIFICATION.EXPLORANDO;
-  if (norm(budget) === norm(FRACTIONED)) return QUALIFICATION.REVISION;
-  if (norm(budget) === norm(INVESTMENT_2K)) return QUALIFICATION.APTO;
-  if (norm(budget) === norm(BUDGET_700_1200)) return QUALIFICATION.NO_APTO;
-  if (norm(budget) === norm(NO_BUDGET)) return QUALIFICATION.NO_APTO;
-  return QUALIFICATION.EXPLORANDO;
+/** Calificación interna: solo depende del presupuesto. */
+export function qualify(budget: string) {
+  if (norm(budget) === norm(NO_BUDGET)) return QUALIFICATION.SIN_PRESUPUESTO;
+  if ([INVESTMENT_2K, FRACTIONED, BUDGET_700_1200].some((item) => norm(item) === norm(budget))) {
+    return QUALIFICATION.APTO;
+  }
+  return QUALIFICATION.SIN_PRESUPUESTO;
+}
+
+/** Añade https:// si falta y comprueba que el dominio esté permitido. */
+export function musicUrl(value: string) {
+  const text = text_of(value, 500);
+  if (!text) return "";
+  const withProto = /^https?:\/\//i.test(text) ? text : `https://${text.replace(/^\/+/, "")}`;
+  try {
+    const url = new URL(withProto);
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
+    return MUSIC_HOSTS.includes(host) ? url.toString() : "";
+  } catch {
+    return "";
+  }
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-const text = (value: unknown, max = 4000) =>
-  typeof value === "string" ? value.trim().slice(0, max) : "";
+function text_of(value: unknown, max = 4000) {
+  return typeof value === "string" ? value.trim().slice(0, max) : "";
+}
 
 const list = (value: unknown, allowed: string[], max = 20) =>
   Array.isArray(value)
     ? value
-        .map((item) => text(item, 300))
+        .map((item) => text_of(item, 300))
         .filter((item) => item && allowed.includes(item))
         .slice(0, max)
     : [];
 
 const pick = (value: unknown, allowed: string[]) => {
-  const clean = text(value, 400);
+  const clean = text_of(value, 400);
   return allowed.includes(clean) ? clean : "";
 };
 
@@ -129,18 +133,12 @@ export type AdmissionPayload = {
   email: string;
   phone: string;
   country: string;
-  city: string;
-  instagram: string;
-  music_link: string;
   project_stage: string;
   genres: string[];
-  genre_other: string;
-  goals: string[];
-  main_blocker: string;
+  music_link: string;
   release_type: string;
-  release_date: string;
-  availability: string;
   budget: string;
+  availability: string;
 };
 
 export function validateAdmission(body: any): {
@@ -148,23 +146,17 @@ export function validateAdmission(body: any): {
   errors: Record<string, string>;
 } {
   const data: AdmissionPayload = {
-    first_name: text(body?.first_name, 120),
-    last_name: text(body?.last_name, 120),
-    email: text(body?.email, 200).toLowerCase(),
-    phone: text(body?.phone, 40),
-    country: text(body?.country, 120),
-    city: text(body?.city, 120),
-    instagram: text(body?.instagram, 120),
-    music_link: text(body?.music_link, 500),
+    first_name: text_of(body?.first_name, 120),
+    last_name: text_of(body?.last_name, 120),
+    email: text_of(body?.email, 200).toLowerCase(),
+    phone: text_of(body?.phone, 40),
+    country: text_of(body?.country, 120),
     project_stage: pick(body?.project_stage, PROJECT_STAGES),
     genres: list(body?.genres, GENRES),
-    genre_other: text(body?.genre_other, 200),
-    goals: list(body?.goals, GOALS),
-    main_blocker: text(body?.main_blocker, 4000),
+    music_link: musicUrl(body?.music_link),
     release_type: pick(body?.release_type, RELEASE_TYPES),
-    release_date: pick(body?.release_date, RELEASE_DATES),
-    availability: pick(body?.availability, AVAILABILITY),
     budget: pick(body?.budget, BUDGETS),
+    availability: pick(body?.availability, AVAILABILITY),
   };
 
   const errors: Record<string, string> = {};
@@ -173,70 +165,54 @@ export function validateAdmission(body: any): {
   if (!EMAIL_RE.test(data.email)) errors.email = "El correo no es válido.";
   if (!data.phone) errors.phone = "El teléfono es obligatorio.";
   if (!data.country) errors.country = "El país es obligatorio.";
-  if (!data.city) errors.city = "La ciudad es obligatoria.";
   if (!data.project_stage) errors.project_stage = "Selecciona la etapa del proyecto.";
   if (!data.genres.length) errors.genres = "Selecciona al menos un género.";
-  if (!data.goals.length) errors.goals = "Selecciona al menos un objetivo.";
-  if (data.main_blocker.length < 10) errors.main_blocker = "El bloqueo principal es obligatorio.";
-  if (!data.release_type) errors.release_type = "Selecciona el tipo de lanzamiento.";
-  if (!data.release_date) errors.release_date = "Selecciona la fecha objetivo.";
-  if (!data.availability) errors.availability = "Selecciona la disponibilidad.";
+  if (!data.music_link) errors.music_link = "Añade un enlace de Spotify, YouTube, SoundCloud o Drive.";
+  if (!data.release_type) errors.release_type = "Selecciona el tipo de proyecto.";
   if (!data.budget) errors.budget = "Selecciona el presupuesto.";
+  if (!data.availability) errors.availability = "Selecciona la disponibilidad.";
 
   return { data, errors };
 }
 
 /** Respuestas saneadas de un borrador: solo se acepta lo que existe en el contrato. */
-export function parseAnswers(body: any) {
+export function parseAnswers(body: any): AdmissionPayload {
   return {
-    first_name: text(body?.first_name, 120),
-    last_name: text(body?.last_name, 120),
-    email: text(body?.email, 200).toLowerCase(),
-    phone: text(body?.phone, 40),
-    country: text(body?.country, 120),
-    city: text(body?.city, 120),
-    instagram: text(body?.instagram, 120),
-    music_link: text(body?.music_link, 500),
+    first_name: text_of(body?.first_name, 120),
+    last_name: text_of(body?.last_name, 120),
+    email: text_of(body?.email, 200).toLowerCase(),
+    phone: text_of(body?.phone, 40),
+    country: text_of(body?.country, 120),
     project_stage: pick(body?.project_stage, PROJECT_STAGES),
     genres: list(body?.genres, GENRES),
-    genre_other: text(body?.genre_other, 200),
-    goals: list(body?.goals, GOALS),
-    main_blocker: text(body?.main_blocker, 4000),
+    music_link: musicUrl(body?.music_link),
     release_type: pick(body?.release_type, RELEASE_TYPES),
-    release_date: pick(body?.release_date, RELEASE_DATES),
-    availability: pick(body?.availability, AVAILABILITY),
     budget: pick(body?.budget, BUDGETS),
-    modality: pick(body?.modality, MODALITIES),
+    availability: pick(body?.availability, AVAILABILITY),
   };
 }
 
 const STEP_MESSAGES: Record<string, string> = {
   first_name: "Escribe tu nombre.",
-  last_name: "Escribe tus apellidos.",
+  last_name: "Escribe tu apellido.",
   email: "Revisa tu correo electrónico.",
   phone: "Necesitamos un teléfono de contacto.",
+  country: "Indica tu país de residencia.",
   project_stage: "Elige la opción que mejor te represente.",
-  country: "Indica tu país.",
-  city: "Indica tu ciudad.",
-  modality: "Elige cómo prefieres trabajar.",
   genres: "Elige al menos un género.",
-  goals: "Elige al menos un objetivo.",
-  main_blocker: "Cuéntanos qué te está frenando.",
-  release_type: "Elige el formato de lanzamiento.",
-  release_date: "Elige una fecha objetivo.",
-  availability: "Elige tu disponibilidad.",
+  music_link: "Añade un enlace válido de Spotify, YouTube, SoundCloud o Drive.",
+  release_type: "Elige qué te gustaría crear.",
   budget: "Elige la opción que mejor refleje tu situación.",
+  availability: "Elige cuándo te gustaría comenzar.",
 };
 
 const STEP_FIELDS: Record<number, string[]> = {
-  1: ["first_name", "last_name", "email", "phone"],
+  1: ["first_name", "last_name", "email", "phone", "country"],
   2: ["project_stage"],
-  3: ["country", "city", "modality"],
-  4: ["genres"],
-  5: ["goals"],
-  6: ["main_blocker"],
-  7: ["release_type", "release_date"],
-  8: ["availability", "budget"],
+  3: ["genres", "music_link"],
+  4: ["release_type"],
+  5: ["budget"],
+  6: ["availability"],
 };
 
 /** Validación de la pantalla que se está guardando. */
@@ -251,8 +227,8 @@ export function validateStep(step: number, data: any) {
 
   if (data?.email && !EMAIL_RE.test(data.email)) errors.email = "Revisa tu correo electrónico.";
   if (data?.phone && !/^\+\d{6,15}$/.test(data.phone)) errors.phone = "Revisa el número de teléfono.";
-  if (data?.music_link && !/^(https?:\/\/)?[\w-]+(\.[\w-]+)+/.test(data.music_link)) {
-    errors.music_link = "Revisa el enlace.";
+  if (data?.music_link && !musicUrl(data.music_link)) {
+    errors.music_link = STEP_MESSAGES.music_link;
   }
 
   return errors;

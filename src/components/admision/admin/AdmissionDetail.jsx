@@ -75,10 +75,24 @@ export default function AdmissionDetail({ item, onClose, onSaved, onRetry, busy 
             <div className="mt-2">
               <Row label="Correo" value={item.email} />
               <Row label="Teléfono" value={item.phone} />
-              <Row label="País / Ciudad" value={[item.country, item.city].filter(Boolean).join(" · ")} />
-              <Row label="Modalidad" value={item.modality} />
-              <Row label="Instagram" value={item.instagram} />
-              <Row label="Música / perfil" value={item.music_link} />
+              <Row label="País" value={item.country} />
+              <div className="border-b border-white/5 py-2">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+                  Música / perfil
+                </p>
+                {item.music_link ? (
+                  <a
+                    href={item.music_link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1 block break-all text-sm text-[#ff5833] underline"
+                  >
+                    {item.music_link}
+                  </a>
+                ) : (
+                  <p className="mt-1 text-sm text-zinc-200">—</p>
+                )}
+              </div>
             </div>
           </div>
           <div>
@@ -86,19 +100,16 @@ export default function AdmissionDetail({ item, onClose, onSaved, onRetry, busy 
             <div className="mt-2">
               <Row label="Etapa del proyecto" value={item.project_stage} />
               <Row label="Géneros" value={(item.genres || []).join(", ")} />
-              <Row label="Otro género" value={item.genre_other} />
-              <Row label="Objetivos" value={(item.goals || []).join(" · ")} />
+              <Row label="Tipo de proyecto" value={item.release_type} />
+              <Row label="Disponibilidad" value={item.availability} />
+              <Row label="Presupuesto" value={item.budget} />
             </div>
           </div>
         </div>
 
         <div className="mt-6">
-          <Row label="Principal bloqueo" value={item.main_blocker} />
-          <Row label="Tipo de lanzamiento" value={item.release_type} />
-          <Row label="Fecha objetivo" value={item.release_date} />
-          <Row label="Disponibilidad" value={item.availability} />
-          <Row label="Presupuesto" value={item.budget} />
           <Row label="Fuente" value={[item.source, item.referrer].filter(Boolean).join(" · ")} />
+          <Row label="Fecha de envío" value={dateLabel(item.submitted_at)} />
         </div>
 
         <div className="mt-6 rounded-xl border border-white/10 p-4">
@@ -136,10 +147,47 @@ export default function AdmissionDetail({ item, onClose, onSaved, onRetry, busy 
         <div className="mt-6 rounded-xl border border-white/10 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
+              <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-500">Reserva</p>
+              <p className="mt-1 text-sm text-zinc-200">
+                {item.booking_status === "reservada"
+                  ? `Reservada · ${dateLabel(item.booking_datetime)}`
+                  : "Sin reserva registrada"}
+              </p>
+            </div>
+            {item.booking_status === "reservada" ? (
+              <button
+                type="button"
+                onClick={() => onSaved(item.id, { booking_status: "", booking_datetime: "" })}
+                className="rounded-md border border-white/10 px-3 py-2 text-xs text-zinc-300 hover:text-white"
+              >
+                Quitar reserva
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() =>
+                  onSaved(item.id, {
+                    booking_status: "reservada",
+                    booking_datetime: new Date().toISOString(),
+                  })
+                }
+                className="rounded-md border border-white/10 px-3 py-2 text-xs text-zinc-200 hover:text-white"
+              >
+                Marcar como reservada
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-xl border border-white/10 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
               <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-500">HubSpot</p>
               <p className="mt-1 text-sm text-zinc-200">
                 {item.hubspot_sync_status === "sincronizado"
                   ? "Sincronizado"
+                  : item.hubspot_sync_status === "parcial"
+                  ? "Sincronizado parcialmente"
                   : item.hubspot_sync_status === "error"
                   ? "Error de sincronización"
                   : "Pendiente"}

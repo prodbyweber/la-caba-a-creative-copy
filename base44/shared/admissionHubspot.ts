@@ -1,11 +1,11 @@
 /**
  * Sincronización de solicitudes de admisión con HubSpot.
  * HubSpot es el CRM principal: aquí solo se crea o actualiza el contacto con
- * las propiedades que existen en el grupo "Cabaña Creative Admisión".
- * Nunca se crean ni se renombran propiedades desde el código.
+ * las propiedades que existen en la cuenta. Nunca se crean ni se renombran
+ * propiedades desde el código.
  *
  * Reglas:
- * - Se envía el contacto con las propiedades estándar y las personalizadas.
+ * - Propiedades estándar y personalizadas: se envían ambas cuando existen.
  * - Los valores de las enumeraciones se resuelven contra la definición real de
  *   la propiedad: siempre viaja el `value` interno, nunca el texto visible.
  * - Una propiedad inválida nunca bloquea el contacto: se omite y se avisa.
@@ -22,34 +22,30 @@ const PROPERTY_MAP: Array<[string, string]> = [
   ["last_name", "apellido"],
   ["email", "correo"],
   ["phone", "telefono"],
-  ["city", "ciudad"],
   ["country", "pais"],
-  ["instagram", "instagram"],
-  ["music_link", "enlace_a_tu_musicaperfil_spotify_youtube_o_drive"],
-  ["main_blocker", "principal_bloqueo"],
   ["project_stage", "etapa_del_proyecto"],
   ["genres", "generos_musicales"],
-  ["goals", "objetivos_del_proyecto"],
+  ["music_link", "enlace_a_tu_musicaperfil_spotify_youtube_o_drive"],
   ["release_type", "tipo_de_lanzamiento"],
-  ["release_date", "fecha_objetivo_de_lanzamiento"],
-  ["availability", "disponibilidad_para_comenzar"],
   ["budget", "presupuesto"],
-  ["modality", "modalidad_preferida_grabacion"],
+  ["availability", "disponibilidad_para_comenzar"],
 ];
 
 /** Propiedades cuyo valor es una URL: HubSpot rechaza el contacto si no lleva protocolo. */
 const URL_FIELDS = new Set(["enlace_a_tu_musicaperfil_spotify_youtube_o_drive"]);
 
 /**
- * Campos sin destino en HubSpot (la propiedad no existe en la cuenta).
- * Se guardan en Base44 y se avisa en el informe, sin marcar la sync como parcial.
+ * Respuestas sin opción equivalente en HubSpot. Se envía el equivalente y la
+ * respuesta original se conserva en Base44 y en la nota del contacto.
  */
-const NO_TARGET: Record<string, string> = {
-  last_name: "apellido: la propiedad no existe en HubSpot, el apellido va en lastname",
-  main_blocker: "principal_bloqueo: la propiedad no existe en HubSpot, el dato queda en Base44",
-  release_date:
-    "fecha_objetivo_de_lanzamiento: la propiedad no existe en HubSpot, el dato queda en Base44",
+const VALUE_FALLBACK: Record<string, Record<string, string>> = {
+  disponibilidad_para_comenzar: {
+    "Todavía no tengo una fecha definida.": "Estoy explorando opciones por ahora",
+  },
 };
+
+/** Propiedades obligatoriamente multiselección. */
+const MULTI_FIELDS = new Set(["generos_musicales"]);
 
 /** Normaliza para comparar: minúsculas, sin acentos, guiones unificados, sin punto final. */
 const norm = (value: unknown) =>
@@ -129,7 +125,6 @@ function buildProperties(submission: any, byName: Map<string, any>) {
     ["firstname", submission.first_name],
     ["lastname", submission.last_name],
     ["phone", submission.phone],
-    ["city", submission.city],
     ["country", submission.country],
   ];
   standard.forEach(([name, value]) => {
@@ -140,14 +135,14 @@ function buildProperties(submission: any, byName: Map<string, any>) {
   PROPERTY_MAP.forEach(([field, name]) => {
     const raw = submission[field];
     const multi = Array.isArray(raw);
-    const values: string[] = (multi ? raw : raw ? [raw] : [])
+    let values: string[] = (multi ? raw : raw ? [raw] : [])
       .map((value: unknown) => String(value ?? "").trim())
       .filter(Boolean);
     if (!values.length) return;
 
     const prop = byName.get(name);
     if (!prop) {
-      notes.push(NO_TARGET[field] || `${name}: la propiedad no existe en HubSpot`);
+      notes.push(`${name}: la propiedad no existe en HubSpot, el dato queda en Base44`);
       return;
     }
     if (prop.groupName && norm(prop.groupName) !== GROUP) {
@@ -155,12 +150,20 @@ function buildProperties(submission: any, byName: Map<string, any>) {
     }
 
     if (prop.type === "enumeration" || prop.type === "checkbox") {
-      // HubSpot expone la multiselección como enumeration + fieldType "checkbox".
       const isMulti = prop.type === "checkbox" || prop.fieldType === "checkbox";
+      if (MULTI_FIELDS.has(name) && !isMulti) {
+        warnings.push(
+          `${name}: es de selección única y debe ser "Multiple checkboxes"; no se ha enviado`
+        );
+        return;
+      }
+
+      const fallback = VALUE_FALLBACK[name] || {};
       const resolved: string[] = [];
       const unmatched: string[] = [];
       values.forEach((value) => {
-        const match = optionValue(prop, value);
+        const target = fallback[value] || value;
+        const match = optionValue(prop, target);
         if (match) resolved.push(match);
         else unmatched.push(value);
       });
@@ -175,28 +178,15 @@ function buildProperties(submission: any, byName: Map<string, any>) {
         return;
       }
       if (resolved.length > 1) {
-        warnings.push(
-          `${name}: es de selección única y se han elegido ${resolved.length} valores; ` +
-            `cámbiala a "Casillas de verificación múltiples" en HubSpot`
-        );
+        warnings.push(`${name}: es de selección única y se han enviado varios valores`);
         return;
       }
       props[name] = resolved[0];
       return;
     }
 
-    if (prop.type === "date" || prop.type === "datetime") {
-      const candidate = values[0];
-      if (!/^\d{4}-\d{2}-\d{2}/.test(candidate)) {
-        warnings.push(`${name}: es una propiedad de fecha y el valor no lo es`);
-        return;
-      }
-      props[name] = candidate;
-      return;
-    }
-
     if (prop.type === "number") {
-      const numeric = Number(String(values[0]).replace(/[^\d.,-]/g, "").replace(",", "."));
+      const numeric = Number(values[0].replace(/[^\d.,-]/g, "").replace(",", "."));
       if (!Number.isFinite(numeric)) {
         warnings.push(`${name}: es numérica y el valor no lo es`);
         return;
@@ -272,6 +262,52 @@ async function writeContact(
   }
 }
 
+/** Relee el contacto y compara con lo enviado (solo valores simples). */
+async function readBack(token: string, contactId: string, props: Record<string, string>) {
+  const names = Object.keys(props).filter((name) => name !== "email" && !props[name].includes(";"));
+  if (!names.length) return [];
+  const contact = await hs(
+    `/crm/v3/objects/contacts/${contactId}?properties=${encodeURIComponent(names.join(","))}`,
+    token
+  );
+  const got = contact?.properties || {};
+  return names.filter((name) => norm(got[name]) !== norm(props[name]));
+}
+
+/** Nota asociada al contacto con el detalle de la admisión. */
+async function createNote(token: string, contactId: string, body: string) {
+  await hs("/crm/v3/objects/notes", token, {
+    method: "POST",
+    body: JSON.stringify({
+      properties: { hs_timestamp: new Date().toISOString(), hs_note_body: body.slice(0, 65000) },
+      associations: [
+        {
+          to: { id: contactId },
+          types: [
+            { associationCategory: "HUBSPOT_DEFINED", associationTypeId: 202 },
+          ],
+        },
+      ],
+    }),
+  });
+}
+
+function noteBody(submission: any) {
+  const lines = [
+    `Solicitud de admisión · Cabaña Full Access`,
+    `Fecha: ${submission.submitted_at || new Date().toISOString()}`,
+    `ID de admisión: ${submission.submission_id || submission.id || ""}`,
+    `Etapa: ${submission.project_stage || "—"}`,
+    `Géneros: ${(submission.genres || []).join(", ") || "—"}`,
+    `Enlace de música: ${submission.music_link || "—"}`,
+    `Tipo de proyecto: ${submission.release_type || "—"}`,
+    `Presupuesto: ${submission.budget || "—"}`,
+    `Disponibilidad (respuesta original): ${submission.availability || "—"}`,
+    `Calificación: ${submission.qualification_status || "—"}`,
+  ];
+  return lines.join("\n");
+}
+
 /**
  * Crea o actualiza el contacto usando el email estándar como identificador.
  * Solo escribe los campos que llegan con valor: nunca sobrescribe con vacíos.
@@ -298,8 +334,30 @@ export async function syncAdmissionToHubspot(base44: any, submission: any) {
     contact = await writeContact(accessToken, retry.id, props, warnings);
   }
 
+  const contactId = contact?.id || existing?.id || "";
+  if (!contactId) throw new Error("HubSpot no devolvió el contacto.");
+
+  try {
+    const mismatched = await readBack(accessToken, contactId, props);
+    if (mismatched.length) {
+      warnings.push(`Lectura distinta en HubSpot: ${mismatched.join(", ")}`);
+    }
+  } catch {
+    notes.push("No se pudo releer el contacto en HubSpot");
+  }
+
+  try {
+    await createNote(accessToken, contactId, noteBody(submission));
+  } catch (error: any) {
+    notes.push(
+      error?.status === 403
+        ? "Nota de HubSpot omitida: falta el permiso de notas en el token"
+        : "Nota de HubSpot omitida"
+    );
+  }
+
   return {
-    contactId: contact?.id || existing?.id || "",
+    contactId,
     warnings,
     notes,
     status: warnings.length ? "parcial" : "sincronizado",

@@ -8,6 +8,8 @@ import { syncAdmissionToHubspot } from "../../shared/admissionHubspot.ts";
  * queda guardada y el visitante puede continuar.
  */
 
+const STEPS = 6;
+
 const stamp = (text: string) => `${new Date().toISOString()} · ${text}`;
 const clean = (value: unknown, max = 300) => String(value ?? "").trim().slice(0, max);
 
@@ -22,6 +24,7 @@ function summarize(record: any) {
     qualification_status: record.qualification_status || "",
     hubspot_sync_status: record.hubspot_sync_status || "pendiente",
     submitted_at: record.submitted_at || "",
+    booking_status: record.booking_status || "",
   };
 }
 
@@ -36,7 +39,7 @@ export default async function (req: Request): Promise<Response> {
 
     const answers = parseAnswers(body?.values || {});
     const errors: Record<string, string> = {};
-    for (let step = 1; step <= 8; step += 1) Object.assign(errors, validateStep(step, answers));
+    for (let step = 1; step <= STEPS; step += 1) Object.assign(errors, validateStep(step, answers));
     if (Object.keys(errors).length) {
       return Response.json({ error: "Revisa tus datos.", errors }, { status: 400 });
     }
@@ -52,7 +55,7 @@ export default async function (req: Request): Promise<Response> {
     }
     if (!record && answers.email) {
       const page = await base44.asServiceRole.entities.AdmissionSubmission.filter(
-        { email: answers.email },
+        { email: answers.email, submitted_at: { $exists: false } },
         { sort: "-created_date", limit: 1 }
       );
       record = page?.items?.[0] || null;
@@ -65,14 +68,11 @@ export default async function (req: Request): Promise<Response> {
     }
 
     // Idempotencia: un doble clic devuelve la solicitud ya enviada.
-    if (
-      record.submitted_at &&
-      ["sincronizado", "parcial"].includes(record.hubspot_sync_status)
-    ) {
+    if (record.submitted_at) {
       return Response.json({ submission: summarize(record), duplicate: true });
     }
 
-    const qualification = qualify(answers.availability, answers.budget);
+    const qualification = qualify(answers.budget);
 
     let submission = await base44.asServiceRole.entities.AdmissionSubmission.update(record.id, {
       ...answers,
@@ -104,7 +104,9 @@ export default async function (req: Request): Promise<Response> {
         hubspot_attempts: attempts,
         activity: [
           ...(submission.activity || []),
-          stamp(`Sincronizado con HubSpot · contacto ${contactId}${warnings.length ? " · parcial" : ""}`),
+          stamp(
+            `Sincronizado con HubSpot · contacto ${contactId}${warnings.length ? " · parcial" : ""}`
+          ),
         ].slice(-30),
       });
       return Response.json({ submission: summarize(submission) });
