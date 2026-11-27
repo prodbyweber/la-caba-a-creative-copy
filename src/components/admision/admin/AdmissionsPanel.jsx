@@ -46,6 +46,7 @@ export default function AdmissionsPanel() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [picked, setPicked] = useState([]);
   const [filters, setFilters] = useState({
     search: "",
     country: "",
@@ -96,16 +97,22 @@ export default function AdmissionsPanel() {
     load();
   }, [load]);
 
-  const retry = async (id) => {
+  /** Resincroniza solo las propiedades (sin crear notas nuevas). */
+  const resync = async (ids) => {
+    if (!ids.length) return;
     setBusy(true);
     try {
-      await base44.functions.invoke("syncAdmissionSubmission", { submission_id: id });
+      await base44.functions.invoke("syncAdmissionSubmission", { ids });
     } finally {
       setBusy(false);
       setSelected(null);
+      setPicked([]);
       await load();
     }
   };
+
+  const togglePick = (id) =>
+    setPicked((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
 
   const save = async (id, patch) => {
     await base44.entities.AdmissionSubmission.update(id, patch);
@@ -225,6 +232,30 @@ export default function AdmissionsPanel() {
         </div>
       </div>
 
+      {picked.length ? (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-md border border-white/10 bg-white/5 px-3 py-2">
+          <p className="text-xs text-zinc-300">{picked.length} seleccionadas</p>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => resync(picked)}
+              disabled={busy}
+              className="inline-flex items-center gap-2 rounded-md border border-white/10 px-3 py-2 text-xs text-zinc-200 hover:text-white disabled:opacity-50"
+            >
+              {busy ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+              Resincronizar propiedades
+            </button>
+            <button
+              type="button"
+              onClick={() => setPicked([])}
+              className="rounded-md border border-white/10 px-3 py-2 text-xs text-zinc-400 hover:text-white"
+            >
+              Quitar selección
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       {loading ? (
         <p className="mt-6 flex items-center gap-2 text-sm text-zinc-400">
           <Loader2 size={14} className="animate-spin" /> Cargando solicitudes...
@@ -236,6 +267,17 @@ export default function AdmissionsPanel() {
           <table className="min-w-full text-left text-xs">
             <thead className="bg-white/5 text-[10px] uppercase tracking-[0.16em] text-zinc-500">
               <tr>
+                <th className="px-3 py-3">
+                  <input
+                    type="checkbox"
+                    checked={items.length > 0 && picked.length === items.length}
+                    onChange={() =>
+                      setPicked(picked.length === items.length ? [] : items.map((item) => item.id))
+                    }
+                    className="h-3.5 w-3.5 accent-[#ff5833]"
+                    aria-label="Seleccionar todas"
+                  />
+                </th>
                 <th className="px-3 py-3">Artista</th>
                 <th className="px-3 py-3">País</th>
                 <th className="px-3 py-3">Etapa</th>
@@ -253,6 +295,16 @@ export default function AdmissionsPanel() {
                   onClick={() => setSelected(item)}
                   className="cursor-pointer border-t border-white/5 text-zinc-300 hover:bg-white/5"
                 >
+                  <td className="px-3 py-3">
+                    <input
+                      type="checkbox"
+                      checked={picked.includes(item.id)}
+                      onChange={() => togglePick(item.id)}
+                      onClick={(event) => event.stopPropagation()}
+                      className="h-3.5 w-3.5 accent-[#ff5833]"
+                      aria-label={`Seleccionar solicitud de ${item.first_name}`}
+                    />
+                  </td>
                   <td className="px-3 py-3">
                     <p className="font-medium text-white">
                       {item.first_name} {item.last_name}
@@ -287,7 +339,7 @@ export default function AdmissionsPanel() {
           busy={busy}
           onClose={() => setSelected(null)}
           onSaved={save}
-          onRetry={retry}
+          onRetry={(id) => resync([id])}
         />
       ) : null}
     </div>

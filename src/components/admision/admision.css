@@ -739,6 +739,41 @@
   border-bottom-color: #c0392b;
 }
 
+/* Enlace de música: mismo campo, con relleno y borde visibles */
+
+.adm-field--boxed input {
+  padding: 13px 14px;
+  border: 1px solid rgba(10, 10, 11, 0.55);
+  border-radius: 12px;
+  background: #ffffff;
+  font-size: 16px;
+}
+
+.adm-field--boxed input::placeholder {
+  color: rgba(10, 10, 11, 0.42);
+}
+
+.adm-field--boxed input:focus {
+  border-color: var(--fa-orange, #ff5833);
+  box-shadow: 0 0 0 3px rgba(255, 88, 51, 0.18);
+}
+
+/* Etiqueta "Opcional" junto al titular */
+
+.adm-tag {
+  display: inline-block;
+  margin-left: 10px;
+  vertical-align: middle;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 10, 11, 0.24);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(10, 10, 11, 0.55);
+}
+
 /* Resultado de la admisión */
 
 .adm-result__text {

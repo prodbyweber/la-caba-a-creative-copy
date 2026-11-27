@@ -44,7 +44,7 @@
     },
     "music_link": {
       "type": "string",
-      "description": "Enlace a m\u00fasica o perfil (Spotify, YouTube, SoundCloud, Drive)"
+      "description": "Enlace a m\u00fasica o perfil (opcional)"
     },
     "project_stage": {
       "type": "string",
@@ -152,7 +152,36 @@
     },
     "sync_warnings": {
       "type": "string",
-      "description": "Valores que no se pudieron enviar a HubSpot"
+      "description": "Propiedades rechazadas por HubSpot con su mensaje de error"
+    },
+    "hubspot_property_results": {
+      "type": "array",
+      "description": "Resultado por propiedad de la \u00faltima sincronizaci\u00f3n",
+      "items": {
+        "type": "object",
+        "properties": {
+          "property": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "note_created": {
+      "type": "boolean",
+      "default": false,
+      "description": "Si la nota de la admisi\u00f3n ya se cre\u00f3 en HubSpot"
     },
     "booking_status": {
       "type": "string",

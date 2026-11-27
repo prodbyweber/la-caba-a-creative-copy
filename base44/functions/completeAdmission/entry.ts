@@ -8,7 +8,7 @@ import { syncAdmissionToHubspot } from "../../shared/admissionHubspot.ts";
  * queda guardada y el visitante puede continuar.
  */
 
-const STEPS = 6;
+const STEPS = 8;
 
 const stamp = (text: string) => `${new Date().toISOString()} · ${text}`;
 const clean = (value: unknown, max = 300) => String(value ?? "").trim().slice(0, max);
@@ -90,16 +90,16 @@ export default async function (req: Request): Promise<Response> {
     const attempts = Number(submission.hubspot_attempts || 0) + 1;
 
     try {
-      const { contactId, warnings, notes, status } = await syncAdmissionToHubspot(
-        base44,
-        submission
-      );
+      const { contactId, warnings, notes, status, results, noteCreated } =
+        await syncAdmissionToHubspot(base44, submission);
       submission = await base44.asServiceRole.entities.AdmissionSubmission.update(submission.id, {
         hubspot_contact_id: contactId,
         hubspot_sync_status: status,
         hubspot_sync_error: "",
         hubspot_sync_warning: [...notes, ...warnings].join(" · ").slice(0, 900),
         sync_warnings: warnings.join(" · ").slice(0, 900),
+        hubspot_property_results: results,
+        note_created: noteCreated,
         hubspot_last_sync: new Date().toISOString(),
         hubspot_attempts: attempts,
         activity: [

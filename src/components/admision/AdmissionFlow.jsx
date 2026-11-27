@@ -3,8 +3,10 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import ContactScreen from "@/components/admision/ContactScreen";
+import CountryScreen from "@/components/admision/CountryScreen";
 import StageScreen from "@/components/admision/StageScreen";
 import SoundScreen from "@/components/admision/SoundScreen";
+import MusicScreen from "@/components/admision/MusicScreen";
 import ReleaseScreen from "@/components/admision/ReleaseScreen";
 import BudgetScreen from "@/components/admision/BudgetScreen";
 import AvailabilityScreen from "@/components/admision/AvailabilityScreen";
@@ -19,8 +21,10 @@ import { browserCountryCode } from "@/lib/phoneCountries";
 
 const SCREENS = [
   ContactScreen,
+  CountryScreen,
   StageScreen,
   SoundScreen,
+  MusicScreen,
   ReleaseScreen,
   BudgetScreen,
   AvailabilityScreen,

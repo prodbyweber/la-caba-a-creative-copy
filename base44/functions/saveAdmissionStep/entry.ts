@@ -22,7 +22,7 @@ export default async function (req: Request): Promise<Response> {
     }
 
     const step = Number(body?.step);
-    if (!(step >= 1 && step <= 6)) {
+    if (!(step >= 1 && step <= 8)) {
       return Response.json({ error: "Paso no válido." }, { status: 400 });
     }
 

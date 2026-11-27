@@ -1,6 +1,5 @@
 import React from "react";
 import PhoneField from "@/components/admision/PhoneField";
-import CountryField from "@/components/admision/CountryField";
 
 export default function ContactScreen({ data, set, errors }) {
   return (
@@ -63,16 +62,6 @@ export default function ContactScreen({ data, set, errors }) {
             error={errors.phone}
           />
           {errors.phone ? <span className="adm-field__error">{errors.phone}</span> : null}
-        </div>
-
-        <div className="adm-field">
-          <span className="adm-field__label">País de residencia actual</span>
-          <CountryField
-            value={data.country}
-            onChange={(value) => set("country", value)}
-            error={errors.country}
-          />
-          {errors.country ? <span className="adm-field__error">{errors.country}</span> : null}
         </div>
       </div>
     </div>

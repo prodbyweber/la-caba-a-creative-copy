@@ -1,7 +1,8 @@
 /**
  * Contrato compartido del formulario de admisión: opciones, validación y
  * calificación. El servidor valida siempre por su cuenta.
- * Seis pasos: datos · etapa · sonido y enlace · tipo de proyecto · inversión · inicio.
+ * Ocho pasos: datos · país · etapa · géneros · enlace (opcional) · proyecto ·
+ * inversión · inicio.
  */
 
 export const PROJECT_STAGES = [
@@ -55,18 +56,6 @@ export const FRACTIONED = "Me interesa, pero necesitaría valorar un pago fracci
 export const INVESTMENT_2K = "Puedo asumir una inversión desde 2.000 €.";
 export const BUDGET_700_1200 = "Mi presupuesto actual está entre los 700 € a 1200€";
 
-/** Dominios aceptados para el enlace de música. */
-export const MUSIC_HOSTS = [
-  "open.spotify.com",
-  "spotify.link",
-  "youtube.com",
-  "youtu.be",
-  "music.youtube.com",
-  "soundcloud.com",
-  "on.soundcloud.com",
-  "drive.google.com",
-];
-
 export const QUALIFICATION = {
   APTO: "APTO PARA AGENDAR",
   EXPLORANDO: "EN EXPLORACIÓN",
@@ -94,25 +83,28 @@ export function qualify(budget: string) {
   return QUALIFICATION.SIN_PRESUPUESTO;
 }
 
-/** Añade https:// si falta y comprueba que el dominio esté permitido. */
+function text_of(value: unknown, max = 4000) {
+  return typeof value === "string" ? value.trim().slice(0, max) : "";
+}
+
+/**
+ * Añade https:// si falta y devuelve el enlace normalizado.
+ * El enlace es opcional: vacío devuelve "" y no es un error.
+ */
 export function musicUrl(value: string) {
   const text = text_of(value, 500);
   if (!text) return "";
   const withProto = /^https?:\/\//i.test(text) ? text : `https://${text.replace(/^\/+/, "")}`;
   try {
     const url = new URL(withProto);
-    const host = url.hostname.toLowerCase().replace(/^www\./, "");
-    return MUSIC_HOSTS.includes(host) ? url.toString() : "";
+    if (!url.hostname.includes(".")) return "";
+    return url.toString();
   } catch {
     return "";
   }
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-function text_of(value: unknown, max = 4000) {
-  return typeof value === "string" ? value.trim().slice(0, max) : "";
-}
 
 const list = (value: unknown, allowed: string[], max = 20) =>
   Array.isArray(value)
@@ -167,7 +159,6 @@ export function validateAdmission(body: any): {
   if (!data.country) errors.country = "El país es obligatorio.";
   if (!data.project_stage) errors.project_stage = "Selecciona la etapa del proyecto.";
   if (!data.genres.length) errors.genres = "Selecciona al menos un género.";
-  if (!data.music_link) errors.music_link = "Añade un enlace de Spotify, YouTube, SoundCloud o Drive.";
   if (!data.release_type) errors.release_type = "Selecciona el tipo de proyecto.";
   if (!data.budget) errors.budget = "Selecciona el presupuesto.";
   if (!data.availability) errors.availability = "Selecciona la disponibilidad.";
@@ -197,22 +188,25 @@ const STEP_MESSAGES: Record<string, string> = {
   last_name: "Escribe tu apellido.",
   email: "Revisa tu correo electrónico.",
   phone: "Necesitamos un teléfono de contacto.",
-  country: "Indica tu país de residencia.",
+  country: "Indica dónde te ubicas.",
   project_stage: "Elige la opción que mejor te represente.",
   genres: "Elige al menos un género.",
-  music_link: "Añade un enlace válido de Spotify, YouTube, SoundCloud o Drive.",
+  music_link: "Escribe un enlace válido (por ejemplo, https://open.spotify.com/...).",
   release_type: "Elige qué te gustaría crear.",
   budget: "Elige la opción que mejor refleje tu situación.",
   availability: "Elige cuándo te gustaría comenzar.",
 };
 
+/** Ocho pantallas. El enlace de música (5) es opcional. */
 const STEP_FIELDS: Record<number, string[]> = {
-  1: ["first_name", "last_name", "email", "phone", "country"],
-  2: ["project_stage"],
-  3: ["genres", "music_link"],
-  4: ["release_type"],
-  5: ["budget"],
-  6: ["availability"],
+  1: ["first_name", "last_name", "email", "phone"],
+  2: ["country"],
+  3: ["project_stage"],
+  4: ["genres"],
+  5: [],
+  6: ["release_type"],
+  7: ["budget"],
+  8: ["availability"],
 };
 
 /** Validación de la pantalla que se está guardando. */
@@ -227,7 +221,7 @@ export function validateStep(step: number, data: any) {
 
   if (data?.email && !EMAIL_RE.test(data.email)) errors.email = "Revisa tu correo electrónico.";
   if (data?.phone && !/^\+\d{6,15}$/.test(data.phone)) errors.phone = "Revisa el número de teléfono.";
-  if (data?.music_link && !musicUrl(data.music_link)) {
+  if (String(data?.music_link ?? "").trim() && !musicUrl(data.music_link)) {
     errors.music_link = STEP_MESSAGES.music_link;
   }
 
