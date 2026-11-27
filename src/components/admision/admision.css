@@ -577,9 +577,17 @@
     overscroll-behavior: none;
   }
 
+  /* La tarjeta se ancla al área visible: el teclado la encoge en lugar de taparla. */
   .adm-wrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     height: var(--adm-viewport, 100dvh);
     padding: 0;
+    overflow: hidden;
+    transform: translateY(var(--adm-offset, 0px));
+    transition: height 0.15s ease;
   }
 
   .adm-shell {
@@ -589,7 +597,7 @@
   }
 
   .adm-card {
-    height: var(--adm-viewport, 100dvh);
+    height: 100%;
     min-height: 0;
     width: 100vw;
     border-radius: 0;
@@ -824,25 +832,45 @@
   flex: 0 0 auto;
 }
 
-/* Agenda: el calendario ocupa el resto de la tarjeta */
+/* Agenda: el calendario recibe toda la altura libre y se desplaza dentro del iframe */
+
+.adm-card--booking {
+  height: clamp(520px, 84dvh, 880px);
+  min-height: 0;
+  padding-bottom: 26px;
+}
+
+.adm-card--booking .adm-screen {
+  display: flex;
+  flex-direction: column;
+}
+
+.adm-card--booking .adm-screen__inner {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
 
 .adm-booking-screen {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .adm-booking-screen .adm-booking {
   margin-top: 16px;
   flex: 1 1 auto;
+  min-height: 0;
   display: flex;
 }
 
 .adm-booking-screen .adm-booking iframe {
   width: 100%;
   height: 100%;
-  min-height: 640px;
+  min-height: 0;
   flex: 1 1 auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .adm-shell--wide {
@@ -851,16 +879,13 @@
 
 @media (max-width: 767px) {
   .adm-card--booking {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
+    height: 100%;
+    padding-top: calc(env(safe-area-inset-top, 0px) + 52px);
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
   }
 
-  .adm-card--booking .adm-screen {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .adm-booking-screen {
-    flex: 1 1 auto;
+  .adm-booking-screen .adm-title {
+    font-size: clamp(17px, 4.6vw, 21px);
   }
 
   .adm-result__text {
@@ -926,5 +951,224 @@
 
   .adm-result .adm-result__cta {
     margin-top: 14px;
+  }
+}
+
+/* Isotipo de la marca en la cabecera de la tarjeta */
+
+.adm-brand {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  z-index: 2;
+  display: inline-flex;
+  transform: translateX(-50%);
+  line-height: 0;
+}
+
+.adm-brand img {
+  display: block;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+/* Aviso legal discreto al pie de la tarjeta */
+
+.adm-legal {
+  flex: 0 0 auto;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(10, 10, 11, 0.42);
+}
+
+.adm-legal__link {
+  padding: 3px 2px;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  transition: color 0.18s ease;
+}
+
+.adm-legal__link:hover {
+  color: var(--fa-orange, #ff5833);
+}
+
+.adm-legal__dot {
+  opacity: 0.55;
+}
+
+/* Popup legal */
+
+.adm-legalmodal {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(10, 10, 11, 0.62);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.adm-legalmodal__panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 620px;
+  max-height: 82dvh;
+  border-radius: 22px;
+  background: var(--fa-cream, #f1efe8);
+  color: #0a0a0b;
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.adm-legalmodal__head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid rgba(10, 10, 11, 0.1);
+}
+
+.adm-legalmodal__title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.adm-legalmodal__close {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(10, 10, 11, 0.18);
+  border-radius: 999px;
+  background: transparent;
+  color: #0a0a0b;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.adm-legalmodal__close:hover {
+  background: rgba(10, 10, 11, 0.06);
+}
+
+.adm-legalmodal__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 16px 22px 26px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.adm-legalmodal__updated {
+  margin: 0 0 16px;
+  font-size: 11px;
+  color: rgba(10, 10, 11, 0.45);
+}
+
+.adm-legalmodal__block + .adm-legalmodal__block {
+  margin-top: 18px;
+}
+
+.adm-legalmodal__block h3 {
+  margin: 0 0 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(10, 10, 11, 0.55);
+}
+
+.adm-legalmodal__block p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: rgba(10, 10, 11, 0.78);
+}
+
+.adm-legalmodal__block ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+
+.adm-legalmodal__block li {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: rgba(10, 10, 11, 0.78);
+}
+
+@media (max-width: 767px) {
+  .adm-legalmodal {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .adm-legalmodal__panel {
+    max-width: none;
+    max-height: min(88dvh, var(--adm-viewport, 100dvh));
+    border-radius: 22px 22px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .adm-legalmodal__head {
+    padding: 18px 20px 12px;
+  }
+
+  .adm-legalmodal__body {
+    padding: 14px 20px 24px;
+  }
+
+  .adm-brand {
+    top: calc(env(safe-area-inset-top, 0px) + 14px);
+  }
+
+  /* Selector de país: la hoja se ajusta al teclado y la lista sigue desplazándose */
+  .adm-sheet__panel {
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  .adm-sheet__search input {
+    font-size: 16px;
+  }
+
+  .adm-sheet__list {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .adm-brand {
+    top: 8px;
+  }
+
+  .adm-brand img {
+    width: 32px;
+    height: 32px;
   }
 }

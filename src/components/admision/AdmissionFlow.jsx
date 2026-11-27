@@ -12,6 +12,7 @@ import BudgetScreen from "@/components/admision/BudgetScreen";
 import AvailabilityScreen from "@/components/admision/AvailabilityScreen";
 import BookingScreen from "@/components/admision/BookingScreen";
 import ResultScreen from "@/components/admision/ResultScreen";
+import LegalModal from "@/components/admision/LegalModal";
 import {
   createEmptyAdmission,
   QUALIFIED_STATUS,
@@ -33,10 +34,14 @@ const LAST_FORM_SCREEN = SCREENS.length - 1;
 
 const readParams = () => new URLSearchParams(window.location.search);
 
+const LOGO =
+  "https://media.base44.com/images/public/6966ddf48947f217e81ea27c/7947f343ed3f736881e57cb4f568e85d_isotipo-cabana-creative.png/v1/fit/w_192,h_192,al_c,q_90/file.png";
+
 export default function AdmissionFlow({ settings }) {
   const reduce = useReducedMotion();
   const [screen, setScreen] = useState(0);
   const [phase, setPhase] = useState("form");
+  const [legal, setLegal] = useState(null);
   const [data, setData] = useState(() => createEmptyAdmission(browserCountryCode()));
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -51,13 +56,14 @@ export default function AdmissionFlow({ settings }) {
   const Screen = SCREENS[screen] || null;
   const qualified = result?.qualification_status === QUALIFIED_STATUS;
 
-  // La tarjeta sigue al teclado: el campo enfocado y el botón quedan visibles.
+  // La tarjeta sigue al teclado: se ancla al área visible real del navegador.
   useEffect(() => {
     const viewport = window.visualViewport;
     if (!viewport) return undefined;
     const root = document.documentElement;
     const apply = () => {
       root.style.setProperty("--adm-viewport", `${Math.round(viewport.height)}px`);
+      root.style.setProperty("--adm-offset", `${Math.round(viewport.offsetTop)}px`);
     };
     apply();
     viewport.addEventListener("resize", apply);
@@ -66,6 +72,56 @@ export default function AdmissionFlow({ settings }) {
       viewport.removeEventListener("resize", apply);
       viewport.removeEventListener("scroll", apply);
       root.style.removeProperty("--adm-viewport");
+      root.style.removeProperty("--adm-offset");
+    };
+  }, []);
+
+  // El campo que se está escribiendo nunca queda bajo el teclado.
+  useEffect(() => {
+    const keepVisible = (field) => {
+      const box = screenRef.current;
+      if (!box || !field) return;
+      const frame = box.getBoundingClientRect();
+      const rect = field.getBoundingClientRect();
+      const top = frame.top + 58;
+      const bottom = frame.bottom - 22;
+      if (rect.top < top) box.scrollTop -= top - rect.top;
+      else if (rect.bottom > bottom) box.scrollTop += rect.bottom - bottom;
+    };
+
+    const focused = () => {
+      const el = document.activeElement;
+      return el && el.closest && el.closest(".adm-screen") ? el : null;
+    };
+
+    const onFocus = (event) => {
+      const field = event.target;
+      if (!field.matches || !field.matches("input, textarea, select")) return;
+      // El teclado tarda en asentarse: se recoloca cuando ya tiene su altura final.
+      [120, 320, 620].forEach((delay) => {
+        setTimeout(() => {
+          if (document.activeElement === field) keepVisible(field);
+        }, delay);
+      });
+    };
+
+    const onViewportChange = () => {
+      const field = focused();
+      if (field) setTimeout(() => keepVisible(field), 80);
+    };
+
+    const viewport = window.visualViewport;
+    document.addEventListener("focusin", onFocus);
+    if (viewport) {
+      viewport.addEventListener("resize", onViewportChange);
+      viewport.addEventListener("scroll", onViewportChange);
+    }
+    return () => {
+      document.removeEventListener("focusin", onFocus);
+      if (viewport) {
+        viewport.removeEventListener("resize", onViewportChange);
+        viewport.removeEventListener("scroll", onViewportChange);
+      }
     };
   }, []);
 
@@ -185,64 +241,100 @@ export default function AdmissionFlow({ settings }) {
       };
 
   return (
-    <div className="adm-wrap">
-      <form
-        className={`adm-shell${booking ? " adm-shell--wide" : ""}`}
-        onSubmit={handleSubmit}
-        noValidate
-      >
-        <div className={`adm-card${booking ? " adm-card--booking" : ""}`}>
-          <input
-            ref={honeypotRef}
-            className="adm-honeypot"
-            name="company"
-            tabIndex={-1}
-            autoComplete="off"
-            aria-hidden="true"
-          />
+    <>
+      <div className="adm-wrap">
+        <form
+          className={`adm-shell${booking ? " adm-shell--wide" : ""}`}
+          onSubmit={handleSubmit}
+          noValidate
+        >
+          <div className={`adm-card${booking ? " adm-card--booking" : ""}`}>
+            <a className="adm-brand" href="/start" aria-label="Cabaña Creative">
+              <img
+                src={LOGO}
+                alt="Cabaña Creative"
+                width="30"
+                height="30"
+                loading="eager"
+                decoding="async"
+                draggable={false}
+              />
+            </a>
 
-          <div className="adm-screen" ref={screenRef}>
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div key={phase === "form" ? screen : phase} className="adm-screen__inner" {...motionProps}>
-                {phase === "booking" ? (
-                  <BookingScreen settings={settings} />
-                ) : phase === "result" ? (
-                  <ResultScreen
-                    qualification={result?.qualification_status}
-                    settings={settings}
-                    onBook={() => setPhase("booking")}
-                  />
-                ) : (
-                  <Screen data={data} set={set} errors={errors} settings={settings} />
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
+            <input
+              ref={honeypotRef}
+              className="adm-honeypot"
+              name="company"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+            />
 
-          {saveError ? <p className="adm-error adm-error--block">{saveError}</p> : null}
-
-          {phase === "form" ? (
-            <div className="adm-nav">
-              {screen > 0 ? (
-                <button
-                  type="button"
-                  className="adm-back"
-                  onClick={() => goTo(screen - 1)}
-                  disabled={saving}
-                  aria-label="Atrás"
+            <div className="adm-screen" ref={screenRef}>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={phase === "form" ? screen : phase}
+                  className="adm-screen__inner"
+                  {...motionProps}
                 >
-                  <ArrowLeft size={18} />
-                </button>
-              ) : null}
+                  {phase === "booking" ? (
+                    <BookingScreen settings={settings} />
+                  ) : phase === "result" ? (
+                    <ResultScreen
+                      qualification={result?.qualification_status}
+                      settings={settings}
+                      onBook={() => setPhase("booking")}
+                    />
+                  ) : (
+                    <Screen data={data} set={set} errors={errors} settings={settings} />
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
 
-              <button type="submit" className="adm-accept" disabled={saving}>
-                {saving ? <Loader2 size={16} className="animate-spin" /> : null}
-                Aceptar
+            {saveError ? <p className="adm-error adm-error--block">{saveError}</p> : null}
+
+            {phase === "form" ? (
+              <div className="adm-nav">
+                {screen > 0 ? (
+                  <button
+                    type="button"
+                    className="adm-back"
+                    onClick={() => goTo(screen - 1)}
+                    disabled={saving}
+                    aria-label="Atrás"
+                  >
+                    <ArrowLeft size={18} />
+                  </button>
+                ) : null}
+
+                <button type="submit" className="adm-accept" disabled={saving}>
+                  {saving ? <Loader2 size={16} className="animate-spin" /> : null}
+                  Aceptar
+                </button>
+              </div>
+            ) : null}
+
+            <div className="adm-legal">
+              <button
+                type="button"
+                className="adm-legal__link"
+                onClick={() => setLegal("privacy")}
+              >
+                Privacidad
+              </button>
+              <span className="adm-legal__dot" aria-hidden="true">
+                ·
+              </span>
+              <button type="button" className="adm-legal__link" onClick={() => setLegal("data")}>
+                Protección de datos
               </button>
             </div>
-          ) : null}
-        </div>
-      </form>
-    </div>
+          </div>
+        </form>
+      </div>
+
+      {legal ? <LegalModal doc={legal} onClose={() => setLegal(null)} /> : null}
+    </>
   );
 }

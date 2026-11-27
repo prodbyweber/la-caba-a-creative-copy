@@ -805,3 +805,59 @@
     display: grid;
   }
 }
+
+/* ============================================================
+   ESCRITORIO (≥900px): VSL, CTA, cifras y marcas en la primera
+   pantalla. El móvil conserva su composición tal cual.
+   ============================================================ */
+@media (min-width: 900px) {
+  .fa-cover {
+    --cover-h: clamp(300px, 42vh, 470px);
+  }
+  .fa-cover__content {
+    padding-bottom: clamp(20px, 2.2vw, 38px);
+  }
+  .fa-cover__title {
+    font-size: clamp(1.65rem, 2.1vw, 2.2rem);
+  }
+  .fa-cover__line {
+    margin-top: 8px;
+  }
+  .fa-cover__play,
+  .fa-cover__center {
+    width: 74px;
+    height: 74px;
+  }
+  .fa-unlockmod {
+    padding-top: 16px;
+  }
+  .fa-unlockmod__hint {
+    font-size: 11.5px;
+  }
+  .fa-progress {
+    margin-top: 10px;
+  }
+  .fa-cta {
+    min-height: 50px;
+    margin-top: 12px;
+  }
+  .fa-statsrow {
+    padding: 22px 0 24px;
+  }
+  .fa-statsrow__value {
+    font-size: clamp(2rem, 3.2vw, 3.1rem);
+  }
+  .fa-statsrow__label {
+    margin-top: 6px;
+  }
+  .fa-brands {
+    padding: 18px 0 20px;
+  }
+  .fa-brands__viewport {
+    margin-top: 10px;
+  }
+  .fa-brands__cell {
+    height: 44px;
+    width: 140px;
+  }
+}
