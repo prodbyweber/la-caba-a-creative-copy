@@ -867,3 +867,64 @@
     font-size: 15px;
   }
 }
+
+/* Cierre de admisión: título, textos, plazas y botón en una sola pantalla */
+
+.adm-result .adm-result__text {
+  margin-top: 10px;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.adm-result .adm-result__text strong {
+  font-weight: 700;
+  color: #0a0a0b;
+}
+
+.adm-result .adm-result__subtitle {
+  margin-top: 16px;
+  font-size: 15px;
+}
+
+.adm-result .adm-spots {
+  margin-top: 16px;
+  padding: 10px 14px;
+}
+
+.adm-result .adm-spots__number {
+  font-size: 26px;
+}
+
+.adm-result .adm-result__cta {
+  margin-top: 16px;
+}
+
+@media (max-width: 767px) {
+  .adm-result .adm-title {
+    font-size: clamp(19px, 5.6vw, 24px);
+  }
+
+  .adm-result .adm-result__text {
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.42;
+  }
+
+  .adm-result .adm-result__subtitle {
+    margin-top: 12px;
+    font-size: 14px;
+  }
+
+  .adm-result .adm-spots {
+    margin-top: 12px;
+    padding: 9px 13px;
+  }
+
+  .adm-result .adm-spots__number {
+    font-size: 24px;
+  }
+
+  .adm-result .adm-result__cta {
+    margin-top: 14px;
+  }
+}

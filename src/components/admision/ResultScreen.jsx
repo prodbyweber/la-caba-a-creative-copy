@@ -20,35 +20,24 @@ export default function ResultScreen({ qualification, settings, onBook }) {
   }
 
   return (
-    <div>
+    <div className="adm-result">
       <h1 className="adm-title">Tu proyecto ha pasado a la siguiente etapa.</h1>
 
-      <p className="adm-result__text">
-        Hemos recibido tu solicitud y cumples con los criterios iniciales para avanzar en la
-        admisión a Cabaña Full Access.
-      </p>
-
-      <p className="adm-result__subtitle">Ahora queremos conocer mejor tu proyecto.</p>
-
-      <p className="adm-result__text">
-        Revisaremos tu propuesta y el material que nos has compartido para conocer tu música y
-        entender mejor lo que quieres construir.
-      </p>
+      <p className="adm-result__text">Tu propuesta encaja con lo que buscamos.</p>
 
       <p className="adm-result__subtitle">
-        El siguiente paso es reservar tu sesión de descubrimiento.
+        El próximo paso es reservar tu sesión de descubrimiento.
       </p>
 
       <p className="adm-result__text">
-        Será un primer encuentro por videollamada para conocer más sobre tu música, entender tu
-        visión artística, resolver tus dudas y explorar si Cabaña Full Access es el programa
-        adecuado para ti.
+        En esta videollamada hablaremos sobre tu música, conoceremos tu visión artística,
+        resolveremos tus dudas y valoraremos si Cabaña Full Access es el programa adecuado para ti.
       </p>
 
       <p className="adm-result__text">
-        Reserva una fecha y guárdala en tu calendario. Una vez revisemos tu propuesta, te
-        confirmaremos el encuentro. Si no podemos avanzar, te lo comunicaremos personalmente por
-        correo electrónico.
+        <strong>Reserva una fecha y guárdala en tu calendario.</strong> Revisaremos el material que
+        nos has compartido y, si todo está en orden, confirmaremos nuestra reunión. Si no podemos
+        avanzar, te lo comunicaremos personalmente por correo electrónico.
       </p>
 
       {spots > 0 ? (
