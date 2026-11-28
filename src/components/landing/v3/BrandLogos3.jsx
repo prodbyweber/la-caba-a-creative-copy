@@ -16,7 +16,6 @@ export default function BrandLogos3() {
 
   return (
     <div className="ccl-brands">
-      <p className="ccl-brands__label">Con quienes hemos colaborado</p>
       <div className="ccl-brands__viewport">
         <div className="ccl-brands__track">
           {[...logos, ...logos].map((logo, idx) => (

@@ -1,6 +1,6 @@
 import React from "react";
 import { ArrowUp, ArrowDown, Trash2, Plus } from "lucide-react";
-import { Label } from "@/components/admin/landing/Field";
+import { Label } from "./Field";
 
 const inputCls =
   "w-full rounded-lg bg-black/40 border border-white/10 px-2.5 py-1.5 text-[12px] text-white placeholder-white/25 focus:outline-none focus:border-[#ff5833]/60";

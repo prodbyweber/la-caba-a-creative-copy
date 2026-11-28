@@ -315,15 +315,12 @@ export const DEFAULT_CREATORS = [
     order: 2,
   },
   {
-    name: "Carly",
+    name: "Maz",
     genre: "",
-    photo_url:
-      "https://base44.app/api/apps/6966ddf48947f217e81ea27c/files/mp/public/6966ddf48947f217e81ea27c/7af9b2a84_3ccd794d7235d69bb691d530d82ad04b.jpg",
-    cover_url:
-      "https://base44.app/api/apps/6966ddf48947f217e81ea27c/files/mp/public/6966ddf48947f217e81ea27c/7af9b2a84_3ccd794d7235d69bb691d530d82ad04b.jpg",
-    track_title: "Nuestra Rola",
-    audio_url:
-      "https://base44.app/api/apps/6966ddf48947f217e81ea27c/files/mp/public/6966ddf48947f217e81ea27c/b97149a4d_Nuestrarolamp3demov1.mp3",
+    photo_url: "",
+    cover_url: "",
+    track_title: "",
+    audio_url: "",
     year: "2026",
     credits: "",
     is_public: true,

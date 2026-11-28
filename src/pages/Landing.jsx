@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "@/components/landing/v3/landing3.css";
 import "@/components/landing/v3/landing3-extra.css";
+import "@/components/landing/v3/landing3-tweaks.css";
 import { useHomeContent } from "@/hooks/useHomeContent";
 import Nav3 from "@/components/landing/v3/Nav3";
 import Hero5 from "@/components/landing/v3/Hero5";
@@ -161,7 +162,7 @@ export default function Landing() {
       case "paises":
         return <CountriesSection key={section.key} section={section} flags={content.flags} />;
       case "marcas":
-        return <BrandsSection key={section.key} creators={content.creators} />;
+        return <BrandsSection key={section.key} />;
       case "generos":
         return <GenresStack key={section.key} section={section} items={content.genres} />;
       case "comunidad":
@@ -196,7 +197,13 @@ export default function Landing() {
     <div className="ccl" ref={rootRef}>
       <Nav3 />
 
-      <main>{sections.map(renderSection)}</main>
+      <main>
+        {sections.map((section, index) => (
+          <React.Fragment key={section.id || `${section.key}-${index}`}>
+            {renderSection(section)}
+          </React.Fragment>
+        ))}
+      </main>
 
       <div className="ccl-dots">
         {sections.map((section) => (

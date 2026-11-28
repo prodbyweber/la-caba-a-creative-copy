@@ -21,13 +21,17 @@ export default function CommunitySection({ section, creators = [], stats = [] })
               {loop.map((creator, i) => (
                 <article className="ccl-comm" key={`${creator.id || creator.name}-${i}`}>
                   <div className="ccl-media">
-                    {(creator.photo_url || creator.cover_url) && (
+                    {creator.photo_url || creator.cover_url ? (
                       <img
                         className="ccl-media__el"
                         src={creator.photo_url || creator.cover_url}
                         alt={creator.name}
                         loading="lazy"
                       />
+                    ) : (
+                      <span className="ccl-comm__initial" aria-hidden="true">
+                        {creator.name.charAt(0)}
+                      </span>
                     )}
                     <span className="ccl-media__veil" />
                   </div>

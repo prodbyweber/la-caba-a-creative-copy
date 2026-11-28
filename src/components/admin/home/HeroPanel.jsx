@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { Loader2, Save, Check } from "lucide-react";
-import { TextField, ImageField } from "@/components/admin/landing/Field";
+import { TextField, ImageField } from "./Field";
 import HeroFramesEditor from "@/components/admin/home/HeroFramesEditor";
 import { DEFAULT_SETTINGS } from "@/lib/landingDefaults";
 

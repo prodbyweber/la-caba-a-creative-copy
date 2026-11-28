@@ -56,3 +56,5 @@ export const TRENDING = ["Feelingmancia", "La Señal", "La Última Vez", "Lipsti
 export const EXPLORE_CTA = "/Explorar";
 export const SESSION_CTA = "/solicitud";
 export const REGISTER_CTA = "/access";
+export const PROJECT_CTA = "/start";
+export const LOGIN_CTA = "/login";

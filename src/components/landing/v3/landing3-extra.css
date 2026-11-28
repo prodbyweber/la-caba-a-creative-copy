@@ -46,7 +46,7 @@
 }
 .ccl-hero5__media {
   position: absolute;
-  top: 82px;
+  top: 0;
   right: 0;
   bottom: 0;
   left: 0;
@@ -72,15 +72,15 @@
   z-index: 1;
   background: linear-gradient(
       180deg,
-      rgba(8, 8, 8, 0.86) 0%,
-      rgba(8, 8, 8, 0.62) 26%,
-      rgba(8, 8, 8, 0.26) 48%,
+      rgba(8, 8, 8, 0.42) 0%,
+      rgba(8, 8, 8, 0.24) 26%,
+      rgba(8, 8, 8, 0.1) 48%,
       rgba(8, 8, 8, 0) 70%
     ),
     linear-gradient(
       180deg,
-      rgba(8, 8, 8, 0) 80%,
-      rgba(8, 8, 8, 0.4) 94%,
+      rgba(8, 8, 8, 0) 84%,
+      rgba(8, 8, 8, 0.3) 95%,
       #080808 100%
     );
 }
@@ -90,9 +90,9 @@
   z-index: 2;
   pointer-events: none;
   background: radial-gradient(
-    120% 80% at 50% 70%,
-    rgba(8, 8, 8, 0) 45%,
-    rgba(8, 8, 8, 0.55) 100%
+    130% 90% at 50% 62%,
+    rgba(8, 8, 8, 0) 52%,
+    rgba(8, 8, 8, 0.32) 100%
   );
 }
 .ccl-hero5__inner {
@@ -237,7 +237,7 @@
 }
 @media (min-width: 900px) {
   .ccl-hero5__media {
-    top: 100px;
+    top: 0;
   }
   .ccl-hero5__inner {
     padding-top: 182px;

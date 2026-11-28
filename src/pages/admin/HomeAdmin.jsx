@@ -17,6 +17,7 @@ import {
 import CrudPanel from "@/components/admin/home/CrudPanel";
 import HeroPanel from "@/components/admin/home/HeroPanel";
 import RequestsPanel from "@/components/admin/home/RequestsPanel";
+import SectionsPanel from "@/components/admin/home/SectionsPanel";
 
 const TABS = [
   { id: "secciones", label: "Secciones", icon: Layout },
@@ -167,15 +168,7 @@ export default function HomeAdmin() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
-        {tab === "secciones" && (
-          <CrudPanel
-            entityName="LandingSection"
-            fields={SECTION_FIELDS}
-            defaults={{ key: "", is_visible: true }}
-            itemTitle={(item) => `${item.key} — ${item.title || "sin título"}`}
-            hint="Activa, oculta o reordena las pantallas de la home. El hero, el cierre y la franja de marcas llevan sus propios botones."
-          />
-        )}
+        {tab === "secciones" && <SectionsPanel />}
 
         {tab === "hero" && <HeroPanel />}
 

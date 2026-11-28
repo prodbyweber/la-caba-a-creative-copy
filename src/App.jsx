@@ -57,7 +57,6 @@ import OnboardingForm from '@/components/onboarding/OnboardingForm';
 import Access from './pages/Access';
 import Reservas from './pages/Reservas';
 import ReservasAdmin from './pages/ReservasAdmin';
-import LandingAdmin from './pages/admin/LandingAdmin';
 import HomeAdmin from './pages/admin/HomeAdmin';
 import FullAccessAdmin from './pages/FullAccessAdmin';
 
@@ -204,7 +203,6 @@ const AuthenticatedApp = () => {
       <Route path="/StudioSessionEditor" element={<ProtectedAdminRoute element={<StudioSessionEditor />} />} />
       <Route path="/BeatsAdmin" element={<ProtectedAdminRoute element={<BeatsAdmin />} />} />
       <Route path="/ReservasAdmin" element={<ProtectedAdminRoute element={<ReservasAdmin />} />} />
-      <Route path="/admin/landing" element={<ProtectedAdminRoute element={<LandingAdmin />} />} />
       <Route path="/admin" element={<ProtectedAdminRoute element={<HomeAdmin />} />} />
       <Route path="/admin/fullaccess" element={<ProtectedAdminRoute element={<FullAccessAdmin />} />} />
       <Route path="/FullAccessAdmin" element={<ProtectedAdminRoute element={<FullAccessAdmin />} />} />

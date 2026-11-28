@@ -11,7 +11,7 @@ import {
   Check,
   X,
 } from "lucide-react";
-import { Label, TextField, ToggleField, ImageField } from "@/components/admin/landing/Field";
+import { Label, TextField, ToggleField, ImageField } from "./Field";
 
 const inputCls =
   "w-full rounded-lg bg-black/40 border border-white/10 px-3 py-2 text-sm text-white placeholder-white/25 focus:outline-none focus:border-[#ff5833]/60";
