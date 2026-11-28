@@ -86,6 +86,40 @@ export default function SectionPreview({ kind }) {
     );
   }
 
+  if (kind === "podcast") {
+    return (
+      <Frame>
+        <span className="relative grid h-6 w-10 place-items-center rounded-sm bg-white/15">
+          <span className="h-0 w-0 border-y-[3px] border-l-[5px] border-y-transparent border-l-[#f1efe8]" />
+        </span>
+      </Frame>
+    );
+  }
+
+  if (kind === "demos") {
+    return (
+      <Frame>
+        <span className="flex items-center gap-[3px]">
+          <span className="h-4 w-[6px] rounded-sm bg-[#f1efe8]/60" />
+          <span className="h-2 w-[3px] rounded-sm bg-white/25" />
+          <span className="h-5 w-[6px] rounded-sm bg-[#ff5833]" />
+        </span>
+      </Frame>
+    );
+  }
+
+  if (kind === "testimonials") {
+    return (
+      <Frame>
+        <span className="flex items-end gap-[3px]">
+          <span className="h-6 w-[7px] rounded-sm bg-white/20" />
+          <span className="h-6 w-[7px] rounded-sm bg-white/40" />
+          <span className="h-6 w-[7px] rounded-sm bg-white/20" />
+        </span>
+      </Frame>
+    );
+  }
+
   return (
     <Frame>
       <span className="flex flex-col items-center gap-1">

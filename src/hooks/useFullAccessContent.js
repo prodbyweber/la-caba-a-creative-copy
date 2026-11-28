@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
 import { normalizeSectionOrder } from "@/lib/fullAccessSections";
+import { PODCAST_DEFAULTS } from "@/lib/podcastDefaults";
 import {
   FA_DEFAULTS,
   FA_STATS_FALLBACK,
@@ -11,7 +12,17 @@ import {
 const byOrder = (a, b) => (a.order ?? 0) - (b.order ?? 0);
 
 async function loadContent() {
-  const [settingsList, stats, projects, demos, stages, configs, artists] = await Promise.all([
+  const [
+    settingsList,
+    stats,
+    projects,
+    demos,
+    stages,
+    configs,
+    artists,
+    testimonials,
+    podcastList,
+  ] = await Promise.all([
     base44.entities.FullAccessSettings.list("-created_date", 1),
     base44.entities.FullAccessStat.list("order"),
     base44.entities.FullAccessProject.list("order"),
@@ -19,6 +30,8 @@ async function loadContent() {
     base44.entities.FullAccessStage.list("order"),
     base44.entities.LandingConfig.list(),
     base44.entities.StartArtist.list("order"),
+    base44.entities.Testimonial.list("order"),
+    base44.entities.FullAccessPodcast.list("-created_date", 1),
   ]);
 
   const saved = settingsList?.[0] || {};
@@ -45,6 +58,8 @@ async function loadContent() {
     stages: visibleStages.length ? visibleStages : FA_STAGES,
     artists: visibleArtists,
     collabLogos: settings.collab_logos?.length > 0 ? settings.collab_logos : configs?.[0]?.brand_logos || [],
+    testimonials: (testimonials || []).filter((item) => item.is_visible !== false).sort(byOrder),
+    podcast: podcastList?.[0] || null,
   };
 }
 
@@ -64,6 +79,8 @@ export default function useFullAccessContent() {
     stages: data?.stages || FA_STAGES,
     artists: data?.artists || [],
     collabLogos: data?.collabLogos || [],
+    testimonials: data?.testimonials || [],
+    podcast: { ...PODCAST_DEFAULTS, ...(data?.podcast || {}) },
     sectionOrder: normalizeSectionOrder(data?.settings?.section_order),
   };
 }

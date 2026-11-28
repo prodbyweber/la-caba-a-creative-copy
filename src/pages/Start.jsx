@@ -4,17 +4,22 @@ import { ArrowRight } from "lucide-react";
 import "@/components/fullaccess/fa.css";
 import "@/components/fullaccess/fa-landing.css";
 import "@/components/fullaccess/fa-v4.css";
+import "@/components/fullaccess/fa-sections.css";
 import useFullAccessContent from "@/hooks/useFullAccessContent";
 import FullAccessNav from "@/components/fullaccess/FullAccessNav";
 import HeroVSL from "@/components/fullaccess/HeroVSL";
 import StatsSection from "@/components/fullaccess/StatsSection";
 import BrandsStrip from "@/components/fullaccess/BrandsStrip";
+import PodcastSection from "@/components/fullaccess/PodcastSection";
 import ArtistsCarousel from "@/components/fullaccess/ArtistsCarousel";
 import SelectedProjects from "@/components/fullaccess/SelectedProjects";
 import Methodology from "@/components/fullaccess/Methodology";
+import DemoMasterSection from "@/components/fullaccess/DemoMasterSection";
+import TestimonialsSection from "@/components/fullaccess/TestimonialsSection";
 
 export default function Start() {
-  const { settings, projects, demos, artists, sectionOrder } = useFullAccessContent();
+  const { settings, projects, demos, artists, podcast, testimonials, sectionOrder } =
+    useFullAccessContent();
   const [unlocked, setUnlocked] = useState(false);
   const navigate = useNavigate();
 
@@ -41,9 +46,12 @@ export default function Start() {
   const sections = {
     stats: <StatsSection key="stats" />,
     brands: <BrandsStrip key="brands" />,
+    podcast: <PodcastSection key="podcast" podcast={podcast} />,
     artists: <ArtistsCarousel key="artists" artists={artists} settings={settings} />,
     projects: <SelectedProjects key="projects" projects={projects} />,
-    methodology: <Methodology key="methodology" settings={settings} demos={demos} />,
+    methodology: <Methodology key="methodology" settings={settings} />,
+    demos: <DemoMasterSection key="demos" settings={settings} demos={demos} />,
+    testimonials: <TestimonialsSection key="testimonials" items={testimonials} />,
     closing: (
       <footer className="fa-wrap" key="closing">
         <div className="fa-endcta">

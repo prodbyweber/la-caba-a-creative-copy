@@ -1,0 +1,58 @@
+{
+  "name": "FullAccessPodcast",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Titular de la secci\u00f3n de podcast"
+    },
+    "description": {
+      "type": "string",
+      "description": "Descripci\u00f3n secundaria bajo el titular"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "Enlace de Vimeo o YouTube, o c\u00f3digo embed del v\u00eddeo 16:9"
+    },
+    "cover_url": {
+      "type": "string",
+      "description": "Portada cinematogr\u00e1fica opcional; si est\u00e1 vac\u00eda se usa la del v\u00eddeo"
+    },
+    "credits": {
+      "type": "string",
+      "description": "Cr\u00e9ditos bajo el reproductor"
+    },
+    "logo_jbl_url": {
+      "type": "string",
+      "description": "Logotipo de JBL (opcional)"
+    },
+    "logo_academy_url": {
+      "type": "string",
+      "description": "Logotipo de Martin Garrix Academy (opcional)"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la secci\u00f3n se muestra"
+    }
+  },
+  "required": [],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

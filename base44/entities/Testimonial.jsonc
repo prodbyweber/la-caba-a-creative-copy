@@ -1,0 +1,49 @@
+{
+  "name": "Testimonial",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Nombre interno del testimonio (solo se ve en el panel)"
+    },
+    "video_url": {
+      "type": "string",
+      "description": "Enlace de Vimeo, YouTube o c\u00f3digo embed del v\u00eddeo vertical"
+    },
+    "cover_url": {
+      "type": "string",
+      "description": "Portada opcional; si est\u00e1 vac\u00eda se usa la del v\u00eddeo"
+    },
+    "order": {
+      "type": "number",
+      "default": 0,
+      "description": "Orden dentro del carrusel"
+    },
+    "is_visible": {
+      "type": "boolean",
+      "default": true,
+      "description": "Si la tarjeta se muestra"
+    }
+  },
+  "required": [
+    "video_url"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

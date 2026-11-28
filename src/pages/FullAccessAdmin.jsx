@@ -4,6 +4,7 @@ import SettingsPanel from "@/components/fullaccess/admin/SettingsPanel";
 import ListPanel from "@/components/fullaccess/admin/ListPanel";
 import SortablePanel from "@/components/fullaccess/admin/SortablePanel";
 import SectionOrderPanel from "@/components/fullaccess/admin/SectionOrderPanel";
+import PodcastPanel from "@/components/fullaccess/admin/PodcastPanel";
 import ApplicationsPanel from "@/components/fullaccess/admin/ApplicationsPanel";
 import AdmissionsPanel from "@/components/admision/admin/AdmissionsPanel";
 
@@ -11,9 +12,11 @@ const TABS = [
   { key: "admisiones", label: "Admisiones" },
   { key: "secciones", label: "Secciones" },
   { key: "contenido", label: "Contenido" },
+  { key: "podcast", label: "Podcast" },
   { key: "stats", label: "Estadísticas" },
   { key: "artistas", label: "Artistas" },
   { key: "demos", label: "Demo / Master" },
+  { key: "testimonios", label: "Testimonios" },
   { key: "proyectos", label: "Proyectos" },
   { key: "etapas", label: "Metodología" },
   { key: "solicitudes", label: "Solicitudes" },
@@ -69,6 +72,8 @@ export default function FullAccessAdmin() {
           {tab === "secciones" && <SectionOrderPanel />}
 
           {tab === "contenido" && <SettingsPanel />}
+
+          {tab === "podcast" && <PodcastPanel />}
 
           {tab === "stats" && (
             <ListPanel
@@ -178,6 +183,27 @@ export default function FullAccessAdmin() {
                   label: "Audio MASTER",
                   type: "media",
                   accept: "audio/*",
+                  wide: true,
+                },
+              ]}
+            />
+          )}
+
+          {tab === "testimonios" && (
+            <SortablePanel
+              title="Testimonios"
+              description="Tarjetas verticales con vídeo. Acepta enlace de Vimeo/YouTube o código embed. Arrastra para reordenar."
+              entity="Testimonial"
+              defaults={{ name: "", video_url: "", cover_url: "", order: 0, is_visible: true }}
+              fields={[
+                { key: "name", label: "Nombre (interno)" },
+                { key: "is_visible", label: "Visible", type: "bool" },
+                { key: "video_url", label: "Enlace o código embed", type: "textarea", wide: true },
+                {
+                  key: "cover_url",
+                  label: "Portada (opcional)",
+                  type: "media",
+                  accept: "image/*",
                   wide: true,
                 },
               ]}
