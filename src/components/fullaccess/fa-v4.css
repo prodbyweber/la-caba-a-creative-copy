@@ -449,7 +449,7 @@
   display: none;
 }
 .fa-dmcard {
-  flex: 0 0 84%;
+  flex: 0 0 min(88%, 460px);
   scroll-snap-align: start;
   scroll-snap-stop: always;
   border: 1px solid var(--fa-line);
@@ -509,8 +509,8 @@
   font-family: inherit;
   font-size: 10px;
   font-weight: 800;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-transform: none;
   cursor: pointer;
 }
 .fa-dmcard__opt.is-on {
@@ -526,11 +526,14 @@
 .fa-dmcard__bar {
   position: relative;
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
-  height: 16px;
+  height: 22px;
   cursor: pointer;
   touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 .fa-dmcard__bar::before {
   content: "";
@@ -541,12 +544,30 @@
   border-radius: 999px;
   background: rgba(241, 239, 232, 0.16);
 }
-.fa-dmcard__bar span {
+.fa-dmcard__bar:focus-visible {
+  outline: 2px solid var(--fa-orange);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+.fa-dmcard__fill {
   position: relative;
   display: block;
   height: 3px;
   border-radius: 999px;
   background: var(--fa-orange);
+  pointer-events: none;
+}
+.fa-dmcard__knob {
+  position: absolute;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  margin-left: -5.5px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: var(--fa-cream);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
 }
 .fa-dm__empty {
   margin-top: 12px;
@@ -554,7 +575,7 @@
   line-height: 1.5;
   color: var(--fa-faint);
 }
-@media (min-width: 900px) {
+@media (min-width: 720px) {
   .fa-dmcard {
     flex: 0 0 calc(50% - 6px);
   }
