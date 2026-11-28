@@ -110,9 +110,20 @@
 }
 
 /* ---------- Testimonios ---------- */
+.fa-testis-sec {
+  padding: clamp(26px, 4vw, 54px) 0;
+  border-top: 1px solid var(--fa-line);
+}
+
 .fa-testis__wrap {
-  max-width: 900px;
+  max-width: 760px;
   margin: 0 auto;
+}
+
+.fa-testis__title {
+  font-size: clamp(1.3rem, 4.2vw, 2.3rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
 }
 
 .fa-testis__head {
@@ -149,8 +160,8 @@
 
 .fa-testis {
   display: flex;
-  gap: 14px;
-  margin-top: clamp(18px, 3vw, 32px);
+  gap: 12px;
+  margin-top: clamp(14px, 2.4vw, 22px);
   padding-bottom: 4px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -164,11 +175,11 @@
 
 .fa-tcard {
   position: relative;
-  flex: 0 0 calc((100% - 28px) / 3);
+  flex: 0 0 calc((100% - 24px) / 3);
   aspect-ratio: 9 / 16;
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  border-radius: 20px;
+  border-radius: 16px;
   border: 1px solid var(--fa-line);
   background: #0b0b0c;
   overflow: hidden;
@@ -232,15 +243,19 @@
   }
 }
 
-@media (max-width: 1023px) {
-  .fa-tcard {
-    flex-basis: calc((100% - 14px) / 2);
-  }
-}
-
 @media (max-width: 640px) {
+  .fa-testis {
+    gap: 10px;
+  }
+
   .fa-tcard {
-    flex-basis: 78%;
+    flex-basis: calc((100% - 20px) / 3);
+    border-radius: 12px;
+  }
+
+  .fa-tcard__play {
+    width: 38px;
+    height: 38px;
   }
 
   .fa-podcast__play {

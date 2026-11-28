@@ -811,8 +811,18 @@
    pantalla. El móvil conserva su composición tal cual.
    ============================================================ */
 @media (min-width: 900px) {
+  /* Portada centrada en 16:9: el VSL se ve entero, grande y sin barras. */
+  .fa-hero {
+    padding-top: 84px;
+  }
   .fa-cover {
-    --cover-h: clamp(300px, 42vh, 470px);
+    --cover-h: auto;
+    width: min(1180px, calc(100% - 64px));
+    height: auto;
+    aspect-ratio: 16 / 9;
+    margin: 0 auto;
+    border-radius: 18px;
+    border: 1px solid var(--fa-line);
   }
   .fa-cover__content {
     padding-bottom: clamp(20px, 2.2vw, 38px);
@@ -829,7 +839,7 @@
     height: 74px;
   }
   .fa-unlockmod {
-    padding-top: 16px;
+    padding-top: 30px;
   }
   .fa-unlockmod__hint {
     font-size: 11.5px;
@@ -842,7 +852,7 @@
     margin-top: 12px;
   }
   .fa-statsrow {
-    padding: 22px 0 24px;
+    padding: 34px 0 36px;
   }
   .fa-statsrow__value {
     font-size: clamp(2rem, 3.2vw, 3.1rem);
@@ -851,7 +861,7 @@
     margin-top: 6px;
   }
   .fa-brands {
-    padding: 18px 0 20px;
+    padding: 28px 0 30px;
   }
   .fa-brands__viewport {
     margin-top: 10px;

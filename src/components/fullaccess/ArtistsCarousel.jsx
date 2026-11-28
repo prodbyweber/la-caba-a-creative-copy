@@ -84,9 +84,8 @@ export default function ArtistsCarousel({ artists, settings = {} }) {
     <section className="fa-artists">
       <div className="fa-wrap">
         <div className="fa-artists__head">
-          <span className="fa-eyebrow">{settings.artists_eyebrow || "Respaldo"}</span>
           <h2 className="fa-display fa-artists__title">
-            {settings.artists_title || "Artistas que confiaron en nosotros."}
+            {(settings.artists_title || "Artistas que confiaron en nosotros").replace(/\.\s*$/, "")}
           </h2>
         </div>
       </div>

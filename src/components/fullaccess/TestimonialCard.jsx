@@ -10,7 +10,11 @@ export default function TestimonialCard({ item }) {
   const source = parseVideoSource(item.video_url);
   const embed = parseVideoSource(item.video_url, { autoplay: true });
   const vimeoForThumb = !item.cover_url && source?.kind === "vimeo" ? item.video_url : "";
-  const { poster } = useVimeoThumb(vimeoForThumb, item.cover_url || source?.thumb || "");
+  const { poster } = useVimeoThumb(
+    vimeoForThumb,
+    item.cover_url || source?.thumb || "",
+    "640x1136"
+  );
 
   if (!source) return null;
 
