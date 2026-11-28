@@ -9,7 +9,10 @@ export function extractEmbedSrc(input) {
 }
 
 /** Interpreta un enlace de Vimeo/YouTube o un código embed. */
-export function parseVideoSource(input, { autoplay = false, chromeless = false } = {}) {
+export function parseVideoSource(
+  input,
+  { autoplay = false, chromeless = false, muted = false } = {}
+) {
   const raw = String(input || "").trim();
   if (!raw) return null;
   const source = extractEmbedSrc(raw) || raw;
@@ -28,7 +31,7 @@ export function parseVideoSource(input, { autoplay = false, chromeless = false }
     // Sin interfaz de Vimeo: solo el vídeo, con sonido y sin pantalla final.
     if (chromeless) {
       params.set("controls", "0");
-      params.set("muted", "0");
+      params.set("muted", muted ? "1" : "0");
       params.set("playsinline", "1");
       params.set("pip", "0");
       params.set("keyboard", "0");

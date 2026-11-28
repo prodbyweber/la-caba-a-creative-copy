@@ -22,7 +22,14 @@ export default function useInlinePlayer(rawUrl) {
   const [playing, setPlaying] = useState(false);
 
   const source = useMemo(
-    () => parseVideoSource(rawUrl, { autoplay: autoplayOn, chromeless: true }),
+    () =>
+      parseVideoSource(rawUrl, {
+        autoplay: autoplayOn,
+        chromeless: true,
+        // El autoplay del navegador solo se concede en silencio: el audio se
+        // activa en cuanto el vídeo arranca.
+        muted: autoplayOn,
+      }),
     [rawUrl, autoplayOn]
   );
   const embedUrl = source?.embedUrl || "";
@@ -39,23 +46,17 @@ export default function useInlinePlayer(rawUrl) {
     idRef.current = `inline-${counter}`;
   }
 
-  // Preparado en silencio antes de que llegue el clic, nunca en reproducción.
+  // Se prepara al cargar la página, igual que el VSL: cuando llega el clic el
+  // reproductor ya está listo y el vídeo arranca con sonido a la primera.
   useEffect(() => {
     if (!interactive || mounted) return undefined;
-    const node = containerRef.current;
-    if (!node) return undefined;
-    if (typeof IntersectionObserver !== "function") {
-      setMounted(true);
-      return undefined;
+    const boot = () => setMounted(true);
+    if (typeof window.requestIdleCallback === "function") {
+      const handle = window.requestIdleCallback(boot, { timeout: 1200 });
+      return () => window.cancelIdleCallback(handle);
     }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) setMounted(true);
-      },
-      { rootMargin: "400px" }
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
+    const timer = window.setTimeout(boot, 400);
+    return () => window.clearTimeout(timer);
   }, [interactive, mounted]);
 
   const pause = useCallback(() => {
@@ -85,7 +86,16 @@ export default function useInlinePlayer(rawUrl) {
     runPromise(player.setVolume(1));
     const result = player.play();
     if (result && typeof result.catch === "function") {
-      result.catch(() => setAutoplayOn(true));
+      result.catch(() => {
+        // Si el navegador bloquea el arranque con sonido, se arranca en
+        // silencio y se activa el audio al instante, sin otro clic.
+        player
+          .setMuted(true)
+          .then(() => player.play())
+          .then(() => player.setMuted(false))
+          .then(() => player.setVolume(1))
+          .catch(() => setAutoplayOn(true));
+      });
     }
   }, [interactive, pause]);
 
