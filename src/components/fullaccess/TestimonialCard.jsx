@@ -13,8 +13,19 @@ export default function TestimonialCard({ item }) {
     item.cover_url || source?.thumb || "",
     "640x1136"
   );
-  const { mounted, engaged, playing, interactive, containerRef, iframeRef, embedUrl, play, pause } =
-    useInlinePlayer(item.video_url);
+  const {
+    mounted,
+    engaged,
+    playing,
+    interactive,
+    containerRef,
+    iframeRef,
+    embedUrl,
+    play,
+    pause,
+    reloadKey,
+    handleIframeLoad,
+  } = useInlinePlayer(item.video_url);
 
   if (!source) return null;
 
@@ -22,8 +33,10 @@ export default function TestimonialCard({ item }) {
     <article className="fa-tcard" ref={containerRef}>
       {mounted ? (
         <iframe
+          key={reloadKey}
           ref={iframeRef}
           src={embedUrl}
+          onLoad={handleIframeLoad}
           title={item.name || "Testimonio"}
           allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
           allowFullScreen

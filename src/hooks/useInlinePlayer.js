@@ -10,27 +10,30 @@ const runPromise = (result) =>
 
 /**
  * Reproductor en línea de testimonios y podcast.
- * Se prepara en silencio al entrar en pantalla, pero el primer clic siempre
- * arranca el vídeo con sonido: si el reproductor aún no está listo, el propio
- * iframe arranca con autoplay desde ese mismo clic. Nunca se deja el play
- * pendiente fuera del gesto del visitante (eso obligaba a pulsar dos veces).
+ * El iframe se monta una sola vez al cargar la página y el reproductor de Vimeo
+ * se engancha cuando el iframe ya ha cargado, así que responde a la primera.
+ * El clic del visitante arranca el vídeo con audio dentro de su propio gesto.
+ * Si en ese gesto el reproductor no respondiera, hay dos redes: el play se
+ * ejecuta en cuanto esté listo y, como último recurso, el propio iframe arranca
+ * solo en silencio y el audio entra al instante. Nunca hace falta un 2º clic.
  */
 export default function useInlinePlayer(rawUrl) {
   const [mounted, setMounted] = useState(false);
-  const [autoplayOn, setAutoplayOn] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [ytAutoplay, setYtAutoplay] = useState(false);
+  const [selfAutoplay, setSelfAutoplay] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [engaged, setEngaged] = useState(false);
   const [playing, setPlaying] = useState(false);
 
   const source = useMemo(
     () =>
       parseVideoSource(rawUrl, {
-        autoplay: autoplayOn,
+        autoplay: ytAutoplay || selfAutoplay,
         chromeless: true,
-        // El autoplay del navegador solo se concede en silencio: el audio se
-        // activa en cuanto el vídeo arranca.
-        muted: autoplayOn,
+        muted: selfAutoplay,
       }),
-    [rawUrl, autoplayOn]
+    [rawUrl, ytAutoplay, selfAutoplay]
   );
   const embedUrl = source?.embedUrl || "";
   const interactive = source?.kind === "vimeo";
@@ -39,6 +42,10 @@ export default function useInlinePlayer(rawUrl) {
   const iframeRef = useRef(null);
   const playerRef = useRef(null);
   const readyRef = useRef(false);
+  const pendingRef = useRef(false);
+  const mutedStartRef = useRef(false);
+  const startedRef = useRef(false);
+  const clickTimerRef = useRef(null);
   const idRef = useRef("");
 
   if (!idRef.current) {
@@ -46,8 +53,7 @@ export default function useInlinePlayer(rawUrl) {
     idRef.current = `inline-${counter}`;
   }
 
-  // Se prepara al cargar la página, igual que el VSL: cuando llega el clic el
-  // reproductor ya está listo y el vídeo arranca con sonido a la primera.
+  // Se prepara al cargar la página, igual que el VSL.
   useEffect(() => {
     if (!interactive || mounted) return undefined;
     const boot = () => setMounted(true);
@@ -59,48 +65,75 @@ export default function useInlinePlayer(rawUrl) {
     return () => window.clearTimeout(timer);
   }, [interactive, mounted]);
 
+  // Red de seguridad: si el evento load del iframe no llegara, se engancha igual.
+  useEffect(() => {
+    if (!mounted || !interactive || loaded) return undefined;
+    const timer = window.setTimeout(() => setLoaded(true), 3000);
+    return () => window.clearTimeout(timer);
+  }, [mounted, interactive, loaded]);
+
+  useEffect(() => () => window.clearTimeout(clickTimerRef.current), []);
+
+  const handleIframeLoad = useCallback(() => setLoaded(true), []);
+
   const pause = useCallback(() => {
+    window.clearTimeout(clickTimerRef.current);
     setPlaying(false);
     releasePlayback(idRef.current);
     const player = playerRef.current;
     if (player) runPromise(player.pause());
   }, []);
 
-  // Todo ocurre dentro del gesto: el vídeo suena desde el primer clic.
+  // Arranque con sonido; si el navegador exige silencio, arranca en silencio y
+  // el audio se activa en cuanto el vídeo empieza.
+  const startPlayback = useCallback((player) => {
+    if (!player) return;
+    runPromise(player.setMuted(false));
+    runPromise(player.setVolume(1));
+    const result = player.play();
+    if (result && typeof result.catch === "function") {
+      result.catch(() => {
+        mutedStartRef.current = true;
+        player
+          .setMuted(true)
+          .then(() => player.play())
+          .catch(() => {
+            mutedStartRef.current = false;
+          });
+      });
+    }
+  }, []);
+
+  // El play se resuelve siempre dentro del gesto del visitante.
   const play = useCallback(() => {
     claimPlayback(idRef.current, pause);
     setMounted(true);
     if (!interactive) {
       // Fuente sin SDK (YouTube): arranca con el autoplay del propio iframe.
       setEngaged(true);
-      setAutoplayOn(true);
+      setYtAutoplay(true);
       return;
     }
+
     const player = playerRef.current;
-    if (!player || !readyRef.current) {
-      // Sin reproductor listo: el iframe arranca solo con este mismo clic.
-      setAutoplayOn(true);
-      return;
-    }
-    runPromise(player.setMuted(false));
-    runPromise(player.setVolume(1));
-    const result = player.play();
-    if (result && typeof result.catch === "function") {
-      result.catch(() => {
-        // Si el navegador bloquea el arranque con sonido, se arranca en
-        // silencio y se activa el audio al instante, sin otro clic.
-        player
-          .setMuted(true)
-          .then(() => player.play())
-          .then(() => player.setMuted(false))
-          .then(() => player.setVolume(1))
-          .catch(() => setAutoplayOn(true));
-      });
-    }
-  }, [interactive, pause]);
+    if (player && readyRef.current) startPlayback(player);
+    else pendingRef.current = true;
+
+    // Último recurso: si el reproductor no responde, el iframe se remonta con
+    // autoplay en silencio y el audio entra en cuanto empieza.
+    window.clearTimeout(clickTimerRef.current);
+    clickTimerRef.current = window.setTimeout(() => {
+      if (startedRef.current || readyRef.current || selfAutoplay) return;
+      pendingRef.current = true;
+      mutedStartRef.current = true;
+      setLoaded(false);
+      setSelfAutoplay(true);
+      setReloadKey((key) => key + 1);
+    }, 1600);
+  }, [interactive, pause, startPlayback, selfAutoplay]);
 
   useEffect(() => {
-    if (!mounted || !interactive || !iframeRef.current) return undefined;
+    if (!mounted || !loaded || !interactive || !iframeRef.current) return undefined;
     let cancelled = false;
     let player;
 
@@ -111,12 +144,17 @@ export default function useInlinePlayer(rawUrl) {
         playerRef.current = player;
 
         player.on("playing", () => {
+          startedRef.current = true;
+          window.clearTimeout(clickTimerRef.current);
           setPlaying(true);
           setEngaged(true);
           claimPlayback(idRef.current, pause);
-          // Si el navegador arrancó en silencio, el audio se activa al momento.
-          runPromise(player.setMuted(false));
-          runPromise(player.setVolume(1));
+          // Solo si el navegador obligó a arrancar en silencio.
+          if (mutedStartRef.current) {
+            mutedStartRef.current = false;
+            runPromise(player.setMuted(false));
+            runPromise(player.setVolume(1));
+          }
         });
 
         player.on("pause", () => {
@@ -136,7 +174,14 @@ export default function useInlinePlayer(rawUrl) {
         player
           .ready()
           .then(() => {
+            if (cancelled) return;
             readyRef.current = true;
+            runPromise(player.setMuted(false));
+            runPromise(player.setVolume(1));
+            if (pendingRef.current) {
+              pendingRef.current = false;
+              startPlayback(player);
+            }
           })
           .catch(() => {});
       })
@@ -153,7 +198,19 @@ export default function useInlinePlayer(rawUrl) {
       }
       playerRef.current = null;
     };
-  }, [mounted, autoplayOn, interactive, pause]);
+  }, [mounted, loaded, interactive, pause, startPlayback, reloadKey]);
 
-  return { mounted, engaged, playing, interactive, containerRef, iframeRef, embedUrl, play, pause };
+  return {
+    mounted,
+    engaged,
+    playing,
+    interactive,
+    reloadKey,
+    containerRef,
+    iframeRef,
+    embedUrl,
+    play,
+    pause,
+    handleIframeLoad,
+  };
 }

@@ -9,8 +9,19 @@ export default function PodcastSection({ podcast }) {
   const source = parseVideoSource(podcast.video_url);
   const vimeoForThumb = !podcast.cover_url && source?.kind === "vimeo" ? podcast.video_url : "";
   const { poster } = useVimeoThumb(vimeoForThumb, podcast.cover_url || source?.thumb || "");
-  const { mounted, engaged, playing, interactive, containerRef, iframeRef, embedUrl, play, pause } =
-    useInlinePlayer(podcast.video_url);
+  const {
+    mounted,
+    engaged,
+    playing,
+    interactive,
+    containerRef,
+    iframeRef,
+    embedUrl,
+    play,
+    pause,
+    reloadKey,
+    handleIframeLoad,
+  } = useInlinePlayer(podcast.video_url);
 
   if (podcast.is_visible === false || !source) return null;
 
@@ -25,8 +36,10 @@ export default function PodcastSection({ podcast }) {
         <div className="fa-podcast__player" ref={containerRef}>
           {mounted ? (
             <iframe
+              key={reloadKey}
               ref={iframeRef}
               src={embedUrl}
+              onLoad={handleIframeLoad}
               title={podcast.title}
               allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
               allowFullScreen
