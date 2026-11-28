@@ -10,7 +10,7 @@ export default function DemoMasterRow({ eyebrow, projects = [] }) {
   return (
     <div className="fa-dm">
       <div className="fa-wrap">
-        <span className="fa-eyebrow">{eyebrow || "Demo & Master"}</span>
+        <h2 className="fa-display fa-h2 fa-dm__title">{eyebrow || "Demo & Master"}</h2>
       </div>
 
       {list.length > 0 ? (

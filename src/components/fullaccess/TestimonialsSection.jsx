@@ -27,7 +27,7 @@ export default function TestimonialsSection({ items = [] }) {
       <div className="fa-wrap">
         <div className="fa-testis__wrap">
           <div className="fa-testis__head">
-            <h2 className="fa-display fa-testis__title">Experiencias que dejan huella</h2>
+            <h2 className="fa-display fa-h2 fa-testis__title">Experiencias que dejan huella</h2>
             <div className="fa-testis__nav">
               <button
                 type="button"

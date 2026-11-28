@@ -438,7 +438,7 @@
 .fa-dm__rail {
   display: flex;
   gap: 12px;
-  margin-top: 14px;
+  margin-top: clamp(16px, 2.4vw, 26px);
   padding: 4px clamp(20px, 5vw, 56px) 8px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;

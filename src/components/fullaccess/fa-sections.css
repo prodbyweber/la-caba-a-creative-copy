@@ -13,6 +13,10 @@
   margin-top: 0;
 }
 
+.fa-dm__title {
+  color: var(--fa-cream);
+}
+
 /* ---------- Podcast ---------- */
 .fa-podcast__head {
   display: flex;
@@ -121,9 +125,9 @@
 }
 
 .fa-testis__title {
-  font-size: clamp(1.3rem, 4.2vw, 2.3rem);
-  line-height: 1;
-  letter-spacing: -0.03em;
+  font-size: clamp(2.1rem, 6.4vw, 4.6rem);
+  line-height: 0.94;
+  letter-spacing: -0.045em;
 }
 
 .fa-testis__head {

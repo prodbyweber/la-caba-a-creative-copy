@@ -12,7 +12,7 @@ export default function Methodology({ settings = {} }) {
     <section className="fa-method" id="metodologia">
       <div className="fa-wrap">
         <div className="fa-sec-head">
-          <span className="fa-eyebrow">Metodología</span>
+          <span className="fa-eyebrow">Workflow</span>
           <h2 className="fa-display fa-h2">{METHOD_TITLE}</h2>
         </div>
 

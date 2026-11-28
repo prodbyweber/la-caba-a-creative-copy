@@ -7,9 +7,6 @@ import StageVideo from "@/components/fullaccess/StageVideo";
 export default function MethodologyStage({ stage, studioUrl }) {
   return (
     <article className="fa-mstage">
-      <span className="fa-mstage__num">
-        {stage.num} · {stage.key}
-      </span>
       <h3 className="fa-display fa-mstage__title">{stage.title}</h3>
       <p className="fa-mstage__p">{stage.text}</p>
 

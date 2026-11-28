@@ -1,12 +1,12 @@
 // Metodología de Cabaña Full Access (/start).
-// Tres bloques compactos: etiqueta, titular, una frase y tres puntos clave.
+// Tres bloques compactos: titular, una frase y tres puntos clave.
 export const METHOD_TITLE = "Las tres etapas de Cabaña Full Access";
 
 export const METHOD_STAGES = [
   {
     num: "01",
     key: "EXPLORAR",
-    title: "ENCUENTRA TU SONIDO",
+    title: "Explorar",
     text: "Probamos géneros, fusiones y referencias hasta definir una dirección sonora propia.",
     items: ["Beatmaking", "Instrumentales exclusivas", "Dirección sonora"],
     media: "genres",
@@ -14,7 +14,7 @@ export const METHOD_STAGES = [
   {
     num: "02",
     key: "DESCUBRIR",
-    title: "CREA TU MÚSICA EN EL ESTUDIO",
+    title: "Descubrir",
     text: "Sesiones presenciales uno a uno con Santiago Weber para convertir tus ideas en canciones.",
     items: ["Sesiones presenciales", "FLOW CAMP", "Producción y songwriting"],
     media: "studio",
@@ -23,9 +23,14 @@ export const METHOD_STAGES = [
   {
     num: "03",
     key: "LANZAR",
-    title: "PREPARA TU MÚSICA PARA EL MUNDO",
-    text: "Organizamos tu catálogo y construimos la dirección y el plan para presentarlo al público.",
-    items: ["Selección de canciones", "Dirección artística y visual", "Calendario de lanzamientos"],
+    title: "Lanzar",
+    text: "Definimos cómo presentar tu proyecto, diferenciamos tu identidad artística y trazamos el camino para conectar tu música con el público adecuado.",
+    items: [
+      "Selección y organización de canciones",
+      "Dirección artística e identidad visual",
+      "Estrategia de posicionamiento",
+      "Marketing y planificación de lanzamientos",
+    ],
     media: null,
   },
 ];
