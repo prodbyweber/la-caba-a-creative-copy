@@ -1,22 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { unlockKey } from "@/lib/fullAccess";
+import { loadVimeoPlayer } from "@/lib/vimeoPlayer";
+import { claimPlayback, releasePlayback } from "@/lib/videoBus";
 
 const DEFAULT_UNLOCK = 249;
 const JUMP_TOLERANCE = 1.5;
-
-function loadSdk() {
-  if (window.Vimeo?.Player) return Promise.resolve(window.Vimeo);
-  if (window.__faVimeoPromise) return window.__faVimeoPromise;
-  window.__faVimeoPromise = new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = "https://player.vimeo.com/api/player.js";
-    script.async = true;
-    script.onload = () => resolve(window.Vimeo);
-    script.onerror = () => reject(new Error("Vimeo no disponible"));
-    document.head.appendChild(script);
-  });
-  return window.__faVimeoPromise;
-}
+const PLAYER_ID = "vsl";
 
 const isTouchDevice = () =>
   typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
@@ -201,6 +190,7 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
     const player = playerRef.current;
     setPlaying(false);
     setLoading(false);
+    releasePlayback(PLAYER_ID);
     markUnlocked();
     setProgress(1);
     await exitFullscreen();
@@ -225,7 +215,7 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
     let player;
 
     const boot = () => {
-      loadSdk()
+      loadVimeoPlayer()
         .then((Vimeo) => {
           if (cancelled || !iframeRef.current) return;
           player = new Vimeo.Player(iframeRef.current);
@@ -253,6 +243,10 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
             setLoading(false);
             setPlaying(true);
             setStarted(true);
+            // Toma el turno: pausa cualquier otro vídeo que estuviera sonando.
+            claimPlayback(PLAYER_ID, () => {
+              player.pause().catch(() => {});
+            });
             if (firstPlayRef.current) {
               firstPlayRef.current = false;
               player.setMuted(false).catch(() => {});
@@ -260,7 +254,10 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
             }
           });
 
-          player.on("pause", () => setPlaying(false));
+          player.on("pause", () => {
+            setPlaying(false);
+            releasePlayback(PLAYER_ID);
+          });
           player.on("ended", () => endedRef.current());
 
           player
@@ -316,6 +313,10 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
     }
     player.setMuted(false).catch(() => {});
     player.setVolume(1).catch(() => {});
+    // En el mismo gesto: pausa cualquier otro vídeo antes de arrancar.
+    claimPlayback(PLAYER_ID, () => {
+      player.pause().catch(() => {});
+    });
     const result = player.play();
     if (result && typeof result.catch === "function") {
       result.catch(() => {
@@ -334,6 +335,10 @@ export default function useVimeoPlayer({ settings, unlocked, onUnlock, suspended
     }
     player.setMuted(false).catch(() => {});
     player.setVolume(1).catch(() => {});
+    // En el mismo gesto: pausa cualquier otro vídeo antes de reanudar.
+    claimPlayback(PLAYER_ID, () => {
+      player.pause().catch(() => {});
+    });
     runPromise(player.play());
   }, [playing]);
 

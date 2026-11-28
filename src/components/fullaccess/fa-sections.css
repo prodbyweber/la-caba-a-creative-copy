@@ -269,3 +269,18 @@
     scroll-behavior: auto;
   }
 }
+
+/* Capa transparente sobre el vídeo en reproducción: un toque lo pausa. */
+.fa-tcard__tap,
+.fa-tcard__resume,
+.fa-podcast__tap,
+.fa-podcast__resume {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}

@@ -9,7 +9,7 @@ export function extractEmbedSrc(input) {
 }
 
 /** Interpreta un enlace de Vimeo/YouTube o un código embed. */
-export function parseVideoSource(input, { autoplay = false } = {}) {
+export function parseVideoSource(input, { autoplay = false, chromeless = false } = {}) {
   const raw = String(input || "").trim();
   if (!raw) return null;
   const source = extractEmbedSrc(raw) || raw;
@@ -25,6 +25,25 @@ export function parseVideoSource(input, { autoplay = false } = {}) {
       app_id: "58479",
     });
     if (autoplay) params.set("autoplay", "1");
+    // Sin interfaz de Vimeo: solo el vídeo, con sonido y sin pantalla final.
+    if (chromeless) {
+      params.set("controls", "0");
+      params.set("muted", "0");
+      params.set("playsinline", "1");
+      params.set("pip", "0");
+      params.set("keyboard", "0");
+      params.set("speed", "0");
+      params.set("logo", "0");
+      params.set("outro", "0");
+      params.set("cards", "0");
+      params.set("like", "0");
+      params.set("share", "0");
+      params.set("watch_later", "0");
+      params.set("badge", "0");
+      params.set("cc", "0");
+      params.set("chapters", "0");
+      params.set("transcript", "0");
+    }
     const hash = source.match(/[?&]h=([a-zA-Z0-9]+)/);
     if (hash) params.set("h", hash[1]);
     return {
