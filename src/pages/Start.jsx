@@ -14,7 +14,7 @@ import SelectedProjects from "@/components/fullaccess/SelectedProjects";
 import Methodology from "@/components/fullaccess/Methodology";
 
 export default function Start() {
-  const { settings, projects, demos, artists } = useFullAccessContent();
+  const { settings, projects, demos, artists, sectionOrder } = useFullAccessContent();
   const [unlocked, setUnlocked] = useState(false);
   const navigate = useNavigate();
 
@@ -37,6 +37,30 @@ export default function Start() {
     navigate(`/admision?${next.toString()}`);
   }, [navigate]);
 
+  // Orden de secciones editable desde el panel (Full Access → Secciones).
+  const sections = {
+    stats: <StatsSection key="stats" />,
+    brands: <BrandsStrip key="brands" />,
+    artists: <ArtistsCarousel key="artists" artists={artists} settings={settings} />,
+    projects: <SelectedProjects key="projects" projects={projects} />,
+    methodology: <Methodology key="methodology" settings={settings} demos={demos} />,
+    closing: (
+      <footer className="fa-wrap" key="closing">
+        <div className="fa-endcta">
+          <button type="button" className="fa-cta" onClick={openBrief}>
+            Envía tu proyecto
+            <ArrowRight size={17} />
+          </button>
+        </div>
+
+        <div className="fa-foot">
+          <span>Cabaña Creative · Madrid</span>
+          <span>Full Access · Programa de desarrollo artístico</span>
+        </div>
+      </footer>
+    ),
+  };
+
   return (
     <div className="fa">
       <FullAccessNav />
@@ -50,26 +74,7 @@ export default function Start() {
         />
       </div>
 
-      <StatsSection />
-      <BrandsStrip />
-      <ArtistsCarousel artists={artists} settings={settings} />
-      <SelectedProjects projects={projects} />
-      <Methodology settings={settings} demos={demos} />
-
-      <footer className="fa-wrap">
-        <div className="fa-endcta">
-          <button type="button" className="fa-cta" onClick={openBrief}>
-            Envía tu proyecto
-            <ArrowRight size={17} />
-          </button>
-        </div>
-
-        <div className="fa-foot">
-          <span>Cabaña Creative · Madrid</span>
-          <span>Full Access · Programa de desarrollo artístico</span>
-        </div>
-      </footer>
-
+      {sectionOrder.map((key) => sections[key] || null)}
     </div>
   );
 }

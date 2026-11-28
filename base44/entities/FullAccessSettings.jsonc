@@ -157,6 +157,13 @@
       "type": "number",
       "default": 7,
       "description": "Plazas disponibles que se muestran en la pantalla final de /admision"
+    },
+    "section_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Orden de las secciones de /start: stats, brands, artists, projects, methodology, closing"
     }
   },
   "required": [],

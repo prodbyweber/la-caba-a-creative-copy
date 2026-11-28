@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { base44 } from "@/api/base44Client";
+import { normalizeSectionOrder } from "@/lib/fullAccessSections";
 import {
   FA_DEFAULTS,
   FA_STATS_FALLBACK,
@@ -63,5 +64,6 @@ export default function useFullAccessContent() {
     stages: data?.stages || FA_STAGES,
     artists: data?.artists || [],
     collabLogos: data?.collabLogos || [],
+    sectionOrder: normalizeSectionOrder(data?.settings?.section_order),
   };
 }
